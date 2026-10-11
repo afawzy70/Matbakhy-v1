@@ -1546,8 +1546,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Onboarding/meals/slots/order queue; accept deadline and allowed actions; handover/cash report; statement; query refresh and scope-safe UI",
       "then": "Cook can fulfill pickup and delivery using real API; other kitchen data inaccessible",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-022/evidence.json"
+      ]
     },
     {
       "id": "TC-123",

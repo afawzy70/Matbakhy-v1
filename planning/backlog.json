@@ -782,7 +782,7 @@
       "id": "MB-022",
       "phase": "P05",
       "title": "Build cook workspace",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-012",
@@ -809,9 +809,11 @@
       "scenario_ids": [
         "TC-122"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-022/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Cook workspace (operations web) on the real API with dashboard/settings/statement endpoints and a Playwright workflow; self-reviewed; refunds/remittances in statements await MB-025."
     },
     {
       "id": "MB-023",
