@@ -1,5 +1,7 @@
 # UX review package (MB-004) — DRAFT, approval PENDING
 
+> **Owner direction update, 2026-10-11:** Use [the terracotta/Cairo reference](approved/DESIGN.md) and [Claude handoff](approved/README.md) for visual implementation. The owner selected the original rich-card homepage and rejected green. The older prototype below remains a behavioral reference; its visual-direction questions, font and colors are superseded. Whole-product UX approval remains pending.
+
 A clickable, static prototype of the Matbakhy critical journeys for owner review. Every kitchen, meal, price, address and policy in it is synthetic. It illustrates screen structure, content and states; it is not the product, and server rules (quotes, stock, transitions) are only simulated.
 
 Visual approval status: **PENDING** — see [approval record](approval.md). No approval has been given or inferred.
