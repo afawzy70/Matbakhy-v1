@@ -1,0 +1,105 @@
+{
+  "run_id": "20261011-MB-028",
+  "story_id": "MB-028",
+  "phase": "P06",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Cook, staff and customer browser workflows against the real local stack (Playwright, Chromium), including reviews, favorites, moderation and basket replacement",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-039",
+      "observed": "ReviewsAndFavoritesIntegrationTest (PostgreSQL): review of a non-completed order 409, of another customer's order 404, ratings 0 and 6 422, second review of the same order 409; public list and kitchen/meal rating summaries contain only VISIBLE reviews and no order or customer data; hiding a review (content.moderate, reason, version) removes it from the list and the aggregate (3.5 -> 2.0); cook forbidden; audited. Browser journey: customer-b reviews the completed order in the customer web; a second submission after reload is refused by the server and exactly one review row exists; the moderator hides the reported review in the operations web and it disappears from the public meal page."
+    },
+    {
+      "id": "TC-040",
+      "observed": "ReviewsAndFavoritesIntegrationTest: repeated PUT of a favorite keeps one row and DELETE is idempotent; a favorite whose meal is no longer public stays listed with available=false; a non-public meal cannot be added (404); another customer's order is 404 and anonymous access is 401 (private order link). Customer web: the account page lists unavailable favorites without a link (component test). Browser journey: the meal is favorited from the meal page (pressed state from the server list) and appears in the account page."
+    },
+    {
+      "id": "TC-128",
+      "observed": "Browser journey on the real stack: order placed, cooked and completed; review once; meal page shows the visible rating summary and review; favorite and account page; report; moderator queue (API-098) shows the report count and hides it with a reason (audit row checked); order-again link opens the meal page so the next order is re-quoted at the current server price; basket replacement confirmation. Component tests: account page (profile with preferred language, favorites with unavailable marking, inbox, support cases, addresses, deletion request after explicit confirmation), meal-page favorite/report, order review form and order-again link, staff review queue sending the review version and reason. Integration test: moderation queue lists reported visible reviews with counts and reasons and hidden reviews with their reason, never reporter identities; cook and customer 403; invalid filter 422."
+    },
+    {
+      "id": "TC-147",
+      "observed": "Browser journey: with a second synthetic OPEN slot of the same kitchen (test-only SQL), adding the meal for the other slot shows the replacement confirmation; choosing to keep the basket leaves the stored basket slot unchanged; confirming replaces it with the other slot. Component tests: a basket of another kitchen is kept on cancel and replaced (new kitchen, slot and single line) only on confirmation; no replacement is offered while a placement from the current basket is pending."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-028/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Verified-order reviews, idempotent favorites and staff moderation exercised against PostgreSQL and in the browser.",
+      "Moderation queue exposes report counts and reasons only; no reporter identities.",
+      "Basket replacement now asks for confirmation (BR-018 client part, split from TC-018).",
+      "Residual: draft-to-approved visual restyle of the customer screens to the terracotta homepage hierarchy is pending (tokens and Cairo applied); dark palette unreviewed; deletion uses the draft retention policy version."
+    ]
+  },
+  "open_defects": []
+}

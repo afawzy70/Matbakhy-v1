@@ -14,6 +14,9 @@ import { env, sql } from "./fixtures";
  * MB-028 (TC-128): the customer reviews the completed order once, sees the visible rating on the meal page, keeps the
  * meal as a favorite in the account page and reports the review; a moderator (ops-a, granted by the cook workflow)
  * finds it in the reported-review queue and hides it with a reason, after which it leaves the public list and rating.
+ *
+ * TC-147 (BR-018 client part): with a second synthetic slot of the same kitchen (test-only SQL), adding the meal for
+ * the other slot asks before replacing the basket; keeping it leaves the basket unchanged, replacing it switches slot.
  */
 const c = customerStrings.ar;
 const t = strings.ar;
@@ -169,6 +172,35 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByText(c.noReviews)).toBeVisible();
   expect(sql(`SELECT count(*) FROM audit_event WHERE action = 'review.moderation'`)).toBe("1");
   await opsContext.close();
+
+  // One kitchen and one slot per basket: replacing needs explicit confirmation; cancelling keeps the basket.
+  sql(`WITH s AS (SELECT * FROM cook_slot WHERE kitchen_id = (SELECT kitchen_id FROM meal WHERE title_ar = 'كشري تجريبي') AND state = 'OPEN'
+         ORDER BY starts_at LIMIT 1),
+       n AS (INSERT INTO cook_slot (id, kitchen_id, local_date, starts_at, ends_at, lead_minutes, cutoff_at, max_portions, state)
+         SELECT gen_random_uuid(), kitchen_id, local_date + 1, starts_at + interval '1 day', ends_at + interval '1 day', lead_minutes,
+                cutoff_at + interval '1 day', max_portions, 'OPEN' FROM s RETURNING id)
+       INSERT INTO meal_slot (id, cook_slot_id, meal_id, capacity)
+         SELECT gen_random_uuid(), n.id, ms.meal_id, ms.capacity FROM n, meal_slot ms JOIN s ON ms.cook_slot_id = s.id`);
+  const cartSlot = () => page.evaluate(() => (JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "null") as { slotId: string } | null)?.slotId);
+  await page.reload();
+  await expect(page.getByRole("radio")).toHaveCount(2);
+  await page.getByRole("radio").first().check();
+  await page.getByRole("button", { name: c.addToCart }).click();
+  await expect(page.getByText(c.added)).toBeVisible();
+  const firstSlot = await cartSlot();
+  await page.getByRole("radio").nth(1).check();
+  await page.getByRole("button", { name: c.addToCart }).click();
+  const prompt = page.getByRole("alertdialog", { name: c.replaceTitle });
+  await expect(prompt).toBeVisible();
+  await prompt.getByRole("button", { name: c.keepBasket }).click();
+  await expect(page.getByText(c.basketKept)).toBeVisible();
+  expect(await cartSlot(), "cancelling keeps the previous basket").toBe(firstSlot);
+  await page.getByRole("button", { name: c.addToCart }).click();
+  await page.getByRole("alertdialog", { name: c.replaceTitle }).getByRole("button", { name: c.replaceBasket }).click();
+  await expect(page.getByText(c.added)).toBeVisible();
+  const replaced = await cartSlot();
+  expect(replaced, "confirming replaces the basket with the other slot").not.toBe(firstSlot);
+  expect(replaced).toBeTruthy();
 
   await cookContext.close();
   await customerContext.close();

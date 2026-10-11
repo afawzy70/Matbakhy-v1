@@ -14,7 +14,7 @@ const out = resolve(process.argv[2] ?? "specimen");
 mkdirSync(out, { recursive: true });
 const tokens = JSON.parse(readFileSync(new URL("../tokens.json", import.meta.url), "utf8"));
 const require = createRequire(import.meta.url);
-const fontDir = dirname(require.resolve("@fontsource/ibm-plex-sans-arabic/package.json"));
+const fontDir = dirname(require.resolve("@fontsource/cairo/package.json"));
 const fontCss = ["arabic-400", "arabic-700", "latin-400", "latin-700"]
   .map((f) => `<link rel="stylesheet" href="file://${join(fontDir, f + ".css")}">`).join("\n");
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
@@ -74,11 +74,11 @@ try {
         await p.goto("file://" + file);
         await p.evaluate(() => document.fonts.ready);
         const fonts = await p.evaluate(async () => {
-          await document.fonts.load('400 16px "IBM Plex Sans Arabic"', "مطبخي");
-          await document.fonts.load('700 16px "IBM Plex Sans Arabic"', "Matbakhy");
+          await document.fonts.load('400 16px "Cairo"', "مطبخي");
+          await document.fonts.load('700 16px "Cairo"', "Matbakhy");
           return {
-            arabic: document.fonts.check('16px "IBM Plex Sans Arabic"', "مطبخي ج.م"),
-            loaded: [...document.fonts].filter((f) => f.family.includes("IBM Plex Sans Arabic") && f.status === "loaded").length,
+            arabic: document.fonts.check('16px "Cairo"', "مطبخي ج.م"),
+            loaded: [...document.fonts].filter((f) => f.family.includes("Cairo") && f.status === "loaded").length,
           };
         });
         if (!fonts.arabic || fonts.loaded < 2) {
@@ -95,4 +95,4 @@ try {
   await browser.close();
 }
 writeFileSync(join(out, "specimen-results.json"), JSON.stringify(results, null, 2) + "\n");
-console.log(`PASS: rendered ${results.length} specimens with IBM Plex Sans Arabic loaded into ${out}`);
+console.log(`PASS: rendered ${results.length} specimens with Cairo loaded into ${out}`);

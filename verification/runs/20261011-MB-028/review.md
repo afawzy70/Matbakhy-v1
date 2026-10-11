@@ -10,7 +10,8 @@ Favorites, verified-order reviews, review reports and staff review moderation (b
 2. Favorites (BR-040): PUT/DELETE are idempotent; unavailable meals stay listed with `available` false and are not linked in the account page; private orders stay owner-only (404 for others, 401 anonymous).
 3. Reports are once per reporter and review, rate-limited, and the staff queue exposes counts and reasons only, never reporter identities (asserted in the integration test).
 4. Moderation requires `content.moderate`, a reason and the current version; every change is audited (integration test; browser journey checks the audit row).
-5. "Order again" opens the meal page so a new server quote applies today's price; the client never stores prices.
+5. Basket replacement (BR-018 client part, TC-147): adding a meal of another kitchen or slot asks before replacing; keeping leaves the basket unchanged; replacement is refused while a placement from the current basket is pending (component tests and browser journey).
+6. "Order again" opens the meal page so a new server quote applies today's price; the client never stores prices.
 
 ## Residual
 - Visual design uses draft tokens until O05; P06 gate remains blocked on O05.
@@ -18,3 +19,4 @@ Favorites, verified-order reviews, review reports and staff review moderation (b
 - Share links are the public meal page address; no kitchen profile page in the customer web yet.
 - Notification channel preferences have no API in the contract; only language preference is offered.
 - Accessibility audit is MB-029.
+- The customer screens use the approved palette and Cairo via tokens, but their layout still follows the earlier draft; restyling to the approved homepage hierarchy (intent tiles, stacked food cards, dishes/kitchens switch, bottom navigation) is remaining UI work.

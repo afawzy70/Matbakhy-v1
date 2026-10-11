@@ -19,3 +19,20 @@ To reproduce without changing project dependencies, install `jsdom@26.1.0` into 
 Integration follow-up: run the browser check and inspect all three screens before porting. Replace remote assets with approved local assets, integrate shared product tokens/fonts, and verify existing checkout/order journeys in the selected visual system. This package does not close MB-004 or O05.
  
 Publication used the GitHub connector because shell Git had no credentials. Checks ran locally against the identical published source tree `57bc7666a524ab4728b300953e1c2426c41930ff`; only this evidence file changes afterwards.
+
+## Integration into `implementation/mvp` (Claude Code, 2026-10-11, self-review)
+
+Merged `design/approved-terracotta` (b83630f) into `implementation/mvp` without conflicts (merge 912d447). Checks run in the implementation environment (Node 24.21.0, Chromium 1194 preinstalled at `/opt/pw-browsers`):
+
+| Check | Result |
+|---|---|
+| `node --check docs/design/approved/app.js` | PASS |
+| `check-dom.cjs` with jsdom 26.1.0 in an external temporary directory (`NODE_PATH`) | PASS |
+| `check.cjs` with Playwright 1.56.1 and `CHROMIUM_PATH` set to the preinstalled Chromium | PASS: filters, reset, search, modes, price filter, routes, quantity/capacity, basket replacement/cancel, returning state, no horizontal overflow and all targets at least 44 px at 320/390/420 px, no page errors |
+| Visual inspection of home, kitchen and dish screenshots at 320/390/420 px (RTL) | Inspected. One defect fixed: at 320 px the portion label and "details" action wrapped inside their buttons; the card action row now wraps instead (`style.css`). `check.cjs` re-run PASS after the fix |
+| Cairo loading in Chromium (Google Fonts from the reference page) | Loaded (`document.fonts.check` true) |
+| Remote food photographs | Did not load in this environment (requests failed); the image fallback was shown. Licensing/availability not established |
+| Workspace lint (`eslint .`) | Initially FAILED on the reference files (browser globals in a classic script, `require()` in CommonJS checks). Fixed by declaring the correct environments in `eslint.config.js` (classic browser script; CommonJS for `.cjs`; browser globals for in-page callbacks of the check scripts); no rule weakened for product code |
+| Desktop, English, native rendering; full accessibility audit | NOT_RUN for this reference |
+
+The screenshot written by `check.cjs` is not committed (generated output). Product integration of the tokens and Cairo font is recorded in `docs/status/latest.md`.

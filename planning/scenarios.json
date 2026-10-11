@@ -326,7 +326,7 @@
     },
     {
       "id": "TC-018",
-      "title": "Basket: A basket/order contains exactly one cook and one slot",
+      "title": "Basket: the server rejects any basket or quote mixing cooks or slots",
       "rule_ids": [
         "BR-018"
       ],
@@ -334,14 +334,15 @@
       "phase": "P04",
       "level": "integration",
       "severity": "high",
-      "given": "Basket has cook A items",
-      "when": "Customer adds cook B or another slot",
-      "then": "UI asks to replace; server rejects any mixed basket payload",
+      "given": "Basket has cook A items in one slot",
+      "when": "A quote or order payload adds cook B or another slot",
+      "then": "Server rejects any mixed basket payload; the client replacement confirmation is verified separately (TC-147 web, TC-148 native)",
       "status": "PASS",
       "evidence": [
         "verification/runs/20261011-MB-017/evidence.json",
         "verification/runs/20261011-P04-gate/evidence.json"
-      ]
+      ],
+      "correction_note": "2026-10-11 owner correction: the original PASS covered only server rejection; the UI replacement confirmation was split into TC-147/TC-148 and is not established by this evidence."
     },
     {
       "id": "TC-019",
@@ -1970,6 +1971,38 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Monitor agreed observation window; reconcile cash/errors/support; repair production defects safely; publish operator/user guides and next backlog",
       "then": "All four surfaces accepted; operational metrics and incidents reviewed; residual risks explicitly accepted or fixed",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-147",
+      "title": "Basket replacement confirmation in the customer web",
+      "rule_ids": [
+        "BR-018"
+      ],
+      "story_id": "MB-028",
+      "phase": "P06",
+      "level": "browser",
+      "severity": "high",
+      "given": "The web basket holds cook A items for one slot",
+      "when": "The customer adds a meal of cook B or another slot",
+      "then": "The UI asks before replacing; cancelling keeps the previous basket unchanged; confirming replaces it with the new kitchen and slot only",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-148",
+      "title": "Basket replacement confirmation in the native apps",
+      "rule_ids": [
+        "BR-018"
+      ],
+      "story_id": "MB-032",
+      "phase": "P07",
+      "level": "native",
+      "severity": "high",
+      "given": "The native basket holds cook A items for one slot",
+      "when": "The customer adds a meal of cook B or another slot",
+      "then": "The app asks before replacing; cancelling keeps the previous basket; confirming replaces it (Android and iOS verified separately)",
       "status": "NOT_RUN",
       "evidence": []
     }

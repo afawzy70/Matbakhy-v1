@@ -1,7 +1,7 @@
-import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
-import "@fontsource/ibm-plex-sans-arabic/arabic-700.css";
-import "@fontsource/ibm-plex-sans-arabic/latin-400.css";
-import "@fontsource/ibm-plex-sans-arabic/latin-700.css";
+import "@fontsource/cairo/arabic-400.css";
+import "@fontsource/cairo/arabic-700.css";
+import "@fontsource/cairo/latin-400.css";
+import "@fontsource/cairo/latin-700.css";
 import "@matbakhy/design-tokens/tokens.css";
 import "./app.css";
 import { StrictMode } from "react";

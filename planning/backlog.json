@@ -1014,7 +1014,7 @@
       "id": "MB-028",
       "phase": "P06",
       "title": "Complete customer account and trust features",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -1029,7 +1029,8 @@
         "verified-order reviews/report",
         "reorder via new quote",
         "inbox/support",
-        "Review moderation for staff (API-073), carried from MB-023 because reviews are created in this story"
+        "Review moderation for staff (API-073), carried from MB-023 because reviews are created in this story",
+        "Basket replacement confirmation in the customer web (BR-018 client part, split from TC-018 on 2026-10-11)"
       ],
       "artifacts": [
         "apps/customer-web",
@@ -1045,7 +1046,8 @@
       "scenario_ids": [
         "TC-039",
         "TC-040",
-        "TC-128"
+        "TC-128",
+        "TC-147"
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
@@ -1191,7 +1193,8 @@
       ],
       "scenario_ids": [
         "TC-049",
-        "TC-132"
+        "TC-132",
+        "TC-148"
       ],
       "evidence": [],
       "review_status": "NOT_RUN",

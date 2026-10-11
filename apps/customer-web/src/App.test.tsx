@@ -1,5 +1,5 @@
 import { brand } from "@matbakhy/design-tokens";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App, title } from "./App";
 import { savePending } from "./cart";
@@ -240,5 +240,62 @@ describe("customer web", () => {
     fireEvent.click(del);
     expect(await screen.findByText("Deletion request received; the account is disabled.")).toBeTruthy();
     expect(calls.find((c) => c.path === "/api/v1/me/deletion-requests")?.body).toEqual({ confirm: true, policyVersion: "retention-policy-draft" });
+  });
+
+  it("asks before replacing a basket of another kitchen or slot and keeps it when the customer cancels", async () => {
+    cartWithOneMeal();
+    window.location.hash = "#/meal/44444444-4444-4444-8444-444444444444";
+    const meal = {
+      id: "44444444-4444-4444-8444-444444444444",
+      title: "Fatta",
+      kitchen: { id: "k2", name: "Other kitchen" },
+      portionText: "1 plate",
+      price: egp(15000),
+      description: "",
+      ingredients: "",
+      allergenCodes: [],
+      allergenStatement: null,
+      photo: null,
+      nextSlots: [{ id: "s2", startsAt: "2026-10-12T12:00:00Z", availablePortions: 5, fulfillmentModes: ["PICKUP"] }],
+      availability: "AVAILABLE",
+    };
+    const { fetchImpl } = server({
+      [`GET /api/v1/meals/${meal.id}`]: () => ({ status: 200, body: meal }),
+      "GET /api/v1/kitchens/k2/reviews": () => ({ status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio"));
+    fireEvent.click(screen.getByRole("button", { name: "Add to cart" }));
+    const prompt = await screen.findByRole("alertdialog", { name: "Replace your cart?" });
+    fireEvent.click(within(prompt).getByRole("button", { name: "Keep my current cart" }));
+    expect(screen.getByText("Your cart is unchanged.")).toBeTruthy();
+    expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").kitchenId).toBe("k1");
+    fireEvent.click(screen.getByRole("button", { name: "Add to cart" }));
+    fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Replace cart" }));
+    const cart = JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}");
+    expect(cart.kitchenId).toBe("k2");
+    expect(cart.slotId).toBe("s2");
+    expect(cart.lines).toEqual([{ mealId: meal.id, title: "Fatta", quantity: 1 }]);
+  });
+
+  it("does not replace the basket while a placement from it is still pending", async () => {
+    cartWithOneMeal();
+    savePending({ clientRequestId: "c1", idempotencyKey: "i1", quoteId: "q1", terms: "t1", cancellation: "c1" });
+    window.location.hash = "#/meal/44444444-4444-4444-8444-444444444444";
+    const { fetchImpl } = server({
+      "GET /api/v1/meals/44444444-4444-4444-8444-444444444444": () => ({
+        status: 200,
+        body: { id: "44444444-4444-4444-8444-444444444444", title: "Fatta", kitchen: { id: "k2", name: "Other" }, portionText: "", price: egp(1), description: "", ingredients: "", allergenCodes: [], allergenStatement: null, photo: null, nextSlots: [{ id: "s2", startsAt: "2026-10-12T12:00:00Z", availablePortions: 5, fulfillmentModes: ["PICKUP"] }], availability: "AVAILABLE" },
+      }),
+      "GET /api/v1/kitchens/k2/reviews": () => ({ status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio"));
+    fireEvent.click(screen.getByRole("button", { name: "Add to cart" }));
+    expect(await screen.findByText("An order from your cart is still being confirmed. Finish it on the cart page first.")).toBeTruthy();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").kitchenId).toBe("k1");
   });
 });

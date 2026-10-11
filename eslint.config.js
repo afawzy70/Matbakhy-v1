@@ -33,8 +33,20 @@ export default tseslint.config(
     languageOptions: { globals: { ...globals.node } },
   },
   {
-    // Static browser prototype for design review (MB-004), loaded with classic script tags.
-    files: ["docs/design/prototype/**/*.js"],
+    // Static browser references for design review (MB-004 prototype and the owner-selected approved direction), loaded
+    // with classic script tags.
+    files: ["docs/design/prototype/**/*.js", "docs/design/approved/**/*.js"],
     languageOptions: { sourceType: "script", globals: { ...globals.browser } },
+  },
+  {
+    // CommonJS Node scripts: require() is their module system. The design reference checks also pass callbacks that
+    // run inside the page (Playwright evaluate, jsdom), hence browser globals there.
+    files: ["**/*.cjs"],
+    languageOptions: { sourceType: "commonjs" },
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
+  {
+    files: ["docs/design/approved/check*.cjs"],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
 );

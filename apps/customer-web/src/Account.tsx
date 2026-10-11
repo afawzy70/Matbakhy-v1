@@ -21,6 +21,7 @@ export function Account({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["Custo
 function Profile({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["CustomerProfile"]; onMeChanged: () => void }) {
   const { t } = ctx;
   const [name, setName] = useState(me.displayName ?? "");
+  const [language, setLanguage] = useState<"ar" | "en">(me.locale === "en" ? "en" : "ar");
   const [done, setDone] = useState(false);
   const { run, error, busy } = useMutation(ctx, onMeChanged);
   return (
@@ -29,11 +30,18 @@ function Profile({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["CustomerProf
       <label>
         {t.displayName} <input maxLength={120} value={name} onChange={(e) => setName(e.target.value)} />
       </label>
+      <label>
+        {t.preferredLanguage}{" "}
+        <select value={language} onChange={(e) => setLanguage(e.target.value === "en" ? "en" : "ar")}>
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+      </label>
       <button
         type="button"
         disabled={busy || !name.trim()}
         onClick={() =>
-          void run(() => ctx.api.PATCH("/api/v1/me", { body: { expectedVersion: me.version, displayName: name.trim() } })).then((ok) => setDone(ok))
+          void run(() => ctx.api.PATCH("/api/v1/me", { body: { expectedVersion: me.version, displayName: name.trim(), locale: language } })).then((ok) => setDone(ok))
         }
       >
         {t.save}

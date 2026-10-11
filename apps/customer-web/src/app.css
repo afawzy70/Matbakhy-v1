@@ -291,3 +291,9 @@ td {
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mb-space-sm);
+}

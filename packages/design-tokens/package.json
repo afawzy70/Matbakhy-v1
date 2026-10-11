@@ -18,13 +18,14 @@
     "specimen": "node scripts/render-specimen.mjs",
     "ux:journeys": "node scripts/prototype-journeys.mjs"
   },
-  "dependencies": {
-    "@fontsource/ibm-plex-sans-arabic": "5.3.0"
-  },
   "devDependencies": {
+    "@fontsource/ibm-plex-sans-arabic": "5.3.0",
     "@types/node": "24.19.2",
     "playwright-core": "1.56.1",
     "typescript": "6.0.3",
     "vitest": "5.0.3"
+  },
+  "dependencies": {
+    "@fontsource/cairo": "5.3.0"
   }
 }

@@ -1,8 +1,8 @@
 /* Generated from packages/design-tokens/tokens.json by `pnpm --filter @matbakhy/design-tokens generate`. Do not edit. */
 
 :root {
-  --mb-font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
-  --mb-font-size-xs: 12px;
+  --mb-font-family: 'Cairo', system-ui, sans-serif;
+  --mb-font-size-xs: 13px;
   --mb-font-size-sm: 14px;
   --mb-font-size-md: 16px;
   --mb-font-size-lg: 20px;
@@ -22,28 +22,33 @@
   --mb-space-xxl: 32px;
   --mb-space-xxxl: 48px;
   --mb-radius-sm: 4px;
-  --mb-radius-md: 8px;
+  --mb-radius-md: 12px;
   --mb-radius-lg: 16px;
   --mb-radius-pill: 999px;
   --mb-elevation-none: none;
-  --mb-elevation-card: 0 1px 2px rgba(43, 29, 20, 0.12), 0 2px 8px rgba(43, 29, 20, 0.08);
-  --mb-elevation-overlay: 0 8px 24px rgba(43, 29, 20, 0.18);
+  --mb-elevation-card: 0 1px 2px rgba(33, 26, 23, 0.10), 0 2px 8px rgba(33, 26, 23, 0.06);
+  --mb-elevation-overlay: 0 8px 24px rgba(33, 26, 23, 0.16);
   --mb-touch-target-min: 44px;
-  --mb-color-background: #FFFBF5;
+  --mb-color-background: #FFF8F6;
   --mb-color-surface: #FFFFFF;
-  --mb-color-surface-muted: #F6EFE6;
-  --mb-color-foreground: #2B1D14;
-  --mb-color-foreground-muted: #5E4B3C;
-  --mb-color-primary: #A63D12;
+  --mb-color-surface-muted: #F9EBE6;
+  --mb-color-surface-high: #F3E5E0;
+  --mb-color-surface-low: #FFF1EC;
+  --mb-color-foreground: #211A17;
+  --mb-color-foreground-muted: #59413B;
+  --mb-color-primary: #982505;
+  --mb-color-primary-accent: #BA3D1D;
   --mb-color-on-primary: #FFFFFF;
-  --mb-color-accent: #2F6B3A;
+  --mb-color-accent: #6B5148;
   --mb-color-on-accent: #FFFFFF;
-  --mb-color-border: #D9CBBB;
-  --mb-color-border-strong: #7E6A58;
+  --mb-color-accent-surface: #F0E4DA;
+  --mb-color-tertiary: #754600;
+  --mb-color-border: #E1BFB7;
+  --mb-color-border-strong: #8D716A;
   --mb-color-focus: #1F5FBF;
   --mb-color-danger: #A4161A;
   --mb-color-on-danger: #FFFFFF;
-  --mb-color-warning: #7A4B00;
+  --mb-color-warning: #754600;
   --mb-color-warning-surface: #FFF1D6;
   --mb-color-success: #1E6B33;
   --mb-color-success-surface: #E3F4E6;
@@ -51,17 +56,22 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --mb-color-background: #17110C;
-    --mb-color-surface: #211912;
-    --mb-color-surface-muted: #2C2219;
-    --mb-color-foreground: #F7EEE4;
-    --mb-color-foreground-muted: #CDBBA8;
-    --mb-color-primary: #F29B6B;
-    --mb-color-on-primary: #2B1206;
-    --mb-color-accent: #8FD19A;
-    --mb-color-on-accent: #0E2A14;
-    --mb-color-border: #4A3B2E;
-    --mb-color-border-strong: #9A8672;
+    --mb-color-background: #1A1210;
+    --mb-color-surface: #231916;
+    --mb-color-surface-muted: #2E221E;
+    --mb-color-surface-high: #382A25;
+    --mb-color-surface-low: #20160F;
+    --mb-color-foreground: #F7ECE8;
+    --mb-color-foreground-muted: #D8C2BB;
+    --mb-color-primary: #FFB59F;
+    --mb-color-primary-accent: #FF9A7A;
+    --mb-color-on-primary: #3A0A00;
+    --mb-color-accent: #E2C2B6;
+    --mb-color-on-accent: #2E1A13;
+    --mb-color-accent-surface: #4A3730;
+    --mb-color-tertiary: #F5BD73;
+    --mb-color-border: #4F3B35;
+    --mb-color-border-strong: #A88B83;
     --mb-color-focus: #8DB8FF;
     --mb-color-danger: #FF8A80;
     --mb-color-on-danger: #3A0606;

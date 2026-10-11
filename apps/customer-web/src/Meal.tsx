@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { formatMoney, formatTime } from "./api";
-import { loadCart, saveCart } from "./cart";
+import { loadCart, loadPending, saveCart, type Cart } from "./cart";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: boolean }) {
@@ -9,6 +9,8 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
   const [slotId, setSlotId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
+  // BR-018: a basket holds one kitchen and one slot; replacing it needs the customer's explicit confirmation.
+  const [replacement, setReplacement] = useState<Cart | null>(null);
   return (
     <Status ctx={ctx} state={meal} onRetry={reload}>
       {(m) => {
@@ -52,19 +54,59 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                   return;
                 }
                 const cart = loadCart();
-                if (cart && (cart.kitchenId !== m.kitchen.id || cart.slotId !== slot.id)) {
-                  setMessage(t.otherKitchen);
+                const next: Cart = { kitchenId: m.kitchen.id, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes, lines: [] };
+                const line = { mealId: m.id, title: m.title, quantity };
+                if (cart && cart.lines.length > 0 && (cart.kitchenId !== m.kitchen.id || cart.slotId !== slot.id)) {
+                  if (loadPending()) {
+                    // An order may already exist for the current basket; it is resolved at checkout before any change.
+                    setMessage(t.placementPending);
+                    return;
+                  }
+                  setMessage(null);
+                  setReplacement({ ...next, lines: [line] });
                   return;
                 }
                 const lines = (cart?.lines ?? []).filter((l) => l.mealId !== m.id);
-                lines.push({ mealId: m.id, title: m.title, quantity });
-                saveCart({ kitchenId: m.kitchen.id, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes, lines });
+                lines.push(line);
+                saveCart({ ...next, lines });
+                setReplacement(null);
                 setMessage(t.added);
               }}
             >
               {t.addToCart}
             </button>
+            {replacement ? (
+              <div role="alertdialog" aria-labelledby="replace-title" aria-describedby="replace-text" className="notice stack">
+                <h3 id="replace-title">{t.replaceTitle}</h3>
+                <p id="replace-text">{t.otherKitchen}</p>
+                <div className="row">
+                  <button
+                    type="button"
+                    className="danger"
+                    onClick={() => {
+                      saveCart(replacement);
+                      setReplacement(null);
+                      setMessage(t.added);
+                    }}
+                  >
+                    {t.replaceBasket}
+                  </button>
+                  <button
+                    type="button"
+                    className="secondary"
+                    autoFocus
+                    onClick={() => {
+                      setReplacement(null);
+                      setMessage(t.basketKept);
+                    }}
+                  >
+                    {t.keepBasket}
+                  </button>
+                </div>
+              </div>
+            ) : null}
             {message ? <p role="status">{message}</p> : null}
+            <ShareLink ctx={ctx} mealId={m.id} />
             {signedIn ? <FavoriteToggle ctx={ctx} mealId={m.id} /> : null}
             <KitchenReviews ctx={ctx} kitchenId={m.kitchen.id} signedIn={signedIn} />
           </article>
@@ -156,5 +198,32 @@ function KitchenReviews({ ctx, kitchenId, signedIn }: { ctx: Ctx; kitchenId: str
       </Status>
       <ErrorLine message={error} />
     </section>
+  );
+}
+
+/** The public meal address; private order links are never shared from here. Clipboard failure leaves the link selectable. */
+function ShareLink({ ctx, mealId }: { ctx: Ctx; mealId: string }) {
+  const { t } = ctx;
+  const [copied, setCopied] = useState(false);
+  const link = `${window.location.origin}${window.location.pathname}#/meal/${mealId}`;
+  return (
+    <p className="row">
+      <bdi dir="ltr" className="muted">
+        {link}
+      </bdi>
+      <button
+        type="button"
+        className="secondary"
+        onClick={() => {
+          void navigator.clipboard?.writeText(link).then(
+            () => setCopied(true),
+            () => setCopied(false),
+          );
+        }}
+      >
+        {t.shareLink}
+      </button>
+      {copied ? <span role="status">{t.linkCopied}</span> : null}
+    </p>
   );
 }
