@@ -2271,10 +2271,22 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
         };
-        /** @description PENDING typed schema. Response for API-019. */
-        Favorite: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-018. */
-        FavoritePage: Record<string, never>;
+        /** @description available is false when the meal is no longer orderable (paused, archived, hidden or kitchen not selling); the favorite is kept. */
+        Favorite: {
+            /** Format: uuid */
+            mealId: string;
+            title: string | null;
+            priceMinor: number | null;
+            kitchenName: string;
+            available: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        FavoritePage: {
+            items: components["schemas"]["Favorite"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         FieldError: {
             field: string;
             code: string;
@@ -2880,8 +2892,13 @@ export interface components {
             reason: string;
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Request for API-073: visibility, reason, expectedVersion */
-        PostOpsReviewsModerationRequest: Record<string, never>;
+        /** @description Hidden reviews leave public lists and ratings; audited. */
+        PostOpsReviewsModerationRequest: {
+            /** @enum {string} */
+            visibility: "VISIBLE" | "HIDDEN";
+            reason: string;
+            expectedVersion: number;
+        };
         /** @description Requires staff.grant and recent MFA. Revoking the last active staff.grant holder is 409. */
         PostOpsStaffGrantRevocationsRequest: {
             /** Format: uuid */
@@ -2903,10 +2920,17 @@ export interface components {
             reasonCode: "CHANGED_MIND" | "ORDERED_BY_MISTAKE" | "TOO_SLOW" | "OTHER";
             note?: string;
         };
-        /** @description PENDING typed schema. Request for API-029: rating, text; completed only, unique order */
-        PostOrdersReviewsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-030: reasonCode, bounded description; rate limit */
-        PostReviewsReportsRequest: Record<string, never>;
+        /** @description Own COMPLETED order only (404 otherwise; 409 when not completed or already reviewed). */
+        PostOrdersReviewsRequest: {
+            rating: number;
+            text?: string;
+        };
+        /** @description Once per reporter and review; at most 20 reports per hour per account (429). */
+        PostReviewsReportsRequest: {
+            /** @enum {string} */
+            reasonCode: "OFFENSIVE" | "PRIVATE_INFO" | "SPAM" | "NOT_ABOUT_ORDER" | "OTHER";
+            description?: string;
+        };
         /** @description Always PUBLIC. A reply reopens a waiting or resolved case; closed cases accept no messages (409). */
         PostSupportCasesMessagesRequest: {
             body: string;
@@ -2951,8 +2975,6 @@ export interface components {
             environment: "PRODUCTION" | "DEVELOPMENT";
             appVersion: string;
         };
-        /** @description PENDING typed schema. Request for API-019: idempotent add */
-        PutMeFavoritesByIdRequest: Record<string, never>;
         QuoteItemRequest: {
             /** Format: uuid */
             mealId: string;
@@ -3046,12 +3068,36 @@ export interface components {
             orderId: string;
             amount: components["schemas"]["Money"];
         };
-        /** @description PENDING typed schema. Response for API-030. */
-        Report: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-029. */
-        Review: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-007. */
-        ReviewPage: Record<string, never>;
+        /** @description The author's or staff view of a review. Public lists use ReviewPage items without order or customer data. */
+        Review: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            orderId: string;
+            /** Format: uuid */
+            kitchenId: string;
+            rating: number;
+            text: string | null;
+            /** @enum {string} */
+            visibility: "VISIBLE" | "HIDDEN";
+            /** Format: date-time */
+            createdAt: string;
+            version: number;
+        };
+        /** @description Visible reviews of a kitchen, newest first, with the visible-only rating summary. No customer or order data. */
+        ReviewPage: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                rating: number;
+                text: string | null;
+                /** Format: date-time */
+                createdAt: string;
+            }[];
+            summary: components["schemas"]["RatingSummary"];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         Settlement: {
             /** Format: uuid */
             id: string;
@@ -3811,11 +3857,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutMeFavoritesByIdRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Success */
             200: {
@@ -4103,8 +4145,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4131,14 +4173,12 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Reported (repeating a report changes nothing) */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "application/json": components["schemas"]["Report"];
-                };
+                content?: never;
             };
             "4XX": components["responses"]["Error"];
             "5XX": components["responses"]["Error"];

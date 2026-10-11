@@ -297,7 +297,7 @@ paths:
       description: visible only, cursor, limit
       x-matbakhy-id: API-007
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       parameters:
         - name: kitchenId
@@ -615,7 +615,7 @@ paths:
       description: own, cursor, limit; unavailable items annotated
       x-matbakhy-id: API-018
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -642,7 +642,7 @@ paths:
       description: idempotent add
       x-matbakhy-id: API-019
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -662,12 +662,7 @@ paths:
           $ref: "#/components/responses/Error"
         5XX:
           $ref: "#/components/responses/Error"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PutMeFavoritesByIdRequest"
+
     delete:
       operationId: deleteMeFavoritesById
       tags:
@@ -676,7 +671,7 @@ paths:
       description: idempotent remove
       x-matbakhy-id: API-020
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1001,7 +996,7 @@ paths:
       description: rating, text; completed only, unique order
       x-matbakhy-id: API-029
       x-permission: ORDER_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1011,8 +1006,8 @@ paths:
           required: true
           schema: *a1
       responses:
-        "200":
-          description: Success
+        "201":
+          description: Created
           content:
             application/json:
               schema:
@@ -1036,7 +1031,7 @@ paths:
       description: reasonCode, bounded description; rate limit
       x-matbakhy-id: API-030
       x-permission: AUTHENTICATED
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1046,12 +1041,8 @@ paths:
           required: true
           schema: *a1
       responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Report"
+        "204":
+          description: Reported (repeating a report changes nothing)
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2463,7 +2454,7 @@ paths:
       description: visibility, reason, expectedVersion
       x-matbakhy-id: API-073
       x-permission: CONTENT_MODERATE
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -4686,12 +4677,37 @@ components:
           format: date-time
     Favorite:
       type: object
-      description: PENDING typed schema. Response for API-019.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: available is false when the meal is no longer orderable (paused, archived, hidden or kitchen not selling); the favorite is kept.
+      required: [mealId, title, priceMinor, kitchenName, available, createdAt]
+      properties:
+        mealId:
+          type: string
+          format: uuid
+        title:
+          type: [string, "null"]
+        priceMinor:
+          type: [integer, "null"]
+        kitchenName:
+          type: string
+        available:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
     FavoritePage:
       type: object
-      description: PENDING typed schema. Response for API-018.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Favorite"
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     FieldError:
       type: object
       additionalProperties: false
@@ -6158,8 +6174,20 @@ components:
           minimum: 0
     PostOpsReviewsModerationRequest:
       type: object
-      description: "PENDING typed schema. Request for API-073: visibility, reason, expectedVersion"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Hidden reviews leave public lists and ratings; audited.
+      required: [visibility, reason, expectedVersion]
+      properties:
+        visibility:
+          type: string
+          enum: [VISIBLE, HIDDEN]
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsStaffGrantRevocationsRequest:
       type: object
       additionalProperties: false
@@ -6209,12 +6237,29 @@ components:
           maxLength: 3900
     PostOrdersReviewsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-029: rating, text; completed only, unique order"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Own COMPLETED order only (404 otherwise; 409 when not completed or already reviewed).
+      required: [rating]
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        text:
+          type: string
+          maxLength: 1000
     PostReviewsReportsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-030: reasonCode, bounded description; rate limit"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Once per reporter and review; at most 20 reports per hour per account (429).
+      required: [reasonCode]
+      properties:
+        reasonCode:
+          type: string
+          enum: [OFFENSIVE, PRIVATE_INFO, SPAM, NOT_ABOUT_ORDER, OTHER]
+        description:
+          type: string
+          maxLength: 500
     PostSupportCasesMessagesRequest:
       type: object
       additionalProperties: false
@@ -6329,10 +6374,6 @@ components:
           type: string
           minLength: 1
           maxLength: 40
-    PutMeFavoritesByIdRequest:
-      type: object
-      description: "PENDING typed schema. Request for API-019: idempotent add"
-      x-schema-status: PENDING
     QuoteItemRequest:
       type: object
       additionalProperties: false
@@ -6528,18 +6569,68 @@ components:
           format: uuid
         amount:
           $ref: "#/components/schemas/Money"
-    Report:
-      type: object
-      description: PENDING typed schema. Response for API-030.
-      x-schema-status: PENDING
     Review:
       type: object
-      description: PENDING typed schema. Response for API-029.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: The author's or staff view of a review. Public lists use ReviewPage items without order or customer data.
+      required: [id, orderId, kitchenId, rating, text, visibility, createdAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        kitchenId:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        text:
+          type: [string, "null"]
+          maxLength: 1000
+        visibility:
+          type: string
+          enum: [VISIBLE, HIDDEN]
+        createdAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
     ReviewPage:
       type: object
-      description: PENDING typed schema. Response for API-007.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Visible reviews of a kitchen, newest first, with the visible-only rating summary. No customer or order data.
+      required: [items, summary, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, rating, text, createdAt]
+            properties:
+              id:
+                type: string
+                format: uuid
+              rating:
+                type: integer
+                minimum: 1
+                maximum: 5
+              text:
+                type: [string, "null"]
+              createdAt:
+                type: string
+                format: date-time
+        summary:
+          $ref: "#/components/schemas/RatingSummary"
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     Settlement:
       type: object
       additionalProperties: false

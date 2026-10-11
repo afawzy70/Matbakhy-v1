@@ -64,7 +64,7 @@
       "permission": "PUBLIC",
       "response_type": "ReviewPage",
       "contract": "visible only, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-008",
@@ -163,7 +163,7 @@
       "permission": "SELF",
       "response_type": "FavoritePage",
       "contract": "own, cursor, limit; unavailable items annotated",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-019",
@@ -172,7 +172,7 @@
       "permission": "SELF",
       "response_type": "Favorite",
       "contract": "idempotent add",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-020",
@@ -181,7 +181,7 @@
       "permission": "SELF",
       "response_type": "NoContent",
       "contract": "idempotent remove",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-021",
@@ -262,16 +262,16 @@
       "permission": "ORDER_OWNER",
       "response_type": "Review",
       "contract": "rating, text; completed only, unique order",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-030",
       "method": "POST",
       "path": "/api/v1/reviews/{reviewId}/reports",
       "permission": "AUTHENTICATED",
-      "response_type": "Report",
+      "response_type": "NoContent",
       "contract": "reasonCode, bounded description; rate limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-031",
@@ -658,7 +658,7 @@
       "permission": "CONTENT_MODERATE",
       "response_type": "Review",
       "contract": "visibility, reason, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-074",

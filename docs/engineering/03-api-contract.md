@@ -230,3 +230,10 @@ Online payment/courier routes are conditional and not part of cash-first API acc
 - Placement stores the client request id and idempotency key in the browser before sending. After a lost response the customer retries with the same keys and sees the one existing order; after a reload the cart page asks `GET /api/v1/orders/by-request/{clientRequestId}` first. A definitive 4xx (expired quote, price change) clears the stored keys and shows the server reason.
 - Order page refreshes every 10 seconds: state, timeline, handover code when the server provides it, kitchen contact after acceptance, cancel while pending and a cancellation request after acceptance. Loading, empty, error-with-retry, offline and signed-out states are explicit. Arabic RTL by default, English LTR; draft brand tokens until the owner's visual approval (O05).
 
+## Favorites, reviews and review moderation (MB-028, backend)
+
+- Favorites (Flyway V20): `GET/PUT/DELETE /api/v1/me/favorites[/{mealId}]`; PUT and DELETE are idempotent; only currently public meals can be added (404 otherwise); a favorite whose meal is paused, archived, hidden or whose kitchen does not sell stays listed with `available` false.
+- Reviews: `POST /api/v1/orders/{id}/reviews` by the order's customer for a COMPLETED order, once (409 on repeat), rating integer 1..5, optional text up to 1000. `GET /api/v1/kitchens/{id}/reviews` (public) lists only VISIBLE reviews without order or customer data, with the visible-only rating summary; meal detail and discovery show the same kitchen rating (`KitchenRatings` port implemented by orders).
+- Reports: `POST /api/v1/reviews/{id}/reports` (authenticated) — once per reporter and review (repeat is a no-op), at most 20 per hour (429); hidden reviews cannot be reported.
+- Moderation (carried from MB-023): `POST /api/v1/ops/reviews/{id}/moderation` (`content.moderate`, reason, `expectedVersion`) hides or restores a review; hidden reviews leave public lists and ratings; audited.
+

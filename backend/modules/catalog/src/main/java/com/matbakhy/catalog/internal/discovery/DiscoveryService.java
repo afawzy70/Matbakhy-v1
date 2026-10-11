@@ -67,10 +67,13 @@ public class DiscoveryService {
     private final ObjectStorage storage;
     private final Clock clock;
 
-    DiscoveryService(JdbcTemplate jdbc, MealOffers offers, ObjectStorage storage, Clock clock) {
+    private final com.matbakhy.catalog.api.KitchenRatings ratings;
+
+    DiscoveryService(JdbcTemplate jdbc, MealOffers offers, ObjectStorage storage, com.matbakhy.catalog.api.KitchenRatings ratings, Clock clock) {
         this.jdbc = jdbc;
         this.offers = offers;
         this.storage = storage;
+        this.ratings = ratings;
         this.clock = clock;
     }
 
@@ -191,11 +194,13 @@ public class DiscoveryService {
         }
         Map<UUID, Offer> byMeal = offers.offers(modes.keySet(), modes, in.date(), in.slotId());
         boolean en = in.english();
+        Map<UUID, com.matbakhy.catalog.api.KitchenRatings.Rating> byKitchen = ratings.ratings(page.stream().map(Row::kitchenId).distinct().toList());
         List<MealSummary> items = page.stream().map(r -> {
+            com.matbakhy.catalog.api.KitchenRatings.Rating rating = byKitchen.getOrDefault(r.kitchenId(), new com.matbakhy.catalog.api.KitchenRatings.Rating(0, null));
             Offer offer = byMeal.get(r.id());
             Photo photo = r.photoKey() == null ? null : new Photo(storage.publicUrl(r.photoKey()).toString(),
                     en && r.altEn() != null ? r.altEn() : r.altAr() != null ? r.altAr() : "");
-            return new MealSummary(r.id(), new KitchenSummary(r.kitchenId(), r.slug(), r.kitchenName(), new RatingSummary(0, null)),
+            return new MealSummary(r.id(), new KitchenSummary(r.kitchenId(), r.slug(), r.kitchenName(), new RatingSummary(rating.count(), rating.averageTenths())),
                     en && r.titleEn() != null ? r.titleEn() : r.titleAr(), photo, en && r.portionEn() != null ? r.portionEn() : r.portionAr(),
                     new Money(r.price(), "EGP"), offer.nextSlots(), offer.availability());
         }).toList();

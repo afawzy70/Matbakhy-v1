@@ -1,5 +1,6 @@
 package com.matbakhy.catalog.internal.meal;
 
+import com.matbakhy.catalog.api.KitchenRatings;
 import com.matbakhy.catalog.api.MediaLibrary;
 import com.matbakhy.catalog.api.MediaLibrary.Purpose;
 import com.matbakhy.catalog.api.SellerDirectory;
@@ -121,10 +122,11 @@ public class MealService {
     private final JsonMapper json;
     private final MealOffers offers;
     private final AuditLog audit;
+    private final KitchenRatings ratings;
     private final Clock clock;
 
     MealService(JdbcTemplate jdbc, SellerDirectory sellers, MediaLibrary mediaLibrary, MediaService media, JsonMapper json, MealOffers offers,
-                AuditLog audit, Clock clock) {
+                AuditLog audit, KitchenRatings ratings, Clock clock) {
         this.jdbc = jdbc;
         this.sellers = sellers;
         this.mediaLibrary = mediaLibrary;
@@ -132,6 +134,7 @@ public class MealService {
         this.json = json;
         this.offers = offers;
         this.audit = audit;
+        this.ratings = ratings;
         this.clock = clock;
     }
 
@@ -254,7 +257,8 @@ public class MealService {
         }
         List<String> allergenCodes = c.allergenDeclaration() == Declaration.CONTAINS
                 ? c.allergenCodes().stream().map(Enum::name).toList() : List.of(c.allergenDeclaration().name());
-        RatingSummary noReviews = new RatingSummary(0, null);
+        KitchenRatings.Rating r = ratings.ratings(List.of(seller.kitchenId())).getOrDefault(seller.kitchenId(), new KitchenRatings.Rating(0, null));
+        RatingSummary noReviews = new RatingSummary(r.count(), r.averageTenths());
         List<String> modes = new ArrayList<>();
         if (seller.pickupEnabled()) {
             modes.add("PICKUP");
