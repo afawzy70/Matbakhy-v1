@@ -855,7 +855,7 @@
       "id": "MB-024",
       "phase": "P05",
       "title": "Build support and order exceptions",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-019",
@@ -882,9 +882,11 @@
         "TC-041",
         "TC-124"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-024/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Support cases with private staff notes, safety escalation and SLA; cancellation requests resolved through audited exception cancellation; ops order monitoring; self-reviewed. Proposed SLA/category defaults recorded."
     },
     {
       "id": "MB-025",

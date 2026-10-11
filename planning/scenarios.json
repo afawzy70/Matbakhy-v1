@@ -759,8 +759,10 @@
       "given": "A case includes staff-only notes and safety category",
       "when": "Customer/cook fetches case and ops queue refreshes",
       "then": "Notes hidden; safety task visible to authorized ops with timestamp",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-024/evidence.json"
+      ]
     },
     {
       "id": "TC-042",
@@ -1580,8 +1582,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Cases/messages/private notes; SLA and safety categories; cancellation request/ops resolution; handover override with step-up; failure queues",
       "then": "Customer sees only own public case messages; safety escalation and immutable order timeline verified",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-024/evidence.json"
+      ]
     },
     {
       "id": "TC-125",
