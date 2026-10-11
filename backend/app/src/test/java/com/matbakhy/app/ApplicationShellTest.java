@@ -31,6 +31,9 @@ class ApplicationShellTest {
 
     @Test
     void non_health_actuator_endpoints_are_not_exposed() throws Exception {
-        assertThat(get("/actuator/env").statusCode()).isEqualTo(404);
+        // Not exposed (management exposure is health only) and, since MB-009, also denied before routing.
+        HttpResponse<String> env = get("/actuator/env");
+        assertThat(env.statusCode()).isIn(401, 403, 404);
+        assertThat(env.body()).doesNotContain("propertySources", "activeProfiles", "systemProperties");
     }
 }

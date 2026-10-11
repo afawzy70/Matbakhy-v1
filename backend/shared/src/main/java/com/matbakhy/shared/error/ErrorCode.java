@@ -8,6 +8,8 @@ public enum ErrorCode {
     MALFORMED_REQUEST(400, false),
     UNAUTHENTICATED(401, false),
     FORBIDDEN(403, false),
+    ACCOUNT_DISABLED(403, false),
+    STEP_UP_REQUIRED(403, false),
     NOT_FOUND(404, false),
     METHOD_NOT_ALLOWED(405, false),
     UNSUPPORTED_MEDIA_TYPE(415, false),

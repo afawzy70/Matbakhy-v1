@@ -59,3 +59,19 @@ Use 409 `STOCK_CHANGED`, `PRICE_CHANGED`, `QUOTE_EXPIRED`, `SLOT_CLOSED`, `STATE
 Order history endpoint is authoritative. Poll visible active orders with bounded backoff; background/native refresh refetches history. Push is a hint with order ID/event ID and no sensitive address. A stale push cannot regress state.
 
 Online payment/courier routes are conditional and not part of cash-first API acceptance. When enabled, webhook signature verification uses raw request bytes, replay window and event deduplication before side effects. Provider/browser redirect never marks payment captured. See [integration design](07-integrations.md).
+
+## Authentication and sessions (MB-009, implemented)
+
+| Client | Mechanism | Backend behavior |
+|---|---|---|
+| Customer and operations web | OIDC authorization code (with PKCE) via the backend: browser navigates to `GET /oauth2/authorization/keycloak`; provider redirects to `/login/oauth2/code/keycloak`; backend redirects to `WEB_POST_LOGIN_REDIRECT` | Server-side session stored in PostgreSQL (`spring_session`), cookie `MATBAKHY_SESSION` (HttpOnly, SameSite=Lax, Secure in staging/production), idle timeout `WEB_SESSION_TIMEOUT` (default 30 min) |
+| Web mutations | `XSRF-TOKEN` cookie (readable by the SPA) echoed in the `X-XSRF-TOKEN` header | Missing or wrong token: 403, no state change |
+| Web logout | `POST /api/v1/auth/logout` with the CSRF header | Deletes only this session; responds `{"idpLogoutUrl": ...}` so the app can also end the provider session |
+| Native app | Authorization code + PKCE (S256) in the system browser against the public `matbakhy-mobile` client (redirect `matbakhy-dev://auth/callback` in development); `Authorization: Bearer <access token>` | Stateless; validates signature (provider JWKS), issuer, audience `matbakhy-api` and expiry; no cookies are read, so no CSRF token is needed |
+
+- Every authenticated identity maps to one local `app_user` by (issuer, subject). Permissions come only from server-side state. Provider role claims (for example a realm `admin` role) grant nothing; staff grants arrive with MB-011.
+- Errors use the standard body: 401 `UNAUTHENTICATED` (no or invalid credentials, expired session or token), 403 `ACCOUNT_DISABLED` (suspended account, no profile data returned), 403 `FORBIDDEN`, 403 `STEP_UP_REQUIRED` (staff operation without recent MFA: provider `acr` in `OIDC_MFA_ACR_VALUES` or an MFA `amr`, authenticated within `OIDC_STEP_UP_MAX_AGE`). API calls are never redirected to a login page.
+- CORS: only `WEB_ALLOWED_ORIGINS` with credentials; any other origin gets 403 on preflight.
+- Implemented operations: API-009 `GET /api/v1/me` and API-010 `PATCH /api/v1/me` (optimistic `expectedVersion`; 409 `VERSION_CONFLICT`; unknown or privileged fields give 400).
+- Provider endpoints assume Keycloak's path layout under `OIDC_ISSUER`; `OIDC_BACKCHANNEL_ISSUER` sets the server-to-provider address inside container networks. The production identity provider is open decision O07. Staging and production refuse to start without `OIDC_WEB_CLIENT_SECRET`.
+- Native token storage, refresh, state/nonce checks and logout on device are client responsibilities delivered and verified in P07 (MB-031); this story covers the provider contract and backend validation.

@@ -3,6 +3,7 @@ package com.matbakhy.app.web;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.matbakhy.app.support.IntegrationTest;
+import com.matbakhy.app.support.ProbeSecurity;
 import com.matbakhy.shared.Money;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** TC-107 (backend): malformed monetary DTOs are rejected rather than coerced or truncated. */
 @IntegrationTest
-@Import(StrictJsonIntegrationTest.MoneyProbe.class)
+@Import({StrictJsonIntegrationTest.MoneyProbe.class, ProbeSecurity.class})
 class StrictJsonIntegrationTest {
 
     @LocalServerPort

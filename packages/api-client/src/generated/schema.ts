@@ -1779,7 +1779,7 @@ export interface components {
         /** @description Standard error body; matches backend ErrorCode/ApiError. */
         ApiError: {
             /** @enum {string} */
-            code: "MALFORMED_REQUEST" | "UNAUTHENTICATED" | "FORBIDDEN" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "VALIDATION_FAILED" | "STATE_CONFLICT" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "STOCK_CHANGED" | "PRICE_CHANGED" | "QUOTE_EXPIRED" | "SLOT_CLOSED" | "KITCHEN_UNAVAILABLE" | "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "INTERNAL_ERROR";
+            code: "MALFORMED_REQUEST" | "UNAUTHENTICATED" | "FORBIDDEN" | "ACCOUNT_DISABLED" | "STEP_UP_REQUIRED" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "VALIDATION_FAILED" | "STATE_CONFLICT" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "STOCK_CHANGED" | "PRICE_CHANGED" | "QUOTE_EXPIRED" | "SLOT_CLOSED" | "KITCHEN_UNAVAILABLE" | "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "INTERNAL_ERROR";
             messageKey: string;
             fieldErrors: components["schemas"]["FieldError"][];
             requestId: string | null;
@@ -1830,8 +1830,18 @@ export interface components {
         CookSlot: Record<string, never>;
         /** @description PENDING typed schema. Response for API-050. */
         CookSlotPage: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-009. */
-        CustomerProfile: Record<string, never>;
+        /** @description The caller's own profile (MB-009). Contains no role or staff permission data. */
+        CustomerProfile: {
+            /** Format: uuid */
+            id: string;
+            displayName: string | null;
+            /** @enum {string} */
+            locale: "ar" | "en";
+            emailVerified: boolean;
+            phoneVerified: boolean;
+            version: number;
+            capabilities: string[];
+        };
         /** @description PENDING typed schema. Response for API-017. */
         DeletionRequest: Record<string, never>;
         /** @description PENDING typed schema. Response for API-033. */
@@ -1978,8 +1988,13 @@ export interface components {
         PatchCookSlotsByIdRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-015: allowed address fields, expectedVersion */
         PatchMeAddressesByIdRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-010: displayName, locale, expectedVersion; no role fields */
-        PatchMeRequest: Record<string, never>;
+        /** @description Profile update with optimistic concurrency; unknown or privileged fields are rejected (400). */
+        PatchMeRequest: {
+            expectedVersion: number;
+            displayName?: string;
+            /** @enum {string} */
+            locale?: "ar" | "en";
+        };
         /** @description PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion */
         PatchOpsCasesByIdRequest: Record<string, never>;
         /** @description PENDING typed schema. Response for API-011. */

@@ -67,6 +67,17 @@ public class ApiExceptionHandler {
         return respond(ErrorCode.UNSUPPORTED_MEDIA_TYPE, List.of(), request);
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    ResponseEntity<ApiError> denied(org.springframework.security.access.AccessDeniedException e, HttpServletRequest request) {
+        return respond(com.matbakhy.app.security.ApiSecurityErrors.denialCode(
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication(), e), List.of(), request);
+    }
+
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    ResponseEntity<ApiError> unauthenticated(org.springframework.security.core.AuthenticationException e, HttpServletRequest request) {
+        return respond(ErrorCode.UNAUTHENTICATED, List.of(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> unexpected(Exception e, HttpServletRequest request) {
         log.error("Unhandled failure", e);

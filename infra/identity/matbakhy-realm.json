@@ -12,13 +12,41 @@
   "supportedLocales": ["ar", "en"],
   "defaultLocale": "ar",
   "accessTokenLifespan": 300,
-  "smtpServer": {
-    "host": "mail",
-    "port": "1025",
-    "from": "no-reply@matbakhy.test",
-    "fromDisplayName": "Matbakhy local"
-  },
-  "attributes": {
-    "matbakhy.note": "Local reference realm only. Clients, roles and synthetic users are added in MB-009."
-  }
+  "smtpServer": { "host": "mail", "port": "1025", "from": "no-reply@matbakhy.test", "fromDisplayName": "Matbakhy local" },
+  "attributes": { "matbakhy.note": "Local reference realm template. scripts/dev.sh fills the placeholders from infra/.env into infra/.generated (ignored by Git)." },
+  "clients": [
+    {
+      "clientId": "matbakhy-web",
+      "name": "Matbakhy web (server-side OIDC client)",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "${OIDC_WEB_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:${API_PORT}/login/oauth2/code/keycloak"],
+      "attributes": { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": "http://localhost:5173/" },
+      "protocolMappers": [ { "name": "api-audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+        "config": { "included.custom.audience": "matbakhy-api", "access.token.claim": "true", "id.token.claim": "false" } } ]
+    },
+    {
+      "clientId": "matbakhy-mobile",
+      "name": "Matbakhy customer app (public client, PKCE)",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["matbakhy-dev://auth/callback"],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "protocolMappers": [ { "name": "api-audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+        "config": { "included.custom.audience": "matbakhy-api", "access.token.claim": "true", "id.token.claim": "false" } } ]
+    }
+  ],
+  "users": [
+    { "username": "customer-a", "email": "customer-a@matbakhy.test", "emailVerified": true, "enabled": true,
+      "firstName": "Customer", "lastName": "SyntheticA",
+      "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] },
+    { "username": "customer-b", "email": "customer-b@matbakhy.test", "emailVerified": true, "enabled": true,
+      "firstName": "Customer", "lastName": "SyntheticB",
+      "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] }
+  ]
 }

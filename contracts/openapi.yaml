@@ -262,7 +262,7 @@ paths:
       description: current subject mapping, contact verification, locale and scoped capabilities
       x-matbakhy-id: API-009
       x-permission: AUTHENTICATED
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -285,7 +285,7 @@ paths:
       description: displayName, locale, expectedVersion; no role fields
       x-matbakhy-id: API-010
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3098,6 +3098,8 @@ components:
             - MALFORMED_REQUEST
             - UNAUTHENTICATED
             - FORBIDDEN
+            - ACCOUNT_DISABLED
+            - STEP_UP_REQUIRED
             - NOT_FOUND
             - METHOD_NOT_ALLOWED
             - UNSUPPORTED_MEDIA_TYPE
@@ -3226,8 +3228,30 @@ components:
       x-schema-status: PENDING
     CustomerProfile:
       type: object
-      description: PENDING typed schema. Response for API-009.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: The caller's own profile (MB-009). Contains no role or staff permission data.
+      required: [id, displayName, locale, emailVerified, phoneVerified, version, capabilities]
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: [string, "null"]
+          maxLength: 120
+        locale:
+          type: string
+          enum: [ar, en]
+        emailVerified:
+          type: boolean
+        phoneVerified:
+          type: boolean
+        version:
+          type: integer
+          minimum: 0
+        capabilities:
+          type: array
+          items:
+            type: string
     DeletionRequest:
       type: object
       description: PENDING typed schema. Response for API-017.
@@ -3627,8 +3651,20 @@ components:
       x-schema-status: PENDING
     PatchMeRequest:
       type: object
-      description: "PENDING typed schema. Request for API-010: displayName, locale, expectedVersion; no role fields"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Profile update with optimistic concurrency; unknown or privileged fields are rejected (400).
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 120
+        locale:
+          type: string
+          enum: [ar, en]
     PatchOpsCasesByIdRequest:
       type: object
       description: "PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion"

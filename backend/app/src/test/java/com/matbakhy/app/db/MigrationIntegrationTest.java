@@ -33,12 +33,12 @@ class MigrationIntegrationTest {
     void blank_database_is_migrated_by_flyway_to_the_baseline() {
         List<String> versions = jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class);
-        assertThat(versions).containsExactly("1");
+        assertThat(versions).containsExactly("1", "2");
         assertThat(jdbc.queryForObject("SELECT current_setting('server_version_num')::int / 10000", Integer.class))
                 .isEqualTo(16);
         assertThat(jdbc.queryForList(
                 "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name",
-                String.class)).contains("app_user", "idempotency_record");
+                String.class)).contains("app_user", "idempotency_record", "spring_session", "spring_session_attributes");
     }
 
     @Test

@@ -36,6 +36,8 @@ ensure_env() {
     info "creating $ENV_FILE with random local passwords"
     sed -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
         -e "s/^KEYCLOAK_ADMIN_PASSWORD=.*/KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -hex 16)/" \
+        -e "s/^OIDC_WEB_CLIENT_SECRET=.*/OIDC_WEB_CLIENT_SECRET=$(openssl rand -hex 24)/" \
+        -e "s/^DEV_USER_PASSWORD=.*/DEV_USER_PASSWORD=$(openssl rand -hex 12)/" \
         "$INFRA/.env.example" > "$ENV_FILE"
     chmod 600 "$ENV_FILE"
   fi
@@ -45,10 +47,21 @@ ensure_env() {
 
 compose() { docker compose --env-file "$ENV_FILE" -f "$INFRA/compose.yaml" "$@"; }
 
+render_realm() {
+  # Fill the realm template from the env file; the output stays out of Git (infra/.generated).
+  mkdir -p "$INFRA/.generated/identity"
+  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|${OIDC_WEB_CLIENT_SECRET}|" -e "s|\${API_PORT}|${API_PORT}|" \
+      -e "s|\${DEV_USER_PASSWORD}|${DEV_USER_PASSWORD}|g" \
+      "$INFRA/identity/matbakhy-realm.json" > "$INFRA/.generated/identity/matbakhy-realm.json"
+  # Readable by the non-root Keycloak user in the container; holds generated local-only values.
+  chmod 644 "$INFRA/.generated/identity/matbakhy-realm.json"
+}
+
 up() {
   ensure_env
   info "building API jar"
   (cd "$ROOT/backend" && ./mvnw -B -ntp -q -DskipTests package)
+  render_realm
   info "starting stack (project ${COMPOSE_PROJECT_NAME})"
   compose up --build --detach --wait --wait-timeout 300
   compose ps
@@ -74,6 +87,24 @@ smoke() {
     | curl -fsS --url "smtp://127.0.0.1:${MAIL_SMTP_PORT}" --mail-from smoke@matbakhy.test --mail-rcpt customer-a@matbakhy.test --upload-file -
   curl -fsS "http://127.0.0.1:${MAIL_UI_PORT}/api/v1/search?query=subject:$subject" | grep -q "\"Subject\":\"$subject\"" \
     || die "mail sink did not capture the message"
+  info "native client enforces PKCE (authorization without code_challenge is refused)"
+  local pkce; pkce="$(curl -s -o /dev/null -w '%{redirect_url}' "$idp/realms/matbakhy/protocol/openid-connect/auth?response_type=code&scope=openid&client_id=matbakhy-mobile&redirect_uri=matbakhy-dev%3A%2F%2Fauth%2Fcallback&state=smoke")"
+  echo "$pkce" | grep -q "error=invalid_request" || die "PKCE is not enforced for matbakhy-mobile"
+  info "anonymous private API call is denied"
+  [ "$(curl -s -o /dev/null -w '%{http_code}' "$api/api/v1/me")" = "401" ] || die "anonymous /api/v1/me is not 401"
+  info "web OIDC login through the API with a synthetic user"
+  local jar; jar="$(mktemp)"
+  local login_page action location
+  location="$(curl -s -c "$jar" -b "$jar" -o /dev/null -w '%{redirect_url}' "http://localhost:${API_PORT}/oauth2/authorization/keycloak")"
+  login_page="$(curl -s -c "$jar" -b "$jar" "$location")"
+  action="$(echo "$login_page" | grep -o 'id="kc-form-login"[^>]*action="[^"]*"' | sed 's/.*action="//; s/"$//; s/&amp;/\&/g')"
+  [ -n "$action" ] || die "Keycloak login form not found"
+  location="$(curl -s -c "$jar" -b "$jar" -o /dev/null -w '%{redirect_url}' --data-urlencode "username=customer-a" \
+    --data-urlencode "password=${DEV_USER_PASSWORD}" --data "credentialId=" "$action")"
+  case "$location" in "http://localhost:${API_PORT}/login/oauth2/code/keycloak"*) ;; *) die "login did not return to the API callback";; esac
+  curl -s -c "$jar" -b "$jar" -o /dev/null "$location"
+  curl -s -c "$jar" -b "$jar" "http://localhost:${API_PORT}/api/v1/me" | grep -q '"emailVerified":true' || { rm -f "$jar"; die "authenticated /api/v1/me failed"; }
+  rm -f "$jar"
   echo "PASS: local stack smoke checks"
 }
 
@@ -92,6 +123,8 @@ verify() {
   sed -e "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=matbakhy-verify-$$/" \
       -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
       -e "s/^KEYCLOAK_ADMIN_PASSWORD=.*/KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -hex 16)/" \
+      -e "s/^OIDC_WEB_CLIENT_SECRET=.*/OIDC_WEB_CLIENT_SECRET=$(openssl rand -hex 24)/" \
+      -e "s/^DEV_USER_PASSWORD=.*/DEV_USER_PASSWORD=$(openssl rand -hex 12)/" \
       -e "s/^POSTGRES_PORT=.*/POSTGRES_PORT=15432/" -e "s/^IDENTITY_PORT=.*/IDENTITY_PORT=18180/" \
       -e "s/^OBJECT_STORAGE_PORT=.*/OBJECT_STORAGE_PORT=19090/" -e "s/^MAIL_UI_PORT=.*/MAIL_UI_PORT=18025/" \
       -e "s/^MAIL_SMTP_PORT=.*/MAIL_SMTP_PORT=11025/" -e "s/^API_PORT=.*/API_PORT=18080/" \

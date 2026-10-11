@@ -3,6 +3,7 @@ package com.matbakhy.app.web;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.matbakhy.app.support.IntegrationTest;
+import com.matbakhy.app.support.ProbeSecurity;
 import com.matbakhy.shared.error.ApiException;
 import com.matbakhy.shared.error.ErrorCode;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** Standard error body for framework and domain failures, with request ID correlation. */
 @IntegrationTest
-@Import(ApiErrorIntegrationTest.ProbeController.class)
+@Import({ApiErrorIntegrationTest.ProbeController.class, ProbeSecurity.class})
 class ApiErrorIntegrationTest {
 
     @LocalServerPort
@@ -72,11 +73,18 @@ class ApiErrorIntegrationTest {
 
     @Test
     void unknown_route_returns_not_found_body_with_echoed_request_id() throws Exception {
-        HttpResponse<String> r = send(request("/api/v1/does-not-exist").header("X-Request-Id", "req-12345678"));
+        HttpResponse<String> r = send(request("/api/v1/test-probe/does-not-exist").header("X-Request-Id", "req-12345678"));
         assertThat(r.statusCode()).isEqualTo(404);
         assertThat(r.body()).isEqualTo("{\"code\":\"NOT_FOUND\",\"messageKey\":\"error.not_found\",\"fieldErrors\":[],"
                 + "\"requestId\":\"req-12345678\",\"retryable\":false}");
         assertThat(r.headers().firstValue("X-Request-Id")).hasValue("req-12345678");
+    }
+
+    @Test
+    void unknown_private_route_requires_authentication_before_revealing_existence() throws Exception {
+        HttpResponse<String> r = send(request("/api/v1/does-not-exist"));
+        assertThat(r.statusCode()).isEqualTo(401);
+        assertThat(r.body()).contains("\"code\":\"UNAUTHENTICATED\"");
     }
 
     @Test

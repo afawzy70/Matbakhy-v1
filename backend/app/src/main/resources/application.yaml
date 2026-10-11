@@ -12,6 +12,10 @@ spring:
   mvc:
     problemdetails:
       enabled: false
+  session:
+    timeout: ${WEB_SESSION_TIMEOUT:30m}
+    jdbc:
+      initialize-schema: never
 server:
   error:
     include-stacktrace: never
@@ -26,6 +30,16 @@ management:
     health:
       show-details: never
 matbakhy:
+  identity:
+    issuer: ${OIDC_ISSUER:http://localhost:8180/realms/matbakhy}
+    backchannel-issuer: ${OIDC_BACKCHANNEL_ISSUER:}
+    api-audience: ${OIDC_API_AUDIENCE:matbakhy-api}
+    web-client-id: ${OIDC_WEB_CLIENT_ID:matbakhy-web}
+    web-client-secret: ${OIDC_WEB_CLIENT_SECRET:}
+    allowed-origins: ${WEB_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}
+    post-login-redirect: ${WEB_POST_LOGIN_REDIRECT:http://localhost:5173/}
+    mfa-acr-values: ${OIDC_MFA_ACR_VALUES:mfa,2}
+    step-up-max-age: ${OIDC_STEP_UP_MAX_AGE:10m}
   # Required: LOCAL, CI, STAGING or PRODUCTION. No default, so a deployment cannot start unconfigured.
   environment: ${APP_ENV}
   market:

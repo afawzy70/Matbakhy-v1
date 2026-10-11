@@ -81,7 +81,7 @@ Android native compilation needs the Android SDK, platform tools and a JDK suppo
 |---|---|
 | `scripts/dev.sh doctor` | Checks Docker CLI/daemon, Compose v2, JDK 21, pinned Node, pnpm, curl, openssl; names every missing item and starts nothing |
 | `scripts/dev.sh up` | Creates `infra/.env` from `infra/.env.example` with random local passwords (first run), builds the API jar, starts the stack and waits for health |
-| `scripts/dev.sh smoke` | API health, Flyway baseline, Keycloak `matbakhy` realm OIDC discovery, S3 buckets, mail sink capture of a synthetic message |
+| `scripts/dev.sh smoke` | API health, Flyway baseline, Keycloak `matbakhy` realm OIDC discovery, S3 buckets, mail sink capture of a synthetic message, PKCE enforced for the native client, anonymous `/api/v1/me` is 401, and a full web OIDC login through the API returning the profile |
 | `scripts/dev.sh down` / `reset` | Stop / stop and delete the data volume; refuses env files not marked `MATBAKHY_ENV_MARKER=local` |
 | `scripts/dev.sh verify` | All of the above in a throwaway compose project on alternate ports, then removes it (P01-CHECK-3) |
 
@@ -92,3 +92,5 @@ Secret scan: `scripts/check_secrets.sh` runs Gitleaks 8.30.1 (digest-pinned imag
 CI (`.github/workflows/ci.yml`): clean-checkout workspace check, local stack verify and secret scan on every push and PR. It uses only the SHA-pinned checkout action; Node is downloaded from nodejs.org and checked against a recorded SHA-256, and JDK 21 is the runner's preinstalled toolchain.
 
 Windows: PowerShell equivalents are not provided yet. No PowerShell runtime was available to test them, and untested scripts are not published (BLK-002). Use WSL2 with Docker Desktop meanwhile.
+
+Local identity (MB-009): `infra/identity/matbakhy-realm.json` is a template with the `matbakhy-web` confidential client, the `matbakhy-mobile` public PKCE client and two synthetic users (`customer-a`, `customer-b`). `scripts/dev.sh up` fills in a generated client secret and a synthetic user password from `infra/.env` and writes the result to `infra/.generated/` (ignored by Git). The local user password is in `infra/.env` as `DEV_USER_PASSWORD`. Backend identity tests start their own Keycloak container from the same digest-pinned image, with per-run random secrets.

@@ -82,7 +82,7 @@
       "permission": "AUTHENTICATED",
       "response_type": "CustomerProfile",
       "contract": "current subject mapping, contact verification, locale and scoped capabilities",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-010",
@@ -91,7 +91,7 @@
       "permission": "SELF",
       "response_type": "CustomerProfile",
       "contract": "displayName, locale, expectedVersion; no role fields",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-011",
