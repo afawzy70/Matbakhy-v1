@@ -24,11 +24,13 @@
           "id": "P00-CHECK-2",
           "name": "Brand and UX artifacts review",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_design.sh"
+          ],
+          "timeout_seconds": 900,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Design token tests (contrast, drift, no hard-coded brand), Chromium specimen render with Arabic font assertion, and all prototype journeys in ar/en at 390/1280 px. Visual approval is a separate owner record (docs/design/approval.md)."
         }
       ]
     },

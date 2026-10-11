@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matbakhy UX prototype (draft)</title>
+  <link rel="stylesheet" href="../../../packages/design-tokens/node_modules/@fontsource/ibm-plex-sans-arabic/arabic-400.css">
+  <link rel="stylesheet" href="../../../packages/design-tokens/node_modules/@fontsource/ibm-plex-sans-arabic/arabic-700.css">
+  <link rel="stylesheet" href="../../../packages/design-tokens/node_modules/@fontsource/ibm-plex-sans-arabic/latin-400.css">
+  <link rel="stylesheet" href="../../../packages/design-tokens/node_modules/@fontsource/ibm-plex-sans-arabic/latin-700.css">
+  <link rel="stylesheet" href="../../../packages/design-tokens/src/generated/tokens.css">
+  <link rel="stylesheet" href="prototype.css">
+</head>
+<body>
+  <div class="banner" data-testid="prototype-banner"></div>
+  <header class="top">
+    <a class="brand" href="#/discover" data-testid="brand"></a>
+    <nav class="areas" aria-label="Prototype areas"></nav>
+    <button type="button" class="btn btn-quiet lang" data-testid="lang-toggle"></button>
+  </header>
+  <main id="screen" tabindex="-1"></main>
+  <script src="data.js"></script>
+  <script src="prototype.js"></script>
+</body>
+</html>

@@ -52,6 +52,23 @@ jobs:
       - name: Bootstrap, smoke and tear down
         run: scripts/dev.sh verify
 
+  design:
+    name: Design tokens, specimens and prototype journeys (P00-CHECK-2)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Install workspace from lockfile
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Design checks with the runner's Chrome
+        run: CHROMIUM_PATH="$(command -v google-chrome)" scripts/check_design.sh
+
   secrets:
     name: Secret scan
     runs-on: ubuntu-24.04

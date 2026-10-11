@@ -32,4 +32,9 @@ export default tseslint.config(
     files: ["**/*.{js,mjs,cjs}", "**/*.config.{ts,js}"],
     languageOptions: { globals: { ...globals.node } },
   },
+  {
+    // Static browser prototype for design review (MB-004), loaded with classic script tags.
+    files: ["docs/design/prototype/**/*.js"],
+    languageOptions: { sourceType: "script", globals: { ...globals.browser } },
+  },
 );
