@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "P05-GATE",
+  "phase": "P05",
+  "source_commit": "6736a860de134b7dd62f291b4c3013d62ac10356",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T17:14:50.804815+00:00",
+  "finished_at": "2026-10-11T17:26:08.724134+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P05-CHECK-1",
+      "name": "Cook and operations browser workflows",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/P05-CHECK-1.log"
+    },
+    {
+      "id": "P05-CHECK-2",
+      "name": "Support finance reconciliation and staff configuration",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "SupportIntegrationTest",
+        "FinanceOperationsIntegrationTest",
+        "ConfigurationIntegrationTest",
+        "StaffAccessIntegrationTest",
+        "CookWorkspaceIntegrationTest",
+        "ModerationIntegrationTest",
+        "CashAndLedgerIntegrationTest"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/P05-CHECK-2.log"
+    },
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. all P05 integration suites (PostgreSQL, Keycloak)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/LOCAL-STACK.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P05-gate/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-034",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: FinanceOperationsIntegrationTest: a pickup order of 24000 completed, cash reported and verified (24000) and commission posted produces no ledger entry of 24000; the commission receivable is 2400; the finance statement shows direction COOK_PAYS_PLATFORM, verified cash 24000 as position only, outstanding commission 2400 and one unsettled entry; customers 403, unknown kitchen 404. Cook statement (CookWorkspaceIntegrationTest) includes REFUNDS and SETTLEMENTS with the same direction."
+    },
+    {
+      "id": "TC-035",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: Refund of 1000 (not full) and 30000 (over) are 422; settlement staff 403; 24000 is REQUESTED; a second request is 409 while the first is committed; payment before approval 409; the requester cannot approve (403); after approval the statement shows APPROVED (unpaid) and no reversal; payment without reference 422; the payer cannot verify (403); verification by another person makes it VERIFIED and posts exactly one reversal (net receivable 0, outstanding 0); the idempotent replay returns the same result; another VERIFY is 409; a further refund is 409. A rejected refund frees the amount for a new request. Actions audited. Mutation counting only verified refunds failed."
+    },
+    {
+      "id": "TC-036",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: Two concurrent batches selecting the same entry: one 200, one 409. Cancelling the draft releases the entry; a new batch with both entries totals 4800; selecting a settled entry again is 409; the creator cannot review (403); after review, line update and delete are refused by the database and CANCEL is 409; payment without reference 422; the recorder cannot reconcile (403); reconciliation by another person makes the statement show 4800 settled, 0 outstanding and no unsettled entries; refund staff cannot create batches (403). Mutation weakening line uniqueness failed."
+    },
+    {
+      "id": "TC-041",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: SupportIntegrationTest: a customer opens QUALITY and FOOD_SAFETY cases on an own order (another customer's order 404; CANCELLATION_REQUEST category and short descriptions 422); the customer view has no severity, SLA or assignee. The staff queue (support.case; customer and order.ops 403) lists the FOOD_SAFETY case first as CRITICAL with escalatedAt set. A STAFF_ONLY note does not count as first response; a PUBLIC reply does and moves the case to IN_PROGRESS. The customer sees 2 messages without the note; staff see 3; another customer and the cook get 404. Messages are append-only and customer-authored staff notes are rejected by the database. Browser workflow: the FOOD_SAFETY case appears as critical in the operations support queue; an internal note added in the UI is absent from the customer's case. Mutations exposing notes or dropping ownership failed tests."
+    },
+    {
+      "id": "TC-042",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: ConfigurationIntegrationTest: with an order placed at delivery fee 3000 and another quote outstanding, a zone fee change to 4500 (config.write with MFA; without MFA 403, config.read 403, stale version 409, negative fee 422; key sent percent-encoded) leaves the placed order at 3000, makes the stale quote fail with TOTAL_CHANGED and gives new quotes 4500; the change log lists it and is append-only; one audit event. A new synthetic policy version (tax 14%) makes a stale quote fail with POLICY_CHANGED while a new quote has tax 1820 and terms-v2; a real policy without approval reference is 422, with one it is active and approved; exactly one active policy; stale version 409; unknown key 404; future effectiveAt 422. The ordering switch off makes new quotes and placement 409 ORDERING_PAUSED while the cook can still accept a placed order; switched back on, quotes work. Mutations removing the approval guard or ignoring the switch failed."
+    },
+    {
+      "id": "TC-043",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: StaffAccessIntegrationTest (backend verify): granting oneself a permission is refused (403, audited 'self-escalation refused'); revoking the last administrator grant is 409 (audited 'last administrator protected'); grant changes require recent MFA; revoked grants stop working on the next request; expired grants confer nothing. Operations web staff screen sends grants/revocations with reasons and shows the MFA step-up prompt."
+    },
+    {
+      "id": "TC-122",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: scripts/dev.sh e2e (throwaway PostgreSQL, Keycloak, S3 emulator, API; operations web dev server; Chromium): cook-a signs in through Keycloak and sees no kitchen and no application; after synthetic approval the dashboard shows the kitchen; the cook creates a meal with an uploaded PNG photo (signed upload verified and approved by the server), publishes it, creates a slot for tomorrow and opens it. customer-a signs in (operations web shows no kitchen; GET /cook/dashboard 403), adds an address and places one pickup and one delivery order through the real API. The cook sees both on the dashboard with server-time deadlines, accepts, prepares and marks both ready; sees the delivery contact and address; a wrong pickup handover code shows the verification error and the customer's real code completes it; the delivery order is dispatched with a reference and completed with the customer's code. A cash report on the completed pickup order makes it REPORTED (also in the customer's order view); the statement lists both orders with the coverage note; pausing sales blocks a new quote and resuming allows it; the UI switches from Arabic RTL to English LTR. CookWorkspaceIntegrationTest (5): own-kitchen dashboard, other cook's order 404, customer 403; pause/resume and staff pause/suspension rules (409), serviceability/zone/version validation, public profile update, audit; statement lines, posted commission 2400 of 24000, period/cursor validation, other cook empty. Identity: returnTo honoured only for allowed origins (6 cases). Operations web component tests (9). Mutations: stale version from the UI and an open returnTo both failed tests."
+    },
+    {
+      "id": "TC-123",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: ModerationIntegrationTest: hiding a published meal (content.moderate; cook and cook.review 403; reason required 422; stale version 409; repeat 409) removes it from discovery, public detail (404) and quotes; the cook's content and status are unchanged, the cook sees HIDDEN with the reason, and pause/republish does not lift it; the catalogue lists it without private kitchen data; restore makes it discoverable and orderable again; two audit events. Suspension (cook.review with MFA) reports activeOrders PENDING_ACCEPTANCE 1 and removes the kitchen's meals from discovery, detail and checkout; restore re-enables them. Identity: stepUp=true sends acr_values and max_age=0 with PKCE. Browser workflow (scripts/dev.sh e2e): ops-a without grants sees no staff sections; with synthetic content.moderate and cook.review grants sees reviews and catalogue but not cook tabs; hides the meal (public detail 404, customer quote refused) and restores it (detail 200); opens the approved application with private location and the kitchen panel with impact; a suspension attempt without MFA shows the step-up link (stepUp=true) and the kitchen stays ACTIVE; the cook gets 403 on the catalogue. Operations web component tests: reviewer queue, signed document link, decision body and step-up prompt; moderation needs a reason. Private documents: never in public responses (MediaIntegrationTest/CookWorkflowIntegrationTest within backend verify). Approval reflection: no kitchen means no workspace and no selling (cook workflow tests, browser onboarding state). Mutations dropping the discovery or quote filter failed the tests."
+    },
+    {
+      "id": "TC-124",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: SupportIntegrationTest: a cancellation request on a pending order is 409; after acceptance another customer gets 404, an unknown reason 422, the request opens a HIGH CANCELLATION_REQUEST case, a second request 409, and the order version and state are unchanged; the customer view offers REQUEST_CANCELLATION and lists the case id. Resolving as ORDER_CANCELLED before cancellation is 409. order.ops lists the order under OPEN_CASE and the view shows flags, case ids and active-order contact without handover code (support.case 403, unknown flag 422). After preparation an audited exception cancellation with the case reference cancels it; the case is then resolved; the order timeline shows CANCELLED and order events are append-only. Resolution needs code and reason, CLOSE only after RESOLVED, closed cases refuse messages, overdue cases are flagged and filterable, updates are audited. Browser workflow: the same request/flag/exception-cancel/resolve path through the operations web. Handover override with step-up: OrderLifecycleIntegrationTest (backend verify) and the UI step-up prompt."
+    },
+    {
+      "id": "TC-125",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: Acceptance: duplicate refund and settlement prevented (TC-035/TC-036 above), over-refund rejected, cook-collected cash is not platform revenue (TC-034). Operations web finance section: component test sends refund payment with the current version and evidence reference and creates a settlement from selected unsettled entries for the statement period. Browser workflow regression passes; finance UI itself is not in the browser workflow (NOT_RUN)."
+    },
+    {
+      "id": "TC-126",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P05-CHECK-1 (browser workflows), P05-CHECK-2 (named suites) and the full backend verify: Acceptance: configuration changes affect new quotes only (TC-042); self-escalation and loss of the last recoverable administrator prevented (TC-043); configuration audit append-only; live approval guard for real policies. Operations web component test: a zone change sends the new fee in piastres with reason and current version and shows the step-up link on STEP_UP_REQUIRED."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-P05-gate/P05-CHECK-1.log",
+    "verification/runs/20261011-P05-gate/P05-CHECK-2.log",
+    "verification/runs/20261011-P05-gate/BACKEND-VERIFY.log",
+    "verification/runs/20261011-P05-gate/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-P05-gate/LOCAL-STACK.log",
+    "verification/runs/20261011-P05-gate/SECRET-SCAN.log",
+    "verification/runs/20261011-P05-gate/GUARDRAIL-TESTS.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Gate re-verification of MB-022..MB-026 at one source commit.",
+      "Carried residuals (not gate blockers by the configured checks): review moderation carried to MB-028; MFA step-up actions cannot complete on the local identity provider (backend MFA tests cover them; the UI prompt is browser-verified); finance, configuration and staff screens component-tested only; real policy, refund and settlement rules await O04; final visual design awaits O05; cross-site cookie/CSRF arrangement for deployed domains decided with hosting (P09)."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

@@ -643,7 +643,8 @@
       "then": "Platform commission receivable is 2400, no platform 27000 cash receipt",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-025/evidence.json"
+        "verification/runs/20261011-MB-025/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -661,7 +662,8 @@
       "then": "Over-refund rejected; unpaid refund remains outstanding and ledger never double-reverses",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-025/evidence.json"
+        "verification/runs/20261011-MB-025/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -679,7 +681,8 @@
       "then": "Entry settles once; duplicate excluded; corrections append adjustment",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-025/evidence.json"
+        "verification/runs/20261011-MB-025/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -767,7 +770,8 @@
       "then": "Notes hidden; safety task visible to authorized ops with timestamp",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-024/evidence.json"
+        "verification/runs/20261011-MB-024/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -785,7 +789,8 @@
       "then": "Order unchanged; stale quote invalidated as specified; new quote uses new version",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-026/evidence.json"
+        "verification/runs/20261011-MB-026/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -803,7 +808,8 @@
       "then": "Denied or controlled recovery workflow; no lockout/escalation",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-026/evidence.json"
+        "verification/runs/20261011-MB-026/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -1560,7 +1566,8 @@
       "then": "Cook can fulfill pickup and delivery using real API; other kitchen data inaccessible",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-022/evidence.json"
+        "verification/runs/20261011-MB-022/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -1576,7 +1583,8 @@
       "then": "Approval/suspension reflected in discovery and checkout; private docs never appear in public network responses",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-023/evidence.json"
+        "verification/runs/20261011-MB-023/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -1594,7 +1602,8 @@
       "then": "Customer sees only own public case messages; safety escalation and immutable order timeline verified",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-024/evidence.json"
+        "verification/runs/20261011-MB-024/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -1614,7 +1623,8 @@
       "then": "Duplicate refund/settlement prevented; over-refund rejected; cook-collected cash is not platform revenue",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-025/evidence.json"
+        "verification/runs/20261011-MB-025/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {
@@ -1633,7 +1643,8 @@
       "then": "Config changes affect new quotes only; self-escalation and loss of last recoverable admin prevented",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-026/evidence.json"
+        "verification/runs/20261011-MB-026/evidence.json",
+        "verification/runs/20261011-P05-gate/evidence.json"
       ]
     },
     {

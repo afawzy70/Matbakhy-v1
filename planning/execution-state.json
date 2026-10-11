@@ -2,11 +2,11 @@
   "schema_version": 1,
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
-  "current_phase": "P05",
+  "current_phase": "P06",
   "current_story": "MB-027",
-  "last_tested_commit": "c96535bb64167ebabeb73c5b04606b42b6ac3804",
+  "last_tested_commit": "6736a860de134b7dd62f291b4c3013d62ac10356",
   "last_completed_story": "MB-026",
-  "last_successful_gate": "P04 at 8412e873d28f2dab1388275a7ee32c9f9ccc4067 (self-reviewed evidence)",
+  "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
     {
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "Run the P05 gate at this commit, then MB-027 customer web purchase flow (P06; final visual design depends on O05).",
-  "updated_at": "2026-10-11T17:14:00Z",
+  "next_action": "MB-027 customer web purchase flow (P06). Final branded visuals depend on owner visual approval O05 (pending).",
+  "updated_at": "2026-10-11T17:26:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

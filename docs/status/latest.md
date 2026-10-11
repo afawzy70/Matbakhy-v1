@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T20:14+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-11T20:26+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P05 gate next (MB-022 to MB-026 DONE; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
+- Phase/story: P06 / MB-027 next (P05 complete: MB-022 to MB-026 DONE; P00–P05 gates PASS on self-reviewed evidence; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -63,6 +63,8 @@ Implementation-agent report (self-reported, not an independent review certificat
 | P02-CHECK-1/2 (named identity/contact and access/cook suites; fail if a class did not run) plus full backend verify, clean-clone workspace, local stack, secret scan, guardrails | PASS at `b2260d3` ([run](../../verification/runs/20261011-P02-gate/evidence.json)) |
 | P03-CHECK-1/2 (media/meals/discovery and slot suites) plus full backend verify, clean-clone workspace, local stack, secret scan, guardrails | PASS at `bd0000c` ([run](../../verification/runs/20261011-P03-gate/evidence.json)) |
 | P04-CHECK-1/2 (quotes/placement/lifecycle and cash/ledger/notification suites) plus full backend verify, clean-clone workspace, local stack, secret scan, guardrails | PASS at `8412e87` ([run](../../verification/runs/20261011-P04-gate/evidence.json)); 23 P04 scenarios re-observed |
+| P05-CHECK-1 (browser workflows on a throwaway stack) and P05-CHECK-2 (support, finance, configuration, staff, cook workspace, moderation, cash suites) plus full backend verify, clean-clone workspace, local stack, secret scan, guardrails | PASS at `6736a86` ([run](../../verification/runs/20261011-P05-gate/evidence.json)); 11 P05 scenarios re-observed |
+| P05 phase gate | PASS (`validate_blueprint.py --phase P05 --commit 6736a86…` exit 0); self-reviewed |
 | P04 phase gate | PASS (`validate_blueprint.py --phase P04 --commit 8412e87…` exit 0); self-reviewed |
 | P03 phase gate | PASS (`validate_blueprint.py --phase P03 --commit bd0000c…` exit 0); self-reviewed |
 | P02 phase gate | PASS (`validate_blueprint.py --phase P02 --commit b2260d3…` exit 0); self-reviewed, no independent security review |
@@ -84,4 +86,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-Run the P05 gate (P05-CHECK-1 browser workflows, P05-CHECK-2 named suites), then MB-027 customer web purchase flow (P06).
+MB-027 customer web purchase flow (P06). Final branded visuals depend on the pending owner visual approval (O05); functional screens on draft tokens can proceed.

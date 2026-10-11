@@ -259,7 +259,7 @@
     },
     {
       "id": "P05",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -295,7 +295,16 @@
           "configured": true,
           "setup_note": "PostgreSQL 16: support privacy/SLA/cancellation requests, refunds/reversal/settlements with separation of duties and concurrency, versioned configuration with approval guard and ordering switch, staff self-escalation and last-admin protection, cook workspace scope, moderation and suspension effects, cash and ledger. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "6736a860de134b7dd62f291b4c3013d62ac10356",
+        "runs": [
+          "verification/runs/20261011-P05-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P05 --commit 6736a860de134b7dd62f291b4c3013d62ac10356",
+        "review": "SELF_REVIEW",
+        "note": "Local throwaway stack with real Keycloak, PostgreSQL and S3 emulator; browser workflows on Chromium; no independent review. Local MFA unavailable (step-up actions backend-tested only); finance/configuration/staff screens component-tested; policy values O04, visual design O05 open."
+      }
     },
     {
       "id": "P06",
