@@ -2,7 +2,7 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T21:47+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-11T22:05+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
 - Phase/story: P06 / customer web restyle to the approved design, then MB-029 (MB-028 DONE; owner design PR #2 integrated; MB-027 DONE; P05 complete: MB-022 to MB-026 DONE; P00–P05 gates PASS on self-reviewed evidence; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
@@ -54,6 +54,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Design tokens: owner-selected terracotta light palette and Cairo (self-hosted) from [approved/DESIGN.md](../design/approved/DESIGN.md), integrated from design PR #2 (merge `912d447`); dark palette is a derived draft (not owner-reviewed); brand name/logo/trademark still draft; WCAG contrast tested; specimens rendered with Cairo.
 - Design reference checks (2026-10-11): DOM checks PASS; browser check at 320/390/420 px PASS with the preinstalled Chromium (previously BLOCKED elsewhere); screenshots inspected and a 320 px wrapping defect fixed. Remote food photos did not load in this environment. Desktop/English/native rendering of the reference NOT_RUN.
 - Customer account and trust (MB-028): favorites, verified-order reviews with report, staff review queue and moderation (API-098, API-073), account page, preferred language, share link, order again via a new quote, basket replacement confirmation (TC-147). **Remaining UI work:** customer screens still use the earlier draft layout with the new palette and font; restyle to the approved homepage hierarchy (home, kitchen, meal, cart, checkout, order status) is next.
+- Customer web restyle (in progress, after MB-028): home, kitchen page and meal page follow the approved hierarchy on real data; the browser journey checks them at 320/390/420 px (no overflow, 44 px controls, RTL) and passes. Cart, checkout, order status and account still need the new component layout. **Decisions needed:** structured portion size (for the approved one-person/two-people filters) and a description in discovery cards both require meal data/contract changes; until decided, intent tiles reveal only sort and clear.
 - TC-018 correction: TC-018 now covers only server rejection of mixed baskets; client confirmation is TC-147 (web, PASS at `bec5830`) and TC-148 (native, NOT_RUN).
 - Contract: OpenAPI 3.1 for 98 planned operations; implemented operations are typed, and a backend test checks that registry `implemented` flags equal the served routes. Generated TypeScript client.
 - Android / iOS: Expo SDK 57 shell compiles natively: Android debug APK (Gradle) and iOS simulator app (Xcode, unsigned) on GitHub-hosted runners at `34be845`. **No emulator, simulator-launch or device verification yet** (P07).

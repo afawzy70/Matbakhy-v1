@@ -688,7 +688,7 @@ a {
 }
 
 .buy-bar > button {
-  flex: 1;
+  flex: 1 1 12rem;
   min-block-size: 3.25rem;
   font-weight: var(--mb-font-weight-bold);
 }
