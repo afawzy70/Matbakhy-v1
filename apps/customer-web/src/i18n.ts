@@ -103,7 +103,7 @@ const ar = {
   back: "رجوع",
   slots: "مواعيد التحضير",
   noSlots: "لا توجد مواعيد متاحة حاليًا.",
-  portionsLeft: (n: number) => `متبقٍ ${n}`,
+  portionsLeft: (n: number) => `متبقٍ ${n.toLocaleString("ar-EG")}`,
   quantity: "الكمية",
   addToCart: "أضف إلى السلة",
   otherKitchen: "سلتك فيها أطباق من مطبخ تاني أو ميعاد تاني. الطلب الواحد من مطبخ واحد وميعاد واحد.",

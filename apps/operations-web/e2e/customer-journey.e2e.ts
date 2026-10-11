@@ -34,6 +34,19 @@ async function idpLogin(page: Page, user: string) {
   await page.locator("#kc-login").click();
 }
 
+/** Optional review screenshots at phone width (E2E_SCREENSHOT_DIR); they assert nothing. */
+async function shot(page: Page, name: string) {
+  if (!process.env.E2E_SCREENSHOT_DIR) {
+    return;
+  }
+  const viewport = page.viewportSize();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${name}-390.png`, fullPage: true });
+  if (viewport) {
+    await page.setViewportSize(viewport);
+  }
+}
+
 async function addToCart(page: Page) {
   await page.goto(`${CUSTOMER}/#/`);
   await page.getByLabel(c.search).fill("كشري");
@@ -78,6 +91,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.getByRole("radio").first().check();
   await page.getByRole("button", { name: c.getQuote }).click();
   await expect(page.getByText(c.total, { exact: true })).toBeVisible();
+  await shot(page, "checkout-quote");
   await page.getByLabel(c.terms).check();
 
   // The first placement reaches the server and commits, but the response is lost.
@@ -113,6 +127,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await card.getByRole("button", { name: t.action.READY as string }).click();
   await expect(page.getByText(c.handoverCode)).toBeVisible({ timeout: 20_000 });
   const code = (await page.locator("strong[dir=ltr]").textContent())?.trim() ?? "";
+  await shot(page, "order-ready");
   await card.getByLabel(t.deliveryReference).fill("Synthetic courier 2");
   await card.getByRole("button", { name: t.action.DISPATCH as string }).click();
   await expect(card.getByText(t.state.OUT_FOR_DELIVERY as string, { exact: true })).toBeVisible();
