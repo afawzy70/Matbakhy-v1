@@ -100,7 +100,7 @@
       "permission": "SELF",
       "response_type": "PhoneChallenge",
       "contract": "phoneE164; generic response, expiry/resend limit; dev OTP never in production response",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-012",
@@ -109,7 +109,7 @@
       "permission": "SELF",
       "response_type": "VerificationResult",
       "contract": "code, expected challenge ownership; single use",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-013",
@@ -118,7 +118,7 @@
       "permission": "SELF",
       "response_type": "AddressPage",
       "contract": "own addresses only",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-014",
@@ -127,7 +127,7 @@
       "permission": "SELF",
       "response_type": "Address",
       "contract": "label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-015",
@@ -136,7 +136,7 @@
       "permission": "SELF",
       "response_type": "Address",
       "contract": "allowed address fields, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-016",
@@ -145,7 +145,7 @@
       "permission": "SELF",
       "response_type": "NoContent",
       "contract": "archive own address; historical snapshots retained",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-017",
@@ -154,7 +154,7 @@
       "permission": "SELF",
       "response_type": "DeletionRequest",
       "contract": "confirmed intent and current policy; idempotent request",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-018",

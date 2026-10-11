@@ -33,12 +33,24 @@ class MigrationIntegrationTest {
     void blank_database_is_migrated_by_flyway_to_the_baseline() {
         List<String> versions = jdbc.queryForList(
                 "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class);
-        assertThat(versions).containsExactly("1", "2");
+        // Every forward migration shipped on the classpath was applied successfully, in order.
+        List<String> shipped;
+        try {
+            shipped = java.util.Arrays.stream(new org.springframework.core.io.support.PathMatchingResourcePatternResolver()
+                            .getResources("classpath:db/migration/V*__*.sql"))
+                    .map(r -> r.getFilename().substring(1, r.getFilename().indexOf("__")))
+                    .sorted(java.util.Comparator.comparingInt(Integer::parseInt)).toList();
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException(e);
+        }
+        assertThat(shipped).startsWith("1", "2", "3");
+        assertThat(versions).isEqualTo(shipped);
         assertThat(jdbc.queryForObject("SELECT current_setting('server_version_num')::int / 10000", Integer.class))
                 .isEqualTo(16);
         assertThat(jdbc.queryForList(
                 "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name",
-                String.class)).contains("app_user", "idempotency_record", "spring_session", "spring_session_attributes");
+                String.class)).contains("app_user", "idempotency_record", "spring_session", "spring_session_attributes",
+                "service_zone", "address", "phone_challenge", "deletion_request");
     }
 
     @Test

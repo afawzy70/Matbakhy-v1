@@ -78,6 +78,9 @@ smoke() {
   info "database migrated by Flyway"
   compose exec -T postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
     "SELECT count(*) FROM flyway_schema_history WHERE success AND version = '1'" | grep -qx 1 || die "Flyway baseline not applied"
+  info "synthetic development zones loaded (dev profile)"
+  [ "$(compose exec -T postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM service_zone WHERE code LIKE 'test-zone-%'")" -ge 2 ] \
+    || die "development zone fixtures missing"
   info "OIDC discovery for realm matbakhy"
   curl -fsS "$idp/realms/matbakhy/.well-known/openid-configuration" | grep -q "\"issuer\":\"$idp/realms/matbakhy\"" \
     || die "Keycloak realm discovery failed"

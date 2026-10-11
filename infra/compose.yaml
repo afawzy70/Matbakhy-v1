@@ -66,6 +66,8 @@ services:
       dockerfile: Dockerfile
     environment:
       APP_ENV: LOCAL
+      # Synthetic development fixtures (db/devdata); EnvironmentGuard allows this profile only in LOCAL/CI.
+      SPRING_PROFILES_ACTIVE: dev
       DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       DATABASE_USERNAME: ${POSTGRES_USER}
       DATABASE_PASSWORD: ${POSTGRES_PASSWORD}

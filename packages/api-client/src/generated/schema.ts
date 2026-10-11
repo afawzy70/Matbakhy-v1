@@ -1772,14 +1772,35 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description PENDING typed schema. Response for API-014. */
-        Address: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-013. */
-        AddressPage: Record<string, never>;
+        /** @description Owner-only. Coordinates are optional and never override zoneId. */
+        Address: {
+            /** Format: uuid */
+            id: string;
+            label: string;
+            recipientName: string;
+            governorate: string;
+            city: string;
+            /** Format: uuid */
+            zoneId: string;
+            street: string;
+            building: string;
+            floor: string | null;
+            unit: string | null;
+            landmark: string | null;
+            latitude: number | null;
+            longitude: number | null;
+            phoneE164: string;
+            version: number;
+        };
+        AddressPage: {
+            items: components["schemas"]["Address"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description Standard error body; matches backend ErrorCode/ApiError. */
         ApiError: {
             /** @enum {string} */
-            code: "MALFORMED_REQUEST" | "UNAUTHENTICATED" | "FORBIDDEN" | "ACCOUNT_DISABLED" | "STEP_UP_REQUIRED" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "VALIDATION_FAILED" | "STATE_CONFLICT" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "STOCK_CHANGED" | "PRICE_CHANGED" | "QUOTE_EXPIRED" | "SLOT_CLOSED" | "KITCHEN_UNAVAILABLE" | "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "INTERNAL_ERROR";
+            code: "MALFORMED_REQUEST" | "UNAUTHENTICATED" | "FORBIDDEN" | "ACCOUNT_DISABLED" | "STEP_UP_REQUIRED" | "NOT_FOUND" | "METHOD_NOT_ALLOWED" | "UNSUPPORTED_MEDIA_TYPE" | "VALIDATION_FAILED" | "CONTACT_VERIFICATION_REQUIRED" | "VERIFICATION_FAILED" | "STATE_CONFLICT" | "VERSION_CONFLICT" | "IDEMPOTENCY_CONFLICT" | "STOCK_CHANGED" | "PRICE_CHANGED" | "QUOTE_EXPIRED" | "SLOT_CLOSED" | "KITCHEN_UNAVAILABLE" | "RATE_LIMITED" | "DEPENDENCY_UNAVAILABLE" | "INTERNAL_ERROR";
             messageKey: string;
             fieldErrors: components["schemas"]["FieldError"][];
             requestId: string | null;
@@ -1842,8 +1863,16 @@ export interface components {
             version: number;
             capabilities: string[];
         };
-        /** @description PENDING typed schema. Response for API-017. */
-        DeletionRequest: Record<string, never>;
+        /** @description Access is disabled at once; purge/anonymization follows the approved retention policy (O06, open). Repeating returns the open request. */
+        DeletionRequest: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            state: "RECEIVED" | "COMPLETED" | "ON_HOLD";
+            policyVersion: string;
+            /** Format: date-time */
+            requestedAt: string;
+        };
         /** @description PENDING typed schema. Response for API-033. */
         DeviceRegistration: Record<string, never>;
         /** @description PENDING typed schema. Response for API-019. */
@@ -1986,8 +2015,23 @@ export interface components {
         PatchCookSettingsRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-052: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations */
         PatchCookSlotsByIdRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-015: allowed address fields, expectedVersion */
-        PatchMeAddressesByIdRequest: Record<string, never>;
+        PatchMeAddressesByIdRequest: {
+            expectedVersion: number;
+            label?: string;
+            recipientName?: string;
+            governorate?: string;
+            city?: string;
+            /** Format: uuid */
+            zoneId?: string;
+            street?: string;
+            building?: string;
+            floor?: string | null;
+            unit?: string | null;
+            landmark?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            phone?: string;
+        };
         /** @description Profile update with optimistic concurrency; unknown or privileged fields are rejected (400). */
         PatchMeRequest: {
             expectedVersion: number;
@@ -1997,8 +2041,15 @@ export interface components {
         };
         /** @description PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion */
         PatchOpsCasesByIdRequest: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-011. */
-        PhoneChallenge: Record<string, never>;
+        /** @description Never contains the code. 429 RATE_LIMITED when resend interval or hourly limits are hit. */
+        PhoneChallenge: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            expiresAt: string;
+            /** Format: date-time */
+            resendAvailableAt: string;
+        };
         Photo: {
             /** Format: uri */
             url: string;
@@ -2037,14 +2088,35 @@ export interface components {
         PostCookOrdersHandoverRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-051: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities */
         PostCookSlotsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-014: label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates */
-        PostMeAddressesRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-017: confirmed intent and current policy; idempotent request */
-        PostMeDeletionRequestsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-011: phoneE164; generic response, expiry/resend limit; dev OTP never in production response */
-        PostMePhoneChallengesRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-012: code, expected challenge ownership; single use */
-        PostMePhoneChallengesVerifyRequest: Record<string, never>;
+        /** @description 422 ZONE_NOT_SERVED for inactive/unknown zones; max 20 active addresses. */
+        PostMeAddressesRequest: {
+            label: string;
+            recipientName: string;
+            governorate: string;
+            city: string;
+            /** Format: uuid */
+            zoneId: string;
+            street: string;
+            building: string;
+            floor?: string | null;
+            unit?: string | null;
+            landmark?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            phone: string;
+        };
+        PostMeDeletionRequestsRequest: {
+            /** @constant */
+            confirm: true;
+            policyVersion: string;
+        };
+        PostMePhoneChallengesRequest: {
+            /** @description Egyptian mobile in any common form (01x…, +20…, 0020…, Arabic-Indic digits); normalized server-side */
+            phoneE164: string;
+        };
+        PostMePhoneChallengesVerifyRequest: {
+            code: string;
+        };
         /** @description PENDING typed schema. Request for API-080: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key */
         PostOpsCasesMessagesRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up */
@@ -2200,8 +2272,10 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-039. */
         UploadTicket: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-012. */
-        VerificationResult: Record<string, never>;
+        /** @description 422 VERIFICATION_FAILED for wrong, expired or used codes (indistinguishable); 429 after 5 attempts; 404 for another account's challenge. */
+        VerificationResult: {
+            phoneVerified: boolean;
+        };
         /** @description PENDING typed schema. Response for API-002. */
         ZonePage: Record<string, never>;
     };
@@ -2494,7 +2568,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2536,11 +2610,7 @@ export interface operations {
     };
     getMeAddresses: {
         parameters: {
-            query?: {
-                /** @description Opaque cursor from a previous page */
-                cursor?: components["parameters"]["Cursor"];
-                limit?: components["parameters"]["Limit"];
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -2574,7 +2644,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -40,6 +40,14 @@ matbakhy:
     post-login-redirect: ${WEB_POST_LOGIN_REDIRECT:http://localhost:5173/}
     mfa-acr-values: ${OIDC_MFA_ACR_VALUES:mfa,2}
     step-up-max-age: ${OIDC_STEP_UP_MAX_AGE:10m}
+  phone-verification:
+    # The default pepper is accepted only in LOCAL/CI; deployed environments must provide PHONE_CODE_PEPPER.
+    code-pepper: ${PHONE_CODE_PEPPER:local-dev-only-pepper-not-a-secret-000000}
+    code-ttl: 5m
+    max-attempts: 5
+    resend-interval: 60s
+    max-sends-per-account-per-hour: ${PHONE_MAX_SENDS_PER_ACCOUNT_PER_HOUR:5}
+    max-sends-per-phone-per-hour: ${PHONE_MAX_SENDS_PER_PHONE_PER_HOUR:5}
   # Required: LOCAL, CI, STAGING or PRODUCTION. No default, so a deployment cannot start unconfigured.
   environment: ${APP_ENV}
   market:

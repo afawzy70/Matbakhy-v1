@@ -315,12 +315,12 @@ paths:
       description: phoneE164; generic response, expiry/resend limit; dev OTP never in production response
       x-matbakhy-id: API-011
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -345,7 +345,7 @@ paths:
       description: code, expected challenge ownership; single use
       x-matbakhy-id: API-012
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -380,13 +380,10 @@ paths:
       description: own addresses only
       x-matbakhy-id: API-013
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/Cursor"
-        - $ref: "#/components/parameters/Limit"
       responses:
         "200":
           description: Success
@@ -406,12 +403,12 @@ paths:
       description: label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates
       x-matbakhy-id: API-014
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -436,7 +433,7 @@ paths:
       description: allowed address fields, expectedVersion
       x-matbakhy-id: API-015
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -470,7 +467,7 @@ paths:
       description: archive own address; historical snapshots retained
       x-matbakhy-id: API-016
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -495,7 +492,7 @@ paths:
       description: confirmed intent and current policy; idempotent request
       x-matbakhy-id: API-017
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3076,12 +3073,108 @@ components:
   schemas:
     Address:
       type: object
-      description: PENDING typed schema. Response for API-014.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - id
+        - label
+        - recipientName
+        - phoneE164
+        - governorate
+        - city
+        - zoneId
+        - street
+        - building
+        - floor
+        - unit
+        - landmark
+        - latitude
+        - longitude
+        - version
+      properties:
+        id: &a4
+          type: string
+          format: uuid
+        label: &a5
+          type: string
+          minLength: 1
+          maxLength: 40
+        recipientName: &a6
+          type: string
+          minLength: 1
+          maxLength: 120
+        governorate: &a7
+          type: string
+          minLength: 1
+          maxLength: 80
+        city: &a8
+          type: string
+          minLength: 1
+          maxLength: 80
+        zoneId: *a4
+        street: &a9
+          type: string
+          minLength: 1
+          maxLength: 200
+        building: &a10
+          type: string
+          minLength: 1
+          maxLength: 40
+        floor: &a11
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 20
+        unit: &a12
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 20
+        landmark: &a13
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 200
+        latitude: &a14
+          type:
+            - number
+            - "null"
+          minimum: -90
+          maximum: 90
+        longitude: &a15
+          type:
+            - number
+            - "null"
+          minimum: -180
+          maximum: 180
+        phoneE164:
+          type: string
+          pattern: ^\+201[0125][0-9]{8}$
+        version:
+          type: integer
+          minimum: 0
+      description: Owner-only. Coordinates are optional and never override zoneId.
     AddressPage:
       type: object
-      description: PENDING typed schema. Response for API-013.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - items
+        - hasMore
+        - nextCursor
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Address"
+          maxItems: 20
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     ApiError:
       type: object
       additionalProperties: false
@@ -3104,6 +3197,8 @@ components:
             - METHOD_NOT_ALLOWED
             - UNSUPPORTED_MEDIA_TYPE
             - VALIDATION_FAILED
+            - CONTACT_VERIFICATION_REQUIRED
+            - VERIFICATION_FAILED
             - STATE_CONFLICT
             - VERSION_CONFLICT
             - IDEMPOTENCY_CONFLICT
@@ -3230,17 +3325,28 @@ components:
       type: object
       additionalProperties: false
       description: The caller's own profile (MB-009). Contains no role or staff permission data.
-      required: [id, displayName, locale, emailVerified, phoneVerified, version, capabilities]
+      required:
+        - id
+        - displayName
+        - locale
+        - emailVerified
+        - phoneVerified
+        - version
+        - capabilities
       properties:
         id:
           type: string
           format: uuid
         displayName:
-          type: [string, "null"]
+          type:
+            - string
+            - "null"
           maxLength: 120
         locale:
           type: string
-          enum: [ar, en]
+          enum:
+            - ar
+            - en
         emailVerified:
           type: boolean
         phoneVerified:
@@ -3254,8 +3360,26 @@ components:
             type: string
     DeletionRequest:
       type: object
-      description: PENDING typed schema. Response for API-017.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - id
+        - state
+        - policyVersion
+        - requestedAt
+      properties:
+        id: *a4
+        state:
+          type: string
+          enum:
+            - RECEIVED
+            - COMPLETED
+            - ON_HOLD
+        policyVersion:
+          type: string
+        requestedAt:
+          type: string
+          format: date-time
+      description: Access is disabled at once; purge/anonymization follows the approved retention policy (O06, open). Repeating returns the open request.
     DeviceRegistration:
       type: object
       description: PENDING typed schema. Response for API-033.
@@ -3647,13 +3771,34 @@ components:
       x-schema-status: PENDING
     PatchMeAddressesByIdRequest:
       type: object
-      description: "PENDING typed schema. Request for API-015: allowed address fields, expectedVersion"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - expectedVersion
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        label: *a5
+        recipientName: *a6
+        governorate: *a7
+        city: *a8
+        zoneId: *a4
+        street: *a9
+        building: *a10
+        floor: *a11
+        unit: *a12
+        landmark: *a13
+        latitude: *a14
+        longitude: *a15
+        phone:
+          type: string
+          maxLength: 32
     PatchMeRequest:
       type: object
       additionalProperties: false
       description: Profile update with optimistic concurrency; unknown or privileged fields are rejected (400).
-      required: [expectedVersion]
+      required:
+        - expectedVersion
       properties:
         expectedVersion:
           type: integer
@@ -3664,15 +3809,29 @@ components:
           maxLength: 120
         locale:
           type: string
-          enum: [ar, en]
+          enum:
+            - ar
+            - en
     PatchOpsCasesByIdRequest:
       type: object
       description: "PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion"
       x-schema-status: PENDING
     PhoneChallenge:
       type: object
-      description: PENDING typed schema. Response for API-011.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - id
+        - expiresAt
+        - resendAvailableAt
+      properties:
+        id: *a4
+        expiresAt:
+          type: string
+          format: date-time
+        resendAvailableAt:
+          type: string
+          format: date-time
+      description: Never contains the code. 429 RATE_LIMITED when resend interval or hourly limits are hit.
     Photo:
       type: object
       additionalProperties: false
@@ -3748,20 +3907,65 @@ components:
       x-schema-status: PENDING
     PostMeAddressesRequest:
       type: object
-      description: "PENDING typed schema. Request for API-014: label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - label
+        - recipientName
+        - phone
+        - governorate
+        - city
+        - zoneId
+        - street
+        - building
+      properties:
+        label: *a5
+        recipientName: *a6
+        governorate: *a7
+        city: *a8
+        zoneId: *a4
+        street: *a9
+        building: *a10
+        floor: *a11
+        unit: *a12
+        landmark: *a13
+        latitude: *a14
+        longitude: *a15
+        phone:
+          type: string
+          maxLength: 32
+      description: 422 ZONE_NOT_SERVED for inactive/unknown zones; max 20 active addresses.
     PostMeDeletionRequestsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-017: confirmed intent and current policy; idempotent request"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - confirm
+        - policyVersion
+      properties:
+        confirm:
+          const: true
+        policyVersion:
+          type: string
+          minLength: 1
+          maxLength: 40
     PostMePhoneChallengesRequest:
       type: object
-      description: "PENDING typed schema. Request for API-011: phoneE164; generic response, expiry/resend limit; dev OTP never in production response"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - phoneE164
+      properties:
+        phoneE164:
+          type: string
+          maxLength: 32
+          description: Egyptian mobile in any common form (01x…, +20…, 0020…, Arabic-Indic digits); normalized server-side
     PostMePhoneChallengesVerifyRequest:
       type: object
-      description: "PENDING typed schema. Request for API-012: code, expected challenge ownership; single use"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - code
+      properties:
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
     PostOpsCasesMessagesRequest:
       type: object
       description: "PENDING typed schema. Request for API-080: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key"
@@ -4120,8 +4324,13 @@ components:
       x-schema-status: PENDING
     VerificationResult:
       type: object
-      description: PENDING typed schema. Response for API-012.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - phoneVerified
+      properties:
+        phoneVerified:
+          type: boolean
+      description: 422 VERIFICATION_FAILED for wrong, expired or used codes (indistinguishable); 429 after 5 attempts; 404 for another account's challenge.
     ZonePage:
       type: object
       description: PENDING typed schema. Response for API-002.

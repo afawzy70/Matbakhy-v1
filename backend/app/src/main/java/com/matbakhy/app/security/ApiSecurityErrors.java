@@ -30,6 +30,7 @@ public class ApiSecurityErrors implements AuthenticationEntryPoint, AccessDenied
 
     public static ErrorCode denialCode(Authentication authentication, AccessDeniedException e) {
         if (authentication != null && authentication.getPrincipal() instanceof CurrentAccount account && !account.active()) {
+            // Suspended, deletion-requested or deleted accounts: scoped denial without profile data.
             return ErrorCode.ACCOUNT_DISABLED;
         }
         if (e instanceof StepUpRequiredException) {

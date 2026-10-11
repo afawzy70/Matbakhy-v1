@@ -56,6 +56,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 class SecurityConfiguration {
 
     static final String REGISTRATION_ID = "keycloak";
+    static final String DELETION_REQUEST = "/api/v1/me/deletion-requests";
     static final String[] PUBLIC_GET = {"/api/v1/configuration/public", "/api/v1/zones", "/api/v1/meals", "/api/v1/meals/*",
             "/api/v1/kitchens/*", "/api/v1/kitchens/*/slots", "/api/v1/kitchens/*/reviews", "/api/v1/policies/*"};
 
@@ -150,6 +151,7 @@ class SecurityConfiguration {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
                 .oauth2ResourceServer(rs -> rs
@@ -171,6 +173,7 @@ class SecurityConfiguration {
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/error").permitAll()
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
                 .oauth2Login(login -> login.defaultSuccessUrl(properties.postLoginRedirect(), true))
