@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { formatMoney, formatTime } from "./api";
 import { loadCart, loadPending, saveCart, type Cart } from "./cart";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
@@ -16,6 +16,12 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
   const [message, setMessage] = useState<string | null>(null);
   // BR-018: a basket holds one kitchen and one slot; replacing it needs the customer's explicit confirmation.
   const [replacement, setReplacement] = useState<Cart | null>(null);
+  // When the replacement prompt closes, focus returns to the button that opened it (keyboard and screen readers).
+  const addButton = useRef<HTMLButtonElement>(null);
+  const closePrompt = () => {
+    setReplacement(null);
+    window.setTimeout(() => addButton.current?.focus(), 0);
+  };
   return (
     <Status ctx={ctx} state={meal} onRetry={reload}>
       {(m) => {
@@ -90,6 +96,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                 </button>
               </div>
             <button
+              ref={addButton}
               type="button"
               disabled={!slot || m.availability !== "AVAILABLE"}
               onClick={() => {
@@ -121,7 +128,18 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
             </div>
             <p className="muted small">{t.totalNote}</p>
             {replacement ? (
-              <div role="alertdialog" aria-labelledby="replace-title" aria-describedby="replace-text" className="notice stack">
+              <div
+                role="alertdialog"
+                aria-labelledby="replace-title"
+                aria-describedby="replace-text"
+                className="notice stack"
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    closePrompt();
+                    setMessage(t.basketKept);
+                  }
+                }}
+              >
                 <h3 id="replace-title">{t.replaceTitle}</h3>
                 <p id="replace-text">{t.otherKitchen}</p>
                 <div className="row">
@@ -130,7 +148,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                     className="danger"
                     onClick={() => {
                       saveCart(replacement);
-                      setReplacement(null);
+                      closePrompt();
                       setMessage(t.added);
                     }}
                   >
@@ -141,7 +159,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                     className="secondary"
                     autoFocus
                     onClick={() => {
-                      setReplacement(null);
+                      closePrompt();
                       setMessage(t.basketKept);
                     }}
                   >

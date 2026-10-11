@@ -268,8 +268,14 @@ describe("customer web", () => {
     fireEvent.click(await screen.findByRole("radio"));
     fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
     const prompt = await screen.findByRole("alertdialog", { name: "Replace your cart?" });
+    expect(document.activeElement?.textContent).toBe("Keep my current cart");
     fireEvent.click(within(prompt).getByRole("button", { name: "Keep my current cart" }));
     expect(screen.getByText("Your cart is unchanged.")).toBeTruthy();
+    await waitFor(() => expect(document.activeElement?.textContent ?? "").toMatch(/^Add to cart/));
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
+    fireEvent.keyDown(await screen.findByRole("alertdialog"), { key: "Escape" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    await waitFor(() => expect(document.activeElement?.textContent ?? "").toMatch(/^Add to cart/));
     expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").kitchenId).toBe("k1");
     fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
     fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Replace cart" }));
