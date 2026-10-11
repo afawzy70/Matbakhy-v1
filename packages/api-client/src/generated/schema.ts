@@ -2137,8 +2137,17 @@ export interface components {
             /** Format: date-time */
             requestedAt: string;
         };
-        /** @description PENDING typed schema. Response for API-033. */
-        DeviceRegistration: Record<string, never>;
+        /** @description Registered installation. The push token is stored encrypted and never returned. */
+        DeviceRegistration: {
+            installationId: string;
+            /** @enum {string} */
+            platform: "ANDROID" | "IOS";
+            /** @enum {string} */
+            environment: "PRODUCTION" | "DEVELOPMENT";
+            appVersion: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         /** @description PENDING typed schema. Response for API-019. */
         Favorite: Record<string, never>;
         /** @description PENDING typed schema. Response for API-018. */
@@ -2163,8 +2172,30 @@ export interface components {
             /** Format: date-time */
             revokedAt: string | null;
         };
-        /** @description PENDING typed schema. Response for API-096. */
-        IntegrationHealth: Record<string, never>;
+        /** @description Redacted integration health (API-096). No recipients, addresses, tokens or payloads. */
+        IntegrationHealth: {
+            outboxPending: number;
+            outboxFailed: number;
+            /** Format: date-time */
+            oldestPendingAt: string | null;
+            channels: {
+                /** @enum {string} */
+                channel: "EMAIL" | "PUSH";
+                pending: number;
+                dead: number;
+                sent: number;
+            }[];
+            recentFailures: {
+                /** Format: uuid */
+                deliveryId: string;
+                /** @enum {string} */
+                channel: "EMAIL" | "PUSH";
+                attempts: number;
+                /** @description Error class or provider code only. */
+                lastError: string | null;
+                type: string;
+            }[];
+        };
         KitchenAdmin: {
             /** Format: uuid */
             kitchenId: string;
@@ -2261,10 +2292,29 @@ export interface components {
         NonNegativeMoney: components["schemas"]["Money"] & {
             amountMinor?: unknown;
         };
-        /** @description PENDING typed schema. Response for API-032. */
-        Notification: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-031. */
-        NotificationPage: Record<string, never>;
+        /** @description One inbox record per recipient and logical event (BR-038). Clients render text from type and params in the account language and refresh the order for its current state; notification order is not authoritative. */
+        Notification: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "ORDER_PLACED" | "ORDER_ACCEPTED" | "ORDER_PREPARING" | "ORDER_READY" | "ORDER_OUT_FOR_DELIVERY" | "ORDER_COMPLETED" | "ORDER_REJECTED" | "ORDER_EXPIRED" | "ORDER_DELIVERY_FAILED" | "ORDER_CANCELLED";
+            /** Format: uuid */
+            orderId: string | null;
+            /** @description Non-sensitive template parameters (order number, state). */
+            params: {
+                [key: string]: string;
+            };
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            readAt: string | null;
+        };
+        /** @description Own inbox, newest first (API-031). */
+        NotificationPage: {
+            items: components["schemas"]["Notification"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description PENDING typed schema. Response for API-066. */
         OpsDashboard: Record<string, never>;
         /** @description PENDING typed schema. Response for API-074. */
@@ -2328,8 +2378,18 @@ export interface components {
             handoverCode?: string | null;
             contact?: components["schemas"]["KitchenFulfillmentContact"] | null;
         };
-        /** @description PENDING typed schema. Response for API-097. */
-        OutboxStatus: Record<string, never>;
+        /** @description Outbox event after an operator retry (API-097). */
+        OutboxStatus: {
+            /** Format: uuid */
+            eventId: string;
+            eventType: string;
+            /** @enum {string} */
+            status: "PENDING" | "SENT" | "FAILED";
+            attempts: number;
+            /** Format: date-time */
+            availableAt: string;
+            version: number;
+        };
         /** @description Omitted fields stay unchanged; an empty string clears optional text; photos replaces the list. A changed published meal must stay publishable. Each change creates a new revision. */
         PatchCookMealsByIdRequest: {
             titleAr?: string;
@@ -2551,8 +2611,11 @@ export interface components {
             reason: string;
             evidenceRef: string;
         };
-        /** @description PENDING typed schema. Request for API-097: reason, expectedVersion, Idempotency-Key; safe predefined replay only */
-        PostOpsOutboxRetryRequest: Record<string, never>;
+        /** @description Replays a FAILED (dead-lettered) event only; fan-out is idempotent per recipient and event. */
+        PostOpsOutboxRetryRequest: {
+            reason: string;
+            expectedVersion: number;
+        };
         /** @description PENDING typed schema. Request for API-073: visibility, reason, expectedVersion */
         PostOpsReviewsModerationRequest: Record<string, never>;
         /** @description Requires staff.grant and recent MFA. Revoking the last active staff.grant holder is 409. */
@@ -2607,12 +2670,17 @@ export interface components {
             documentIds?: string[];
             expectedVersion?: number;
         };
-        /** @description PENDING typed schema. Request for API-033: platform, pushToken, environment, appVersion; encrypt token */
-        PutMeDevicesByIdRequest: Record<string, never>;
+        /** @description Registers or replaces this installation for the signed-in account. The same installation or token registered to another account is revoked there (account switch). */
+        PutMeDevicesByIdRequest: {
+            /** @enum {string} */
+            platform: "ANDROID" | "IOS";
+            pushToken: string;
+            /** @enum {string} */
+            environment: "PRODUCTION" | "DEVELOPMENT";
+            appVersion: string;
+        };
         /** @description PENDING typed schema. Request for API-019: idempotent add */
         PutMeFavoritesByIdRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-032: idempotent mark read */
-        PutNotificationsReadRequest: Record<string, never>;
         QuoteItemRequest: {
             /** Format: uuid */
             mealId: string;
@@ -3615,6 +3683,7 @@ export interface operations {
     getNotifications: {
         parameters: {
             query?: {
+                unreadOnly?: boolean;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -3647,11 +3716,7 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PutNotificationsReadRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Success */
             200: {

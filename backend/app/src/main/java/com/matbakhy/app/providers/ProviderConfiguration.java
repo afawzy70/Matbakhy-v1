@@ -4,6 +4,9 @@ import com.matbakhy.app.config.MatbakhyProperties;
 import com.matbakhy.app.config.MatbakhyProperties.DeploymentEnvironment;
 import com.matbakhy.catalog.api.MalwareScanner;
 import com.matbakhy.catalog.api.ObjectStorage;
+import com.matbakhy.notifications.api.NotificationChannels.EmailSender;
+import com.matbakhy.notifications.api.NotificationChannels.PushSender;
+import com.matbakhy.notifications.internal.NotificationProperties;
 import com.matbakhy.identity.api.PhoneVerificationSender;
 import com.matbakhy.identity.internal.PhoneVerificationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -52,5 +55,31 @@ class ProviderConfiguration {
             return new FakeMalwareScanner();
         }
         throw new IllegalStateException("No malware scanner is configured for " + env + "; uploads cannot be approved (O07)");
+    }
+
+    @Bean
+    EmailSender emailSender(MatbakhyProperties platform) {
+        requireLocal(platform, "email");
+        return LoggingNotificationChannels.email();
+    }
+
+    @Bean
+    PushSender pushSender(MatbakhyProperties platform, NotificationProperties notifications) {
+        DeploymentEnvironment env = platform.environment();
+        boolean local = env == DeploymentEnvironment.LOCAL || env == DeploymentEnvironment.CI;
+        if (!local && (notifications.tokenHashKey().startsWith(NotificationProperties.DEV_PREFIX)
+                || notifications.tokenEncryptionKey().startsWith(NotificationProperties.DEV_PREFIX))) {
+            throw new IllegalStateException("PUSH_TOKEN_HASH_KEY and PUSH_TOKEN_ENCRYPTION_KEY must be set for " + env);
+        }
+        requireLocal(platform, "push");
+        return LoggingNotificationChannels.push();
+    }
+
+    /** Deployed environments need real providers (owner decision O07) and real token keys. */
+    private static void requireLocal(MatbakhyProperties platform, String channel) {
+        DeploymentEnvironment env = platform.environment();
+        if (env != DeploymentEnvironment.LOCAL && env != DeploymentEnvironment.CI) {
+            throw new IllegalStateException("No " + channel + " notification provider is configured for " + env + " (O07)");
+        }
     }
 }

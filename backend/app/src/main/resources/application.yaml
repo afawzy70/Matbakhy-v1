@@ -61,6 +61,15 @@ matbakhy:
     posting-job:
       enabled: ${LEDGER_POSTING_JOB_ENABLED:true}
       interval: 30s
+  notifications:
+    # Development keys are accepted only in LOCAL/CI (providers are refused elsewhere until O07 is decided).
+    token-hash-key: ${PUSH_TOKEN_HASH_KEY:local-dev-only-push-token-hash-key-not-secret}
+    token-encryption-key: ${PUSH_TOKEN_ENCRYPTION_KEY:local-dev-only-push-token-encryption-key-not-secret}
+    max-attempts: 5
+    initial-backoff: 30s
+    lease: 60s
+    jobs-enabled: ${NOTIFICATION_JOBS_ENABLED:true}
+    poll-interval: 5s
   orders:
     expiry-job:
       enabled: ${ORDER_EXPIRY_JOB_ENABLED:true}

@@ -1070,11 +1070,17 @@ paths:
       description: unreadOnly, cursor, limit
       x-matbakhy-id: API-031
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: unreadOnly
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -1097,7 +1103,7 @@ paths:
       description: idempotent mark read
       x-matbakhy-id: API-032
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1117,12 +1123,6 @@ paths:
           $ref: "#/components/responses/Error"
         5XX:
           $ref: "#/components/responses/Error"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PutNotificationsReadRequest"
   /api/v1/me/devices/{installationId}:
     put:
       operationId: putMeDevicesById
@@ -1132,7 +1132,7 @@ paths:
       description: platform, pushToken, environment, appVersion; encrypt token
       x-matbakhy-id: API-033
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1142,8 +1142,9 @@ paths:
           required: true
           schema: &a2
             type: string
+            pattern: "^[A-Za-z0-9-]{8,64}$"
             minLength: 8
-            maxLength: 128
+            maxLength: 64
       responses:
         "200":
           description: Success
@@ -1169,7 +1170,7 @@ paths:
       description: unregister current owned installation
       x-matbakhy-id: API-034
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3178,7 +3179,7 @@ paths:
       description: redacted health and dead-letter counts; no secrets
       x-matbakhy-id: API-096
       x-permission: INTEGRATION_OPS
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3202,7 +3203,7 @@ paths:
       description: reason, expectedVersion, Idempotency-Key; safe predefined replay only
       x-matbakhy-id: API-097
       x-permission: INTEGRATION_OPS
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -4293,8 +4294,25 @@ components:
       description: Access is disabled at once; purge/anonymization follows the approved retention policy (O06, open). Repeating returns the open request.
     DeviceRegistration:
       type: object
-      description: PENDING typed schema. Response for API-033.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Registered installation. The push token is stored encrypted and never returned.
+      required: [installationId, platform, environment, appVersion, updatedAt]
+      properties:
+        installationId:
+          type: string
+          pattern: "^[A-Za-z0-9-]{8,64}$"
+        platform:
+          type: string
+          enum: [ANDROID, IOS]
+        environment:
+          type: string
+          enum: [PRODUCTION, DEVELOPMENT]
+        appVersion:
+          type: string
+          maxLength: 40
+        updatedAt:
+          type: string
+          format: date-time
     Favorite:
       type: object
       description: PENDING typed schema. Response for API-019.
@@ -4363,8 +4381,61 @@ components:
           format: date-time
     IntegrationHealth:
       type: object
-      description: PENDING typed schema. Response for API-096.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Redacted integration health (API-096). No recipients, addresses, tokens or payloads.
+      required: [outboxPending, outboxFailed, oldestPendingAt, channels, recentFailures]
+      properties:
+        outboxPending:
+          type: integer
+          minimum: 0
+        outboxFailed:
+          type: integer
+          minimum: 0
+        oldestPendingAt:
+          type: [string, "null"]
+          format: date-time
+        channels:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [channel, pending, dead, sent]
+            properties:
+              channel:
+                type: string
+                enum: [EMAIL, PUSH]
+              pending:
+                type: integer
+                minimum: 0
+              dead:
+                type: integer
+                minimum: 0
+              sent:
+                type: integer
+                minimum: 0
+        recentFailures:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            additionalProperties: false
+            required: [deliveryId, channel, attempts, lastError, type]
+            properties:
+              deliveryId:
+                type: string
+                format: uuid
+              channel:
+                type: string
+                enum: [EMAIL, PUSH]
+              attempts:
+                type: integer
+                minimum: 0
+              lastError:
+                type: [string, "null"]
+                maxLength: 500
+                description: Error class or provider code only.
+              type:
+                type: string
     KitchenAdmin:
       type: object
       additionalProperties: false
@@ -4612,12 +4683,47 @@ components:
               minimum: 0
     Notification:
       type: object
-      description: PENDING typed schema. Response for API-032.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        One inbox record per recipient and logical event (BR-038). Clients render text from type and params in the
+        account language and refresh the order for its current state; notification order is not authoritative.
+      required: [id, type, orderId, params, createdAt, readAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [ORDER_PLACED, ORDER_ACCEPTED, ORDER_PREPARING, ORDER_READY, ORDER_OUT_FOR_DELIVERY, ORDER_COMPLETED,
+                 ORDER_REJECTED, ORDER_EXPIRED, ORDER_DELIVERY_FAILED, ORDER_CANCELLED]
+        orderId:
+          type: [string, "null"]
+          format: uuid
+        params:
+          type: object
+          additionalProperties:
+            type: string
+          description: Non-sensitive template parameters (order number, state).
+        createdAt:
+          type: string
+          format: date-time
+        readAt:
+          type: [string, "null"]
+          format: date-time
     NotificationPage:
       type: object
-      description: PENDING typed schema. Response for API-031.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Own inbox, newest first (API-031).
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     OpsDashboard:
       type: object
       description: PENDING typed schema. Response for API-066.
@@ -4814,8 +4920,27 @@ components:
       description: Monetary amounts are immutable snapshots from placement.
     OutboxStatus:
       type: object
-      description: PENDING typed schema. Response for API-097.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Outbox event after an operator retry (API-097).
+      required: [eventId, eventType, status, attempts, availableAt, version]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+        status:
+          type: string
+          enum: [PENDING, SENT, FAILED]
+        attempts:
+          type: integer
+          minimum: 0
+        availableAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
     PatchCookMealsByIdRequest:
       type: object
       additionalProperties: false
@@ -5328,8 +5453,17 @@ components:
           maxLength: 200
     PostOpsOutboxRetryRequest:
       type: object
-      description: "PENDING typed schema. Request for API-097: reason, expectedVersion, Idempotency-Key; safe predefined replay only"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Replays a FAILED (dead-lettered) event only; fan-out is idempotent per recipient and event.
+      required: [reason, expectedVersion]
+      properties:
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsReviewsModerationRequest:
       type: object
       description: "PENDING typed schema. Request for API-073: visibility, reason, expectedVersion"
@@ -5457,15 +5591,30 @@ components:
           minimum: 0
     PutMeDevicesByIdRequest:
       type: object
-      description: "PENDING typed schema. Request for API-033: platform, pushToken, environment, appVersion; encrypt token"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        Registers or replaces this installation for the signed-in account. The same installation or token registered
+        to another account is revoked there (account switch).
+      required: [platform, pushToken, environment, appVersion]
+      properties:
+        platform:
+          type: string
+          enum: [ANDROID, IOS]
+        pushToken:
+          type: string
+          minLength: 16
+          maxLength: 4096
+          writeOnly: true
+        environment:
+          type: string
+          enum: [PRODUCTION, DEVELOPMENT]
+        appVersion:
+          type: string
+          minLength: 1
+          maxLength: 40
     PutMeFavoritesByIdRequest:
       type: object
       description: "PENDING typed schema. Request for API-019: idempotent add"
-      x-schema-status: PENDING
-    PutNotificationsReadRequest:
-      type: object
-      description: "PENDING typed schema. Request for API-032: idempotent mark read"
       x-schema-status: PENDING
     QuoteItemRequest:
       type: object

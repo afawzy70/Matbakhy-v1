@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.matbakhy.app.config.MatbakhyProperties;
 import com.matbakhy.app.config.MatbakhyProperties.DeploymentEnvironment;
 import com.matbakhy.identity.internal.PhoneVerificationProperties;
+import com.matbakhy.notifications.internal.NotificationProperties;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
@@ -30,5 +31,19 @@ class ProviderConfigurationTest {
                 phone("local-dev-only-pepper-not-a-secret-000000"))).hasMessageContaining("PHONE_CODE_PEPPER");
         assertThatThrownBy(() -> config.phoneVerificationSender(env(DeploymentEnvironment.STAGING),
                 phone("a-real-secret-pepper-value-0123456789abcdef"))).hasMessageContaining("No SMS verification provider");
+    }
+
+    @Test
+    void notification_channels_only_in_local_and_ci_and_dev_token_keys_refused_elsewhere() {
+        ProviderConfiguration config = new ProviderConfiguration();
+        NotificationProperties dev = new NotificationProperties("local-dev-only-push-token-hash-key-not-secret",
+                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+        NotificationProperties real = new NotificationProperties("a-real-hash-key-value-0123456789abcdef",
+                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+        assertThat(config.emailSender(env(DeploymentEnvironment.CI))).isNotNull();
+        assertThat(config.pushSender(env(DeploymentEnvironment.LOCAL), dev)).isNotNull();
+        assertThatThrownBy(() -> config.pushSender(env(DeploymentEnvironment.PRODUCTION), dev)).hasMessageContaining("PUSH_TOKEN_HASH_KEY");
+        assertThatThrownBy(() -> config.pushSender(env(DeploymentEnvironment.STAGING), real)).hasMessageContaining("No push notification provider");
+        assertThatThrownBy(() -> config.emailSender(env(DeploymentEnvironment.PRODUCTION))).hasMessageContaining("No email notification provider");
     }
 }
