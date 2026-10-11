@@ -1144,8 +1144,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Compose database/IdP/object storage/mail sink/API; healthchecks and environment templates; add build/test/lint/secret checks; replace phase verification checks with real commands",
       "then": "Documented bootstrap works from a clean environment and missing dependencies fail clearly",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-008/evidence.json"
+      ]
     },
     {
       "id": "TC-147",

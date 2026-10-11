@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
-  "current_phase": "P01",
-  "current_story": "MB-008",
-  "last_tested_commit": "f8c5dc53009b1758dfaee539d6ab11a79ecf0c98",
-  "last_completed_story": "MB-007",
+  "current_phase": "P00",
+  "current_story": "MB-003",
+  "last_tested_commit": "af22248e18e03430aa570e346efc7ad98cfe76c3",
+  "last_completed_story": "MB-008",
   "last_successful_gate": null,
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -18,10 +18,20 @@
       "first_seen": "2026-10-11T08:27:00Z",
       "missing": "Android SDK runner (dl.google.com denied by container network policy) and macOS/Xcode runner",
       "next_action": "Provide an environment allowing dl.google.com or a CI runner with Android SDK, and a macOS runner; MB-047 then runs native builds"
+    },
+    {
+      "id": "BLK-002",
+      "affects": [
+        "docs/operations/01-environments.md PowerShell bootstrap"
+      ],
+      "owner": "Ahmed Fawzy (Windows runner or PowerShell access)",
+      "first_seen": "2026-10-11T08:59:00Z",
+      "missing": "No PowerShell runtime available to test Windows bootstrap scripts (GitHub release downloads denied)",
+      "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-008: compose stack (PostgreSQL, Keycloak, object storage, mail sink, API), env templates, CI build/test/lint/secret checks, real P01-CHECK-2; then MB-003.",
-  "updated_at": "2026-10-11T08:50:00Z",
+  "next_action": "Observe product CI for af22248+; MB-003 editable brand tokens/fonts/samples; then MB-004 UX package; P02 MB-009 identity.",
+  "updated_at": "2026-10-11T08:59:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active."
 }
