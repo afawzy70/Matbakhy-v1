@@ -68,17 +68,18 @@ class ScopeGuards(unittest.TestCase):
         self.assertTrue(any("no story owns customer mobile" in e for e in check(self.root)))
 
     def test_merged_native_verification_is_rejected(self):
-        self.change("planning/backlog.json", lambda d: d["stories"][34].update(title="Verify native release candidates"))
+        self.change("planning/backlog.json", lambda d: next(s for s in d["stories"] if s["id"] == "MB-035").update(
+            title="Verify native release candidates"))
         self.regenerate()
         self.assertTrue(any("no separate iOS native verification" in e for e in check(self.root)))
 
     def test_later_phase_dependency_is_rejected(self):
-        self.change("planning/backlog.json", lambda d: d["stories"][4]["depends_on"].append("MB-009"))
+        self.change("planning/backlog.json", lambda d: next(s for s in d["stories"] if s["id"] == "MB-005")["depends_on"].append("MB-009"))
         self.regenerate()
         self.assertTrue(any("MB-005 depends on later-phase MB-009" in e for e in check(self.root)))
 
     def test_stale_matrix_is_rejected(self):
-        self.change("planning/backlog.json", lambda d: d["stories"][0].update(title="Renamed"))
+        self.change("planning/backlog.json", lambda d: next(s for s in d["stories"] if s["id"] == "MB-001").update(title="Renamed"))
         self.assertTrue(any("is stale" in e for e in check(self.root)))
 
     def test_removed_deferred_extension_is_rejected(self):

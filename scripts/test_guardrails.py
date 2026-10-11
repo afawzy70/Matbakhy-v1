@@ -33,7 +33,11 @@ class BlueprintGuards(unittest.TestCase):
         self.assertTrue(any("cycle" in x for x in validate(self.root)))
 
     def test_done_without_evidence_cannot_pass(self):
-        self.change("planning/backlog.json", lambda d: d["stories"][0].update(status="DONE"))
+        def mark(d):
+            # MB-003 is TODO and its dependency is DONE, so the only defect is the missing evidence.
+            story = next(s for s in d["stories"] if s["id"] == "MB-003")
+            story.update(status="DONE", evidence=[], review_status="NOT_RUN")
+        self.change("planning/backlog.json", mark)
         self.assertTrue(any("DONE without evidence" in x for x in validate(self.root)))
 
     def test_scenario_pass_without_evidence_is_rejected(self):
