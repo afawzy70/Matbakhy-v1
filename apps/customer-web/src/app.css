@@ -715,3 +715,21 @@ a {
 .search-bar label.grow {
   flex-basis: 100%;
 }
+
+/* Radios and checkboxes: palette accent and the 44 px target on every screen (cart, checkout, account). */
+input[type="radio"],
+input[type="checkbox"] {
+  flex-shrink: 0;
+  inline-size: var(--mb-touch-target-min);
+  block-size: var(--mb-touch-target-min);
+  margin: 0;
+  accent-color: var(--mb-color-primary);
+}
+
+label:has(> input[type="radio"]),
+label:has(> input[type="checkbox"]) {
+  display: flex;
+  align-items: center;
+  gap: var(--mb-space-sm);
+  min-block-size: var(--mb-touch-target-min);
+}

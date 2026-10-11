@@ -34,14 +34,25 @@ async function idpLogin(page: Page, user: string) {
   await page.locator("#kc-login").click();
 }
 
-/** Optional review screenshots at phone width (E2E_SCREENSHOT_DIR); they assert nothing. */
+/**
+ * Phone-width layout check of the current screen (approved direction): no horizontal overflow and every visible
+ * control at least 44 px at 320 and 390 px. With E2E_SCREENSHOT_DIR set, review screenshots are saved as well.
+ */
 async function shot(page: Page, name: string) {
-  if (!process.env.E2E_SCREENSHOT_DIR) {
-    return;
-  }
   const viewport = page.viewportSize();
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${name}-390.png`, fullPage: true });
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${width} ${name}`).toBe(true);
+    const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
+      els.filter((e) => {
+        const r = e.getBoundingClientRect();
+        return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
+      }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
+    expect(undersized, `touch targets ${width} ${name}`).toEqual([]);
+    if (process.env.E2E_SCREENSHOT_DIR) {
+      await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${name}-${width}.png`, fullPage: true });
+    }
+  }
   if (viewport) {
     await page.setViewportSize(viewport);
   }
