@@ -120,21 +120,35 @@
           "id": "P02-CHECK-1",
           "name": "Identity OTP and address integration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "IdentityIntegrationTest",
+            "ContactIntegrationTest",
+            "EgyptianPhoneTest",
+            "ProviderConfigurationTest",
+            "StaffAssuranceTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Real Keycloak 26.8 and PostgreSQL 16 (Testcontainers; Docker required): OIDC web session/CSRF/PKCE/bearer, expiry/logout, suspended and deleted accounts, OTP and address ownership, Egyptian phone normalization, fake SMS provider confined to LOCAL/CI. Fails if any named class did not run."
         },
         {
           "id": "P02-CHECK-2",
           "name": "Role isolation and cook application integration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "StaffAccessIntegrationTest",
+            "CookWorkflowIntegrationTest",
+            "ModuleBoundaryTest",
+            "ContractRoutesTest",
+            "MigrationIntegrationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16 (Testcontainers): deny-by-default object scope, grants/step-up/revocation, append-only audit, cook application review/approval/operating state, module boundaries, registry-route parity and migrations. Fails if any named class did not run."
         }
       ]
     },

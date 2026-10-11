@@ -385,7 +385,7 @@
       "id": "MB-012",
       "phase": "P02",
       "title": "Implement cook application workflow",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -412,9 +412,11 @@
         "TC-009",
         "TC-112"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-012/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: application documents with MB-013/O06; reapplication after rejection pending O06; cook self-pause and suspension order impact with cook workspace/orders; real MFA login not configured locally."
     },
     {
       "id": "MB-013",

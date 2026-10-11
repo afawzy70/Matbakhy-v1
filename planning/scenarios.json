@@ -140,8 +140,10 @@
       "given": "An unapproved or incomplete cook application",
       "when": "Its meal is published or order accepted",
       "then": "Publication/acceptance denied and review history preserved",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-012/evidence.json"
+      ]
     },
     {
       "id": "TC-009",
@@ -156,8 +158,10 @@
       "given": "An approved cook with accepted and pending orders becomes suspended",
       "when": "Discovery, checkout and fulfillment views refresh",
       "then": "No new sales/acceptance; accepted-order safe fulfillment/ops controls remain available",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-012/evidence.json"
+      ]
     },
     {
       "id": "TC-010",
@@ -1247,8 +1251,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Private application/document metadata; revisioned submit/change-request/review/approve/reject; separate operating state; hide private kitchen location",
       "then": "Only scoped reviewer can approve; incomplete application cannot publish; rejected revision history preserved",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-012/evidence.json"
+      ]
     },
     {
       "id": "TC-113",

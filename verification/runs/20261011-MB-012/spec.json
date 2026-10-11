@@ -1,0 +1,92 @@
+{
+  "run_id": "20261011-MB-012",
+  "story_id": "MB-012",
+  "phase": "P02",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. CookWorkflowIntegrationTest and ContractRoutesTest",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-008",
+      "observed": "CookWorkflowIntegrationTest on PostgreSQL: an account with no application, an incomplete application (422 with REQUIRED/PICKUP_OR_ZONE_REQUIRED field errors, no revision) or one under review, changes-requested or rejected has no kitchen, so KitchenDirectory.ownedBy is empty and nothing can sell; only APPROVE by a cook.review holder with recent MFA creates the kitchen (canSell true). Rejected and changes-requested revisions keep their snapshot, decision, reason, reviewer and time; database triggers reject rewriting or deleting them. Meal publication (MB-014) and order acceptance (MB-019) do not exist yet and must call KitchenDirectory; they are re-tested there."
+    },
+    {
+      "id": "TC-009",
+      "observed": "Ops PAUSE makes canSell false while canAcceptOrders and canFulfillAcceptedOrders stay true; SUSPEND makes canSell and canAcceptOrders false while canFulfillAcceptedOrders stays true; the public profile reports available=false; the application stays APPROVED (operating state separate); RESTORE returns to selling; every change is audited. The cook cannot change state through ops (403), staff cannot change their own kitchen (403, audited), no-MFA is STEP_UP_REQUIRED. A mutation letting suspended kitchens accept orders made the test fail. Discovery/checkout/fulfilment views (MB-016/017/019) must use this policy and will be re-tested there."
+    },
+    {
+      "id": "TC-112",
+      "observed": "Only scoped reviewers can decide: customers, finance.read staff, unauthenticated callers and reviewers without recent MFA are refused with no state change; self-review is 403 and audited (mutation removing the check made the test fail); incomplete applications cannot be submitted (mutation removing a required field check failed the test); stale revision/version, missing reason, missing Idempotency-Key and skipping UNDER_REVIEW are refused; idempotent replay returns the same result, key reuse with another body is IDEMPOTENCY_CONFLICT, and four concurrent approvals create exactly one kitchen and one approval audit. Private location and contact never appear in the queue or public profile; reviewer detail reads are audited. Registry implemented flags equal the served /api routes (mutation detected)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-012/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review: idempotency records would survive a failed command when the caller does not roll back; failed commands now delete their record, and self-review denial runs in a separate transaction so its audit survives while the decision rolls back normally.",
+      "Self-review: server Idempotency-Key charset aligned to the contract pattern; queue default limit aligned to 20; q search escapes LIKE wildcards (tested).",
+      "Residual: private application documents (upload, expiring reviewer access) are not implemented; they depend on media (MB-013) and on the required-document policy (O06). Completeness currently covers profile, contact, location and serviceability only.",
+      "Residual: REJECTED is final (no reapplication) pending O06; cook self-pause (CK09) and affected-order review on suspension arrive with the cook workspace and orders.",
+      "Residual: reviewer step-up relies on provider MFA claims; a real OTP login in local Keycloak is still not configured (carried from MB-011)."
+    ]
+  },
+  "open_defects": []
+}
