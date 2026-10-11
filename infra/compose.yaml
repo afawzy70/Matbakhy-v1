@@ -1,0 +1,83 @@
+# Matbakhy local development stack (MB-008). Local/CI only: synthetic data, no real providers.
+# Start with scripts/dev.sh up; every image is pinned by version and digest.
+name: ${COMPOSE_PROJECT_NAME:-matbakhy}
+
+services:
+  postgres:
+    image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set in infra/.env}
+      POSTGRES_USER: ${POSTGRES_USER:?set in infra/.env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in infra/.env}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  identity:
+    # Local OIDC reference provider (D08). Dev mode with an embedded store; never a production setup.
+    image: keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:?set in infra/.env}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?set in infra/.env}
+      KC_HEALTH_ENABLED: "true"
+      KC_HTTP_PORT: "8080"
+      KC_HOSTNAME: http://localhost:${IDENTITY_PORT:-8180}
+    ports:
+      - "127.0.0.1:${IDENTITY_PORT:-8180}:8080"
+    volumes:
+      - ./identity:/opt/keycloak/data/import:ro
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
+
+  object-storage:
+    # S3-compatible emulator for local development and tests only (not production storage).
+    image: adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92
+    environment:
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: matbakhy-private,matbakhy-public
+    ports:
+      - "127.0.0.1:${OBJECT_STORAGE_PORT:-9090}:9090"
+
+  mail:
+    # Mail sink: captures all outgoing mail; nothing is delivered externally.
+    image: axllent/mailpit:v1.31.5@sha256:94f6b70c1436defae6799d9ac7ff0eeff9540465b842026d5cdb018f1c0234ea
+    ports:
+      - "127.0.0.1:${MAIL_UI_PORT:-8025}:8025"
+      - "127.0.0.1:${MAIL_SMTP_PORT:-1025}:1025"
+    healthcheck:
+      test: ["CMD", "/mailpit", "readyz"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  api:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    environment:
+      APP_ENV: LOCAL
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DATABASE_USERNAME: ${POSTGRES_USER}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 3s
+      timeout: 3s
+      retries: 60
+
+volumes:
+  postgres-data:

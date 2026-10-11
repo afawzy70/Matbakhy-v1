@@ -56,11 +56,38 @@
           "id": "P01-CHECK-2",
           "name": "Web/native shell and contract/CI bootstrap",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_workspace.sh"
+          ],
+          "timeout_seconds": 2400,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Clean clone of HEAD: pinned toolchain, backend verify, frozen install, OpenAPI lint and client drift, typecheck, lint, unit/contract tests, web builds, Android/iOS JS bundles."
+        },
+        {
+          "id": "P01-CHECK-3",
+          "name": "Local stack bootstrap and smoke",
+          "kind": "command",
+          "command": [
+            "scripts/dev.sh",
+            "verify"
+          ],
+          "timeout_seconds": 1800,
+          "required": true,
+          "configured": true,
+          "setup_note": "Isolated compose project: PostgreSQL, Keycloak realm discovery, S3 emulator buckets, mail sink capture, API health and Flyway baseline; torn down afterwards. Requires Docker."
+        },
+        {
+          "id": "P01-CHECK-4",
+          "name": "Secret scan",
+          "kind": "command",
+          "command": [
+            "scripts/check_secrets.sh"
+          ],
+          "timeout_seconds": 600,
+          "required": true,
+          "configured": true,
+          "setup_note": "Gitleaks (digest-pinned) over full git history and working tree; redacted output."
         }
       ]
     },

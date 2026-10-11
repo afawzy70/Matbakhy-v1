@@ -38,8 +38,11 @@ class ScopeGuards(unittest.TestCase):
         self.assertTrue(any("unlisted top-level entry mystery" in e for e in check(self.root)))
 
     def test_planned_path_that_exists_is_rejected(self):
-        (self.root / "infra").mkdir()
-        self.assertTrue(any("infra exists but is marked PLANNED" in e for e in check(self.root)))
+        inventory = json.loads((self.root / "planning/inventory.json").read_text())["entries"]
+        planned = next(e["path"] for e in inventory if e["state"] == "PLANNED" and "." not in e["path"])
+        (self.root / planned).mkdir()
+        (self.root / planned / "file.txt").write_text("x")
+        self.assertTrue(any(f"{planned} exists but is marked PLANNED" in e for e in check(self.root)))
 
     def test_present_path_that_is_missing_is_rejected(self):
         shutil.rmtree(self.root / "contracts")

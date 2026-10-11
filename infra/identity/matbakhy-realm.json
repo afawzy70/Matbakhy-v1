@@ -1,0 +1,24 @@
+{
+  "realm": "matbakhy",
+  "displayName": "Matbakhy (local development)",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "verifyEmail": true,
+  "bruteForceProtected": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["ar", "en"],
+  "defaultLocale": "ar",
+  "accessTokenLifespan": 300,
+  "smtpServer": {
+    "host": "mail",
+    "port": "1025",
+    "from": "no-reply@matbakhy.test",
+    "fromDisplayName": "Matbakhy local"
+  },
+  "attributes": {
+    "matbakhy.note": "Local reference realm only. Clients, roles and synthetic users are added in MB-009."
+  }
+}

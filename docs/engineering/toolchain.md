@@ -72,3 +72,23 @@ Android native compilation needs the Android SDK, platform tools and a JDK suppo
 - `APP_ENV` (LOCAL, CI, STAGING, PRODUCTION) is required; startup fails without it. Datasource: `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`.
 - Integration tests use Testcontainers with `postgres:16.15-alpine` pinned by digest (`postgres.test.image` in `backend/pom.xml`), so **Docker must be running** for `./mvnw verify`. There is no H2 or mock-database fallback.
 - API errors use the body `{code, messageKey, fieldErrors, requestId, retryable}` with stable codes in `ErrorCode`. `X-Request-Id` is accepted when well-formed, otherwise generated, and always echoed.
+
+## Local stack (MB-008)
+
+`scripts/dev.sh` (bash; Linux, macOS, or WSL2 on Windows):
+
+| Command | Effect |
+|---|---|
+| `scripts/dev.sh doctor` | Checks Docker CLI/daemon, Compose v2, JDK 21, pinned Node, pnpm, curl, openssl; names every missing item and starts nothing |
+| `scripts/dev.sh up` | Creates `infra/.env` from `infra/.env.example` with random local passwords (first run), builds the API jar, starts the stack and waits for health |
+| `scripts/dev.sh smoke` | API health, Flyway baseline, Keycloak `matbakhy` realm OIDC discovery, S3 buckets, mail sink capture of a synthetic message |
+| `scripts/dev.sh down` / `reset` | Stop / stop and delete the data volume; refuses env files not marked `MATBAKHY_ENV_MARKER=local` |
+| `scripts/dev.sh verify` | All of the above in a throwaway compose project on alternate ports, then removes it (P01-CHECK-3) |
+
+Services (`infra/compose.yaml`, ports bound to 127.0.0.1, images pinned by digest): PostgreSQL 16.15 (5432), Keycloak 26.8.0 dev mode with realm import from `infra/identity` (8180), Adobe S3Mock 5.2.3 as a local S3 emulator (9090, buckets `matbakhy-private` and `matbakhy-public`), Mailpit 1.31.5 mail sink (UI 8025, SMTP 1025) and the API (8080). The API image (`backend/Dockerfile`) copies the jar built on the host and runs as a non-root user on Temurin 21 JRE.
+
+Secret scan: `scripts/check_secrets.sh` runs Gitleaks 8.30.1 (digest-pinned image) over the full history and working tree (P01-CHECK-4).
+
+CI (`.github/workflows/ci.yml`): clean-checkout workspace check, local stack verify and secret scan on every push and PR. It uses only the SHA-pinned checkout action; Node is downloaded from nodejs.org and checked against a recorded SHA-256, and JDK 21 is the runner's preinstalled toolchain.
+
+Windows: PowerShell equivalents are not provided yet. No PowerShell runtime was available to test them, and untested scripts are not published (BLK-002). Use WSL2 with Docker Desktop meanwhile.

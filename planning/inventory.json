@@ -6,7 +6,7 @@
       "path": ".github",
       "state": "PRESENT",
       "owner_story": "MB-008",
-      "purpose": "Workflows, PR and defect templates; currently planning-integrity CI only"
+      "purpose": "Planning-integrity and product CI workflows, PR and defect templates"
     },
     {
       "path": ".gitignore",
@@ -82,7 +82,7 @@
     },
     {
       "path": "infra",
-      "state": "PLANNED",
+      "state": "PRESENT",
       "owner_story": "MB-008",
       "purpose": "Local compose stack, identity provider and environment templates"
     },
