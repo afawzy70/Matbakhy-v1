@@ -661,7 +661,7 @@
       "id": "MB-019",
       "phase": "P04",
       "title": "Implement lifecycle and handover",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-018"
@@ -696,9 +696,11 @@
         "TC-031",
         "TC-119"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Cancellation requests with MB-024; ops order list/view, cook dashboard and outbox worker later; handover parameters proposed defaults."
     },
     {
       "id": "MB-020",

@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P04",
-  "current_story": "MB-019",
-  "last_tested_commit": "7ed8cecb3666e928cba1a0c9fb83996ac306fc73",
-  "last_completed_story": "MB-018",
+  "current_story": "MB-020",
+  "last_tested_commit": "1b7cdb1e2db888544a7eab1cfba2161a789754e3",
+  "last_completed_story": "MB-019",
   "last_successful_gate": "P03 at bd0000c3f4f4ba979284d5ddee0d16f29e3515dd (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-019 order lifecycle and handover (P04).",
-  "updated_at": "2026-10-11T13:10:00Z",
+  "next_action": "MB-020 cash and ledger core (P04), then MB-021; then P04 gate.",
+  "updated_at": "2026-10-11T13:34:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

@@ -481,8 +481,10 @@
       "given": "A completed order or stale version is targeted",
       "when": "Cook tries accept/prepare/cancel or free-form status PATCH",
       "then": "Rejected without changing history",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-027",
@@ -497,8 +499,10 @@
       "given": "Accept, expire and cancel race at the deadline",
       "when": "Commands execute concurrently",
       "then": "One legal outcome; one stock release at most; no accepted-and-expired order",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-028",
@@ -513,8 +517,10 @@
       "given": "Customer has pending and preparing orders",
       "when": "Customer cancels each",
       "then": "Pending cancels and releases; preparing creates request/denial, not unilateral cancellation",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-029",
@@ -529,8 +535,10 @@
       "given": "An order is prepared then cancelled by ops",
       "when": "Cancellation retries and stock is queried",
       "then": "Consumed stock not automatically restored and no duplicate release occurs",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-030",
@@ -545,8 +553,10 @@
       "given": "One pickup and one delivery order are ready",
       "when": "Dispatch/complete commands use wrong paths",
       "then": "Wrong mode denied; correct paths preserve event history",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-031",
@@ -561,8 +571,10 @@
       "given": "Incorrect/replayed code or unauthorized override",
       "when": "Actor tries to complete order",
       "then": "No completion; valid code works once; valid override is distinguishable in audit",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-032",
@@ -1449,8 +1461,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Explicit commands and version guards; expiry scheduler; cancel/reject/prepare/ready/dispatch/complete/fail; secure handover challenge; audit ops override",
       "then": "Invalid/racing transitions rejected; release happens once; pickup cannot dispatch; code replay/brute force denied",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ]
     },
     {
       "id": "TC-120",
