@@ -163,7 +163,7 @@
     },
     {
       "id": "P03",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -198,7 +198,16 @@
           "configured": true,
           "setup_note": "PostgreSQL 16: Cairo/DST scheduling, server-time cutoff, capacity bounds against obligations at meal and slot level, migrations and module boundaries. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "bd0000c3f4f4ba979284d5ddee0d16f29e3515dd",
+        "runs": [
+          "verification/runs/20261011-P03-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P03 --commit bd0000c3f4f4ba979284d5ddee0d16f29e3515dd",
+        "review": "SELF_REVIEW",
+        "note": "Local container evidence with PostgreSQL and the S3 emulator; no independent review. Production storage policy and scanner unverified (O07/P09)."
+      }
     },
     {
       "id": "P04",
