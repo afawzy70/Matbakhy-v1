@@ -14,8 +14,10 @@
       "given": "An anonymous or suspended session",
       "when": "A private order endpoint is called",
       "then": "It returns 401 or scoped denial without private data",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-009/evidence.json"
+      ]
     },
     {
       "id": "TC-002",
@@ -30,8 +32,10 @@
       "given": "A valid cookie without a CSRF token and a malformed native auth state",
       "when": "Each attempts authentication or mutation",
       "then": "The unsafe requests are rejected and no mutation occurs",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-009/evidence.json"
+      ]
     },
     {
       "id": "TC-003",
@@ -1175,8 +1179,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Configure OIDC web sessions and native PKCE contract; account mapping; logout/recovery; expiry and staff MFA assurance; CSRF/CORS protections",
       "then": "Anonymous and expired sessions denied; logout revokes intended session; role claims cannot be forged",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-009/evidence.json"
+      ]
     },
     {
       "id": "TC-110",

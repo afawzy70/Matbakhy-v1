@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T12:28+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-11T13:01+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P02 / MB-009 next (P00 and P01 gates PASS on self-reviewed evidence)
+- Phase/story: P02 / MB-010 next (MB-009 DONE; P00 and P01 gates PASS on self-reviewed evidence)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -18,13 +18,14 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-8 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+9 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
-- Backend: Spring Boot 4.1.1/Java 21 shell, nine declared modules with enforced boundaries, Flyway V1 (app_user, idempotency_record) on PostgreSQL 16, standard errors, strict JSON. No domain feature endpoints.
+- Backend: Spring Boot 4.1.1/Java 21, nine declared modules with enforced boundaries, Flyway V1–V2 on PostgreSQL 16, standard errors, strict JSON. **Identity (MB-009):** OIDC web login with PostgreSQL sessions, CSRF, CORS allowlist and logout; native bearer JWT validation; local account mapping; suspended-account denial; staff MFA step-up check; `GET/PATCH /api/v1/me`. Tested against real Keycloak and PostgreSQL.
 - Customer web / operations web: React + Vite shells (Arabic RTL default, English LTR) reading draft brand tokens, IBM Plex Sans Arabic and CSS variables. No product screens.
 - Design tokens: editable draft brand (name, slogan, light/dark palette, typography); WCAG contrast tested; specimens rendered.
 - Contract: OpenAPI 3.1 for 97 planned operations (26 typed schemas, 93 explicit PENDING), generated TypeScript client.
@@ -54,4 +55,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-MB-009 identity and sessions (Keycloak OIDC web session and native PKCE contract, logout/expiry/revocation, 401/403 and forged-claim negative tests).
+MB-010 (profile, address and phone OTP verification) or MB-011 (scoped permissions and audit); both now eligible.

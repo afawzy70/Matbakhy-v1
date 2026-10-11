@@ -269,7 +269,7 @@
       "id": "MB-009",
       "phase": "P02",
       "title": "Integrate identity and sessions",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-008"
@@ -297,9 +297,11 @@
         "TC-002",
         "TC-109"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-009/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 44d5a558d4f1f20039657dce70c39f7ec4efb609 (attempt 1 at 2edf3ef failed secret scan, repaired); SELF_REVIEW only"
     },
     {
       "id": "MB-010",
