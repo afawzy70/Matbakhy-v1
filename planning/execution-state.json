@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P00",
-  "current_story": "MB-003",
-  "last_tested_commit": "af22248e18e03430aa570e346efc7ad98cfe76c3",
-  "last_completed_story": "MB-002",
+  "current_story": "MB-004",
+  "last_tested_commit": "430fb9371ad673acbd7665345811f0558a7bc766",
+  "last_completed_story": "MB-003",
   "last_successful_gate": null,
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -34,8 +34,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-003 brand tokens (in progress), then MB-004 UX package. MB-005 BLOCKED on native Android/iOS compilation evidence (BLK-001); MB-006/007/008 BLOCKED by dependency; MB-009 not eligible.",
-  "updated_at": "2026-10-11T09:10:00Z",
+  "next_action": "MB-004 reviewable UX package; native-build workflow attempt for MB-005 (BLK-001) on GitHub-hosted runners.",
+  "updated_at": "2026-10-11T09:09:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active."
 }

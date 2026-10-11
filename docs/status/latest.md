@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T12:04+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-11T12:09+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P00 / MB-003 in progress; next eligible after it: MB-004
+- Phase/story: P00 / MB-004 next
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -13,18 +13,19 @@ Implementation-agent report (self-reported, not an independent review certificat
 |---|---|---|
 | MB-001 Reconcile scope and repository baseline | DONE (self-review) | [run](../../verification/runs/20261011-MB-001/evidence.json) at `1a1fdad` |
 | MB-002 Freeze traceable MVP backlog | DONE (self-review) | [run](../../verification/runs/20261011-MB-002/evidence.json) at `1a1fdad` |
-| MB-003 Prepare editable brand system | IN_PROGRESS | — |
+| MB-003 Prepare editable brand system | DONE (self-review; draft brand pending O05) | [run](../../verification/runs/20261011-MB-003/evidence.json) at `430fb93`, 8 rendered specimens |
 | MB-005 Pin workspace and compatible toolchain | BLOCKED (BLK-001) | Workspace/backend/web/Expo JS bundles verified ([run](../../verification/runs/20261011-MB-005/evidence.json) at `babfe81`); native Android Gradle and iOS Xcode compilation have no evidence |
 | MB-006 Database and module boundaries | BLOCKED by MB-005 | Tests passed ([run](../../verification/runs/20261011-MB-006/evidence.json) at `845b6ca`); not closed |
 | MB-007 Contract toolchain | BLOCKED by MB-005 | Tests passed ([run](../../verification/runs/20261011-MB-007/evidence.json) at `f8c5dc5`); not closed |
 | MB-008 Local stack and CI commands | BLOCKED by MB-006/007 | Implemented before the correction; tests passed ([run](../../verification/runs/20261011-MB-008/evidence.json) at `af22248`); not closed |
 
-2 of 46 stories DONE (a count, not a measure of effort or readiness). Passing test results for MB-005–MB-008 are kept but are not story closure.
+3 of 46 stories DONE (a count, not a measure of effort or readiness). Passing test results for MB-005–MB-008 are kept but are not story closure.
 
 ## Surfaces
 
 - Backend: Spring Boot 4.1.1/Java 21 shell, nine declared modules with enforced boundaries, Flyway V1 (app_user, idempotency_record) on PostgreSQL 16, standard errors, strict JSON. No domain feature endpoints.
-- Customer web / operations web: React + Vite shells (Arabic RTL default, English LTR). No product screens.
+- Customer web / operations web: React + Vite shells (Arabic RTL default, English LTR) reading draft brand tokens, IBM Plex Sans Arabic and CSS variables. No product screens.
+- Design tokens: editable draft brand (name, slogan, light/dark palette, typography); WCAG contrast tested; specimens rendered.
 - Contract: OpenAPI 3.1 for 97 planned operations (26 typed schemas, 93 explicit PENDING), generated TypeScript client.
 - Android / iOS: Expo SDK 57 shell; JavaScript/Hermes bundles only. **Native Gradle and Xcode builds NOT_RUN (BLOCKED, BLK-001).** No device verification.
 
@@ -51,4 +52,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-Finish MB-003 (tokens, fonts, rendered Arabic/English and contrast samples), then MB-004 UX package. Pursue native build evidence for MB-005 only in an authorized environment.
+MB-004 reviewable UX package (prototype journeys in Arabic/English, phone/desktop, screenshots), then request visual approval. Pursue native build evidence for MB-005 only in an authorized environment.

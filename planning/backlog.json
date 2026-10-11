@@ -68,7 +68,7 @@
       "id": "MB-003",
       "phase": "P00",
       "title": "Prepare editable brand system",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-001"
@@ -90,9 +90,11 @@
       "scenario_ids": [
         "TC-103"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-003/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 430fb9371ad673acbd7665345811f0558a7bc766; SELF_REVIEW only; brand is a draft pending owner approval (O05)"
     },
     {
       "id": "MB-004",

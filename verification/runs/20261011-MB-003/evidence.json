@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-003",
+  "phase": "P00",
+  "source_commit": "430fb9371ad673acbd7665345811f0558a7bc766",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T09:07:36.972701+00:00",
+  "finished_at": "2026-10-11T09:08:51.042846+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "TOKENS-TESTS",
+      "name": "Design token tests: WCAG contrast both themes, completeness, CSS drift, no hard-coded brand name/hex in apps",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "pnpm",
+        "--filter",
+        "@matbakhy/design-tokens",
+        "test"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-003/TOKENS-TESTS.log"
+    },
+    {
+      "id": "SPECIMEN-RENDER",
+      "name": "Chromium specimen render with Arabic font load assertion (light/dark x ar/en x phone/desktop)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "pnpm",
+        "--filter",
+        "@matbakhy/design-tokens",
+        "specimen",
+        "../../verification/runs/20261011-MB-003/specimen"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-003/SPECIMEN-RENDER.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Regression: clean-clone workspace check (apps consume tokens)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-003/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-003/BLUEPRINT.log"
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-003/SCOPE.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-003/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-103",
+      "status": "PASS",
+      "observed": "Brand name, slogan, colors, typography and spacing live only in packages/design-tokens/tokens.json; customer web, operations web and the Expo app read them (tests assert app titles derive from tokens and that app source contains no hard-coded brand name or hex color), so name/logo/colors change without business-code edits. Contrast tests pass for every listed pair in light and dark themes (text >=4.5:1, focus and borderStrong >=3:1). Chromium rendered 8 specimens (light/dark x ar/en x 390/1280 px) with IBM Plex Sans Arabic loaded (document.fonts checks), showing the draft wordmark, Arabic glyph set, Arabic-Indic and Latin digits, bidi-isolated mixed content and contrast swatches. Trademark clearance remains OPEN (O05)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-003/TOKENS-TESTS.log",
+    "verification/runs/20261011-MB-003/SPECIMEN-RENDER.log",
+    "verification/runs/20261011-MB-003/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-003/BLUEPRINT.log",
+    "verification/runs/20261011-MB-003/SCOPE.log",
+    "verification/runs/20261011-MB-003/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-003/review.md",
+    "verification/runs/20261011-MB-003/specimen/specimen-results.json",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-ar-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-ar-desktop.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-en-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-en-desktop.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-ar-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-ar-desktop.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-en-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-en-desktop.png"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Visual self-review of rendered specimens found unisolated mixed-direction amounts, an off-center button label and 1.5:1 border contrast unsuitable for form controls; fixed with <bdi> runs, inline-flex centering and a tested borderStrong token (>=3:1). Bracket mirroring in the Arabic total line verified by measuring glyph positions.",
+      "Brand, wordmark and palette are drafts for owner review (O05); no trademark search performed.",
+      "Font licensing: IBM Plex Sans Arabic under OFL-1.1 via @fontsource 5.3.0.",
+      "Native app uses token values but native rendering/fonts are not verified on devices (MB-005 native BLOCKED; P07)."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

@@ -1068,8 +1068,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create draft logo/name treatment and design tokens; choose licensed Arabic/Latin fonts; prepare sample content; flag trademark clearance as open",
       "then": "Name/logo/colors can change without editing business code; Arabic glyph and contrast samples rendered",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-003/evidence.json"
+      ]
     },
     {
       "id": "TC-104",
