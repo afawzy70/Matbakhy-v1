@@ -1,0 +1,89 @@
+name: Native builds (MB-005 Android Gradle and iOS Xcode compilation)
+# Compiles the minimal customer-mobile shell natively on GitHub-hosted runners (no signing, no
+# store upload, no device). Android and iOS are separate jobs and produce separate evidence.
+on:
+  push:
+    branches: [implementation/mvp]
+    paths:
+      - apps/customer-mobile/**
+      - packages/design-tokens/**
+      - pnpm-lock.yaml
+      - .github/workflows/native-build.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NODE_VERSION: "24.21.0"
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+  CI: "1"
+  EXPO_NO_TELEMETRY: "1"
+
+jobs:
+  android:
+    name: Android debug APK (Gradle)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Toolchain (JDK 17 for Android Gradle Plugin, preinstalled Android SDK)
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$ANDROID_HOME, ANDROID_NDK_LATEST_HOME=${ANDROID_NDK_LATEST_HOME:-unset}"
+      - name: Install workspace from lockfile
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Generate native Android project (Expo prebuild)
+        working-directory: apps/customer-mobile
+        run: pnpm exec expo prebuild --platform android --no-install --clean
+      - name: Gradle assembleDebug
+        working-directory: apps/customer-mobile/android
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Record artifact identity
+        working-directory: apps/customer-mobile/android
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          ls -l "$APK" && sha256sum "$APK"
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/aapt dump badging "$APK" | grep -E "^package:|sdkVersion|targetSdkVersion"
+          java -version 2>&1 | head -1; ./gradlew --version | grep -E "Gradle|Kotlin|JVM"
+
+  ios:
+    name: iOS simulator build (Xcode, unsigned)
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-darwin-arm64.tar.xz"
+          echo "6239d4cf92d864487ec8cd3615038f7b67e7f58b77b21cd2f09ea9fbd68065fe  node-v${NODE_VERSION}-darwin-arm64.tar.xz" | shasum -a 256 -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-darwin-arm64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Toolchain versions
+        run: xcodebuild -version && pod --version && sw_vers
+      - name: Install workspace from lockfile
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Generate native iOS project (Expo prebuild) and install pods
+        working-directory: apps/customer-mobile
+        run: pnpm exec expo prebuild --platform ios --clean
+      - name: xcodebuild for iOS Simulator (no code signing)
+        working-directory: apps/customer-mobile/ios
+        run: |
+          set -o pipefail
+          xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build | tail -50
+      - name: Record artifact identity
+        working-directory: apps/customer-mobile/ios
+        run: |
+          APP=$(find build/Build/Products -maxdepth 2 -name '*.app' | head -1)
+          echo "$APP" && /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist"
+          shasum -a 256 "$APP/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")"
