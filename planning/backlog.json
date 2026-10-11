@@ -100,7 +100,7 @@
       "id": "MB-004",
       "phase": "P00",
       "title": "Produce reviewable UX package",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-002",
@@ -123,9 +123,11 @@
       "scenario_ids": [
         "TC-104"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-004/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source be2562757e27b2124283f7d3d051c9bb9052f872; SELF_REVIEW only; owner visual approval PENDING (docs/design/approval.md)"
     },
     {
       "id": "MB-005",

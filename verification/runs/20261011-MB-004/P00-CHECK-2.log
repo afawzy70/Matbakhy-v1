@@ -1,0 +1,28 @@
+== design token tests
+
+> @matbakhy/design-tokens@0.1.0 test /home/user/Matbakhy-v1/packages/design-tokens
+> vitest run
+
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/packages/design-tokens
+
+
+ Test Files  1 passed (1)
+      Tests  37 passed (37)
+   Start at  09:20:15
+   Duration  292ms (transform 66%, import 18%, tests 11%, worker 5%)
+
+== brand specimens
+
+> @matbakhy/design-tokens@0.1.0 specimen /home/user/Matbakhy-v1/packages/design-tokens
+> node scripts/render-specimen.mjs /home/user/Matbakhy-v1/verification/runs/20261011-MB-004/specimen
+
+PASS: rendered 8 specimens with IBM Plex Sans Arabic loaded into /home/user/Matbakhy-v1/verification/runs/20261011-MB-004/specimen
+== prototype journeys
+
+> @matbakhy/design-tokens@0.1.0 ux:journeys /home/user/Matbakhy-v1/packages/design-tokens
+> node scripts/prototype-journeys.mjs /home/user/Matbakhy-v1/verification/runs/20261011-MB-004/ux
+
+PASS: 4 locale/viewport runs, 8 journeys each
+visual approval: PENDING (recorded separately)
+PASS: design checks

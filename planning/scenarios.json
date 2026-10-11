@@ -1084,8 +1084,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Build prototypes of discovery/detail/checkout/tracking and cook/ops queues; show Arabic/English and mobile/desktop; capture screenshots and design decisions; request bounded visual review",
       "then": "Reviewer can complete all critical journeys in prototype; approval is recorded separately and not fabricated",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-004/evidence.json"
+      ]
     },
     {
       "id": "TC-105",

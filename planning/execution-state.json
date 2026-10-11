@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
-  "current_phase": "P00",
-  "current_story": "MB-004",
-  "last_tested_commit": "430fb9371ad673acbd7665345811f0558a7bc766",
-  "last_completed_story": "MB-003",
+  "current_phase": "P01",
+  "current_story": "MB-005",
+  "last_tested_commit": "be2562757e27b2124283f7d3d051c9bb9052f872",
+  "last_completed_story": "MB-004",
   "last_successful_gate": null,
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -34,8 +34,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-004 reviewable UX package; native-build workflow attempt for MB-005 (BLK-001) on GitHub-hosted runners.",
-  "updated_at": "2026-10-11T09:09:00Z",
+  "next_action": "P00 phase evidence at one SHA; MB-005 native evidence: Android Gradle PASS (run 38127355259), iOS Xcode attempt 2 running (run 38127899749). Owner visual approval for MB-004 PENDING.",
+  "updated_at": "2026-10-11T09:21:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active."
 }
