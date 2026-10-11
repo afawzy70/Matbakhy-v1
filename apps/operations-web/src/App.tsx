@@ -10,13 +10,14 @@ import { Slots } from "./cook/Slots";
 import { Statement } from "./cook/Statement";
 import { Cases } from "./ops/Cases";
 import { Catalogue } from "./ops/Catalogue";
+import { Finance } from "./ops/Finance";
 import { OpsOrders } from "./ops/OpsOrders";
 import { Reviews } from "./ops/Reviews";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
 const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
-type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders";
+type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance";
 
 export function title(locale: Locale): string {
   return `${brand.name[locale]} — ${strings[locale].section}`;
@@ -27,7 +28,7 @@ type Session =
   | { kind: "checking" }
   | { kind: "signedOut" }
   | { kind: "error" }
-  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean };
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean };
 
 function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
   return [
@@ -36,6 +37,7 @@ function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
     ...(s.catalogue ? (["catalogue"] as const) : []),
     ...(s.cases ? (["cases"] as const) : []),
     ...(s.opsOrders ? (["opsOrders"] as const) : []),
+    ...(s.finance ? (["finance"] as const) : []),
   ];
 }
 
@@ -46,12 +48,14 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const [d, reviews, catalogue, cases, opsOrders] = await Promise.all([
+    const [d, reviews, catalogue, cases, opsOrders, finance] = await Promise.all([
       api.GET("/api/v1/cook/dashboard"),
       api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/cases", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/orders", { params: { query: { limit: 1 } } }),
+      // An unknown kitchen answers 404 to finance staff and 403 to everyone else.
+      api.GET("/api/v1/ops/finance/statements", { params: { query: { kitchenId: "00000000-0000-0000-0000-000000000000" } } }),
     ]);
     if (!d.data && d.response.status !== 403) {
       return { kind: "error" };
@@ -64,6 +68,7 @@ async function checkSession(api: Api): Promise<Session> {
       catalogue: catalogue.response.ok,
       cases: cases.response.ok,
       opsOrders: opsOrders.response.ok,
+      finance: finance.response.status === 404,
     };
   } catch {
     return { kind: "error" };
@@ -169,7 +174,9 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
                         ? t.ops.cases
                         : name === "opsOrders"
                           ? t.ops.orders
-                          : t.tabs[name]}
+                          : name === "finance"
+                            ? t.ops.finance
+                            : t.tabs[name]}
                 </button>
               ))}
             </nav>
@@ -185,6 +192,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "catalogue" ? <Catalogue ctx={ctx} /> : null}
             {current === "cases" ? <Cases ctx={ctx} /> : null}
             {current === "opsOrders" ? <OpsOrders ctx={ctx} /> : null}
+            {current === "finance" ? <Finance ctx={ctx} /> : null}
           </>
         ) : null}
       </main>

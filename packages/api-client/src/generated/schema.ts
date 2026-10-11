@@ -2727,14 +2727,45 @@ export interface components {
             reason?: string;
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Request for API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key */
-        PostOpsFinanceRefundsActionRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-084: orderId, caseId, fullAmountMinor, reason, Idempotency-Key */
-        PostOpsFinanceRefundsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-088: action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key */
-        PostOpsFinanceSettlementsActionRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-087: kitchenId, period, entryIds, Idempotency-Key */
-        PostOpsFinanceSettlementsRequest: Record<string, never>;
+        PostOpsFinanceRefundsActionRequest: {
+            /** @enum {string} */
+            action: "APPROVE" | "REJECT" | "PAYMENT_RECORDED" | "VERIFY";
+            /** @description External payment reference, required for PAYMENT_RECORDED */
+            evidenceRef?: string;
+            /** @description Required for REJECT */
+            reason?: string;
+            expectedVersion: number;
+        };
+        /** @description Requires VERIFIED cash collection. fullAmountMinor must equal the verified collection less refunds not rejected (422 OVER_REFUND or FULL_REFUND_REQUIRED; 409 when nothing is left). */
+        PostOpsFinanceRefundsRequest: {
+            /** Format: uuid */
+            orderId: string;
+            /** @description Support case reference */
+            caseId: string;
+            /** Format: int64 */
+            fullAmountMinor: number;
+            reason: string;
+        };
+        /** @description REVIEW (not the creator) makes the batch immutable; CANCEL only from DRAFT; PAYMENT_RECORDED needs the external remittance reference; RECONCILE by someone other than the recorder. */
+        PostOpsFinanceSettlementsActionRequest: {
+            /** @enum {string} */
+            action: "REVIEW" | "PAYMENT_RECORDED" | "RECONCILE" | "CANCEL";
+            evidenceRef?: string;
+            reason?: string;
+            expectedVersion: number;
+        };
+        /** @description Ledger groups of the kitchen posted within the period; each can be in one active batch only (409 ALREADY_SETTLED). */
+        PostOpsFinanceSettlementsRequest: {
+            /** Format: uuid */
+            kitchenId: string;
+            period: {
+                /** Format: date */
+                from: string;
+                /** Format: date */
+                to: string;
+            };
+            entryIds: string[];
+        };
         /** @description PAUSE (ACTIVE to PAUSED), SUSPEND (ACTIVE or PAUSED to SUSPENDED), RESTORE (PAUSED or SUSPENDED to ACTIVE). Staff cannot change their own kitchen. */
         PostOpsKitchensOperatingStateRequest: {
             /** @enum {string} */
@@ -2914,16 +2945,83 @@ export interface components {
             /** @description Average rating x10 (e.g. 43 = 4.3); null without visible reviews */
             averageTenths?: number | null;
         };
-        /** @description PENDING typed schema. Response for API-084. */
-        Refund: Record<string, never>;
+        /** @description Full refund obligation. REQUESTED -> APPROVED (another person) -> PAID (external payment reference) -> VERIFIED (not the payer; reverses the order's commission once) or REJECTED. Approval does not mean paid. */
+        Refund: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            orderId: string;
+            /** Format: uuid */
+            kitchenId: string;
+            caseReference: string;
+            amount: components["schemas"]["Money"];
+            state: components["schemas"]["RefundState"];
+            reason: string;
+            /** Format: uuid */
+            requestedBy: string;
+            /** Format: uuid */
+            approvedBy: string | null;
+            /** Format: uuid */
+            paidBy: string | null;
+            paymentReference: string | null;
+            /** Format: uuid */
+            verifiedBy: string | null;
+            decisionReason: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        /** @enum {string} */
+        RefundState: "REQUESTED" | "APPROVED" | "PAID" | "VERIFIED" | "REJECTED";
+        /** @enum {string} */
+        SettlementState: "DRAFT" | "REVIEWED" | "PAYMENT_RECORDED" | "RECONCILED" | "CANCELLED";
+        /** @description A ledger group; reversals are negative. */
+        SettlementLine: {
+            /** Format: uuid */
+            ledgerGroupId: string;
+            /** @enum {string} */
+            kind: "COMMISSION" | "COMMISSION_REVERSAL";
+            /** Format: uuid */
+            orderId: string;
+            amount: components["schemas"]["Money"];
+        };
         /** @description PENDING typed schema. Response for API-030. */
         Report: Record<string, never>;
         /** @description PENDING typed schema. Response for API-029. */
         Review: Record<string, never>;
         /** @description PENDING typed schema. Response for API-007. */
         ReviewPage: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-087. */
-        Settlement: Record<string, never>;
+        Settlement: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            kitchenId: string;
+            /** Format: date */
+            periodFrom: string;
+            /** Format: date */
+            periodTo: string;
+            state: components["schemas"]["SettlementState"];
+            total: components["schemas"]["Money"];
+            /** @enum {string} */
+            direction: "COOK_PAYS_PLATFORM";
+            lines: components["schemas"]["SettlementLine"][];
+            /** Format: uuid */
+            createdBy: string;
+            /** Format: uuid */
+            reviewedBy: string | null;
+            paymentReference: string | null;
+            /** Format: uuid */
+            paymentRecordedBy: string | null;
+            /** Format: uuid */
+            reconciledBy: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
         SlotAvailability: {
             /** Format: uuid */
             id: string;
@@ -2996,13 +3094,40 @@ export interface components {
             messages: components["schemas"]["CaseMessage"][];
             version: number;
         };
-        /** @description Own statement for a Cairo date range. includes lists what it covers; refunds, reversals and remittances are not included until finance operations (MB-025), and their absence does not mean zero. Cash collected by the cook is not platform revenue; only the commission is receivable. */
+        /** @description Kitchen statement for a Cairo date range of order completion: completed orders, cash position, posted commission, refunds of those orders, commission reversals and settlements. Cash collected by the cook is not platform revenue; only the commission is receivable (direction COOK_PAYS_PLATFORM). Outstanding = posted - reversed - reconciled. */
         StatementPage: {
+            /** Format: uuid */
+            kitchenId: string;
+            /** @enum {string} */
+            direction: "COOK_PAYS_PLATFORM";
+            refunds: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                orderId: string;
+                amount: components["schemas"]["Money"];
+                state: components["schemas"]["RefundState"];
+                paymentReference: string | null;
+                version: number;
+            }[];
+            settlements: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date */
+                periodFrom: string;
+                /** Format: date */
+                periodTo: string;
+                state: components["schemas"]["SettlementState"];
+                total: components["schemas"]["Money"];
+                paymentReference: string | null;
+                version: number;
+            }[];
+            unsettledEntries: components["schemas"]["SettlementLine"][];
             /** Format: date */
             from: string;
             /** Format: date */
             to: string;
-            includes: ("COMPLETED_ORDERS" | "CASH_POSITION" | "COMMISSION")[];
+            includes: ("COMPLETED_ORDERS" | "CASH_POSITION" | "COMMISSION" | "REFUNDS" | "SETTLEMENTS")[];
             summary: {
                 completedOrders: number;
                 ordersTotal: components["schemas"]["Money"];
@@ -3012,6 +3137,9 @@ export interface components {
                 commissionPosted: components["schemas"]["Money"];
                 /** @description Completed orders whose commission is not posted yet. */
                 commissionPending: number;
+                commissionReversed: components["schemas"]["Money"];
+                commissionSettled: components["schemas"]["Money"];
+                commissionOutstanding: components["schemas"]["Money"];
             };
             items: {
                 /** Format: uuid */
@@ -5492,7 +5620,10 @@ export interface operations {
     };
     getOpsFinanceStatements: {
         parameters: {
-            query?: {
+            query: {
+                kitchenId: string;
+                from?: string;
+                to?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];

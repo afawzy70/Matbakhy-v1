@@ -757,7 +757,7 @@
       "permission": "FINANCE_REFUND",
       "response_type": "Refund",
       "contract": "orderId, caseId, fullAmountMinor, reason, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-085",
@@ -766,7 +766,7 @@
       "permission": "FINANCE_REFUND",
       "response_type": "Refund",
       "contract": "action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-086",
@@ -775,7 +775,7 @@
       "permission": "FINANCE",
       "response_type": "StatementPage",
       "contract": "kitchen/period/state pagination; direction explicit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-087",
@@ -784,7 +784,7 @@
       "permission": "FINANCE_SETTLEMENT",
       "response_type": "Settlement",
       "contract": "kitchenId, period, entryIds, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-088",
@@ -793,7 +793,7 @@
       "permission": "FINANCE_SETTLEMENT",
       "response_type": "Settlement",
       "contract": "action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-089",

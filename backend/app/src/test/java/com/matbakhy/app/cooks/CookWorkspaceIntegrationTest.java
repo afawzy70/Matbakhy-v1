@@ -234,7 +234,8 @@ class CookWorkspaceIntegrationTest {
         UUID pendingOrder = placeOrder("DELIVERY");
 
         JsonNode before = ok(call(get("/api/v1/cook/statements"), as(cookSubject)), 200);
-        assertThat(before.get("includes").toString()).contains("COMMISSION").doesNotContain("REFUND").doesNotContain("REMITTANCE");
+        assertThat(before.get("includes").toString()).contains("COMMISSION").contains("REFUNDS").contains("SETTLEMENTS");
+        assertThat(before.get("direction").asString()).isEqualTo("COOK_PAYS_PLATFORM");
         assertThat(before.get("items").size()).isEqualTo(1);
         JsonNode line = before.get("items").get(0);
         assertThat(line.get("orderId").asString()).isEqualTo(order.toString());

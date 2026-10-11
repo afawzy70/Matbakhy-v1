@@ -21,9 +21,9 @@ import org.springframework.stereotype.Service;
 
 /**
  * API-064: the cook's own statement for a Cairo date range: completed orders with their cash position and the posted
- * commission receivable. Cash the cook collected is the cook's money; only the commission is owed to the platform.
- * Refunds, reversals and remittances are not part of it until finance operations exist (MB-025); {@code includes}
- * says what the statement covers so clients never imply those are zero.
+ * commission receivable, refunds, commission reversals and settlements (MB-025). Cash the cook collected is the cook's
+ * money; only the commission is owed to the platform ({@code direction} COOK_PAYS_PLATFORM). Outstanding commission is
+ * posted minus reversed minus reconciled settlements. Staff read any kitchen's statement (API-086).
  */
 @Service
 public class StatementService {
@@ -35,11 +35,22 @@ public class StatementService {
     }
 
     public record Summary(int completedOrders, Money ordersTotal, Money cashReported, Money cashVerified, Money cashOutstanding,
-                          Money commissionPosted, int commissionPending) {
+                          Money commissionPosted, int commissionPending, Money commissionReversed, Money commissionSettled, Money commissionOutstanding) {
     }
 
-    public record StatementPage(LocalDate from, LocalDate to, List<String> includes, Summary summary, List<Line> items, String nextCursor,
-                                boolean hasMore) {
+    public record RefundSummary(UUID id, UUID orderId, Money amount, String state, String paymentReference, long version) {
+    }
+
+    public record SettlementSummary(UUID id, LocalDate periodFrom, LocalDate periodTo, String state, Money total, String paymentReference,
+                                    long version) {
+    }
+
+    public record UnsettledEntry(UUID ledgerGroupId, String kind, UUID orderId, Money amount) {
+    }
+
+    public record StatementPage(UUID kitchenId, LocalDate from, LocalDate to, String direction, List<String> includes, Summary summary, List<Line> items,
+                                List<RefundSummary> refunds, List<SettlementSummary> settlements, List<UnsettledEntry> unsettledEntries,
+                                String nextCursor, boolean hasMore) {
     }
 
     private final JdbcTemplate jdbc;
@@ -66,6 +77,14 @@ public class StatementService {
     public StatementPage statement(UUID cookId, String fromParam, String toParam, String cursor, int limit) {
         UUID kitchen = kitchens.ownedBy(cookId).map(KitchenDirectory.KitchenStatus::kitchenId)
                 .orElseThrow(() -> new ApiException(ErrorCode.FORBIDDEN, "not a cook"));
+        return forKitchen(kitchen, fromParam, toParam, cursor, limit);
+    }
+
+    /** API-086: any kitchen, for finance staff. */
+    public StatementPage forKitchen(UUID kitchen, String fromParam, String toParam, String cursor, int limit) {
+        if (kitchens.find(kitchen).isEmpty()) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "kitchen not found");
+        }
         if (limit < 1 || limit > 100) {
             throw invalid("limit", "RANGE_1_100");
         }
@@ -101,7 +120,33 @@ public class StatementService {
                 commission += ((Number) c).longValue();
             }
         }
-        Summary summary = new Summary(all.size(), egp(ordersTotal), egp(reported), egp(verified), egp(outstanding), egp(commission), pending);
+        List<UUID> orderIds = all.stream().map(r -> (UUID) r.get("id")).toList();
+        UUID[] ids = orderIds.toArray(UUID[]::new);
+        long reversed = jdbc.queryForObject("""
+                SELECT coalesce(sum(e.amount_minor), 0) FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id
+                WHERE g.kind = 'COMMISSION_REVERSAL' AND e.account = 'COOK_COMMISSION_RECEIVABLE' AND g.order_id = ANY (?)""", Long.class, (Object) ids);
+        long settled = jdbc.queryForObject("""
+                SELECT coalesce(sum(l.amount_minor), 0) FROM settlement_line l JOIN settlement_batch b ON b.id = l.batch_id
+                JOIN ledger_group g ON g.id = l.ledger_group_id WHERE l.active AND b.state = 'RECONCILED' AND g.order_id = ANY (?)""", Long.class, (Object) ids);
+        Summary summary = new Summary(all.size(), egp(ordersTotal), egp(reported), egp(verified), egp(outstanding), egp(commission), pending,
+                egp(reversed), egp(settled), egp(commission - reversed - settled));
+        List<RefundSummary> refunds = jdbc.query("""
+                SELECT id, order_id, amount_minor, state, payment_reference, version FROM refund WHERE order_id = ANY (?) ORDER BY created_at, id""",
+                (rs, n) -> new RefundSummary(rs.getObject(1, UUID.class), rs.getObject(2, UUID.class), egp(rs.getLong(3)), rs.getString(4), rs.getString(5), rs.getLong(6)),
+                (Object) ids);
+        List<SettlementSummary> settlements = jdbc.query("""
+                SELECT id, period_from, period_to, state, total_minor, payment_reference, version FROM settlement_batch
+                WHERE kitchen_id = ? AND period_from <= ? AND period_to >= ? ORDER BY created_at, id""",
+                (rs, n) -> new SettlementSummary(rs.getObject(1, UUID.class), rs.getObject(2, LocalDate.class), rs.getObject(3, LocalDate.class),
+                        rs.getString(4), egp(rs.getLong(5)), rs.getString(6), rs.getLong(7)), kitchen, to, from);
+        List<UnsettledEntry> unsettled = jdbc.query("""
+                SELECT g.id, g.kind, g.order_id, CASE WHEN g.kind = 'COMMISSION' THEN e.amount_minor ELSE -e.amount_minor END
+                FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id AND e.account = 'COOK_COMMISSION_RECEIVABLE'
+                WHERE g.kitchen_id = ? AND g.posted_at >= ? AND g.posted_at < ?
+                  AND NOT EXISTS (SELECT 1 FROM settlement_line l WHERE l.ledger_group_id = g.id AND l.active)
+                ORDER BY g.posted_at, g.id LIMIT 500""",
+                (rs, n) -> new UnsettledEntry(rs.getObject(1, UUID.class), rs.getString(2), rs.getObject(3, UUID.class), egp(rs.getLong(4))),
+                kitchen, start, end);
 
         Instant afterTime = Instant.EPOCH;
         UUID afterId = new UUID(0, 0);
@@ -131,7 +176,8 @@ public class StatementService {
         List<Line> page = more ? rows.subList(0, limit) : rows;
         String next = more ? Base64.getUrlEncoder().withoutPadding().encodeToString((page.getLast().completedAt() + "|" + page.getLast().orderId()
                 + "|" + from + "|" + to).getBytes(StandardCharsets.UTF_8)) : null;
-        return new StatementPage(from, to, List.of("COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION"), summary, page, next, more);
+        return new StatementPage(kitchen, from, to, "COOK_PAYS_PLATFORM", List.of("COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION", "REFUNDS", "SETTLEMENTS"),
+                summary, page, refunds, settlements, unsettled, next, more);
     }
 
     private static LocalDate date(String field, String value, LocalDate fallback) {

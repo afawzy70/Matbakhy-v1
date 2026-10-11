@@ -2888,7 +2888,7 @@ paths:
       description: orderId, caseId, fullAmountMinor, reason, Idempotency-Key
       x-matbakhy-id: API-084
       x-permission: FINANCE_REFUND
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2920,7 +2920,7 @@ paths:
       description: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key
       x-matbakhy-id: API-085
       x-permission: FINANCE_REFUND
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2956,11 +2956,29 @@ paths:
       description: kitchen/period/state pagination; direction explicit
       x-matbakhy-id: API-086
       x-permission: FINANCE
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: kitchenId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2983,7 +3001,7 @@ paths:
       description: kitchenId, period, entryIds, Idempotency-Key
       x-matbakhy-id: API-087
       x-permission: FINANCE_SETTLEMENT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3015,7 +3033,7 @@ paths:
       description: action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key
       x-matbakhy-id: API-088
       x-permission: FINANCE_SETTLEMENT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -5789,20 +5807,96 @@ components:
           minimum: 0
     PostOpsFinanceRefundsActionRequest:
       type: object
-      description: "PENDING typed schema. Request for API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [action, expectedVersion]
+      properties:
+        action:
+          type: string
+          enum: [APPROVE, REJECT, PAYMENT_RECORDED, VERIFY]
+        evidenceRef:
+          type: string
+          minLength: 3
+          maxLength: 200
+          description: External payment reference, required for PAYMENT_RECORDED
+        reason:
+          type: string
+          maxLength: 1000
+          description: Required for REJECT
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsFinanceRefundsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-084: orderId, caseId, fullAmountMinor, reason, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        Requires VERIFIED cash collection. fullAmountMinor must equal the verified collection less refunds not rejected
+        (422 OVER_REFUND or FULL_REFUND_REQUIRED; 409 when nothing is left).
+      required: [orderId, caseId, fullAmountMinor, reason]
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        caseId:
+          type: string
+          minLength: 3
+          maxLength: 100
+          description: Support case reference
+        fullAmountMinor:
+          type: integer
+          format: int64
+          minimum: 1
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
     PostOpsFinanceSettlementsActionRequest:
       type: object
-      description: "PENDING typed schema. Request for API-088: action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        REVIEW (not the creator) makes the batch immutable; CANCEL only from DRAFT; PAYMENT_RECORDED needs the external
+        remittance reference; RECONCILE by someone other than the recorder.
+      required: [action, expectedVersion]
+      properties:
+        action:
+          type: string
+          enum: [REVIEW, PAYMENT_RECORDED, RECONCILE, CANCEL]
+        evidenceRef:
+          type: string
+          minLength: 3
+          maxLength: 200
+        reason:
+          type: string
+          maxLength: 1000
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsFinanceSettlementsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-087: kitchenId, period, entryIds, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Ledger groups of the kitchen posted within the period; each can be in one active batch only (409 ALREADY_SETTLED).
+      required: [kitchenId, period, entryIds]
+      properties:
+        kitchenId:
+          type: string
+          format: uuid
+        period:
+          type: object
+          additionalProperties: false
+          required: [from, to]
+          properties:
+            from:
+              type: string
+              format: date
+            to:
+              type: string
+              format: date
+        entryIds:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: string
+            format: uuid
     PostOpsKitchensOperatingStateRequest:
       type: object
       additionalProperties: false
@@ -6229,8 +6323,78 @@ components:
           description: Average rating x10 (e.g. 43 = 4.3); null without visible reviews
     Refund:
       type: object
-      description: PENDING typed schema. Response for API-084.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        Full refund obligation. REQUESTED -> APPROVED (another person) -> PAID (external payment reference) -> VERIFIED (not the
+        payer; reverses the order's commission once) or REJECTED. Approval does not mean paid.
+      required: [id, orderId, kitchenId, caseReference, amount, state, reason, requestedBy, approvedBy, paidBy, paymentReference, verifiedBy,
+                 decisionReason, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderId:
+          type: string
+          format: uuid
+        kitchenId:
+          type: string
+          format: uuid
+        caseReference:
+          type: string
+        amount:
+          $ref: "#/components/schemas/Money"
+        state:
+          $ref: "#/components/schemas/RefundState"
+        reason:
+          type: string
+        requestedBy:
+          type: string
+          format: uuid
+        approvedBy:
+          type: [string, "null"]
+          format: uuid
+        paidBy:
+          type: [string, "null"]
+          format: uuid
+        paymentReference:
+          type: [string, "null"]
+        verifiedBy:
+          type: [string, "null"]
+          format: uuid
+        decisionReason:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
+    RefundState:
+      type: string
+      enum: [REQUESTED, APPROVED, PAID, VERIFIED, REJECTED]
+    SettlementState:
+      type: string
+      enum: [DRAFT, REVIEWED, PAYMENT_RECORDED, RECONCILED, CANCELLED]
+    SettlementLine:
+      type: object
+      additionalProperties: false
+      description: A ledger group; reversals are negative.
+      required: [ledgerGroupId, kind, orderId, amount]
+      properties:
+        ledgerGroupId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum: [COMMISSION, COMMISSION_REVERSAL]
+        orderId:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/Money"
     Report:
       type: object
       description: PENDING typed schema. Response for API-030.
@@ -6245,8 +6409,56 @@ components:
       x-schema-status: PENDING
     Settlement:
       type: object
-      description: PENDING typed schema. Response for API-087.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [id, kitchenId, periodFrom, periodTo, state, total, direction, lines, createdBy, reviewedBy, paymentReference, paymentRecordedBy,
+                 reconciledBy, createdAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kitchenId:
+          type: string
+          format: uuid
+        periodFrom:
+          type: string
+          format: date
+        periodTo:
+          type: string
+          format: date
+        state:
+          $ref: "#/components/schemas/SettlementState"
+        total:
+          $ref: "#/components/schemas/Money"
+        direction:
+          type: string
+          enum: [COOK_PAYS_PLATFORM]
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/SettlementLine"
+        createdBy:
+          type: string
+          format: uuid
+        reviewedBy:
+          type: [string, "null"]
+          format: uuid
+        paymentReference:
+          type: [string, "null"]
+        paymentRecordedBy:
+          type: [string, "null"]
+          format: uuid
+        reconciledBy:
+          type: [string, "null"]
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
     SlotAvailability:
       type: object
       additionalProperties: false
@@ -6416,11 +6628,69 @@ components:
       type: object
       additionalProperties: false
       description: >-
-        Own statement for a Cairo date range. includes lists what it covers; refunds, reversals and remittances are
-        not included until finance operations (MB-025), and their absence does not mean zero. Cash collected by the
-        cook is not platform revenue; only the commission is receivable.
-      required: [from, to, includes, summary, items, nextCursor, hasMore]
+        Kitchen statement for a Cairo date range of order completion: completed orders, cash position, posted commission,
+        refunds of those orders, commission reversals and settlements. Cash collected by the cook is not platform revenue;
+        only the commission is receivable (direction COOK_PAYS_PLATFORM). Outstanding = posted - reversed - reconciled.
+      required: [kitchenId, from, to, direction, includes, summary, items, refunds, settlements, unsettledEntries, nextCursor, hasMore]
       properties:
+        kitchenId:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum: [COOK_PAYS_PLATFORM]
+        refunds:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, orderId, amount, state, paymentReference, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              orderId:
+                type: string
+                format: uuid
+              amount:
+                $ref: "#/components/schemas/Money"
+              state:
+                $ref: "#/components/schemas/RefundState"
+              paymentReference:
+                type: [string, "null"]
+              version:
+                type: integer
+                minimum: 0
+        settlements:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, periodFrom, periodTo, state, total, paymentReference, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              periodFrom:
+                type: string
+                format: date
+              periodTo:
+                type: string
+                format: date
+              state:
+                $ref: "#/components/schemas/SettlementState"
+              total:
+                $ref: "#/components/schemas/Money"
+              paymentReference:
+                type: [string, "null"]
+              version:
+                type: integer
+                minimum: 0
+        unsettledEntries:
+          type: array
+          maxItems: 500
+          items:
+            $ref: "#/components/schemas/SettlementLine"
         from:
           type: string
           format: date
@@ -6431,11 +6701,12 @@ components:
           type: array
           items:
             type: string
-            enum: [COMPLETED_ORDERS, CASH_POSITION, COMMISSION]
+            enum: [COMPLETED_ORDERS, CASH_POSITION, COMMISSION, REFUNDS, SETTLEMENTS]
         summary:
           type: object
           additionalProperties: false
-          required: [completedOrders, ordersTotal, cashReported, cashVerified, cashOutstanding, commissionPosted, commissionPending]
+          required: [completedOrders, ordersTotal, cashReported, cashVerified, cashOutstanding, commissionPosted, commissionPending, commissionReversed,
+                     commissionSettled, commissionOutstanding]
           properties:
             completedOrders:
               type: integer
@@ -6454,6 +6725,12 @@ components:
               type: integer
               minimum: 0
               description: Completed orders whose commission is not posted yet.
+            commissionReversed:
+              $ref: "#/components/schemas/Money"
+            commissionSettled:
+              $ref: "#/components/schemas/Money"
+            commissionOutstanding:
+              $ref: "#/components/schemas/Money"
         items:
           type: array
           items:

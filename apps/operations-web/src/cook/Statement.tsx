@@ -51,6 +51,14 @@ export function Statement({ ctx }: { ctx: Ctx }) {
               <dd>{formatMoney(s.summary.commissionPosted.amountMinor, locale)}</dd>
               <dt>{t.commissionPending}</dt>
               <dd>{s.summary.commissionPending}</dd>
+              <dt>{t.commissionReversed}</dt>
+              <dd>{formatMoney(s.summary.commissionReversed.amountMinor, locale)}</dd>
+              <dt>{t.commissionSettled}</dt>
+              <dd>{formatMoney(s.summary.commissionSettled.amountMinor, locale)}</dd>
+              <dt>{t.commissionOutstanding}</dt>
+              <dd>
+                <strong>{formatMoney(s.summary.commissionOutstanding.amountMinor, locale)}</strong>
+              </dd>
             </dl>
             <div className="table-wrap">
               <table>

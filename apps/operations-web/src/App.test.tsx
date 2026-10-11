@@ -20,7 +20,7 @@ function server(routes: Record<string, Handler>) {
     calls.push({ method: input.method, path: url.pathname + url.search, headers: input.headers, body });
     const key = `${input.method} ${url.pathname}`;
     const handler = routes[key];
-    const r = handler ? handler(input, body) : { status: 404, body: { code: "NOT_FOUND" } };
+    const r = handler ? handler(input, body) : { status: 403, body: { code: "FORBIDDEN" } };
     return new Response(r.body === undefined ? null : JSON.stringify(r.body), {
       status: r.status,
       headers: { "Content-Type": "application/json" },
@@ -199,7 +199,7 @@ describe("operations-web cook workspace", () => {
     expect(screen.queryByRole("button", { name: "استئناف البيع" })).toBeNull();
   });
 
-  it("states that the statement excludes refunds and settlements", async () => {
+  it("explains that collected cash is the cook's and shows the commission still owed", async () => {
     const { fetchImpl } = server({
       "GET /api/v1/me": me,
       "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
@@ -209,7 +209,23 @@ describe("operations-web cook workspace", () => {
           from: "2026-10-01",
           to: "2026-10-11",
           includes: ["COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION"],
-          summary: { completedOrders: 1, ordersTotal: egp(24000), cashReported: egp(0), cashVerified: egp(0), cashOutstanding: egp(24000), commissionPosted: egp(2400), commissionPending: 0 },
+          kitchenId: "k1",
+          direction: "COOK_PAYS_PLATFORM",
+          refunds: [],
+          settlements: [],
+          unsettledEntries: [],
+          summary: {
+            completedOrders: 1,
+            ordersTotal: egp(24000),
+            cashReported: egp(0),
+            cashVerified: egp(0),
+            cashOutstanding: egp(24000),
+            commissionPosted: egp(2400),
+            commissionPending: 0,
+            commissionReversed: egp(0),
+            commissionSettled: egp(0),
+            commissionOutstanding: egp(2400),
+          },
           items: [{ orderId: "o1", publicNumber: "MB-1001", completedAt: "2026-10-11T09:00:00Z", orderTotal: egp(24000), cashState: "DUE", commission: egp(2400), commissionState: "POSTED" }],
           nextCursor: null,
           hasMore: false,
@@ -218,7 +234,8 @@ describe("operations-web cook workspace", () => {
     });
     render(<App fetchImpl={fetchImpl} />);
     fireEvent.click(await screen.findByRole("button", { name: "الكشف" }));
-    expect(await screen.findByText(/الاستردادات والتسويات غير مشمولة بعد/)).toBeTruthy();
+    expect(await screen.findByText(/المستحق للمنصة هو العمولة فقط/)).toBeTruthy();
+    expect(screen.getByText("عمولة مستحقة الدفع للمنصة")).toBeTruthy();
     expect(screen.getByRole("cell", { name: "MB-1001" })).toBeTruthy();
   });
 
@@ -347,6 +364,60 @@ describe("operations-web cook workspace", () => {
     fireEvent.click(screen.getByRole("button", { name: "إرسال" }));
     await waitFor(() => expect(calls.some((c) => c.method === "POST")).toBe(true));
     expect(calls.find((c) => c.method === "POST")?.body).toEqual({ body: "calling the customer now", visibility: "STAFF_ONLY" });
+  });
+
+  it("lets finance staff act on refunds and settlements with the current versions and evidence", async () => {
+    const statement = {
+      kitchenId: "11111111-1111-4111-8111-111111111111",
+      from: "2026-10-01",
+      to: "2026-10-11",
+      direction: "COOK_PAYS_PLATFORM",
+      includes: ["COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION", "REFUNDS", "SETTLEMENTS"],
+      summary: {
+        completedOrders: 1,
+        ordersTotal: egp(24000),
+        cashReported: egp(0),
+        cashVerified: egp(24000),
+        cashOutstanding: egp(0),
+        commissionPosted: egp(2400),
+        commissionPending: 0,
+        commissionReversed: egp(0),
+        commissionSettled: egp(0),
+        commissionOutstanding: egp(2400),
+      },
+      items: [{ orderId: "o1", publicNumber: "MB-1001", completedAt: SERVER_NOW, orderTotal: egp(24000), cashState: "VERIFIED", commission: egp(2400), commissionState: "POSTED" }],
+      refunds: [{ id: "r1", orderId: "o1", amount: egp(24000), state: "APPROVED", paymentReference: null, version: 3 }],
+      settlements: [],
+      unsettledEntries: [{ ledgerGroupId: "g1", kind: "COMMISSION", orderId: "o1", amount: egp(2400) }],
+      nextCursor: null,
+      hasMore: false,
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/finance/statements": (req) =>
+        new URL(req.url).searchParams.get("kitchenId") === statement.kitchenId ? { status: 200, body: statement } : { status: 404, body: { code: "NOT_FOUND" } },
+      "POST /api/v1/ops/finance/refunds/r1/action": () => ({ status: 200, body: {} }),
+      "POST /api/v1/ops/finance/settlements": () => ({ status: 200, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.change(await screen.findByLabelText("معرّف المطبخ"), { target: { value: statement.kitchenId } });
+    fireEvent.click(screen.getByRole("button", { name: "عرض" }));
+    expect(await screen.findByText(/معتمد \(غير مدفوع\)/)).toBeTruthy();
+    const pay = screen.getByRole("button", { name: "تسجيل الدفع" }) as HTMLButtonElement;
+    expect(pay.disabled).toBe(true);
+    fireEvent.change(screen.getByLabelText("مرجع الدفع الخارجي"), { target: { value: "bank-ref-9" } });
+    fireEvent.click(pay);
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/refunds/r1/action"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/refunds/r1/action"))?.body).toEqual({ action: "PAYMENT_RECORDED", expectedVersion: 3, evidenceRef: "bank-ref-9" });
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: "إنشاء دفعة تسوية" }));
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/ops/finance/settlements")).toBe(true));
+    expect(calls.find((c) => c.path === "/api/v1/ops/finance/settlements")?.body).toEqual({
+      kitchenId: statement.kitchenId,
+      period: { from: "2026-10-01", to: "2026-10-11" },
+      entryIds: ["g1"],
+    });
   });
 });
 
