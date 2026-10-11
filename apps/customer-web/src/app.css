@@ -625,3 +625,10 @@ button.link {
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
   }
 }
+
+/* Links inside the page are touch targets too (44 px minimum), not just buttons. */
+.shell a:not(.button) {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--mb-touch-target-min);
+}

@@ -195,6 +195,9 @@ test("customer orders delivery and pickup in the customer web and follows the co
         }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
       expect(undersized, `touch targets ${width} ${route}`).toEqual([]);
       await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+      if (process.env.E2E_SCREENSHOT_DIR) {
+        await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${route.replace(/[#/]+/g, "_").slice(0, 12)}-${width}.png`, fullPage: true });
+      }
     }
   }
   await page.goto(`${CUSTOMER}/#/`);
