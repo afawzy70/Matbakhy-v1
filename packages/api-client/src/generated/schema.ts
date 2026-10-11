@@ -1806,10 +1806,56 @@ export interface components {
             requestId: string | null;
             retryable: boolean;
         };
-        /** @description PENDING typed schema. Response for API-067. */
-        ApplicationPage: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-068. */
-        ApplicationReview: Record<string, never>;
+        ApplicationPage: {
+            items: components["schemas"]["ApplicationSummary"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        /** @description Queue row without private fields. */
+        ApplicationSummary: {
+            /** Format: uuid */
+            id: string;
+            state: components["schemas"]["CookApplicationState"];
+            publicName: string | null;
+            currentRevision: number;
+            /** Format: date-time */
+            submittedAt: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        /** @description Reviewer view of submitted revisions including private fields; every read is audited. Document access arrives with media (MB-013). */
+        ApplicationReview: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            applicantId: string;
+            state: components["schemas"]["CookApplicationState"];
+            currentRevision: number;
+            revisions: components["schemas"]["CookApplicationRevision"][];
+            /** Format: uuid */
+            kitchenId: string | null;
+            version: number;
+        };
+        /** @description Immutable submitted snapshot; decision fields are set once. */
+        CookApplicationRevision: {
+            revision: number;
+            publicName: string;
+            bio: string;
+            contactPhone: string;
+            privateLocation: string;
+            pickupEnabled: boolean;
+            zoneIds: string[];
+            /** Format: date-time */
+            submittedAt: string;
+            /** @enum {string|null} */
+            decision: "APPROVED" | "CHANGES_REQUESTED" | "REJECTED" | null;
+            decisionReason: string | null;
+            /** Format: uuid */
+            reviewerId: string | null;
+            /** Format: date-time */
+            decidedAt: string | null;
+        };
         AuditEvent: {
             /** Format: uuid */
             id: string;
@@ -1855,8 +1901,38 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-089. */
         ConfigurationVersions: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-042. */
-        CookApplication: Record<string, never>;
+        /** @description The applicant's own application (API-042..044). Reviewer identity is not included. */
+        CookApplication: {
+            /** Format: uuid */
+            id: string;
+            state: components["schemas"]["CookApplicationState"];
+            draft: components["schemas"]["CookApplicationDraft"];
+            currentRevision: number;
+            history: components["schemas"]["CookApplicationHistoryEntry"][];
+            version: number;
+        };
+        /** @enum {string} */
+        CookApplicationState: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "CHANGES_REQUESTED" | "REJECTED";
+        CookApplicationDraft: {
+            publicName: string | null;
+            bio: string | null;
+            /** @description Egyptian mobile in E.164 */
+            contactPhone: string | null;
+            /** @description Private; never shown publicly */
+            privateLocation: string | null;
+            pickupEnabled: boolean;
+            zoneIds: string[];
+        };
+        CookApplicationHistoryEntry: {
+            revision: number;
+            /** Format: date-time */
+            submittedAt: string;
+            /** @enum {string|null} */
+            decision: "APPROVED" | "CHANGES_REQUESTED" | "REJECTED" | null;
+            decisionReason: string | null;
+            /** Format: date-time */
+            decidedAt: string | null;
+        };
         /** @description PENDING typed schema. Response for API-045. */
         CookDashboard: Record<string, never>;
         /** @description PENDING typed schema. Response for API-047. */
@@ -1923,10 +1999,32 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-096. */
         IntegrationHealth: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-070. */
-        KitchenAdmin: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-005. */
-        KitchenPublic: Record<string, never>;
+        KitchenAdmin: {
+            /** Format: uuid */
+            kitchenId: string;
+            /** Format: uuid */
+            ownerId: string;
+            publicSlug: string;
+            displayName: string;
+            /** @enum {string} */
+            operatingState: "ACTIVE" | "PAUSED" | "SUSPENDED" | "CLOSED";
+            stateReason: string | null;
+            approvedRevision: number;
+            version: number;
+        };
+        /** @description Public profile. Never includes private location, contact phone, owner or documents. The label is operational verification, not a food-safety certification. Rating summary arrives with reviews (MB-024). */
+        KitchenPublic: {
+            /** Format: uuid */
+            kitchenId: string;
+            slug: string;
+            displayName: string;
+            description: string;
+            /** @enum {string} */
+            verificationLabel: "OPERATIONALLY_VERIFIED";
+            available: boolean;
+            pickupEnabled: boolean;
+            deliveryZoneIds: string[];
+        };
         KitchenSummary: {
             /** Format: uuid */
             id: string;
@@ -2110,8 +2208,9 @@ export interface components {
         PolicyDocument: Record<string, never>;
         /** @description PENDING typed schema. Response for API-090. */
         PolicyVersion: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-044: expectedVersion; full validation */
-        PostCookApplicationSubmitRequest: Record<string, never>;
+        PostCookApplicationSubmitRequest: {
+            expectedVersion: number;
+        };
         /** @description PENDING typed schema. Request for API-049: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards */
         PostCookMealsPublicationRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-047: localized fields, portion, price, ingredients, allergens, approved media refs */
@@ -2155,8 +2254,14 @@ export interface components {
         PostOpsCasesMessagesRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up */
         PostOpsConfigurationVersionsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-069: decision, reason, revision, expectedVersion, Idempotency-Key */
-        PostOpsCooksDecisionRequest: Record<string, never>;
+        /** @description START_REVIEW moves SUBMITTED to UNDER_REVIEW; the other decisions need UNDER_REVIEW and a reason. A reviewer cannot decide their own application. */
+        PostOpsCooksDecisionRequest: {
+            /** @enum {string} */
+            decision: "START_REVIEW" | "APPROVE" | "REQUEST_CHANGES" | "REJECT";
+            reason?: string | null;
+            revision: number;
+            expectedVersion: number;
+        };
         /** @description PENDING typed schema. Request for API-083: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key */
         PostOpsFinanceCashReportsVerificationRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key */
@@ -2167,8 +2272,13 @@ export interface components {
         PostOpsFinanceSettlementsActionRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-087: kitchenId, period, entryIds, Idempotency-Key */
         PostOpsFinanceSettlementsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-070: pause/suspend/restore, reason, expectedVersion; affected order review */
-        PostOpsKitchensOperatingStateRequest: Record<string, never>;
+        /** @description PAUSE (ACTIVE to PAUSED), SUSPEND (ACTIVE or PAUSED to SUSPENDED), RESTORE (PAUSED or SUSPENDED to ACTIVE). Staff cannot change their own kitchen. */
+        PostOpsKitchensOperatingStateRequest: {
+            /** @enum {string} */
+            action: "PAUSE" | "SUSPEND" | "RESTORE";
+            reason: string;
+            expectedVersion: number;
+        };
         /** @description PENDING typed schema. Request for API-072: action, reason, expectedVersion */
         PostOpsMealsModerationRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-077: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key */
@@ -2205,8 +2315,17 @@ export interface components {
         PostUploadsRequest: Record<string, never>;
         /** @description PENDING typed schema. Response for API-001. */
         PublicConfiguration: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-043: public profile, contact/location refs, documents, zones, expectedVersion */
-        PutCookApplicationRequest: Record<string, never>;
+        /** @description Full replacement of the working draft. Omitted fields become empty. expectedVersion is required once the application exists. */
+        PutCookApplicationRequest: {
+            publicName?: string;
+            bio?: string;
+            /** @description Egyptian mobile in any common local form; normalized to E.164 */
+            contactPhone?: string;
+            privateLocation?: string;
+            pickupEnabled?: boolean;
+            zoneIds?: string[];
+            expectedVersion?: number;
+        };
         /** @description PENDING typed schema. Request for API-033: platform, pushToken, environment, appVersion; encrypt token */
         PutMeDevicesByIdRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-019: idempotent add */
@@ -4120,6 +4239,8 @@ export interface operations {
     getOpsCooks: {
         parameters: {
             query?: {
+                state?: components["schemas"]["CookApplicationState"];
+                q?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -4191,7 +4312,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CookApplication"];
+                    "application/json": components["schemas"]["ApplicationReview"];
                 };
             };
             "4XX": components["responses"]["Error"];

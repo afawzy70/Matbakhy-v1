@@ -146,7 +146,7 @@ paths:
       description: public profile, operational approval label and visible rating summary
       x-matbakhy-id: API-005
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       parameters:
         - name: slug
@@ -1272,7 +1272,7 @@ paths:
       description: current own revision and decision history
       x-matbakhy-id: API-042
       x-permission: COOK_APPLICANT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1295,7 +1295,7 @@ paths:
       description: public profile, contact/location refs, documents, zones, expectedVersion
       x-matbakhy-id: API-043
       x-permission: COOK_APPLICANT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1325,7 +1325,7 @@ paths:
       description: expectedVersion; full validation
       x-matbakhy-id: API-044
       x-permission: COOK_APPLICANT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2057,11 +2057,22 @@ paths:
       description: state, q, cursor, limit
       x-matbakhy-id: API-067
       x-permission: COOK_REVIEW
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CookApplicationState"
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 80
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2084,7 +2095,7 @@ paths:
       description: revision, private documents via expiring scoped access
       x-matbakhy-id: API-068
       x-permission: COOK_REVIEW
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2113,7 +2124,7 @@ paths:
       description: decision, reason, revision, expectedVersion, Idempotency-Key
       x-matbakhy-id: API-069
       x-permission: COOK_REVIEW
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2129,7 +2140,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CookApplication"
+                $ref: "#/components/schemas/ApplicationReview"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2149,7 +2160,7 @@ paths:
       description: pause/suspend/restore, reason, expectedVersion; affected order review
       x-matbakhy-id: API-070
       x-permission: COOK_REVIEW
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3247,12 +3258,125 @@ components:
       description: Standard error body; matches backend ErrorCode/ApiError.
     ApplicationPage:
       type: object
-      description: PENDING typed schema. Response for API-067.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ApplicationSummary"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
+    ApplicationSummary:
+      type: object
+      additionalProperties: false
+      description: Queue row without private fields.
+      required: [id, state, publicName, currentRevision, submittedAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: "#/components/schemas/CookApplicationState"
+        publicName:
+          type:
+            - string
+            - "null"
+          maxLength: 80
+        currentRevision:
+          type: integer
+          minimum: 0
+        submittedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
     ApplicationReview:
       type: object
-      description: PENDING typed schema. Response for API-068.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Reviewer view of submitted revisions including private fields; every read is audited. Document access arrives with media (MB-013).
+      required: [id, applicantId, state, currentRevision, revisions, kitchenId, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        applicantId:
+          type: string
+          format: uuid
+        state:
+          $ref: "#/components/schemas/CookApplicationState"
+        currentRevision:
+          type: integer
+          minimum: 0
+        revisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/CookApplicationRevision"
+        kitchenId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        version:
+          type: integer
+          minimum: 0
+    CookApplicationRevision:
+      type: object
+      additionalProperties: false
+      description: Immutable submitted snapshot; decision fields are set once.
+      required: [revision, publicName, bio, contactPhone, privateLocation, pickupEnabled, zoneIds, submittedAt, decision, decisionReason, reviewerId, decidedAt]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        publicName:
+          type: string
+        bio:
+          type: string
+        contactPhone:
+          type: string
+        privateLocation:
+          type: string
+        pickupEnabled:
+          type: boolean
+        zoneIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        submittedAt:
+          type: string
+          format: date-time
+        decision:
+          type:
+            - string
+            - "null"
+          enum: [APPROVED, CHANGES_REQUESTED, REJECTED, null]
+        decisionReason:
+          type:
+            - string
+            - "null"
+          maxLength: 1000
+        reviewerId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        decidedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
     AuditEvent:
       type: object
       additionalProperties: false
@@ -3378,8 +3502,91 @@ components:
       x-schema-status: PENDING
     CookApplication:
       type: object
-      description: PENDING typed schema. Response for API-042.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: The applicant's own application (API-042..044). Reviewer identity is not included.
+      required: [id, state, draft, currentRevision, history, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: "#/components/schemas/CookApplicationState"
+        draft:
+          $ref: "#/components/schemas/CookApplicationDraft"
+        currentRevision:
+          type: integer
+          minimum: 0
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/CookApplicationHistoryEntry"
+        version:
+          type: integer
+          minimum: 0
+    CookApplicationState:
+      type: string
+      enum: [DRAFT, SUBMITTED, UNDER_REVIEW, APPROVED, CHANGES_REQUESTED, REJECTED]
+    CookApplicationDraft:
+      type: object
+      additionalProperties: false
+      required: [publicName, bio, contactPhone, privateLocation, pickupEnabled, zoneIds]
+      properties:
+        publicName:
+          type:
+            - string
+            - "null"
+          maxLength: 80
+        bio:
+          type:
+            - string
+            - "null"
+          maxLength: 1000
+        contactPhone:
+          type:
+            - string
+            - "null"
+          description: Egyptian mobile in E.164
+          pattern: ^\+201[0125][0-9]{8}$
+        privateLocation:
+          description: Private; never shown publicly
+          type:
+            - string
+            - "null"
+          maxLength: 300
+        pickupEnabled:
+          type: boolean
+        zoneIds:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            format: uuid
+    CookApplicationHistoryEntry:
+      type: object
+      additionalProperties: false
+      required: [revision, submittedAt, decision, decisionReason, decidedAt]
+      properties:
+        revision:
+          type: integer
+          minimum: 1
+        submittedAt:
+          type: string
+          format: date-time
+        decision:
+          type:
+            - string
+            - "null"
+          enum: [APPROVED, CHANGES_REQUESTED, REJECTED, null]
+        decisionReason:
+          type:
+            - string
+            - "null"
+          maxLength: 1000
+        decidedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
     CookDashboard:
       type: object
       description: PENDING typed schema. Response for API-045.
@@ -3547,12 +3754,61 @@ components:
       x-schema-status: PENDING
     KitchenAdmin:
       type: object
-      description: PENDING typed schema. Response for API-070.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [kitchenId, ownerId, publicSlug, displayName, operatingState, stateReason, approvedRevision, version]
+      properties:
+        kitchenId:
+          type: string
+          format: uuid
+        ownerId:
+          type: string
+          format: uuid
+        publicSlug:
+          type: string
+          pattern: ^[a-z0-9-]{3,80}$
+        displayName:
+          type: string
+        operatingState:
+          type: string
+          enum: [ACTIVE, PAUSED, SUSPENDED, CLOSED]
+        stateReason:
+          type:
+            - string
+            - "null"
+        approvedRevision:
+          type: integer
+          minimum: 1
+        version:
+          type: integer
+          minimum: 0
     KitchenPublic:
       type: object
-      description: PENDING typed schema. Response for API-005.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Public profile. Never includes private location, contact phone, owner or documents. The label is operational verification, not a food-safety certification. Rating summary arrives with reviews (MB-024).
+      required: [kitchenId, slug, displayName, description, verificationLabel, available, pickupEnabled, deliveryZoneIds]
+      properties:
+        kitchenId:
+          type: string
+          format: uuid
+        slug:
+          type: string
+          pattern: ^[a-z0-9-]{3,80}$
+        displayName:
+          type: string
+        description:
+          type: string
+        verificationLabel:
+          type: string
+          enum: [OPERATIONALLY_VERIFIED]
+        available:
+          type: boolean
+        pickupEnabled:
+          type: boolean
+        deliveryZoneIds:
+          type: array
+          items:
+            type: string
+            format: uuid
     KitchenSummary:
       type: object
       additionalProperties: false
@@ -4012,8 +4268,12 @@ components:
       x-schema-status: PENDING
     PostCookApplicationSubmitRequest:
       type: object
-      description: "PENDING typed schema. Request for API-044: expectedVersion; full validation"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [expectedVersion]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostCookMealsPublicationRequest:
       type: object
       description: "PENDING typed schema. Request for API-049: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards"
@@ -4105,8 +4365,25 @@ components:
       x-schema-status: PENDING
     PostOpsCooksDecisionRequest:
       type: object
-      description: "PENDING typed schema. Request for API-069: decision, reason, revision, expectedVersion, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: START_REVIEW moves SUBMITTED to UNDER_REVIEW; the other decisions need UNDER_REVIEW and a reason. A reviewer cannot decide their own application.
+      required: [decision, revision, expectedVersion]
+      properties:
+        decision:
+          type: string
+          enum: [START_REVIEW, APPROVE, REQUEST_CHANGES, REJECT]
+        reason:
+          type:
+            - string
+            - "null"
+          minLength: 3
+          maxLength: 1000
+        revision:
+          type: integer
+          minimum: 1
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsFinanceCashReportsVerificationRequest:
       type: object
       description: "PENDING typed schema. Request for API-083: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key"
@@ -4129,8 +4406,20 @@ components:
       x-schema-status: PENDING
     PostOpsKitchensOperatingStateRequest:
       type: object
-      description: "PENDING typed schema. Request for API-070: pause/suspend/restore, reason, expectedVersion; affected order review"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: PAUSE (ACTIVE to PAUSED), SUSPEND (ACTIVE or PAUSED to SUSPENDED), RESTORE (PAUSED or SUSPENDED to ACTIVE). Staff cannot change their own kitchen.
+      required: [action, reason, expectedVersion]
+      properties:
+        action:
+          type: string
+          enum: [PAUSE, SUSPEND, RESTORE]
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsMealsModerationRequest:
       type: object
       description: "PENDING typed schema. Request for API-072: action, reason, expectedVersion"
@@ -4207,8 +4496,36 @@ components:
       x-schema-status: PENDING
     PutCookApplicationRequest:
       type: object
-      description: "PENDING typed schema. Request for API-043: public profile, contact/location refs, documents, zones, expectedVersion"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Full replacement of the working draft. Omitted fields become empty. expectedVersion is required once the application exists.
+      properties:
+        publicName:
+          type: string
+          minLength: 2
+          maxLength: 80
+        bio:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        contactPhone:
+          type: string
+          maxLength: 32
+          description: Egyptian mobile in any common local form; normalized to E.164
+        privateLocation:
+          type: string
+          minLength: 5
+          maxLength: 300
+        pickupEnabled:
+          type: boolean
+        zoneIds:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            format: uuid
+        expectedVersion:
+          type: integer
+          minimum: 0
     PutMeDevicesByIdRequest:
       type: object
       description: "PENDING typed schema. Request for API-033: platform, pushToken, environment, appVersion; encrypt token"

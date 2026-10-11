@@ -46,7 +46,7 @@
       "permission": "PUBLIC",
       "response_type": "KitchenPublic",
       "contract": "public profile, operational approval label and visible rating summary",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-006",
@@ -379,7 +379,7 @@
       "permission": "COOK_APPLICANT",
       "response_type": "CookApplication",
       "contract": "current own revision and decision history",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-043",
@@ -388,7 +388,7 @@
       "permission": "COOK_APPLICANT",
       "response_type": "CookApplication",
       "contract": "public profile, contact/location refs, documents, zones, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-044",
@@ -397,7 +397,7 @@
       "permission": "COOK_APPLICANT",
       "response_type": "CookApplication",
       "contract": "expectedVersion; full validation",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-045",
@@ -604,7 +604,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "ApplicationPage",
       "contract": "state, q, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-068",
@@ -613,7 +613,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "ApplicationReview",
       "contract": "revision, private documents via expiring scoped access",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-069",
@@ -622,7 +622,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "CookApplication",
       "contract": "decision, reason, revision, expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-070",
@@ -631,7 +631,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "KitchenAdmin",
       "contract": "pause/suspend/restore, reason, expectedVersion; affected order review",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-071",
