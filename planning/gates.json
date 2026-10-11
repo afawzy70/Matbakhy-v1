@@ -211,7 +211,7 @@
     },
     {
       "id": "P04",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -246,7 +246,16 @@
           "configured": true,
           "setup_note": "PostgreSQL 16: completion never implies payment, separated cash verification, balanced once-only commission groups, provider outage leaves order/inbox committed with bounded retries and visible dead letters, leased workers and duplicate events deliver once, operator replay of failed events. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "8412e873d28f2dab1388275a7ee32c9f9ccc4067",
+        "runs": [
+          "verification/runs/20261011-P04-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P04 --commit 8412e873d28f2dab1388275a7ee32c9f9ccc4067",
+        "review": "SELF_REVIEW",
+        "note": "Local container evidence with PostgreSQL; no independent review. Real commerce policy values (O04) and notification providers (O07) unverified; synthetic policy and logging channels in LOCAL/CI only."
+      }
     },
     {
       "id": "P05",

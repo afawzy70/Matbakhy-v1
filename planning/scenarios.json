@@ -339,7 +339,8 @@
       "then": "UI asks to replace; server rejects any mixed basket payload",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-017/evidence.json"
+        "verification/runs/20261011-MB-017/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -357,7 +358,8 @@
       "then": "Authoritative total is 27000 and forged fields cannot alter it",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-017/evidence.json"
+        "verification/runs/20261011-MB-017/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -375,7 +377,8 @@
       "then": "409 with a recoverable reason; fresh quote and explicit reconfirmation required",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-017/evidence.json"
+        "verification/runs/20261011-MB-017/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -393,7 +396,8 @@
       "then": "Denied; no silent conversion to another zone/mode",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-017/evidence.json"
+        "verification/runs/20261011-MB-017/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -411,7 +415,8 @@
       "then": "Rollback leaves no partial allocation/order; retry can complete once",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-018/evidence.json"
+        "verification/runs/20261011-MB-018/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -429,7 +434,8 @@
       "then": "Exactly one order and allocation exist",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-018/evidence.json"
+        "verification/runs/20261011-MB-018/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -447,7 +453,8 @@
       "then": "409 IDEMPOTENCY_CONFLICT; original order unchanged",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-018/evidence.json"
+        "verification/runs/20261011-MB-018/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -465,7 +472,8 @@
       "then": "Exactly one succeeds; others receive stock conflict; counters match one allocation",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-018/evidence.json"
+        "verification/runs/20261011-MB-018/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -483,7 +491,8 @@
       "then": "Rejected without changing history",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -501,7 +510,8 @@
       "then": "One legal outcome; one stock release at most; no accepted-and-expired order",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -519,7 +529,8 @@
       "then": "Pending cancels and releases; preparing creates request/denial, not unilateral cancellation",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -537,7 +548,8 @@
       "then": "Consumed stock not automatically restored and no duplicate release occurs",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -555,7 +567,8 @@
       "then": "Wrong mode denied; correct paths preserve event history",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -573,7 +586,8 @@
       "then": "No completion; valid code works once; valid override is distinguishable in audit",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -591,7 +605,8 @@
       "then": "Order completed, cash DUE; no invented receipt or cash balance",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-020/evidence.json"
+        "verification/runs/20261011-MB-020/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -609,7 +624,8 @@
       "then": "One 2400 commission group, debits equal credits; current rate changes do not alter it",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-020/evidence.json"
+        "verification/runs/20261011-MB-020/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -675,7 +691,8 @@
       "then": "Order/inbox present, retry count bounded, operator can see failure",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-021/evidence.json"
+        "verification/runs/20261011-MB-021/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -693,7 +710,8 @@
       "then": "No duplicate inbox record; UI resolves current server state",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-021/evidence.json"
+        "verification/runs/20261011-MB-021/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -1427,7 +1445,8 @@
       "then": "Tampered totals rejected; delivery/pickup totals exact; expired/repriced quote requires review",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-017/evidence.json"
+        "verification/runs/20261011-MB-017/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -1448,7 +1467,8 @@
       "then": "Concurrent last-portion requests yield one success; timeout/retry creates one order; transaction rollback leaves no partial state",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-018/evidence.json"
+        "verification/runs/20261011-MB-018/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -1471,7 +1491,8 @@
       "then": "Invalid/racing transitions rejected; release happens once; pickup cannot dispatch; code replay/brute force denied",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-019/evidence.json"
+        "verification/runs/20261011-MB-019/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -1490,7 +1511,8 @@
       "then": "Completion does not imply payment; duplicate event posts once; commission example and balanced groups verified",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-020/evidence.json"
+        "verification/runs/20261011-MB-020/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
@@ -1509,7 +1531,8 @@
       "then": "Provider outage leaves order committed; restart/multiple workers deliver effective notification once",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-021/evidence.json"
+        "verification/runs/20261011-MB-021/evidence.json",
+        "verification/runs/20261011-P04-gate/evidence.json"
       ]
     },
     {
