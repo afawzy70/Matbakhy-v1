@@ -56,7 +56,7 @@ jobs:
 
   ios:
     name: iOS simulator build (Xcode, unsigned)
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
@@ -67,7 +67,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-darwin-arm64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
           echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
       - name: Toolchain versions
-        run: xcodebuild -version && pod --version && sw_vers
+        run: ls -d /Applications/Xcode*.app; xcodebuild -version && pod --version && sw_vers
       - name: Install workspace from lockfile
         run: corepack enable && pnpm install --frozen-lockfile
       - name: Generate native iOS project (Expo prebuild) and install pods
@@ -76,10 +76,14 @@ jobs:
       - name: xcodebuild for iOS Simulator (no code signing)
         working-directory: apps/customer-mobile/ios
         run: |
-          set -o pipefail
+          set +e
           xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Debug \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build | tail -50
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > "$RUNNER_TEMP/xcodebuild.log" 2>&1
+          status=$?
+          grep -nE "error:|\*\* BUILD" "$RUNNER_TEMP/xcodebuild.log" | head -60
+          tail -20 "$RUNNER_TEMP/xcodebuild.log"
+          exit $status
       - name: Record artifact identity
         working-directory: apps/customer-mobile/ios
         run: |
