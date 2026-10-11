@@ -3,6 +3,9 @@ package com.matbakhy.app.security;
 import com.matbakhy.identity.api.AccountDirectory;
 import com.matbakhy.identity.api.CurrentAccount;
 import com.matbakhy.identity.api.ExternalIdentity;
+import com.matbakhy.identity.api.GrantDirectory;
+import com.matbakhy.identity.api.Permission;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,9 +23,13 @@ class AccountMapper {
     private static final List<String> ASSURANCE_CLAIMS = List.of("acr", "amr", "auth_time");
 
     private final AccountDirectory accounts;
+    private final GrantDirectory grants;
+    private final IdentityProperties properties;
 
-    AccountMapper(AccountDirectory accounts) {
+    AccountMapper(AccountDirectory accounts, GrantDirectory grants, IdentityProperties properties) {
         this.accounts = accounts;
+        this.grants = grants;
+        this.properties = properties;
     }
 
     AccountAuthentication map(String issuer, String subject, Map<String, Object> claims) {
@@ -31,11 +38,21 @@ class AccountMapper {
         Object locale = claims.get("locale");
         CurrentAccount account = accounts.resolve(new ExternalIdentity(issuer, subject, Boolean.TRUE.equals(verified),
                 name == null ? null : name.toString(), locale == null ? null : locale.toString()));
-        List<GrantedAuthority> authorities = switch (account.status()) {
-            case ACTIVE -> List.of(new SimpleGrantedAuthority(ACTIVE));
-            case DELETION_REQUESTED -> List.of(new SimpleGrantedAuthority(DELETION_REQUESTED));
-            default -> List.of();
-        };
+        if (account.active() && subject.equals(properties.bootstrapAdminSubject()) && issuer.equals(properties.issuer())) {
+            grants.bootstrapAdministratorIfNone(account.id());
+        }
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        switch (account.status()) {
+            case ACTIVE -> {
+                authorities.add(new SimpleGrantedAuthority(ACTIVE));
+                // Staff permissions come only from current server-side grants, re-read on every request.
+                for (Permission p : grants.activePermissions(account.id())) {
+                    authorities.add(new SimpleGrantedAuthority(p.authority()));
+                }
+            }
+            case DELETION_REQUESTED -> authorities.add(new SimpleGrantedAuthority(DELETION_REQUESTED));
+            default -> { }
+        }
         Map<String, Object> assurance = new HashMap<>();
         for (String claim : ASSURANCE_CLAIMS) {
             if (claims.get(claim) != null) {

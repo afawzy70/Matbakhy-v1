@@ -23,7 +23,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class RequestIdFilter extends OncePerRequestFilter {
 
     public static final String HEADER = "X-Request-Id";
-    public static final String ATTRIBUTE = RequestIdFilter.class.getName() + ".requestId";
+    public static final String ATTRIBUTE = com.matbakhy.shared.web.RequestContext.REQUEST_ID_ATTRIBUTE;
     private static final Pattern ACCEPTED = Pattern.compile("[A-Za-z0-9-]{8,64}");
 
     @Override

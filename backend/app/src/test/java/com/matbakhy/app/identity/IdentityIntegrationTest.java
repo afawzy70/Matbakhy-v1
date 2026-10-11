@@ -256,6 +256,24 @@ class IdentityIntegrationTest {
     }
 
     @Test
+    void reused_token_loses_staff_access_once_the_grant_is_revoked() throws Exception {
+        String token = nativeToken("matbakhy-mobile", MOBILE_REDIRECT, "customer-a", KeycloakTestServer.PASSWORD_A);
+        assertThat(bearer("/api/v1/me", token).statusCode()).isEqualTo(200);
+        String subject = new String(Base64.getUrlDecoder().decode(token.split("\\.")[1]), StandardCharsets.UTF_8)
+                .replaceAll(".*\"sub\":\"([^\"]+)\".*", "$1");
+        UUID account = jdbc.queryForObject("SELECT id FROM app_user WHERE issuer = ? AND subject = ?", UUID.class,
+                KeycloakTestServer.issuer(), subject);
+        UUID grant = UUID.randomUUID();
+        jdbc.update("INSERT INTO user_grant (id, user_id, permission, grant_reason) VALUES (?, ?, 'audit.read', 'temporary duty')", grant, account);
+        assertThat(bearer("/api/v1/ops/audit", token).statusCode()).isEqualTo(200);
+        jdbc.update("UPDATE user_grant SET revoked_at = now(), revoked_by = user_id, revoke_reason = 'duty ended' WHERE id = ?", grant);
+        HttpResponse<String> reused = bearer("/api/v1/ops/audit", token);
+        assertThat(reused.statusCode()).as("same unexpired token, grant revoked").isEqualTo(403);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE actor_id = ? AND outcome = 'DENIED'", Integer.class, account))
+                .isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
     void token_for_another_client_audience_is_rejected() throws Exception {
         String token = nativeToken("unrelated-app", "unrelated-app://callback", "customer-a", KeycloakTestServer.PASSWORD_A);
         assertThat(bearer("/api/v1/me", token).statusCode()).isEqualTo(401);

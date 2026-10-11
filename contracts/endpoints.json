@@ -820,7 +820,7 @@
       "permission": "STAFF_GRANT",
       "response_type": "StaffPage",
       "contract": "scoped roles/status, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-092",
@@ -829,7 +829,7 @@
       "permission": "STAFF_GRANT",
       "response_type": "Grant",
       "contract": "permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-093",
@@ -838,7 +838,7 @@
       "permission": "STAFF_GRANT",
       "response_type": "Grant",
       "contract": "grantId, reason, expectedVersion; last-admin protection",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-094",
@@ -847,7 +847,7 @@
       "permission": "AUDIT_READ_SCOPED",
       "response_type": "AuditPage",
       "contract": "actor/object/date/action, cursor, limit; redacted",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-095",

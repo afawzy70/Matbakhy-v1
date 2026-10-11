@@ -2820,13 +2820,10 @@ paths:
       description: scoped roles/status, cursor, limit
       x-matbakhy-id: API-091
       x-permission: STAFF_GRANT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/Cursor"
-        - $ref: "#/components/parameters/Limit"
       responses:
         "200":
           description: Success
@@ -2847,7 +2844,7 @@ paths:
       description: permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation
       x-matbakhy-id: API-092
       x-permission: STAFF_GRANT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2857,7 +2854,7 @@ paths:
           required: true
           schema: *a1
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -2882,7 +2879,7 @@ paths:
       description: grantId, reason, expectedVersion; last-admin protection
       x-matbakhy-id: API-093
       x-permission: STAFF_GRANT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2917,13 +2914,37 @@ paths:
       description: actor/object/date/action, cursor, limit; redacted
       x-matbakhy-id: API-094
       x-permission: AUDIT_READ_SCOPED
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
+        - name: actorId
+          in: query
+          required: false
+          schema: &a5
+            type: string
+            format: uuid
+        - name: objectType
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+        - name: objectId
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
+        - name: action
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 120
       responses:
         "200":
           description: Success
@@ -3094,56 +3115,56 @@ components:
         id: &a4
           type: string
           format: uuid
-        label: &a5
+        label: &a7
           type: string
           minLength: 1
           maxLength: 40
-        recipientName: &a6
+        recipientName: &a8
           type: string
           minLength: 1
           maxLength: 120
-        governorate: &a7
+        governorate: &a9
           type: string
           minLength: 1
           maxLength: 80
-        city: &a8
+        city: &a10
           type: string
           minLength: 1
           maxLength: 80
         zoneId: *a4
-        street: &a9
+        street: &a11
           type: string
           minLength: 1
           maxLength: 200
-        building: &a10
+        building: &a12
           type: string
           minLength: 1
           maxLength: 40
-        floor: &a11
+        floor: &a13
           type:
             - string
             - "null"
           minLength: 1
           maxLength: 20
-        unit: &a12
+        unit: &a14
           type:
             - string
             - "null"
           minLength: 1
           maxLength: 20
-        landmark: &a13
+        landmark: &a15
           type:
             - string
             - "null"
           minLength: 1
           maxLength: 200
-        latitude: &a14
+        latitude: &a16
           type:
             - number
             - "null"
           minimum: -90
           maximum: 90
-        longitude: &a15
+        longitude: &a17
           type:
             - number
             - "null"
@@ -3232,10 +3253,80 @@ components:
       type: object
       description: PENDING typed schema. Response for API-068.
       x-schema-status: PENDING
+    AuditEvent:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - occurredAt
+        - actorId
+        - action
+        - permission
+        - objectType
+        - objectId
+        - outcome
+        - reason
+        - requestId
+        - details
+      properties:
+        id: *a5
+        occurredAt: &a6
+          type: string
+          format: date-time
+        actorId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        action:
+          type: string
+        permission:
+          type:
+            - string
+            - "null"
+        objectType:
+          type:
+            - string
+            - "null"
+        objectId:
+          type:
+            - string
+            - "null"
+        outcome:
+          type: string
+          enum:
+            - ALLOWED
+            - DENIED
+        reason:
+          type:
+            - string
+            - "null"
+          description: Redacted
+        requestId:
+          type:
+            - string
+            - "null"
+        details:
+          type: string
+          description: Redacted JSON object
     AuditPage:
       type: object
-      description: PENDING typed schema. Response for API-094.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - items
+        - nextCursor
+        - hasMore
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AuditEvent"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     CaseMessage:
       type: object
       description: PENDING typed schema. Response for API-038.
@@ -3410,8 +3501,46 @@ components:
         - PICKUP
     Grant:
       type: object
-      description: PENDING typed schema. Response for API-092.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - id
+        - userId
+        - permission
+        - grantedAt
+        - expiresAt
+        - revokedAt
+      properties:
+        id: *a5
+        userId: *a5
+        permission:
+          type: string
+          enum: &a18
+            - staff.grant
+            - audit.read
+            - cook.review
+            - content.moderate
+            - order.ops
+            - order.exception_cancel
+            - order.handover_override
+            - support.case
+            - finance.read
+            - finance.verify
+            - finance.refund_approve
+            - finance.settlement
+            - config.read
+            - config.write
+            - integration.ops
+        grantedAt: *a6
+        expiresAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        revokedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
     IntegrationHealth:
       type: object
       description: PENDING typed schema. Response for API-096.
@@ -3778,18 +3907,18 @@ components:
         expectedVersion:
           type: integer
           minimum: 0
-        label: *a5
-        recipientName: *a6
-        governorate: *a7
-        city: *a8
+        label: *a7
+        recipientName: *a8
+        governorate: *a9
+        city: *a10
         zoneId: *a4
-        street: *a9
-        building: *a10
-        floor: *a11
-        unit: *a12
-        landmark: *a13
-        latitude: *a14
-        longitude: *a15
+        street: *a11
+        building: *a12
+        floor: *a13
+        unit: *a14
+        landmark: *a15
+        latitude: *a16
+        longitude: *a17
         phone:
           type: string
           maxLength: 32
@@ -3918,18 +4047,18 @@ components:
         - street
         - building
       properties:
-        label: *a5
-        recipientName: *a6
-        governorate: *a7
-        city: *a8
+        label: *a7
+        recipientName: *a8
+        governorate: *a9
+        city: *a10
         zoneId: *a4
-        street: *a9
-        building: *a10
-        floor: *a11
-        unit: *a12
-        landmark: *a13
-        latitude: *a14
-        longitude: *a15
+        street: *a11
+        building: *a12
+        floor: *a13
+        unit: *a14
+        landmark: *a15
+        latitude: *a16
+        longitude: *a17
         phone:
           type: string
           maxLength: 32
@@ -4020,12 +4149,34 @@ components:
       x-schema-status: PENDING
     PostOpsStaffGrantRevocationsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-093: grantId, reason, expectedVersion; last-admin protection"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - grantId
+        - reason
+      properties:
+        grantId: *a5
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
+      description: Requires staff.grant and recent MFA. Revoking the last active staff.grant holder is 409.
     PostOpsStaffGrantsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-092: permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - permission
+        - reason
+      properties:
+        permission:
+          type: string
+          maxLength: 64
+          description: One of the Grant.permission values; others give 422
+        expiresAt: *a6
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 500
+      description: Requires staff.grant and recent MFA (403 STEP_UP_REQUIRED). Granting to yourself is 403; duplicate active grant 409.
     PostOrdersCancellationRequestsRequest:
       type: object
       description: "PENDING typed schema. Request for API-028: expectedVersion, reasonCode, note; accepted or later; no direct transition"
@@ -4263,10 +4414,53 @@ components:
           maxLength: 512
         hasMore:
           type: boolean
+    StaffMember:
+      type: object
+      additionalProperties: false
+      required:
+        - userId
+        - displayName
+        - status
+        - grants
+      properties:
+        userId: *a5
+        displayName:
+          type:
+            - string
+            - "null"
+        status:
+          type: string
+        grants:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - grantId
+              - permission
+            properties:
+              grantId: *a5
+              permission:
+                type: string
+                enum: *a18
     StaffPage:
       type: object
-      description: PENDING typed schema. Response for API-091.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required:
+        - items
+        - nextCursor
+        - hasMore
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StaffMember"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     StaffSupportCase:
       type: object
       description: PENDING typed schema. Response for API-079.

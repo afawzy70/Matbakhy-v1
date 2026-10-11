@@ -18,6 +18,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApiSecurityErrors implements AuthenticationEntryPoint, AccessDeniedHandler {
 
+    private final com.matbakhy.operations.api.AuditLog audit;
+
+    ApiSecurityErrors(com.matbakhy.operations.api.AuditLog audit) {
+        this.audit = audit;
+    }
+
+    /** TC-007: an authenticated actor denied a privileged operation leaves a redacted audit record. */
+    public void auditDenial(HttpServletRequest request, Authentication authentication, ErrorCode code) {
+        if (authentication != null && authentication.getPrincipal() instanceof CurrentAccount actor) {
+            Object requestId = request.getAttribute(RequestIdFilter.ATTRIBUTE);
+            audit.record(new com.matbakhy.operations.api.AuditLog.Entry(actor.id(), "denied " + request.getMethod() + " " + request.getRequestURI(),
+                    null, "endpoint", request.getRequestURI(), com.matbakhy.operations.api.AuditLog.Outcome.DENIED, code.name(),
+                    requestId == null ? null : requestId.toString(), java.util.Map.of()));
+        }
+    }
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException {
         write(request, response, ErrorCode.UNAUTHENTICATED);
@@ -25,7 +41,10 @@ public class ApiSecurityErrors implements AuthenticationEntryPoint, AccessDenied
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {
-        write(request, response, denialCode(SecurityContextHolder.getContext().getAuthentication(), e));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        ErrorCode code = denialCode(authentication, e);
+        auditDenial(request, authentication, code);
+        write(request, response, code);
     }
 
     public static ErrorCode denialCode(Authentication authentication, AccessDeniedException e) {

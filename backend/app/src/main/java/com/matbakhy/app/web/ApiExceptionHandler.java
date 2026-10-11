@@ -26,6 +26,12 @@ public class ApiExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
 
+    private final com.matbakhy.app.security.ApiSecurityErrors securityErrors;
+
+    ApiExceptionHandler(com.matbakhy.app.security.ApiSecurityErrors securityErrors) {
+        this.securityErrors = securityErrors;
+    }
+
     @ExceptionHandler(ApiException.class)
     ResponseEntity<ApiError> api(ApiException e, HttpServletRequest request) {
         log.info("API failure {}: {}", e.code(), e.getMessage());
@@ -69,8 +75,10 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     ResponseEntity<ApiError> denied(org.springframework.security.access.AccessDeniedException e, HttpServletRequest request) {
-        return respond(com.matbakhy.app.security.ApiSecurityErrors.denialCode(
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication(), e), List.of(), request);
+        var authentication = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        ErrorCode code = com.matbakhy.app.security.ApiSecurityErrors.denialCode(authentication, e);
+        securityErrors.auditDenial(request, authentication, code);
+        return respond(code, List.of(), request);
     }
 
     @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)

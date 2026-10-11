@@ -1810,8 +1810,30 @@ export interface components {
         ApplicationPage: Record<string, never>;
         /** @description PENDING typed schema. Response for API-068. */
         ApplicationReview: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-094. */
-        AuditPage: Record<string, never>;
+        AuditEvent: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            occurredAt: string;
+            /** Format: uuid */
+            actorId: string | null;
+            action: string;
+            permission: string | null;
+            objectType: string | null;
+            objectId: string | null;
+            /** @enum {string} */
+            outcome: "ALLOWED" | "DENIED";
+            /** @description Redacted */
+            reason: string | null;
+            requestId: string | null;
+            /** @description Redacted JSON object */
+            details: string;
+        };
+        AuditPage: {
+            items: components["schemas"]["AuditEvent"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description PENDING typed schema. Response for API-038. */
         CaseMessage: Record<string, never>;
         /** @description PENDING typed schema. Response for API-063. */
@@ -1885,8 +1907,20 @@ export interface components {
         };
         /** @enum {string} */
         FulfillmentMode: "DELIVERY" | "PICKUP";
-        /** @description PENDING typed schema. Response for API-092. */
-        Grant: Record<string, never>;
+        Grant: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            /** @enum {string} */
+            permission: "staff.grant" | "audit.read" | "cook.review" | "content.moderate" | "order.ops" | "order.exception_cancel" | "order.handover_override" | "support.case" | "finance.read" | "finance.verify" | "finance.refund_approve" | "finance.settlement" | "config.read" | "config.write" | "integration.ops";
+            /** Format: date-time */
+            grantedAt: string;
+            /** Format: date-time */
+            expiresAt: string | null;
+            /** Format: date-time */
+            revokedAt: string | null;
+        };
         /** @description PENDING typed schema. Response for API-096. */
         IntegrationHealth: Record<string, never>;
         /** @description PENDING typed schema. Response for API-070. */
@@ -2143,10 +2177,20 @@ export interface components {
         PostOpsOutboxRetryRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-073: visibility, reason, expectedVersion */
         PostOpsReviewsModerationRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-093: grantId, reason, expectedVersion; last-admin protection */
-        PostOpsStaffGrantRevocationsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-092: permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation */
-        PostOpsStaffGrantsRequest: Record<string, never>;
+        /** @description Requires staff.grant and recent MFA. Revoking the last active staff.grant holder is 409. */
+        PostOpsStaffGrantRevocationsRequest: {
+            /** Format: uuid */
+            grantId: string;
+            reason: string;
+        };
+        /** @description Requires staff.grant and recent MFA (403 STEP_UP_REQUIRED). Granting to yourself is 403; duplicate active grant 409. */
+        PostOpsStaffGrantsRequest: {
+            /** @description One of the Grant.permission values; others give 422 */
+            permission: string;
+            /** Format: date-time */
+            expiresAt?: string;
+            reason: string;
+        };
         /** @description PENDING typed schema. Request for API-028: expectedVersion, reasonCode, note; accepted or later; no direct transition */
         PostOrdersCancellationRequestsRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-029: rating, text; completed only, unique order */
@@ -2248,8 +2292,23 @@ export interface components {
             nextCursor: string | null;
             hasMore: boolean;
         };
-        /** @description PENDING typed schema. Response for API-091. */
-        StaffPage: Record<string, never>;
+        StaffMember: {
+            /** Format: uuid */
+            userId: string;
+            displayName: string | null;
+            status: string;
+            grants: {
+                /** Format: uuid */
+                grantId: string;
+                /** @enum {string} */
+                permission: "staff.grant" | "audit.read" | "cook.review" | "content.moderate" | "order.ops" | "order.exception_cancel" | "order.handover_override" | "support.case" | "finance.read" | "finance.verify" | "finance.refund_approve" | "finance.settlement" | "config.read" | "config.write" | "integration.ops";
+            }[];
+        };
+        StaffPage: {
+            items: components["schemas"]["StaffMember"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description PENDING typed schema. Response for API-079. */
         StaffSupportCase: Record<string, never>;
         /** @description PENDING typed schema. Response for API-064. */
@@ -4725,11 +4784,7 @@ export interface operations {
     };
     getOpsStaff: {
         parameters: {
-            query?: {
-                /** @description Opaque cursor from a previous page */
-                cursor?: components["parameters"]["Cursor"];
-                limit?: components["parameters"]["Limit"];
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -4765,7 +4820,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4811,6 +4866,10 @@ export interface operations {
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
+                actorId?: string;
+                objectType?: string;
+                objectId?: string;
+                action?: string;
             };
             header?: never;
             path?: never;

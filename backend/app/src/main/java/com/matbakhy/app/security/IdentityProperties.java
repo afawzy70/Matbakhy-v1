@@ -22,7 +22,8 @@ public record IdentityProperties(
         @NotEmpty List<String> allowedOrigins,
         @NotBlank String postLoginRedirect,
         @NotEmpty List<String> mfaAcrValues,
-        Duration stepUpMaxAge) {
+        Duration stepUpMaxAge,
+        String bootstrapAdminSubject) {
 
     public IdentityProperties {
         if (backchannelIssuer == null || backchannelIssuer.isBlank()) {
