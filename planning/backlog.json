@@ -892,7 +892,7 @@
       "id": "MB-025",
       "phase": "P05",
       "title": "Build finance operations",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-020",
@@ -923,9 +923,11 @@
         "TC-036",
         "TC-125"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-025/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Full refunds bounded by verified collection with commission reversal, unique reviewed settlements with remittance evidence, separation of duties; self-reviewed. Finance UI component-tested; not in the browser workflow. Proposed defaults await O04."
     },
     {
       "id": "MB-026",

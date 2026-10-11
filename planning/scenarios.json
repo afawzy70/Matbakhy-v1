@@ -641,8 +641,10 @@
       "given": "Cook receives 27000 cash for the sample order",
       "when": "Statement and ledger are generated",
       "then": "Platform commission receivable is 2400, no platform 27000 cash receipt",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-025/evidence.json"
+      ]
     },
     {
       "id": "TC-035",
@@ -657,8 +659,10 @@
       "given": "A fully refunded order and a newly approved unpaid refund",
       "when": "Finance attempts another refund or reads status",
       "then": "Over-refund rejected; unpaid refund remains outstanding and ledger never double-reverses",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-025/evidence.json"
+      ]
     },
     {
       "id": "TC-036",
@@ -673,8 +677,10 @@
       "given": "Same eligible entry selected for two batches",
       "when": "Both are reviewed/paid concurrently",
       "then": "Entry settles once; duplicate excluded; corrections append adjustment",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-025/evidence.json"
+      ]
     },
     {
       "id": "TC-037",
@@ -1602,8 +1608,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Cash reconciliation; full-refund obligations; commission reversal; reviewed settlement statements; actual remittance evidence and discrepancy queue",
       "then": "Duplicate refund/settlement prevented; over-refund rejected; cook-collected cash is not platform revenue",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-025/evidence.json"
+      ]
     },
     {
       "id": "TC-126",
