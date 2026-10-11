@@ -568,7 +568,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CashCollection",
       "contract": "CashReport, Idempotency-Key; no finance verification authority",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-064",
@@ -739,7 +739,7 @@
       "permission": "FINANCE",
       "response_type": "CashPage",
       "contract": "state/kitchen/period pagination",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-083",
@@ -748,7 +748,7 @@
       "permission": "FINANCE_VERIFY",
       "response_type": "CashCollection",
       "contract": "decision, verified amount/ref, expectedVersion, reason, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-084",

@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"matbakhy.environment=CI", "matbakhy.orders.expiry-job.enabled=false"})
+        properties = {"matbakhy.environment=CI", "matbakhy.orders.expiry-job.enabled=false",
+            "matbakhy.finance.posting-job.enabled=false"})
 @Import({PostgresTestConfiguration.class, StorageTestConfiguration.class})
 public @interface IntegrationTest {
 }

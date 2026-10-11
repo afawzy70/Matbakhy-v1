@@ -57,6 +57,10 @@ matbakhy:
     max-attempts: 5
     expiry-after-slot-end: 2h
     max-attempts-per-actor-per-hour: 30
+  finance:
+    posting-job:
+      enabled: ${LEDGER_POSTING_JOB_ENABLED:true}
+      interval: 30s
   orders:
     expiry-job:
       enabled: ${ORDER_EXPIRY_JOB_ENABLED:true}

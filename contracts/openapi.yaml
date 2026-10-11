@@ -2106,7 +2106,7 @@ paths:
       description: CashReport, Idempotency-Key; no finance verification authority
       x-matbakhy-id: API-063
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2117,7 +2117,7 @@ paths:
           schema: *a1
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -2712,11 +2712,23 @@ paths:
       description: state/kitchen/period pagination
       x-matbakhy-id: API-082
       x-permission: FINANCE
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [DUE, REPORTED, VERIFIED, DISPUTED, NOT_DUE]
+        - name: kitchenId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2739,7 +2751,7 @@ paths:
       description: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key
       x-matbakhy-id: API-083
       x-permission: FINANCE_VERIFY
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3630,12 +3642,86 @@ components:
       x-schema-status: PENDING
     CashCollection:
       type: object
-      description: PENDING typed schema. Response for API-063.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: A cook's cash report and, once decided, finance's verification. discrepancy = reported - due (negative when short); any non-zero discrepancy makes the obligation DISPUTED.
+      required: [id, amount, collectedAt, externalReference, reportedAt, discrepancy, state, verifiedAmount, verificationReference, verifiedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        collectedAt:
+          type: string
+          format: date-time
+        externalReference:
+          type:
+            - string
+            - "null"
+        reportedAt:
+          type: string
+          format: date-time
+        discrepancy:
+          $ref: "#/components/schemas/Money"
+        state:
+          type: string
+          enum: [REPORTED, VERIFIED, DISPUTED]
+        verifiedAmount:
+          oneOf:
+            - $ref: "#/components/schemas/NonNegativeMoney"
+            - type: "null"
+        verificationReference:
+          type:
+            - string
+            - "null"
+        verifiedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
     CashPage:
       type: object
-      description: PENDING typed schema. Response for API-082.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Cash positions per order (due amount, obligation state, the cook's report if any); nothing is inferred from order completion.
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CashItem"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
+    CashItem:
+      type: object
+      additionalProperties: false
+      required: [orderId, publicNumber, kitchenId, orderState, amountDue, cashState, report]
+      properties:
+        orderId:
+          type: string
+          format: uuid
+        publicNumber:
+          type: string
+        kitchenId:
+          type: string
+          format: uuid
+        orderState:
+          $ref: "#/components/schemas/OrderState"
+        amountDue:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        cashState:
+          type: string
+          enum: [DUE, REPORTED, VERIFIED, DISPUTED, NOT_DUE]
+        report:
+          oneOf:
+            - $ref: "#/components/schemas/CashCollection"
+            - type: "null"
     CashReport:
       type: object
       additionalProperties: false
@@ -5149,8 +5235,26 @@ components:
           minimum: 0
     PostOpsFinanceCashReportsVerificationRequest:
       type: object
-      description: "PENDING typed schema. Request for API-083: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: VERIFY requires verifiedAmountMinor equal to the amount due; any other outcome is DISPUTE. A reason is required for disputes and for reports with a discrepancy. The reporter can never verify their own report.
+      required: [decision, verifiedAmountMinor, expectedVersion]
+      properties:
+        decision:
+          type: string
+          enum: [VERIFY, DISPUTE]
+        verifiedAmountMinor:
+          type: integer
+          minimum: 0
+        reference:
+          type: string
+          maxLength: 100
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsFinanceRefundsActionRequest:
       type: object
       description: "PENDING typed schema. Request for API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key"

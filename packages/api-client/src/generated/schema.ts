@@ -1884,10 +1884,43 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-038. */
         CaseMessage: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-063. */
-        CashCollection: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-082. */
-        CashPage: Record<string, never>;
+        /** @description A cook's cash report and, once decided, finance's verification. discrepancy = reported - due (negative when short); any non-zero discrepancy makes the obligation DISPUTED. */
+        CashCollection: {
+            /** Format: uuid */
+            id: string;
+            amount: components["schemas"]["NonNegativeMoney"];
+            /** Format: date-time */
+            collectedAt: string;
+            externalReference: string | null;
+            /** Format: date-time */
+            reportedAt: string;
+            discrepancy: components["schemas"]["Money"];
+            /** @enum {string} */
+            state: "REPORTED" | "VERIFIED" | "DISPUTED";
+            verifiedAmount: components["schemas"]["NonNegativeMoney"] | null;
+            verificationReference: string | null;
+            /** Format: date-time */
+            verifiedAt: string | null;
+            version: number;
+        };
+        /** @description Cash positions per order (due amount, obligation state, the cook's report if any); nothing is inferred from order completion. */
+        CashPage: {
+            items: components["schemas"]["CashItem"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        CashItem: {
+            /** Format: uuid */
+            orderId: string;
+            publicNumber: string;
+            /** Format: uuid */
+            kitchenId: string;
+            orderState: components["schemas"]["OrderState"];
+            amountDue: components["schemas"]["NonNegativeMoney"];
+            /** @enum {string} */
+            cashState: "DUE" | "REPORTED" | "VERIFIED" | "DISPUTED" | "NOT_DUE";
+            report: components["schemas"]["CashCollection"] | null;
+        };
         /** @description Cook declaration only; finance verifies separately. */
         CashReport: {
             /** Format: int64 */
@@ -2479,8 +2512,15 @@ export interface components {
             revision: number;
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Request for API-083: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key */
-        PostOpsFinanceCashReportsVerificationRequest: Record<string, never>;
+        /** @description VERIFY requires verifiedAmountMinor equal to the amount due; any other outcome is DISPUTE. A reason is required for disputes and for reports with a discrepancy. The reporter can never verify their own report. */
+        PostOpsFinanceCashReportsVerificationRequest: {
+            /** @enum {string} */
+            decision: "VERIFY" | "DISPUTE";
+            verifiedAmountMinor: number;
+            reference?: string;
+            reason?: string;
+            expectedVersion: number;
+        };
         /** @description PENDING typed schema. Request for API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key */
         PostOpsFinanceRefundsActionRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-084: orderId, caseId, fullAmountMinor, reason, Idempotency-Key */
@@ -4467,7 +4507,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4970,6 +5010,8 @@ export interface operations {
     getOpsFinanceCashReports: {
         parameters: {
             query?: {
+                state?: "DUE" | "REPORTED" | "VERIFIED" | "DISPUTED" | "NOT_DUE";
+                kitchenId?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
