@@ -129,7 +129,7 @@
       "id": "MB-005",
       "phase": "P01",
       "title": "Pin workspace and compatible toolchain",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-002"
@@ -153,9 +153,11 @@
       "scenario_ids": [
         "TC-105"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-005/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source babfe81253eafdeb3947194ed2a08914aa1a39a5; SELF_REVIEW only; native compile moved to MB-047"
     },
     {
       "id": "MB-006",

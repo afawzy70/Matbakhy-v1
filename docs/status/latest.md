@@ -2,10 +2,10 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T11:22+03:00 (Asia/Kuwait); workday 2026-10-11
+- Observed: 2026-10-11T11:33+03:00 (Asia/Kuwait); workday 2026-10-11
 - Active branch: `implementation/mvp` (draft PR: not yet opened)
-- Phase/story: P01 / MB-005 (next)
-- Last tested source: [`1a1fdad`](https://github.com/afawzy70/Matbakhy-v1/commit/1a1fdadac8b0f4bff2cefdf4a9c791ed150f12d8)
+- Phase/story: P01 / MB-006 (next)
+- Last tested source: [`babfe81`](https://github.com/afawzy70/Matbakhy-v1/commit/babfe81253eafdeb3947194ed2a08914aa1a39a5)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, token usage and quota UNKNOWN
 
 ## Stories
@@ -14,29 +14,36 @@ Implementation-agent report (self-reported, not an independent review certificat
 |---|---|---|
 | MB-001 Reconcile scope and repository baseline | DONE (self-review) | [run](../../verification/runs/20261011-MB-001/evidence.json) |
 | MB-002 Freeze traceable MVP backlog | DONE (self-review) | [run](../../verification/runs/20261011-MB-002/evidence.json) |
+| MB-005 Pin workspace and compatible toolchain | DONE (self-review) | [run](../../verification/runs/20261011-MB-005/evidence.json) |
+| MB-047 Prove native Android and iOS toolchain builds (new, split from MB-005) | TODO, BLOCKED by BLK-001 | — |
 
-2 of 46 stories DONE (a count, not a measure of effort or release readiness).
+3 of 47 stories DONE (a count, not a measure of effort or release readiness).
 
 ## Surfaces
 
-Backend, customer web, cook/platform operations, Android and iOS: untouched (no application code yet).
+- Backend: Spring Boot 4.1.1/Java 21 shell (health-only actuator) and checked integer `Money` primitive; no domain feature yet.
+- Customer web / operations web: React 19 + Vite shells with Arabic RTL default and English LTR switch; no product screens.
+- Android / iOS: Expo SDK 57 shell; JavaScript/Hermes bundles compile for both; native Gradle/Xcode builds NOT_RUN (BLK-001).
 
 ## Checks
 
 | Check | Result |
 |---|---|
-| `python3 scripts/check_scope.py` (P00-CHECK-1) | PASS at `1a1fdad` |
+| `python3 scripts/check_scope.py` (P00-CHECK-1) | PASS at `babfe81` |
+| `scripts/check_workspace.sh` (clean clone: backend verify, frozen install, typecheck, lint, tests, builds, native JS bundles) | PASS at `babfe81` |
 | `python3 scripts/validate_blueprint.py` | PASS (planning structure only) |
 | `python3 -m unittest discover -s scripts -p 'test_*.py'` | PASS, 27 tests |
 | P00-CHECK-2 brand/UX | BLOCKED: not configured until MB-003/MB-004 |
 | P01–P10 gate checks | BLOCKED: not configured |
-| GitHub Actions | UNKNOWN until pushed and observed |
+| GitHub Actions blueprint integrity | FAIL on `8ca414d` ([run 38124549506](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38124549506)): position-dependent guardrail test; repaired in `babfe81`, result of next run pending |
+| Windows/macOS commands | NOT_RUN |
 
 ## Blockers and decisions
 
 - O01–O10 remain OPEN; none blocks current foundation work. O10 (social scope) is nominally due at P00; working default D07 (deferred).
-- Native Android/iOS builds: this container has no Android SDK, macOS or Xcode; affected checks will be BLOCKED when reached.
+- BLK-001 (MB-047): Android SDK download host `dl.google.com` is denied by this container's network policy, and there is no macOS/Xcode runner. Native builds BLOCKED; owner needs to provide runner/network access.
+- Planning change pending owner review: native compile acceptance moved from MB-005 to new MB-047 (see [decision register](../product/01-context-and-decisions.md)).
 
 ## Next action
 
-Implement MB-005 (pinned Maven multi-module backend, pnpm workspace, minimal web/native shells).
+MB-006: backend module boundaries, Flyway baseline on PostgreSQL 16 via Testcontainers, ArchUnit boundary tests, consistent API errors, isolated dev fixtures.

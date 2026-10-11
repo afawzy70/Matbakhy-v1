@@ -1096,8 +1096,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create Maven multi-module backend and pnpm apps/packages; select supported versions from official sources; generate lockfiles and wrappers; document Linux/Windows/macOS commands",
       "then": "Clean checkout installs and compiles minimal backend/web projects and the customer-mobile Expo project (typecheck, unit test, Android and iOS JavaScript bundles) using pinned versions; native Gradle/Xcode compilation is verified separately in MB-047",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-005/evidence.json"
+      ]
     },
     {
       "id": "TC-106",

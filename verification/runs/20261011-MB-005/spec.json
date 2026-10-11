@@ -1,0 +1,74 @@
+{
+  "run_id": "20261011-MB-005",
+  "story_id": "MB-005",
+  "phase": "P01",
+  "checks": [
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean clone: pinned versions, backend verify, frozen install, typecheck, lint, tests, web builds, Android/iOS JS bundles",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-105",
+      "observed": "check_workspace.sh from a fresh clone of the tested commit: Node 24.21.0, pnpm 10.34.6 and JDK 21 matched pins; ./mvnw verify ran enforcer (Java/Maven versions, dependency convergence) and 6 backend tests; pnpm install --frozen-lockfile succeeded; typecheck, lint, 5 web/mobile unit tests and both Vite builds passed; Expo export produced Android and iOS Hermes bundles. Native Gradle/Xcode compilation is out of scope (MB-047)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-005/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Versions selected from Maven Central, npm and nodejs.org on 2026-10-11; TypeScript held at 6.0.3 because typescript-eslint supports <6.1.",
+      "React pinned to Expo SDK 57's 19.2.3 across the workspace to avoid duplicate React.",
+      "Actuator exposes only health without details; error responses never include stack traces or messages.",
+      "Defect found and repaired: guardrail tests depended on story position/status and failed after MB-001 DONE (CI run 38124549506); fixed by ID-based selection.",
+      "Residual: Windows/macOS command documentation is NOT_RUN; expo-doctor networked checks cannot run here (exp.host unresolvable); Maven Central 429 required a machine-local mirror."
+    ]
+  },
+  "open_defects": []
+}
