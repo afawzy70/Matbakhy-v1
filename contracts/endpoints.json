@@ -802,7 +802,7 @@
       "permission": "CONFIG_READ",
       "response_type": "ConfigurationVersions",
       "contract": "permission-filtered operational and finance policies",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-090",
@@ -811,7 +811,7 @@
       "permission": "CONFIG_WRITE_SCOPED",
       "response_type": "PolicyVersion",
       "contract": "value, effectiveAt, reason, approvalReference, expectedVersion; step-up",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-091",

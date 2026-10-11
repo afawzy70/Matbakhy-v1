@@ -10,14 +10,16 @@ import { Slots } from "./cook/Slots";
 import { Statement } from "./cook/Statement";
 import { Cases } from "./ops/Cases";
 import { Catalogue } from "./ops/Catalogue";
+import { Configuration } from "./ops/Configuration";
 import { Finance } from "./ops/Finance";
 import { OpsOrders } from "./ops/OpsOrders";
 import { Reviews } from "./ops/Reviews";
+import { Staff } from "./ops/Staff";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
 const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
-type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance";
+type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance" | "configuration" | "staff";
 
 export function title(locale: Locale): string {
   return `${brand.name[locale]} — ${strings[locale].section}`;
@@ -28,7 +30,7 @@ type Session =
   | { kind: "checking" }
   | { kind: "signedOut" }
   | { kind: "error" }
-  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean };
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean };
 
 function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
   return [
@@ -38,6 +40,8 @@ function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
     ...(s.cases ? (["cases"] as const) : []),
     ...(s.opsOrders ? (["opsOrders"] as const) : []),
     ...(s.finance ? (["finance"] as const) : []),
+    ...(s.configuration ? (["configuration"] as const) : []),
+    ...(s.staff ? (["staff"] as const) : []),
   ];
 }
 
@@ -48,7 +52,7 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const [d, reviews, catalogue, cases, opsOrders, finance] = await Promise.all([
+    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff] = await Promise.all([
       api.GET("/api/v1/cook/dashboard"),
       api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
@@ -56,6 +60,8 @@ async function checkSession(api: Api): Promise<Session> {
       api.GET("/api/v1/ops/orders", { params: { query: { limit: 1 } } }),
       // An unknown kitchen answers 404 to finance staff and 403 to everyone else.
       api.GET("/api/v1/ops/finance/statements", { params: { query: { kitchenId: "00000000-0000-0000-0000-000000000000" } } }),
+      api.GET("/api/v1/ops/configuration"),
+      api.GET("/api/v1/ops/staff"),
     ]);
     if (!d.data && d.response.status !== 403) {
       return { kind: "error" };
@@ -69,6 +75,8 @@ async function checkSession(api: Api): Promise<Session> {
       cases: cases.response.ok,
       opsOrders: opsOrders.response.ok,
       finance: finance.response.status === 404,
+      configuration: configuration.response.ok,
+      staff: staff.response.ok,
     };
   } catch {
     return { kind: "error" };
@@ -176,7 +184,11 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
                           ? t.ops.orders
                           : name === "finance"
                             ? t.ops.finance
-                            : t.tabs[name]}
+                            : name === "configuration"
+                              ? t.ops.configuration
+                              : name === "staff"
+                                ? t.ops.staff
+                                : t.tabs[name]}
                 </button>
               ))}
             </nav>
@@ -193,6 +205,8 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "cases" ? <Cases ctx={ctx} /> : null}
             {current === "opsOrders" ? <OpsOrders ctx={ctx} /> : null}
             {current === "finance" ? <Finance ctx={ctx} /> : null}
+            {current === "configuration" ? <Configuration ctx={ctx} /> : null}
+            {current === "staff" ? <Staff ctx={ctx} /> : null}
           </>
         ) : null}
       </main>

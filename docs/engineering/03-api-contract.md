@@ -216,3 +216,11 @@ Online payment/courier routes are conditional and not part of cash-first API acc
 - Discrepancies: disputed cash reports are listed by API-082 (state DISPUTED); approved-unpaid refunds and recorded-but-unreconciled remittances are visible in the statement.
 - Operations web finance section per kitchen: statement, full refund requests, refund actions with payment references, settlement creation from unsettled entries and batch actions. The cook statement text now explains that collected cash is the cook's and shows the commission still owed.
 
+## Operating configuration and staff controls (MB-026, implemented)
+
+- `GET /api/v1/ops/configuration` (`config.read` or `config.write`): active commerce policy and recent versions, service zones (delivery fee, active, version), feature flags and the latest 50 recorded changes.
+- `POST /api/v1/ops/configuration/{key}/versions` (`config.write` plus recent MFA; Flyway V19): `commerce-policy` creates and activates a new policy version (a real policy needs an `approvalReference` — the live approval guard; synthetic policies only in LOCAL/CI), `zone:{id}` sets delivery fee and availability, `flag:ordering-enabled` switches new quotes and placements off or on (409 `ORDERING_PAUSED`; placed orders continue). Each change needs a reason and the key's current version, is recorded append-only (`config_change`, database trigger) and audited. Future `effectiveAt` is refused (422 `SCHEDULED_CHANGES_NOT_SUPPORTED`).
+- Only new quotes use a change: stale quotes fail revalidation (`POLICY_CHANGED`, `TOTAL_CHANGED`) and placed orders keep their snapshots.
+- Staff permissions (API-091..093, MB-011) gain an operations web screen: grants and revocations with reasons and MFA step-up; the server keeps refusing self-escalation and removal of the last administrator.
+- Operations web configuration screen: policy summary, ordering switch, zone fees and availability, change log; step-up prompt when MFA is needed.
+

@@ -18,7 +18,7 @@ function server(routes: Record<string, Handler>) {
     const text = input.method === "GET" ? "" : await input.text();
     const body = text ? JSON.parse(text) : undefined;
     calls.push({ method: input.method, path: url.pathname + url.search, headers: input.headers, body });
-    const key = `${input.method} ${url.pathname}`;
+    const key = `${input.method} ${decodeURIComponent(url.pathname)}`;
     const handler = routes[key];
     const r = handler ? handler(input, body) : { status: 403, body: { code: "FORBIDDEN" } };
     return new Response(r.body === undefined ? null : JSON.stringify(r.body), {
@@ -418,6 +418,29 @@ describe("operations-web cook workspace", () => {
       period: { from: "2026-10-01", to: "2026-10-11" },
       entryIds: ["g1"],
     });
+  });
+
+  it("changes a zone fee with a reason and the current version, and asks for MFA when the server requires it", async () => {
+    const config = {
+      commercePolicy: null,
+      policyHistory: [],
+      zones: [{ id: "z1", code: "test-zone-a", nameAr: "المعادي", nameEn: "Maadi", active: true, deliveryFeeMinor: 3000, version: 2 }],
+      flags: [{ key: "ordering-enabled", enabled: true, version: 0 }],
+      changes: [],
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/configuration": () => ({ status: 200, body: config }),
+      "POST /api/v1/ops/configuration/zone:z1/versions": () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    const zone = await screen.findByRole("article", { name: "test-zone-a" });
+    fireEvent.change(within(zone).getByLabelText("رسوم التوصيل (جنيه)"), { target: { value: "45" } });
+    fireEvent.change(within(zone).getByLabelText("سبب التغيير"), { target: { value: "pilot fee review" } });
+    fireEvent.click(within(zone).getByRole("button", { name: "حفظ" }));
+    expect(await within(zone).findByRole("link", { name: "إعادة التحقق" })).toBeTruthy();
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ value: { active: true, deliveryFeeMinor: 4500 }, reason: "pilot fee review", expectedVersion: 2 });
   });
 });
 

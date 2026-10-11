@@ -1958,8 +1958,44 @@ export interface components {
             externalReference?: string;
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Response for API-089. */
-        ConfigurationVersions: Record<string, never>;
+        /** @description Current operating configuration with recent policy versions and the latest 50 recorded changes. */
+        ConfigurationVersions: {
+            commercePolicy: components["schemas"]["CommercePolicyVersion"] | null;
+            policyHistory: components["schemas"]["CommercePolicyVersion"][];
+            zones: {
+                /** Format: uuid */
+                id: string;
+                code: string;
+                nameAr: string;
+                nameEn: string;
+                active: boolean;
+                deliveryFeeMinor: number;
+                version: number;
+            }[];
+            flags: {
+                key: string;
+                enabled: boolean;
+                version: number;
+            }[];
+            changes: components["schemas"]["PolicyVersion"][];
+        };
+        CommercePolicyVersion: {
+            version: number;
+            label: string;
+            synthetic: boolean;
+            /** @enum {string} */
+            status: "DRAFT" | "ACTIVE" | "RETIRED";
+            taxRateBps: number;
+            commissionRateBps: number;
+            maxItemQuantity: number;
+            quoteTtlSeconds: number;
+            acceptanceWindowMinutes: number;
+            minAcceptanceMinutes: number;
+            cancellationPolicyVersion: string;
+            termsVersion: string;
+            /** Format: date-time */
+            approvedAt: string | null;
+        };
         /** @description The applicant's own application (API-042..044). Reviewer identity is not included. */
         CookApplication: {
             /** Format: uuid */
@@ -2619,8 +2655,22 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-008. */
         PolicyDocument: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-090. */
-        PolicyVersion: Record<string, never>;
+        /** @description One recorded configuration change (append-only, audited). */
+        PolicyVersion: {
+            /** Format: uuid */
+            id: string;
+            key: string;
+            version: number;
+            value: {
+                [key: string]: unknown;
+            };
+            reason: string;
+            approvalReference: string | null;
+            /** Format: uuid */
+            actorId: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
         PostCookApplicationSubmitRequest: {
             expectedVersion: number;
         };
@@ -2708,8 +2758,17 @@ export interface components {
             visibility: "PUBLIC" | "STAFF_ONLY";
             attachmentIds?: string[];
         };
-        /** @description PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up */
-        PostOpsConfigurationVersionsRequest: Record<string, never>;
+        /** @description Keys: commerce-policy (value = all CommercePolicyVersion fields except version/status/approvedAt; a real policy needs approvalReference; synthetic only in LOCAL/CI), zone:{zoneId} (value {active, deliveryFeeMinor}), flag:ordering-enabled (value {enabled}). expectedVersion is the current version of that key (0 when none). Applies now; future effectiveAt is 422 SCHEDULED_CHANGES_NOT_SUPPORTED. Only new quotes use the change. Needs config.write and recent MFA. */
+        PostOpsConfigurationVersionsRequest: {
+            value: {
+                [key: string]: unknown;
+            };
+            /** Format: date-time */
+            effectiveAt?: string;
+            reason: string;
+            approvalReference?: string;
+            expectedVersion: number;
+        };
         /** @description START_REVIEW moves SUBMITTED to UNDER_REVIEW; the other decisions need UNDER_REVIEW and a reason. A reviewer cannot decide their own application. */
         PostOpsCooksDecisionRequest: {
             /** @enum {string} */

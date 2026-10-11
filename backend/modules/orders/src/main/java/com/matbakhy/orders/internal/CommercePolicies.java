@@ -8,7 +8,10 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-/** The single ACTIVE commerce policy. Ordering is blocked without one, or when only a synthetic one exists outside LOCAL/CI. */
+/**
+ * The single ACTIVE commerce policy. Ordering is blocked without one, when only a synthetic one exists outside LOCAL/CI,
+ * or while the {@code ordering-enabled} flag is off (MB-026). Placed orders keep their snapshots.
+ */
 @Component
 public class CommercePolicies {
 
@@ -31,6 +34,10 @@ public class CommercePolicies {
                 FROM commerce_policy WHERE status = 'ACTIVE'""",
                 (rs, n) -> new Policy(rs.getInt(1), rs.getBoolean(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7),
                         rs.getInt(8), rs.getString(9), rs.getString(10))).stream().findFirst().orElse(null);
+        Boolean ordering = jdbc.query("SELECT enabled FROM feature_flag WHERE key = 'ordering-enabled'", rs -> rs.next() ? rs.getBoolean(1) : null);
+        if (Boolean.FALSE.equals(ordering)) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "ordering is paused by operations", List.of(new FieldError("ordering", "ORDERING_PAUSED")));
+        }
         if (p == null || (p.synthetic() && !synthetic.allowed())) {
             throw new ApiException(ErrorCode.STATE_CONFLICT, "no usable commerce policy",
                     List.of(new FieldError("policy", "NO_APPROVED_POLICY")));

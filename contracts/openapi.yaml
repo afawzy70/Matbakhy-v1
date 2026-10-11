@@ -3069,7 +3069,7 @@ paths:
       description: permission-filtered operational and finance policies
       x-matbakhy-id: API-089
       x-permission: CONFIG_READ
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3093,7 +3093,7 @@ paths:
       description: value, effectiveAt, reason, approvalReference, expectedVersion; step-up
       x-matbakhy-id: API-090
       x-permission: CONFIG_WRITE_SCOPED
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3909,8 +3909,95 @@ components:
       description: Cook declaration only; finance verifies separately.
     ConfigurationVersions:
       type: object
-      description: PENDING typed schema. Response for API-089.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Current operating configuration with recent policy versions and the latest 50 recorded changes.
+      required: [commercePolicy, policyHistory, zones, flags, changes]
+      properties:
+        commercePolicy:
+          oneOf:
+            - $ref: "#/components/schemas/CommercePolicyVersion"
+            - type: "null"
+        policyHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/CommercePolicyVersion"
+        zones:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, code, nameAr, nameEn, active, deliveryFeeMinor, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              code:
+                type: string
+              nameAr:
+                type: string
+              nameEn:
+                type: string
+              active:
+                type: boolean
+              deliveryFeeMinor:
+                type: integer
+                minimum: 0
+              version:
+                type: integer
+                minimum: 0
+        flags:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [key, enabled, version]
+            properties:
+              key:
+                type: string
+              enabled:
+                type: boolean
+              version:
+                type: integer
+                minimum: 0
+        changes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PolicyVersion"
+    CommercePolicyVersion:
+      type: object
+      additionalProperties: false
+      required: [version, label, synthetic, status, taxRateBps, commissionRateBps, maxItemQuantity, quoteTtlSeconds, acceptanceWindowMinutes,
+                 minAcceptanceMinutes, cancellationPolicyVersion, termsVersion, approvedAt]
+      properties:
+        version:
+          type: integer
+          minimum: 1
+        label:
+          type: string
+        synthetic:
+          type: boolean
+        status:
+          type: string
+          enum: [DRAFT, ACTIVE, RETIRED]
+        taxRateBps:
+          type: integer
+        commissionRateBps:
+          type: integer
+        maxItemQuantity:
+          type: integer
+        quoteTtlSeconds:
+          type: integer
+        acceptanceWindowMinutes:
+          type: integer
+        minAcceptanceMinutes:
+          type: integer
+        cancellationPolicyVersion:
+          type: string
+        termsVersion:
+          type: string
+        approvedAt:
+          type: [string, "null"]
+          format: date-time
     CookApplication:
       type: object
       additionalProperties: false
@@ -5542,8 +5629,31 @@ components:
       x-schema-status: PENDING
     PolicyVersion:
       type: object
-      description: PENDING typed schema. Response for API-090.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: One recorded configuration change (append-only, audited).
+      required: [id, key, version, value, reason, approvalReference, actorId, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+        version:
+          type: integer
+          minimum: 0
+        value:
+          type: object
+          additionalProperties: true
+        reason:
+          type: string
+        approvalReference:
+          type: [string, "null"]
+        actorId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
     PostCookApplicationSubmitRequest:
       type: object
       additionalProperties: false
@@ -5760,8 +5870,31 @@ components:
             format: uuid
     PostOpsConfigurationVersionsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        Keys: commerce-policy (value = all CommercePolicyVersion fields except version/status/approvedAt; a real policy needs
+        approvalReference; synthetic only in LOCAL/CI), zone:{zoneId} (value {active, deliveryFeeMinor}), flag:ordering-enabled
+        (value {enabled}). expectedVersion is the current version of that key (0 when none). Applies now; future effectiveAt
+        is 422 SCHEDULED_CHANGES_NOT_SUPPORTED. Only new quotes use the change. Needs config.write and recent MFA.
+      required: [value, reason, expectedVersion]
+      properties:
+        value:
+          type: object
+          additionalProperties: true
+        effectiveAt:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        approvalReference:
+          type: string
+          minLength: 3
+          maxLength: 200
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsCooksDecisionRequest:
       type: object
       additionalProperties: false
