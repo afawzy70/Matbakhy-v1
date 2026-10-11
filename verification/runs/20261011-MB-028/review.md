@@ -20,3 +20,6 @@ Favorites, verified-order reviews, review reports and staff review moderation (b
 - Notification channel preferences have no API in the contract; only language preference is offered.
 - Accessibility audit is MB-029.
 - The customer screens use the approved palette and Cairo via tokens, but their layout still follows the earlier draft; restyling to the approved homepage hierarchy (intent tiles, stacked food cards, dishes/kitchens switch, bottom navigation) is remaining UI work.
+
+## Evidence attempts
+- Attempt 1 at `fe94d8b`: BACKEND-VERIFY, WORKSPACE-CLEAN-CHECKOUT, LOCAL-STACK, BROWSER-E2E and SECRET-SCAN PASS; GUARDRAIL-TESTS FAIL (`test_scope`: traceability matrix stale after adding TC-147/TC-148). Repaired in `cb64230` by regenerating the matrix; the full suite is re-run at the repaired commit.
