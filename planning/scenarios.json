@@ -50,8 +50,10 @@
       "given": "An account changes its verified phone",
       "when": "It requests a quote/order requiring contact verification",
       "then": "Checkout requires verification of the new number",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-010/evidence.json"
+      ]
     },
     {
       "id": "TC-004",
@@ -66,8 +68,10 @@
       "given": "A used, expired or repeatedly failed OTP",
       "when": "The code is submitted again",
       "then": "Verification fails; the account is not marked verified; sensitive value is absent from logs",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-010/evidence.json"
+      ]
     },
     {
       "id": "TC-005",
@@ -82,8 +86,10 @@
       "given": "Customer B knows customer A's address ID",
       "when": "B requests quote or reads/edits that address",
       "then": "No A address data leaks and order creation fails",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-010/evidence.json"
+      ]
     },
     {
       "id": "TC-006",
@@ -1199,8 +1205,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create customer profile/address APIs; Egyptian phone normalization and OTP adapter; verification limits; deletion-request intake; reject another user's addresses",
       "then": "OTP expiry/replay/rate limits and address object authorization pass with isolated fake sender",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-010/evidence.json"
+      ]
     },
     {
       "id": "TC-111",

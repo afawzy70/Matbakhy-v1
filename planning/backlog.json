@@ -307,7 +307,7 @@
       "id": "MB-010",
       "phase": "P02",
       "title": "Build profile address and phone verification",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-009"
@@ -337,9 +337,11 @@
         "TC-005",
         "TC-110"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-010/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 0724f73e3a41483650ca28d7b7295b3808d4f100; SELF_REVIEW only; quote-path parts of TC-003/TC-005 re-exercised in MB-017"
     },
     {
       "id": "MB-011",
