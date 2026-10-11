@@ -1,0 +1,28 @@
+# Generated dependencies and builds
+node_modules/
+target/
+dist/
+build/
+.expo/
+__pycache__/
+*.pyc
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.mobileprovision
+*.keystore
+credentials.json
+# Unsanitized local test outputs
+verification/local/
+playwright-report/
+test-results/
+*.log
+!verification/runs/**/*.log
+# Developer tools
+.DS_Store
+.idea/
+.vscode/

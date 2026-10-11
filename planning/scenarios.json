@@ -1,0 +1,1770 @@
+{
+  "schema_version": 1,
+  "scenarios": [
+    {
+      "id": "TC-001",
+      "title": "Identity: Only authenticated active accounts may perform private operations",
+      "rule_ids": [
+        "BR-001"
+      ],
+      "story_id": "MB-009",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "An anonymous or suspended session",
+      "when": "A private order endpoint is called",
+      "then": "It returns 401 or scoped denial without private data",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-002",
+      "title": "Identity: Web mutations require CSRF protection and native auth uses authorization code with PKCE",
+      "rule_ids": [
+        "BR-002"
+      ],
+      "story_id": "MB-009",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "A valid cookie without a CSRF token and a malformed native auth state",
+      "when": "Each attempts authentication or mutation",
+      "then": "The unsafe requests are rejected and no mutation occurs",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-003",
+      "title": "Identity: First checkout requires verified email and verified normalized Egyptian phone",
+      "rule_ids": [
+        "BR-003"
+      ],
+      "story_id": "MB-010",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "An account changes its verified phone",
+      "when": "It requests a quote/order requiring contact verification",
+      "then": "Checkout requires verification of the new number",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-004",
+      "title": "Identity: OTP is single use, hashed, valid 5 minutes, max 5 attempts",
+      "rule_ids": [
+        "BR-004"
+      ],
+      "story_id": "MB-010",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "A used, expired or repeatedly failed OTP",
+      "when": "The code is submitted again",
+      "then": "Verification fails; the account is not marked verified; sensitive value is absent from logs",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-005",
+      "title": "Address: Address ownership is enforced",
+      "rule_ids": [
+        "BR-005"
+      ],
+      "story_id": "MB-010",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "Customer B knows customer A's address ID",
+      "when": "B requests quote or reads/edits that address",
+      "then": "No A address data leaks and order creation fails",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-006",
+      "title": "Access: Every kitchen/order/case/list/count/export checks object scope",
+      "rule_ids": [
+        "BR-006"
+      ],
+      "story_id": "MB-011",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Two customers and two cooks with separate data",
+      "when": "They enumerate one another's IDs and filters",
+      "then": "No cross-owner data or state change occurs",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-007",
+      "title": "Access: Staff privileges are assigned server-side",
+      "rule_ids": [
+        "BR-007"
+      ],
+      "story_id": "MB-011",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "critical",
+      "given": "A customer submits role=ADMIN or a revoked staff token is reused",
+      "when": "A privileged command is attempted",
+      "then": "Denied with a redacted auditable event",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-008",
+      "title": "Cook: Cook approval is required before selling",
+      "rule_ids": [
+        "BR-008"
+      ],
+      "story_id": "MB-012",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "An unapproved or incomplete cook application",
+      "when": "Its meal is published or order accepted",
+      "then": "Publication/acceptance denied and review history preserved",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-009",
+      "title": "Cook: Cook pause stops new sales",
+      "rule_ids": [
+        "BR-009"
+      ],
+      "story_id": "MB-012",
+      "phase": "P02",
+      "level": "integration",
+      "severity": "high",
+      "given": "An approved cook with accepted and pending orders becomes suspended",
+      "when": "Discovery, checkout and fulfillment views refresh",
+      "then": "No new sales/acceptance; accepted-order safe fulfillment/ops controls remain available",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-010",
+      "title": "Media: Public media must pass type/size/content checks and quarantine",
+      "rule_ids": [
+        "BR-010"
+      ],
+      "story_id": "MB-013",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "A spoofed image, oversized upload and verification document",
+      "when": "They are uploaded or requested publicly",
+      "then": "Unsafe media rejected/quarantined; private document inaccessible without scoped signed read",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-011",
+      "title": "Catalogue: Published meals require title, description, portion, positive price, ingredients, explicit allergen declaration and approved image/cook.",
+      "rule_ids": [
+        "BR-011"
+      ],
+      "story_id": "MB-014",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "A draft lacks an allergen declaration",
+      "when": "Cook tries to publish",
+      "then": "Validation identifies the missing field and meal stays non-public",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-012",
+      "title": "Catalogue: Meal updates are versioned",
+      "rule_ids": [
+        "BR-012"
+      ],
+      "story_id": "MB-014",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "An order exists and its meal is edited/archived",
+      "when": "Customer opens order and tries reorder",
+      "then": "History unchanged; reorder uses current serviceability and price or reports unavailable",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-013",
+      "title": "Availability: Capacity is bounded at both meal-slot and total cook-slot portions",
+      "rule_ids": [
+        "BR-013"
+      ],
+      "story_id": "MB-015",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "Slot has five obligated portions",
+      "when": "Cook lowers capacity to four",
+      "then": "409; obligations and capacity remain consistent",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-014",
+      "title": "Availability: Store instants in UTC and schedule in Africa/Cairo",
+      "rule_ids": [
+        "BR-014"
+      ],
+      "story_id": "MB-015",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "A slot boundary falls on a timezone offset change",
+      "when": "Slot is created and shown on clients",
+      "then": "A single correct instant is used; invalid/ambiguous input handled explicitly",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-015",
+      "title": "Availability: Slots require end after start and cutoff before start",
+      "rule_ids": [
+        "BR-015"
+      ],
+      "story_id": "MB-015",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "Server time reaches slot cutoff",
+      "when": "A quote/order or slot edit is attempted",
+      "then": "New order is rejected regardless of device clock",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-016",
+      "title": "Discovery: Search/filter/sort/pagination execute on the server over all eligible data",
+      "rule_ids": [
+        "BR-016"
+      ],
+      "story_id": "MB-016",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "A matching meal is outside the initial page",
+      "when": "Customer changes filter",
+      "then": "The meal can appear in a fresh server result, not just a filtered local subset",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-017",
+      "title": "Discovery: Only approved active kitchens and published serviceable meals are purchasable",
+      "rule_ids": [
+        "BR-017"
+      ],
+      "story_id": "MB-016",
+      "phase": "P03",
+      "level": "integration",
+      "severity": "high",
+      "given": "Kitchen is paused and meal is favorited",
+      "when": "Discovery and favorites load",
+      "then": "Discovery excludes purchase; favorite explains unavailability without broken route",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-018",
+      "title": "Basket: A basket/order contains exactly one cook and one slot",
+      "rule_ids": [
+        "BR-018"
+      ],
+      "story_id": "MB-017",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Basket has cook A items",
+      "when": "Customer adds cook B or another slot",
+      "then": "UI asks to replace; server rejects any mixed basket payload",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-019",
+      "title": "Pricing: Server calculates amounts in integer EGP minor units",
+      "rule_ids": [
+        "BR-019"
+      ],
+      "story_id": "MB-017",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Two 12000-minor items and fee 3000 with fixture tax 0",
+      "when": "Client submits a forged total",
+      "then": "Authoritative total is 27000 and forged fields cannot alter it",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-020",
+      "title": "Pricing: Quote lasts 5 minutes, reserves no stock, snapshots versions and exposes complete cost/policy before confirmation.",
+      "rule_ids": [
+        "BR-020"
+      ],
+      "story_id": "MB-017",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Valid quote exists and price or address/zone changes",
+      "when": "Customer submits the stale quote",
+      "then": "409 with a recoverable reason; fresh quote and explicit reconfirmation required",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-021",
+      "title": "Fulfillment: Delivery requires active cook-zone coverage and complete own address",
+      "rule_ids": [
+        "BR-021"
+      ],
+      "story_id": "MB-017",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Non-serviceable address or disabled pickup selected",
+      "when": "Customer requests quote",
+      "then": "Denied; no silent conversion to another zone/mode",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-022",
+      "title": "Order: Placement atomically validates quote, reserves all stock, writes snapshots/idempotency/events/outbox and cash due record.",
+      "rule_ids": [
+        "BR-022"
+      ],
+      "story_id": "MB-018",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "critical",
+      "given": "A database failure is injected after stock update before commit",
+      "when": "Order creation fails and is retried",
+      "then": "Rollback leaves no partial allocation/order; retry can complete once",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-023",
+      "title": "Order: Permanent unique customer+clientRequestId prevents duplicate orders even after cached idempotency response expires.",
+      "rule_ids": [
+        "BR-023"
+      ],
+      "story_id": "MB-018",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Same request is retried after timeout and after response-cache retention",
+      "when": "Client repeats order with original identifiers",
+      "then": "Exactly one order and allocation exist",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-024",
+      "title": "Order: Idempotency scope is actor+command+key",
+      "rule_ids": [
+        "BR-024"
+      ],
+      "story_id": "MB-018",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "critical",
+      "given": "An idempotency key already maps to one body",
+      "when": "Another body uses that key",
+      "then": "409 IDEMPOTENCY_CONFLICT; original order unchanged",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-025",
+      "title": "Stock: Concurrent last-portion requests must serialize/check stock and never oversell either meal or kitchen totals.",
+      "rule_ids": [
+        "BR-025"
+      ],
+      "story_id": "MB-018",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "critical",
+      "given": "One portion remains and 20 concurrent distinct customers submit",
+      "when": "All requests race",
+      "then": "Exactly one succeeds; others receive stock conflict; counters match one allocation",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-026",
+      "title": "Lifecycle: Only legal actor-scoped transitions are accepted with expected version",
+      "rule_ids": [
+        "BR-026"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "A completed order or stale version is targeted",
+      "when": "Cook tries accept/prepare/cancel or free-form status PATCH",
+      "then": "Rejected without changing history",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-027",
+      "title": "Lifecycle: Acceptance deadline is min(created+15m, slotStart-lead), with 5m minimum remaining at placement",
+      "rule_ids": [
+        "BR-027"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Accept, expire and cancel race at the deadline",
+      "when": "Commands execute concurrently",
+      "then": "One legal outcome; one stock release at most; no accepted-and-expired order",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-028",
+      "title": "Cancellation: Customer can directly cancel pending orders only",
+      "rule_ids": [
+        "BR-028"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Customer has pending and preparing orders",
+      "when": "Customer cancels each",
+      "then": "Pending cancels and releases; preparing creates request/denial, not unilateral cancellation",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-029",
+      "title": "Stock: Reject/expire/preparation-not-started cancellation releases once",
+      "rule_ids": [
+        "BR-029"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "critical",
+      "given": "An order is prepared then cancelled by ops",
+      "when": "Cancellation retries and stock is queried",
+      "then": "Consumed stock not automatically restored and no duplicate release occurs",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-030",
+      "title": "Fulfillment: Pickup completes only from READY",
+      "rule_ids": [
+        "BR-030"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "One pickup and one delivery order are ready",
+      "when": "Dispatch/complete commands use wrong paths",
+      "then": "Wrong mode denied; correct paths preserve event history",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-031",
+      "title": "Fulfillment: Completion requires single-use customer handover code with bounded attempts",
+      "rule_ids": [
+        "BR-031"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Incorrect/replayed code or unauthorized override",
+      "when": "Actor tries to complete order",
+      "then": "No completion; valid code works once; valid override is distinguishable in audit",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-032",
+      "title": "Cash: Order completion and collection are independent",
+      "rule_ids": [
+        "BR-032"
+      ],
+      "story_id": "MB-020",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Order is completed without a collection report",
+      "when": "Finance dashboard loads",
+      "then": "Order completed, cash DUE; no invented receipt or cash balance",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-033",
+      "title": "Finance: Commission rate/rounding are snapshot",
+      "rule_ids": [
+        "BR-033"
+      ],
+      "story_id": "MB-020",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "critical",
+      "given": "24000 subtotal, 3000 delivery, sample rate 1000 bps",
+      "when": "Completion event is delivered twice",
+      "then": "One 2400 commission group, debits equal credits; current rate changes do not alter it",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-034",
+      "title": "Finance: Cook-collected cash creates commission receivable, not gross platform cash/revenue",
+      "rule_ids": [
+        "BR-034"
+      ],
+      "story_id": "MB-025",
+      "phase": "P05",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Cook receives 27000 cash for the sample order",
+      "when": "Statement and ledger are generated",
+      "then": "Platform commission receivable is 2400, no platform 27000 cash receipt",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-035",
+      "title": "Refund: Full refunds are bounded by verified collection less prior verified refunds",
+      "rule_ids": [
+        "BR-035"
+      ],
+      "story_id": "MB-025",
+      "phase": "P05",
+      "level": "integration",
+      "severity": "critical",
+      "given": "A fully refunded order and a newly approved unpaid refund",
+      "when": "Finance attempts another refund or reads status",
+      "then": "Over-refund rejected; unpaid refund remains outstanding and ledger never double-reverses",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-036",
+      "title": "Settlement: Settlement lines are unique and reviewed batches immutable",
+      "rule_ids": [
+        "BR-036"
+      ],
+      "story_id": "MB-025",
+      "phase": "P05",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Same eligible entry selected for two batches",
+      "when": "Both are reviewed/paid concurrently",
+      "then": "Entry settles once; duplicate excluded; corrections append adjustment",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-037",
+      "title": "Notification: Order/inbox persists despite notification-provider failure",
+      "rule_ids": [
+        "BR-037"
+      ],
+      "story_id": "MB-021",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Email/push provider times out after order commit",
+      "when": "Worker retries and customer reloads",
+      "then": "Order/inbox present, retry count bounded, operator can see failure",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-038",
+      "title": "Notification: Use transactional outbox and recipient/event deduplication with leased workers",
+      "rule_ids": [
+        "BR-038"
+      ],
+      "story_id": "MB-021",
+      "phase": "P04",
+      "level": "integration",
+      "severity": "high",
+      "given": "Two workers and duplicate/out-of-order events",
+      "when": "Both deliver and clients refresh",
+      "then": "No duplicate inbox record; UI resolves current server state",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-039",
+      "title": "Reviews: Only owning customer can review a COMPLETED order once, integer 1..5",
+      "rule_ids": [
+        "BR-039"
+      ],
+      "story_id": "MB-028",
+      "phase": "P06",
+      "level": "integration",
+      "severity": "high",
+      "given": "Another user or incomplete order attempts review; an existing review is hidden",
+      "when": "Requests and aggregate refresh occur",
+      "then": "Invalid review denied; unique order review enforced; aggregate excludes hidden review",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-040",
+      "title": "Favorites: Favorite/unfavorite is idempotent per user+meal",
+      "rule_ids": [
+        "BR-040"
+      ],
+      "story_id": "MB-028",
+      "phase": "P06",
+      "level": "integration",
+      "severity": "high",
+      "given": "Favorite request retries and private order link is shared",
+      "when": "Another anonymous visitor opens link",
+      "then": "One favorite; private order requires owner authentication; no private address preview",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-041",
+      "title": "Support: Cases are order-scoped",
+      "rule_ids": [
+        "BR-041"
+      ],
+      "story_id": "MB-024",
+      "phase": "P05",
+      "level": "integration",
+      "severity": "high",
+      "given": "A case includes staff-only notes and safety category",
+      "when": "Customer/cook fetches case and ops queue refreshes",
+      "then": "Notes hidden; safety task visible to authorized ops with timestamp",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-042",
+      "title": "Configuration: Fee/rate/zone/policy changes are versioned and audited",
+      "rule_ids": [
+        "BR-042"
+      ],
+      "story_id": "MB-026",
+      "phase": "P05",
+      "level": "integration",
+      "severity": "high",
+      "given": "Fee changes while an order and quote already exist",
+      "when": "Views and new quote request run",
+      "then": "Order unchanged; stale quote invalidated as specified; new quote uses new version",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-043",
+      "title": "Access: Staff cannot self-escalate or remove last recoverable administrator",
+      "rule_ids": [
+        "BR-043"
+      ],
+      "story_id": "MB-026",
+      "phase": "P05",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Only one administrator exists",
+      "when": "They remove last admin grant or self-add restricted finance permission",
+      "then": "Denied or controlled recovery workflow; no lockout/escalation",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-044",
+      "title": "Web: Order submission uses stable key persisted before request",
+      "rule_ids": [
+        "BR-044"
+      ],
+      "story_id": "MB-027",
+      "phase": "P06",
+      "level": "browser",
+      "severity": "high",
+      "given": "Connection drops after server commit",
+      "when": "Customer refreshes and retries",
+      "then": "Existing order displayed; no second order or silent empty basket",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-045",
+      "title": "Web: Every critical screen has loading/empty/error/offline/denied/success states and an actionable recovery",
+      "rule_ids": [
+        "BR-045"
+      ],
+      "story_id": "MB-027",
+      "phase": "P06",
+      "level": "browser",
+      "severity": "high",
+      "given": "Catalogue, checkout or order request fails",
+      "when": "Customer retries or navigates back",
+      "then": "Clear state and retained safe input; no fabricated success",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-046",
+      "title": "UX: Arabic RTL and English LTR work at phone/tablet/desktop widths, long text and mixed numbers",
+      "rule_ids": [
+        "BR-046"
+      ],
+      "story_id": "MB-029",
+      "phase": "P06",
+      "level": "browser",
+      "severity": "high",
+      "given": "Long Arabic cook/meal names and high totals",
+      "when": "Pages render at 360/390/768/1440 widths",
+      "then": "No overlap/clipped totals/hidden checkout actions; directional order is correct",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-047",
+      "title": "Accessibility: Keyboard, visible focus, labels/errors, dialog focus restoration and screen readers support every critical journey.",
+      "rule_ids": [
+        "BR-047"
+      ],
+      "story_id": "MB-029",
+      "phase": "P06",
+      "level": "browser",
+      "severity": "high",
+      "given": "User uses keyboard/screen reader and enlarged text",
+      "when": "They place an order and operate backoffice forms",
+      "then": "Complete without pointer-only controls or ambiguous error/status feedback",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-048",
+      "title": "Mobile: Use system-browser PKCE and OS secure storage",
+      "rule_ids": [
+        "BR-048"
+      ],
+      "story_id": "MB-031",
+      "phase": "P07",
+      "level": "native",
+      "severity": "high",
+      "given": "User A logs out then user B signs in",
+      "when": "App restores cache or opens previous order link",
+      "then": "A's data/tokens absent; B cannot access A's order",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-049",
+      "title": "Mobile: Offline cannot submit orders or pretend stock is current",
+      "rule_ids": [
+        "BR-049"
+      ],
+      "story_id": "MB-032",
+      "phase": "P07",
+      "level": "native",
+      "severity": "high",
+      "given": "App is killed during submit and later reopened offline then online",
+      "when": "Customer opens orders/retries",
+      "then": "No duplicate; offline state explicit; authoritative status reloaded",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-050",
+      "title": "Mobile: Push permission optional",
+      "rule_ids": [
+        "BR-050"
+      ],
+      "story_id": "MB-033",
+      "phase": "P07",
+      "level": "native",
+      "severity": "high",
+      "given": "Push denied or old-account notification opened cold",
+      "when": "App launches",
+      "then": "Ordering still works; correct authorized route or safe sign-in/denial, never data leak",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-051",
+      "title": "Mobile: Android acceptance requires native build/install/test evidence with version, device/OS and artifact checksum.",
+      "rule_ids": [
+        "BR-051"
+      ],
+      "story_id": "MB-034",
+      "phase": "P07",
+      "level": "native",
+      "severity": "high",
+      "given": "Android release candidate built",
+      "when": "Critical purchase and support journeys run",
+      "then": "Native results recorded; web-only checks cannot satisfy gate",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-052",
+      "title": "Mobile: iOS acceptance requires native simulator/device and signing evidence",
+      "rule_ids": [
+        "BR-052"
+      ],
+      "story_id": "MB-035",
+      "phase": "P07",
+      "level": "native",
+      "severity": "high",
+      "given": "Only Linux/web environment is available",
+      "when": "Agent evaluates iOS release gate",
+      "then": "Gate reports BLOCKED until real iOS evidence exists",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-053",
+      "title": "Security: Input is validated/encoded",
+      "rule_ids": [
+        "BR-053"
+      ],
+      "story_id": "MB-036",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Malicious meal text, attachment URL and spreadsheet-formula prefix entered",
+      "when": "Views/downloads render",
+      "then": "Payload remains inert; server denies unsafe URLs/content; no stored XSS",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-054",
+      "title": "Security: Rate limits cover login/OTP/quote/order/upload/search",
+      "rule_ids": [
+        "BR-054"
+      ],
+      "story_id": "MB-036",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "critical",
+      "given": "High-volume requests and unknown accounts",
+      "when": "Requests exceed configured budgets",
+      "then": "429/backoff and stable generic account responses; legitimate baseline unaffected",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-055",
+      "title": "Privacy: Deletion requests revoke access and apply approved retention/anonymization across stores",
+      "rule_ids": [
+        "BR-055"
+      ],
+      "story_id": "MB-039",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "high",
+      "given": "Synthetic user with orders and private uploads requests deletion",
+      "when": "Retention workflow executes under fixture policy",
+      "then": "PII removed/anonymized as specified, balanced finance remains, audit documents actions",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-056",
+      "title": "Observability: Logs/metrics exclude tokens/OTP/contact/address/document content",
+      "rule_ids": [
+        "BR-056"
+      ],
+      "story_id": "MB-039",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "high",
+      "given": "Full order/error/OTP flows execute",
+      "when": "Captured logs are scanned",
+      "then": "No sensitive payloads; request ID traces transaction and provider failure",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-057",
+      "title": "Recovery: Backup is only accepted after restore test",
+      "rule_ids": [
+        "BR-057"
+      ],
+      "story_id": "MB-039",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "high",
+      "given": "Staging backup and prior schema exist",
+      "when": "Restore/migration/restart runs",
+      "then": "Orders, allocations and balanced ledger reconcile; measured RPO/RTO recorded",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-058",
+      "title": "Reliability: Jobs use leases and idempotent effects",
+      "rule_ids": [
+        "BR-058"
+      ],
+      "story_id": "MB-037",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "high",
+      "given": "Workers/API crash at selected boundaries",
+      "when": "They restart and replay pending work",
+      "then": "No duplicate orders/commission or permanently lost pending event",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-059",
+      "title": "Performance: Measure documented load/hardware and preserve correctness",
+      "rule_ids": [
+        "BR-059"
+      ],
+      "story_id": "MB-038",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "high",
+      "given": "10k meals,100k orders and 100 active synthetic users",
+      "when": "Load scenarios run",
+      "then": "Measured p95/errors recorded, pagination bounded and stock/ledger invariants preserved",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-060",
+      "title": "Deployment: Dev/test/staging/production credentials and data are separate",
+      "rule_ids": [
+        "BR-060"
+      ],
+      "story_id": "MB-040",
+      "phase": "P09",
+      "level": "integration",
+      "severity": "high",
+      "given": "Production config selects fake SMS or missing policy",
+      "when": "Application starts",
+      "then": "It fails closed with redacted actionable configuration error",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-061",
+      "title": "Operations: Operators must rehearse late/failed/safety/refund/cash-variance cases and know escalation contacts before pilot.",
+      "rule_ids": [
+        "BR-061"
+      ],
+      "story_id": "MB-041",
+      "phase": "P09",
+      "level": "integration",
+      "severity": "high",
+      "given": "Synthetic day contains all exception types",
+      "when": "Assigned operators follow runbooks",
+      "then": "Cases resolved/escalated with evidence; no unexplained financial variance",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-062",
+      "title": "Release: Required gate evidence is tied to exact source/build and cannot pass with skipped/failed/blocked mandatory checks.",
+      "rule_ids": [
+        "BR-062"
+      ],
+      "story_id": "MB-043",
+      "phase": "P09",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Report has stale commit or missing native test",
+      "when": "Release gate evaluated",
+      "then": "BLOCKED/FAIL and specific reason; no successful badge from docs validation",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-063",
+      "title": "Release: Android and iOS publication is distinct from build/upload",
+      "rule_ids": [
+        "BR-063"
+      ],
+      "story_id": "MB-045",
+      "phase": "P10",
+      "level": "integration",
+      "severity": "critical",
+      "given": "Build is uploaded but review pending",
+      "when": "Release status reported",
+      "then": "Status remains submitted/pending; no claim that customers can download yet",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-064",
+      "title": "Operations: Pilot closure requires accepted surfaces, observed metrics and reconciled incidents",
+      "rule_ids": [
+        "BR-064"
+      ],
+      "story_id": "MB-046",
+      "phase": "P10",
+      "level": "integration",
+      "severity": "high",
+      "given": "Observation window has unresolved critical incident",
+      "when": "Agent tries to close MVP",
+      "then": "Closure blocked; remediation and rerun recorded",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-101",
+      "title": "Reconcile scope and repository baseline acceptance",
+      "rule_ids": [],
+      "story_id": "MB-001",
+      "phase": "P00",
+      "level": "review",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Inspect existing files/branches and preserve user work; read confirmed context; inventory proposed and open decisions; record product assumptions and superseded ideas",
+      "then": "Repository inventory matches reality and unresolved launch decisions remain explicit",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-102",
+      "title": "Freeze traceable MVP backlog acceptance",
+      "rule_ids": [],
+      "story_id": "MB-002",
+      "phase": "P00",
+      "level": "review",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Map rules to stories and tests; confirm four client targets; retain deferred social/payment/courier scope; record dependency order and launch blockers",
+      "then": "Every mandatory rule has an owner story and measurable scenario; dependency graph is acyclic",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-103",
+      "title": "Prepare editable brand system acceptance",
+      "rule_ids": [],
+      "story_id": "MB-003",
+      "phase": "P00",
+      "level": "review",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Create draft logo/name treatment and design tokens; choose licensed Arabic/Latin fonts; prepare sample content; flag trademark clearance as open",
+      "then": "Name/logo/colors can change without editing business code; Arabic glyph and contrast samples rendered",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-104",
+      "title": "Produce reviewable UX package acceptance",
+      "rule_ids": [],
+      "story_id": "MB-004",
+      "phase": "P00",
+      "level": "review",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Build prototypes of discovery/detail/checkout/tracking and cook/ops queues; show Arabic/English and mobile/desktop; capture screenshots and design decisions; request bounded visual review",
+      "then": "Reviewer can complete all critical journeys in prototype; approval is recorded separately and not fabricated",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-105",
+      "title": "Pin workspace and compatible toolchain acceptance",
+      "rule_ids": [],
+      "story_id": "MB-005",
+      "phase": "P01",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Create Maven multi-module backend and pnpm apps/packages; select supported versions from official sources; generate lockfiles and wrappers; document Linux/Windows/macOS commands",
+      "then": "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-106",
+      "title": "Establish database and module boundaries acceptance",
+      "rule_ids": [],
+      "story_id": "MB-006",
+      "phase": "P01",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Create module interfaces and schema migration baseline; configure PostgreSQL/Testcontainers; add architecture constraints and consistent errors; isolate dev fixtures",
+      "then": "Blank PostgreSQL migrates; duplicate constraints fail; forbidden module dependency test fails when violated",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-107",
+      "title": "Implement contract toolchain acceptance",
+      "rule_ids": [],
+      "story_id": "MB-007",
+      "phase": "P01",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Create typed OpenAPI from endpoint registry; establish validation and generated TS clients; define pagination/errors/money; add client regeneration drift check",
+      "then": "OpenAPI validates and client generation is reproducible; malformed monetary DTO rejected",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-108",
+      "title": "Create local stack and required CI commands acceptance",
+      "rule_ids": [],
+      "story_id": "MB-008",
+      "phase": "P01",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Compose database/IdP/object storage/mail sink/API; healthchecks and environment templates; add build/test/lint/secret checks; replace phase verification checks with real commands",
+      "then": "Documented bootstrap works from a clean environment and missing dependencies fail clearly",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-109",
+      "title": "Integrate identity and sessions acceptance",
+      "rule_ids": [
+        "BR-001",
+        "BR-002"
+      ],
+      "story_id": "MB-009",
+      "phase": "P02",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Configure OIDC web sessions and native PKCE contract; account mapping; logout/recovery; expiry and staff MFA assurance; CSRF/CORS protections",
+      "then": "Anonymous and expired sessions denied; logout revokes intended session; role claims cannot be forged",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-110",
+      "title": "Build profile address and phone verification acceptance",
+      "rule_ids": [
+        "BR-003",
+        "BR-004",
+        "BR-005"
+      ],
+      "story_id": "MB-010",
+      "phase": "P02",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Create customer profile/address APIs; Egyptian phone normalization and OTP adapter; verification limits; deletion-request intake; reject another user's addresses",
+      "then": "OTP expiry/replay/rate limits and address object authorization pass with isolated fake sender",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-111",
+      "title": "Enforce scoped permissions and auditing acceptance",
+      "rule_ids": [
+        "BR-006",
+        "BR-007"
+      ],
+      "story_id": "MB-011",
+      "phase": "P02",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Implement deny-by-default permission service; kitchen/order/case scope; staff step-up; grants/revocations; append-only redacted audit",
+      "then": "Cross-customer and cross-cook access matrix denied; privilege escalation and audit-redaction checks pass",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-112",
+      "title": "Implement cook application workflow acceptance",
+      "rule_ids": [
+        "BR-008",
+        "BR-009"
+      ],
+      "story_id": "MB-012",
+      "phase": "P02",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Private application/document metadata; revisioned submit/change-request/review/approve/reject; separate operating state; hide private kitchen location",
+      "then": "Only scoped reviewer can approve; incomplete application cannot publish; rejected revision history preserved",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-113",
+      "title": "Implement safe media lifecycle acceptance",
+      "rule_ids": [
+        "BR-010"
+      ],
+      "story_id": "MB-013",
+      "phase": "P03",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Signed private upload flow; byte/type/dimension limits; scan/quarantine adapters; strip metadata; approved public derivatives; scoped deletes",
+      "then": "Spoofed type/oversize/private-object access fail; no quarantined asset is publicly served",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-114",
+      "title": "Implement meals and publication acceptance",
+      "rule_ids": [
+        "BR-011",
+        "BR-012"
+      ],
+      "story_id": "MB-014",
+      "phase": "P03",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Meal CRUD with translations/portion/ingredients/allergens; versioning; publication guards; archive semantics; public/private DTO split",
+      "then": "Required declarations and approval enforced; historical order snapshot unaffected by later meal changes",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-115",
+      "title": "Implement dated slots and capacity acceptance",
+      "rule_ids": [
+        "BR-013",
+        "BR-014",
+        "BR-015"
+      ],
+      "story_id": "MB-015",
+      "phase": "P03",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Cook/meal slot tables and constraints; cutoff/timezone rules; pause/close; capacity edit bounds; aggregate stock counters",
+      "then": "Cairo time boundaries, last available portion and capacity reductions below obligations are handled",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-116",
+      "title": "Implement serviceable discovery acceptance",
+      "rule_ids": [
+        "BR-016",
+        "BR-017"
+      ],
+      "story_id": "MB-016",
+      "phase": "P03",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Zone-based filtering/search/sort/cursor pagination; public cook/meal details; unavailable/favorite presentation; full server query on filter changes",
+      "then": "Filtering searches all matching stored data; unpublished/suspended supply excluded; stable pagination has no duplicates",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-117",
+      "title": "Implement authoritative quotes acceptance",
+      "rule_ids": [
+        "BR-018",
+        "BR-019",
+        "BR-020",
+        "BR-021"
+      ],
+      "story_id": "MB-017",
+      "phase": "P04",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Validate one cook/slot; calculate integer totals from policy snapshots; check serviceability/address; quote expiry; no capacity hold",
+      "then": "Tampered totals rejected; delivery/pickup totals exact; expired/repriced quote requires review",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-118",
+      "title": "Implement atomic order placement acceptance",
+      "rule_ids": [
+        "BR-022",
+        "BR-023",
+        "BR-024",
+        "BR-025"
+      ],
+      "story_id": "MB-018",
+      "phase": "P04",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Persistent idempotency/clientRequestId; deterministic stock locks; order/item/address snapshots; reservation+events+outbox in one transaction; recovery lookup",
+      "then": "Concurrent last-portion requests yield one success; timeout/retry creates one order; transaction rollback leaves no partial state",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-119",
+      "title": "Implement lifecycle and handover acceptance",
+      "rule_ids": [
+        "BR-026",
+        "BR-027",
+        "BR-028",
+        "BR-029",
+        "BR-030",
+        "BR-031"
+      ],
+      "story_id": "MB-019",
+      "phase": "P04",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Explicit commands and version guards; expiry scheduler; cancel/reject/prepare/ready/dispatch/complete/fail; secure handover challenge; audit ops override",
+      "then": "Invalid/racing transitions rejected; release happens once; pickup cannot dispatch; code replay/brute force denied",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-120",
+      "title": "Implement cash and ledger core acceptance",
+      "rule_ids": [
+        "BR-032",
+        "BR-033"
+      ],
+      "story_id": "MB-020",
+      "phase": "P04",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Cash report/verification separate from order; immutable balanced commission entries; dedup source events; snapshot rates; discrepancy handling",
+      "then": "Completion does not imply payment; duplicate event posts once; commission example and balanced groups verified",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-121",
+      "title": "Implement outbox and notifications acceptance",
+      "rule_ids": [
+        "BR-037",
+        "BR-038"
+      ],
+      "story_id": "MB-021",
+      "phase": "P04",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Persist inbox; lease worker; email/push adapters; retry and dead-letter; dedup recipient/event; unread/read operations",
+      "then": "Provider outage leaves order committed; restart/multiple workers deliver effective notification once",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-122",
+      "title": "Build cook workspace acceptance",
+      "rule_ids": [],
+      "story_id": "MB-022",
+      "phase": "P05",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Onboarding/meals/slots/order queue; accept deadline and allowed actions; handover/cash report; statement; query refresh and scope-safe UI",
+      "then": "Cook can fulfill pickup and delivery using real API; other kitchen data inaccessible",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-123",
+      "title": "Build operations approval and moderation acceptance",
+      "rule_ids": [],
+      "story_id": "MB-023",
+      "phase": "P05",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Cook review queue/document viewer; reasoned decisions; meal/review moderation; suspend/restore workflow; active-order impact summary",
+      "then": "Approval/suspension reflected in discovery and checkout; private docs never appear in public network responses",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-124",
+      "title": "Build support and order exceptions acceptance",
+      "rule_ids": [
+        "BR-041"
+      ],
+      "story_id": "MB-024",
+      "phase": "P05",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Cases/messages/private notes; SLA and safety categories; cancellation request/ops resolution; handover override with step-up; failure queues",
+      "then": "Customer sees only own public case messages; safety escalation and immutable order timeline verified",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-125",
+      "title": "Build finance operations acceptance",
+      "rule_ids": [
+        "BR-034",
+        "BR-035",
+        "BR-036"
+      ],
+      "story_id": "MB-025",
+      "phase": "P05",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Cash reconciliation; full-refund obligations; commission reversal; reviewed settlement statements; actual remittance evidence and discrepancy queue",
+      "then": "Duplicate refund/settlement prevented; over-refund rejected; cook-collected cash is not platform revenue",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-126",
+      "title": "Build operating configuration and staff controls acceptance",
+      "rule_ids": [
+        "BR-042",
+        "BR-043"
+      ],
+      "story_id": "MB-026",
+      "phase": "P05",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Versioned zones/cutoffs/fees/rates; feature flags; staff permissions; immutable config audit; live approval guard",
+      "then": "Config changes affect new quotes only; self-escalation and loss of last recoverable admin prevented",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-127",
+      "title": "Complete customer web purchase flow acceptance",
+      "rule_ids": [
+        "BR-044",
+        "BR-045"
+      ],
+      "story_id": "MB-027",
+      "phase": "P06",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Responsive discovery/details/cart/address/quote/checkout/order status; auth return path; retry with stable key; empty/loading/error/offline states",
+      "then": "Real browser customer places delivery and pickup orders and tracks actual cook actions without mocks",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-128",
+      "title": "Complete customer account and trust features acceptance",
+      "rule_ids": [
+        "BR-039",
+        "BR-040"
+      ],
+      "story_id": "MB-028",
+      "phase": "P06",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Address/profile/preferences/deletion request; favorites/share links; verified-order reviews/report; reorder via new quote; inbox/support",
+      "then": "Only completed owned orders can be reviewed once; archived favorites and repriced reorder handled",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-129",
+      "title": "Verify accessibility RTL and responsive behavior acceptance",
+      "rule_ids": [
+        "BR-046",
+        "BR-047"
+      ],
+      "story_id": "MB-029",
+      "phase": "P06",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Audit Arabic/English strings; keyboard/screen reader/focus/contrast; table alignment and long values; browser history and mobile widths",
+      "then": "Critical journeys pass RTL/LTR at 360/390/768/1440 widths with no lost actions or clipped totals",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-130",
+      "title": "Automate complete web and backoffice journeys acceptance",
+      "rule_ids": [],
+      "story_id": "MB-030",
+      "phase": "P06",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Playwright real API journeys; role isolation and stock conflicts; stable test fixtures; capture traces/screenshots; repair discovered regressions",
+      "then": "Both happy and failure paths pass on clean seeded stack; no browser console errors in tested journeys",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-131",
+      "title": "Build native shell and authentication acceptance",
+      "rule_ids": [
+        "BR-048"
+      ],
+      "story_id": "MB-031",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Expo navigation/locales/environment config; PKCE/deep links; secure token storage; account switch/logout; crash boundary",
+      "then": "Development builds launch on Android and iOS; invalid redirect/token state rejected; private cache cleared",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-132",
+      "title": "Implement native discovery and ordering acceptance",
+      "rule_ids": [
+        "BR-049"
+      ],
+      "story_id": "MB-032",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Native list/details/cart/address/checkout/orders/account/review/support; generated client; same totals/errors; uncertain-order recovery",
+      "then": "Cross-client parity of order totals/states; app kill during submit and retry cannot duplicate order",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-133",
+      "title": "Implement native lifecycle push and accessibility acceptance",
+      "rule_ids": [
+        "BR-050"
+      ],
+      "story_id": "MB-033",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Device token registration/logout; push routing; cold/warm deep link login return; offline/foreground refetch; dynamic text and screen reader",
+      "then": "Notification denial safe; stale push cannot regress state; account switch cannot open previous user's order",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-134",
+      "title": "Verify Android native release candidate acceptance",
+      "rule_ids": [
+        "BR-051"
+      ],
+      "story_id": "MB-034",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Run native tests on emulator and physical device; signed internal build; permissions/back navigation/keyboard; capture identifiers and test evidence",
+      "then": "Installable Android build completes purchase/support flow; signing and artifact checksum recorded",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-135",
+      "title": "Verify iOS native release candidate acceptance",
+      "rule_ids": [
+        "BR-052"
+      ],
+      "story_id": "MB-035",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Run simulator plus physical iPhone/TestFlight-equivalent beta; signing/provisioning; safe area/keyboard/links; test push on supported device",
+      "then": "Installable iOS build completes purchase/support flow; unavailable Apple tooling is BLOCKED, never emulated by web tests",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-136",
+      "title": "Complete adversarial security verification acceptance",
+      "rule_ids": [
+        "BR-053",
+        "BR-054"
+      ],
+      "story_id": "MB-036",
+      "phase": "P08",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Threat model review; BOLA/CSRF/XSS/upload/OTP/MFA/rate limits; dependency/secret/container scans; repair and rerun",
+      "then": "No unresolved critical/high exploitable issue; every privileged route has negative authorization evidence",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-137",
+      "title": "Prove concurrency retries and recovery acceptance",
+      "rule_ids": [
+        "BR-058"
+      ],
+      "story_id": "MB-037",
+      "phase": "P08",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Race stock/expire/cancel; kill workers around commit/send; two instances; dedup finance; database outage recovery; server clock boundary tests",
+      "then": "No oversell/duplicate order/ledger imbalance; recovery after restart demonstrated with real PostgreSQL",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-138",
+      "title": "Measure capacity and performance budgets acceptance",
+      "rule_ids": [
+        "BR-059"
+      ],
+      "story_id": "MB-038",
+      "phase": "P08",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Load realistic synthetic catalogue/orders; profile p95 and DB plans; measure web/mobile responsiveness; tune boundedly; document hardware",
+      "then": "Targets measured under documented workload; correctness remains intact during contention/load",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-139",
+      "title": "Implement privacy observability and recovery tooling acceptance",
+      "rule_ids": [
+        "BR-055",
+        "BR-056",
+        "BR-057"
+      ],
+      "story_id": "MB-039",
+      "phase": "P08",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Retention/deletion workflows; redacted structured logs/metrics/alerts; migration checks; backup/restore automation; provider outage dashboards",
+      "then": "No PII/secrets in captured logs; restored staging database reconciles orders/stock/ledger; deletion policy enforced",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-140",
+      "title": "Deploy controlled staging environment acceptance",
+      "rule_ids": [
+        "BR-060"
+      ],
+      "story_id": "MB-040",
+      "phase": "P09",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Provision approved environment; separate sandbox credentials; TLS/config checks; deploy pinned artifacts and migrations; smoke and rollback rehearsal",
+      "then": "Staging web/ops/native point to same tested API; restored/redeployed release works without fake production providers",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-141",
+      "title": "Rehearse business operations acceptance",
+      "rule_ids": [
+        "BR-061"
+      ],
+      "story_id": "MB-041",
+      "phase": "P09",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Run cook onboarding, real operator queues, synthetic end-to-end orders, failed delivery, complaint, refund and settlement; approve commercial config and support rota",
+      "then": "Named operators can complete every critical runbook and reconcile sample day to zero unexplained variance",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-142",
+      "title": "Perform owner UAT and corrective cycle acceptance",
+      "rule_ids": [],
+      "story_id": "MB-042",
+      "phase": "P09",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Present exact builds/screens and walkthrough; capture owner feedback; prioritize defects; fix and rerun affected regressions; record accepted scope",
+      "then": "Owner can review all requested surfaces; no fabricated approval; critical defects closed with rerun evidence",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-143",
+      "title": "Assemble release candidate and gate evidence acceptance",
+      "rule_ids": [
+        "BR-062"
+      ],
+      "story_id": "MB-043",
+      "phase": "P09",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Freeze versions/commit; complete traceability; sign build checksums; validate policies/provider setup/restore/security/native reports; record go/no-go",
+      "then": "Every required gate has fresh evidence or explicitly blocks; no unresolved critical/high issue",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-144",
+      "title": "Execute authorized production pilot release acceptance",
+      "rule_ids": [],
+      "story_id": "MB-044",
+      "phase": "P10",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Obtain scoped release authorization; backup and deploy canary/pilot; run health/business smoke; monitor/reconcile; rollback if thresholds breach",
+      "then": "Release actor/artifact/time recorded; real-order controls and incident contacts active; success verified after deployment",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-145",
+      "title": "Submit authorized mobile store releases acceptance",
+      "rule_ids": [
+        "BR-063"
+      ],
+      "story_id": "MB-045",
+      "phase": "P10",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Finalize metadata/privacy/support/deletion URLs/screenshots; owner signing/accounts; submit exact approved builds; track review and remediation",
+      "then": "Android and iOS submission/outcome tracked separately; store approval not assumed from upload",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-146",
+      "title": "Observe pilot and close MVP acceptance",
+      "rule_ids": [
+        "BR-064"
+      ],
+      "story_id": "MB-046",
+      "phase": "P10",
+      "level": "system",
+      "severity": "high",
+      "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
+      "when": "Monitor agreed observation window; reconcile cash/errors/support; repair production defects safely; publish operator/user guides and next backlog",
+      "then": "All four surfaces accepted; operational metrics and incidents reviewed; residual risks explicitly accepted or fixed",
+      "status": "NOT_RUN",
+      "evidence": []
+    }
+  ]
+}

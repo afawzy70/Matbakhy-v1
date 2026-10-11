@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "gates": [
+    {
+      "id": "P00",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P00-CHECK-1",
+          "name": "Scope and traceability review",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P00-CHECK-2",
+          "name": "Brand and UX artifacts review",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P01",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P01-CHECK-1",
+          "name": "Backend workspace and PostgreSQL baseline",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P01-CHECK-2",
+          "name": "Web/native shell and contract/CI bootstrap",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P02",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P02-CHECK-1",
+          "name": "Identity OTP and address integration",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P02-CHECK-2",
+          "name": "Role isolation and cook application integration",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P03",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P03-CHECK-1",
+          "name": "Media publication and discovery integration",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P03-CHECK-2",
+          "name": "Availability cutoff timezone and stock constraints",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P04",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P04-CHECK-1",
+          "name": "Transactional order lifecycle and concurrency",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P04-CHECK-2",
+          "name": "Cash ledger and outbox failure recovery",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P05",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P05-CHECK-1",
+          "name": "Cook and operations browser workflows",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P05-CHECK-2",
+          "name": "Support finance reconciliation and staff configuration",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P06",
+      "status": "NOT_RUN",
+      "required_decisions": [
+        "O05"
+      ],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P06-CHECK-1",
+          "name": "Customer web and backoffice E2E",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P06-CHECK-2",
+          "name": "RTL responsive accessibility and approved UX",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P07",
+      "status": "NOT_RUN",
+      "required_decisions": [
+        "O08"
+      ],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P07-CHECK-1",
+          "name": "Android native build device and lifecycle",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P07-CHECK-2",
+          "name": "iOS native build device and lifecycle",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P08",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [],
+      "checks": [
+        {
+          "id": "P08-CHECK-1",
+          "name": "Security adversarial and race crash recovery",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P08-CHECK-2",
+          "name": "Performance privacy backup restore and migration",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P09",
+      "status": "NOT_RUN",
+      "required_decisions": [
+        "O01",
+        "O02",
+        "O03",
+        "O04",
+        "O05",
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O10"
+      ],
+      "required_approvals": [
+        "owner_uat"
+      ],
+      "checks": [
+        {
+          "id": "P09-CHECK-1",
+          "name": "Staging end-to-end and business rehearsal",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P09-CHECK-2",
+          "name": "Owner UAT and exact release candidate review",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    },
+    {
+      "id": "P10",
+      "status": "NOT_RUN",
+      "required_decisions": [],
+      "required_approvals": [
+        "production_release",
+        "store_submission"
+      ],
+      "checks": [
+        {
+          "id": "P10-CHECK-1",
+          "name": "Authorized production pilot and store outcomes",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        },
+        {
+          "id": "P10-CHECK-2",
+          "name": "Postlaunch monitoring reconciliation and closure",
+          "kind": "command",
+          "command": null,
+          "timeout_seconds": 1200,
+          "required": true,
+          "configured": false,
+          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+        }
+      ]
+    }
+  ]
+}

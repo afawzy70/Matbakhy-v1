@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "project": "Matbakhy-v1",
+  "status": "READY_TO_START",
+  "current_phase": "P00",
+  "current_story": null,
+  "last_tested_commit": null,
+  "last_completed_story": null,
+  "last_successful_gate": null,
+  "working_branch": null,
+  "open_blockers": [],
+  "next_action": "Read CLAUDE.md and execute MB-001; do not mark planning artifacts as implemented product.",
+  "updated_at": "2026-10-11T00:00:00Z",
+  "heartbeat": null,
+  "runtime_note": "No continuously running supervisor is installed or active."
+}

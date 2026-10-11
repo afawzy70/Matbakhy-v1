@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "phase": "P00",
+  "source_commit": null,
+  "environment": null,
+  "started_at": null,
+  "finished_at": null,
+  "status": "NOT_RUN",
+  "checks": [],
+  "scenario_results": [],
+  "artifacts": [],
+  "review": {
+    "status": "NOT_RUN",
+    "reviewer": null,
+    "type": "SELF_REVIEW",
+    "findings": []
+  },
+  "approvals": [],
+  "open_defects": []
+}

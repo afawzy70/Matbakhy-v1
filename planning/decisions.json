@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "decisions": [
+    {
+      "id": "D01",
+      "topic": "Architecture",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Spring Boot modular monolith with PostgreSQL",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P01",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D02",
+      "topic": "Web",
+      "status": "PROPOSED_DEFAULT",
+      "value": "React and TypeScript, customer and operations apps",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P01",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D03",
+      "topic": "Mobile",
+      "status": "PROPOSED_DEFAULT",
+      "value": "React Native with Expo, Android and iOS",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P01",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D04",
+      "topic": "Ordering",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Single cook and dated slot per order",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P04",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D05",
+      "topic": "Payment",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Cash at delivery or pickup; manual audited reconciliation",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P04",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D06",
+      "topic": "Fulfillment",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Cook-arranged delivery or pickup",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P04",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D07",
+      "topic": "Social",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Favorites/share links now; feed/follows/comments deferred",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P04",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D08",
+      "topic": "Identity",
+      "status": "PROPOSED_DEFAULT",
+      "value": "OIDC with local Keycloak reference, verified phone at checkout",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P01",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D09",
+      "topic": "Locale",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Arabic/English, EGP, Africa/Cairo",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P04",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "D10",
+      "topic": "Revenue",
+      "status": "PROPOSED_DEFAULT",
+      "value": "Configurable commission on item subtotal",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P04",
+      "approval_reference": null,
+      "build_with_default": true
+    },
+    {
+      "id": "O01",
+      "topic": "Launch city, zones and pickup policy",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O02",
+      "topic": "Cash-first versus online prepayment at launch",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O03",
+      "topic": "Delivery responsibility, cash collector and failed-delivery cost",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O04",
+      "topic": "Commission, tax, invoices, refunds and settlement policy",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O05",
+      "topic": "Brand clearance and visual approval",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O06",
+      "topic": "Cook verification, food-business obligations, privacy and retention policies",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O07",
+      "topic": "Providers, hosting, budget and domain",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O08",
+      "topic": "Apple/Google accounts, identifiers, signing and testers",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P07",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O09",
+      "topic": "Support contacts, operating hours and emergency escalation",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "O10",
+      "topic": "Are social feed/follows/comments launch-critical?",
+      "status": "OPEN",
+      "value": null,
+      "owner": "Ahmed Fawzy",
+      "required_before": "P00",
+      "approval_reference": null,
+      "build_with_default": true,
+      "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    }
+  ]
+}

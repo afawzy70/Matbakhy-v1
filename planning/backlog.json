@@ -1,0 +1,1631 @@
+{
+  "schema_version": 1,
+  "status": "PLANNED_NOT_IMPLEMENTED",
+  "stories": [
+    {
+      "id": "MB-001",
+      "phase": "P00",
+      "title": "Reconcile scope and repository baseline",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [],
+      "implementation_steps": [
+        "Inspect existing files/branches and preserve user work",
+        "read confirmed context",
+        "inventory proposed and open decisions",
+        "record product assumptions and superseded ideas"
+      ],
+      "artifacts": [
+        "planning/decisions.json",
+        "docs/product/01-context-and-decisions.md"
+      ],
+      "acceptance": [
+        "Repository inventory matches reality and unresolved launch decisions remain explicit"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-101"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-002",
+      "phase": "P00",
+      "title": "Freeze traceable MVP backlog",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-001"
+      ],
+      "implementation_steps": [
+        "Map rules to stories and tests",
+        "confirm four client targets",
+        "retain deferred social/payment/courier scope",
+        "record dependency order and launch blockers"
+      ],
+      "artifacts": [
+        "planning/backlog.json",
+        "planning/scenarios.json"
+      ],
+      "acceptance": [
+        "Every mandatory rule has an owner story and measurable scenario; dependency graph is acyclic"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-102"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-003",
+      "phase": "P00",
+      "title": "Prepare editable brand system",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-001"
+      ],
+      "implementation_steps": [
+        "Create draft logo/name treatment and design tokens",
+        "choose licensed Arabic/Latin fonts",
+        "prepare sample content",
+        "flag trademark clearance as open"
+      ],
+      "artifacts": [
+        "packages/design-tokens",
+        "docs/product/07-brand-and-content.md"
+      ],
+      "acceptance": [
+        "Name/logo/colors can change without editing business code; Arabic glyph and contrast samples rendered"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-103"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-004",
+      "phase": "P00",
+      "title": "Produce reviewable UX package",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-002",
+        "MB-003"
+      ],
+      "implementation_steps": [
+        "Build prototypes of discovery/detail/checkout/tracking and cook/ops queues",
+        "show Arabic/English and mobile/desktop",
+        "capture screenshots and design decisions",
+        "request bounded visual review"
+      ],
+      "artifacts": [
+        "docs/design",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Reviewer can complete all critical journeys in prototype; approval is recorded separately and not fabricated"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-104"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-005",
+      "phase": "P01",
+      "title": "Pin workspace and compatible toolchain",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-002"
+      ],
+      "implementation_steps": [
+        "Create Maven multi-module backend and pnpm apps/packages",
+        "select supported versions from official sources",
+        "generate lockfiles and wrappers",
+        "document Linux/Windows/macOS commands"
+      ],
+      "artifacts": [
+        "backend/pom.xml",
+        "pnpm-workspace.yaml",
+        "package.json",
+        "docs/engineering/toolchain.md"
+      ],
+      "acceptance": [
+        "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-105"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-006",
+      "phase": "P01",
+      "title": "Establish database and module boundaries",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-005"
+      ],
+      "implementation_steps": [
+        "Create module interfaces and schema migration baseline",
+        "configure PostgreSQL/Testcontainers",
+        "add architecture constraints and consistent errors",
+        "isolate dev fixtures"
+      ],
+      "artifacts": [
+        "backend/modules",
+        "backend/app"
+      ],
+      "acceptance": [
+        "Blank PostgreSQL migrates; duplicate constraints fail; forbidden module dependency test fails when violated"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-106"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-007",
+      "phase": "P01",
+      "title": "Implement contract toolchain",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-005"
+      ],
+      "implementation_steps": [
+        "Create typed OpenAPI from endpoint registry",
+        "establish validation and generated TS clients",
+        "define pagination/errors/money",
+        "add client regeneration drift check"
+      ],
+      "artifacts": [
+        "contracts/openapi.yaml",
+        "packages/api-client"
+      ],
+      "acceptance": [
+        "OpenAPI validates and client generation is reproducible; malformed monetary DTO rejected"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-107"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-008",
+      "phase": "P01",
+      "title": "Create local stack and required CI commands",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-006",
+        "MB-007"
+      ],
+      "implementation_steps": [
+        "Compose database/IdP/object storage/mail sink/API",
+        "healthchecks and environment templates",
+        "add build/test/lint/secret checks",
+        "replace phase verification checks with real commands"
+      ],
+      "artifacts": [
+        "infra/compose.yaml",
+        ".github/workflows",
+        "scripts"
+      ],
+      "acceptance": [
+        "Documented bootstrap works from a clean environment and missing dependencies fail clearly"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-108"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-009",
+      "phase": "P02",
+      "title": "Integrate identity and sessions",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-008"
+      ],
+      "implementation_steps": [
+        "Configure OIDC web sessions and native PKCE contract",
+        "account mapping",
+        "logout/recovery",
+        "expiry and staff MFA assurance",
+        "CSRF/CORS protections"
+      ],
+      "artifacts": [
+        "backend/modules/identity",
+        "infra/identity"
+      ],
+      "acceptance": [
+        "Anonymous and expired sessions denied; logout revokes intended session; role claims cannot be forged"
+      ],
+      "rule_ids": [
+        "BR-001",
+        "BR-002"
+      ],
+      "scenario_ids": [
+        "TC-001",
+        "TC-002",
+        "TC-109"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-010",
+      "phase": "P02",
+      "title": "Build profile address and phone verification",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-009"
+      ],
+      "implementation_steps": [
+        "Create customer profile/address APIs",
+        "Egyptian phone normalization and OTP adapter",
+        "verification limits",
+        "deletion-request intake",
+        "reject another user's addresses"
+      ],
+      "artifacts": [
+        "backend/modules/identity",
+        "contracts/openapi.yaml"
+      ],
+      "acceptance": [
+        "OTP expiry/replay/rate limits and address object authorization pass with isolated fake sender"
+      ],
+      "rule_ids": [
+        "BR-003",
+        "BR-004",
+        "BR-005"
+      ],
+      "scenario_ids": [
+        "TC-003",
+        "TC-004",
+        "TC-005",
+        "TC-110"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-011",
+      "phase": "P02",
+      "title": "Enforce scoped permissions and auditing",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-009"
+      ],
+      "implementation_steps": [
+        "Implement deny-by-default permission service",
+        "kitchen/order/case scope",
+        "staff step-up",
+        "grants/revocations",
+        "append-only redacted audit"
+      ],
+      "artifacts": [
+        "backend/modules/identity",
+        "backend/modules/operations"
+      ],
+      "acceptance": [
+        "Cross-customer and cross-cook access matrix denied; privilege escalation and audit-redaction checks pass"
+      ],
+      "rule_ids": [
+        "BR-006",
+        "BR-007"
+      ],
+      "scenario_ids": [
+        "TC-006",
+        "TC-007",
+        "TC-111"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-012",
+      "phase": "P02",
+      "title": "Implement cook application workflow",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-010",
+        "MB-011"
+      ],
+      "implementation_steps": [
+        "Private application/document metadata",
+        "revisioned submit/change-request/review/approve/reject",
+        "separate operating state",
+        "hide private kitchen location"
+      ],
+      "artifacts": [
+        "backend/modules/cooks"
+      ],
+      "acceptance": [
+        "Only scoped reviewer can approve; incomplete application cannot publish; rejected revision history preserved"
+      ],
+      "rule_ids": [
+        "BR-008",
+        "BR-009"
+      ],
+      "scenario_ids": [
+        "TC-008",
+        "TC-009",
+        "TC-112"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-013",
+      "phase": "P03",
+      "title": "Implement safe media lifecycle",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-008",
+        "MB-011"
+      ],
+      "implementation_steps": [
+        "Signed private upload flow",
+        "byte/type/dimension limits",
+        "scan/quarantine adapters",
+        "strip metadata",
+        "approved public derivatives",
+        "scoped deletes"
+      ],
+      "artifacts": [
+        "backend/modules/catalog",
+        "infra/storage"
+      ],
+      "acceptance": [
+        "Spoofed type/oversize/private-object access fail; no quarantined asset is publicly served"
+      ],
+      "rule_ids": [
+        "BR-010"
+      ],
+      "scenario_ids": [
+        "TC-010",
+        "TC-113"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-014",
+      "phase": "P03",
+      "title": "Implement meals and publication",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-012",
+        "MB-013"
+      ],
+      "implementation_steps": [
+        "Meal CRUD with translations/portion/ingredients/allergens",
+        "versioning",
+        "publication guards",
+        "archive semantics",
+        "public/private DTO split"
+      ],
+      "artifacts": [
+        "backend/modules/catalog"
+      ],
+      "acceptance": [
+        "Required declarations and approval enforced; historical order snapshot unaffected by later meal changes"
+      ],
+      "rule_ids": [
+        "BR-011",
+        "BR-012"
+      ],
+      "scenario_ids": [
+        "TC-011",
+        "TC-012",
+        "TC-114"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-015",
+      "phase": "P03",
+      "title": "Implement dated slots and capacity",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-014"
+      ],
+      "implementation_steps": [
+        "Cook/meal slot tables and constraints",
+        "cutoff/timezone rules",
+        "pause/close",
+        "capacity edit bounds",
+        "aggregate stock counters"
+      ],
+      "artifacts": [
+        "backend/modules/availability"
+      ],
+      "acceptance": [
+        "Cairo time boundaries, last available portion and capacity reductions below obligations are handled"
+      ],
+      "rule_ids": [
+        "BR-013",
+        "BR-014",
+        "BR-015"
+      ],
+      "scenario_ids": [
+        "TC-013",
+        "TC-014",
+        "TC-015",
+        "TC-115"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-016",
+      "phase": "P03",
+      "title": "Implement serviceable discovery",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-014",
+        "MB-015"
+      ],
+      "implementation_steps": [
+        "Zone-based filtering/search/sort/cursor pagination",
+        "public cook/meal details",
+        "unavailable/favorite presentation",
+        "full server query on filter changes"
+      ],
+      "artifacts": [
+        "backend/modules/catalog",
+        "contracts/openapi.yaml"
+      ],
+      "acceptance": [
+        "Filtering searches all matching stored data; unpublished/suspended supply excluded; stable pagination has no duplicates"
+      ],
+      "rule_ids": [
+        "BR-016",
+        "BR-017"
+      ],
+      "scenario_ids": [
+        "TC-016",
+        "TC-017",
+        "TC-116"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-017",
+      "phase": "P04",
+      "title": "Implement authoritative quotes",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-010",
+        "MB-015",
+        "MB-016"
+      ],
+      "implementation_steps": [
+        "Validate one cook/slot",
+        "calculate integer totals from policy snapshots",
+        "check serviceability/address",
+        "quote expiry",
+        "no capacity hold"
+      ],
+      "artifacts": [
+        "backend/modules/orders"
+      ],
+      "acceptance": [
+        "Tampered totals rejected; delivery/pickup totals exact; expired/repriced quote requires review"
+      ],
+      "rule_ids": [
+        "BR-018",
+        "BR-019",
+        "BR-020",
+        "BR-021"
+      ],
+      "scenario_ids": [
+        "TC-018",
+        "TC-019",
+        "TC-020",
+        "TC-021",
+        "TC-117"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-018",
+      "phase": "P04",
+      "title": "Implement atomic order placement",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-017",
+        "MB-011"
+      ],
+      "implementation_steps": [
+        "Persistent idempotency/clientRequestId",
+        "deterministic stock locks",
+        "order/item/address snapshots",
+        "reservation+events+outbox in one transaction",
+        "recovery lookup"
+      ],
+      "artifacts": [
+        "backend/modules/orders",
+        "backend/modules/availability"
+      ],
+      "acceptance": [
+        "Concurrent last-portion requests yield one success; timeout/retry creates one order; transaction rollback leaves no partial state"
+      ],
+      "rule_ids": [
+        "BR-022",
+        "BR-023",
+        "BR-024",
+        "BR-025"
+      ],
+      "scenario_ids": [
+        "TC-022",
+        "TC-023",
+        "TC-024",
+        "TC-025",
+        "TC-118"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-019",
+      "phase": "P04",
+      "title": "Implement lifecycle and handover",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-018"
+      ],
+      "implementation_steps": [
+        "Explicit commands and version guards",
+        "expiry scheduler",
+        "cancel/reject/prepare/ready/dispatch/complete/fail",
+        "secure handover challenge",
+        "audit ops override"
+      ],
+      "artifacts": [
+        "backend/modules/orders"
+      ],
+      "acceptance": [
+        "Invalid/racing transitions rejected; release happens once; pickup cannot dispatch; code replay/brute force denied"
+      ],
+      "rule_ids": [
+        "BR-026",
+        "BR-027",
+        "BR-028",
+        "BR-029",
+        "BR-030",
+        "BR-031"
+      ],
+      "scenario_ids": [
+        "TC-026",
+        "TC-027",
+        "TC-028",
+        "TC-029",
+        "TC-030",
+        "TC-031",
+        "TC-119"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-020",
+      "phase": "P04",
+      "title": "Implement cash and ledger core",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-018",
+        "MB-019"
+      ],
+      "implementation_steps": [
+        "Cash report/verification separate from order",
+        "immutable balanced commission entries",
+        "dedup source events",
+        "snapshot rates",
+        "discrepancy handling"
+      ],
+      "artifacts": [
+        "backend/modules/finance"
+      ],
+      "acceptance": [
+        "Completion does not imply payment; duplicate event posts once; commission example and balanced groups verified"
+      ],
+      "rule_ids": [
+        "BR-032",
+        "BR-033"
+      ],
+      "scenario_ids": [
+        "TC-032",
+        "TC-033",
+        "TC-120"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-021",
+      "phase": "P04",
+      "title": "Implement outbox and notifications",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-018"
+      ],
+      "implementation_steps": [
+        "Persist inbox",
+        "lease worker",
+        "email/push adapters",
+        "retry and dead-letter",
+        "dedup recipient/event",
+        "unread/read operations"
+      ],
+      "artifacts": [
+        "backend/modules/notifications"
+      ],
+      "acceptance": [
+        "Provider outage leaves order committed; restart/multiple workers deliver effective notification once"
+      ],
+      "rule_ids": [
+        "BR-037",
+        "BR-038"
+      ],
+      "scenario_ids": [
+        "TC-037",
+        "TC-038",
+        "TC-121"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-022",
+      "phase": "P05",
+      "title": "Build cook workspace",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-012",
+        "MB-014",
+        "MB-015",
+        "MB-019",
+        "MB-020",
+        "MB-021"
+      ],
+      "implementation_steps": [
+        "Onboarding/meals/slots/order queue",
+        "accept deadline and allowed actions",
+        "handover/cash report",
+        "statement",
+        "query refresh and scope-safe UI"
+      ],
+      "artifacts": [
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Cook can fulfill pickup and delivery using real API; other kitchen data inaccessible"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-122"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-023",
+      "phase": "P05",
+      "title": "Build operations approval and moderation",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-012",
+        "MB-013",
+        "MB-014",
+        "MB-011"
+      ],
+      "implementation_steps": [
+        "Cook review queue/document viewer",
+        "reasoned decisions",
+        "meal/review moderation",
+        "suspend/restore workflow",
+        "active-order impact summary"
+      ],
+      "artifacts": [
+        "apps/operations-web",
+        "backend/modules/operations"
+      ],
+      "acceptance": [
+        "Approval/suspension reflected in discovery and checkout; private docs never appear in public network responses"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-123"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-024",
+      "phase": "P05",
+      "title": "Build support and order exceptions",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-019",
+        "MB-011"
+      ],
+      "implementation_steps": [
+        "Cases/messages/private notes",
+        "SLA and safety categories",
+        "cancellation request/ops resolution",
+        "handover override with step-up",
+        "failure queues"
+      ],
+      "artifacts": [
+        "backend/modules/support",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Customer sees only own public case messages; safety escalation and immutable order timeline verified"
+      ],
+      "rule_ids": [
+        "BR-041"
+      ],
+      "scenario_ids": [
+        "TC-041",
+        "TC-124"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-025",
+      "phase": "P05",
+      "title": "Build finance operations",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-020",
+        "MB-024"
+      ],
+      "implementation_steps": [
+        "Cash reconciliation",
+        "full-refund obligations",
+        "commission reversal",
+        "reviewed settlement statements",
+        "actual remittance evidence and discrepancy queue"
+      ],
+      "artifacts": [
+        "backend/modules/finance",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Duplicate refund/settlement prevented; over-refund rejected; cook-collected cash is not platform revenue"
+      ],
+      "rule_ids": [
+        "BR-034",
+        "BR-035",
+        "BR-036"
+      ],
+      "scenario_ids": [
+        "TC-034",
+        "TC-035",
+        "TC-036",
+        "TC-125"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-026",
+      "phase": "P05",
+      "title": "Build operating configuration and staff controls",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-011",
+        "MB-016",
+        "MB-020"
+      ],
+      "implementation_steps": [
+        "Versioned zones/cutoffs/fees/rates",
+        "feature flags",
+        "staff permissions",
+        "immutable config audit",
+        "live approval guard"
+      ],
+      "artifacts": [
+        "backend/modules/operations",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Config changes affect new quotes only; self-escalation and loss of last recoverable admin prevented"
+      ],
+      "rule_ids": [
+        "BR-042",
+        "BR-043"
+      ],
+      "scenario_ids": [
+        "TC-042",
+        "TC-043",
+        "TC-126"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-027",
+      "phase": "P06",
+      "title": "Complete customer web purchase flow",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-016",
+        "MB-017",
+        "MB-018",
+        "MB-019",
+        "MB-021",
+        "MB-004"
+      ],
+      "implementation_steps": [
+        "Responsive discovery/details/cart/address/quote/checkout/order status",
+        "auth return path",
+        "retry with stable key",
+        "empty/loading/error/offline states"
+      ],
+      "artifacts": [
+        "apps/customer-web"
+      ],
+      "acceptance": [
+        "Real browser customer places delivery and pickup orders and tracks actual cook actions without mocks"
+      ],
+      "rule_ids": [
+        "BR-044",
+        "BR-045"
+      ],
+      "scenario_ids": [
+        "TC-044",
+        "TC-045",
+        "TC-127"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-028",
+      "phase": "P06",
+      "title": "Complete customer account and trust features",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-010",
+        "MB-014",
+        "MB-019",
+        "MB-024",
+        "MB-027"
+      ],
+      "implementation_steps": [
+        "Address/profile/preferences/deletion request",
+        "favorites/share links",
+        "verified-order reviews/report",
+        "reorder via new quote",
+        "inbox/support"
+      ],
+      "artifacts": [
+        "apps/customer-web",
+        "backend/modules/catalog"
+      ],
+      "acceptance": [
+        "Only completed owned orders can be reviewed once; archived favorites and repriced reorder handled"
+      ],
+      "rule_ids": [
+        "BR-039",
+        "BR-040"
+      ],
+      "scenario_ids": [
+        "TC-039",
+        "TC-040",
+        "TC-128"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-029",
+      "phase": "P06",
+      "title": "Verify accessibility RTL and responsive behavior",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-022",
+        "MB-023",
+        "MB-024",
+        "MB-025",
+        "MB-026",
+        "MB-027",
+        "MB-028"
+      ],
+      "implementation_steps": [
+        "Audit Arabic/English strings",
+        "keyboard/screen reader/focus/contrast",
+        "table alignment and long values",
+        "browser history and mobile widths"
+      ],
+      "artifacts": [
+        "apps/customer-web",
+        "apps/operations-web",
+        "packages/i18n"
+      ],
+      "acceptance": [
+        "Critical journeys pass RTL/LTR at 360/390/768/1440 widths with no lost actions or clipped totals"
+      ],
+      "rule_ids": [
+        "BR-046",
+        "BR-047"
+      ],
+      "scenario_ids": [
+        "TC-046",
+        "TC-047",
+        "TC-129"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-030",
+      "phase": "P06",
+      "title": "Automate complete web and backoffice journeys",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-029"
+      ],
+      "implementation_steps": [
+        "Playwright real API journeys",
+        "role isolation and stock conflicts",
+        "stable test fixtures",
+        "capture traces/screenshots",
+        "repair discovered regressions"
+      ],
+      "artifacts": [
+        "tests/e2e",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Both happy and failure paths pass on clean seeded stack; no browser console errors in tested journeys"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-130"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-031",
+      "phase": "P07",
+      "title": "Build native shell and authentication",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-005",
+        "MB-007",
+        "MB-009",
+        "MB-010"
+      ],
+      "implementation_steps": [
+        "Expo navigation/locales/environment config",
+        "PKCE/deep links",
+        "secure token storage",
+        "account switch/logout",
+        "crash boundary"
+      ],
+      "artifacts": [
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "Development builds launch on Android and iOS; invalid redirect/token state rejected; private cache cleared"
+      ],
+      "rule_ids": [
+        "BR-048"
+      ],
+      "scenario_ids": [
+        "TC-048",
+        "TC-131"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-032",
+      "phase": "P07",
+      "title": "Implement native discovery and ordering",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-031",
+        "MB-016",
+        "MB-017",
+        "MB-018",
+        "MB-019",
+        "MB-028"
+      ],
+      "implementation_steps": [
+        "Native list/details/cart/address/checkout/orders/account/review/support",
+        "generated client",
+        "same totals/errors",
+        "uncertain-order recovery"
+      ],
+      "artifacts": [
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "Cross-client parity of order totals/states; app kill during submit and retry cannot duplicate order"
+      ],
+      "rule_ids": [
+        "BR-049"
+      ],
+      "scenario_ids": [
+        "TC-049",
+        "TC-132"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-033",
+      "phase": "P07",
+      "title": "Implement native lifecycle push and accessibility",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-032",
+        "MB-021"
+      ],
+      "implementation_steps": [
+        "Device token registration/logout",
+        "push routing",
+        "cold/warm deep link login return",
+        "offline/foreground refetch",
+        "dynamic text and screen reader"
+      ],
+      "artifacts": [
+        "apps/customer-mobile",
+        "tests/mobile"
+      ],
+      "acceptance": [
+        "Notification denial safe; stale push cannot regress state; account switch cannot open previous user's order"
+      ],
+      "rule_ids": [
+        "BR-050"
+      ],
+      "scenario_ids": [
+        "TC-050",
+        "TC-133"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-034",
+      "phase": "P07",
+      "title": "Verify Android native release candidate",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-033"
+      ],
+      "implementation_steps": [
+        "Run native tests on emulator and physical device",
+        "signed internal build",
+        "permissions/back navigation/keyboard",
+        "capture identifiers and test evidence"
+      ],
+      "artifacts": [
+        "tests/mobile",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Installable Android build completes purchase/support flow; signing and artifact checksum recorded"
+      ],
+      "rule_ids": [
+        "BR-051"
+      ],
+      "scenario_ids": [
+        "TC-051",
+        "TC-134"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-035",
+      "phase": "P07",
+      "title": "Verify iOS native release candidate",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-033"
+      ],
+      "implementation_steps": [
+        "Run simulator plus physical iPhone/TestFlight-equivalent beta",
+        "signing/provisioning",
+        "safe area/keyboard/links",
+        "test push on supported device"
+      ],
+      "artifacts": [
+        "tests/mobile",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Installable iOS build completes purchase/support flow; unavailable Apple tooling is BLOCKED, never emulated by web tests"
+      ],
+      "rule_ids": [
+        "BR-052"
+      ],
+      "scenario_ids": [
+        "TC-052",
+        "TC-135"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-036",
+      "phase": "P08",
+      "title": "Complete adversarial security verification",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-030",
+        "MB-033"
+      ],
+      "implementation_steps": [
+        "Threat model review",
+        "BOLA/CSRF/XSS/upload/OTP/MFA/rate limits",
+        "dependency/secret/container scans",
+        "repair and rerun"
+      ],
+      "artifacts": [
+        "tests/security",
+        "docs/engineering/04-security.md"
+      ],
+      "acceptance": [
+        "No unresolved critical/high exploitable issue; every privileged route has negative authorization evidence"
+      ],
+      "rule_ids": [
+        "BR-053",
+        "BR-054"
+      ],
+      "scenario_ids": [
+        "TC-053",
+        "TC-054",
+        "TC-136"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-037",
+      "phase": "P08",
+      "title": "Prove concurrency retries and recovery",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-019",
+        "MB-020",
+        "MB-021",
+        "MB-025"
+      ],
+      "implementation_steps": [
+        "Race stock/expire/cancel",
+        "kill workers around commit/send",
+        "two instances",
+        "dedup finance",
+        "database outage recovery",
+        "server clock boundary tests"
+      ],
+      "artifacts": [
+        "tests/integration",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "No oversell/duplicate order/ledger imbalance; recovery after restart demonstrated with real PostgreSQL"
+      ],
+      "rule_ids": [
+        "BR-058"
+      ],
+      "scenario_ids": [
+        "TC-058",
+        "TC-137"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-038",
+      "phase": "P08",
+      "title": "Measure capacity and performance budgets",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-016",
+        "MB-018",
+        "MB-030",
+        "MB-032"
+      ],
+      "implementation_steps": [
+        "Load realistic synthetic catalogue/orders",
+        "profile p95 and DB plans",
+        "measure web/mobile responsiveness",
+        "tune boundedly",
+        "document hardware"
+      ],
+      "artifacts": [
+        "tests/load",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Targets measured under documented workload; correctness remains intact during contention/load"
+      ],
+      "rule_ids": [
+        "BR-059"
+      ],
+      "scenario_ids": [
+        "TC-059",
+        "TC-138"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-039",
+      "phase": "P08",
+      "title": "Implement privacy observability and recovery tooling",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-010",
+        "MB-020",
+        "MB-024"
+      ],
+      "implementation_steps": [
+        "Retention/deletion workflows",
+        "redacted structured logs/metrics/alerts",
+        "migration checks",
+        "backup/restore automation",
+        "provider outage dashboards"
+      ],
+      "artifacts": [
+        "infra",
+        "scripts",
+        "docs/operations"
+      ],
+      "acceptance": [
+        "No PII/secrets in captured logs; restored staging database reconciles orders/stock/ledger; deletion policy enforced"
+      ],
+      "rule_ids": [
+        "BR-055",
+        "BR-056",
+        "BR-057"
+      ],
+      "scenario_ids": [
+        "TC-055",
+        "TC-056",
+        "TC-057",
+        "TC-139"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-040",
+      "phase": "P09",
+      "title": "Deploy controlled staging environment",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-034",
+        "MB-035",
+        "MB-036",
+        "MB-037",
+        "MB-038",
+        "MB-039"
+      ],
+      "implementation_steps": [
+        "Provision approved environment",
+        "separate sandbox credentials",
+        "TLS/config checks",
+        "deploy pinned artifacts and migrations",
+        "smoke and rollback rehearsal"
+      ],
+      "artifacts": [
+        "infra",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Staging web/ops/native point to same tested API; restored/redeployed release works without fake production providers"
+      ],
+      "rule_ids": [
+        "BR-060"
+      ],
+      "scenario_ids": [
+        "TC-060",
+        "TC-140"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-041",
+      "phase": "P09",
+      "title": "Rehearse business operations",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-040",
+        "MB-025",
+        "MB-026"
+      ],
+      "implementation_steps": [
+        "Run cook onboarding, real operator queues, synthetic end-to-end orders, failed delivery, complaint, refund and settlement",
+        "approve commercial config and support rota"
+      ],
+      "artifacts": [
+        "docs/operations/03-business-operations.md",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Named operators can complete every critical runbook and reconcile sample day to zero unexplained variance"
+      ],
+      "rule_ids": [
+        "BR-061"
+      ],
+      "scenario_ids": [
+        "TC-061",
+        "TC-141"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-042",
+      "phase": "P09",
+      "title": "Perform owner UAT and corrective cycle",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-040",
+        "MB-041"
+      ],
+      "implementation_steps": [
+        "Present exact builds/screens and walkthrough",
+        "capture owner feedback",
+        "prioritize defects",
+        "fix and rerun affected regressions",
+        "record accepted scope"
+      ],
+      "artifacts": [
+        "verification/runs",
+        "planning/decisions.json"
+      ],
+      "acceptance": [
+        "Owner can review all requested surfaces; no fabricated approval; critical defects closed with rerun evidence"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-142"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-043",
+      "phase": "P09",
+      "title": "Assemble release candidate and gate evidence",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-042"
+      ],
+      "implementation_steps": [
+        "Freeze versions/commit",
+        "complete traceability",
+        "sign build checksums",
+        "validate policies/provider setup/restore/security/native reports",
+        "record go/no-go"
+      ],
+      "artifacts": [
+        "verification/runs",
+        "docs/quality/02-release-gates.md"
+      ],
+      "acceptance": [
+        "Every required gate has fresh evidence or explicitly blocks; no unresolved critical/high issue"
+      ],
+      "rule_ids": [
+        "BR-062"
+      ],
+      "scenario_ids": [
+        "TC-062",
+        "TC-143"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-044",
+      "phase": "P10",
+      "title": "Execute authorized production pilot release",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-043"
+      ],
+      "implementation_steps": [
+        "Obtain scoped release authorization",
+        "backup and deploy canary/pilot",
+        "run health/business smoke",
+        "monitor/reconcile",
+        "rollback if thresholds breach"
+      ],
+      "artifacts": [
+        "infra",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Release actor/artifact/time recorded; real-order controls and incident contacts active; success verified after deployment"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-144"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-045",
+      "phase": "P10",
+      "title": "Submit authorized mobile store releases",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-043"
+      ],
+      "implementation_steps": [
+        "Finalize metadata/privacy/support/deletion URLs/screenshots",
+        "owner signing/accounts",
+        "submit exact approved builds",
+        "track review and remediation"
+      ],
+      "artifacts": [
+        "apps/customer-mobile",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Android and iOS submission/outcome tracked separately; store approval not assumed from upload"
+      ],
+      "rule_ids": [
+        "BR-063"
+      ],
+      "scenario_ids": [
+        "TC-063",
+        "TC-145"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-046",
+      "phase": "P10",
+      "title": "Observe pilot and close MVP",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-044",
+        "MB-045"
+      ],
+      "implementation_steps": [
+        "Monitor agreed observation window",
+        "reconcile cash/errors/support",
+        "repair production defects safely",
+        "publish operator/user guides and next backlog"
+      ],
+      "artifacts": [
+        "docs/operations",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "All four surfaces accepted; operational metrics and incidents reviewed; residual risks explicitly accepted or fixed"
+      ],
+      "rule_ids": [
+        "BR-064"
+      ],
+      "scenario_ids": [
+        "TC-064",
+        "TC-146"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    }
+  ]
+}

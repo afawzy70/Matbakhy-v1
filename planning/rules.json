@@ -1,0 +1,645 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "id": "BR-001",
+      "domain": "Identity",
+      "text": "Only authenticated active accounts may perform private operations; public browsing remains anonymous.",
+      "story_id": "MB-009",
+      "scenario_ids": [
+        "TC-001"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-002",
+      "domain": "Identity",
+      "text": "Web mutations require CSRF protection and native auth uses authorization code with PKCE; clients contain no secret.",
+      "story_id": "MB-009",
+      "scenario_ids": [
+        "TC-002"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-003",
+      "domain": "Identity",
+      "text": "First checkout requires verified email and verified normalized Egyptian phone; changing phone invalidates its verification.",
+      "story_id": "MB-010",
+      "scenario_ids": [
+        "TC-003"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-004",
+      "domain": "Identity",
+      "text": "OTP is single use, hashed, valid 5 minutes, max 5 attempts; resend at least 60 seconds and bounded hourly limits are configurable.",
+      "story_id": "MB-010",
+      "scenario_ids": [
+        "TC-004"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-005",
+      "domain": "Address",
+      "text": "Address ownership is enforced; street/building/zone/recipient/contact required for delivery; optional coordinates cannot override service zone.",
+      "story_id": "MB-010",
+      "scenario_ids": [
+        "TC-005"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-006",
+      "domain": "Access",
+      "text": "Every kitchen/order/case/list/count/export checks object scope; UUID secrecy is not authorization.",
+      "story_id": "MB-011",
+      "scenario_ids": [
+        "TC-006"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-007",
+      "domain": "Access",
+      "text": "Staff privileges are assigned server-side; MFA required; revoked grants cannot perform sensitive commands.",
+      "story_id": "MB-011",
+      "scenario_ids": [
+        "TC-007"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-008",
+      "domain": "Cook",
+      "text": "Cook approval is required before selling; approval requires a complete revision and reviewer/reason record.",
+      "story_id": "MB-012",
+      "scenario_ids": [
+        "TC-008"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-009",
+      "domain": "Cook",
+      "text": "Cook pause stops new sales; suspension stops new sales/acceptance and triggers ops review while preserving existing accepted order access.",
+      "story_id": "MB-012",
+      "scenario_ids": [
+        "TC-009"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-010",
+      "domain": "Media",
+      "text": "Public media must pass type/size/content checks and quarantine; private verification documents never get public URLs.",
+      "story_id": "MB-013",
+      "scenario_ids": [
+        "TC-010"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-011",
+      "domain": "Catalogue",
+      "text": "Published meals require title, description, portion, positive price, ingredients, explicit allergen declaration and approved image/cook.",
+      "story_id": "MB-014",
+      "scenario_ids": [
+        "TC-011"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-012",
+      "domain": "Catalogue",
+      "text": "Meal updates are versioned; archive removes new ordering but never changes historical item/allergen/price snapshots.",
+      "story_id": "MB-014",
+      "scenario_ids": [
+        "TC-012"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-013",
+      "domain": "Availability",
+      "text": "Capacity is bounded at both meal-slot and total cook-slot portions; reductions below reserved+allocated+consumed are rejected.",
+      "story_id": "MB-015",
+      "scenario_ids": [
+        "TC-013"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-014",
+      "domain": "Availability",
+      "text": "Store instants in UTC and schedule in Africa/Cairo; reject nonexistent local times and disambiguate repeated times.",
+      "story_id": "MB-015",
+      "scenario_ids": [
+        "TC-014"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-015",
+      "domain": "Availability",
+      "text": "Slots require end after start and cutoff before start; default lead 120 minutes is fixture policy; closed/past slots cannot order.",
+      "story_id": "MB-015",
+      "scenario_ids": [
+        "TC-015"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-016",
+      "domain": "Discovery",
+      "text": "Search/filter/sort/pagination execute on the server over all eligible data; a filter change resets cursor and sends a new query.",
+      "story_id": "MB-016",
+      "scenario_ids": [
+        "TC-016"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-017",
+      "domain": "Discovery",
+      "text": "Only approved active kitchens and published serviceable meals are purchasable; paused/archived favorites show unavailable.",
+      "story_id": "MB-016",
+      "scenario_ids": [
+        "TC-017"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-018",
+      "domain": "Basket",
+      "text": "A basket/order contains exactly one cook and one slot; replacing either requires explicit client confirmation before clearing.",
+      "story_id": "MB-017",
+      "scenario_ids": [
+        "TC-018"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-019",
+      "domain": "Pricing",
+      "text": "Server calculates amounts in integer EGP minor units; client prices/fees/roles are rejected, not trusted.",
+      "story_id": "MB-017",
+      "scenario_ids": [
+        "TC-019"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-020",
+      "domain": "Pricing",
+      "text": "Quote lasts 5 minutes, reserves no stock, snapshots versions and exposes complete cost/policy before confirmation.",
+      "story_id": "MB-017",
+      "scenario_ids": [
+        "TC-020"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-021",
+      "domain": "Fulfillment",
+      "text": "Delivery requires active cook-zone coverage and complete own address; pickup only if enabled and has zero delivery fee.",
+      "story_id": "MB-017",
+      "scenario_ids": [
+        "TC-021"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-022",
+      "domain": "Order",
+      "text": "Placement atomically validates quote, reserves all stock, writes snapshots/idempotency/events/outbox and cash due record.",
+      "story_id": "MB-018",
+      "scenario_ids": [
+        "TC-022"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-023",
+      "domain": "Order",
+      "text": "Permanent unique customer+clientRequestId prevents duplicate orders even after cached idempotency response expires.",
+      "story_id": "MB-018",
+      "scenario_ids": [
+        "TC-023"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-024",
+      "domain": "Order",
+      "text": "Idempotency scope is actor+command+key; different payload with same key returns conflict.",
+      "story_id": "MB-018",
+      "scenario_ids": [
+        "TC-024"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-025",
+      "domain": "Stock",
+      "text": "Concurrent last-portion requests must serialize/check stock and never oversell either meal or kitchen totals.",
+      "story_id": "MB-018",
+      "scenario_ids": [
+        "TC-025"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-026",
+      "domain": "Lifecycle",
+      "text": "Only legal actor-scoped transitions are accepted with expected version; terminal order state is immutable.",
+      "story_id": "MB-019",
+      "scenario_ids": [
+        "TC-026"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-027",
+      "domain": "Lifecycle",
+      "text": "Acceptance deadline is min(created+15m, slotStart-lead), with 5m minimum remaining at placement; expiry uses server time.",
+      "story_id": "MB-019",
+      "scenario_ids": [
+        "TC-027"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-028",
+      "domain": "Cancellation",
+      "text": "Customer can directly cancel pending orders only; after acceptance customer opens a request; preparing/ready cancellation needs ops reason.",
+      "story_id": "MB-019",
+      "scenario_ids": [
+        "TC-028"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-029",
+      "domain": "Stock",
+      "text": "Reject/expire/preparation-not-started cancellation releases once; after preparation capacity stays consumed unless audited adjustment.",
+      "story_id": "MB-019",
+      "scenario_ids": [
+        "TC-029"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-030",
+      "domain": "Fulfillment",
+      "text": "Pickup completes only from READY; delivery dispatches READY to OUT_FOR_DELIVERY before completion; wrong-mode commands rejected.",
+      "story_id": "MB-019",
+      "scenario_ids": [
+        "TC-030"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-031",
+      "domain": "Fulfillment",
+      "text": "Completion requires single-use customer handover code with bounded attempts; ops override requires fresh MFA, reason and evidence.",
+      "story_id": "MB-019",
+      "scenario_ids": [
+        "TC-031"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-032",
+      "domain": "Cash",
+      "text": "Order completion and collection are independent; cook report and finance verification are separate events.",
+      "story_id": "MB-020",
+      "scenario_ids": [
+        "TC-032"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-033",
+      "domain": "Finance",
+      "text": "Commission rate/rounding are snapshot; exclude delivery; balanced immutable entries post once per source event.",
+      "story_id": "MB-020",
+      "scenario_ids": [
+        "TC-033"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-034",
+      "domain": "Finance",
+      "text": "Cook-collected cash creates commission receivable, not gross platform cash/revenue; remittance requires evidence.",
+      "story_id": "MB-025",
+      "scenario_ids": [
+        "TC-034"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-035",
+      "domain": "Refund",
+      "text": "Full refunds are bounded by verified collection less prior verified refunds; approval does not mean paid; commission reversal follows snapshot policy.",
+      "story_id": "MB-025",
+      "scenario_ids": [
+        "TC-035"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-036",
+      "domain": "Settlement",
+      "text": "Settlement lines are unique and reviewed batches immutable; payment recorded only with actual external reference and reconciliation.",
+      "story_id": "MB-025",
+      "scenario_ids": [
+        "TC-036"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-037",
+      "domain": "Notification",
+      "text": "Order/inbox persists despite notification-provider failure; retries are bounded and dead letters visible.",
+      "story_id": "MB-021",
+      "scenario_ids": [
+        "TC-037"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-038",
+      "domain": "Notification",
+      "text": "Use transactional outbox and recipient/event deduplication with leased workers; notification cannot regress order state.",
+      "story_id": "MB-021",
+      "scenario_ids": [
+        "TC-038"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-039",
+      "domain": "Reviews",
+      "text": "Only owning customer can review a COMPLETED order once, integer 1..5; visible reviews alone affect average/count.",
+      "story_id": "MB-028",
+      "scenario_ids": [
+        "TC-039"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-040",
+      "domain": "Favorites",
+      "text": "Favorite/unfavorite is idempotent per user+meal; sharing exposes only public content.",
+      "story_id": "MB-028",
+      "scenario_ids": [
+        "TC-040"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-041",
+      "domain": "Support",
+      "text": "Cases are order-scoped; private staff notes never appear to customer/cook; safety complaints escalate operationally.",
+      "story_id": "MB-024",
+      "scenario_ids": [
+        "TC-041"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-042",
+      "domain": "Configuration",
+      "text": "Fee/rate/zone/policy changes are versioned and audited; only new quotes use new policy; live unapproved config blocks ordering.",
+      "story_id": "MB-026",
+      "scenario_ids": [
+        "TC-042"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-043",
+      "domain": "Access",
+      "text": "Staff cannot self-escalate or remove last recoverable administrator; high-risk changes require step-up.",
+      "story_id": "MB-026",
+      "scenario_ids": [
+        "TC-043"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-044",
+      "domain": "Web",
+      "text": "Order submission uses stable key persisted before request; unknown response resolves via request lookup then same-key retry.",
+      "story_id": "MB-027",
+      "scenario_ids": [
+        "TC-044"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-045",
+      "domain": "Web",
+      "text": "Every critical screen has loading/empty/error/offline/denied/success states and an actionable recovery; preserve valid form input.",
+      "story_id": "MB-027",
+      "scenario_ids": [
+        "TC-045"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-046",
+      "domain": "UX",
+      "text": "Arabic RTL and English LTR work at phone/tablet/desktop widths, long text and mixed numbers; all actions remain usable.",
+      "story_id": "MB-029",
+      "scenario_ids": [
+        "TC-046"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-047",
+      "domain": "Accessibility",
+      "text": "Keyboard, visible focus, labels/errors, dialog focus restoration and screen readers support every critical journey.",
+      "story_id": "MB-029",
+      "scenario_ids": [
+        "TC-047"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-048",
+      "domain": "Mobile",
+      "text": "Use system-browser PKCE and OS secure storage; logout/account switch clears private data and registrations.",
+      "story_id": "MB-031",
+      "scenario_ids": [
+        "TC-048"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-049",
+      "domain": "Mobile",
+      "text": "Offline cannot submit orders or pretend stock is current; foreground resume refreshes quote/order; app-kill retry preserves request ID.",
+      "story_id": "MB-032",
+      "scenario_ids": [
+        "TC-049"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-050",
+      "domain": "Mobile",
+      "text": "Push permission optional; route deep links after authentication and object authorization; handle cold/warm start.",
+      "story_id": "MB-033",
+      "scenario_ids": [
+        "TC-050"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-051",
+      "domain": "Mobile",
+      "text": "Android acceptance requires native build/install/test evidence with version, device/OS and artifact checksum.",
+      "story_id": "MB-034",
+      "scenario_ids": [
+        "TC-051"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-052",
+      "domain": "Mobile",
+      "text": "iOS acceptance requires native simulator/device and signing evidence; absent Apple tooling is BLOCKED.",
+      "story_id": "MB-035",
+      "scenario_ids": [
+        "TC-052"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-053",
+      "domain": "Security",
+      "text": "Input is validated/encoded; uploaded files, rich text, URLs and CSV exports cannot execute script/formula injection.",
+      "story_id": "MB-036",
+      "scenario_ids": [
+        "TC-053"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-054",
+      "domain": "Security",
+      "text": "Rate limits cover login/OTP/quote/order/upload/search; errors avoid enumeration and secrets.",
+      "story_id": "MB-036",
+      "scenario_ids": [
+        "TC-054"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-055",
+      "domain": "Privacy",
+      "text": "Deletion requests revoke access and apply approved retention/anonymization across stores; financial audit integrity preserved.",
+      "story_id": "MB-039",
+      "scenario_ids": [
+        "TC-055"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-056",
+      "domain": "Observability",
+      "text": "Logs/metrics exclude tokens/OTP/contact/address/document content; request IDs join diagnosis safely.",
+      "story_id": "MB-039",
+      "scenario_ids": [
+        "TC-056"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-057",
+      "domain": "Recovery",
+      "text": "Backup is only accepted after restore test; migrations validate empty and prior-release database; recovery reconciles ledger/stock.",
+      "story_id": "MB-039",
+      "scenario_ids": [
+        "TC-057"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-058",
+      "domain": "Reliability",
+      "text": "Jobs use leases and idempotent effects; restart around commit/send and multi-instance races cannot duplicate side effects.",
+      "story_id": "MB-037",
+      "scenario_ids": [
+        "TC-058"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-059",
+      "domain": "Performance",
+      "text": "Measure documented load/hardware and preserve correctness; excessive queries/list limits cannot exhaust server.",
+      "story_id": "MB-038",
+      "scenario_ids": [
+        "TC-059"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-060",
+      "domain": "Deployment",
+      "text": "Dev/test/staging/production credentials and data are separate; required fake adapters prevent production startup.",
+      "story_id": "MB-040",
+      "scenario_ids": [
+        "TC-060"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-061",
+      "domain": "Operations",
+      "text": "Operators must rehearse late/failed/safety/refund/cash-variance cases and know escalation contacts before pilot.",
+      "story_id": "MB-041",
+      "scenario_ids": [
+        "TC-061"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-062",
+      "domain": "Release",
+      "text": "Required gate evidence is tied to exact source/build and cannot pass with skipped/failed/blocked mandatory checks.",
+      "story_id": "MB-043",
+      "scenario_ids": [
+        "TC-062"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-063",
+      "domain": "Release",
+      "text": "Android and iOS publication is distinct from build/upload; store credentials and explicit release authorization required.",
+      "story_id": "MB-045",
+      "scenario_ids": [
+        "TC-063"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    },
+    {
+      "id": "BR-064",
+      "domain": "Operations",
+      "text": "Pilot closure requires accepted surfaces, observed metrics and reconciled incidents; residual risks are explicit.",
+      "story_id": "MB-046",
+      "scenario_ids": [
+        "TC-064"
+      ],
+      "status": "PROPOSED_DEFAULT"
+    }
+  ]
+}

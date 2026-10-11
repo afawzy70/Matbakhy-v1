@@ -1,0 +1,880 @@
+{
+  "schema_version": 1,
+  "status": "DESIGN_NOT_IMPLEMENTED",
+  "note": "OIDC authorization/callback/logout routes are framework-managed and must be documented after provider/client spike. This inventory is not complete OpenAPI. Expand validated request/response schemas in MB-007 before client implementation.",
+  "endpoints": [
+    {
+      "id": "API-001",
+      "method": "GET",
+      "path": "/api/v1/configuration/public",
+      "permission": "PUBLIC",
+      "response_type": "PublicConfiguration",
+      "contract": "locale, zones summary, enabled fulfillment modes, support/public policy versions only",
+      "implemented": false
+    },
+    {
+      "id": "API-002",
+      "method": "GET",
+      "path": "/api/v1/zones",
+      "permission": "PUBLIC",
+      "response_type": "ZonePage",
+      "contract": "cityId, active=true, cursor, limit; no private cook locations",
+      "implemented": false
+    },
+    {
+      "id": "API-003",
+      "method": "GET",
+      "path": "/api/v1/meals",
+      "permission": "PUBLIC",
+      "response_type": "MealPage",
+      "contract": "q, zoneId, date, slotId, categoryId, minPriceMinor, maxPriceMinor, sort, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-004",
+      "method": "GET",
+      "path": "/api/v1/meals/{mealId}",
+      "permission": "PUBLIC",
+      "response_type": "MealDetail",
+      "contract": "published public meal or 404",
+      "implemented": false
+    },
+    {
+      "id": "API-005",
+      "method": "GET",
+      "path": "/api/v1/kitchens/{slug}",
+      "permission": "PUBLIC",
+      "response_type": "KitchenPublic",
+      "contract": "public profile, operational approval label and visible rating summary",
+      "implemented": false
+    },
+    {
+      "id": "API-006",
+      "method": "GET",
+      "path": "/api/v1/kitchens/{kitchenId}/slots",
+      "permission": "PUBLIC",
+      "response_type": "SlotPage",
+      "contract": "date, fulfillmentMode, zoneId; future eligible slots",
+      "implemented": false
+    },
+    {
+      "id": "API-007",
+      "method": "GET",
+      "path": "/api/v1/kitchens/{kitchenId}/reviews",
+      "permission": "PUBLIC",
+      "response_type": "ReviewPage",
+      "contract": "visible only, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-008",
+      "method": "GET",
+      "path": "/api/v1/policies/{key}",
+      "permission": "PUBLIC",
+      "response_type": "PolicyDocument",
+      "contract": "published version, locale, effectiveAt; draft only in dev",
+      "implemented": false
+    },
+    {
+      "id": "API-009",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "permission": "AUTHENTICATED",
+      "response_type": "CustomerProfile",
+      "contract": "current subject mapping, contact verification, locale and scoped capabilities",
+      "implemented": false
+    },
+    {
+      "id": "API-010",
+      "method": "PATCH",
+      "path": "/api/v1/me",
+      "permission": "SELF",
+      "response_type": "CustomerProfile",
+      "contract": "displayName, locale, expectedVersion; no role fields",
+      "implemented": false
+    },
+    {
+      "id": "API-011",
+      "method": "POST",
+      "path": "/api/v1/me/phone/challenges",
+      "permission": "SELF",
+      "response_type": "PhoneChallenge",
+      "contract": "phoneE164; generic response, expiry/resend limit; dev OTP never in production response",
+      "implemented": false
+    },
+    {
+      "id": "API-012",
+      "method": "POST",
+      "path": "/api/v1/me/phone/challenges/{challengeId}/verify",
+      "permission": "SELF",
+      "response_type": "VerificationResult",
+      "contract": "code, expected challenge ownership; single use",
+      "implemented": false
+    },
+    {
+      "id": "API-013",
+      "method": "GET",
+      "path": "/api/v1/me/addresses",
+      "permission": "SELF",
+      "response_type": "AddressPage",
+      "contract": "own addresses only",
+      "implemented": false
+    },
+    {
+      "id": "API-014",
+      "method": "POST",
+      "path": "/api/v1/me/addresses",
+      "permission": "SELF",
+      "response_type": "Address",
+      "contract": "label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates",
+      "implemented": false
+    },
+    {
+      "id": "API-015",
+      "method": "PATCH",
+      "path": "/api/v1/me/addresses/{addressId}",
+      "permission": "SELF",
+      "response_type": "Address",
+      "contract": "allowed address fields, expectedVersion",
+      "implemented": false
+    },
+    {
+      "id": "API-016",
+      "method": "DELETE",
+      "path": "/api/v1/me/addresses/{addressId}",
+      "permission": "SELF",
+      "response_type": "NoContent",
+      "contract": "archive own address; historical snapshots retained",
+      "implemented": false
+    },
+    {
+      "id": "API-017",
+      "method": "POST",
+      "path": "/api/v1/me/deletion-requests",
+      "permission": "SELF",
+      "response_type": "DeletionRequest",
+      "contract": "confirmed intent and current policy; idempotent request",
+      "implemented": false
+    },
+    {
+      "id": "API-018",
+      "method": "GET",
+      "path": "/api/v1/me/favorites",
+      "permission": "SELF",
+      "response_type": "FavoritePage",
+      "contract": "own, cursor, limit; unavailable items annotated",
+      "implemented": false
+    },
+    {
+      "id": "API-019",
+      "method": "PUT",
+      "path": "/api/v1/me/favorites/{mealId}",
+      "permission": "SELF",
+      "response_type": "Favorite",
+      "contract": "idempotent add",
+      "implemented": false
+    },
+    {
+      "id": "API-020",
+      "method": "DELETE",
+      "path": "/api/v1/me/favorites/{mealId}",
+      "permission": "SELF",
+      "response_type": "NoContent",
+      "contract": "idempotent remove",
+      "implemented": false
+    },
+    {
+      "id": "API-021",
+      "method": "POST",
+      "path": "/api/v1/quotes",
+      "permission": "CUSTOMER",
+      "response_type": "QuoteResponse",
+      "contract": "QuoteRequest; verified contact; one cook/slot; authoritative amounts",
+      "implemented": false
+    },
+    {
+      "id": "API-022",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "permission": "CUSTOMER",
+      "response_type": "OrderView",
+      "contract": "PlaceOrderRequest; Idempotency-Key required; returns 201 plus Location",
+      "implemented": false
+    },
+    {
+      "id": "API-023",
+      "method": "GET",
+      "path": "/api/v1/orders",
+      "permission": "SELF",
+      "response_type": "OrderPage",
+      "contract": "state group, cursor, limit; own orders",
+      "implemented": false
+    },
+    {
+      "id": "API-024",
+      "method": "GET",
+      "path": "/api/v1/orders/by-request/{clientRequestId}",
+      "permission": "SELF",
+      "response_type": "OrderView",
+      "contract": "lookup permanent request reference for unknown response recovery",
+      "implemented": false
+    },
+    {
+      "id": "API-025",
+      "method": "GET",
+      "path": "/api/v1/orders/{orderId}",
+      "permission": "ORDER_OWNER",
+      "response_type": "OrderView",
+      "contract": "customer-scoped fields including available handover challenge",
+      "implemented": false
+    },
+    {
+      "id": "API-026",
+      "method": "GET",
+      "path": "/api/v1/orders/{orderId}/events",
+      "permission": "ORDER_OWNER",
+      "response_type": "OrderEventPage",
+      "contract": "afterSequence, cursor, limit; chronological immutable events",
+      "implemented": false
+    },
+    {
+      "id": "API-027",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/cancel",
+      "permission": "ORDER_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, reasonCode; pending only; Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-028",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/cancellation-requests",
+      "permission": "ORDER_OWNER",
+      "response_type": "SupportCase",
+      "contract": "expectedVersion, reasonCode, note; accepted or later; no direct transition",
+      "implemented": false
+    },
+    {
+      "id": "API-029",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/reviews",
+      "permission": "ORDER_OWNER",
+      "response_type": "Review",
+      "contract": "rating, text; completed only, unique order",
+      "implemented": false
+    },
+    {
+      "id": "API-030",
+      "method": "POST",
+      "path": "/api/v1/reviews/{reviewId}/reports",
+      "permission": "AUTHENTICATED",
+      "response_type": "Report",
+      "contract": "reasonCode, bounded description; rate limit",
+      "implemented": false
+    },
+    {
+      "id": "API-031",
+      "method": "GET",
+      "path": "/api/v1/notifications",
+      "permission": "SELF",
+      "response_type": "NotificationPage",
+      "contract": "unreadOnly, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-032",
+      "method": "PUT",
+      "path": "/api/v1/notifications/{notificationId}/read",
+      "permission": "SELF",
+      "response_type": "Notification",
+      "contract": "idempotent mark read",
+      "implemented": false
+    },
+    {
+      "id": "API-033",
+      "method": "PUT",
+      "path": "/api/v1/me/devices/{installationId}",
+      "permission": "SELF",
+      "response_type": "DeviceRegistration",
+      "contract": "platform, pushToken, environment, appVersion; encrypt token",
+      "implemented": false
+    },
+    {
+      "id": "API-034",
+      "method": "DELETE",
+      "path": "/api/v1/me/devices/{installationId}",
+      "permission": "SELF",
+      "response_type": "NoContent",
+      "contract": "unregister current owned installation",
+      "implemented": false
+    },
+    {
+      "id": "API-035",
+      "method": "POST",
+      "path": "/api/v1/support/cases",
+      "permission": "CUSTOMER",
+      "response_type": "SupportCase",
+      "contract": "orderId, category, description, attachmentIds; scope",
+      "implemented": false
+    },
+    {
+      "id": "API-036",
+      "method": "GET",
+      "path": "/api/v1/support/cases",
+      "permission": "SELF",
+      "response_type": "SupportCasePage",
+      "contract": "own cases only, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-037",
+      "method": "GET",
+      "path": "/api/v1/support/cases/{caseId}",
+      "permission": "CASE_OWNER",
+      "response_type": "SupportCase",
+      "contract": "public messages only, no private notes",
+      "implemented": false
+    },
+    {
+      "id": "API-038",
+      "method": "POST",
+      "path": "/api/v1/support/cases/{caseId}/messages",
+      "permission": "CASE_OWNER",
+      "response_type": "CaseMessage",
+      "contract": "body, attachmentIds; customer-visible; Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-039",
+      "method": "POST",
+      "path": "/api/v1/uploads",
+      "permission": "AUTHENTICATED_SCOPED",
+      "response_type": "UploadTicket",
+      "contract": "purpose, filename, contentType, bytes, sha256; scoped storage key/expiry",
+      "implemented": false
+    },
+    {
+      "id": "API-040",
+      "method": "POST",
+      "path": "/api/v1/uploads/{uploadId}/complete",
+      "permission": "UPLOAD_OWNER",
+      "response_type": "MediaStatus",
+      "contract": "checksum, upload completion; quarantine and scan",
+      "implemented": false
+    },
+    {
+      "id": "API-041",
+      "method": "GET",
+      "path": "/api/v1/uploads/{uploadId}",
+      "permission": "UPLOAD_OWNER_OR_REVIEWER",
+      "response_type": "MediaStatus",
+      "contract": "state or authorized private signed read; no public private-doc URL",
+      "implemented": false
+    },
+    {
+      "id": "API-042",
+      "method": "GET",
+      "path": "/api/v1/cook/application",
+      "permission": "COOK_APPLICANT",
+      "response_type": "CookApplication",
+      "contract": "current own revision and decision history",
+      "implemented": false
+    },
+    {
+      "id": "API-043",
+      "method": "PUT",
+      "path": "/api/v1/cook/application",
+      "permission": "COOK_APPLICANT",
+      "response_type": "CookApplication",
+      "contract": "public profile, contact/location refs, documents, zones, expectedVersion",
+      "implemented": false
+    },
+    {
+      "id": "API-044",
+      "method": "POST",
+      "path": "/api/v1/cook/application/submit",
+      "permission": "COOK_APPLICANT",
+      "response_type": "CookApplication",
+      "contract": "expectedVersion; full validation",
+      "implemented": false
+    },
+    {
+      "id": "API-045",
+      "method": "GET",
+      "path": "/api/v1/cook/dashboard",
+      "permission": "COOK",
+      "response_type": "CookDashboard",
+      "contract": "own active queue counts/slot totals and deadlines",
+      "implemented": false
+    },
+    {
+      "id": "API-046",
+      "method": "GET",
+      "path": "/api/v1/cook/meals",
+      "permission": "COOK",
+      "response_type": "CookMealPage",
+      "contract": "status, q, cursor, limit; own kitchen",
+      "implemented": false
+    },
+    {
+      "id": "API-047",
+      "method": "POST",
+      "path": "/api/v1/cook/meals",
+      "permission": "COOK",
+      "response_type": "CookMeal",
+      "contract": "localized fields, portion, price, ingredients, allergens, approved media refs",
+      "implemented": false
+    },
+    {
+      "id": "API-048",
+      "method": "PATCH",
+      "path": "/api/v1/cook/meals/{mealId}",
+      "permission": "COOK_OWNER",
+      "response_type": "CookMeal",
+      "contract": "editable fields and expectedVersion; no kitchen reassignment",
+      "implemented": false
+    },
+    {
+      "id": "API-049",
+      "method": "POST",
+      "path": "/api/v1/cook/meals/{mealId}/publication",
+      "permission": "COOK_OWNER",
+      "response_type": "CookMeal",
+      "contract": "action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards",
+      "implemented": false
+    },
+    {
+      "id": "API-050",
+      "method": "GET",
+      "path": "/api/v1/cook/slots",
+      "permission": "COOK",
+      "response_type": "CookSlotPage",
+      "contract": "date range, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-051",
+      "method": "POST",
+      "path": "/api/v1/cook/slots",
+      "permission": "COOK",
+      "response_type": "CookSlot",
+      "contract": "localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities",
+      "implemented": false
+    },
+    {
+      "id": "API-052",
+      "method": "PATCH",
+      "path": "/api/v1/cook/slots/{slotId}",
+      "permission": "COOK_OWNER",
+      "response_type": "CookSlot",
+      "contract": "capacity, mealCapacities, state, expectedVersion; cannot undercut obligations",
+      "implemented": false
+    },
+    {
+      "id": "API-053",
+      "method": "GET",
+      "path": "/api/v1/cook/orders",
+      "permission": "COOK",
+      "response_type": "CookOrderPage",
+      "contract": "state, from, to, sort, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-054",
+      "method": "GET",
+      "path": "/api/v1/cook/orders/{orderId}",
+      "permission": "COOK_OWNER",
+      "response_type": "CookOrderView",
+      "contract": "own kitchen, minimum fulfillment contact, no customer handover code",
+      "implemented": false
+    },
+    {
+      "id": "API-055",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/accept",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, Idempotency-Key; before acceptBy",
+      "implemented": false
+    },
+    {
+      "id": "API-056",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/reject",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, reasonCode, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-057",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/prepare",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-058",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/ready",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-059",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/dispatch",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, delivery reference, Idempotency-Key; delivery only",
+      "implemented": false
+    },
+    {
+      "id": "API-060",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/handover",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, code, Idempotency-Key; correct mode/state",
+      "implemented": false
+    },
+    {
+      "id": "API-061",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/delivery-failure",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, reasonCode, note, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-062",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/cancel",
+      "permission": "COOK_OWNER",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, reasonCode; ACCEPTED before preparation only; Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-063",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/cash-reports",
+      "permission": "COOK_OWNER",
+      "response_type": "CashCollection",
+      "contract": "CashReport, Idempotency-Key; no finance verification authority",
+      "implemented": false
+    },
+    {
+      "id": "API-064",
+      "method": "GET",
+      "path": "/api/v1/cook/statements",
+      "permission": "COOK",
+      "response_type": "StatementPage",
+      "contract": "period, cursor, limit; own receivables/refunds/remittances",
+      "implemented": false
+    },
+    {
+      "id": "API-065",
+      "method": "PATCH",
+      "path": "/api/v1/cook/settings",
+      "permission": "COOK_OWNER",
+      "response_type": "CookSettings",
+      "contract": "public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension",
+      "implemented": false
+    },
+    {
+      "id": "API-066",
+      "method": "GET",
+      "path": "/api/v1/ops/dashboard",
+      "permission": "OPS_SCOPED",
+      "response_type": "OpsDashboard",
+      "contract": "role-scoped metrics and exception counts",
+      "implemented": false
+    },
+    {
+      "id": "API-067",
+      "method": "GET",
+      "path": "/api/v1/ops/cooks",
+      "permission": "COOK_REVIEW",
+      "response_type": "ApplicationPage",
+      "contract": "state, q, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-068",
+      "method": "GET",
+      "path": "/api/v1/ops/cooks/{applicationId}",
+      "permission": "COOK_REVIEW",
+      "response_type": "ApplicationReview",
+      "contract": "revision, private documents via expiring scoped access",
+      "implemented": false
+    },
+    {
+      "id": "API-069",
+      "method": "POST",
+      "path": "/api/v1/ops/cooks/{applicationId}/decision",
+      "permission": "COOK_REVIEW",
+      "response_type": "CookApplication",
+      "contract": "decision, reason, revision, expectedVersion, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-070",
+      "method": "POST",
+      "path": "/api/v1/ops/kitchens/{kitchenId}/operating-state",
+      "permission": "COOK_REVIEW",
+      "response_type": "KitchenAdmin",
+      "contract": "pause/suspend/restore, reason, expectedVersion; affected order review",
+      "implemented": false
+    },
+    {
+      "id": "API-071",
+      "method": "GET",
+      "path": "/api/v1/ops/catalogue",
+      "permission": "CONTENT_MODERATE",
+      "response_type": "MealPage",
+      "contract": "flags/status/kitchen/query pagination",
+      "implemented": false
+    },
+    {
+      "id": "API-072",
+      "method": "POST",
+      "path": "/api/v1/ops/meals/{mealId}/moderation",
+      "permission": "CONTENT_MODERATE",
+      "response_type": "CookMeal",
+      "contract": "action, reason, expectedVersion",
+      "implemented": false
+    },
+    {
+      "id": "API-073",
+      "method": "POST",
+      "path": "/api/v1/ops/reviews/{reviewId}/moderation",
+      "permission": "CONTENT_MODERATE",
+      "response_type": "Review",
+      "contract": "visibility, reason, expectedVersion",
+      "implemented": false
+    },
+    {
+      "id": "API-074",
+      "method": "GET",
+      "path": "/api/v1/ops/orders",
+      "permission": "ORDER_OPS",
+      "response_type": "OpsOrderPage",
+      "contract": "state, kitchen, date, exceptions, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-075",
+      "method": "GET",
+      "path": "/api/v1/ops/orders/{orderId}",
+      "permission": "ORDER_OPS",
+      "response_type": "OpsOrderView",
+      "contract": "events/stock/finance refs with scoped contact fields",
+      "implemented": false
+    },
+    {
+      "id": "API-076",
+      "method": "POST",
+      "path": "/api/v1/ops/orders/{orderId}/exception-cancel",
+      "permission": "ORDER_EXCEPTION_CANCEL",
+      "response_type": "OrderView",
+      "contract": "expectedVersion, reasonCode, caseId, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-077",
+      "method": "POST",
+      "path": "/api/v1/ops/orders/{orderId}/handover-override",
+      "permission": "ORDER_HANDOVER_OVERRIDE",
+      "response_type": "OrderView",
+      "contract": "fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-078",
+      "method": "GET",
+      "path": "/api/v1/ops/cases",
+      "permission": "SUPPORT",
+      "response_type": "SupportCasePage",
+      "contract": "category/severity/assignee/state/SLA pagination",
+      "implemented": false
+    },
+    {
+      "id": "API-079",
+      "method": "GET",
+      "path": "/api/v1/ops/cases/{caseId}",
+      "permission": "SUPPORT",
+      "response_type": "StaffSupportCase",
+      "contract": "staff notes included only with staff scope",
+      "implemented": false
+    },
+    {
+      "id": "API-080",
+      "method": "POST",
+      "path": "/api/v1/ops/cases/{caseId}/messages",
+      "permission": "SUPPORT",
+      "response_type": "CaseMessage",
+      "contract": "body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-081",
+      "method": "PATCH",
+      "path": "/api/v1/ops/cases/{caseId}",
+      "permission": "SUPPORT",
+      "response_type": "StaffSupportCase",
+      "contract": "assignment/state/resolution, reason, expectedVersion",
+      "implemented": false
+    },
+    {
+      "id": "API-082",
+      "method": "GET",
+      "path": "/api/v1/ops/finance/cash-reports",
+      "permission": "FINANCE",
+      "response_type": "CashPage",
+      "contract": "state/kitchen/period pagination",
+      "implemented": false
+    },
+    {
+      "id": "API-083",
+      "method": "POST",
+      "path": "/api/v1/ops/finance/cash-reports/{reportId}/verification",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "CashCollection",
+      "contract": "decision, verified amount/ref, expectedVersion, reason, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-084",
+      "method": "POST",
+      "path": "/api/v1/ops/finance/refunds",
+      "permission": "FINANCE_REFUND",
+      "response_type": "Refund",
+      "contract": "orderId, caseId, fullAmountMinor, reason, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-085",
+      "method": "POST",
+      "path": "/api/v1/ops/finance/refunds/{refundId}/action",
+      "permission": "FINANCE_REFUND",
+      "response_type": "Refund",
+      "contract": "action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-086",
+      "method": "GET",
+      "path": "/api/v1/ops/finance/statements",
+      "permission": "FINANCE",
+      "response_type": "StatementPage",
+      "contract": "kitchen/period/state pagination; direction explicit",
+      "implemented": false
+    },
+    {
+      "id": "API-087",
+      "method": "POST",
+      "path": "/api/v1/ops/finance/settlements",
+      "permission": "FINANCE_SETTLEMENT",
+      "response_type": "Settlement",
+      "contract": "kitchenId, period, entryIds, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-088",
+      "method": "POST",
+      "path": "/api/v1/ops/finance/settlements/{batchId}/action",
+      "permission": "FINANCE_SETTLEMENT",
+      "response_type": "Settlement",
+      "contract": "action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key",
+      "implemented": false
+    },
+    {
+      "id": "API-089",
+      "method": "GET",
+      "path": "/api/v1/ops/configuration",
+      "permission": "CONFIG_READ",
+      "response_type": "ConfigurationVersions",
+      "contract": "permission-filtered operational and finance policies",
+      "implemented": false
+    },
+    {
+      "id": "API-090",
+      "method": "POST",
+      "path": "/api/v1/ops/configuration/{key}/versions",
+      "permission": "CONFIG_WRITE_SCOPED",
+      "response_type": "PolicyVersion",
+      "contract": "value, effectiveAt, reason, approvalReference, expectedVersion; step-up",
+      "implemented": false
+    },
+    {
+      "id": "API-091",
+      "method": "GET",
+      "path": "/api/v1/ops/staff",
+      "permission": "STAFF_GRANT",
+      "response_type": "StaffPage",
+      "contract": "scoped roles/status, cursor, limit",
+      "implemented": false
+    },
+    {
+      "id": "API-092",
+      "method": "POST",
+      "path": "/api/v1/ops/staff/{userId}/grants",
+      "permission": "STAFF_GRANT",
+      "response_type": "Grant",
+      "contract": "permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation",
+      "implemented": false
+    },
+    {
+      "id": "API-093",
+      "method": "POST",
+      "path": "/api/v1/ops/staff/{userId}/grant-revocations",
+      "permission": "STAFF_GRANT",
+      "response_type": "Grant",
+      "contract": "grantId, reason, expectedVersion; last-admin protection",
+      "implemented": false
+    },
+    {
+      "id": "API-094",
+      "method": "GET",
+      "path": "/api/v1/ops/audit",
+      "permission": "AUDIT_READ_SCOPED",
+      "response_type": "AuditPage",
+      "contract": "actor/object/date/action, cursor, limit; redacted",
+      "implemented": false
+    },
+    {
+      "id": "API-095",
+      "method": "GET",
+      "path": "/api/v1/ops/audit/export",
+      "permission": "AUDIT_EXPORT_SCOPED",
+      "response_type": "SafeCsv",
+      "contract": "bounded date range, same scopes, formula neutralization, audited download",
+      "implemented": false
+    },
+    {
+      "id": "API-096",
+      "method": "GET",
+      "path": "/api/v1/ops/integrations",
+      "permission": "INTEGRATION_OPS",
+      "response_type": "IntegrationHealth",
+      "contract": "redacted health and dead-letter counts; no secrets",
+      "implemented": false
+    },
+    {
+      "id": "API-097",
+      "method": "POST",
+      "path": "/api/v1/ops/outbox/{eventId}/retry",
+      "permission": "INTEGRATION_OPS",
+      "response_type": "OutboxStatus",
+      "contract": "reason, expectedVersion, Idempotency-Key; safe predefined replay only",
+      "implemented": false
+    }
+  ]
+}
