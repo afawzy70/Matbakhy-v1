@@ -8,17 +8,24 @@ import { Orders } from "./cook/Orders";
 import { SettingsPanel } from "./cook/Settings";
 import { Slots } from "./cook/Slots";
 import { Statement } from "./cook/Statement";
+import { Catalogue } from "./ops/Catalogue";
+import { Reviews } from "./ops/Reviews";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
-const TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
-type Tab = (typeof TABS)[number];
+const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
+type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue";
 
 export function title(locale: Locale): string {
   return `${brand.name[locale]} — ${strings[locale].section}`;
 }
 
-type Session = { kind: "checking" } | { kind: "signedOut" } | { kind: "noKitchen" } | { kind: "cook"; serverOffsetMs: number } | { kind: "error" };
+/** Which sections the server allows: a kitchen for the cook workspace, staff permissions for review and moderation. */
+type Session =
+  | { kind: "checking" }
+  | { kind: "signedOut" }
+  | { kind: "error" }
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean };
 
 /** Signed in? Approved kitchen? The server decides; 403 on the dashboard means no approved kitchen. */
 async function checkSession(api: Api): Promise<Session> {
@@ -27,11 +34,21 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const d = await api.GET("/api/v1/cook/dashboard");
-    if (d.data) {
-      return { kind: "cook", serverOffsetMs: Date.parse(d.data.serverTime) - Date.now() };
+    const [d, reviews, catalogue] = await Promise.all([
+      api.GET("/api/v1/cook/dashboard"),
+      api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
+      api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
+    ]);
+    if (!d.data && d.response.status !== 403) {
+      return { kind: "error" };
     }
-    return d.response.status === 403 ? { kind: "noKitchen" } : { kind: "error" };
+    return {
+      kind: "in",
+      kitchen: d.data !== undefined,
+      serverOffsetMs: d.data ? Date.parse(d.data.serverTime) - Date.now() : 0,
+      reviews: reviews.response.ok,
+      catalogue: catalogue.response.ok,
+    };
   } catch {
     return { kind: "error" };
   }
@@ -63,12 +80,26 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
     };
   }, [api, probe]);
 
+  // The first allowed section is shown until the user picks another one.
+  const current: Tab | null =
+    session.kind !== "in"
+      ? null
+      : (session.kitchen && (COOK_TABS as readonly string[]).includes(tab)) || (tab === "reviews" && session.reviews) || (tab === "catalogue" && session.catalogue)
+        ? tab
+        : session.kitchen
+          ? "dashboard"
+          : session.reviews
+            ? "reviews"
+            : session.catalogue
+              ? "catalogue"
+              : null;
+
   const ctx: Ctx = {
     api,
     t,
     locale,
     onSignedOut: () => setSession({ kind: "signedOut" }),
-    serverOffsetMs: session.kind === "cook" ? session.serverOffsetMs : 0,
+    serverOffsetMs: session.kind === "in" ? session.serverOffsetMs : 0,
   };
 
   async function signOut() {
@@ -88,7 +119,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
           <button type="button" onClick={() => setLocale(locale === "ar" ? "en" : "ar")}>
             {t.language}
           </button>
-          {session.kind === "cook" || session.kind === "noKitchen" ? (
+          {session.kind === "in" ? (
             <button type="button" className="secondary" onClick={() => void signOut()}>
               {t.signOut}
             </button>
@@ -114,22 +145,28 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             </a>
           </section>
         ) : null}
-        {session.kind === "noKitchen" ? <Onboarding ctx={ctx} /> : null}
-        {session.kind === "cook" ? (
+        {session.kind === "in" ? (
           <>
+            {current !== null ? (
             <nav aria-label={t.section} className="tabs">
-              {TABS.map((name) => (
-                <button key={name} type="button" aria-current={tab === name ? "page" : undefined} onClick={() => setTab(name)}>
-                  {t.tabs[name]}
-                </button>
-              ))}
+              {[...(session.kitchen ? COOK_TABS : []), ...(session.reviews ? (["reviews"] as const) : []), ...(session.catalogue ? (["catalogue"] as const) : [])].map(
+                (name) => (
+                  <button key={name} type="button" aria-current={current === name ? "page" : undefined} onClick={() => setTab(name)}>
+                    {name === "reviews" ? t.ops.reviews : name === "catalogue" ? t.ops.catalogue : t.tabs[name]}
+                  </button>
+                ),
+              )}
             </nav>
-            {tab === "dashboard" ? <Dashboard ctx={ctx} onOpenOrders={() => setTab("orders")} /> : null}
-            {tab === "orders" ? <Orders ctx={ctx} /> : null}
-            {tab === "meals" ? <Meals ctx={ctx} /> : null}
-            {tab === "slots" ? <Slots ctx={ctx} /> : null}
-            {tab === "statement" ? <Statement ctx={ctx} /> : null}
-            {tab === "settings" ? <SettingsPanel ctx={ctx} /> : null}
+            ) : null}
+            {current === null ? <Onboarding ctx={ctx} /> : null}
+            {current === "dashboard" ? <Dashboard ctx={ctx} onOpenOrders={() => setTab("orders")} /> : null}
+            {current === "orders" ? <Orders ctx={ctx} /> : null}
+            {current === "meals" ? <Meals ctx={ctx} /> : null}
+            {current === "slots" ? <Slots ctx={ctx} /> : null}
+            {current === "statement" ? <Statement ctx={ctx} /> : null}
+            {current === "settings" ? <SettingsPanel ctx={ctx} /> : null}
+            {current === "reviews" ? <Reviews ctx={ctx} /> : null}
+            {current === "catalogue" ? <Catalogue ctx={ctx} /> : null}
           </>
         ) : null}
       </main>

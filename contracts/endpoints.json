@@ -638,9 +638,9 @@
       "method": "GET",
       "path": "/api/v1/ops/catalogue",
       "permission": "CONTENT_MODERATE",
-      "response_type": "MealPage",
+      "response_type": "OpsCataloguePage",
       "contract": "flags/status/kitchen/query pagination",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-072",
@@ -649,7 +649,7 @@
       "permission": "CONTENT_MODERATE",
       "response_type": "CookMeal",
       "contract": "action, reason, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-073",

@@ -1824,7 +1824,7 @@ export interface components {
             updatedAt: string;
             version: number;
         };
-        /** @description Reviewer view of submitted revisions including private fields; every read is audited. Document access arrives with media (MB-013). */
+        /** @description Reviewer view of submitted revisions including private fields; every read is audited. Documents are read through GET /api/v1/uploads/{id} (5-minute signed read, audited). */
         ApplicationReview: {
             /** Format: uuid */
             id: string;
@@ -1836,6 +1836,8 @@ export interface components {
             /** Format: uuid */
             kitchenId: string | null;
             version: number;
+            /** @description Staff view of the approved kitchen with its active-order impact; null before approval. */
+            kitchen: components["schemas"]["KitchenAdmin"] | null;
         };
         /** @description Immutable submitted snapshot; decision fields are set once. */
         CookApplicationRevision: {
@@ -2026,6 +2028,12 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             version: number;
+            /**
+             * @description HIDDEN means operations hid the meal; it is not shown or sold whatever its status.
+             * @enum {string}
+             */
+            moderationState: "VISIBLE" | "HIDDEN";
+            moderationReason: string | null;
         };
         /** @description Versioned meal content (one immutable revision per change). Arabic text is required to publish; English is optional. */
         MealContent: {
@@ -2265,6 +2273,10 @@ export interface components {
             stateReason: string | null;
             approvedRevision: number;
             version: number;
+            /** @description Impact summary - active orders per state. A pause or suspension does not cancel them; they still need fulfilment or exception handling. */
+            activeOrders: {
+                [key: string]: number;
+            };
         };
         /** @description Public profile. Never includes private location, contact phone, owner or documents. The label is operational verification, not a food-safety certification. Rating summary arrives with reviews (MB-024). */
         KitchenPublic: {
@@ -2664,8 +2676,36 @@ export interface components {
             reason: string;
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Request for API-072: action, reason, expectedVersion */
-        PostOpsMealsModerationRequest: Record<string, never>;
+        /** @description Moderation list across kitchens, most recently changed first. No private kitchen data. */
+        OpsCataloguePage: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                kitchenId: string;
+                kitchenName: string;
+                /** @enum {string} */
+                status: "DRAFT" | "PUBLISHED" | "PAUSED" | "ARCHIVED";
+                /** @enum {string} */
+                moderationState: "VISIBLE" | "HIDDEN";
+                moderationReason: string | null;
+                titleAr: string | null;
+                titleEn: string | null;
+                priceMinor: number | null;
+                /** Format: date-time */
+                updatedAt: string;
+                version: number;
+            }[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        /** @description HIDE or RESTORE a meal with a reason; audited. Content and the cook's publication status are not changed. */
+        PostOpsMealsModerationRequest: {
+            /** @enum {string} */
+            action: "HIDE" | "RESTORE";
+            reason: string;
+            expectedVersion: number;
+        };
         PostOpsOrdersExceptionCancelRequest: {
             expectedVersion: number;
             /** @enum {string} */
@@ -4875,6 +4915,10 @@ export interface operations {
     getOpsCatalogue: {
         parameters: {
             query?: {
+                status?: "DRAFT" | "PUBLISHED" | "PAUSED" | "ARCHIVED";
+                moderationState?: "VISIBLE" | "HIDDEN";
+                kitchenId?: string;
+                q?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -4891,7 +4935,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["MealPage"];
+                    "application/json": components["schemas"]["OpsCataloguePage"];
                 };
             };
             "4XX": components["responses"]["Error"];

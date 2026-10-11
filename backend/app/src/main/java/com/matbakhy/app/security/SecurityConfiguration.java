@@ -176,7 +176,9 @@ class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
-                .oauth2Login(login -> login.successHandler(WebReturnTo.successHandler(properties.postLoginRedirect())))
+                .oauth2Login(login -> login
+                        .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(stepUpResolver(registrations, properties)))
+                        .successHandler(WebReturnTo.successHandler(properties.postLoginRedirect())))
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
                         .logoutSuccessHandler(idpLogout(properties, registrations))
@@ -187,6 +189,41 @@ class SecurityConfiguration {
                 .addFilterBefore(WebReturnTo.capture(properties.allowedOrigins()),
                         org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
+    }
+
+    /**
+     * Web step-up: {@code /oauth2/authorization/keycloak?stepUp=true} asks the provider for an MFA-level ACR and a fresh
+     * authentication (max_age=0). The API still decides from the returned token's acr/auth_time (StaffAssurance); this
+     * only lets staff obtain such a token from the web app.
+     */
+    private static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver stepUpResolver(
+            ClientRegistrationRepository registrations, IdentityProperties properties) {
+        var defaults = new org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver(registrations,
+                "/oauth2/authorization");
+        return new org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver() {
+            @Override
+            public org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest resolve(jakarta.servlet.http.HttpServletRequest request) {
+                return stepUp(request, defaults.resolve(request));
+            }
+
+            @Override
+            public org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest resolve(jakarta.servlet.http.HttpServletRequest request,
+                                                                                                       String registrationId) {
+                return stepUp(request, defaults.resolve(request, registrationId));
+            }
+
+            private org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest stepUp(jakarta.servlet.http.HttpServletRequest request,
+                    org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest resolved) {
+                if (resolved == null || !"true".equals(request.getParameter("stepUp"))) {
+                    return resolved;
+                }
+                return org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.from(resolved)
+                        .additionalParameters(p -> {
+                            p.put("acr_values", String.join(" ", properties.mfaAcrValues()));
+                            p.put("max_age", "0");
+                        }).build();
+            }
+        };
     }
 
     /** Responds 200 with the provider end-session URL so the web app can also end the IdP session. */

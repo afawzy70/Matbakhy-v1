@@ -221,4 +221,93 @@ describe("operations-web cook workspace", () => {
     expect(await screen.findByText(/الاستردادات والتسويات غير مشمولة بعد/)).toBeTruthy();
     expect(screen.getByRole("cell", { name: "MB-1001" })).toBeTruthy();
   });
+
+  it("gives a reviewer the application queue and asks for MFA step-up when a decision needs it", async () => {
+    const review = {
+      id: "a1",
+      applicantId: "u2",
+      state: "UNDER_REVIEW",
+      currentRevision: 1,
+      revisions: [
+        {
+          revision: 1,
+          publicName: "مطبخ سلمى",
+          bio: "أكل بيتي",
+          contactPhone: "+201001234567",
+          privateLocation: "Synthetic location",
+          pickupEnabled: true,
+          zoneIds: ["z1"],
+          documentIds: ["d1"],
+          submittedAt: SERVER_NOW,
+          decision: null,
+          decisionReason: null,
+          reviewerId: null,
+          decidedAt: null,
+        },
+      ],
+      kitchenId: null,
+      version: 2,
+      kitchen: null,
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/catalogue": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/cooks": () => ({
+        status: 200,
+        body: { items: [{ id: "a1", state: "UNDER_REVIEW", publicName: "مطبخ سلمى", currentRevision: 1, submittedAt: SERVER_NOW, updatedAt: SERVER_NOW, version: 2 }], nextCursor: null, hasMore: false },
+      }),
+      "GET /api/v1/ops/cooks/a1": () => ({ status: 200, body: review }),
+      "GET /api/v1/uploads/d1": () => ({ status: 200, body: { id: "d1", state: "APPROVED", privateReadUrl: "http://localhost:9090/private/d1?sig=1" } }),
+      "POST /api/v1/ops/cooks/a1/decision": () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("button", { name: "طلبات الطهاة" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "الطلبات" })).toBeNull();
+    fireEvent.click(await screen.findByRole("button", { name: "قيد المراجعة" }));
+    fireEvent.click(await screen.findByRole("button", { name: "مطبخ سلمى" }));
+    expect(await screen.findByText("Synthetic location")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "عرض المستند #1" }));
+    expect((await screen.findByRole("link", { name: /رابط مؤقت/ })).getAttribute("href")).toContain("sig=1");
+    fireEvent.change(screen.getByLabelText("سبب القرار"), { target: { value: "documents complete" } });
+    fireEvent.click(screen.getByRole("button", { name: "اعتماد" }));
+    const link = await screen.findByRole("link", { name: "إعادة التحقق" });
+    expect(link.getAttribute("href")).toMatch(/\/oauth2\/authorization\/keycloak\?stepUp=true&returnTo=/);
+    const decision = calls.find((c) => c.method === "POST");
+    expect(decision?.body).toEqual({ decision: "APPROVE", revision: 1, expectedVersion: 2, reason: "documents complete" });
+    expect(decision?.headers.get("Idempotency-Key")).toMatch(/^ops-/);
+  });
+
+  it("lets a moderator hide a meal only with a reason", async () => {
+    const item = {
+      id: "m1",
+      kitchenId: "k1",
+      kitchenName: "مطبخ أم علي",
+      status: "PUBLISHED",
+      moderationState: "VISIBLE",
+      moderationReason: null,
+      titleAr: "كشري",
+      titleEn: null,
+      priceMinor: 9000,
+      updatedAt: SERVER_NOW,
+      version: 4,
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/cooks": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/catalogue": () => ({ status: 200, body: { items: [item], nextCursor: null, hasMore: false } }),
+      "POST /api/v1/ops/meals/m1/moderation": () => ({ status: 200, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    const card = await screen.findByRole("article", { name: "كشري" });
+    const hide = within(card).getByRole("button", { name: "إخفاء" }) as HTMLButtonElement;
+    expect(hide.disabled).toBe(true);
+    fireEvent.change(within(card).getByLabelText("السبب"), { target: { value: "misleading photo" } });
+    expect(hide.disabled).toBe(false);
+    fireEvent.click(hide);
+    await waitFor(() => expect(calls.some((c) => c.method === "POST")).toBe(true));
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ action: "HIDE", reason: "misleading photo", expectedVersion: 4 });
+  });
 });
+

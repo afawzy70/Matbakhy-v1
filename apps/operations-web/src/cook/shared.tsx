@@ -74,11 +74,13 @@ export function Status<T>({ ctx, state, onRetry, children }: { ctx: Ctx; state: 
 /** Runs a mutation, shows the server's error, and always refreshes from the server afterwards. */
 export function useMutation(ctx: Ctx, refresh: () => unknown) {
   const [error, setError] = useState<string | null>(null);
+  const [code, setCode] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const run = useCallback(
     async (call: () => Promise<{ error?: unknown; response: Response }>): Promise<boolean> => {
       setBusy(true);
       setError(null);
+      setCode(null);
       try {
         const r = await call();
         if (r.response.status === 401) {
@@ -86,6 +88,7 @@ export function useMutation(ctx: Ctx, refresh: () => unknown) {
           return false;
         }
         if (!r.response.ok) {
+          setCode(errorCode(r.error));
           setError(errorText(ctx.t, errorCode(r.error)));
           return false;
         }
@@ -100,7 +103,7 @@ export function useMutation(ctx: Ctx, refresh: () => unknown) {
     },
     [ctx, refresh],
   );
-  return { run, error, busy };
+  return { run, error, code, busy };
 }
 
 export function ErrorLine({ message }: { message: string | null }) {

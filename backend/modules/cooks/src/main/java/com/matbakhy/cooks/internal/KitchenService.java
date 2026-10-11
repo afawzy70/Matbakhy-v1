@@ -1,6 +1,7 @@
 package com.matbakhy.cooks.internal;
 
 import com.matbakhy.cooks.api.KitchenDirectory;
+import com.matbakhy.cooks.api.KitchenOrderImpact;
 import com.matbakhy.cooks.internal.CookApplications.Revision;
 import com.matbakhy.identity.api.Permission;
 import com.matbakhy.operations.api.AuditLog;
@@ -33,8 +34,13 @@ public class KitchenService implements KitchenDirectory {
 
     public enum Action { PAUSE, SUSPEND, RESTORE }
 
+    /** Staff view; activeOrders is the impact summary (orders still to fulfil, which a pause or suspension does not cancel). */
     public record KitchenAdmin(UUID kitchenId, UUID ownerId, String publicSlug, String displayName, String operatingState,
-                               String stateReason, int approvedRevision, long version) {
+                               String stateReason, int approvedRevision, long version, Map<String, Integer> activeOrders) {
+
+        KitchenAdmin withImpact(Map<String, Integer> impact) {
+            return new KitchenAdmin(kitchenId, ownerId, publicSlug, displayName, operatingState, stateReason, approvedRevision, version, impact);
+        }
     }
 
     /** API-005 public profile. Approval is an operational verification label, not a food-safety certification. */
@@ -46,11 +52,13 @@ public class KitchenService implements KitchenDirectory {
 
     private final JdbcTemplate jdbc;
     private final AuditLog audit;
+    private final KitchenOrderImpact impact;
     private final Clock clock;
 
-    KitchenService(JdbcTemplate jdbc, AuditLog audit, Clock clock) {
+    KitchenService(JdbcTemplate jdbc, AuditLog audit, KitchenOrderImpact impact, Clock clock) {
         this.jdbc = jdbc;
         this.audit = audit;
+        this.impact = impact;
         this.clock = clock;
     }
 
@@ -104,7 +112,8 @@ public class KitchenService implements KitchenDirectory {
         return jdbc.query("""
                 SELECT id, owner_id, public_slug, display_name, operating_state, state_reason, approved_revision, version
                 FROM kitchen WHERE id = ?""", KitchenService::admin, kitchenId)
-                .stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "kitchen not found"));
+                .stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "kitchen not found"))
+                .withImpact(impact.activeOrders(kitchenId));
     }
 
     @Transactional(noRollbackFor = ApiException.class)
@@ -248,6 +257,6 @@ public class KitchenService implements KitchenDirectory {
     private static KitchenAdmin admin(ResultSet rs, int n) throws SQLException {
         return new KitchenAdmin(rs.getObject("id", UUID.class), rs.getObject("owner_id", UUID.class), rs.getString("public_slug"),
                 rs.getString("display_name"), rs.getString("operating_state"), rs.getString("state_reason"),
-                rs.getInt("approved_revision"), rs.getLong("version"));
+                rs.getInt("approved_revision"), rs.getLong("version"), Map.of());
     }
 }

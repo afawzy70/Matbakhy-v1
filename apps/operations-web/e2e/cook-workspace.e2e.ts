@@ -15,6 +15,7 @@ const PASSWORD = env("E2E_USER_PASSWORD");
 const COOK_SUBJECT = "00000000-0000-4000-8000-0000000000c1";
 const CUSTOMER_SUBJECT = "00000000-0000-4000-8000-0000000000a1";
 const ZONE = "00000000-0000-4000-8000-00000000a001";
+const OPS_SUBJECT = "00000000-0000-4000-8000-0000000000d2";
 
 async function idpLogin(page: Page, user: string) {
   await page.locator("#username").fill(user);
@@ -231,6 +232,50 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await expect(cook.getByRole("button", { name: t.pauseKitchen })).toBeVisible();
   const allowed = await customerCall(customerContext, req, "POST", "/api/v1/quotes", { items: [{ mealId, quantity: 1 }], slotId, fulfillmentMode: "PICKUP" });
   expect(allowed.status, JSON.stringify(allowed.body)).toBe(201);
+
+  // ---- operations staff: moderation and kitchen review (MB-023) ----
+  const opsContext = await browser.newContext();
+  const ops = await opsContext.newPage();
+  await ops.goto("/");
+  await ops.getByRole("link", { name: t.signIn }).click();
+  await idpLogin(ops, "ops-a");
+  await expect(ops.getByText(t.noKitchen)).toBeVisible();
+  sql(`INSERT INTO user_grant (id, user_id, permission, grant_reason)
+       SELECT gen_random_uuid(), id, p, 'e2e synthetic grant' FROM app_user, unnest(ARRAY['content.moderate', 'cook.review']) AS p
+       WHERE subject = '${OPS_SUBJECT}'`);
+  await ops.reload();
+  await expect(ops.getByRole("button", { name: t.ops.reviews })).toBeVisible();
+  await expect(ops.getByRole("button", { name: t.tabs.orders })).toHaveCount(0);
+
+  // Hide the meal: no longer sold or shown; restore: sold again.
+  await ops.getByRole("button", { name: t.ops.catalogue }).click();
+  const modCard = ops.getByRole("article", { name: "كشري تجريبي" });
+  await modCard.getByLabel(t.reason).fill("e2e moderation check");
+  await modCard.getByRole("button", { name: t.ops.hide }).click();
+  await expect(modCard.getByText(t.ops.hidden, { exact: true })).toBeVisible();
+  expect((await req.get(`${API}/api/v1/meals/${mealId}`)).status(), "hidden meal not public").toBe(404);
+  const hiddenQuote = await customerCall(customerContext, req, "POST", "/api/v1/quotes", { items: [{ mealId, quantity: 1 }], slotId, fulfillmentMode: "PICKUP" });
+  expect(hiddenQuote.status, "hidden meal not sold").not.toBe(201);
+  await modCard.getByLabel(t.reason).fill("e2e restore");
+  await modCard.getByRole("button", { name: t.ops.restore }).click();
+  await expect(modCard.getByText(t.ops.visible, { exact: true })).toBeVisible();
+  expect((await req.get(`${API}/api/v1/meals/${mealId}`)).status()).toBe(200);
+
+  // Review queue: the approved application with its kitchen and active-order impact; suspension needs MFA step-up,
+  // which the local identity provider cannot satisfy, so the UI must offer the step-up login instead of acting.
+  await ops.getByRole("button", { name: t.ops.reviews }).click();
+  await ops.getByRole("button", { name: label(t.ops.appState.APPROVED) }).click();
+  await ops.getByRole("button", { name: "مطبخ تجريبي" }).click();
+  await expect(ops.getByText("Synthetic location")).toBeVisible();
+  const kitchenPanel = ops.getByLabel(t.ops.kitchen);
+  await expect(kitchenPanel.getByText(new RegExp(t.ops.impact))).toBeVisible();
+  await kitchenPanel.getByLabel(t.reason).fill("e2e suspension attempt");
+  await kitchenPanel.getByRole("button", { name: label(t.ops.kitchenAction.SUSPEND), exact: true }).click();
+  await expect(kitchenPanel.getByRole("link", { name: t.ops.stepUpLink })).toHaveAttribute("href", /stepUp=true/);
+  expect(sql(`SELECT operating_state FROM kitchen WHERE id = '00000000-0000-4000-8000-0000000000d1'`)).toBe("ACTIVE");
+  // A cook never sees staff sections or private application data of others.
+  expect((await cook.request.get(`${API}/api/v1/ops/catalogue`)).status()).toBe(403);
+  await opsContext.close();
 
   // ---- English left-to-right ----
   await cook.getByRole("button", { name: t.language }).click();

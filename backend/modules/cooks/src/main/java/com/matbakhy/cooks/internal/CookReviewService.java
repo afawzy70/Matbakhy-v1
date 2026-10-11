@@ -44,8 +44,9 @@ public class CookReviewService {
     }
 
     /** Reviewer view: submitted revisions with private fields. Draft edits in progress are not shown. */
+    /** kitchen is the staff view of the approved kitchen (operating state, version, active-order impact), if any. */
     public record ApplicationReview(UUID id, UUID applicantId, String state, int currentRevision, List<Revision> revisions,
-                                    UUID kitchenId, long version) {
+                                    UUID kitchenId, long version, KitchenService.KitchenAdmin kitchen) {
     }
 
     private static final Set<String> STATES = Set.of("DRAFT", "SUBMITTED", "UNDER_REVIEW", "APPROVED", "CHANGES_REQUESTED", "REJECTED");
@@ -198,6 +199,6 @@ public class CookReviewService {
         UUID kitchenId = jdbc.query("SELECT id FROM kitchen WHERE application_id = ?",
                 rs -> rs.next() ? rs.getObject(1, UUID.class) : null, app.id());
         return new ApplicationReview(app.id(), app.userId(), app.state(), app.currentRevision(), applications.revisions(app.id()),
-                kitchenId, app.version());
+                kitchenId, app.version(), kitchenId == null ? null : kitchens.admin(kitchenId));
     }
 }

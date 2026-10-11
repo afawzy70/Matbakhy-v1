@@ -6,6 +6,10 @@ import com.matbakhy.catalog.api.SellerDirectory;
 import com.matbakhy.catalog.api.SellerDirectory.Seller;
 import com.matbakhy.catalog.internal.discovery.MealOffers;
 import com.matbakhy.catalog.internal.media.MediaService;
+import com.matbakhy.identity.api.Permission;
+import com.matbakhy.operations.api.AuditLog;
+import com.matbakhy.operations.api.AuditLog.Entry;
+import com.matbakhy.operations.api.AuditLog.Outcome;
 import com.matbakhy.shared.error.ApiException;
 import com.matbakhy.shared.error.ApiException.FieldError;
 import com.matbakhy.shared.error.ErrorCode;
@@ -21,6 +25,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -64,9 +69,20 @@ public class MealService {
                               String allergenNote, Long priceMinor, String currency, List<Photo> photos, Category category) {
     }
 
+    /** moderationState HIDDEN means operations hid the meal; it is not shown or sold whatever its status. */
     public record CookMeal(UUID id, UUID kitchenId, String status, MealContent content, int revision, Instant publishedAt,
-                           Instant archivedAt, Instant updatedAt, long version) {
+                           Instant archivedAt, Instant updatedAt, long version, String moderationState, String moderationReason) {
     }
+
+    /** API-071 row: what moderators need, no private kitchen data. */
+    public record OpsMeal(UUID id, UUID kitchenId, String kitchenName, String status, String moderationState, String moderationReason,
+                          String titleAr, String titleEn, Long priceMinor, Instant updatedAt, long version) {
+    }
+
+    public record OpsMealPage(List<OpsMeal> items, String nextCursor, boolean hasMore) {
+    }
+
+    public enum Moderation { HIDE, RESTORE }
 
     public record CookMealPage(List<CookMeal> items, String nextCursor, boolean hasMore) {
     }
@@ -96,7 +112,7 @@ public class MealService {
 
     private static final String COLUMNS = "id, kitchen_id, status, title_ar, title_en, description_ar, description_en, portion_ar, portion_en, "
             + "ingredients_ar, ingredients_en, allergen_declaration, allergen_codes, allergen_note, price_minor, currency, category, revision, "
-            + "published_at, archived_at, created_at, updated_at, version";
+            + "published_at, archived_at, created_at, updated_at, version, moderation_state, moderation_reason";
 
     private final JdbcTemplate jdbc;
     private final SellerDirectory sellers;
@@ -104,16 +120,18 @@ public class MealService {
     private final MediaService media;
     private final JsonMapper json;
     private final MealOffers offers;
+    private final AuditLog audit;
     private final Clock clock;
 
     MealService(JdbcTemplate jdbc, SellerDirectory sellers, MediaLibrary mediaLibrary, MediaService media, JsonMapper json, MealOffers offers,
-                Clock clock) {
+                AuditLog audit, Clock clock) {
         this.jdbc = jdbc;
         this.sellers = sellers;
         this.mediaLibrary = mediaLibrary;
         this.media = media;
         this.json = json;
         this.offers = offers;
+        this.audit = audit;
         this.clock = clock;
     }
 
@@ -223,7 +241,7 @@ public class MealService {
 
     /** API-004: only a published meal of a kitchen that can sell; everything else is indistinguishable from missing. */
     public MealDetail publicMeal(UUID mealId, boolean english) {
-        Row row = jdbc.query("SELECT " + COLUMNS + " FROM meal WHERE id = ? AND status = 'PUBLISHED'", this::map, mealId).stream()
+        Row row = jdbc.query("SELECT " + COLUMNS + " FROM meal WHERE id = ? AND status = 'PUBLISHED' AND moderation_state = 'VISIBLE'", this::map, mealId).stream()
                 .findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "meal not public"));
         Seller seller = sellers.byKitchen(row.kitchenId()).filter(Seller::canSell)
                 .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "kitchen not selling"));
@@ -266,10 +284,80 @@ public class MealService {
         return json.readValue(snapshot, MealContent.class);
     }
 
+    // ---- operations moderation (API-071/072) ----
+
+    public OpsMealPage catalogue(String status, String moderation, UUID kitchenId, String q, String cursor, int limit) {
+        if (status != null && !Set.of("DRAFT", "PUBLISHED", "PAUSED", "ARCHIVED").contains(status)) {
+            throw invalid("status", "UNKNOWN_STATUS");
+        }
+        if (moderation != null && !Set.of("VISIBLE", "HIDDEN").contains(moderation)) {
+            throw invalid("moderationState", "UNKNOWN_STATE");
+        }
+        if (limit < 1 || limit > 100) {
+            throw invalid("limit", "RANGE_1_100");
+        }
+        String search = q == null || q.isBlank() ? null : q.strip();
+        if (search != null && search.length() > 80) {
+            throw invalid("q", "MAX_80");
+        }
+        String like = search == null ? null : "%" + search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%";
+        Instant beforeTime = Instant.parse("9999-12-31T00:00:00Z");
+        UUID beforeId = new UUID(-1L, -1L);
+        if (cursor != null) {
+            try {
+                String[] parts = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8).split("\\|", 2);
+                beforeTime = Instant.parse(parts[0]);
+                beforeId = UUID.fromString(parts[1]);
+            } catch (RuntimeException e) {
+                throw invalid("cursor", "INVALID");
+            }
+        }
+        List<OpsMeal> rows = jdbc.query("""
+                SELECT m.id, m.kitchen_id, k.display_name, m.status, m.moderation_state, m.moderation_reason, m.title_ar, m.title_en,
+                       m.price_minor, m.updated_at, m.version
+                FROM meal m JOIN kitchen k ON k.id = m.kitchen_id
+                WHERE (?::text IS NULL OR m.status = ?) AND (?::text IS NULL OR m.moderation_state = ?) AND (?::uuid IS NULL OR m.kitchen_id = ?)
+                  AND (?::text IS NULL OR m.title_ar ILIKE ? OR m.title_en ILIKE ? OR k.display_name ILIKE ?)
+                  AND (m.updated_at, m.id) < (?, ?)
+                ORDER BY m.updated_at DESC, m.id DESC LIMIT ?""",
+                (rs, n) -> new OpsMeal(rs.getObject(1, UUID.class), rs.getObject(2, UUID.class), rs.getString(3), rs.getString(4), rs.getString(5),
+                        rs.getString(6), rs.getString(7), rs.getString(8), rs.getObject(9) == null ? null : rs.getLong(9),
+                        rs.getTimestamp(10).toInstant(), rs.getLong(11)),
+                status, status, moderation, moderation, kitchenId, kitchenId, like, like, like, like, Timestamp.from(beforeTime), beforeId, limit + 1);
+        boolean more = rows.size() > limit;
+        List<OpsMeal> page = more ? rows.subList(0, limit) : rows;
+        String next = more ? Base64.getUrlEncoder().withoutPadding().encodeToString(
+                (page.getLast().updatedAt() + "|" + page.getLast().id()).getBytes(StandardCharsets.UTF_8)) : null;
+        return new OpsMealPage(page, next, more);
+    }
+
+    /** Hide or restore a meal (any status); reasoned and audited. The cook's content and status stay unchanged. */
+    @Transactional
+    public CookMeal moderate(UUID staffId, UUID mealId, Moderation action, String reason, Long expectedVersion, String requestId) {
+        Row row = jdbc.query("SELECT " + COLUMNS + " FROM meal WHERE id = ? FOR UPDATE", this::map, mealId).stream().findFirst()
+                .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "meal not found"));
+        requireVersion(row, expectedVersion);
+        String trimmed = reason == null ? null : reason.strip();
+        if (trimmed == null || trimmed.length() < 3 || trimmed.length() > 1000) {
+            throw invalid("reason", "LENGTH_3_1000");
+        }
+        String target = action == Moderation.HIDE ? "HIDDEN" : "VISIBLE";
+        if (target.equals(row.moderationState())) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "meal is already " + target);
+        }
+        Instant now = clock.instant();
+        jdbc.update("""
+                UPDATE meal SET moderation_state = ?, moderation_reason = ?, moderated_at = ?, moderated_by = ?, version = version + 1 WHERE id = ?""",
+                target, action == Moderation.HIDE ? trimmed : null, Timestamp.from(now), staffId, mealId);
+        audit.record(new Entry(staffId, "meal.moderation", Permission.CONTENT_MODERATE.code(), "meal", mealId.toString(), Outcome.ALLOWED, trimmed,
+                requestId, Map.of("action", action.name(), "kitchenId", row.kitchenId().toString())));
+        return cookMeal(mealId);
+    }
+
     // ---- internals ----
 
     private record Row(UUID id, UUID kitchenId, String status, MealContent content, int revision, Instant publishedAt, Instant archivedAt,
-                       Instant createdAt, Instant updatedAt, long version) {
+                       Instant createdAt, Instant updatedAt, long version, String moderationState, String moderationReason) {
     }
 
     private Seller requireSeller(UUID actorId) {
@@ -413,7 +501,7 @@ public class MealService {
 
     private CookMeal toCookMeal(Row r) {
         return new CookMeal(r.id(), r.kitchenId(), r.status(), r.content(), r.revision(), r.publishedAt(), r.archivedAt(), r.updatedAt(),
-                r.version());
+                r.version(), r.moderationState(), r.moderationReason());
     }
 
     private Row map(ResultSet rs, int n) throws SQLException {
@@ -429,7 +517,7 @@ public class MealService {
                 rs.getString("category") == null ? null : Category.valueOf(rs.getString("category")));
         return new Row(id, rs.getObject("kitchen_id", UUID.class), rs.getString("status"), content, rs.getInt("revision"),
                 instant(rs, "published_at"), instant(rs, "archived_at"), instant(rs, "created_at"), instant(rs, "updated_at"),
-                rs.getLong("version"));
+                rs.getLong("version"), rs.getString("moderation_state"), rs.getString("moderation_reason"));
     }
 
     private static List<Allergen> allergens(Array array) throws SQLException {

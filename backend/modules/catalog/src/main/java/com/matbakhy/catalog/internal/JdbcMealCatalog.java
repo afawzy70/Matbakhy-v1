@@ -18,9 +18,9 @@ class JdbcMealCatalog implements MealCatalog {
 
     @Override
     public Optional<PricedMeal> current(UUID mealId) {
-        return jdbc.query("SELECT id, kitchen_id, status, revision, price_minor, title_ar, title_en FROM meal WHERE id = ?",
+        return jdbc.query("SELECT id, kitchen_id, status, moderation_state, revision, price_minor, title_ar, title_en FROM meal WHERE id = ?",
                 (rs, n) -> new PricedMeal(rs.getObject("id", UUID.class), rs.getObject("kitchen_id", UUID.class),
-                        "PUBLISHED".equals(rs.getString("status")), rs.getInt("revision"), rs.getLong("price_minor"), rs.getString("title_ar"),
+                        "PUBLISHED".equals(rs.getString("status")) && "VISIBLE".equals(rs.getString("moderation_state")), rs.getInt("revision"), rs.getLong("price_minor"), rs.getString("title_ar"),
                         rs.getString("title_en")), mealId).stream().findFirst();
     }
 

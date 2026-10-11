@@ -322,6 +322,17 @@ class IdentityIntegrationTest {
     // ---- TC-002 / TC-109: web session, CSRF, CORS, logout, expiry ----
 
     @Test
+    void web_step_up_login_requests_mfa_and_fresh_authentication() throws Exception {
+        OidcBrowser browser = new OidcBrowser();
+        String plain = browser.followUntil(api("/oauth2/authorization/keycloak"), KeycloakTestServer.issuer());
+        assertThat(OidcBrowser.queryParam(plain, "acr_values")).isNull();
+        String stepUp = new OidcBrowser().followUntil(api("/oauth2/authorization/keycloak?stepUp=true"), KeycloakTestServer.issuer());
+        assertThat(OidcBrowser.queryParam(stepUp, "acr_values")).isNotBlank();
+        assertThat(OidcBrowser.queryParam(stepUp, "max_age")).isEqualTo("0");
+        assertThat(OidcBrowser.queryParam(stepUp, "code_challenge")).as("PKCE kept").isNotNull();
+    }
+
+    @Test
     void web_login_returns_only_to_allowed_first_party_origins() throws Exception {
         assertThat(webLoginLanding("http://localhost:5174/cook?tab=orders")).isEqualTo("http://localhost:5174/cook?tab=orders");
         assertThat(webLoginLanding("https://evil.example/steal")).as("not an allowed origin").isEqualTo("http://localhost:5173/");

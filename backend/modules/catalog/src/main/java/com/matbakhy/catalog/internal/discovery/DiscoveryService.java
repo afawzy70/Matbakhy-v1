@@ -106,7 +106,7 @@ public class DiscoveryService {
                 LEFT JOIN LATERAL (SELECT ma.public_key, mm.alt_ar, mm.alt_en FROM meal_media mm
                                    JOIN media_asset ma ON ma.id = mm.media_id AND ma.state = 'APPROVED' AND ma.public_key IS NOT NULL
                                    WHERE mm.meal_id = m.id ORDER BY mm.position LIMIT 1) p ON true
-                WHERE m.status = 'PUBLISHED'
+                WHERE m.status = 'PUBLISHED' AND m.moderation_state = 'VISIBLE'
                 """);
         List<Object> args = new ArrayList<>(java.util.Arrays.asList(in.zoneId(), in.zoneId()));
         if (q != null) {

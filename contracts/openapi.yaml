@@ -2376,11 +2376,35 @@ paths:
       description: flags/status/kitchen/query pagination
       x-matbakhy-id: API-071
       x-permission: CONTENT_MODERATE
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED, PAUSED, ARCHIVED]
+        - name: moderationState
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [VISIBLE, HIDDEN]
+        - name: kitchenId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 80
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2389,7 +2413,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/MealPage"
+                $ref: "#/components/schemas/OpsCataloguePage"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2403,7 +2427,7 @@ paths:
       description: action, reason, expectedVersion
       x-matbakhy-id: API-072
       x-permission: CONTENT_MODERATE
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3497,8 +3521,8 @@ components:
     ApplicationReview:
       type: object
       additionalProperties: false
-      description: Reviewer view of submitted revisions including private fields; every read is audited. Document access arrives with media (MB-013).
-      required: [id, applicantId, state, currentRevision, revisions, kitchenId, version]
+      description: Reviewer view of submitted revisions including private fields; every read is audited. Documents are read through GET /api/v1/uploads/{id} (5-minute signed read, audited).
+      required: [id, applicantId, state, currentRevision, revisions, kitchenId, version, kitchen]
       properties:
         id:
           type: string
@@ -3523,6 +3547,11 @@ components:
         version:
           type: integer
           minimum: 0
+        kitchen:
+          description: Staff view of the approved kitchen with its active-order impact; null before approval.
+          oneOf:
+            - $ref: "#/components/schemas/KitchenAdmin"
+            - type: "null"
     CookApplicationRevision:
       type: object
       additionalProperties: false
@@ -3961,7 +3990,7 @@ components:
     CookMeal:
       type: object
       additionalProperties: false
-      required: [id, kitchenId, status, content, revision, publishedAt, archivedAt, updatedAt, version]
+      required: [id, kitchenId, status, content, revision, publishedAt, archivedAt, updatedAt, version, moderationState, moderationReason]
       properties:
         id:
           type: string
@@ -3993,6 +4022,13 @@ components:
         version:
           type: integer
           minimum: 0
+        moderationState:
+          type: string
+          enum: [VISIBLE, HIDDEN]
+          description: HIDDEN means operations hid the meal; it is not shown or sold whatever its status.
+        moderationReason:
+          type: [string, "null"]
+          maxLength: 1000
     MealContent:
       type: object
       additionalProperties: false
@@ -4579,7 +4615,7 @@ components:
     KitchenAdmin:
       type: object
       additionalProperties: false
-      required: [kitchenId, ownerId, publicSlug, displayName, operatingState, stateReason, approvedRevision, version]
+      required: [kitchenId, ownerId, publicSlug, displayName, operatingState, stateReason, approvedRevision, version, activeOrders]
       properties:
         kitchenId:
           type: string
@@ -4605,6 +4641,12 @@ components:
         version:
           type: integer
           minimum: 0
+        activeOrders:
+          type: object
+          description: Impact summary - active orders per state. A pause or suspension does not cancel them; they still need fulfilment or exception handling.
+          additionalProperties:
+            type: integer
+            minimum: 0
     KitchenPublic:
       type: object
       additionalProperties: false
@@ -5581,10 +5623,68 @@ components:
         expectedVersion:
           type: integer
           minimum: 0
+    OpsCataloguePage:
+      type: object
+      additionalProperties: false
+      description: Moderation list across kitchens, most recently changed first. No private kitchen data.
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, kitchenId, kitchenName, status, moderationState, moderationReason, titleAr, titleEn, priceMinor, updatedAt, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              kitchenId:
+                type: string
+                format: uuid
+              kitchenName:
+                type: string
+              status:
+                type: string
+                enum: [DRAFT, PUBLISHED, PAUSED, ARCHIVED]
+              moderationState:
+                type: string
+                enum: [VISIBLE, HIDDEN]
+              moderationReason:
+                type: [string, "null"]
+              titleAr:
+                type: [string, "null"]
+              titleEn:
+                type: [string, "null"]
+              priceMinor:
+                type: [integer, "null"]
+                minimum: 0
+              updatedAt:
+                type: string
+                format: date-time
+              version:
+                type: integer
+                minimum: 0
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     PostOpsMealsModerationRequest:
       type: object
-      description: "PENDING typed schema. Request for API-072: action, reason, expectedVersion"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: HIDE or RESTORE a meal with a reason; audited. Content and the cook's publication status are not changed.
+      required: [action, reason, expectedVersion]
+      properties:
+        action:
+          type: string
+          enum: [HIDE, RESTORE]
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostOpsOrdersExceptionCancelRequest:
       type: object
       additionalProperties: false

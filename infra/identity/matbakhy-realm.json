@@ -50,6 +50,9 @@
       "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] },
     { "id": "00000000-0000-4000-8000-0000000000c1", "username": "cook-a", "email": "cook-a@matbakhy.test", "emailVerified": true, "enabled": true,
       "firstName": "Cook", "lastName": "SyntheticA",
+      "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] },
+    { "id": "00000000-0000-4000-8000-0000000000d2", "username": "ops-a", "email": "ops-a@matbakhy.test", "emailVerified": true, "enabled": true,
+      "firstName": "Ops", "lastName": "SyntheticA",
       "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] }
   ]
 }
