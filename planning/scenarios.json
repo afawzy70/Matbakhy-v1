@@ -737,8 +737,10 @@
       "given": "Another user or incomplete order attempts review; an existing review is hidden",
       "when": "Requests and aggregate refresh occur",
       "then": "Invalid review denied; unique order review enforced; aggregate excludes hidden review",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-028/evidence.json"
+      ]
     },
     {
       "id": "TC-040",
@@ -753,8 +755,10 @@
       "given": "Favorite request retries and private order link is shared",
       "when": "Another anonymous visitor opens link",
       "then": "One favorite; private order requires owner authentication; no private address preview",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-028/evidence.json"
+      ]
     },
     {
       "id": "TC-041",
@@ -1685,8 +1689,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Address/profile/preferences/deletion request; favorites/share links; verified-order reviews/report; reorder via new quote; inbox/support",
       "then": "Only completed owned orders can be reviewed once; archived favorites and repriced reorder handled",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-028/evidence.json"
+      ]
     },
     {
       "id": "TC-129",
@@ -1987,8 +1993,10 @@
       "given": "The web basket holds cook A items for one slot",
       "when": "The customer adds a meal of cook B or another slot",
       "then": "The UI asks before replacing; cancelling keeps the previous basket unchanged; confirming replaces it with the new kitchen and slot only",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-028/evidence.json"
+      ]
     },
     {
       "id": "TC-148",

@@ -1014,7 +1014,7 @@
       "id": "MB-028",
       "phase": "P06",
       "title": "Complete customer account and trust features",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -1049,9 +1049,11 @@
         "TC-128",
         "TC-147"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-028/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Verified at bec5830 (attempt 2; attempt 1 at fe94d8b failed only the stale traceability matrix). Includes staff review queue API-098 and the web basket-replacement confirmation (TC-147, split from TC-018). Customer screens use the approved palette and Cairo but still the draft layout; restyle to the approved homepage hierarchy pending."
     },
     {
       "id": "MB-029",
