@@ -1059,7 +1059,7 @@
       "id": "MB-029",
       "phase": "P06",
       "title": "Verify accessibility RTL and responsive behavior",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-022",
