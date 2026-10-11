@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: matbakhy
+  jackson:
+    time-zone: UTC
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+matbakhy:
+  market:
+    currency: EGP
+    timezone: Africa/Cairo

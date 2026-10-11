@@ -1095,7 +1095,7 @@
       "severity": "high",
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create Maven multi-module backend and pnpm apps/packages; select supported versions from official sources; generate lockfiles and wrappers; document Linux/Windows/macOS commands",
-      "then": "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions",
+      "then": "Clean checkout installs and compiles minimal backend/web projects and the customer-mobile Expo project (typecheck, unit test, Android and iOS JavaScript bundles) using pinned versions; native Gradle/Xcode compilation is verified separately in MB-047",
       "status": "NOT_RUN",
       "evidence": []
     },
@@ -1138,6 +1138,20 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Compose database/IdP/object storage/mail sink/API; healthchecks and environment templates; add build/test/lint/secret checks; replace phase verification checks with real commands",
       "then": "Documented bootstrap works from a clean environment and missing dependencies fail clearly",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-147",
+      "title": "Prove native Android and iOS toolchain builds acceptance",
+      "rule_ids": [],
+      "story_id": "MB-047",
+      "phase": "P01",
+      "level": "system",
+      "severity": "high",
+      "given": "MB-005 is DONE; an Android SDK runner and a macOS/Xcode runner are available",
+      "when": "expo prebuild and native Gradle (Android) and Xcode (iOS) builds run from a clean checkout",
+      "then": "Both native builds succeed with recorded toolchain versions and artifact hashes; a missing platform runner is BLOCKED, never PASS",
       "status": "NOT_RUN",
       "evidence": []
     },

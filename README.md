@@ -2,7 +2,7 @@
 
 An Egypt-focused marketplace for discovering and ordering homemade meals from approved home cooks.
 
-**Current state: executable planning pack, not an implemented application.** No customer app, backend, deployed environment, payment integration, or mobile build is claimed to exist. All implementation stories and product verification scenarios start unexecuted.
+**Current state: implementation in progress on branch `implementation/mvp`.** Minimal backend, web and Expo shells exist; no product feature, deployed environment, payment integration or native mobile build is claimed. See [latest status](docs/status/latest.md) and [toolchain](docs/engineering/toolchain.md).
 
 ## Start here
 
@@ -12,7 +12,7 @@ An Egypt-focused marketplace for discovering and ordering homemade meals from ap
 4. Give Claude Code the complete [start prompt](docs/delivery/03-claude-start-prompt.md). Later use the [resume/recovery prompts](docs/delivery/04-resume-and-recovery.md).
 5. Run `python3 scripts/validate_blueprint.py` to validate this planning pack. This does **not** verify the product.
 
-Pack contents: 46 implementation stories, 64 business rules, 110 planned verification scenarios, 97 planned API operations, and 11 delivery phases. See the [planning-pack validation report](docs/quality/03-blueprint-validation.md).
+Pack contents: 47 implementation stories, 64 business rules, 111 planned verification scenarios, 97 planned API operations, and 11 delivery phases. See the [planning-pack validation report](docs/quality/03-blueprint-validation.md).
 
 ## Planned product surfaces
 

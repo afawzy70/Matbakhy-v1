@@ -78,3 +78,9 @@ Decision status is unchanged by this reconciliation: D01–D10 remain PROPOSED_D
 - Daily execution policy: one fresh owner prompt per workday, 12:00–00:00 Asia/Kuwait, Opus for the first session and evidence-based model selection afterwards ([daily execution](../delivery/06-daily-execution.md)).
 - The owner instructed "Begin" at 11:17 Asia/Kuwait on 2026-10-11, before the noon window. That explicit instruction is treated as authorizing that day's session to start early; it does not change the standing window.
 - Superseded ideas remain as listed above: Kuwait geography/KNET/vendors, FlutterFlow/Flutter and earlier web UI library options, and the mock-data social prototype are not carried into the build baseline.
+
+### Planning change recorded 2026-10-11 — MB-047 split (agent proposal, pending owner review)
+
+MB-005's acceptance ("compiles minimal backend/web/native projects") mixed workspace compilation with native Gradle/Xcode builds. Native builds need an Android SDK runner and a macOS/Xcode runner; neither exists in the current container (the Android SDK host is denied by network policy, and iOS requires macOS). Without a change, every backend and contract story would wait on mobile build infrastructure.
+
+The native compile requirement was moved, not removed: MB-005 now covers clean-checkout install and compilation of backend, web and the Expo project (typecheck, unit test, Android and iOS JavaScript bundles). New story **MB-047 (P01)** with scenario **TC-147** requires native Android (Gradle) and iOS (Xcode) compilation with separate evidence, and MB-031 depends on it. The P01 gate still cannot pass until MB-047 is DONE. The owner may reverse this split; doing so returns MB-005 to BLOCKED on native runners.

@@ -1,11 +1,11 @@
 # Delivery roadmap and checkpoints
 
-The [46-story backlog](../../planning/backlog.json) is the executable queue. Each story includes concrete implementation steps, outputs, acceptance, dependencies, rule IDs and scenario IDs. Estimates below are planning ranges in focused engineer-days for one experienced engineer assisted by AI; they are not commitments or predicted autonomous-agent runtime. External reviews, credentials, recruitment and store review can extend elapsed time. Re-estimate after P01 and P04 using actual throughput.
+The [47-story backlog](../../planning/backlog.json) is the executable queue. Each story includes concrete implementation steps, outputs, acceptance, dependencies, rule IDs and scenario IDs. Estimates below are planning ranges in focused engineer-days for one experienced engineer assisted by AI; they are not commitments or predicted autonomous-agent runtime. External reviews, credentials, recruitment and store review can extend elapsed time. Re-estimate after P01 and P04 using actual throughput.
 
 | Phase | Stories | Deliverable / exit evidence | Planning range |
 |---|---|---|---|
 | P00 Scope and UX | MB-001–004 | Reconciled assumptions, traceability, editable brand direction and reviewable prototypes | 3–5 days |
-| P01 Foundation | MB-005–008 | Pinned workspace, backend/module/database baseline, contract tooling, local stack and real CI commands | 4–7 days |
+| P01 Foundation | MB-005–008, MB-047 | Pinned workspace, backend/module/database baseline, contract tooling, local stack and real CI commands | 4–7 days |
 | P02 Identity and supply onboarding | MB-009–012 | Sessions/PKCE contract, profile/phone/address, scoped grants/audit, cook review API | 5–8 days |
 | P03 Catalogue and availability | MB-013–016 | Media, publishable meals, correct dated capacity, serviceable server-side discovery | 4–7 days |
 | P04 Transaction slice | MB-017–021 | Quote → order → cook acceptance → fulfillment → cash/ledger → notification with failure/race proof | 7–12 days |

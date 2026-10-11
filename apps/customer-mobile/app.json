@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Matbakhy Dev",
+    "slug": "matbakhy-customer",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "matbakhy-dev",
+    "android": {
+      "package": "com.matbakhy.customer.dev"
+    },
+    "ios": {
+      "bundleIdentifier": "com.matbakhy.customer.dev",
+      "supportsTablet": false
+    },
+    "extra": {
+      "environment": "development",
+      "note": "Development identifiers only. Production identifiers/signing are owner decision O08."
+    }
+  }
+}

@@ -8,7 +8,7 @@ from pathlib import Path
 from check_scope import MATRIX, check, render_matrix
 from validate_blueprint import ROOT
 
-IGNORE = shutil.ignore_patterns(".git", "__pycache__", "local", "node_modules", "target", "dist", "build", ".expo")
+IGNORE = shutil.ignore_patterns(".git", "__pycache__", "local", "node_modules", "target", "dist", "build", ".expo", "android", "ios")
 
 
 class ScopeGuards(unittest.TestCase):

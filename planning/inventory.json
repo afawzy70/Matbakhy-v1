@@ -2,23 +2,143 @@
   "schema_version": 1,
   "note": "Repository inventory checked by scripts/check_scope.py. PRESENT entries must exist; PLANNED entries must not exist yet. Every top-level tracked or untracked (non-ignored) entry must be listed. Update the entry state in the story that creates the path.",
   "entries": [
-    {"path": ".github", "state": "PRESENT", "owner_story": "MB-008", "purpose": "Workflows, PR and defect templates; currently planning-integrity CI only"},
-    {"path": ".gitignore", "state": "PRESENT", "owner_story": "MB-005", "purpose": "Ignored build output, dependencies, local config and local verification reports"},
-    {"path": "AGENTS.md", "state": "PRESENT", "owner_story": "MB-001", "purpose": "Coding-agent entry guidance"},
-    {"path": "CLAUDE.md", "state": "PRESENT", "owner_story": "MB-001", "purpose": "Claude Code project instructions"},
-    {"path": "README.md", "state": "PRESENT", "owner_story": "MB-001", "purpose": "Repository overview and current implementation state"},
-    {"path": "contracts", "state": "PRESENT", "owner_story": "MB-007", "purpose": "Endpoint registry; OpenAPI contract is added by MB-007"},
-    {"path": "docs", "state": "PRESENT", "owner_story": "MB-001", "purpose": "Product, engineering, delivery, quality, operations and status documentation"},
-    {"path": "planning", "state": "PRESENT", "owner_story": "MB-002", "purpose": "Backlog, rules, scenarios, gates, decisions, execution state and this inventory"},
-    {"path": "scripts", "state": "PRESENT", "owner_story": "MB-008", "purpose": "Planning validation, scope checks and verification runner"},
-    {"path": "verification", "state": "PRESENT", "owner_story": "MB-002", "purpose": "Evidence templates and committed redacted verification runs"},
-    {"path": "backend", "state": "PLANNED", "owner_story": "MB-005", "purpose": "Spring Boot modular monolith (Maven)"},
-    {"path": "apps", "state": "PLANNED", "owner_story": "MB-005", "purpose": "customer-web, operations-web and customer-mobile applications"},
-    {"path": "packages", "state": "PLANNED", "owner_story": "MB-003", "purpose": "design-tokens, api-client and i18n shared packages"},
-    {"path": "infra", "state": "PLANNED", "owner_story": "MB-008", "purpose": "Local compose stack, identity provider and environment templates"},
-    {"path": "tests", "state": "PLANNED", "owner_story": "MB-030", "purpose": "Cross-surface E2E, mobile, security, integration and load suites"},
-    {"path": "package.json", "state": "PLANNED", "owner_story": "MB-005", "purpose": "pnpm workspace root"},
-    {"path": "pnpm-workspace.yaml", "state": "PLANNED", "owner_story": "MB-005", "purpose": "pnpm workspace definition"},
-    {"path": "pnpm-lock.yaml", "state": "PLANNED", "owner_story": "MB-005", "purpose": "pnpm lockfile"}
+    {
+      "path": ".github",
+      "state": "PRESENT",
+      "owner_story": "MB-008",
+      "purpose": "Workflows, PR and defect templates; currently planning-integrity CI only"
+    },
+    {
+      "path": ".gitignore",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "Ignored build output, dependencies, local config and local verification reports"
+    },
+    {
+      "path": "AGENTS.md",
+      "state": "PRESENT",
+      "owner_story": "MB-001",
+      "purpose": "Coding-agent entry guidance"
+    },
+    {
+      "path": "CLAUDE.md",
+      "state": "PRESENT",
+      "owner_story": "MB-001",
+      "purpose": "Claude Code project instructions"
+    },
+    {
+      "path": "README.md",
+      "state": "PRESENT",
+      "owner_story": "MB-001",
+      "purpose": "Repository overview and current implementation state"
+    },
+    {
+      "path": "contracts",
+      "state": "PRESENT",
+      "owner_story": "MB-007",
+      "purpose": "Endpoint registry; OpenAPI contract is added by MB-007"
+    },
+    {
+      "path": "docs",
+      "state": "PRESENT",
+      "owner_story": "MB-001",
+      "purpose": "Product, engineering, delivery, quality, operations and status documentation"
+    },
+    {
+      "path": "planning",
+      "state": "PRESENT",
+      "owner_story": "MB-002",
+      "purpose": "Backlog, rules, scenarios, gates, decisions, execution state and this inventory"
+    },
+    {
+      "path": "scripts",
+      "state": "PRESENT",
+      "owner_story": "MB-008",
+      "purpose": "Planning validation, scope checks and verification runner"
+    },
+    {
+      "path": "verification",
+      "state": "PRESENT",
+      "owner_story": "MB-002",
+      "purpose": "Evidence templates and committed redacted verification runs"
+    },
+    {
+      "path": "backend",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "Spring Boot modular monolith (Maven)"
+    },
+    {
+      "path": "apps",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "customer-web, operations-web and customer-mobile applications"
+    },
+    {
+      "path": "packages",
+      "state": "PLANNED",
+      "owner_story": "MB-003",
+      "purpose": "design-tokens, api-client and i18n shared packages"
+    },
+    {
+      "path": "infra",
+      "state": "PLANNED",
+      "owner_story": "MB-008",
+      "purpose": "Local compose stack, identity provider and environment templates"
+    },
+    {
+      "path": "tests",
+      "state": "PLANNED",
+      "owner_story": "MB-030",
+      "purpose": "Cross-surface E2E, mobile, security, integration and load suites"
+    },
+    {
+      "path": "package.json",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "pnpm workspace root"
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "pnpm workspace definition"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "pnpm lockfile"
+    },
+    {
+      "path": ".node-version",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "Pinned Node.js version"
+    },
+    {
+      "path": ".nvmrc",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "Pinned Node.js version for nvm"
+    },
+    {
+      "path": ".npmrc",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "pnpm settings: engine-strict, exact saves"
+    },
+    {
+      "path": "eslint.config.js",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "Workspace ESLint flat config"
+    },
+    {
+      "path": "tsconfig.base.json",
+      "state": "PRESENT",
+      "owner_story": "MB-005",
+      "purpose": "Shared strict TypeScript settings"
+    }
   ]
 }

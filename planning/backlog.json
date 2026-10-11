@@ -147,7 +147,7 @@
         "docs/engineering/toolchain.md"
       ],
       "acceptance": [
-        "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions"
+        "Clean checkout installs and compiles minimal backend/web projects and the customer-mobile Expo project (typecheck, unit test, Android and iOS JavaScript bundles) using pinned versions; native Gradle/Xcode compilation is verified separately in MB-047"
       ],
       "rule_ids": [],
       "scenario_ids": [
@@ -244,6 +244,36 @@
       "rule_ids": [],
       "scenario_ids": [
         "TC-108"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-047",
+      "phase": "P01",
+      "title": "Prove native Android and iOS toolchain builds",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-005"
+      ],
+      "implementation_steps": [
+        "Provision Android SDK/emulator runner and macOS/Xcode runner (local or approved CI)",
+        "generate native projects with expo prebuild",
+        "compile Android debug APK and iOS simulator build of the minimal shell",
+        "record exact toolchain versions and artifact hashes"
+      ],
+      "artifacts": [
+        "apps/customer-mobile",
+        "verification/runs"
+      ],
+      "acceptance": [
+        "Minimal customer-mobile shell compiles natively for Android (Gradle) and iOS (Xcode) from a clean checkout with pinned versions; each platform has separate evidence"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-147"
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
@@ -1079,7 +1109,8 @@
         "MB-005",
         "MB-007",
         "MB-009",
-        "MB-010"
+        "MB-010",
+        "MB-047"
       ],
       "implementation_steps": [
         "Expo navigation/locales/environment config",
