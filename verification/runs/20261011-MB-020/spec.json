@@ -1,0 +1,90 @@
+{
+  "run_id": "20261011-MB-020",
+  "story_id": "MB-020",
+  "phase": "P04",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. CashAndLedgerIntegrationTest (PostgreSQL)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-032",
+      "observed": "CashAndLedgerIntegrationTest: a delivery order taken to COMPLETED through real lifecycle commands (handover with the customer's code) shows cash DUE in the customer view and in the finance list (amount due 27000, orderState COMPLETED, report null); no cash report row exists; customers get 403 on the finance list. Commission posting leaves the cash obligation DUE."
+    },
+    {
+      "id": "TC-033",
+      "observed": "Order with subtotal 24000 (2 x 12000) and delivery 3000 under a synthetic 1000 bps policy: posting the completion event twice yields true then false and exactly one ledger group with base 24000 (delivery excluded) and rate 1000; debit COOK_COMMISSION_RECEIVABLE 2400 equals credit PLATFORM_COMMISSION_REVENUE 2400; retiring/replacing the active policy does not change it; ledger rows are append-only and a one-sided entry is rejected at commit by the deferred balance trigger; the posting job posts each completion once. Mutations posting an unbalanced credit or removing the duplicate guard failed the tests."
+    },
+    {
+      "id": "TC-120",
+      "observed": "Cash report separate from the order: exact report -> REPORTED (order view shows REPORTED), second report 409; finance.read cannot verify (403); a different finance.verify user verifies -> VERIFIED, repeat 409. Short (20000 of 27000) and zero reports make the obligation DISPUTED with signed discrepancy; VERIFY with a partial amount is 422, DISPUTE needs a reason, then DISPUTED. Reports need a COMPLETED order of the own kitchen (409/404), collectedAt not in the future and CASH/EGP (422). A cook who also holds finance.verify cannot verify their own report (403, audited DENIED). A mutation treating short reports as success failed the test."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-020/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review defect fixed before tests: the separation-of-duties denial audit would have been rolled back with the verification transaction; moved to a separate refusal step whose audit survives.",
+      "Proposed defaults recorded: one cash report per order; verification confirms full collection only, everything else is a dispute; commission posts on completion from the placement snapshot.",
+      "Residual: refunds, statements and settlements (MB-025); discrepancy follow-up cases (MB-024); commission eligibility rules beyond completion and real rates are O04."
+    ]
+  },
+  "open_defects": []
+}

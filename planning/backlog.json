@@ -706,7 +706,7 @@
       "id": "MB-020",
       "phase": "P04",
       "title": "Implement cash and ledger core",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-018",
@@ -734,9 +734,11 @@
         "TC-033",
         "TC-120"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-020/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Refunds/statements/settlements MB-025; discrepancy cases MB-024; real rates O04."
     },
     {
       "id": "MB-021",

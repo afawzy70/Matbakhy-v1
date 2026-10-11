@@ -589,8 +589,10 @@
       "given": "Order is completed without a collection report",
       "when": "Finance dashboard loads",
       "then": "Order completed, cash DUE; no invented receipt or cash balance",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-020/evidence.json"
+      ]
     },
     {
       "id": "TC-033",
@@ -605,8 +607,10 @@
       "given": "24000 subtotal, 3000 delivery, sample rate 1000 bps",
       "when": "Completion event is delivered twice",
       "then": "One 2400 commission group, debits equal credits; current rate changes do not alter it",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-020/evidence.json"
+      ]
     },
     {
       "id": "TC-034",
@@ -1480,8 +1484,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Cash report/verification separate from order; immutable balanced commission entries; dedup source events; snapshot rates; discrepancy handling",
       "then": "Completion does not imply payment; duplicate event posts once; commission example and balanced groups verified",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-020/evidence.json"
+      ]
     },
     {
       "id": "TC-121",
