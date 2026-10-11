@@ -1,0 +1,100 @@
+{
+  "run_id": "20261011-MB-026",
+  "story_id": "MB-026",
+  "phase": "P05",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. ConfigurationIntegrationTest and StaffAccessIntegrationTest (PostgreSQL)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflow regression (cook, staff, support)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-042",
+      "observed": "ConfigurationIntegrationTest: with an order placed at delivery fee 3000 and another quote outstanding, a zone fee change to 4500 (config.write with MFA; without MFA 403, config.read 403, stale version 409, negative fee 422; key sent percent-encoded) leaves the placed order at 3000, makes the stale quote fail with TOTAL_CHANGED and gives new quotes 4500; the change log lists it and is append-only; one audit event. A new synthetic policy version (tax 14%) makes a stale quote fail with POLICY_CHANGED while a new quote has tax 1820 and terms-v2; a real policy without approval reference is 422, with one it is active and approved; exactly one active policy; stale version 409; unknown key 404; future effectiveAt 422. The ordering switch off makes new quotes and placement 409 ORDERING_PAUSED while the cook can still accept a placed order; switched back on, quotes work. Mutations removing the approval guard or ignoring the switch failed."
+    },
+    {
+      "id": "TC-043",
+      "observed": "StaffAccessIntegrationTest (backend verify): granting oneself a permission is refused (403, audited 'self-escalation refused'); revoking the last administrator grant is 409 (audited 'last administrator protected'); grant changes require recent MFA; revoked grants stop working on the next request; expired grants confer nothing. Operations web staff screen sends grants/revocations with reasons and shows the MFA step-up prompt."
+    },
+    {
+      "id": "TC-126",
+      "observed": "Acceptance: configuration changes affect new quotes only (TC-042); self-escalation and loss of the last recoverable administrator prevented (TC-043); configuration audit append-only; live approval guard for real policies. Operations web component test: a zone change sends the new fee in piastres with reason and current version and shows the step-up link on STEP_UP_REQUIRED."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-026/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Approval guard and ordering switch mutation-tested; new-quotes-only behaviour proven with placed and stale quotes.",
+      "Staff controls are MB-011 behaviour re-observed; UI added.",
+      "Residual: no scheduled changes; real policy values O04; configuration/staff UI not in the browser workflow."
+    ]
+  },
+  "open_defects": []
+}

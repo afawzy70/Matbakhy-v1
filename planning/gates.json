@@ -267,21 +267,33 @@
           "id": "P05-CHECK-1",
           "name": "Cook and operations browser workflows",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/dev.sh",
+            "e2e"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Throwaway local stack (PostgreSQL, Keycloak, S3 emulator, API) plus the operations web; Playwright/Chromium workflow: cook onboarding state, meal with uploaded photo, slot, pickup and delivery fulfilment with handover codes, cash report, statement, pause/resume; staff moderation, review queue with MFA step-up prompt, support queue with private notes, cancellation request resolved by exception cancellation. Synthetic users and SQL approval/grants (no local MFA). Finance, configuration and staff screens are component-tested only."
         },
         {
           "id": "P05-CHECK-2",
           "name": "Support finance reconciliation and staff configuration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "SupportIntegrationTest",
+            "FinanceOperationsIntegrationTest",
+            "ConfigurationIntegrationTest",
+            "StaffAccessIntegrationTest",
+            "CookWorkspaceIntegrationTest",
+            "ModerationIntegrationTest",
+            "CashAndLedgerIntegrationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16: support privacy/SLA/cancellation requests, refunds/reversal/settlements with separation of duties and concurrency, versioned configuration with approval guard and ordering switch, staff self-escalation and last-admin protection, cook workspace scope, moderation and suspension effects, cash and ledger. Fails if any named class did not run."
         }
       ]
     },

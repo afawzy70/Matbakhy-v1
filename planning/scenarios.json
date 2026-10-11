@@ -783,8 +783,10 @@
       "given": "Fee changes while an order and quote already exist",
       "when": "Views and new quote request run",
       "then": "Order unchanged; stale quote invalidated as specified; new quote uses new version",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-026/evidence.json"
+      ]
     },
     {
       "id": "TC-043",
@@ -799,8 +801,10 @@
       "given": "Only one administrator exists",
       "when": "They remove last admin grant or self-add restricted finance permission",
       "then": "Denied or controlled recovery workflow; no lockout/escalation",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-026/evidence.json"
+      ]
     },
     {
       "id": "TC-044",
@@ -1627,8 +1631,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Versioned zones/cutoffs/fees/rates; feature flags; staff permissions; immutable config audit; live approval guard",
       "then": "Config changes affect new quotes only; self-escalation and loss of last recoverable admin prevented",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-026/evidence.json"
+      ]
     },
     {
       "id": "TC-127",

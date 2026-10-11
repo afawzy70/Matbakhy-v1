@@ -933,7 +933,7 @@
       "id": "MB-026",
       "phase": "P05",
       "title": "Build operating configuration and staff controls",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-011",
@@ -963,9 +963,11 @@
         "TC-043",
         "TC-126"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-026/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Versioned configuration (policy, zones, ordering switch) with append-only change log, approval guard and MFA; staff permissions UI; self-reviewed. Scheduled changes not supported; real policy values O04."
     },
     {
       "id": "MB-027",
