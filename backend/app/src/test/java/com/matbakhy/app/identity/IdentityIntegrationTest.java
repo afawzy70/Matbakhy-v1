@@ -181,7 +181,9 @@ class IdentityIntegrationTest {
     @Test
     void public_browsing_stays_anonymous() throws Exception {
         HttpResponse<String> meals = new OidcBrowser().get(api("/api/v1/meals"));
-        assertThat(meals.statusCode()).as("public route is not behind authentication (not implemented yet => 404)").isEqualTo(404);
+        assertThat(meals.statusCode()).as("public discovery (MB-016) needs no authentication").isEqualTo(200);
+        assertThat(meals.headers().firstValue("Location")).isEmpty();
+        assertThat(meals.body()).contains("\"items\"");
     }
 
     @Test

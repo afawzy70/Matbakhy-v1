@@ -3,6 +3,7 @@ package com.matbakhy.catalog.web;
 import com.matbakhy.catalog.internal.meal.MealService;
 import com.matbakhy.catalog.internal.meal.MealService.Action;
 import com.matbakhy.catalog.internal.meal.MealService.Allergen;
+import com.matbakhy.catalog.internal.meal.MealService.Category;
 import com.matbakhy.catalog.internal.meal.MealService.CookMeal;
 import com.matbakhy.catalog.internal.meal.MealService.CookMealPage;
 import com.matbakhy.catalog.internal.meal.MealService.Declaration;
@@ -48,12 +49,12 @@ class MealController {
                     @Size(max = 4000) String descriptionEn, @Size(max = 200) String portionAr, @Size(max = 200) String portionEn,
                     @Size(max = 4000) String ingredientsAr, @Size(max = 4000) String ingredientsEn, Declaration allergenDeclaration,
                     @Size(max = 14) List<@NotNull Allergen> allergenCodes, @Size(max = 1000) String allergenNote, Long priceMinor,
-                    @Size(max = 10) List<@NotNull @Valid PhotoBody> photos, @Min(0) Long expectedVersion) {
+                    @Size(max = 10) List<@NotNull @Valid PhotoBody> photos, Category category, @Min(0) Long expectedVersion) {
 
         MealInput input() {
             return new MealInput(titleAr, titleEn, descriptionAr, descriptionEn, portionAr, portionEn, ingredientsAr, ingredientsEn,
                     allergenDeclaration, allergenCodes, allergenNote, priceMinor,
-                    photos == null ? null : photos.stream().map(p -> new Photo(p.mediaId(), p.altAr(), p.altEn())).toList());
+                    photos == null ? null : photos.stream().map(p -> new Photo(p.mediaId(), p.altAr(), p.altEn())).toList(), category);
         }
     }
 

@@ -67,9 +67,15 @@ paths:
       description: cityId, active=true, cursor, limit; no private cook locations
       x-matbakhy-id: API-002
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Arabic by default; English when preferred and available
+          schema:
+            type: string
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -92,9 +98,73 @@ paths:
       description: q, zoneId, date, slotId, categoryId, minPriceMinor, maxPriceMinor, sort, cursor, limit
       x-matbakhy-id: API-003
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Arabic by default; English when preferred and available
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          description: Meal title (Arabic or English) or kitchen name; Arabic diacritics and letter variants are ignored
+          schema:
+            type: string
+            maxLength: 80
+        - name: zoneId
+          in: query
+          required: false
+          description: Only kitchens delivering to this zone
+          schema:
+            type: string
+            format: uuid
+        - name: date
+          in: query
+          required: false
+          description: Local Cairo date with an orderable slot
+          schema:
+            type: string
+            format: date
+        - name: slotId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/MealCategory"
+        - name: minPriceMinor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - name: maxPriceMinor
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - name: kitchenId
+          in: query
+          required: false
+          description: Meals of one kitchen (cook profile page)
+          schema:
+            type: string
+            format: uuid
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [NEWEST, PRICE_ASC, PRICE_DESC]
+            default: NEWEST
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -3691,7 +3761,7 @@ components:
       type: object
       additionalProperties: false
       description: Versioned meal content (one immutable revision per change). Arabic text is required to publish; English is optional.
-      required: [titleAr, titleEn, descriptionAr, descriptionEn, portionAr, portionEn, ingredientsAr, ingredientsEn, allergenDeclaration, allergenCodes, allergenNote, priceMinor, currency, photos]
+      required: [titleAr, titleEn, descriptionAr, descriptionEn, portionAr, portionEn, ingredientsAr, ingredientsEn, allergenDeclaration, allergenCodes, allergenNote, priceMinor, currency, photos, category]
       properties:
         titleAr:
           type:
@@ -3771,6 +3841,10 @@ components:
           maxItems: 6
           items:
             $ref: "#/components/schemas/MealPhotoRef"
+        category:
+          oneOf:
+            - $ref: "#/components/schemas/MealCategory"
+            - type: "null"
     MealPhotoRef:
       type: object
       additionalProperties: false
@@ -4546,6 +4620,8 @@ components:
           type: integer
           minimum: 1
           maximum: 1000000
+        category:
+          $ref: "#/components/schemas/MealCategory"
         photos:
           type: array
           maxItems: 6
@@ -4756,6 +4832,8 @@ components:
           type: integer
           minimum: 1
           maximum: 1000000
+        category:
+          $ref: "#/components/schemas/MealCategory"
         photos:
           type: array
           maxItems: 6
@@ -5405,5 +5483,37 @@ components:
       description: 422 VERIFICATION_FAILED for wrong, expired or used codes (indistinguishable); 429 after 5 attempts; 404 for another account's challenge.
     ZonePage:
       type: object
-      description: PENDING typed schema. Response for API-002.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceZone"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
+    ServiceZone:
+      type: object
+      additionalProperties: false
+      description: Active service zone; name and city localized by Accept-Language (Arabic default).
+      required: [id, code, name, city, deliveryFee]
+      properties:
+        id:
+          type: string
+          format: uuid
+        code:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+        deliveryFee:
+          $ref: "#/components/schemas/NonNegativeMoney"
+    MealCategory:
+      type: string
+      description: Proposed fixed category list; clients localize labels.
+      enum: [MAIN_DISHES, SIDES_SALADS, SOUPS, BAKED_GOODS, DESSERTS, BREAKFAST, READY_TO_COOK]

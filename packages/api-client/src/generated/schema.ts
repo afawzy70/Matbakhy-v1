@@ -1975,6 +1975,7 @@ export interface components {
             /** @enum {string} */
             currency: "EGP";
             photos: components["schemas"]["MealPhotoRef"][];
+            category: components["schemas"]["MealCategory"] | null;
         };
         MealPhotoRef: {
             /**
@@ -2271,6 +2272,7 @@ export interface components {
             allergenCodes?: ("GLUTEN" | "CRUSTACEANS" | "EGGS" | "FISH" | "PEANUTS" | "SOY" | "MILK" | "TREE_NUTS" | "CELERY" | "MUSTARD" | "SESAME" | "SULPHITES" | "LUPIN" | "MOLLUSCS")[];
             allergenNote?: string;
             priceMinor?: number;
+            category?: components["schemas"]["MealCategory"];
             photos?: components["schemas"]["MealPhotoRef"][];
             expectedVersion: number;
         };
@@ -2369,6 +2371,7 @@ export interface components {
             allergenCodes?: ("GLUTEN" | "CRUSTACEANS" | "EGGS" | "FISH" | "PEANUTS" | "SOY" | "MILK" | "TREE_NUTS" | "CELERY" | "MUSTARD" | "SESAME" | "SULPHITES" | "LUPIN" | "MOLLUSCS")[];
             allergenNote?: string;
             priceMinor?: number;
+            category?: components["schemas"]["MealCategory"];
             photos?: components["schemas"]["MealPhotoRef"][];
         };
         /** @description PENDING typed schema. Request for API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only */
@@ -2647,8 +2650,25 @@ export interface components {
         VerificationResult: {
             phoneVerified: boolean;
         };
-        /** @description PENDING typed schema. Response for API-002. */
-        ZonePage: Record<string, never>;
+        ZonePage: {
+            items: components["schemas"]["ServiceZone"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        /** @description Active service zone; name and city localized by Accept-Language (Arabic default). */
+        ServiceZone: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            name: string;
+            city: string;
+            deliveryFee: components["schemas"]["NonNegativeMoney"];
+        };
+        /**
+         * @description Proposed fixed category list; clients localize labels.
+         * @enum {string}
+         */
+        MealCategory: "MAIN_DISHES" | "SIDES_SALADS" | "SOUPS" | "BAKED_GOODS" | "DESSERTS" | "BREAKFAST" | "READY_TO_COOK";
     };
     responses: {
         /** @description Standard error */
@@ -2704,7 +2724,10 @@ export interface operations {
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
             };
-            header?: never;
+            header?: {
+                /** @description Arabic by default; English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2726,11 +2749,27 @@ export interface operations {
     getMeals: {
         parameters: {
             query?: {
+                /** @description Meal title (Arabic or English) or kitchen name; Arabic diacritics and letter variants are ignored */
+                q?: string;
+                /** @description Only kitchens delivering to this zone */
+                zoneId?: string;
+                /** @description Local Cairo date with an orderable slot */
+                date?: string;
+                slotId?: string;
+                categoryId?: components["schemas"]["MealCategory"];
+                minPriceMinor?: number;
+                maxPriceMinor?: number;
+                /** @description Meals of one kitchen (cook profile page) */
+                kitchenId?: string;
+                sort?: "NEWEST" | "PRICE_ASC" | "PRICE_DESC";
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
             };
-            header?: never;
+            header?: {
+                /** @description Arabic by default; English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path?: never;
             cookie?: never;
         };

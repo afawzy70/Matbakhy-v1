@@ -4,6 +4,7 @@ import com.matbakhy.catalog.api.MediaLibrary;
 import com.matbakhy.catalog.api.MediaLibrary.Purpose;
 import com.matbakhy.catalog.api.SellerDirectory;
 import com.matbakhy.catalog.api.SellerDirectory.Seller;
+import com.matbakhy.catalog.internal.discovery.MealOffers;
 import com.matbakhy.catalog.internal.media.MediaService;
 import com.matbakhy.shared.error.ApiException;
 import com.matbakhy.shared.error.ApiException.FieldError;
@@ -43,6 +44,9 @@ public class MealService {
 
     public enum Action { PUBLISH, PAUSE, ARCHIVE }
 
+    /** Proposed fixed category list (owner may revise); labels are localized by clients. */
+    public enum Category { MAIN_DISHES, SIDES_SALADS, SOUPS, BAKED_GOODS, DESSERTS, BREAKFAST, READY_TO_COOK }
+
     static final int MAX_PHOTOS = 6;
 
     public record Photo(UUID mediaId, String altAr, String altEn) {
@@ -51,13 +55,13 @@ public class MealService {
     /** Partial update: null leaves a field unchanged, an empty string clears an optional text, a list replaces. */
     public record MealInput(String titleAr, String titleEn, String descriptionAr, String descriptionEn, String portionAr, String portionEn,
                             String ingredientsAr, String ingredientsEn, Declaration allergenDeclaration, List<Allergen> allergenCodes,
-                            String allergenNote, Long priceMinor, List<Photo> photos) {
+                            String allergenNote, Long priceMinor, List<Photo> photos, Category category) {
     }
 
     /** The versioned content; serialized as the revision snapshot. */
     public record MealContent(String titleAr, String titleEn, String descriptionAr, String descriptionEn, String portionAr, String portionEn,
                               String ingredientsAr, String ingredientsEn, Declaration allergenDeclaration, List<Allergen> allergenCodes,
-                              String allergenNote, Long priceMinor, String currency, List<Photo> photos) {
+                              String allergenNote, Long priceMinor, String currency, List<Photo> photos, Category category) {
     }
 
     public record CookMeal(UUID id, UUID kitchenId, String status, MealContent content, int revision, Instant publishedAt,
@@ -80,18 +84,18 @@ public class MealService {
     }
 
     /**
-     * API-004 MealDetail (docs/engineering/03-api-contract.md core DTO), localized to one language. Slots and
-     * availability arrive with MB-015/MB-016 and reviews with MB-024; until then nextSlots is empty, availability
-     * is UNAVAILABLE and the rating count is 0. Never contains owner identity, private location or contact.
+     * API-004 MealDetail (docs/engineering/03-api-contract.md core DTO), localized to one language, with up to five
+     * next orderable slots and availability (MB-016). Reviews arrive with MB-024; until then rating counts are 0.
+     * Never contains owner identity, private location or contact.
      */
     public record MealDetail(UUID id, KitchenSummary kitchen, String title, PublicPhoto photo, String portionText, Money price,
-                             List<Object> nextSlots, String availability, String description, String ingredients,
+                             List<MealOffers.SlotOffer> nextSlots, String availability, String description, String ingredients,
                              List<String> allergenCodes, String allergenStatement, List<PublicPhoto> photos, RatingSummary reviewSummary,
                              int publishedRevision) {
     }
 
     private static final String COLUMNS = "id, kitchen_id, status, title_ar, title_en, description_ar, description_en, portion_ar, portion_en, "
-            + "ingredients_ar, ingredients_en, allergen_declaration, allergen_codes, allergen_note, price_minor, currency, revision, "
+            + "ingredients_ar, ingredients_en, allergen_declaration, allergen_codes, allergen_note, price_minor, currency, category, revision, "
             + "published_at, archived_at, created_at, updated_at, version";
 
     private final JdbcTemplate jdbc;
@@ -99,14 +103,17 @@ public class MealService {
     private final MediaLibrary mediaLibrary;
     private final MediaService media;
     private final JsonMapper json;
+    private final MealOffers offers;
     private final Clock clock;
 
-    MealService(JdbcTemplate jdbc, SellerDirectory sellers, MediaLibrary mediaLibrary, MediaService media, JsonMapper json, Clock clock) {
+    MealService(JdbcTemplate jdbc, SellerDirectory sellers, MediaLibrary mediaLibrary, MediaService media, JsonMapper json, MealOffers offers,
+                Clock clock) {
         this.jdbc = jdbc;
         this.sellers = sellers;
         this.mediaLibrary = mediaLibrary;
         this.media = media;
         this.json = json;
+        this.offers = offers;
         this.clock = clock;
     }
 
@@ -230,9 +237,17 @@ public class MealService {
         List<String> allergenCodes = c.allergenDeclaration() == Declaration.CONTAINS
                 ? c.allergenCodes().stream().map(Enum::name).toList() : List.of(c.allergenDeclaration().name());
         RatingSummary noReviews = new RatingSummary(0, null);
+        List<String> modes = new ArrayList<>();
+        if (seller.pickupEnabled()) {
+            modes.add("PICKUP");
+        }
+        if (!seller.deliveryZoneIds().isEmpty()) {
+            modes.add("DELIVERY");
+        }
+        MealOffers.Offer offer = offers.offers(List.of(row.id()), java.util.Map.of(row.id(), modes), null, null).get(row.id());
         return new MealDetail(row.id(), new KitchenSummary(seller.kitchenId(), seller.publicSlug(), seller.displayName(), noReviews),
                 pick(en, c.titleEn(), c.titleAr()), photos.isEmpty() ? null : photos.getFirst(), pick(en, c.portionEn(), c.portionAr()),
-                new Money(c.priceMinor(), c.currency()), List.of(), "UNAVAILABLE", pick(en, c.descriptionEn(), c.descriptionAr()),
+                new Money(c.priceMinor(), c.currency()), offer.nextSlots(), offer.availability(), pick(en, c.descriptionEn(), c.descriptionAr()),
                 pick(en, c.ingredientsEn(), c.ingredientsAr()), allergenCodes, c.allergenNote() == null ? "" : c.allergenNote(), photos,
                 noReviews, row.revision());
     }
@@ -279,12 +294,12 @@ public class MealService {
         jdbc.update("""
                 UPDATE meal SET title_ar = ?, title_en = ?, description_ar = ?, description_en = ?, portion_ar = ?, portion_en = ?,
                        ingredients_ar = ?, ingredients_en = ?, allergen_declaration = ?, allergen_codes = ?::text[], allergen_note = ?,
-                       price_minor = ?, revision = ?, updated_at = ?, version = version + ?
+                       price_minor = ?, category = ?, revision = ?, updated_at = ?, version = version + ?
                 WHERE id = ?""",
                 c.titleAr(), c.titleEn(), c.descriptionAr(), c.descriptionEn(), c.portionAr(), c.portionEn(), c.ingredientsAr(),
                 c.ingredientsEn(), c.allergenDeclaration() == null ? null : c.allergenDeclaration().name(),
                 c.allergenCodes().stream().map(Enum::name).collect(Collectors.joining(",", "{", "}")), c.allergenNote(), c.priceMinor(),
-                revision, Timestamp.from(clock.instant()), revision == 1 ? 0 : 1, mealId);
+                c.category() == null ? null : c.category().name(), revision, Timestamp.from(clock.instant()), revision == 1 ? 0 : 1, mealId);
         jdbc.update("DELETE FROM meal_media WHERE meal_id = ?", mealId);
         for (int i = 0; i < c.photos().size(); i++) {
             Photo p = c.photos().get(i);
@@ -296,7 +311,7 @@ public class MealService {
     }
 
     private static MealContent empty() {
-        return new MealContent(null, null, null, null, null, null, null, null, null, List.of(), null, null, "EGP", List.of());
+        return new MealContent(null, null, null, null, null, null, null, null, null, List.of(), null, null, "EGP", List.of(), null);
     }
 
     private static MealContent merge(MealContent base, MealInput in) {
@@ -308,7 +323,7 @@ public class MealService {
                 text(in.portionAr(), base.portionAr()), text(in.portionEn(), base.portionEn()),
                 text(in.ingredientsAr(), base.ingredientsAr()), text(in.ingredientsEn(), base.ingredientsEn()), declaration, codes,
                 text(in.allergenNote(), base.allergenNote()), in.priceMinor() != null ? in.priceMinor() : base.priceMinor(), "EGP",
-                in.photos() != null ? List.copyOf(in.photos()) : base.photos());
+                in.photos() != null ? List.copyOf(in.photos()) : base.photos(), in.category() != null ? in.category() : base.category());
     }
 
     private static String text(String value, String current) {
@@ -410,7 +425,8 @@ public class MealService {
         MealContent content = new MealContent(rs.getString("title_ar"), rs.getString("title_en"), rs.getString("description_ar"),
                 rs.getString("description_en"), rs.getString("portion_ar"), rs.getString("portion_en"), rs.getString("ingredients_ar"),
                 rs.getString("ingredients_en"), declaration == null ? null : Declaration.valueOf(declaration), allergens(rs.getArray("allergen_codes")),
-                rs.getString("allergen_note"), price == null ? null : ((Number) price).longValue(), rs.getString("currency"), photos);
+                rs.getString("allergen_note"), price == null ? null : ((Number) price).longValue(), rs.getString("currency"), photos,
+                rs.getString("category") == null ? null : Category.valueOf(rs.getString("category")));
         return new Row(id, rs.getObject("kitchen_id", UUID.class), rs.getString("status"), content, rs.getInt("revision"),
                 instant(rs, "published_at"), instant(rs, "archived_at"), instant(rs, "created_at"), instant(rs, "updated_at"),
                 rs.getLong("version"));

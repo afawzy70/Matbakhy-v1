@@ -19,7 +19,7 @@
       "permission": "PUBLIC",
       "response_type": "ZonePage",
       "contract": "cityId, active=true, cursor, limit; no private cook locations",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-003",
@@ -28,7 +28,7 @@
       "permission": "PUBLIC",
       "response_type": "MealPage",
       "contract": "q, zoneId, date, slotId, categoryId, minPriceMinor, maxPriceMinor, sort, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-004",
