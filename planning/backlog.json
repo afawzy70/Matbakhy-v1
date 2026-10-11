@@ -6,7 +6,7 @@
       "id": "MB-001",
       "phase": "P00",
       "title": "Reconcile scope and repository baseline",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [],
       "implementation_steps": [
@@ -26,15 +26,17 @@
       "scenario_ids": [
         "TC-101"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-001/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 1a1fdadac8b0f4bff2cefdf4a9c791ed150f12d8; SELF_REVIEW only"
     },
     {
       "id": "MB-002",
       "phase": "P00",
       "title": "Freeze traceable MVP backlog",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-001"
@@ -56,9 +58,11 @@
       "scenario_ids": [
         "TC-102"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-002/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 1a1fdadac8b0f4bff2cefdf4a9c791ed150f12d8; SELF_REVIEW only"
     },
     {
       "id": "MB-003",

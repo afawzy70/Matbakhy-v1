@@ -1036,8 +1036,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Inspect existing files/branches and preserve user work; read confirmed context; inventory proposed and open decisions; record product assumptions and superseded ideas",
       "then": "Repository inventory matches reality and unresolved launch decisions remain explicit",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-001/evidence.json"
+      ]
     },
     {
       "id": "TC-102",
@@ -1050,8 +1052,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Map rules to stories and tests; confirm four client targets; retain deferred social/payment/courier scope; record dependency order and launch blockers",
       "then": "Every mandatory rule has an owner story and measurable scenario; dependency graph is acyclic",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-002/evidence.json"
+      ]
     },
     {
       "id": "TC-103",
