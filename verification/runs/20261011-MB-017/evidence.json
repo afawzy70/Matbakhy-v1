@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-017",
+  "phase": "P04",
+  "source_commit": "4ba8041e672cba3eff68a62e6d88d72f40736681",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T12:42:03.916364+00:00",
+  "finished_at": "2026-10-11T12:49:20.210631+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. QuoteIntegrationTest and CommerceConfigurationTest (PostgreSQL)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-017/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-017/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-017/LOCAL-STACK.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-017/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-017/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-018",
+      "status": "PASS",
+      "observed": "QuoteIntegrationTest: a quote mixing a meal of another kitchen is 422 MIXED_KITCHENS_OR_SLOT, a meal not offered in the slot 422, duplicate lines 422, over-maximum quantity 422, empty basket 422, unknown slot 404; a quote names exactly one slot and its kitchen. A mutation removing the kitchen check failed the test. The client replace-basket confirmation is verified with the web/native cart (MB-027/MB-031)."
+    },
+    {
+      "id": "TC-019",
+      "status": "PASS",
+      "observed": "Two meals at 12000 piastres and a zone fee of 3000 with synthetic tax 0 give subtotal 24000, fee 3000, tax 0, total 27000 (stored and returned); pickup gives fee 0 and total 24000; with 14% tax 7005 gives 981 (half-up) and 7986. Requests carrying total, deliveryFee, unitPriceMinor, unitPrice or customerId fields are 400 and create no quote; fractional quantity is 400."
+    },
+    {
+      "id": "TC-020",
+      "status": "PASS",
+      "observed": "QuoteDirectory.requireValid accepts a fresh quote and refuses a stale one with recoverable reasons: meal repriced (PRICE_CHANGED/MEAL_CHANGED), address edited (STATE_CONFLICT/ADDRESS_CHANGED), zone fee changed (TOTAL_CHANGED), policy replaced (POLICY_CHANGED), slot paused (SLOT_CLOSED), 301 s of server time (QUOTE_EXPIRED); another customer's quote is 404. A mutation removing the revision check failed the test. The order placement endpoint that calls it is MB-018, which re-tests submission of stale quotes."
+    },
+    {
+      "id": "TC-021",
+      "status": "PASS",
+      "observed": "Delivery to an address in a zone the kitchen does not serve is 422 NOT_SERVICEABLE and no quote is created (no conversion to pickup or another zone); delivery without address 422; pickup with an address 422; another customer's address 404; pickup when the kitchen disabled it is 422 PICKUP_NOT_OFFERED. A mutation charging 0 for unserved zones failed the test."
+    },
+    {
+      "id": "TC-117",
+      "status": "PASS",
+      "observed": "One cook/slot validation, integer totals from the policy snapshot (policy version stored on the quote), serviceability and own-address checks, verified contact, server-time cutoff and acceptance window (409 ACCEPTANCE_WINDOW_TOO_SHORT 4 minutes before cutoff, SLOT_CLOSED after), paused kitchen 409, quote expiry, no capacity hold (two full-capacity quotes leave counters at 0; quantities above remaining meal or slot portions are 409 STOCK_CHANGED), immutable quotes (triggers), no usable policy 409 NO_APPROVED_POLICY, real policy cannot be ACTIVE unapproved, synthetic policies permitted only in LOCAL/CI (unit test)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-017/BACKEND-VERIFY.log",
+    "verification/runs/20261011-MB-017/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-017/LOCAL-STACK.log",
+    "verification/runs/20261011-MB-017/SECRET-SCAN.log",
+    "verification/runs/20261011-MB-017/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-017/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review: contract allowed 50 quote lines while the server caps 20; contract and controller aligned to 20.",
+      "Proposed defaults recorded: tax base = subtotal + delivery fee, rounded half up; acceptance deadline min(now+15 min, cutoff) with 5 minutes minimum; quote TTL 300 s; per-item maximum 10 - all synthetic policy values pending O04.",
+      "Residual: commission is stored on the policy but not exposed to customers; order snapshots and posting are MB-018/MB-020. Policy administration and audited changes are MB-026. Client basket replacement prompt is a client story."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

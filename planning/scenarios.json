@@ -337,8 +337,10 @@
       "given": "Basket has cook A items",
       "when": "Customer adds cook B or another slot",
       "then": "UI asks to replace; server rejects any mixed basket payload",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ]
     },
     {
       "id": "TC-019",
@@ -353,8 +355,10 @@
       "given": "Two 12000-minor items and fee 3000 with fixture tax 0",
       "when": "Client submits a forged total",
       "then": "Authoritative total is 27000 and forged fields cannot alter it",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ]
     },
     {
       "id": "TC-020",
@@ -369,8 +373,10 @@
       "given": "Valid quote exists and price or address/zone changes",
       "when": "Customer submits the stale quote",
       "then": "409 with a recoverable reason; fresh quote and explicit reconfirmation required",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ]
     },
     {
       "id": "TC-021",
@@ -385,8 +391,10 @@
       "given": "Non-serviceable address or disabled pickup selected",
       "when": "Customer requests quote",
       "then": "Denied; no silent conversion to another zone/mode",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ]
     },
     {
       "id": "TC-022",
@@ -1389,8 +1397,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Validate one cook/slot; calculate integer totals from policy snapshots; check serviceability/address; quote expiry; no capacity hold",
       "then": "Tampered totals rejected; delivery/pickup totals exact; expired/repriced quote requires review",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ]
     },
     {
       "id": "TC-118",

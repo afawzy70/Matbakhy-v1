@@ -575,7 +575,7 @@
       "id": "MB-017",
       "phase": "P04",
       "title": "Implement authoritative quotes",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -608,9 +608,11 @@
         "TC-021",
         "TC-117"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Synthetic policy values pending O04; placement uses requireValid in MB-018; basket replacement prompt is a client story."
     },
     {
       "id": "MB-018",
