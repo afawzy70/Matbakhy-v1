@@ -195,7 +195,7 @@
       "id": "MB-007",
       "phase": "P01",
       "title": "Implement contract toolchain",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -217,9 +217,11 @@
       "scenario_ids": [
         "TC-107"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-007/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source f8c5dc53009b1758dfaee539d6ab11a79ecf0c98; SELF_REVIEW only"
     },
     {
       "id": "MB-008",

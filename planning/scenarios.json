@@ -1128,8 +1128,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create typed OpenAPI from endpoint registry; establish validation and generated TS clients; define pagination/errors/money; add client regeneration drift check",
       "then": "OpenAPI validates and client generation is reproducible; malformed monetary DTO rejected",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-007/evidence.json"
+      ]
     },
     {
       "id": "TC-108",

@@ -1,0 +1,86 @@
+{
+  "run_id": "20261011-MB-007",
+  "story_id": "MB-007",
+  "phase": "P01",
+  "checks": [
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean clone: pinned versions, backend verify, frozen install, contract lint and drift, typecheck, lint, tests (incl. 31 contract tests), builds, native JS bundles",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "P01-CHECK-1",
+      "name": "Backend verify incl. strict JSON money tests on PostgreSQL",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-107",
+      "observed": "Redocly (2.62.1, recommended-strict) reports the OpenAPI 3.1 contract valid (4 documented ambiguous-path warnings); openapi-typescript regeneration matches the committed client (drift check PASS) from a clean clone; registry parity test confirms all 97 operations with matching permission/implementation state; Money schema and parseMoney reject decimal, numeric/formatted string, missing field, wrong/lower-case currency, extra field, unsafe integer and null; QuoteRequest/PlaceOrderRequest reject client prices and privileged fields; backend StrictJsonIntegrationTest rejects 12 malformed bodies with 400 MALFORMED_REQUEST and round-trips integer minor units. A mutation (Money additionalProperties true) made 2 contract tests fail, confirming sensitivity."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-007/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Defect found and repaired: default Jackson truncated 270.5 to 270, coerced \"27000\", accepted unknown fields; Money serialized derived 'negative'. Fixed with strict mapper configuration and signum().",
+      "93 of 119 schemas are explicit PENDING placeholders; owning stories must type them before client use (visible via x-schema-status).",
+      "Typed DTO field shapes beyond the API spec (e.g. averageTenths rating, cashState values, OrderEvent actorType) are drafts to be confirmed by MB-016/MB-019/MB-020.",
+      "openapi-typescript declares typescript ^5; allowed 6.0.3 explicitly in pnpm-workspace.yaml and covered by drift/typecheck.",
+      "no-ambiguous-paths kept as warning: orders/by-request literal cannot match UUID orderId.",
+      "test-renderer pinned 1.2.0 so its reconciler matches React 19.2 (1.3.0 required React 19.3)."
+    ]
+  },
+  "open_defects": []
+}
