@@ -5,6 +5,7 @@ import { Account } from "./Account";
 import { Browse } from "./Browse";
 import { Checkout } from "./Checkout";
 import { strings } from "./i18n";
+import { Kitchen } from "./Kitchen";
 import { Meal } from "./Meal";
 import { OrderDetail, OrderList } from "./Orders";
 import type { Ctx } from "./shared";
@@ -74,30 +75,16 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
 
   const mealMatch = /^\/meal\/([0-9a-f-]{36})$/.exec(route);
   const orderMatch = /^\/orders\/([0-9a-f-]{36})$/.exec(route);
+  const kitchenMatch = /^\/kitchen\/([a-z0-9-]{3,80})$/.exec(route);
   return (
     <div className="app">
       <header className="topbar">
         <h1>{title(locale)}</h1>
-        <nav aria-label={title(locale)} className="tabs">
-          <a className="button secondary" href="#/" aria-current={route === "/" ? "page" : undefined}>
-            {t.nav.browse}
-          </a>
+        <div className="topbar-actions">
           <a className="button secondary" href="#/checkout" aria-current={route === "/checkout" ? "page" : undefined}>
             {t.nav.cart}
           </a>
-          {me ? (
-            <a className="button secondary" href="#/orders" aria-current={route.startsWith("/orders") ? "page" : undefined}>
-              {t.nav.orders}
-            </a>
-          ) : null}
-          {me ? (
-            <a className="button secondary" href="#/account" aria-current={route === "/account" ? "page" : undefined}>
-              {t.nav.account}
-            </a>
-          ) : null}
-        </nav>
-        <div className="topbar-actions">
-          <button type="button" onClick={() => setLocale(locale === "ar" ? "en" : "ar")}>
+          <button type="button" className="secondary" onClick={() => setLocale(locale === "ar" ? "en" : "ar")}>
             {t.language}
           </button>
           {me ? null : (
@@ -114,17 +101,28 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
       ) : null}
       <main className="shell">
         {mealMatch?.[1] ? <Meal ctx={ctx} id={mealMatch[1]} signedIn={me !== null} /> : null}
+        {kitchenMatch?.[1] ? <Kitchen ctx={ctx} slug={kitchenMatch[1]} /> : null}
         {orderMatch?.[1] ? <OrderDetail ctx={ctx} id={orderMatch[1]} /> : null}
         {route === "/orders" ? <OrderList ctx={ctx} /> : null}
         {route === "/account" && me ? <Account ctx={ctx} me={me} onMeChanged={() => setMeVersion((v) => v + 1)} /> : null}
         {route === "/checkout" ? <Checkout ctx={ctx} me={me} onMeChanged={() => setMeVersion((v) => v + 1)} /> : null}
-        {route === "/" ? (
-          <>
-            <p>{brand.slogan[locale]}</p>
-            <Browse ctx={ctx} />
-          </>
-        ) : null}
+        {route === "/" ? <Browse ctx={ctx} /> : null}
       </main>
+      <nav aria-label={title(locale)} className="bottom-nav">
+        <a href="#/" aria-current={route === "/" ? "page" : undefined}>
+          {t.nav.browse}
+        </a>
+        {me ? (
+          <a href="#/orders" aria-current={route.startsWith("/orders") ? "page" : undefined}>
+            {t.nav.orders}
+          </a>
+        ) : null}
+        {me ? (
+          <a href="#/account" aria-current={route === "/account" ? "page" : undefined}>
+            {t.nav.account}
+          </a>
+        ) : null}
+      </nav>
     </div>
   );
 }

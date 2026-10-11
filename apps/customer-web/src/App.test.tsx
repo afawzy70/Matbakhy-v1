@@ -298,4 +298,65 @@ describe("customer web", () => {
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").kitchenId).toBe("k1");
   });
+
+  it("home follows the approved hierarchy and sends every filter to the server", async () => {
+    const meal = {
+      id: "55555555-5555-4555-8555-555555555555",
+      title: "Mahshi",
+      kitchen: { id: "k5", slug: "amina-kitchen", name: "Amina", ratingSummary: { count: 0, averageTenths: null } },
+      photo: null,
+      portionText: "Serves two",
+      price: egp(18000),
+      nextSlots: [],
+      availability: "AVAILABLE",
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/zones": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/meals": (req) =>
+        new URL(req.url).searchParams.get("maxPriceMinor") === "10000"
+          ? { status: 200, body: { items: [], nextCursor: null, hasMore: false } }
+          : { status: 200, body: { items: [meal], nextCursor: null, hasMore: false } },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const intents = ["A meal for me or us", "Complete my table", "Prepare a gathering"].map((n) => screen.getByRole("button", { name: new RegExp(n) }));
+    expect(intents.every((b) => b.getAttribute("aria-pressed") === "false")).toBe(true);
+    expect(screen.queryByLabelText("Helpful choices")).toBeNull();
+    fireEvent.click(intents[0] as HTMLElement);
+    expect(screen.getByLabelText("Helpful choices")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Lowest price" }));
+    await waitFor(() => expect(calls.some((c) => c.path.includes("sort=PRICE_ASC"))).toBe(true));
+    const card = await screen.findByRole("article", { name: "Mahshi" });
+    expect(within(card).getByText("Serves two")).toBeTruthy();
+    expect(within(card).getByRole("link", { name: "Amina" }).getAttribute("href")).toBe("#/kitchen/amina-kitchen");
+    fireEvent.click(screen.getByRole("button", { name: "Soups" }));
+    await waitFor(() => expect(calls.some((c) => c.path.includes("categoryId=SOUPS"))).toBe(true));
+    fireEvent.click(screen.getByRole("button", { name: "Filter results" }));
+    fireEvent.change(screen.getByLabelText("Maximum price (EGP)"), { target: { value: "100" } });
+    fireEvent.click(screen.getByRole("button", { name: "Show results" }));
+    expect(await screen.findByText("No meals match this search.")).toBeTruthy();
+    expect(calls.some((c) => c.path.includes("maxPriceMinor=10000"))).toBe(true);
+    fireEvent.click(screen.getAllByRole("button", { name: "Clear filters" })[0] as HTMLElement);
+    expect(await screen.findByRole("article", { name: "Mahshi" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Kitchens" }));
+    expect(await screen.findByRole("article", { name: "Amina" })).toBeTruthy();
+    expect(screen.getByText("1 dish(es) in these results")).toBeTruthy();
+  });
+
+  it("shows a public kitchen profile with its meals and the operational-verification wording", async () => {
+    window.location.hash = "#/kitchen/amina-kitchen";
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/kitchens/amina-kitchen": () => ({
+        status: 200,
+        body: { kitchenId: "k5", slug: "amina-kitchen", displayName: "Amina", description: "Stuffed vegetables", verificationLabel: "OPERATIONALLY_VERIFIED", available: true, pickupEnabled: true, deliveryZoneIds: [] },
+      }),
+      "GET /api/v1/meals": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByRole("heading", { name: "Amina" })).toBeTruthy();
+    expect(screen.getByText(/not a food-safety certification/)).toBeTruthy();
+    await waitFor(() => expect(calls.some((c) => c.path.startsWith("/api/v1/meals?") && c.path.includes("kitchenId=k5"))).toBe(true));
+  });
 });
+

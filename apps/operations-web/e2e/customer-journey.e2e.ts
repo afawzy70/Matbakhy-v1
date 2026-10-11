@@ -15,6 +15,9 @@ import { env, sql } from "./fixtures";
  * meal as a favorite in the account page and reports the review; a moderator (ops-a, granted by the cook workflow)
  * finds it in the reported-review queue and hides it with a reason, after which it leaves the public list and rating.
  *
+ * Approved-direction layout (docs/design/approved): at 320, 390 and 420 px the home (dishes and kitchens), kitchen
+ * and meal pages render right-to-left without horizontal overflow and with every control at least 44 px.
+ *
  * TC-147 (BR-018 client part): with a second synthetic slot of the same kitchen (test-only SQL), adding the meal for
  * the other slot asks before replacing the basket; keeping it leaves the basket unchanged, replacing it switches slot.
  */
@@ -35,7 +38,7 @@ async function addToCart(page: Page) {
   await page.goto(`${CUSTOMER}/#/`);
   await page.getByLabel(c.search).fill("كشري");
   await page.getByRole("search").getByRole("button", { name: c.search }).click();
-  await page.getByRole("link", { name: "كشري تجريبي" }).click();
+  await page.getByRole("link", { name: "كشري تجريبي", exact: true }).click();
   await page.getByRole("radio").first().check();
   await page.getByLabel(c.quantity).fill("1");
   await page.getByRole("button", { name: c.addToCart }).click();
@@ -143,7 +146,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.goto(`${CUSTOMER}/#/`);
   await page.getByLabel(c.search).fill("كشري");
   await page.getByRole("search").getByRole("button", { name: c.search }).click();
-  await page.getByRole("link", { name: "كشري تجريبي" }).click();
+  await page.getByRole("link", { name: "كشري تجريبي", exact: true }).click();
   await page.getByRole("button", { name: c.favorite }).click();
   await expect(page.getByRole("button", { name: c.unfavorite })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toBeVisible();
@@ -172,6 +175,33 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByText(c.noReviews)).toBeVisible();
   expect(sql(`SELECT count(*) FROM audit_event WHERE action = 'review.moderation'`)).toBe("1");
   await opsContext.close();
+
+  // Layout in the approved direction at phone widths, on real data.
+  const kitchenSlug = sql(`SELECT public_slug FROM kitchen k JOIN meal m ON m.kitchen_id = k.id WHERE m.title_ar = 'كشري تجريبي'`);
+  const mealId = sql(`SELECT id FROM meal WHERE title_ar = 'كشري تجريبي'`);
+  for (const width of [320, 390, 420]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const route of ["#/", "#/kitchen/" + kitchenSlug, "#/meal/" + mealId]) {
+      await page.goto(`${CUSTOMER}/${route}`);
+      await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
+      if (route === "#/") {
+        await expect(page.getByRole("button", { name: c.home.intents.SELF.title })).toBeVisible();
+      }
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${width} ${route}`).toBe(true);
+      const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
+        els.filter((e) => {
+          const r = e.getBoundingClientRect();
+          return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
+        }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
+      expect(undersized, `touch targets ${width} ${route}`).toEqual([]);
+      await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+    }
+  }
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByRole("button", { name: c.home.kitchens }).click();
+  await expect(page.getByRole("article", { name: /.+/ }).first()).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`${CUSTOMER}/#/meal/${mealId}`);
 
   // One kitchen and one slot per basket: replacing needs explicit confirmation; cancelling keeps the basket.
   sql(`WITH s AS (SELECT * FROM cook_slot WHERE kitchen_id = (SELECT kitchen_id FROM meal WHERE title_ar = 'كشري تجريبي') AND state = 'OPEN'
