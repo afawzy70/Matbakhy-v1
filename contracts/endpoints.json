@@ -55,7 +55,7 @@
       "permission": "PUBLIC",
       "response_type": "SlotPage",
       "contract": "date, fulfillmentMode, zoneId; future eligible slots",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-007",
@@ -451,7 +451,7 @@
       "permission": "COOK",
       "response_type": "CookSlotPage",
       "contract": "date range, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-051",
@@ -460,7 +460,7 @@
       "permission": "COOK",
       "response_type": "CookSlot",
       "contract": "localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-052",
@@ -469,7 +469,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookSlot",
       "contract": "capacity, mealCapacities, state, expectedVersion; cannot undercut obligations",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-053",

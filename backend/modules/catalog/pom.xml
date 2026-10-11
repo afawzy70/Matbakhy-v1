@@ -30,6 +30,10 @@
       <artifactId>matbakhy-operations</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.matbakhy</groupId>
+      <artifactId>matbakhy-availability</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webmvc</artifactId>
     </dependency>

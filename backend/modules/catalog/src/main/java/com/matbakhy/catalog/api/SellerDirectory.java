@@ -9,7 +9,8 @@ import java.util.UUID;
  */
 public interface SellerDirectory {
 
-    record Seller(UUID kitchenId, UUID ownerId, String publicSlug, String displayName, boolean canSell) {
+    record Seller(UUID kitchenId, UUID ownerId, String publicSlug, String displayName, boolean canSell, boolean pickupEnabled,
+                  java.util.Set<UUID> deliveryZoneIds) {
     }
 
     Optional<Seller> byOwner(UUID ownerId);

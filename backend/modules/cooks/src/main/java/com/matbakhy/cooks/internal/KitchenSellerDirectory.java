@@ -11,7 +11,8 @@ import org.springframework.stereotype.Component;
 @Component
 class KitchenSellerDirectory implements SellerDirectory {
 
-    private static final String SELECT = "SELECT id, owner_id, public_slug, display_name, operating_state FROM kitchen WHERE ";
+    private static final String SELECT = "SELECT id, owner_id, public_slug, display_name, operating_state, pickup_enabled, "
+            + "ARRAY(SELECT zone_id FROM kitchen_zone z WHERE z.kitchen_id = kitchen.id AND z.delivery_enabled) AS zones FROM kitchen WHERE ";
 
     private final JdbcTemplate jdbc;
 
@@ -33,6 +34,7 @@ class KitchenSellerDirectory implements SellerDirectory {
         return jdbc.query(SELECT + where, (rs, n) -> new Seller(rs.getObject("id", UUID.class), rs.getObject("owner_id", UUID.class),
                 rs.getString("public_slug"), rs.getString("display_name"),
                 new com.matbakhy.cooks.api.KitchenDirectory.KitchenStatus(rs.getObject("id", UUID.class), rs.getObject("owner_id", UUID.class),
-                        OperatingState.valueOf(rs.getString("operating_state"))).canSell()), id).stream().findFirst();
+                        OperatingState.valueOf(rs.getString("operating_state"))).canSell(), rs.getBoolean("pickup_enabled"),
+                java.util.Set.copyOf(CookApplications.uuids(rs.getArray("zones")))), id).stream().findFirst();
     }
 }

@@ -181,13 +181,30 @@ paths:
       description: date, fulfillmentMode, zoneId; future eligible slots
       x-matbakhy-id: API-006
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       parameters:
         - name: kitchenId
           in: path
           required: true
           schema: *a1
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: fulfillmentMode
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/FulfillmentMode"
+        - name: zoneId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -1523,11 +1540,23 @@ paths:
       description: date range, cursor, limit
       x-matbakhy-id: API-050
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -1549,12 +1578,12 @@ paths:
       description: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities
       x-matbakhy-id: API-051
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -1579,7 +1608,7 @@ paths:
       description: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations
       x-matbakhy-id: API-052
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3790,12 +3819,114 @@ components:
       x-schema-status: PENDING
     CookSlot:
       type: object
-      description: PENDING typed schema. Response for API-051.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Own-kitchen slot with counters (reserved by placed orders, allocated by accepted orders, consumed in preparation). orderable means OPEN and before cutoffAt by server time.
+      required: [id, kitchenId, localDate, startsAt, endsAt, timezone, leadMinutes, cutoffAt, maxPortions, reserved, allocated, consumed, availablePortions, state, orderable, meals, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kitchenId:
+          type: string
+          format: uuid
+        localDate:
+          type: string
+          format: date
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        timezone:
+          type: string
+          enum: [Africa/Cairo]
+        leadMinutes:
+          type: integer
+          minimum: 30
+          maximum: 1440
+        cutoffAt:
+          type: string
+          format: date-time
+        maxPortions:
+          type: integer
+          minimum: 1
+          maximum: 500
+        reserved:
+          type: integer
+          minimum: 0
+        allocated:
+          type: integer
+          minimum: 0
+        consumed:
+          type: integer
+          minimum: 0
+        availablePortions:
+          type: integer
+          minimum: 0
+        state:
+          type: string
+          enum: [DRAFT, OPEN, PAUSED, CLOSED, CANCELLED]
+        orderable:
+          type: boolean
+        meals:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealSlot"
+        version:
+          type: integer
+          minimum: 0
+    MealSlot:
+      type: object
+      additionalProperties: false
+      required: [mealId, capacity, reserved, allocated, consumed, available]
+      properties:
+        mealId:
+          type: string
+          format: uuid
+        capacity:
+          type: integer
+          minimum: 0
+        reserved:
+          type: integer
+          minimum: 0
+        allocated:
+          type: integer
+          minimum: 0
+        consumed:
+          type: integer
+          minimum: 0
+        available:
+          type: integer
+          minimum: 0
+          description: Bounded by the meal capacity and by the slot aggregate
+    MealCapacity:
+      type: object
+      additionalProperties: false
+      required: [mealId, capacity]
+      properties:
+        mealId:
+          type: string
+          format: uuid
+        capacity:
+          type: integer
+          minimum: 0
+          maximum: 500
     CookSlotPage:
       type: object
-      description: PENDING typed schema. Response for API-050.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CookSlot"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     CustomerProfile:
       type: object
       additionalProperties: false
@@ -4429,8 +4560,25 @@ components:
       x-schema-status: PENDING
     PatchCookSlotsByIdRequest:
       type: object
-      description: "PENDING typed schema. Request for API-052: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Capacity changes are refused after cutoff (409 SLOT_CLOSED) and below current obligations (409 BELOW_OBLIGATIONS). mealCapacities replaces the list. States DRAFT→OPEN, OPEN↔PAUSED, OPEN/PAUSED→CLOSED, DRAFT/OPEN/PAUSED→CANCELLED (only without obligations); CLOSED and CANCELLED are final. Times cannot be changed.
+      required: [expectedVersion]
+      properties:
+        maxPortions:
+          type: integer
+          minimum: 1
+          maximum: 500
+        mealCapacities:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/MealCapacity"
+        state:
+          type: string
+          enum: [DRAFT, OPEN, PAUSED, CLOSED, CANCELLED]
+        expectedVersion:
+          type: integer
+          minimum: 0
     PatchMeAddressesByIdRequest:
       type: object
       additionalProperties: false
@@ -4623,8 +4771,41 @@ components:
       x-schema-status: PENDING
     PostCookSlotsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-051: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Local Cairo date and times on one local date. A time skipped by daylight saving is 422 NONEXISTENT_LOCAL_TIME; a repeated time needs startOffset/endOffset (422 AMBIGUOUS_LOCAL_TIME otherwise). Cutoff (start minus leadMinutes, default 120) must be in the future; at most 60 days ahead; no overlap with another slot of the kitchen (409). Created as DRAFT.
+      required: [localDate, localStart, localEnd, maxPortions]
+      properties:
+        localDate:
+          type: string
+          format: date
+        localStart:
+          type: string
+          pattern: ^[0-2][0-9]:[0-5][0-9]$
+        localEnd:
+          type: string
+          pattern: ^[0-2][0-9]:[0-5][0-9]$
+        timezone:
+          type: string
+          enum: [Africa/Cairo]
+        startOffset:
+          type: string
+          pattern: ^[+-][0-9]{2}:[0-9]{2}$
+        endOffset:
+          type: string
+          pattern: ^[+-][0-9]{2}:[0-9]{2}$
+        maxPortions:
+          type: integer
+          minimum: 1
+          maximum: 500
+        leadMinutes:
+          type: integer
+          minimum: 30
+          maximum: 1440
+        mealCapacities:
+          type: array
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/MealCapacity"
     PostMeAddressesRequest:
       type: object
       additionalProperties: false

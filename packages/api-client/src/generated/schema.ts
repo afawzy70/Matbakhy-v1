@@ -1996,10 +1996,54 @@ export interface components {
         CookOrderView: Record<string, never>;
         /** @description PENDING typed schema. Response for API-065. */
         CookSettings: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-051. */
-        CookSlot: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-050. */
-        CookSlotPage: Record<string, never>;
+        /** @description Own-kitchen slot with counters (reserved by placed orders, allocated by accepted orders, consumed in preparation). orderable means OPEN and before cutoffAt by server time. */
+        CookSlot: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            kitchenId: string;
+            /** Format: date */
+            localDate: string;
+            /** Format: date-time */
+            startsAt: string;
+            /** Format: date-time */
+            endsAt: string;
+            /** @enum {string} */
+            timezone: "Africa/Cairo";
+            leadMinutes: number;
+            /** Format: date-time */
+            cutoffAt: string;
+            maxPortions: number;
+            reserved: number;
+            allocated: number;
+            consumed: number;
+            availablePortions: number;
+            /** @enum {string} */
+            state: "DRAFT" | "OPEN" | "PAUSED" | "CLOSED" | "CANCELLED";
+            orderable: boolean;
+            meals: components["schemas"]["MealSlot"][];
+            version: number;
+        };
+        MealSlot: {
+            /** Format: uuid */
+            mealId: string;
+            capacity: number;
+            reserved: number;
+            allocated: number;
+            consumed: number;
+            /** @description Bounded by the meal capacity and by the slot aggregate */
+            available: number;
+        };
+        MealCapacity: {
+            /** Format: uuid */
+            mealId: string;
+            capacity: number;
+        };
+        CookSlotPage: {
+            items: components["schemas"]["CookSlot"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description The caller's own profile (MB-009). Contains no role or staff permission data. */
         CustomerProfile: {
             /** Format: uuid */
@@ -2232,8 +2276,14 @@ export interface components {
         };
         /** @description PENDING typed schema. Request for API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension */
         PatchCookSettingsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-052: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations */
-        PatchCookSlotsByIdRequest: Record<string, never>;
+        /** @description Capacity changes are refused after cutoff (409 SLOT_CLOSED) and below current obligations (409 BELOW_OBLIGATIONS). mealCapacities replaces the list. States DRAFT→OPEN, OPEN↔PAUSED, OPEN/PAUSED→CLOSED, DRAFT/OPEN/PAUSED→CANCELLED (only without obligations); CLOSED and CANCELLED are final. Times cannot be changed. */
+        PatchCookSlotsByIdRequest: {
+            maxPortions?: number;
+            mealCapacities?: components["schemas"]["MealCapacity"][];
+            /** @enum {string} */
+            state?: "DRAFT" | "OPEN" | "PAUSED" | "CLOSED" | "CANCELLED";
+            expectedVersion: number;
+        };
         PatchMeAddressesByIdRequest: {
             expectedVersion: number;
             label?: string;
@@ -2325,8 +2375,20 @@ export interface components {
         PostCookOrdersDispatchRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-060: expectedVersion, code, Idempotency-Key; correct mode/state */
         PostCookOrdersHandoverRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-051: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities */
-        PostCookSlotsRequest: Record<string, never>;
+        /** @description Local Cairo date and times on one local date. A time skipped by daylight saving is 422 NONEXISTENT_LOCAL_TIME; a repeated time needs startOffset/endOffset (422 AMBIGUOUS_LOCAL_TIME otherwise). Cutoff (start minus leadMinutes, default 120) must be in the future; at most 60 days ahead; no overlap with another slot of the kitchen (409). Created as DRAFT. */
+        PostCookSlotsRequest: {
+            /** Format: date */
+            localDate: string;
+            localStart: string;
+            localEnd: string;
+            /** @enum {string} */
+            timezone?: "Africa/Cairo";
+            startOffset?: string;
+            endOffset?: string;
+            maxPortions: number;
+            leadMinutes?: number;
+            mealCapacities?: components["schemas"]["MealCapacity"][];
+        };
         /** @description 422 ZONE_NOT_SERVED for inactive/unknown zones; max 20 active addresses. */
         PostMeAddressesRequest: {
             label: string;
@@ -2741,6 +2803,9 @@ export interface operations {
     getKitchensSlots: {
         parameters: {
             query?: {
+                date?: string;
+                fulfillmentMode?: components["schemas"]["FulfillmentMode"];
+                zoneId?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -3892,6 +3957,8 @@ export interface operations {
     getCookSlots: {
         parameters: {
             query?: {
+                from?: string;
+                to?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -3929,7 +3996,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
