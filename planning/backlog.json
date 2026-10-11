@@ -133,7 +133,7 @@
       "id": "MB-005",
       "phase": "P01",
       "title": "Pin workspace and compatible toolchain",
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-002"
@@ -158,16 +158,17 @@
         "TC-105"
       ],
       "evidence": [
+        "verification/runs/20261011-MB-005-native/evidence.json",
         "verification/runs/20261011-MB-005/evidence.json"
       ],
-      "review_status": "NOT_RUN",
-      "completion_note": "BLOCKED: workspace/backend/web/Expo JS-bundle compilation verified at babfe81253eafdeb3947194ed2a08914aa1a39a5 (verification/runs/20261011-MB-005), but the acceptance requires native Android (Gradle) and iOS (Xcode) compilation, which has no evidence (BLK-001). DONE was withdrawn on 2026-10-11 after owner correction; the MB-047 split is a pending proposal, not applied."
+      "review_status": "PASS",
+      "completion_note": "DONE at source 34be845bc5ab5b283c3c62998b090eff71a80f19: local clean-checkout workspace compile (verification/runs/20261011-P01-local-34be845) plus native Android Gradle and iOS Xcode simulator compilation on GitHub-hosted runners (run 38128068345), separate evidence per platform; SELF_REVIEW; no device verification"
     },
     {
       "id": "MB-006",
       "phase": "P01",
       "title": "Establish database and module boundaries",
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -190,16 +191,17 @@
         "TC-106"
       ],
       "evidence": [
-        "verification/runs/20261011-MB-006/evidence.json"
+        "verification/runs/20261011-MB-006/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
       ],
-      "review_status": "NOT_RUN",
-      "completion_note": "BLOCKED by dependency MB-005. Implementation and tests passed at 845b6cabe68ce974240283d6b2da85cd5ac92fdc (verification/runs/20261011-MB-006); story closure withheld until MB-005 is DONE and affected checks are rerun."
+      "review_status": "PASS",
+      "completion_note": "DONE after dependency MB-005 closed: affected checks re-run at 34be845bc5ab5b283c3c62998b090eff71a80f19 (verification/runs/20261011-P01-local-34be845); original story evidence retained; SELF_REVIEW"
     },
     {
       "id": "MB-007",
       "phase": "P01",
       "title": "Implement contract toolchain",
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -222,16 +224,17 @@
         "TC-107"
       ],
       "evidence": [
-        "verification/runs/20261011-MB-007/evidence.json"
+        "verification/runs/20261011-MB-007/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
       ],
-      "review_status": "NOT_RUN",
-      "completion_note": "BLOCKED by dependency MB-005. Implementation and tests passed at f8c5dc53009b1758dfaee539d6ab11a79ecf0c98 (verification/runs/20261011-MB-007); story closure withheld until MB-005 is DONE and affected checks are rerun."
+      "review_status": "PASS",
+      "completion_note": "DONE after dependency MB-005 closed: affected checks re-run at 34be845bc5ab5b283c3c62998b090eff71a80f19 (verification/runs/20261011-P01-local-34be845); original story evidence retained; SELF_REVIEW"
     },
     {
       "id": "MB-008",
       "phase": "P01",
       "title": "Create local stack and required CI commands",
-      "status": "BLOCKED",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-006",
@@ -256,10 +259,11 @@
         "TC-108"
       ],
       "evidence": [
-        "verification/runs/20261011-MB-008/evidence.json"
+        "verification/runs/20261011-MB-008/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
       ],
-      "review_status": "NOT_RUN",
-      "completion_note": "BLOCKED by dependencies MB-006/MB-007 (via MB-005). Implemented before the owner correction; tests passed at af22248e18e03430aa570e346efc7ad98cfe76c3 (verification/runs/20261011-MB-008) and product CI run 38126747250 passed; closure withheld until dependencies are DONE."
+      "review_status": "PASS",
+      "completion_note": "DONE after dependency MB-005 closed: affected checks re-run at 34be845bc5ab5b283c3c62998b090eff71a80f19 (verification/runs/20261011-P01-local-34be845); original story evidence retained; SELF_REVIEW"
     },
     {
       "id": "MB-009",

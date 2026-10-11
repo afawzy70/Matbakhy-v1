@@ -1104,8 +1104,9 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create Maven multi-module backend and pnpm apps/packages; select supported versions from official sources; generate lockfiles and wrappers; document Linux/Windows/macOS commands",
       "then": "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence": [
+        "verification/runs/20261011-MB-005-native/evidence.json",
         "verification/runs/20261011-MB-005/evidence.json"
       ]
     },
@@ -1120,9 +1121,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create module interfaces and schema migration baseline; configure PostgreSQL/Testcontainers; add architecture constraints and consistent errors; isolate dev fixtures",
       "then": "Blank PostgreSQL migrates; duplicate constraints fail; forbidden module dependency test fails when violated",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-006/evidence.json"
+        "verification/runs/20261011-MB-006/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
       ]
     },
     {
@@ -1136,9 +1138,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create typed OpenAPI from endpoint registry; establish validation and generated TS clients; define pagination/errors/money; add client regeneration drift check",
       "then": "OpenAPI validates and client generation is reproducible; malformed monetary DTO rejected",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-007/evidence.json"
+        "verification/runs/20261011-MB-007/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
       ]
     },
     {
@@ -1152,9 +1155,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Compose database/IdP/object storage/mail sink/API; healthchecks and environment templates; add build/test/lint/secret checks; replace phase verification checks with real commands",
       "then": "Documented bootstrap works from a clean environment and missing dependencies fail clearly",
-      "status": "BLOCKED",
+      "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-008/evidence.json"
+        "verification/runs/20261011-MB-008/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
       ]
     },
     {

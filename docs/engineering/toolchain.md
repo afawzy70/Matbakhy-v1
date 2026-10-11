@@ -57,7 +57,7 @@ Development servers: `pnpm --filter @matbakhy/customer-web dev` (port 5173), `pn
 
 ## Native builds
 
-Android native compilation needs the Android SDK, platform tools and a JDK supported by the Android Gradle Plugin. iOS needs macOS with the Xcode version supported by Expo SDK 57 and CocoaPods. Generate the native projects with `pnpm exec expo prebuild` inside `apps/customer-mobile`, then build with Gradle or Xcode. Native compilation is part of MB-005's acceptance and is BLOCKED until a runner with the Android SDK and a macOS/Xcode runner produce evidence (BLK-001). JavaScript bundles, Expo Go or web preview never count as native compilation or device verification.
+Android native compilation needs the Android SDK, platform tools and a JDK supported by the Android Gradle Plugin. iOS needs macOS with the Xcode version supported by Expo SDK 57 and CocoaPods. Generate the native projects with `pnpm exec expo prebuild` inside `apps/customer-mobile`, then build with Gradle or Xcode. Native compilation is part of MB-005's acceptance. `.github/workflows/native-build.yml` compiles it on GitHub-hosted runners: an Android debug APK on ubuntu-24.04 (JDK 17, preinstalled SDK, Gradle 9.3.1) and an unsigned iOS simulator build on macos-26. Xcode 16.4 (macos-15) fails for Expo SDK 57 in the ExpoModulesJSI build phase. The development container cannot do native builds (Android SDK host denied, no macOS). JavaScript bundles, Expo Go or web preview never count as native compilation or device verification.
 
 ## Environment notes (development container, 2026-10-11)
 

@@ -43,7 +43,7 @@
     },
     {
       "id": "P01",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -98,7 +98,17 @@
           "configured": true,
           "setup_note": "Gitleaks (digest-pinned) over full git history and working tree; redacted output."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "runs": [
+          "verification/runs/20261011-P01-local-34be845/evidence.json",
+          "verification/runs/20261011-MB-005-native/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P01 --commit 34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "review": "SELF_REVIEW",
+        "note": "Native compilation on GitHub-hosted runners (run 38128068345); no device verification (P07)."
+      }
     },
     {
       "id": "P02",
