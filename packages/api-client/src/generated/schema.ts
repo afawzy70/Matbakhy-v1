@@ -2211,8 +2211,12 @@ export interface components {
             actorType: "CUSTOMER" | "COOK" | "STAFF" | "SYSTEM";
             reasonCode?: string | null;
         };
-        /** @description PENDING typed schema. Response for API-026. */
-        OrderEventPage: Record<string, never>;
+        /** @description Chronological immutable events; nextCursor is the last sequence, pass it as afterSequence. */
+        OrderEventPage: {
+            items: components["schemas"]["OrderEvent"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         OrderLine: {
             /** Format: uuid */
             mealId: string;
@@ -2556,6 +2560,8 @@ export interface components {
             tax: components["schemas"]["NonNegativeMoney"];
             total: components["schemas"]["NonNegativeMoney"];
             cancellationPolicyVersion: string;
+            /** @description Terms version the customer accepts when placing the order */
+            termsVersion?: string;
             /** Format: date-time */
             acceptanceDeadlinePreview: string;
             warnings: string[];
@@ -3256,11 +3262,16 @@ export interface operations {
     getOrders: {
         parameters: {
             query?: {
+                /** @description ACTIVE (pending to out for delivery) or PAST (terminal states) */
+                stateGroup?: "ACTIVE" | "PAST";
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
             };
-            header?: never;
+            header?: {
+                /** @description Item titles in Arabic by default, English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3283,6 +3294,8 @@ export interface operations {
         parameters: {
             query?: never;
             header: {
+                /** @description Item titles in Arabic by default, English when preferred and available */
+                "Accept-Language"?: string;
                 /** @description Persisted random UUID reused on every retry of the same command */
                 "Idempotency-Key": components["parameters"]["IdempotencyKey"];
             };
@@ -3313,7 +3326,10 @@ export interface operations {
     getOrdersByRequestById: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Item titles in Arabic by default, English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path: {
                 clientRequestId: string;
             };
@@ -3337,7 +3353,10 @@ export interface operations {
     getOrdersById: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Item titles in Arabic by default, English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path: {
                 orderId: string;
             };
@@ -3361,8 +3380,7 @@ export interface operations {
     getOrdersEvents: {
         parameters: {
             query?: {
-                /** @description Opaque cursor from a previous page */
-                cursor?: components["parameters"]["Cursor"];
+                afterSequence?: number;
                 limit?: components["parameters"]["Limit"];
             };
             header?: never;

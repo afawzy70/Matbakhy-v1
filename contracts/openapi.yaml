@@ -738,11 +738,17 @@ paths:
       description: PlaceOrderRequest; Idempotency-Key required; returns 201 plus Location
       x-matbakhy-id: API-022
       x-permission: CUSTOMER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Item titles in Arabic by default, English when preferred and available
+          schema:
+            type: string
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
         "201":
@@ -776,11 +782,24 @@ paths:
       description: state group, cursor, limit; own orders
       x-matbakhy-id: API-023
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Item titles in Arabic by default, English when preferred and available
+          schema:
+            type: string
+        - name: stateGroup
+          in: query
+          required: false
+          description: ACTIVE (pending to out for delivery) or PAST (terminal states)
+          schema:
+            type: string
+            enum: [ACTIVE, PAST]
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -803,11 +822,17 @@ paths:
       description: lookup permanent request reference for unknown response recovery
       x-matbakhy-id: API-024
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Item titles in Arabic by default, English when preferred and available
+          schema:
+            type: string
         - name: clientRequestId
           in: path
           required: true
@@ -832,11 +857,17 @@ paths:
       description: customer-scoped fields including available handover challenge
       x-matbakhy-id: API-025
       x-permission: ORDER_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Item titles in Arabic by default, English when preferred and available
+          schema:
+            type: string
         - name: orderId
           in: path
           required: true
@@ -861,16 +892,22 @@ paths:
       description: afterSequence, cursor, limit; chronological immutable events
       x-matbakhy-id: API-026
       x-permission: ORDER_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: afterSequence
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
         - name: orderId
           in: path
           required: true
           schema: *a1
-        - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
         "200":
@@ -4440,8 +4477,20 @@ components:
             - "null"
     OrderEventPage:
       type: object
-      description: PENDING typed schema. Response for API-026.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Chronological immutable events; nextCursor is the last sequence, pass it as afterSequence.
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderEvent"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     OrderLine:
       type: object
       additionalProperties: false
@@ -5261,6 +5310,9 @@ components:
           $ref: "#/components/schemas/NonNegativeMoney"
         cancellationPolicyVersion:
           type: string
+        termsVersion:
+          type: string
+          description: Terms version the customer accepts when placing the order
         acceptanceDeadlinePreview:
           type: string
           format: date-time

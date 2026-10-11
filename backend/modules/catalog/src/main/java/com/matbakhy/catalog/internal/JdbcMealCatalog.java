@@ -25,6 +25,12 @@ class JdbcMealCatalog implements MealCatalog {
     }
 
     @Override
+    public Optional<String> revisionSnapshot(UUID mealId, int revision) {
+        return jdbc.query("SELECT snapshot::text FROM meal_revision WHERE meal_id = ? AND revision = ?", (rs, n) -> rs.getString(1), mealId,
+                revision).stream().findFirst();
+    }
+
+    @Override
     public OptionalLong deliveryFee(UUID kitchenId, UUID zoneId) {
         Long fee = jdbc.query("""
                 SELECT coalesce(kz.fee_override_minor, z.delivery_fee_minor) FROM kitchen_zone kz JOIN service_zone z ON z.id = kz.zone_id

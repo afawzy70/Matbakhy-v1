@@ -52,7 +52,7 @@ public class QuoteService implements QuoteDirectory {
     }
 
     public record QuoteResponse(UUID quoteId, Instant expiresAt, UUID kitchenId, List<QuoteLine> items, Money subtotal, Money deliveryFee,
-                                Money tax, Money total, String cancellationPolicyVersion, Instant acceptanceDeadlinePreview,
+                                Money tax, Money total, String cancellationPolicyVersion, String termsVersion, Instant acceptanceDeadlinePreview,
                                 List<String> warnings) {
     }
 
@@ -131,7 +131,7 @@ public class QuoteService implements QuoteDirectory {
             warnings.add("SYNTHETIC_POLICY");
         }
         return new QuoteResponse(id, expires, t.seller().kitchenId(), lines, egp(t.subtotal()), egp(t.deliveryFee()), egp(t.tax()), egp(t.total()),
-                policy.cancellationPolicyVersion(), t.acceptBy(), warnings);
+                policy.cancellationPolicyVersion(), policy.termsVersion(), t.acceptBy(), warnings);
     }
 
     @Override
@@ -170,7 +170,8 @@ public class QuoteService implements QuoteDirectory {
         }
         return new ValidQuote(quoteId, customerId, t.seller().kitchenId(), (UUID) q.get("slot_id"), mode.name(), addressId,
                 (Long) q.get("address_version"), (UUID) q.get("zone_id"), policy.version(), t.subtotal(), t.deliveryFee(), t.tax(), t.total(),
-                ((Timestamp) q.get("accept_by_preview")).toInstant(), expires, items);
+                ((Timestamp) q.get("accept_by_preview")).toInstant(), expires, items, t.acceptBy(), policy.commissionRateBps(),
+                policy.cancellationPolicyVersion(), policy.termsVersion());
     }
 
     /** Recomputes the authoritative terms from current data; used for creation and revalidation. */

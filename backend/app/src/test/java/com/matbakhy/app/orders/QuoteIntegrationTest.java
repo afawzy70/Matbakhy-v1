@@ -105,8 +105,8 @@ class QuoteIntegrationTest {
         Integer next = jdbc.queryForObject("SELECT coalesce(max(version), 0) + 1 FROM commerce_policy", Integer.class);
         jdbc.update("""
                 INSERT INTO commerce_policy (version, label, synthetic, status, tax_rate_bps, commission_rate_bps, max_item_quantity,
-                                             quote_ttl_seconds, acceptance_window_minutes, min_acceptance_minutes, cancellation_policy_version)
-                VALUES (?, 'SYNTHETIC test policy', true, 'ACTIVE', ?, 1000, 10, 300, 15, 5, 'synthetic-cancel-v1')""", next, taxBps);
+                                             quote_ttl_seconds, acceptance_window_minutes, min_acceptance_minutes, cancellation_policy_version, terms_version)
+                VALUES (?, 'SYNTHETIC test policy', true, 'ACTIVE', ?, 1000, 10, 300, 15, 5, 'synthetic-cancel-v1', 'synthetic-terms-v1')""", next, taxBps);
         return next;
     }
 
@@ -390,8 +390,8 @@ class QuoteIntegrationTest {
         Integer next = jdbc.queryForObject("SELECT max(version) + 1 FROM commerce_policy", Integer.class);
         assertThatThrownBy(() -> jdbc.update("""
                 INSERT INTO commerce_policy (version, label, synthetic, status, tax_rate_bps, commission_rate_bps, max_item_quantity,
-                                             quote_ttl_seconds, acceptance_window_minutes, min_acceptance_minutes, cancellation_policy_version)
-                VALUES (?, 'Real but unapproved', false, 'ACTIVE', 0, 1000, 10, 300, 15, 5, 'v1')""", next))
+                                             quote_ttl_seconds, acceptance_window_minutes, min_acceptance_minutes, cancellation_policy_version, terms_version)
+                VALUES (?, 'Real but unapproved', false, 'ACTIVE', 0, 1000, 10, 300, 15, 5, 'v1', 'v1')""", next))
                 .hasMessageContaining("commerce_policy_active_approved_ck");
     }
 

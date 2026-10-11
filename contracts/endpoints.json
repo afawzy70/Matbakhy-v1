@@ -199,7 +199,7 @@
       "permission": "CUSTOMER",
       "response_type": "OrderView",
       "contract": "PlaceOrderRequest; Idempotency-Key required; returns 201 plus Location",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-023",
@@ -208,7 +208,7 @@
       "permission": "SELF",
       "response_type": "OrderPage",
       "contract": "state group, cursor, limit; own orders",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-024",
@@ -217,7 +217,7 @@
       "permission": "SELF",
       "response_type": "OrderView",
       "contract": "lookup permanent request reference for unknown response recovery",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-025",
@@ -226,7 +226,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "OrderView",
       "contract": "customer-scoped fields including available handover challenge",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-026",
@@ -235,7 +235,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "OrderEventPage",
       "contract": "afterSequence, cursor, limit; chronological immutable events",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-027",

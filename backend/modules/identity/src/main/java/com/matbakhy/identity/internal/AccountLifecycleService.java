@@ -31,6 +31,13 @@ public class AccountLifecycleService implements CheckoutContactPolicy {
         }
     }
 
+    @Override
+    public VerifiedContact verifiedContact(UUID accountId) {
+        requireVerifiedContact(accountId);
+        return jdbc.queryForObject("SELECT display_name, phone_e164 FROM app_user WHERE id = ?",
+                (rs, n) -> new VerifiedContact(rs.getString(1), rs.getString(2)), accountId);
+    }
+
     /**
      * Records the request and disables the account at once. Data purge/anonymization follows the approved
      * retention policy (O06, open) and is not performed here. Repeating the request returns the open one.

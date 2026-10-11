@@ -12,6 +12,9 @@ public interface MealCatalog {
 
     Optional<PricedMeal> current(UUID mealId);
 
+    /** Immutable content snapshot (JSON) of a meal revision, copied into order items (BR-012). */
+    Optional<String> revisionSnapshot(UUID mealId, int revision);
+
     /** Delivery fee of a kitchen to an active zone it delivers to (zone fee or kitchen override); empty if not served. */
     OptionalLong deliveryFee(UUID kitchenId, UUID zoneId);
 }

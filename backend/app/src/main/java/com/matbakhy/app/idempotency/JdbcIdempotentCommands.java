@@ -75,9 +75,14 @@ class JdbcIdempotentCommands implements IdempotentCommands {
         try {
             result = action.get();
         } catch (RuntimeException failure) {
-            // A failed command stores no outcome, even if the caller's transaction does not roll back.
-            jdbc.update("DELETE FROM idempotency_record WHERE actor_id = ? AND command = ? AND idempotency_key = ?",
-                    actorId, command, idempotencyKey);
+            // A failed command stores no outcome, even if the caller's transaction does not roll back. If the database
+            // already aborted the transaction the rollback removes the record anyway; the original failure is kept.
+            try {
+                jdbc.update("DELETE FROM idempotency_record WHERE actor_id = ? AND command = ? AND idempotency_key = ?",
+                        actorId, command, idempotencyKey);
+            } catch (RuntimeException cleanup) {
+                failure.addSuppressed(cleanup);
+            }
             throw failure;
         }
         jdbc.update("""

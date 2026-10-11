@@ -7,4 +7,10 @@ public interface CheckoutContactPolicy {
 
     /** Throws {@code ApiException(CONTACT_VERIFICATION_REQUIRED)} unless both contacts are verified. */
     void requireVerifiedContact(UUID accountId);
+
+    record VerifiedContact(String displayName, String phoneE164) {
+    }
+
+    /** The verified contact to snapshot on an order; same check as {@link #requireVerifiedContact}. */
+    VerifiedContact verifiedContact(UUID accountId);
 }
