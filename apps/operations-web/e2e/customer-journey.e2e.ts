@@ -40,7 +40,7 @@ async function addToCart(page: Page) {
   await page.getByRole("search").getByRole("button", { name: c.search }).click();
   await page.getByRole("link", { name: "كشري تجريبي", exact: true }).click();
   await page.getByRole("radio").first().check();
-  await page.getByLabel(c.quantity).fill("1");
+  await page.getByLabel(c.quantity, { exact: true }).fill("1");
   await page.getByRole("button", { name: c.addToCart }).click();
   await expect(page.getByText(c.added)).toBeVisible();
 }

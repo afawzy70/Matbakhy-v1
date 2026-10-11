@@ -73,7 +73,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
               ))}
             </fieldset>
             <div className="buy-bar">
-              <div className="qty" role="group" aria-label={t.quantity}>
+              <div className="qty" role="group" aria-label={t.quantityGroup}>
                 <button type="button" className="secondary" aria-label={t.decrease} disabled={quantity <= 1} onClick={() => setQuantity(quantity - 1)}>
                   −
                 </button>
