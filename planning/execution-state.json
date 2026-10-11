@@ -21,7 +21,7 @@
     }
   ],
   "next_action": "MB-029 (IN_PROGRESS): keyboard-only journeys and dialog focus restoration (customer replacement prompt, checkout), operations web at 360/390/768/1440 and in English, long values in tables, then evidence for TC-046/TC-047/TC-129. Owner decisions needed: structured portion size (approved one-person/two-people filters) and descriptions in discovery cards. P06 gate also needs O05 whole-product approval.",
-  "updated_at": "2026-10-11T19:46:00Z",
+  "updated_at": "2026-10-11T19:42:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
