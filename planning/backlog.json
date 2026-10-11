@@ -618,7 +618,7 @@
       "id": "MB-018",
       "phase": "P04",
       "title": "Implement atomic order placement",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-017",
@@ -651,9 +651,11 @@
         "TC-025",
         "TC-118"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Lifecycle, outbox worker, expiry and handover in MB-019; finance posting MB-020/025; pilot-volume load test P08."
     },
     {
       "id": "MB-019",

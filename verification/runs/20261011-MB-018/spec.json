@@ -1,0 +1,99 @@
+{
+  "run_id": "20261011-MB-018",
+  "story_id": "MB-018",
+  "phase": "P04",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. OrderPlacementIntegrationTest (PostgreSQL, concurrency, injected failure)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-022",
+      "observed": "OrderPlacementIntegrationTest: a test-only trigger raises an error on the outbox insert (after the stock update) for this kitchen; the request returns 500 INTERNAL_ERROR without the internal message and leaves no order, allocation, reserved counter, cash obligation or idempotency record; after dropping the trigger the same key and clientRequestId complete once (one order, reserved 2)."
+    },
+    {
+      "id": "TC-023",
+      "observed": "The same key and body replays the original order (same id); after deleting the cached idempotency records (retention elapsed) the same key, and a new key with the same clientRequestId, both return the same order; exactly one order, one event and reserved=1 remain; the recovery lookup by clientRequestId returns it and an unknown reference is 404. A mutation removing the permanent clientRequestId check failed the test."
+    },
+    {
+      "id": "TC-024",
+      "observed": "The same key with another body is 409 IDEMPOTENCY_CONFLICT; the same clientRequestId with another quote is 409 IDEMPOTENCY_CONFLICT; reusing a quote for another request is 409 QUOTE_ALREADY_USED; the original order keeps its version and item and reserved stays 1."
+    },
+    {
+      "id": "TC-025",
+      "observed": "One portion left and 20 distinct verified customers each holding a valid quote place concurrently: exactly one 201 and nineteen 409 STOCK_CHANGED; slot and meal reserved counters are 1, one order and allocations summing to 1. A mutation removing the row locks failed the test."
+    },
+    {
+      "id": "TC-118",
+      "observed": "Persistent idempotency plus permanent clientRequestId; deterministic stock locks; order, item (meal revision snapshot, unaffected by later meal edits/archiving), address and contact snapshots; reservation, PLACED event, ORDER_PLACED outbox (no personal data) and DUE cash obligation of 35000 in one transaction; commission snapshot 10% of subtotal excluding delivery; stale/expired/foreign/unaccepted quotes and forged fields refused with no stock change; owner-only order, events and list (other customer 404), ACTIVE/PAST paging, recovery lookup."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-018/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review defect fixed: when the database had already aborted the transaction, the idempotency cleanup threw and masked the original failure; the original is now rethrown with the cleanup error suppressed.",
+      "Self-review: contract listed a cursor parameter for events that the server does not use; removed (paging by afterSequence). The optional Idempotent-Replay response header in the contract is not emitted yet.",
+      "Residual: outbox delivery worker, cook queues, lifecycle commands, expiry scheduler and handover codes are MB-019; cash collection/verification and commission posting are finance stories (MB-020/MB-025).",
+      "Residual: the race test runs 20 concurrent requests in one JVM against one PostgreSQL instance; load testing at pilot volume is a P08 activity."
+    ]
+  },
+  "open_defects": []
+}

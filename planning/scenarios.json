@@ -409,8 +409,10 @@
       "given": "A database failure is injected after stock update before commit",
       "when": "Order creation fails and is retried",
       "then": "Rollback leaves no partial allocation/order; retry can complete once",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ]
     },
     {
       "id": "TC-023",
@@ -425,8 +427,10 @@
       "given": "Same request is retried after timeout and after response-cache retention",
       "when": "Client repeats order with original identifiers",
       "then": "Exactly one order and allocation exist",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ]
     },
     {
       "id": "TC-024",
@@ -441,8 +445,10 @@
       "given": "An idempotency key already maps to one body",
       "when": "Another body uses that key",
       "then": "409 IDEMPOTENCY_CONFLICT; original order unchanged",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ]
     },
     {
       "id": "TC-025",
@@ -457,8 +463,10 @@
       "given": "One portion remains and 20 concurrent distinct customers submit",
       "when": "All requests race",
       "then": "Exactly one succeeds; others receive stock conflict; counters match one allocation",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ]
     },
     {
       "id": "TC-026",
@@ -1418,8 +1426,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Persistent idempotency/clientRequestId; deterministic stock locks; order/item/address snapshots; reservation+events+outbox in one transaction; recovery lookup",
       "then": "Concurrent last-portion requests yield one success; timeout/retry creates one order; transaction rollback leaves no partial state",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ]
     },
     {
       "id": "TC-119",
