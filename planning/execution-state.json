@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P03",
-  "current_story": "MB-013",
-  "last_tested_commit": "b2260d37e0ecbc165529f1e980656ea5063d382e",
-  "last_completed_story": "MB-012",
+  "current_story": "MB-014",
+  "last_tested_commit": "9c713a2c011f56c24fb8e0d2456426b66861354c",
+  "last_completed_story": "MB-013",
   "last_successful_gate": "P02 at b2260d37e0ecbc165529f1e980656ea5063d382e (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-013 safe media lifecycle: signed private upload flow, byte/type/dimension limits, scan/quarantine adapters, metadata stripping, approved public derivatives, scoped deletes; then attach cook application documents.",
-  "updated_at": "2026-10-11T11:20:00Z",
+  "next_action": "Next eligible P03 story per scripts/next_task.py (MB-014 onward).",
+  "updated_at": "2026-10-11T12:05:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

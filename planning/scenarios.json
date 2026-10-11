@@ -185,8 +185,10 @@
       "given": "A spoofed image, oversized upload and verification document",
       "when": "They are uploaded or requested publicly",
       "then": "Unsafe media rejected/quarantined; private document inaccessible without scoped signed read",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-013/evidence.json"
+      ]
     },
     {
       "id": "TC-011",
@@ -1282,8 +1284,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Signed private upload flow; byte/type/dimension limits; scan/quarantine adapters; strip metadata; approved public derivatives; scoped deletes",
       "then": "Spoofed type/oversize/private-object access fail; no quarantined asset is publicly served",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-013/evidence.json"
+      ]
     },
     {
       "id": "TC-114",

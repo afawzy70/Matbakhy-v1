@@ -422,7 +422,7 @@
       "id": "MB-013",
       "phase": "P03",
       "title": "Implement safe media lifecycle",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-008",
@@ -450,9 +450,11 @@
         "TC-010",
         "TC-113"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-013/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: emulator cannot prove bucket privacy or signed-URL expiry (verify on production provider, O07/P09); static PDF marker check; no public delete endpoint; required document kinds/retention O06."
     },
     {
       "id": "MB-014",
