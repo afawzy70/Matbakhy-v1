@@ -35,6 +35,8 @@ Latest explicit owner direction governs. Record it and reconcile affected docume
 
 ## Invariants
 
+For visual implementation, read `docs/design/approved/DESIGN.md` and its handoff README. The owner-selected terracotta/Cairo homepage supersedes the older green-accent/IBM Plex prototype direction; integrate its tokens and hierarchy while retaining existing product rules and whole-product review gates.
+
 Egypt / EGP / Africa/Cairo. Server owns price, capacity, roles and transitions. Single cook + slot per order. Integer money. Immutable order snapshots. Transactional reservations and idempotency. Object-level authorization. No secrets or customer data in this public repository. Arabic RTL and English LTR; both mobile platforms require native verification. Cook approval is operational verification, not a food-safety guarantee.
 
 ## Reporting

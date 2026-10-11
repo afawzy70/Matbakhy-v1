@@ -1,5 +1,7 @@
 # Brand, Arabic content and UX direction
 
+**2026-10-11 owner update:** The [approved-direction reference](../design/approved/DESIGN.md) governs palette, Cairo typography and homepage hierarchy. The review package below still defines remaining screen coverage; it does not reopen the selected visual direction. Logo/trademark and whole-product approval remain separate.
+
 Branding starts in P00 before final UI implementation. `Matbakhy / مطبخي` is a working name. No trademark clearance or legal registration is claimed. Keep logo, name, slogan, color tokens and typography editable in shared assets/configuration.
 
 ## Proposed direction to prototype
