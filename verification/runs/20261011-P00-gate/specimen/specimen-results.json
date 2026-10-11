@@ -1,0 +1,66 @@
+[
+  {
+    "theme": "light",
+    "locale": "ar",
+    "viewport": "phone",
+    "width": 390,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-light-ar-phone.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "light",
+    "locale": "ar",
+    "viewport": "desktop",
+    "width": 1280,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-light-ar-desktop.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "viewport": "phone",
+    "width": 390,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-light-en-phone.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "light",
+    "locale": "en",
+    "viewport": "desktop",
+    "width": 1280,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-light-en-desktop.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "dark",
+    "locale": "ar",
+    "viewport": "phone",
+    "width": 390,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-dark-ar-phone.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "dark",
+    "locale": "ar",
+    "viewport": "desktop",
+    "width": 1280,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-dark-ar-desktop.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "viewport": "phone",
+    "width": 390,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-dark-en-phone.png",
+    "fontFacesLoaded": 4
+  },
+  {
+    "theme": "dark",
+    "locale": "en",
+    "viewport": "desktop",
+    "width": 1280,
+    "png": "/home/user/Matbakhy-v1/verification/runs/20261011-P00-gate/specimen/specimen-dark-en-desktop.png",
+    "fontFacesLoaded": 4
+  }
+]

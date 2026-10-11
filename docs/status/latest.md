@@ -38,6 +38,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | P01-CHECK-2 clean-clone workspace check (no native compile) | PASS locally at `af22248` |
 | P01-CHECK-3 local stack verify | PASS locally at `af22248` |
 | P01-CHECK-4 Gitleaks secret scan | PASS locally at `af22248` |
+| P00 phase gate | PASS (`validate_blueprint.py --phase P00 --commit 34be845…` exit 0; [run](../../verification/runs/20261011-P00-gate/evidence.json)); self-reviewed; visual approval still PENDING (gates P06, not P00) |
 | **P01 phase gate** | **NOT PASSED**: MB-005 BLOCKED on native compile, MB-006–008 not closed |
 | Product CI `ci.yml` on GitHub | PASS at `299f942` ([push run 38126747250](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38126747250), [PR run 38126750041](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38126750041)) |
 | Blueprint integrity CI (planning only, not product verification) | PASS at `a985c15` (run 38126233412) and `299f942` (run 38126747097); earlier FAIL at `8ca414d` repaired |

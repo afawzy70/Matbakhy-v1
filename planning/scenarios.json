@@ -1038,7 +1038,8 @@
       "then": "Repository inventory matches reality and unresolved launch decisions remain explicit",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-001/evidence.json"
+        "verification/runs/20261011-MB-001/evidence.json",
+        "verification/runs/20261011-P00-gate/evidence.json"
       ]
     },
     {
@@ -1054,7 +1055,8 @@
       "then": "Every mandatory rule has an owner story and measurable scenario; dependency graph is acyclic",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-002/evidence.json"
+        "verification/runs/20261011-MB-002/evidence.json",
+        "verification/runs/20261011-P00-gate/evidence.json"
       ]
     },
     {
@@ -1070,7 +1072,8 @@
       "then": "Name/logo/colors can change without editing business code; Arabic glyph and contrast samples rendered",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-003/evidence.json"
+        "verification/runs/20261011-MB-003/evidence.json",
+        "verification/runs/20261011-P00-gate/evidence.json"
       ]
     },
     {
@@ -1086,7 +1089,8 @@
       "then": "Reviewer can complete all critical journeys in prototype; approval is recorded separately and not fabricated",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-004/evidence.json"
+        "verification/runs/20261011-MB-004/evidence.json",
+        "verification/runs/20261011-P00-gate/evidence.json"
       ]
     },
     {

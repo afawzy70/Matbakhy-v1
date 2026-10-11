@@ -6,7 +6,7 @@
   "current_story": "MB-005",
   "last_tested_commit": "be2562757e27b2124283f7d3d051c9bb9052f872",
   "last_completed_story": "MB-004",
-  "last_successful_gate": null,
+  "last_successful_gate": "P00 at 34be845bc5ab5b283c3c62998b090eff71a80f19 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
     {

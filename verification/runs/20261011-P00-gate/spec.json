@@ -1,0 +1,74 @@
+{
+  "run_id": "20261011-P00-gate",
+  "story_id": "P00-GATE",
+  "phase": "P00",
+  "checks": [
+    {
+      "id": "P00-CHECK-1",
+      "name": "Scope and traceability review",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "P00-CHECK-2",
+      "name": "Brand and UX artifacts review",
+      "command": [
+        "scripts/check_design.sh",
+        "verification/runs/20261011-P00-gate"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-101",
+      "observed": "check_scope.py PASS at this commit: inventory matches the filesystem; decision register and decisions.json agree with D01-D10 PROPOSED_DEFAULT and O01-O10 OPEN, no fabricated approvals; the MB-047 split is recorded as a pending proposal, not applied."
+    },
+    {
+      "id": "TC-102",
+      "observed": "check_scope.py PASS at this commit: every rule has an owning story and scenario, the dependency graph is acyclic and phase-ordered, the four client targets and separate Android/iOS verification stories exist, deferred extensions are retained and the traceability matrix is current."
+    },
+    {
+      "id": "TC-103",
+      "observed": "check_design.sh at this commit: token tests PASS (contrast in both themes, no hard-coded brand name or hex in apps, CSS current) and 8 specimens rendered with IBM Plex Sans Arabic loaded."
+    },
+    {
+      "id": "TC-104",
+      "observed": "check_design.sh at this commit: all 8 prototype journeys PASS in ar/en at 390/1280 px; docs/design/approval.md remains PENDING (approval not fabricated)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-P00-gate/ux/journey-results.json",
+    "verification/runs/20261011-P00-gate/specimen/specimen-results.json"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "P00 gate re-verification at a single commit; story-level reviews are in the MB-001..MB-004 runs. Owner visual approval (O05) is not a P00 gate requirement and remains PENDING; it gates P06."
+    ]
+  },
+  "open_defects": []
+}

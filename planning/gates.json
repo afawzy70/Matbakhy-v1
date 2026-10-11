@@ -3,7 +3,7 @@
   "gates": [
     {
       "id": "P00",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -32,7 +32,14 @@
           "configured": true,
           "setup_note": "Design token tests (contrast, drift, no hard-coded brand), Chromium specimen render with Arabic font assertion, and all prototype journeys in ar/en at 390/1280 px. Visual approval is a separate owner record (docs/design/approval.md)."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "run": "verification/runs/20261011-P00-gate/evidence.json",
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P00 --commit 34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "review": "SELF_REVIEW",
+        "note": "Owner visual approval (O05) is not a P00 requirement and remains PENDING; it gates P06."
+      }
     },
     {
       "id": "P01",
