@@ -1095,8 +1095,8 @@
       "severity": "high",
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create Maven multi-module backend and pnpm apps/packages; select supported versions from official sources; generate lockfiles and wrappers; document Linux/Windows/macOS commands",
-      "then": "Clean checkout installs and compiles minimal backend/web projects and the customer-mobile Expo project (typecheck, unit test, Android and iOS JavaScript bundles) using pinned versions; native Gradle/Xcode compilation is verified separately in MB-047",
-      "status": "PASS",
+      "then": "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions",
+      "status": "BLOCKED",
       "evidence": [
         "verification/runs/20261011-MB-005/evidence.json"
       ]
@@ -1112,7 +1112,7 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create module interfaces and schema migration baseline; configure PostgreSQL/Testcontainers; add architecture constraints and consistent errors; isolate dev fixtures",
       "then": "Blank PostgreSQL migrates; duplicate constraints fail; forbidden module dependency test fails when violated",
-      "status": "PASS",
+      "status": "BLOCKED",
       "evidence": [
         "verification/runs/20261011-MB-006/evidence.json"
       ]
@@ -1128,7 +1128,7 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create typed OpenAPI from endpoint registry; establish validation and generated TS clients; define pagination/errors/money; add client regeneration drift check",
       "then": "OpenAPI validates and client generation is reproducible; malformed monetary DTO rejected",
-      "status": "PASS",
+      "status": "BLOCKED",
       "evidence": [
         "verification/runs/20261011-MB-007/evidence.json"
       ]
@@ -1144,24 +1144,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Compose database/IdP/object storage/mail sink/API; healthchecks and environment templates; add build/test/lint/secret checks; replace phase verification checks with real commands",
       "then": "Documented bootstrap works from a clean environment and missing dependencies fail clearly",
-      "status": "PASS",
+      "status": "BLOCKED",
       "evidence": [
         "verification/runs/20261011-MB-008/evidence.json"
       ]
-    },
-    {
-      "id": "TC-147",
-      "title": "Prove native Android and iOS toolchain builds acceptance",
-      "rule_ids": [],
-      "story_id": "MB-047",
-      "phase": "P01",
-      "level": "system",
-      "severity": "high",
-      "given": "MB-005 is DONE; an Android SDK runner and a macOS/Xcode runner are available",
-      "when": "expo prebuild and native Gradle (Android) and Xcode (iOS) builds run from a clean checkout",
-      "then": "Both native builds succeed with recorded toolchain versions and artifact hashes; a missing platform runner is BLOCKED, never PASS",
-      "status": "NOT_RUN",
-      "evidence": []
     },
     {
       "id": "TC-109",

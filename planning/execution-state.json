@@ -5,19 +5,23 @@
   "current_phase": "P00",
   "current_story": "MB-003",
   "last_tested_commit": "af22248e18e03430aa570e346efc7ad98cfe76c3",
-  "last_completed_story": "MB-008",
+  "last_completed_story": "MB-002",
   "last_successful_gate": null,
   "working_branch": "implementation/mvp",
   "open_blockers": [
     {
       "id": "BLK-001",
       "affects": [
-        "MB-047"
+        "MB-005",
+        "MB-006 (dependency)",
+        "MB-007 (dependency)",
+        "MB-008 (dependency)",
+        "MB-009+ (transitive)"
       ],
       "owner": "Ahmed Fawzy (environment/runner access)",
       "first_seen": "2026-10-11T08:27:00Z",
-      "missing": "Android SDK runner (dl.google.com denied by container network policy) and macOS/Xcode runner",
-      "next_action": "Provide an environment allowing dl.google.com or a CI runner with Android SDK, and a macOS runner; MB-047 then runs native builds"
+      "missing": "Native Android Gradle compilation (Android SDK; dl.google.com denied in this container) and iOS Xcode compilation (no macOS runner recorded) of the minimal customer-mobile shell",
+      "next_action": "Use an authorized environment with Android SDK and macOS/Xcode (candidate: GitHub-hosted runners for this public repository, if permitted at no cost) to produce separate Android and iOS native build evidence; otherwise owner provides runner access"
     },
     {
       "id": "BLK-002",
@@ -30,8 +34,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "Observe product CI for af22248+; MB-003 editable brand tokens/fonts/samples; then MB-004 UX package; P02 MB-009 identity.",
-  "updated_at": "2026-10-11T08:59:00Z",
+  "next_action": "MB-003 brand tokens (in progress), then MB-004 UX package. MB-005 BLOCKED on native Android/iOS compilation evidence (BLK-001); MB-006/007/008 BLOCKED by dependency; MB-009 not eligible.",
+  "updated_at": "2026-10-11T09:10:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active."
 }

@@ -129,7 +129,7 @@
       "id": "MB-005",
       "phase": "P01",
       "title": "Pin workspace and compatible toolchain",
-      "status": "DONE",
+      "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
         "MB-002"
@@ -147,7 +147,7 @@
         "docs/engineering/toolchain.md"
       ],
       "acceptance": [
-        "Clean checkout installs and compiles minimal backend/web projects and the customer-mobile Expo project (typecheck, unit test, Android and iOS JavaScript bundles) using pinned versions; native Gradle/Xcode compilation is verified separately in MB-047"
+        "Clean checkout installs and compiles minimal backend/web/native projects using pinned versions"
       ],
       "rule_ids": [],
       "scenario_ids": [
@@ -156,14 +156,14 @@
       "evidence": [
         "verification/runs/20261011-MB-005/evidence.json"
       ],
-      "review_status": "PASS",
-      "completion_note": "Evidence at source babfe81253eafdeb3947194ed2a08914aa1a39a5; SELF_REVIEW only; native compile moved to MB-047"
+      "review_status": "NOT_RUN",
+      "completion_note": "BLOCKED: workspace/backend/web/Expo JS-bundle compilation verified at babfe81253eafdeb3947194ed2a08914aa1a39a5 (verification/runs/20261011-MB-005), but the acceptance requires native Android (Gradle) and iOS (Xcode) compilation, which has no evidence (BLK-001). DONE was withdrawn on 2026-10-11 after owner correction; the MB-047 split is a pending proposal, not applied."
     },
     {
       "id": "MB-006",
       "phase": "P01",
       "title": "Establish database and module boundaries",
-      "status": "DONE",
+      "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -188,14 +188,14 @@
       "evidence": [
         "verification/runs/20261011-MB-006/evidence.json"
       ],
-      "review_status": "PASS",
-      "completion_note": "Evidence at source 845b6cabe68ce974240283d6b2da85cd5ac92fdc; SELF_REVIEW only"
+      "review_status": "NOT_RUN",
+      "completion_note": "BLOCKED by dependency MB-005. Implementation and tests passed at 845b6cabe68ce974240283d6b2da85cd5ac92fdc (verification/runs/20261011-MB-006); story closure withheld until MB-005 is DONE and affected checks are rerun."
     },
     {
       "id": "MB-007",
       "phase": "P01",
       "title": "Implement contract toolchain",
-      "status": "DONE",
+      "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -220,14 +220,14 @@
       "evidence": [
         "verification/runs/20261011-MB-007/evidence.json"
       ],
-      "review_status": "PASS",
-      "completion_note": "Evidence at source f8c5dc53009b1758dfaee539d6ab11a79ecf0c98; SELF_REVIEW only"
+      "review_status": "NOT_RUN",
+      "completion_note": "BLOCKED by dependency MB-005. Implementation and tests passed at f8c5dc53009b1758dfaee539d6ab11a79ecf0c98 (verification/runs/20261011-MB-007); story closure withheld until MB-005 is DONE and affected checks are rerun."
     },
     {
       "id": "MB-008",
       "phase": "P01",
       "title": "Create local stack and required CI commands",
-      "status": "DONE",
+      "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
         "MB-006",
@@ -254,38 +254,8 @@
       "evidence": [
         "verification/runs/20261011-MB-008/evidence.json"
       ],
-      "review_status": "PASS",
-      "completion_note": "Evidence at source af22248e18e03430aa570e346efc7ad98cfe76c3; SELF_REVIEW only; GitHub CI result recorded separately"
-    },
-    {
-      "id": "MB-047",
-      "phase": "P01",
-      "title": "Prove native Android and iOS toolchain builds",
-      "status": "TODO",
-      "priority": "P0",
-      "depends_on": [
-        "MB-005"
-      ],
-      "implementation_steps": [
-        "Provision Android SDK/emulator runner and macOS/Xcode runner (local or approved CI)",
-        "generate native projects with expo prebuild",
-        "compile Android debug APK and iOS simulator build of the minimal shell",
-        "record exact toolchain versions and artifact hashes"
-      ],
-      "artifacts": [
-        "apps/customer-mobile",
-        "verification/runs"
-      ],
-      "acceptance": [
-        "Minimal customer-mobile shell compiles natively for Android (Gradle) and iOS (Xcode) from a clean checkout with pinned versions; each platform has separate evidence"
-      ],
-      "rule_ids": [],
-      "scenario_ids": [
-        "TC-147"
-      ],
-      "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": "BLOCKED by dependencies MB-006/MB-007 (via MB-005). Implemented before the owner correction; tests passed at af22248e18e03430aa570e346efc7ad98cfe76c3 (verification/runs/20261011-MB-008) and product CI run 38126747250 passed; closure withheld until dependencies are DONE."
     },
     {
       "id": "MB-009",
@@ -1117,8 +1087,7 @@
         "MB-005",
         "MB-007",
         "MB-009",
-        "MB-010",
-        "MB-047"
+        "MB-010"
       ],
       "implementation_steps": [
         "Expo navigation/locales/environment config",

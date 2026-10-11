@@ -2,7 +2,8 @@
 # MB-005 / P01 workspace check: from a clean clone of the committed HEAD, verify pinned
 # toolchain versions, install from lockfiles and compile/test the backend, web apps and the
 # Expo customer-mobile project (typecheck, unit test, Android and iOS Metro/Hermes bundles).
-# Native Gradle/Xcode compilation is a separate check (MB-047). Exits non-zero on any failure.
+# Native Gradle/Xcode compilation is NOT covered here (MB-005 native evidence, BLK-001).
+# Exits non-zero on any failure.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

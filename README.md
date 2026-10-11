@@ -12,7 +12,7 @@ An Egypt-focused marketplace for discovering and ordering homemade meals from ap
 4. Give Claude Code the complete [start prompt](docs/delivery/03-claude-start-prompt.md). Later use the [resume/recovery prompts](docs/delivery/04-resume-and-recovery.md).
 5. Run `python3 scripts/validate_blueprint.py` to validate this planning pack. This does **not** verify the product.
 
-Pack contents: 47 implementation stories, 64 business rules, 111 planned verification scenarios, 97 planned API operations, and 11 delivery phases. See the [planning-pack validation report](docs/quality/03-blueprint-validation.md).
+Pack contents: 46 implementation stories, 64 business rules, 110 planned verification scenarios, 97 planned API operations, and 11 delivery phases. See the [planning-pack validation report](docs/quality/03-blueprint-validation.md).
 
 ## Planned product surfaces
 
