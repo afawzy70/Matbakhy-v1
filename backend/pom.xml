@@ -20,6 +20,15 @@
 
   <modules>
     <module>shared</module>
+    <module>modules/identity</module>
+    <module>modules/cooks</module>
+    <module>modules/catalog</module>
+    <module>modules/availability</module>
+    <module>modules/orders</module>
+    <module>modules/finance</module>
+    <module>modules/support</module>
+    <module>modules/notifications</module>
+    <module>modules/operations</module>
     <module>app</module>
   </modules>
 
@@ -28,6 +37,8 @@
     <maven.compiler.release>21</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <archunit.version>1.5.1</archunit.version>
+    <!-- Production database major version; digest pinned (PostgreSQL 16.15, alpine, multi-arch index). -->
+    <postgres.test.image>postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea</postgres.test.image>
   </properties>
 
   <dependencyManagement>
@@ -35,6 +46,51 @@
       <dependency>
         <groupId>com.matbakhy</groupId>
         <artifactId>matbakhy-shared</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-identity</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-cooks</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-catalog</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-availability</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-orders</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-finance</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-notifications</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-operations</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -46,6 +102,19 @@
   </dependencyManagement>
 
   <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <matbakhy.test.postgres-image>${postgres.test.image}</matbakhy.test.postgres-image>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

@@ -64,3 +64,11 @@ Android native compilation needs the Android SDK, platform tools and a JDK suppo
 - Maven Central intermittently returned HTTP 429 to this container. A machine-local `~/.m2/settings.xml` mirror of Central (Google Cloud mirror) was used; the repository build itself references only Maven Central. For the wrapper download set `MVNW_REPOURL` to a Central mirror if needed.
 - `dl.google.com` (Android SDK) is denied by this container's network policy, so Android native builds are BLOCKED here. iOS builds need macOS and are BLOCKED on Linux.
 - `exp.host` is not resolvable here, so the two networked `expo-doctor` checks (config schema, React Native Directory) cannot run. The other 19 checks, including the SDK version match and the duplicate-dependency check, passed.
+
+## Backend modules and database tests (MB-006)
+
+- Domain modules are Maven modules under `backend/modules/` (identity, cooks, catalog, availability, orders, finance, support, notifications, operations). Each declares `@DomainModule` on its root package. Other modules may use only its `api` package. `ModuleBoundaryTest` enforces API-only access, no module cycles, `shared` free of module/app dependencies, and modules free of `app` dependencies; deliberately violating fixtures prove the rules fail.
+- Flyway owns the schema (`backend/app/src/main/resources/db/migration`, forward-only `V<n>__*.sql`). Synthetic fixtures live in `db/devdata` and load only with the `dev` profile; `EnvironmentGuard` refuses the `dev` profile or fixture locations in STAGING/PRODUCTION.
+- `APP_ENV` (LOCAL, CI, STAGING, PRODUCTION) is required; startup fails without it. Datasource: `DATABASE_URL`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`.
+- Integration tests use Testcontainers with `postgres:16.15-alpine` pinned by digest (`postgres.test.image` in `backend/pom.xml`), so **Docker must be running** for `./mvnw verify`. There is no H2 or mock-database fallback.
+- API errors use the body `{code, messageKey, fieldErrors, requestId, retryable}` with stable codes in `ErrorCode`. `X-Request-Id` is accepted when well-formed, otherwise generated, and always echoed.

@@ -3,10 +3,20 @@ spring:
     name: matbakhy
   jackson:
     time-zone: UTC
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/matbakhy}
+    username: ${DATABASE_USERNAME:matbakhy}
+    password: ${DATABASE_PASSWORD:}
+  flyway:
+    locations: classpath:db/migration
+  mvc:
+    problemdetails:
+      enabled: false
 server:
   error:
     include-stacktrace: never
     include-message: never
+    include-binding-errors: never
 management:
   endpoints:
     web:
@@ -16,6 +26,8 @@ management:
     health:
       show-details: never
 matbakhy:
+  # Required: LOCAL, CI, STAGING or PRODUCTION. No default, so a deployment cannot start unconfigured.
+  environment: ${APP_ENV}
   market:
     currency: EGP
     timezone: Africa/Cairo

@@ -1,0 +1,5 @@
+# Local development only: adds synthetic fixture migrations. EnvironmentGuard rejects this profile
+# and the devdata location outside LOCAL/CI.
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/devdata

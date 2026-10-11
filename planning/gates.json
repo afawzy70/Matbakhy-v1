@@ -42,11 +42,15 @@
           "id": "P01-CHECK-1",
           "name": "Backend workspace and PostgreSQL baseline",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "bash",
+            "-c",
+            "cd backend && ./mvnw -B -ntp verify"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Maven verify: enforcer, unit tests, Flyway migration and constraint tests on Testcontainers PostgreSQL 16 (Docker required), ArchUnit module boundary tests."
         },
         {
           "id": "P01-CHECK-2",
