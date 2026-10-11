@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T13:17+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-11T13:29+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P02 / MB-011 next (MB-009, MB-010 DONE; P00 and P01 gates PASS on self-reviewed evidence)
+- Phase/story: P02 / MB-012 next (MB-009–MB-011 DONE; P00 and P01 gates PASS on self-reviewed evidence)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -18,15 +18,16 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-011 Enforce scoped permissions and auditing | DONE (self-review) | [run](../../verification/runs/20261011-MB-011/evidence.json) at `4dcc117` |
 | MB-010 Build profile address and phone verification | DONE (self-review) | [run](../../verification/runs/20261011-MB-010/evidence.json) at `0724f73` |
 | MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-10 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+11 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
-- Backend: Spring Boot 4.1.1/Java 21, nine declared modules with enforced boundaries, Flyway V1–V2 on PostgreSQL 16, standard errors, strict JSON. **Identity (MB-009):** OIDC web login with PostgreSQL sessions, CSRF, CORS allowlist and logout; native bearer JWT validation; local account mapping; suspended-account denial; staff MFA step-up check; `GET/PATCH /api/v1/me`. Tested against real Keycloak and PostgreSQL. **Contact (MB-010):** Egyptian mobile verification with HMAC-only single-use codes and limits (fake SMS sender in LOCAL/CI only), owner-scoped addresses with active-zone validation, idempotent deletion intake, checkout contact policy for MB-017.
+- Backend: Spring Boot 4.1.1/Java 21, nine declared modules with enforced boundaries, Flyway V1–V2 on PostgreSQL 16, standard errors, strict JSON. **Identity (MB-009):** OIDC web login with PostgreSQL sessions, CSRF, CORS allowlist and logout; native bearer JWT validation; local account mapping; suspended-account denial; staff MFA step-up check; `GET/PATCH /api/v1/me`. Tested against real Keycloak and PostgreSQL. **Contact (MB-010):** Egyptian mobile verification with HMAC-only single-use codes and limits (fake SMS sender in LOCAL/CI only), owner-scoped addresses with active-zone validation, idempotent deletion intake, checkout contact policy for MB-017. **Permissions (MB-011):** server-side granular staff grants re-read per request (revocation immediate), step-up for grant changes, last-admin protection, deny-by-default object scope (404), append-only redacted audit with read API.
 - Customer web / operations web: React + Vite shells (Arabic RTL default, English LTR) reading draft brand tokens, IBM Plex Sans Arabic and CSS variables. No product screens.
 - Design tokens: editable draft brand (name, slogan, light/dark palette, typography); WCAG contrast tested; specimens rendered.
 - Contract: OpenAPI 3.1 for 97 planned operations (26 typed schemas, 93 explicit PENDING), generated TypeScript client.
@@ -56,4 +57,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-MB-011 scoped permissions, staff grants with step-up, and append-only redacted audit.
+MB-012 cook application workflow.

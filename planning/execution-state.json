@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P02",
-  "current_story": "MB-011",
-  "last_tested_commit": "0724f73e3a41483650ca28d7b7295b3808d4f100",
-  "last_completed_story": "MB-010",
+  "current_story": "MB-012",
+  "last_tested_commit": "4dcc1170960fe289c2d4bfd5f265bd61be1487fd",
+  "last_completed_story": "MB-011",
   "last_successful_gate": "P01 at 34be845bc5ab5b283c3c62998b090eff71a80f19 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-011 deny-by-default permission service: kitchen/order/case scopes, staff grants/revocations with step-up, append-only redacted audit; then MB-012 cook application workflow.",
-  "updated_at": "2026-10-11T10:17:00Z",
+  "next_action": "MB-012 cook application workflow (private application/document metadata, revisioned submit/change-request/review/approve/reject, separate operating state, hidden private location); then MB-013 media.",
+  "updated_at": "2026-10-11T10:29:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

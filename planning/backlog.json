@@ -347,7 +347,7 @@
       "id": "MB-011",
       "phase": "P02",
       "title": "Enforce scoped permissions and auditing",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-009"
@@ -375,9 +375,11 @@
         "TC-007",
         "TC-111"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-011/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 4dcc1170960fe289c2d4bfd5f265bd61be1487fd; SELF_REVIEW only; kitchen/order/case scope re-exercised as those modules land"
     },
     {
       "id": "MB-012",

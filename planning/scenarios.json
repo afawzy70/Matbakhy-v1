@@ -104,8 +104,10 @@
       "given": "Two customers and two cooks with separate data",
       "when": "They enumerate one another's IDs and filters",
       "then": "No cross-owner data or state change occurs",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-011/evidence.json"
+      ]
     },
     {
       "id": "TC-007",
@@ -120,8 +122,10 @@
       "given": "A customer submits role=ADMIN or a revoked staff token is reused",
       "when": "A privileged command is attempted",
       "then": "Denied with a redacted auditable event",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-011/evidence.json"
+      ]
     },
     {
       "id": "TC-008",
@@ -1224,8 +1228,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Implement deny-by-default permission service; kitchen/order/case scope; staff step-up; grants/revocations; append-only redacted audit",
       "then": "Cross-customer and cross-cook access matrix denied; privilege escalation and audit-redaction checks pass",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-011/evidence.json"
+      ]
     },
     {
       "id": "TC-112",
