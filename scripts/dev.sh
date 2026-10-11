@@ -6,6 +6,7 @@
 #   scripts/dev.sh down     stop containers (data volume kept)
 #   scripts/dev.sh reset    stop and delete this local stack's data volume (refuses non-local env files)
 #   scripts/dev.sh verify   doctor + up + smoke in an isolated, throwaway compose project, then clean up
+#   scripts/dev.sh e2e      throwaway stack + operations web + real-API browser workflows (Playwright), then clean up
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -141,11 +142,11 @@ reset() {
   compose down --volumes
 }
 
-verify() {
-  doctor
+# Isolated, throwaway compose project on alternate ports with fresh random secrets; removed on exit.
+throwaway_env() {
   VERIFY_TMP="$(mktemp -d)"
   export MATBAKHY_ENV_FILE="$VERIFY_TMP/.env" ENV_FILE="$VERIFY_TMP/.env" MATBAKHY_GENERATED_DIR="$VERIFY_TMP/generated"
-  sed -e "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=matbakhy-verify-$$/" \
+  sed -e "s/^COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=matbakhy-$1-$$/" \
       -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
       -e "s/^KEYCLOAK_ADMIN_PASSWORD=.*/KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -hex 16)/" \
       -e "s/^OIDC_WEB_CLIENT_SECRET=.*/OIDC_WEB_CLIENT_SECRET=$(openssl rand -hex 24)/" \
@@ -154,9 +155,36 @@ verify() {
       -e "s/^OBJECT_STORAGE_PORT=.*/OBJECT_STORAGE_PORT=19090/" -e "s/^MAIL_UI_PORT=.*/MAIL_UI_PORT=18025/" \
       -e "s/^MAIL_SMTP_PORT=.*/MAIL_SMTP_PORT=11025/" -e "s/^API_PORT=.*/API_PORT=18080/" \
       "$INFRA/.env.example" > "$ENV_FILE"
+}
+
+verify() {
+  doctor
+  throwaway_env verify
   trap 'compose down --volumes >/dev/null 2>&1 || true; rm -rf "$VERIFY_TMP"' EXIT
   up
   smoke
+}
+
+# Browser workflows against the real API (P05-CHECK-1). Synthetic users only; the operations web dev server runs on
+# 5174 (an allowed origin) and talks to the throwaway API. E2E_CHROMIUM may point at a preinstalled Chromium.
+e2e() {
+  doctor
+  throwaway_env e2e
+  E2E_WEB_PID=""
+  trap '[ -n "$E2E_WEB_PID" ] && kill "$E2E_WEB_PID" 2>/dev/null; compose down --volumes >/dev/null 2>&1 || true; rm -rf "$VERIFY_TMP"' EXIT
+  up
+  info "starting operations web on http://localhost:5174"
+  (cd "$ROOT/apps/operations-web" && VITE_API_BASE_URL="http://localhost:${API_PORT}" exec pnpm exec vite --port 5174 --strictPort) \
+    >"$VERIFY_TMP/web.log" 2>&1 &
+  E2E_WEB_PID=$!
+  for _ in $(seq 1 60); do curl -fs -o /dev/null http://localhost:5174/ && break; sleep 1; done
+  curl -fsS -o /dev/null http://localhost:5174/ || { cat "$VERIFY_TMP/web.log"; die "operations web did not start"; }
+  local psql
+  psql="[\"docker\",\"compose\",\"--env-file\",\"$ENV_FILE\",\"-f\",\"$INFRA/compose.yaml\",\"exec\",\"-T\",\"postgres\",\"psql\",\"-U\",\"$POSTGRES_USER\",\"-d\",\"$POSTGRES_DB\"]"
+  info "running browser workflows"
+  (cd "$ROOT/apps/operations-web" && E2E_API_URL="http://localhost:${API_PORT}" E2E_OPS_URL="http://localhost:5174" \
+    E2E_USER_PASSWORD="$DEV_USER_PASSWORD" E2E_PSQL="$psql" E2E_OUTPUT_DIR="${E2E_OUTPUT_DIR:-$VERIFY_TMP/results}" \
+    pnpm exec playwright test)
 }
 
 case "${1:-}" in
@@ -166,5 +194,6 @@ case "${1:-}" in
   down) down ;;
   reset) reset ;;
   verify) verify ;;
-  *) sed -n '2,9p' "$0"; exit 2 ;;
+  e2e) e2e ;;
+  *) sed -n '2,10p' "$0"; exit 2 ;;
 esac

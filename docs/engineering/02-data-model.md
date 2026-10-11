@@ -38,6 +38,7 @@ PostgreSQL is the system of record. IDs are UUIDs (version chosen and pinned dur
 | device_registration | id, user_id, installation_id, platform, push_token_encrypted, enabled, last_seen | rotate/update; disable on logout/unregister; no token logs |
 | outbox_event/delivery_attempt | id, aggregate_id, event_type, payload, status, available_at, lease_until, attempts; provider/result metadata | lease/skip-locked workers; retry bounded; payload avoids unnecessary PII |
 | notification / notification_delivery / device_registration (V14) | inbox row unique per (recipient, type + order); per-channel deliveries with status PENDING/SENT/DEAD/SKIPPED, attempts, lease; installations with keyed token hash and AES-GCM token ciphertext | inbox survives provider failure; retries bounded (5) then DEAD; one active registration per installation and per token |
+| kitchen.paused_by (V15) | COOK or STAFF while PAUSED | cooks resume only their own pause; staff pause/suspension need staff |
 | policy_version | id, key, value_json, effective_at, created_by, reason, approved_reference | append version; live environment rejects unapproved commercial settings |
 | audit_event | id, actor, permission, action, object_type/id, before/after redacted, reason, request_id, timestamp | append-only; scoped reads; no OTP/token/document contents |
 | deletion_request | user_id, requested_at, state, legal_hold_reason, completed_at, policy_version | disable access promptly; anonymize/purge according to approved retention policy |

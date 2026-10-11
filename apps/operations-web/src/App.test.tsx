@@ -1,25 +1,224 @@
 import { brand } from "@matbakhy/design-tokens";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { App, title } from "./App";
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  document.cookie = "XSRF-TOKEN=; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+});
 
-describe("operations-web shell", () => {
-  it("starts in Arabic right-to-left with the token brand name", () => {
-    render(<App />);
+type Handler = (req: Request, body: unknown) => { status: number; body?: unknown };
+
+/** Fake API at the fetch boundary; records every request. Component tests only: real-API behaviour is the browser test. */
+function server(routes: Record<string, Handler>) {
+  const calls: { method: string; path: string; headers: Headers; body: unknown }[] = [];
+  const fetchImpl = (async (input: Request) => {
+    const url = new URL(input.url);
+    const text = input.method === "GET" ? "" : await input.text();
+    const body = text ? JSON.parse(text) : undefined;
+    calls.push({ method: input.method, path: url.pathname + url.search, headers: input.headers, body });
+    const key = `${input.method} ${url.pathname}`;
+    const handler = routes[key];
+    const r = handler ? handler(input, body) : { status: 404, body: { code: "NOT_FOUND" } };
+    return new Response(r.body === undefined ? null : JSON.stringify(r.body), {
+      status: r.status,
+      headers: { "Content-Type": "application/json" },
+    });
+  }) as unknown as typeof fetch;
+  return { fetchImpl, calls };
+}
+
+const egp = (amountMinor: number) => ({ amountMinor, currency: "EGP" });
+const kitchen = {
+  kitchenId: "k1",
+  publicSlug: "umm-ali",
+  displayName: "مطبخ أم علي",
+  description: "أكل بيتي",
+  operatingState: "ACTIVE",
+  pausedBy: null as string | null,
+  pickupEnabled: true,
+  zones: [{ zoneId: "z1", nameAr: "المعادي", nameEn: "Maadi", deliveryEnabled: true }],
+  version: 3,
+};
+const SERVER_NOW = "2026-10-11T10:00:00Z";
+
+function dashboard(over: Partial<typeof kitchen> = {}) {
+  return {
+    serverTime: SERVER_NOW,
+    kitchen: { ...kitchen, ...over },
+    activeCounts: { PENDING_ACCEPTANCE: 1, ACCEPTED: 0, PREPARING: 0, READY: 0, OUT_FOR_DELIVERY: 0 },
+    pendingAcceptance: [
+      { orderId: "o1", publicNumber: "MB-1001", acceptBy: "2026-10-11T10:25:00Z", fulfillmentMode: "PICKUP", total: egp(24000), version: 0 },
+    ],
+    upcomingSlots: [],
+  };
+}
+
+function order(state: string, allowedActions: string[], version = 0) {
+  return {
+    id: "o1",
+    publicNumber: "MB-1001",
+    version,
+    state,
+    fulfillmentMode: "PICKUP",
+    items: [{ mealId: "m1", title: "كشري", allergenStatement: "NONE_DECLARED", quantity: 2, unitPrice: egp(12000), lineTotal: egp(24000) }],
+    subtotal: egp(24000),
+    deliveryFee: egp(0),
+    tax: egp(0),
+    total: egp(24000),
+    slot: { slotId: "s1", startsAt: "2026-10-11T13:00:00Z", endsAt: "2026-10-11T15:00:00Z", cutoffAt: "2026-10-11T11:00:00Z" },
+    acceptBy: "2026-10-11T10:25:00Z",
+    events: [],
+    allowedActions,
+    cashState: "DUE",
+    fulfillmentNote: null,
+    dispatchReference: null,
+    contact: null,
+  };
+}
+
+const me = () => ({ status: 200, body: { id: "u1", displayName: "Cook", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: [] } });
+
+describe("operations-web cook workspace", () => {
+  it("starts in Arabic right-to-left and switches to English", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/me": () => ({ status: 401, body: { code: "UNAUTHENTICATED" } }) });
+    render(<App fetchImpl={fetchImpl} />);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(title("ar"));
     expect(title("ar")).toContain(brand.name.ar);
     expect(document.documentElement.dir).toBe("rtl");
     expect(document.documentElement.lang).toBe("ar");
-    expect(document.title).toBe(title("ar"));
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(title("en"));
+    expect(document.documentElement.dir).toBe("ltr");
   });
 
-  it("switches to English left-to-right", () => {
-    render(<App />);
-    fireEvent.click(screen.getByRole("button"));
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(title("en"));
-    expect(title("en")).toContain(brand.name.en);
-    expect(document.documentElement.dir).toBe("ltr");
+  it("offers sign-in through the API with a return address when signed out", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/me": () => ({ status: 401, body: { code: "UNAUTHENTICATED" } }) });
+    render(<App fetchImpl={fetchImpl} />);
+    const link = await screen.findByRole("link", { name: "تسجيل الدخول" });
+    expect(link.getAttribute("href")).toMatch(/\/oauth2\/authorization\/keycloak\?returnTo=http/);
+  });
+
+  it("shows the application state when the account has no approved kitchen", async () => {
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/cook/application": () => ({ status: 200, body: { id: "a1", state: "UNDER_REVIEW", draft: {}, currentRevision: 1, history: [], version: 1 } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByText("لا يوجد مطبخ معتمد لهذا الحساب بعد.")).toBeTruthy();
+    expect(await screen.findByText("UNDER_REVIEW")).toBeTruthy();
+    expect(screen.queryByRole("navigation")).toBeNull();
+  });
+
+  it("renders server counts and deadlines measured against server time", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/me": me, "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }) });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("heading", { name: "مطبخ أم علي" })).toBeTruthy();
+    // 25 minutes between serverTime and acceptBy regardless of the device clock.
+    expect(await screen.findByText(/باقي (24|25) دقيقة/)).toBeTruthy();
+    expect(screen.getByText("MB-1001")).toBeTruthy();
+  });
+
+  it("sends order commands with the version, an idempotency key and the CSRF token, then refreshes from the server", async () => {
+    document.cookie = "XSRF-TOKEN=csrf-123";
+    let current = order("PENDING_ACCEPTANCE", ["ACCEPT", "REJECT"]);
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/orders": (req) => {
+        const state = new URL(req.url).searchParams.get("state");
+        return { status: 200, body: { items: state === current.state ? [current] : [], nextCursor: null, hasMore: false } };
+      },
+      "POST /api/v1/cook/orders/o1/accept": () => {
+        current = order("ACCEPTED", ["PREPARE", "CANCEL"], 1);
+        return { status: 200, body: current };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الطلبات" }));
+    const card = await screen.findByRole("article", { name: "MB-1001" });
+    fireEvent.click(within(card).getByRole("button", { name: "قبول" }));
+    expect(await screen.findByRole("button", { name: "بدء التحضير" })).toBeTruthy();
+    const accept = calls.find((c) => c.method === "POST");
+    expect(accept?.path).toBe("/api/v1/cook/orders/o1/accept");
+    expect(accept?.body).toEqual({ expectedVersion: 0 });
+    expect(accept?.headers.get("Idempotency-Key")).toMatch(/^ops-/);
+    expect(accept?.headers.get("X-XSRF-TOKEN")).toBe("csrf-123");
+    expect(accept?.headers.get("Accept-Language")).toBe("ar");
+  });
+
+  it("shows the server's conflict and reloads instead of assuming the transition", async () => {
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/orders": (req) => ({
+        status: 200,
+        body: { items: new URL(req.url).searchParams.get("state") === "PENDING_ACCEPTANCE" ? [order("PENDING_ACCEPTANCE", ["ACCEPT", "REJECT"])] : [], nextCursor: null, hasMore: false },
+      }),
+      "POST /api/v1/cook/orders/o1/reject": () => ({ status: 409, body: { code: "VERSION_CONFLICT" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الطلبات" }));
+    const card = await screen.findByRole("article", { name: "MB-1001" });
+    fireEvent.change(within(card).getByRole("combobox"), { target: { value: "INGREDIENT_UNAVAILABLE" } });
+    fireEvent.click(within(card).getByRole("button", { name: "رفض" }));
+    expect(await screen.findByText("تغيّرت البيانات. تم التحديث، حاول مرة أخرى.")).toBeTruthy();
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ expectedVersion: 0, reasonCode: "INGREDIENT_UNAVAILABLE" });
+    await waitFor(() => expect(calls.filter((c) => c.path.startsWith("/api/v1/cook/orders?")).length).toBeGreaterThan(5));
+  });
+
+  it("requires a six-digit handover code before confirming", async () => {
+    const ready = { ...order("READY", ["HANDOVER"]), contact: { name: "Mona", phone: "+201001234567", deliveryAddress: null } };
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/orders": (req) => ({ status: 200, body: { items: new URL(req.url).searchParams.get("state") === "READY" ? [ready] : [], nextCursor: null, hasMore: false } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الطلبات" }));
+    const card = await screen.findByRole("article", { name: "MB-1001" });
+    const confirm = within(card).getByRole("button", { name: "تأكيد التسليم" }) as HTMLButtonElement;
+    expect(confirm.disabled).toBe(true);
+    fireEvent.change(within(card).getByLabelText("رمز التسليم من العميل"), { target: { value: "12a34" } });
+    expect(confirm.disabled).toBe(true);
+    fireEvent.change(within(card).getByLabelText("رمز التسليم من العميل"), { target: { value: "123456" } });
+    expect(confirm.disabled).toBe(false);
+    expect(within(card).getByText("+201001234567")).toBeTruthy();
+  });
+
+  it("offers resume only for a cook pause and explains a staff pause", async () => {
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard({ operatingState: "PAUSED", pausedBy: "STAFF" }) }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الإعدادات" }));
+    expect(await screen.findByText("أوقفته الإدارة مؤقتًا؛ لا يمكنك استئنافه.")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "استئناف البيع" })).toBeNull();
+  });
+
+  it("states that the statement excludes refunds and settlements", async () => {
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/statements": () => ({
+        status: 200,
+        body: {
+          from: "2026-10-01",
+          to: "2026-10-11",
+          includes: ["COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION"],
+          summary: { completedOrders: 1, ordersTotal: egp(24000), cashReported: egp(0), cashVerified: egp(0), cashOutstanding: egp(24000), commissionPosted: egp(2400), commissionPending: 0 },
+          items: [{ orderId: "o1", publicNumber: "MB-1001", completedAt: "2026-10-11T09:00:00Z", orderTotal: egp(24000), cashState: "DUE", commission: egp(2400), commissionState: "POSTED" }],
+          nextCursor: null,
+          hasMore: false,
+        },
+      }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الكشف" }));
+    expect(await screen.findByText(/الاستردادات والتسويات غير مشمولة بعد/)).toBeTruthy();
+    expect(screen.getByRole("cell", { name: "MB-1001" })).toBeTruthy();
   });
 });

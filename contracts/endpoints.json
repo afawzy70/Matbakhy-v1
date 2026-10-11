@@ -406,7 +406,7 @@
       "permission": "COOK",
       "response_type": "CookDashboard",
       "contract": "own active queue counts/slot totals and deadlines",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-046",
@@ -577,7 +577,7 @@
       "permission": "COOK",
       "response_type": "StatementPage",
       "contract": "period, cursor, limit; own receivables/refunds/remittances",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-065",
@@ -586,7 +586,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookSettings",
       "contract": "public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-066",

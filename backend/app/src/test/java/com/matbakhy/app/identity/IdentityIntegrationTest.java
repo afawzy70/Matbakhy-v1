@@ -149,6 +149,15 @@ class IdentityIntegrationTest {
         return browser;
     }
 
+    /** Web login started with {@code returnTo}; returns where the browser lands after the callback. */
+    private String webLoginLanding(String returnTo) throws Exception {
+        OidcBrowser browser = new OidcBrowser();
+        String start = api("/oauth2/authorization/keycloak?returnTo=" + java.net.URLEncoder.encode(returnTo, java.nio.charset.StandardCharsets.UTF_8));
+        String authorize = browser.followUntil(start, KeycloakTestServer.issuer());
+        String callback = browser.login(authorize, "customer-a", KeycloakTestServer.PASSWORD_A);
+        return browser.followUntil(callback, "http://localhost:517");
+    }
+
     private HttpResponse<String> webGet(OidcBrowser browser, String path) throws Exception {
         return browser.send(HttpRequest.newBuilder(URI.create(api(path))).GET().build());
     }
@@ -311,6 +320,16 @@ class IdentityIntegrationTest {
     }
 
     // ---- TC-002 / TC-109: web session, CSRF, CORS, logout, expiry ----
+
+    @Test
+    void web_login_returns_only_to_allowed_first_party_origins() throws Exception {
+        assertThat(webLoginLanding("http://localhost:5174/cook?tab=orders")).isEqualTo("http://localhost:5174/cook?tab=orders");
+        assertThat(webLoginLanding("https://evil.example/steal")).as("not an allowed origin").isEqualTo("http://localhost:5173/");
+        assertThat(webLoginLanding("http://localhost:5174.evil.example/")).isEqualTo("http://localhost:5173/");
+        assertThat(webLoginLanding("http://user@localhost:5174/")).isEqualTo("http://localhost:5173/");
+        assertThat(webLoginLanding("//evil.example/")).isEqualTo("http://localhost:5173/");
+        assertThat(webLoginLanding("http://localhost:5174//evil.example/")).isEqualTo("http://localhost:5173/");
+    }
 
     @Test
     void web_login_creates_server_session_and_mutations_require_csrf() throws Exception {

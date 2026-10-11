@@ -10,6 +10,6 @@ export { MalformedMoneyError, parseMoney, type Money } from "./money";
  * contracts/openapi.yaml at compile time. Authentication (cookie session + CSRF on web, bearer token
  * on native) is configured by the caller in MB-009 and later stories.
  */
-export function createMatbakhyClient(options: ClientOptions) {
+export function createApiClient(options: ClientOptions) {
   return createClient<paths>(options);
 }

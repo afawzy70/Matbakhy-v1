@@ -1,6 +1,8 @@
 package com.matbakhy.orders.web;
 
 import com.matbakhy.identity.api.CurrentAccount;
+import com.matbakhy.orders.internal.CookDashboardService;
+import com.matbakhy.orders.internal.CookDashboardService.CookDashboard;
 import com.matbakhy.orders.internal.OrderLifecycleService;
 import com.matbakhy.orders.internal.OrderLifecycleService.Command;
 import com.matbakhy.orders.internal.OrderService;
@@ -22,16 +24,24 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/** API-053..062: the cook's own kitchen orders and lifecycle commands (Idempotency-Key and expectedVersion). */
+/** API-045 and API-053..062: the cook's own kitchen orders and lifecycle commands (Idempotency-Key and expectedVersion). */
 @RestController
 class CookOrderController {
 
     private final OrderService orders;
     private final OrderLifecycleService lifecycle;
+    private final CookDashboardService dashboard;
 
-    CookOrderController(OrderService orders, OrderLifecycleService lifecycle) {
+    CookOrderController(OrderService orders, OrderLifecycleService lifecycle, CookDashboardService dashboard) {
         this.orders = orders;
         this.lifecycle = lifecycle;
+        this.dashboard = dashboard;
+    }
+
+    /** API-045: own queue counts, acceptance deadlines, upcoming slot totals and kitchen settings. */
+    @GetMapping("/api/v1/cook/dashboard")
+    CookDashboard dashboard(@AuthenticationPrincipal CurrentAccount actor) {
+        return dashboard.dashboard(actor.id());
     }
 
     record CommandBody(@NotNull Long expectedVersion, @Size(max = 64) String reasonCode, @Size(max = 500) String note,

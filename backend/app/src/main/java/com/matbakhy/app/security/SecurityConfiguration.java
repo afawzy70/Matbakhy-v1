@@ -176,14 +176,16 @@ class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
-                .oauth2Login(login -> login.defaultSuccessUrl(properties.postLoginRedirect(), true))
+                .oauth2Login(login -> login.successHandler(WebReturnTo.successHandler(properties.postLoginRedirect())))
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
                         .logoutSuccessHandler(idpLogout(properties, registrations))
                         .invalidateHttpSession(true)
                         .deleteCookies("MATBAKHY_SESSION"))
                 .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors))
-                .addFilterBefore(new WebAccountFilter(mapper), AuthorizationFilter.class);
+                .addFilterBefore(new WebAccountFilter(mapper), AuthorizationFilter.class)
+                .addFilterBefore(WebReturnTo.capture(properties.allowedOrigins()),
+                        org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
     }
 

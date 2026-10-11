@@ -42,11 +42,14 @@
     }
   ],
   "users": [
-    { "username": "customer-a", "email": "customer-a@matbakhy.test", "emailVerified": true, "enabled": true,
+    { "id": "00000000-0000-4000-8000-0000000000a1", "username": "customer-a", "email": "customer-a@matbakhy.test", "emailVerified": true, "enabled": true,
       "firstName": "Customer", "lastName": "SyntheticA",
       "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] },
-    { "username": "customer-b", "email": "customer-b@matbakhy.test", "emailVerified": true, "enabled": true,
+    { "id": "00000000-0000-4000-8000-0000000000b1", "username": "customer-b", "email": "customer-b@matbakhy.test", "emailVerified": true, "enabled": true,
       "firstName": "Customer", "lastName": "SyntheticB",
+      "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] },
+    { "id": "00000000-0000-4000-8000-0000000000c1", "username": "cook-a", "email": "cook-a@matbakhy.test", "emailVerified": true, "enabled": true,
+      "firstName": "Cook", "lastName": "SyntheticA",
       "credentials": [ { "type": "password", "value": "${DEV_USER_PASSWORD}", "temporary": false } ] }
   ]
 }

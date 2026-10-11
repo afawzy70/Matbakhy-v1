@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createMatbakhyClient } from "../src";
+import { createApiClient } from "../src";
 
 describe("typed client", () => {
   it("builds typed requests against the contract paths", async () => {
     const seen: string[] = [];
-    const client = createMatbakhyClient({
+    const client = createApiClient({
       baseUrl: "https://api.test.invalid",
       fetch: async (request: Request) => {
         seen.push(`${request.method} ${new URL(request.url).pathname}${new URL(request.url).search}`);

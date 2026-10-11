@@ -1,5 +1,6 @@
 package com.matbakhy.cooks.api;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,4 +40,15 @@ public interface KitchenDirectory {
     }
 
     Optional<FulfillmentContact> fulfillmentContact(UUID kitchenId);
+
+    /** Delivery zone approved for the kitchen and whether the cook currently delivers there. */
+    record ZoneSetting(UUID zoneId, String nameAr, String nameEn, boolean deliveryEnabled) {
+    }
+
+    /** The owner's own kitchen settings (cook workspace). {@code pausedBy} is COOK or STAFF while PAUSED. */
+    record KitchenSettings(UUID kitchenId, String publicSlug, String displayName, String description, String operatingState,
+                           String pausedBy, boolean pickupEnabled, List<ZoneSetting> zones, long version) {
+    }
+
+    Optional<KitchenSettings> settingsOf(UUID ownerId);
 }

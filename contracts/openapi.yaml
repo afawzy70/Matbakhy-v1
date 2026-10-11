@@ -1493,7 +1493,7 @@ paths:
       description: own active queue counts/slot totals and deadlines
       x-matbakhy-id: API-045
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2143,11 +2143,25 @@ paths:
       description: period, cursor, limit; own receivables/refunds/remittances
       x-matbakhy-id: API-064
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: from
+          in: query
+          required: false
+          description: First Cairo date (default first day of the current month)
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          description: Last Cairo date, inclusive (default today); at most 366 days after from
+          schema:
+            type: string
+            format: date
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2170,7 +2184,7 @@ paths:
       description: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension
       x-matbakhy-id: API-065
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3856,8 +3870,94 @@ components:
           format: date-time
     CookDashboard:
       type: object
-      description: PENDING typed schema. Response for API-045.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Own kitchen at a glance. Deadlines are server times; use serverTime instead of the device clock.
+      required: [serverTime, kitchen, activeCounts, pendingAcceptance, upcomingSlots]
+      properties:
+        serverTime:
+          type: string
+          format: date-time
+        kitchen:
+          $ref: "#/components/schemas/CookSettings"
+        activeCounts:
+          type: object
+          additionalProperties: false
+          required: [PENDING_ACCEPTANCE, ACCEPTED, PREPARING, READY, OUT_FOR_DELIVERY]
+          properties:
+            PENDING_ACCEPTANCE:
+              type: integer
+              minimum: 0
+            ACCEPTED:
+              type: integer
+              minimum: 0
+            PREPARING:
+              type: integer
+              minimum: 0
+            READY:
+              type: integer
+              minimum: 0
+            OUT_FOR_DELIVERY:
+              type: integer
+              minimum: 0
+        pendingAcceptance:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            additionalProperties: false
+            required: [orderId, publicNumber, acceptBy, fulfillmentMode, total, version]
+            properties:
+              orderId:
+                type: string
+                format: uuid
+              publicNumber:
+                type: string
+              acceptBy:
+                type: string
+                format: date-time
+              fulfillmentMode:
+                type: string
+                enum: [DELIVERY, PICKUP]
+              total:
+                $ref: "#/components/schemas/Money"
+              version:
+                type: integer
+                minimum: 0
+        upcomingSlots:
+          type: array
+          maxItems: 10
+          items:
+            type: object
+            additionalProperties: false
+            required: [slotId, startsAt, endsAt, cutoffAt, state, maxPortions, reserved, allocated, consumed]
+            properties:
+              slotId:
+                type: string
+                format: uuid
+              startsAt:
+                type: string
+                format: date-time
+              endsAt:
+                type: string
+                format: date-time
+              cutoffAt:
+                type: string
+                format: date-time
+              state:
+                type: string
+                enum: [DRAFT, OPEN, PAUSED, CLOSED]
+              maxPortions:
+                type: integer
+                minimum: 1
+              reserved:
+                type: integer
+                minimum: 0
+              allocated:
+                type: integer
+                minimum: 0
+              consumed:
+                type: integer
+                minimum: 0
     CookMeal:
       type: object
       additionalProperties: false
@@ -4121,8 +4221,48 @@ components:
             - "null"
     CookSettings:
       type: object
-      description: PENDING typed schema. Response for API-065.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        The cook's own kitchen settings. pausedBy is COOK or STAFF while PAUSED; a cook can resume only their own
+        pause and never clear a suspension. Private location and contact phone are not included.
+      required: [kitchenId, publicSlug, displayName, description, operatingState, pausedBy, pickupEnabled, zones, version]
+      properties:
+        kitchenId:
+          type: string
+          format: uuid
+        publicSlug:
+          type: string
+        displayName:
+          type: string
+        description:
+          type: string
+        operatingState:
+          type: string
+          enum: [ACTIVE, PAUSED, SUSPENDED, CLOSED]
+        pausedBy:
+          type: [string, "null"]
+          enum: [COOK, STAFF, null]
+        pickupEnabled:
+          type: boolean
+        zones:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [zoneId, nameAr, nameEn, deliveryEnabled]
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              nameAr:
+                type: string
+              nameEn:
+                type: string
+              deliveryEnabled:
+                type: boolean
+        version:
+          type: integer
+          minimum: 0
     CookSlot:
       type: object
       additionalProperties: false
@@ -4999,8 +5139,37 @@ components:
           minimum: 0
     PatchCookSettingsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        Optional changes to the own kitchen; omitted fields stay. Delivery can be toggled only for approved zones and
+        the kitchen must keep pickup or at least one delivery zone. Name, location and contact need a new application.
+      required: [expectedVersion]
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        pickupEnabled:
+          type: boolean
+        deliveryZones:
+          type: array
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required: [zoneId, deliveryEnabled]
+            properties:
+              zoneId:
+                type: string
+                format: uuid
+              deliveryEnabled:
+                type: boolean
+        paused:
+          type: boolean
+          description: true pauses new sales; false resumes a pause set by the cook.
+        expectedVersion:
+          type: integer
+          minimum: 0
     PatchCookSlotsByIdRequest:
       type: object
       additionalProperties: false
@@ -5865,8 +6034,77 @@ components:
       x-schema-status: PENDING
     StatementPage:
       type: object
-      description: PENDING typed schema. Response for API-064.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        Own statement for a Cairo date range. includes lists what it covers; refunds, reversals and remittances are
+        not included until finance operations (MB-025), and their absence does not mean zero. Cash collected by the
+        cook is not platform revenue; only the commission is receivable.
+      required: [from, to, includes, summary, items, nextCursor, hasMore]
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        includes:
+          type: array
+          items:
+            type: string
+            enum: [COMPLETED_ORDERS, CASH_POSITION, COMMISSION]
+        summary:
+          type: object
+          additionalProperties: false
+          required: [completedOrders, ordersTotal, cashReported, cashVerified, cashOutstanding, commissionPosted, commissionPending]
+          properties:
+            completedOrders:
+              type: integer
+              minimum: 0
+            ordersTotal:
+              $ref: "#/components/schemas/Money"
+            cashReported:
+              $ref: "#/components/schemas/Money"
+            cashVerified:
+              $ref: "#/components/schemas/Money"
+            cashOutstanding:
+              $ref: "#/components/schemas/Money"
+            commissionPosted:
+              $ref: "#/components/schemas/Money"
+            commissionPending:
+              type: integer
+              minimum: 0
+              description: Completed orders whose commission is not posted yet.
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [orderId, publicNumber, completedAt, orderTotal, cashState, commission, commissionState]
+            properties:
+              orderId:
+                type: string
+                format: uuid
+              publicNumber:
+                type: string
+              completedAt:
+                type: string
+                format: date-time
+              orderTotal:
+                $ref: "#/components/schemas/Money"
+              cashState:
+                type: string
+                enum: [DUE, REPORTED, VERIFIED, DISPUTED, NOT_DUE]
+              commission:
+                oneOf:
+                  - $ref: "#/components/schemas/Money"
+                  - type: "null"
+              commissionState:
+                type: string
+                enum: [POSTED, PENDING_POSTING]
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     SupportCase:
       type: object
       description: PENDING typed schema. Response for API-028.

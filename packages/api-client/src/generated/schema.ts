@@ -1970,8 +1970,46 @@ export interface components {
             /** Format: date-time */
             decidedAt: string | null;
         };
-        /** @description PENDING typed schema. Response for API-045. */
-        CookDashboard: Record<string, never>;
+        /** @description Own kitchen at a glance. Deadlines are server times; use serverTime instead of the device clock. */
+        CookDashboard: {
+            /** Format: date-time */
+            serverTime: string;
+            kitchen: components["schemas"]["CookSettings"];
+            activeCounts: {
+                PENDING_ACCEPTANCE: number;
+                ACCEPTED: number;
+                PREPARING: number;
+                READY: number;
+                OUT_FOR_DELIVERY: number;
+            };
+            pendingAcceptance: {
+                /** Format: uuid */
+                orderId: string;
+                publicNumber: string;
+                /** Format: date-time */
+                acceptBy: string;
+                /** @enum {string} */
+                fulfillmentMode: "DELIVERY" | "PICKUP";
+                total: components["schemas"]["Money"];
+                version: number;
+            }[];
+            upcomingSlots: {
+                /** Format: uuid */
+                slotId: string;
+                /** Format: date-time */
+                startsAt: string;
+                /** Format: date-time */
+                endsAt: string;
+                /** Format: date-time */
+                cutoffAt: string;
+                /** @enum {string} */
+                state: "DRAFT" | "OPEN" | "PAUSED" | "CLOSED";
+                maxPortions: number;
+                reserved: number;
+                allocated: number;
+                consumed: number;
+            }[];
+        };
         CookMeal: {
             /** Format: uuid */
             id: string;
@@ -2065,8 +2103,27 @@ export interface components {
             phone: string;
             pickupLocation: string | null;
         };
-        /** @description PENDING typed schema. Response for API-065. */
-        CookSettings: Record<string, never>;
+        /** @description The cook's own kitchen settings. pausedBy is COOK or STAFF while PAUSED; a cook can resume only their own pause and never clear a suspension. Private location and contact phone are not included. */
+        CookSettings: {
+            /** Format: uuid */
+            kitchenId: string;
+            publicSlug: string;
+            displayName: string;
+            description: string;
+            /** @enum {string} */
+            operatingState: "ACTIVE" | "PAUSED" | "SUSPENDED" | "CLOSED";
+            /** @enum {string|null} */
+            pausedBy: "COOK" | "STAFF" | null;
+            pickupEnabled: boolean;
+            zones: {
+                /** Format: uuid */
+                zoneId: string;
+                nameAr: string;
+                nameEn: string;
+                deliveryEnabled: boolean;
+            }[];
+            version: number;
+        };
         /** @description Own-kitchen slot with counters (reserved by placed orders, allocated by accepted orders, consumed in preparation). orderable means OPEN and before cutoffAt by server time. */
         CookSlot: {
             /** Format: uuid */
@@ -2409,8 +2466,19 @@ export interface components {
             photos?: components["schemas"]["MealPhotoRef"][];
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Request for API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension */
-        PatchCookSettingsRequest: Record<string, never>;
+        /** @description Optional changes to the own kitchen; omitted fields stay. Delivery can be toggled only for approved zones and the kitchen must keep pickup or at least one delivery zone. Name, location and contact need a new application. */
+        PatchCookSettingsRequest: {
+            description?: string;
+            pickupEnabled?: boolean;
+            deliveryZones?: {
+                /** Format: uuid */
+                zoneId: string;
+                deliveryEnabled: boolean;
+            }[];
+            /** @description true pauses new sales; false resumes a pause set by the cook. */
+            paused?: boolean;
+            expectedVersion: number;
+        };
         /** @description Capacity changes are refused after cutoff (409 SLOT_CLOSED) and below current obligations (409 BELOW_OBLIGATIONS). mealCapacities replaces the list. States DRAFT→OPEN, OPEN↔PAUSED, OPEN/PAUSED→CLOSED, DRAFT/OPEN/PAUSED→CANCELLED (only without obligations); CLOSED and CANCELLED are final. Times cannot be changed. */
         PatchCookSlotsByIdRequest: {
             maxPortions?: number;
@@ -2781,8 +2849,39 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-079. */
         StaffSupportCase: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-064. */
-        StatementPage: Record<string, never>;
+        /** @description Own statement for a Cairo date range. includes lists what it covers; refunds, reversals and remittances are not included until finance operations (MB-025), and their absence does not mean zero. Cash collected by the cook is not platform revenue; only the commission is receivable. */
+        StatementPage: {
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            includes: ("COMPLETED_ORDERS" | "CASH_POSITION" | "COMMISSION")[];
+            summary: {
+                completedOrders: number;
+                ordersTotal: components["schemas"]["Money"];
+                cashReported: components["schemas"]["Money"];
+                cashVerified: components["schemas"]["Money"];
+                cashOutstanding: components["schemas"]["Money"];
+                commissionPosted: components["schemas"]["Money"];
+                /** @description Completed orders whose commission is not posted yet. */
+                commissionPending: number;
+            };
+            items: {
+                /** Format: uuid */
+                orderId: string;
+                publicNumber: string;
+                /** Format: date-time */
+                completedAt: string;
+                orderTotal: components["schemas"]["Money"];
+                /** @enum {string} */
+                cashState: "DUE" | "REPORTED" | "VERIFIED" | "DISPUTED" | "NOT_DUE";
+                commission: components["schemas"]["Money"] | null;
+                /** @enum {string} */
+                commissionState: "POSTED" | "PENDING_POSTING";
+            }[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description PENDING typed schema. Response for API-028. */
         SupportCase: Record<string, never>;
         SupportCaseCreate: {
@@ -4587,6 +4686,10 @@ export interface operations {
     getCookStatements: {
         parameters: {
             query?: {
+                /** @description First Cairo date (default first day of the current month) */
+                from?: string;
+                /** @description Last Cairo date, inclusive (default today); at most 366 days after from */
+                to?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];

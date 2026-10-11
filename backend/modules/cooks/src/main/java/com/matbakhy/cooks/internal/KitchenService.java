@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
@@ -134,11 +135,104 @@ public class KitchenService implements KitchenDirectory {
         if (to == null) {
             throw new ApiException(ErrorCode.STATE_CONFLICT, action + " not allowed from " + from);
         }
-        jdbc.update("UPDATE kitchen SET operating_state = ?, state_reason = ?, updated_at = ?, version = version + 1 WHERE id = ?",
-                to, trimmed, Timestamp.from(clock.instant()), kitchenId);
+        jdbc.update("""
+                UPDATE kitchen SET operating_state = ?, paused_by = ?, state_reason = ?, updated_at = ?, version = version + 1 WHERE id = ?""",
+                to, "PAUSED".equals(to) ? "STAFF" : null, trimmed, Timestamp.from(clock.instant()), kitchenId);
         audit.record(new Entry(actorId, "kitchen.operating_state", Permission.COOK_REVIEW.code(), "kitchen", kitchenId.toString(),
                 Outcome.ALLOWED, trimmed, requestId, Map.of("action", action.name(), "from", from, "to", to)));
         return admin(kitchenId);
+    }
+
+    // ---- cook workspace settings (API-065) ----
+
+    /** Optional changes; null fields stay as they are. */
+    public record SettingsPatch(String description, Boolean pickupEnabled, Map<UUID, Boolean> deliveryZones, Boolean paused,
+                                Long expectedVersion) {
+    }
+
+    @Override
+    public Optional<KitchenSettings> settingsOf(UUID ownerId) {
+        return jdbc.query("""
+                SELECT id, public_slug, display_name, description, operating_state, paused_by, pickup_enabled, version
+                FROM kitchen WHERE owner_id = ?""", (rs, n) -> new KitchenSettings(rs.getObject("id", UUID.class), rs.getString("public_slug"),
+                rs.getString("display_name"), rs.getString("description"), rs.getString("operating_state"),
+                "PAUSED".equals(rs.getString("operating_state")) ? (rs.getString("paused_by") == null ? "STAFF" : rs.getString("paused_by")) : null,
+                rs.getBoolean("pickup_enabled"), zoneSettings(rs.getObject("id", UUID.class)), rs.getLong("version")), ownerId)
+                .stream().findFirst();
+    }
+
+    private List<ZoneSetting> zoneSettings(UUID kitchenId) {
+        return jdbc.query("""
+                SELECT z.id, z.name_ar, z.name_en, kz.delivery_enabled FROM kitchen_zone kz JOIN service_zone z ON z.id = kz.zone_id
+                WHERE kz.kitchen_id = ? ORDER BY z.name_en, z.id""",
+                (rs, n) -> new ZoneSetting(rs.getObject(1, UUID.class), rs.getString(2), rs.getString(3), rs.getBoolean(4)), kitchenId);
+    }
+
+    /**
+     * The cook changes only their own kitchen: description, pickup, delivery among the approved zones, and a
+     * pause they control. Suspension, a staff pause and closure cannot be cleared here (BR-009). Approved
+     * identity fields (display name, location, contact) need a new application. The kitchen must stay serviceable.
+     */
+    @Transactional
+    public KitchenSettings updateSettings(UUID cookId, SettingsPatch patch, String requestId) {
+        KitchenSettings current = jdbc.query("SELECT id FROM kitchen WHERE owner_id = ? FOR UPDATE", (rs, n) -> rs.getObject(1, UUID.class), cookId)
+                .stream().findFirst().flatMap(id -> settingsOf(cookId))
+                .orElseThrow(() -> new ApiException(ErrorCode.FORBIDDEN, "no approved kitchen"));
+        if (patch.expectedVersion() == null || patch.expectedVersion() != current.version()) {
+            throw new ApiException(ErrorCode.VERSION_CONFLICT, "stale kitchen version");
+        }
+        List<FieldError> errors = new java.util.ArrayList<>();
+        String description = patch.description() == null ? current.description() : patch.description().strip();
+        if (description.isEmpty() || description.length() > 2000) {
+            errors.add(new FieldError("description", "LENGTH_1_2000"));
+        }
+        boolean pickup = patch.pickupEnabled() == null ? current.pickupEnabled() : patch.pickupEnabled();
+        Map<UUID, Boolean> zones = new java.util.LinkedHashMap<>();
+        current.zones().forEach(z -> zones.put(z.zoneId(), z.deliveryEnabled()));
+        if (patch.deliveryZones() != null) {
+            for (Map.Entry<UUID, Boolean> z : patch.deliveryZones().entrySet()) {
+                if (!zones.containsKey(z.getKey()) || z.getValue() == null) {
+                    errors.add(new FieldError("deliveryZones", "ZONE_NOT_APPROVED"));
+                    break;
+                }
+                zones.put(z.getKey(), z.getValue());
+            }
+        }
+        if (!pickup && !zones.containsValue(Boolean.TRUE)) {
+            errors.add(new FieldError("pickupEnabled", "PICKUP_OR_ZONE_REQUIRED"));
+        }
+        if (!errors.isEmpty()) {
+            throw new ApiException(ErrorCode.VALIDATION_FAILED, "invalid kitchen settings", errors);
+        }
+        String state = current.operatingState();
+        String pausedBy = current.pausedBy();
+        if (patch.paused() != null) {
+            // Pause: ACTIVE -> PAUSED (or already paused). Resume: only a cook pause; ACTIVE stays ACTIVE.
+            boolean allowed = patch.paused() ? "ACTIVE".equals(state) || "PAUSED".equals(state)
+                    : "ACTIVE".equals(state) || ("PAUSED".equals(state) && "COOK".equals(pausedBy));
+            if (!allowed) {
+                throw new ApiException(ErrorCode.STATE_CONFLICT, "kitchen is " + state + ("PAUSED".equals(state) ? " by staff" : ""),
+                        List.of(new FieldError("operatingState", state)));
+            }
+            if (patch.paused() && "ACTIVE".equals(state)) {
+                state = "PAUSED";
+                pausedBy = "COOK";
+            } else if (!patch.paused() && "PAUSED".equals(state)) {
+                state = "ACTIVE";
+                pausedBy = null;
+            }
+        }
+        Instant now = clock.instant();
+        jdbc.update("""
+                UPDATE kitchen SET description = ?, pickup_enabled = ?, operating_state = ?, paused_by = ?,
+                       state_reason = CASE WHEN ? THEN NULL ELSE state_reason END, updated_at = ?, version = version + 1 WHERE id = ?""",
+                description, pickup, state, pausedBy, !state.equals(current.operatingState()), Timestamp.from(now), current.kitchenId());
+        zones.forEach((zone, enabled) -> jdbc.update("""
+                UPDATE kitchen_zone SET delivery_enabled = ?, version = version + 1 WHERE kitchen_id = ? AND zone_id = ? AND delivery_enabled <> ?""",
+                enabled, current.kitchenId(), zone, enabled));
+        audit.record(new Entry(cookId, "kitchen.settings", null, "kitchen", current.kitchenId().toString(), Outcome.ALLOWED, null, requestId,
+                Map.of("operatingState", state, "pickupEnabled", pickup)));
+        return settingsOf(cookId).orElseThrow();
     }
 
     private List<UUID> deliveryZones(UUID kitchenId) {
