@@ -1884,8 +1884,30 @@ export interface components {
             nextCursor: string | null;
             hasMore: boolean;
         };
-        /** @description PENDING typed schema. Response for API-038. */
-        CaseMessage: Record<string, never>;
+        /** @description Messages are append-only. Customers only ever receive PUBLIC ones. */
+        CaseMessage: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            authorRole: "CUSTOMER" | "STAFF";
+            /** @enum {string} */
+            visibility: "PUBLIC" | "STAFF_ONLY";
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        /**
+         * @description CANCELLATION_REQUEST cases are created only through API-028. FOOD_SAFETY cases are CRITICAL and escalated at creation.
+         * @enum {string}
+         */
+        CaseCategory: "LATE" | "MISSING_ITEM" | "QUALITY" | "FOOD_SAFETY" | "CASH" | "HANDOVER" | "OTHER" | "CANCELLATION_REQUEST";
+        /** @enum {string} */
+        CaseState: "OPEN" | "IN_PROGRESS" | "WAITING_ON_CUSTOMER" | "RESOLVED" | "CLOSED";
+        /**
+         * @description OVERDUE_ACCEPTANCE means pending with the acceptance deadline within 5 minutes or past.
+         * @enum {string}
+         */
+        OrderExceptionFlag: "OVERDUE_ACCEPTANCE" | "DELIVERY_FAILED" | "CASH_DISPUTED" | "OPEN_CASE";
         /** @description A cook's cash report and, once decided, finance's verification. discrepancy = reported - due (negative when short); any non-zero discrepancy makes the obligation DISPUTED. */
         CashCollection: {
             /** Format: uuid */
@@ -2386,10 +2408,42 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-066. */
         OpsDashboard: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-074. */
-        OpsOrderPage: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-075. */
-        OpsOrderView: Record<string, never>;
+        OpsOrderPage: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                publicNumber: string;
+                state: components["schemas"]["OrderState"];
+                fulfillmentMode: components["schemas"]["FulfillmentMode"];
+                /** Format: uuid */
+                kitchenId: string;
+                total: components["schemas"]["Money"];
+                /** Format: date-time */
+                acceptBy: string;
+                /** Format: date-time */
+                createdAt: string;
+                cashState: string;
+                exceptions: components["schemas"]["OrderExceptionFlag"][];
+                version: number;
+            }[];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        /** @description Staff order view (no handover code). customerContact only while the order is pending or being fulfilled. */
+        OpsOrderView: {
+            order: components["schemas"]["OrderView"];
+            /** Format: uuid */
+            kitchenId: string;
+            /** Format: uuid */
+            customerId: string;
+            customerContact: {
+                name: string | null;
+                phone: string;
+                deliveryAddress: Record<string, never> | null;
+            } | null;
+            exceptions: components["schemas"]["OrderExceptionFlag"][];
+            caseIds: string[];
+        };
         OrderEvent: {
             sequence: number;
             fromState?: components["schemas"]["OrderState"] | null;
@@ -2523,8 +2577,15 @@ export interface components {
             /** @enum {string} */
             locale?: "ar" | "en";
         };
-        /** @description PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion */
-        PatchOpsCasesByIdRequest: Record<string, never>;
+        /** @description RESOLVED needs a resolutionCode and a reason; ORDER_CANCELLED requires the order to be CANCELLED already (API-076 with the case reference). Only RESOLVED cases can be CLOSED; CLOSED is final. Audited. */
+        PatchOpsCasesByIdRequest: {
+            assignToMe?: boolean;
+            state?: components["schemas"]["CaseState"];
+            /** @enum {string} */
+            resolutionCode?: "INFORMATION_PROVIDED" | "ORDER_CANCELLED" | "CANCELLATION_DECLINED" | "REFUND_REQUESTED" | "KITCHEN_FOLLOW_UP" | "DUPLICATE" | "NO_ACTION" | "OTHER";
+            reason?: string;
+            expectedVersion: number;
+        };
         /** @description Never contains the code. 429 RATE_LIMITED when resend interval or hourly limits are hit. */
         PhoneChallenge: {
             /** Format: uuid */
@@ -2640,8 +2701,13 @@ export interface components {
         PostMePhoneChallengesVerifyRequest: {
             code: string;
         };
-        /** @description PENDING typed schema. Request for API-080: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key */
-        PostOpsCasesMessagesRequest: Record<string, never>;
+        /** @description STAFF_ONLY notes are never shown to customers. The first PUBLIC message records the first response. */
+        PostOpsCasesMessagesRequest: {
+            body: string;
+            /** @enum {string} */
+            visibility: "PUBLIC" | "STAFF_ONLY";
+            attachmentIds?: string[];
+        };
         /** @description PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up */
         PostOpsConfigurationVersionsRequest: Record<string, never>;
         /** @description START_REVIEW moves SUBMITTED to UNDER_REVIEW; the other decisions need UNDER_REVIEW and a reason. A reviewer cannot decide their own application. */
@@ -2740,14 +2806,22 @@ export interface components {
             expiresAt?: string;
             reason: string;
         };
-        /** @description PENDING typed schema. Request for API-028: expectedVersion, reasonCode, note; accepted or later; no direct transition */
-        PostOrdersCancellationRequestsRequest: Record<string, never>;
+        /** @description For own orders after acceptance and before a terminal state. Opens a HIGH CANCELLATION_REQUEST case (one open per order) and never changes the order; staff decide. Pending orders use API-027 instead (409). */
+        PostOrdersCancellationRequestsRequest: {
+            expectedVersion: number;
+            /** @enum {string} */
+            reasonCode: "CHANGED_MIND" | "ORDERED_BY_MISTAKE" | "TOO_SLOW" | "OTHER";
+            note?: string;
+        };
         /** @description PENDING typed schema. Request for API-029: rating, text; completed only, unique order */
         PostOrdersReviewsRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-030: reasonCode, bounded description; rate limit */
         PostReviewsReportsRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-038: body, attachmentIds; customer-visible; Idempotency-Key */
-        PostSupportCasesMessagesRequest: Record<string, never>;
+        /** @description Always PUBLIC. A reply reopens a waiting or resolved case; closed cases accept no messages (409). */
+        PostSupportCasesMessagesRequest: {
+            body: string;
+            attachmentIds?: string[];
+        };
         PostUploadsCompleteRequest: {
             /** @description Optional; must equal the declared checksum */
             sha256?: string;
@@ -2887,8 +2961,41 @@ export interface components {
             nextCursor: string | null;
             hasMore: boolean;
         };
-        /** @description PENDING typed schema. Response for API-079. */
-        StaffSupportCase: Record<string, never>;
+        /** @description Staff view including STAFF_ONLY notes (detail only). SLA targets are proposed defaults - CRITICAL 30 min, HIGH 2 h, NORMAL 24 h to the first public staff response. */
+        StaffSupportCase: {
+            /** Format: uuid */
+            id: string;
+            reference: string;
+            /** Format: uuid */
+            orderId: string;
+            orderNumber: string | null;
+            /** Format: uuid */
+            customerId: string;
+            category: components["schemas"]["CaseCategory"];
+            /** @enum {string} */
+            severity: "NORMAL" | "HIGH" | "CRITICAL";
+            state: components["schemas"]["CaseState"];
+            description: string;
+            cancellationReason: string | null;
+            /** Format: uuid */
+            assigneeId: string | null;
+            /** Format: date-time */
+            slaDueAt: string;
+            overdue: boolean;
+            /** Format: date-time */
+            firstResponseAt: string | null;
+            /** Format: date-time */
+            escalatedAt: string | null;
+            resolutionCode: string | null;
+            /** Format: date-time */
+            resolvedAt: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            messages: components["schemas"]["CaseMessage"][];
+            version: number;
+        };
         /** @description Own statement for a Cairo date range. includes lists what it covers; refunds, reversals and remittances are not included until finance operations (MB-025), and their absence does not mean zero. Cash collected by the cook is not platform revenue; only the commission is receivable. */
         StatementPage: {
             /** Format: date */
@@ -2922,17 +3029,45 @@ export interface components {
             nextCursor: string | null;
             hasMore: boolean;
         };
-        /** @description PENDING typed schema. Response for API-028. */
-        SupportCase: Record<string, never>;
+        /** @description Customer view of an own case. Lists omit messages; the detail carries PUBLIC messages only. No severity, SLA or assignee. */
+        SupportCase: {
+            /** Format: uuid */
+            id: string;
+            reference: string;
+            /** Format: uuid */
+            orderId: string;
+            orderNumber: string | null;
+            category: components["schemas"]["CaseCategory"];
+            state: components["schemas"]["CaseState"];
+            description: string;
+            resolutionCode: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            messages: components["schemas"]["CaseMessage"][];
+            version: number;
+        };
+        /** @description A case about one of the caller's own orders (another customer's order is 404). Attachments are not accepted yet. */
         SupportCaseCreate: {
             /** Format: uuid */
             orderId: string;
-            category: string;
+            /** @enum {string} */
+            category: "LATE" | "MISSING_ITEM" | "QUALITY" | "FOOD_SAFETY" | "CASH" | "HANDOVER" | "OTHER";
             description: string;
             attachmentIds?: string[];
         };
-        /** @description PENDING typed schema. Response for API-036. */
-        SupportCasePage: Record<string, never>;
+        SupportCasePage: {
+            items: components["schemas"]["SupportCase"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        /** @description Most urgent first (severity, then SLA due time). Items omit messages. */
+        StaffSupportCasePage: {
+            items: components["schemas"]["StaffSupportCase"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         TransitionCommand: {
             expectedVersion: number;
             reasonCode?: string;
@@ -3738,7 +3873,10 @@ export interface operations {
     postOrdersCancellationRequests: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                /** @description Persisted random UUID reused on every retry of the same command */
+                "Idempotency-Key": components["parameters"]["IdempotencyKey"];
+            };
             path: {
                 orderId: string;
             };
@@ -3750,8 +3888,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3959,8 +4097,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4014,8 +4152,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5001,6 +5139,13 @@ export interface operations {
     getOpsOrders: {
         parameters: {
             query?: {
+                state?: components["schemas"]["OrderState"];
+                kitchenId?: string;
+                /** @description First Cairo date of order creation */
+                from?: string;
+                /** @description Last Cairo date of order creation, inclusive */
+                to?: string;
+                exception?: components["schemas"]["OrderExceptionFlag"];
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -5113,6 +5258,13 @@ export interface operations {
     getOpsCases: {
         parameters: {
             query?: {
+                /** @description ACTIVE means any state other than RESOLVED or CLOSED */
+                state?: "ACTIVE" | "OPEN" | "IN_PROGRESS" | "WAITING_ON_CUSTOMER" | "RESOLVED" | "CLOSED";
+                category?: components["schemas"]["CaseCategory"];
+                severity?: "NORMAL" | "HIGH" | "CRITICAL";
+                mine?: boolean;
+                /** @description Only cases past their first-response SLA without a public staff response */
+                overdue?: boolean;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -5129,7 +5281,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["SupportCasePage"];
+                    "application/json": components["schemas"]["StaffSupportCasePage"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -5206,8 +5358,8 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Success */
-            200: {
+            /** @description Created */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

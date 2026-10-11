@@ -253,7 +253,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "SupportCase",
       "contract": "expectedVersion, reasonCode, note; accepted or later; no direct transition",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-029",
@@ -316,7 +316,7 @@
       "permission": "CUSTOMER",
       "response_type": "SupportCase",
       "contract": "orderId, category, description, attachmentIds; scope",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-036",
@@ -325,7 +325,7 @@
       "permission": "SELF",
       "response_type": "SupportCasePage",
       "contract": "own cases only, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-037",
@@ -334,7 +334,7 @@
       "permission": "CASE_OWNER",
       "response_type": "SupportCase",
       "contract": "public messages only, no private notes",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-038",
@@ -343,7 +343,7 @@
       "permission": "CASE_OWNER",
       "response_type": "CaseMessage",
       "contract": "body, attachmentIds; customer-visible; Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-039",
@@ -667,7 +667,7 @@
       "permission": "ORDER_OPS",
       "response_type": "OpsOrderPage",
       "contract": "state, kitchen, date, exceptions, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-075",
@@ -676,7 +676,7 @@
       "permission": "ORDER_OPS",
       "response_type": "OpsOrderView",
       "contract": "events/stock/finance refs with scoped contact fields",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-076",
@@ -701,9 +701,9 @@
       "method": "GET",
       "path": "/api/v1/ops/cases",
       "permission": "SUPPORT",
-      "response_type": "SupportCasePage",
+      "response_type": "StaffSupportCasePage",
       "contract": "category/severity/assignee/state/SLA pagination",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-079",
@@ -712,7 +712,7 @@
       "permission": "SUPPORT",
       "response_type": "StaffSupportCase",
       "contract": "staff notes included only with staff scope",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-080",
@@ -721,7 +721,7 @@
       "permission": "SUPPORT",
       "response_type": "CaseMessage",
       "contract": "body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-081",
@@ -730,7 +730,7 @@
       "permission": "SUPPORT",
       "response_type": "StaffSupportCase",
       "contract": "assignment/state/resolution, reason, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-082",

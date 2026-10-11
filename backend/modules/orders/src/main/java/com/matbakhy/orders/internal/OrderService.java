@@ -9,6 +9,7 @@ import com.matbakhy.identity.api.AddressDirectory;
 import com.matbakhy.identity.api.AddressDirectory.OwnedAddress;
 import com.matbakhy.identity.api.CheckoutContactPolicy;
 import com.matbakhy.identity.api.CheckoutContactPolicy.VerifiedContact;
+import com.matbakhy.orders.api.OrderCases;
 import com.matbakhy.orders.api.QuoteDirectory;
 import com.matbakhy.orders.api.QuoteDirectory.QuotedItem;
 import com.matbakhy.orders.api.QuoteDirectory.ValidQuote;
@@ -99,12 +100,13 @@ public class OrderService {
     private final IdempotentCommands idempotency;
     private final JsonMapper json;
     private final KitchenDirectory kitchens;
+    private final OrderCases cases;
     private final HandoverCodes codes;
     private final Clock clock;
 
     OrderService(JdbcTemplate jdbc, QuoteDirectory quotes, SlotInventory inventory, MealCatalog meals, AddressDirectory addresses,
                  CheckoutContactPolicy contact, IdempotentCommands idempotency, JsonMapper json, KitchenDirectory kitchens,
-                 HandoverCodes codes, Clock clock) {
+                 HandoverCodes codes, OrderCases cases, Clock clock) {
         this.jdbc = jdbc;
         this.quotes = quotes;
         this.inventory = inventory;
@@ -115,6 +117,7 @@ public class OrderService {
         this.json = json;
         this.kitchens = kitchens;
         this.codes = codes;
+        this.cases = cases;
         this.clock = clock;
     }
 
@@ -296,7 +299,9 @@ public class OrderService {
         SlotView slot = new SlotView((UUID) o.get("slot_id"), ((Timestamp) o.get("starts_at")).toInstant(), ((Timestamp) o.get("ends_at")).toInstant(),
                 "Africa/Cairo", ((Timestamp) o.get("cutoff_at")).toInstant(), Math.max(0, ((Number) o.get("slot_available")).intValue()),
                 List.of((String) o.get("fulfillment_mode")));
-        List<String> actions = "PENDING_ACCEPTANCE".equals(state) ? List.of("CANCEL") : List.of();
+        // After acceptance the customer can only ask (a support case); staff decide (BR-028).
+        List<String> actions = "PENDING_ACCEPTANCE".equals(state) ? List.of("CANCEL")
+                : CONTACT_STATES.contains(state) ? List.of("REQUEST_CANCELLATION") : List.of();
         String mode = (String) o.get("fulfillment_mode");
         KitchenContact kitchenContact = null;
         if (CONTACT_STATES.contains(state)) {
@@ -308,7 +313,7 @@ public class OrderService {
         return new OrderView(orderId, (String) o.get("public_number"), (Long) o.get("version"), state, mode, lines,
                 egp((Long) o.get("subtotal_minor")), egp((Long) o.get("delivery_fee_minor")), egp((Long) o.get("tax_minor")),
                 egp((Long) o.get("total_minor")), slot, ((Timestamp) o.get("accept_by")).toInstant(), eventsAfter(orderId, 0, 1000), actions,
-                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), List.of(), handoverCode(orderId, state), kitchenContact);
+                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), cases.caseIds(orderId), handoverCode(orderId, state), kitchenContact);
     }
 
     static final Set<String> CONTACT_STATES = Set.of("ACCEPTED", "PREPARING", "READY", "OUT_FOR_DELIVERY");

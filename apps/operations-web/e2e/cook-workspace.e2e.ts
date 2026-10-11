@@ -241,11 +241,11 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await idpLogin(ops, "ops-a");
   await expect(ops.getByText(t.noKitchen)).toBeVisible();
   sql(`INSERT INTO user_grant (id, user_id, permission, grant_reason)
-       SELECT gen_random_uuid(), id, p, 'e2e synthetic grant' FROM app_user, unnest(ARRAY['content.moderate', 'cook.review']) AS p
+       SELECT gen_random_uuid(), id, p, 'e2e synthetic grant' FROM app_user, unnest(ARRAY['content.moderate', 'cook.review', 'support.case', 'order.ops', 'order.exception_cancel']) AS p
        WHERE subject = '${OPS_SUBJECT}'`);
   await ops.reload();
   await expect(ops.getByRole("button", { name: t.ops.reviews })).toBeVisible();
-  await expect(ops.getByRole("button", { name: t.tabs.orders })).toHaveCount(0);
+  await expect(ops.getByRole("button", { name: t.tabs.orders, exact: true })).toHaveCount(0);
 
   // Hide the meal: no longer sold or shown; restore: sold again.
   await ops.getByRole("button", { name: t.ops.catalogue }).click();
@@ -275,6 +275,53 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   expect(sql(`SELECT operating_state FROM kitchen WHERE id = '00000000-0000-4000-8000-0000000000d1'`)).toBe("ACTIVE");
   // A cook never sees staff sections or private application data of others.
   expect((await cook.request.get(`${API}/api/v1/ops/catalogue`)).status()).toBe(403);
+
+  // ---- support cases and a cancellation request after acceptance (MB-024) ----
+  const third = await place("PICKUP");
+  await cook.getByRole("button", { name: t.tabs.orders }).click();
+  await cook.getByRole("button", { name: t.filter.ACTIVE }).click();
+  await act(third, "ACCEPT");
+  await expectState(third, "ACCEPTED");
+  const thirdView = await customerCall(customerContext, req, "GET", `/api/v1/orders/${third.id}`);
+  expect(thirdView.body.allowedActions).toEqual(["REQUEST_CANCELLATION"]);
+  const request = await customerCall(customerContext, req, "POST", `/api/v1/orders/${third.id}/cancellation-requests`,
+    { expectedVersion: thirdView.body.version, reasonCode: "CHANGED_MIND", note: "Plans changed, sorry" }, true);
+  expect(request.status, JSON.stringify(request.body)).toBe(201);
+  expect((await customerCall(customerContext, req, "GET", `/api/v1/orders/${third.id}`)).body.state, "request does not cancel").toBe("ACCEPTED");
+  const safety = await customerCall(customerContext, req, "POST", "/api/v1/support/cases",
+    { orderId: pickup.id, category: "FOOD_SAFETY", description: "Felt unwell after eating the synthetic meal" });
+  expect(safety.status, JSON.stringify(safety.body)).toBe(201);
+
+  await ops.reload();
+  await ops.getByRole("button", { name: t.ops.cases }).click();
+  const firstRow = ops.getByRole("listitem").filter({ hasText: safety.body.reference as string });
+  await expect(firstRow.getByText(label(t.ops.severity.CRITICAL))).toBeVisible();
+  await firstRow.getByRole("button", { name: safety.body.reference as string }).click();
+  await ops.getByRole("textbox", { name: t.ops.staffOnly }).fill("Synthetic internal note: check kitchen hygiene record");
+  await ops.getByRole("button", { name: t.ops.send }).click();
+  await expect(ops.getByText("Synthetic internal note: check kitchen hygiene record")).toBeVisible();
+  const customerCase = await customerCall(customerContext, req, "GET", `/api/v1/support/cases/${safety.body.id as string}`);
+  expect(JSON.stringify(customerCase.body), "staff notes never reach the customer").not.toContain("internal note");
+
+  // The order shows up flagged; once in preparation operations cancel it with the case reference, then resolve the case.
+  await ops.getByRole("button", { name: t.ops.orders }).click();
+  await ops.getByRole("button", { name: label(t.ops.exception.OPEN_CASE) }).click();
+  await expect(ops.getByRole("button", { name: third.number })).toBeVisible();
+  await act(third, "PREPARE");
+  await expectState(third, "PREPARING");
+  await ops.getByRole("button", { name: third.number }).click();
+  const cancelForm = ops.getByRole("form", { name: t.ops.exceptionCancel });
+  await cancelForm.getByLabel(t.ops.caseReference).fill(request.body.reference as string);
+  await cancelForm.getByRole("button", { name: t.ops.exceptionCancel }).click();
+  await expect(ops.getByRole("heading", { name: new RegExp(`${third.number} · ${label(t.state.CANCELLED)}`) })).toBeVisible();
+  await ops.getByRole("button", { name: t.ops.cases }).click();
+  await ops.getByRole("button", { name: request.body.reference as string }).click();
+  await ops.getByLabel(t.ops.setState).selectOption("RESOLVED");
+  await ops.getByLabel(t.ops.resolution).selectOption("ORDER_CANCELLED");
+  await ops.getByLabel(t.reason, { exact: true }).fill("Cancelled on the customer's request");
+  await ops.getByRole("button", { name: t.save }).click();
+  await expect(ops.getByRole("heading", { name: new RegExp(label(t.ops.caseState.RESOLVED)) })).toBeVisible();
+  expect((await customerCall(customerContext, req, "GET", `/api/v1/support/cases/${request.body.id as string}`)).body.state).toBe("RESOLVED");
   await opsContext.close();
 
   // ---- English left-to-right ----

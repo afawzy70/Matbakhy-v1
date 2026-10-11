@@ -8,13 +8,15 @@ import { Orders } from "./cook/Orders";
 import { SettingsPanel } from "./cook/Settings";
 import { Slots } from "./cook/Slots";
 import { Statement } from "./cook/Statement";
+import { Cases } from "./ops/Cases";
 import { Catalogue } from "./ops/Catalogue";
+import { OpsOrders } from "./ops/OpsOrders";
 import { Reviews } from "./ops/Reviews";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
 const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
-type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue";
+type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders";
 
 export function title(locale: Locale): string {
   return `${brand.name[locale]} — ${strings[locale].section}`;
@@ -25,7 +27,17 @@ type Session =
   | { kind: "checking" }
   | { kind: "signedOut" }
   | { kind: "error" }
-  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean };
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean };
+
+function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
+  return [
+    ...(s.kitchen ? COOK_TABS : []),
+    ...(s.reviews ? (["reviews"] as const) : []),
+    ...(s.catalogue ? (["catalogue"] as const) : []),
+    ...(s.cases ? (["cases"] as const) : []),
+    ...(s.opsOrders ? (["opsOrders"] as const) : []),
+  ];
+}
 
 /** Signed in? Approved kitchen? The server decides; 403 on the dashboard means no approved kitchen. */
 async function checkSession(api: Api): Promise<Session> {
@@ -34,10 +46,12 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const [d, reviews, catalogue] = await Promise.all([
+    const [d, reviews, catalogue, cases, opsOrders] = await Promise.all([
       api.GET("/api/v1/cook/dashboard"),
       api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
+      api.GET("/api/v1/ops/cases", { params: { query: { limit: 1 } } }),
+      api.GET("/api/v1/ops/orders", { params: { query: { limit: 1 } } }),
     ]);
     if (!d.data && d.response.status !== 403) {
       return { kind: "error" };
@@ -48,6 +62,8 @@ async function checkSession(api: Api): Promise<Session> {
       serverOffsetMs: d.data ? Date.parse(d.data.serverTime) - Date.now() : 0,
       reviews: reviews.response.ok,
       catalogue: catalogue.response.ok,
+      cases: cases.response.ok,
+      opsOrders: opsOrders.response.ok,
     };
   } catch {
     return { kind: "error" };
@@ -84,15 +100,9 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
   const current: Tab | null =
     session.kind !== "in"
       ? null
-      : (session.kitchen && (COOK_TABS as readonly string[]).includes(tab)) || (tab === "reviews" && session.reviews) || (tab === "catalogue" && session.catalogue)
+      : allowedTabs(session).includes(tab)
         ? tab
-        : session.kitchen
-          ? "dashboard"
-          : session.reviews
-            ? "reviews"
-            : session.catalogue
-              ? "catalogue"
-              : null;
+        : (allowedTabs(session)[0] ?? null);
 
   const ctx: Ctx = {
     api,
@@ -149,13 +159,19 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
           <>
             {current !== null ? (
             <nav aria-label={t.section} className="tabs">
-              {[...(session.kitchen ? COOK_TABS : []), ...(session.reviews ? (["reviews"] as const) : []), ...(session.catalogue ? (["catalogue"] as const) : [])].map(
-                (name) => (
-                  <button key={name} type="button" aria-current={current === name ? "page" : undefined} onClick={() => setTab(name)}>
-                    {name === "reviews" ? t.ops.reviews : name === "catalogue" ? t.ops.catalogue : t.tabs[name]}
-                  </button>
-                ),
-              )}
+              {allowedTabs(session).map((name) => (
+                <button key={name} type="button" aria-current={current === name ? "page" : undefined} onClick={() => setTab(name)}>
+                  {name === "reviews"
+                    ? t.ops.reviews
+                    : name === "catalogue"
+                      ? t.ops.catalogue
+                      : name === "cases"
+                        ? t.ops.cases
+                        : name === "opsOrders"
+                          ? t.ops.orders
+                          : t.tabs[name]}
+                </button>
+              ))}
             </nav>
             ) : null}
             {current === null ? <Onboarding ctx={ctx} /> : null}
@@ -167,6 +183,8 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "settings" ? <SettingsPanel ctx={ctx} /> : null}
             {current === "reviews" ? <Reviews ctx={ctx} /> : null}
             {current === "catalogue" ? <Catalogue ctx={ctx} /> : null}
+            {current === "cases" ? <Cases ctx={ctx} /> : null}
+            {current === "opsOrders" ? <OpsOrders ctx={ctx} /> : null}
           </>
         ) : null}
       </main>

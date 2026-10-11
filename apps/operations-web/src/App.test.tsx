@@ -309,5 +309,44 @@ describe("operations-web cook workspace", () => {
     await waitFor(() => expect(calls.some((c) => c.method === "POST")).toBe(true));
     expect(calls.find((c) => c.method === "POST")?.body).toEqual({ action: "HIDE", reason: "misleading photo", expectedVersion: 4 });
   });
+
+  it("shows the support queue most urgent first and sends internal notes as staff-only by default", async () => {
+    const base = {
+      orderId: "o1",
+      orderNumber: "MB-1001",
+      customerId: "c1",
+      state: "OPEN",
+      description: "Felt unwell after the meal",
+      cancellationReason: null,
+      assigneeId: null,
+      firstResponseAt: null,
+      resolutionCode: null,
+      resolvedAt: null,
+      createdAt: SERVER_NOW,
+      updatedAt: SERVER_NOW,
+      messages: [],
+      version: 0,
+    };
+    const safety = { ...base, id: "s1", reference: "CS-0000000A", category: "FOOD_SAFETY", severity: "CRITICAL", slaDueAt: SERVER_NOW, overdue: true, escalatedAt: SERVER_NOW };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/cases": () => ({ status: 200, body: { items: [safety], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/ops/cases/s1": () => ({
+        status: 200,
+        body: { ...safety, messages: [{ id: "m1", authorRole: "STAFF", visibility: "STAFF_ONLY", body: "check kitchen history", createdAt: SERVER_NOW }] },
+      }),
+      "POST /api/v1/ops/cases/s1/messages": () => ({ status: 201, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByText("حرج")).toBeTruthy();
+    expect(screen.getByText(/\(متجاوزة للمهلة\)/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "CS-0000000A" }));
+    expect(await screen.findByText("check kitchen history")).toBeTruthy();
+    fireEvent.change(screen.getByRole("textbox", { name: "ملاحظة داخلية" }), { target: { value: "calling the customer now" } });
+    fireEvent.click(screen.getByRole("button", { name: "إرسال" }));
+    await waitFor(() => expect(calls.some((c) => c.method === "POST")).toBe(true));
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ body: "calling the customer now", visibility: "STAFF_ONLY" });
+  });
 });
 

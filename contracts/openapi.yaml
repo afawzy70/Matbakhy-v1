@@ -965,7 +965,7 @@ paths:
       description: expectedVersion, reasonCode, note; accepted or later; no direct transition
       x-matbakhy-id: API-028
       x-permission: ORDER_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -974,9 +974,10 @@ paths:
           in: path
           required: true
           schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
       responses:
-        "200":
-          description: Success
+        "201":
+          description: Created
           content:
             application/json:
               schema:
@@ -1195,13 +1196,13 @@ paths:
       description: orderId, category, description, attachmentIds; scope
       x-matbakhy-id: API-035
       x-permission: CUSTOMER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       responses:
-        "200":
-          description: Success
+        "201":
+          description: Created
           content:
             application/json:
               schema:
@@ -1224,7 +1225,7 @@ paths:
       description: own cases only, cursor, limit
       x-matbakhy-id: API-036
       x-permission: SELF
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1251,7 +1252,7 @@ paths:
       description: public messages only, no private notes
       x-matbakhy-id: API-037
       x-permission: CASE_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1280,7 +1281,7 @@ paths:
       description: body, attachmentIds; customer-visible; Idempotency-Key
       x-matbakhy-id: API-038
       x-permission: CASE_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1291,8 +1292,8 @@ paths:
           schema: *a1
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
-        "200":
-          description: Success
+        "201":
+          description: Created
           content:
             application/json:
               schema:
@@ -2497,11 +2498,41 @@ paths:
       description: state, kitchen, date, exceptions, cursor, limit
       x-matbakhy-id: API-074
       x-permission: ORDER_OPS
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OrderState"
+        - name: kitchenId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: from
+          in: query
+          required: false
+          description: First Cairo date of order creation
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          description: Last Cairo date of order creation, inclusive
+          schema:
+            type: string
+            format: date
+        - name: exception
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OrderExceptionFlag"
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2524,7 +2555,7 @@ paths:
       description: events/stock/finance refs with scoped contact fields
       x-matbakhy-id: API-075
       x-permission: ORDER_OPS
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2625,11 +2656,42 @@ paths:
       description: category/severity/assignee/state/SLA pagination
       x-matbakhy-id: API-078
       x-permission: SUPPORT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: state
+          in: query
+          required: false
+          description: ACTIVE means any state other than RESOLVED or CLOSED
+          schema:
+            type: string
+            enum: [ACTIVE, OPEN, IN_PROGRESS, WAITING_ON_CUSTOMER, RESOLVED, CLOSED]
+        - name: category
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/CaseCategory"
+        - name: severity
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [NORMAL, HIGH, CRITICAL]
+        - name: mine
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: overdue
+          in: query
+          required: false
+          description: Only cases past their first-response SLA without a public staff response
+          schema:
+            type: boolean
+            default: false
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -2638,7 +2700,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SupportCasePage"
+                $ref: "#/components/schemas/StaffSupportCasePage"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2652,7 +2714,7 @@ paths:
       description: staff notes included only with staff scope
       x-matbakhy-id: API-079
       x-permission: SUPPORT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2680,7 +2742,7 @@ paths:
       description: assignment/state/resolution, reason, expectedVersion
       x-matbakhy-id: API-081
       x-permission: SUPPORT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2715,7 +2777,7 @@ paths:
       description: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key
       x-matbakhy-id: API-080
       x-permission: SUPPORT
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2726,8 +2788,8 @@ paths:
           schema: *a1
         - $ref: "#/components/parameters/IdempotencyKey"
       responses:
-        "200":
-          description: Success
+        "201":
+          description: Created
           content:
             application/json:
               schema:
@@ -3682,8 +3744,36 @@ components:
           type: boolean
     CaseMessage:
       type: object
-      description: PENDING typed schema. Response for API-038.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Messages are append-only. Customers only ever receive PUBLIC ones.
+      required: [id, authorRole, visibility, body, createdAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        authorRole:
+          type: string
+          enum: [CUSTOMER, STAFF]
+        visibility:
+          type: string
+          enum: [PUBLIC, STAFF_ONLY]
+        body:
+          type: string
+          maxLength: 4000
+        createdAt:
+          type: string
+          format: date-time
+    CaseCategory:
+      type: string
+      enum: [LATE, MISSING_ITEM, QUALITY, FOOD_SAFETY, CASH, HANDOVER, OTHER, CANCELLATION_REQUEST]
+      description: CANCELLATION_REQUEST cases are created only through API-028. FOOD_SAFETY cases are CRITICAL and escalated at creation.
+    CaseState:
+      type: string
+      enum: [OPEN, IN_PROGRESS, WAITING_ON_CUSTOMER, RESOLVED, CLOSED]
+    OrderExceptionFlag:
+      type: string
+      enum: [OVERDUE_ACCEPTANCE, DELIVERY_FAILED, CASH_DISPUTED, OPEN_CASE]
+      description: OVERDUE_ACCEPTANCE means pending with the acceptance deadline within 5 minutes or past.
     CashCollection:
       type: object
       additionalProperties: false
@@ -4912,12 +5002,85 @@ components:
       x-schema-status: PENDING
     OpsOrderPage:
       type: object
-      description: PENDING typed schema. Response for API-074.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, publicNumber, state, fulfillmentMode, kitchenId, total, acceptBy, createdAt, cashState, exceptions, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              publicNumber:
+                type: string
+              state:
+                $ref: "#/components/schemas/OrderState"
+              fulfillmentMode:
+                $ref: "#/components/schemas/FulfillmentMode"
+              kitchenId:
+                type: string
+                format: uuid
+              total:
+                $ref: "#/components/schemas/Money"
+              acceptBy:
+                type: string
+                format: date-time
+              createdAt:
+                type: string
+                format: date-time
+              cashState:
+                type: string
+              exceptions:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderExceptionFlag"
+              version:
+                type: integer
+                minimum: 0
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     OpsOrderView:
       type: object
-      description: PENDING typed schema. Response for API-075.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Staff order view (no handover code). customerContact only while the order is pending or being fulfilled.
+      required: [order, kitchenId, customerId, customerContact, exceptions, caseIds]
+      properties:
+        order:
+          $ref: "#/components/schemas/OrderView"
+        kitchenId:
+          type: string
+          format: uuid
+        customerId:
+          type: string
+          format: uuid
+        customerContact:
+          oneOf:
+            - type: object
+              additionalProperties: false
+              required: [name, phone, deliveryAddress]
+              properties:
+                name:
+                  type: [string, "null"]
+                phone:
+                  type: string
+                deliveryAddress:
+                  type: [object, "null"]
+            - type: "null"
+        exceptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderExceptionFlag"
+        caseIds:
+          type: array
+          items:
+            type: string
+            format: uuid
     OrderEvent:
       type: object
       additionalProperties: false
@@ -5278,8 +5441,26 @@ components:
             - en
     PatchOpsCasesByIdRequest:
       type: object
-      description: "PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        RESOLVED needs a resolutionCode and a reason; ORDER_CANCELLED requires the order to be CANCELLED already (API-076 with the
+        case reference). Only RESOLVED cases can be CLOSED; CLOSED is final. Audited.
+      required: [expectedVersion]
+      properties:
+        assignToMe:
+          type: boolean
+        state:
+          $ref: "#/components/schemas/CaseState"
+        resolutionCode:
+          type: string
+          enum: [INFORMATION_PROVIDED, ORDER_CANCELLED, CANCELLATION_DECLINED, REFUND_REQUESTED, KITCHEN_FOLLOW_UP, DUPLICATE, NO_ACTION, OTHER]
+        reason:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        expectedVersion:
+          type: integer
+          minimum: 0
     PhoneChallenge:
       type: object
       additionalProperties: false
@@ -5542,8 +5723,23 @@ components:
           pattern: ^[0-9]{6}$
     PostOpsCasesMessagesRequest:
       type: object
-      description: "PENDING typed schema. Request for API-080: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: STAFF_ONLY notes are never shown to customers. The first PUBLIC message records the first response.
+      required: [body, visibility]
+      properties:
+        body:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        visibility:
+          type: string
+          enum: [PUBLIC, STAFF_ONLY]
+        attachmentIds:
+          type: array
+          maxItems: 0
+          items:
+            type: string
+            format: uuid
     PostOpsConfigurationVersionsRequest:
       type: object
       description: "PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up"
@@ -5769,8 +5965,21 @@ components:
       description: Requires staff.grant and recent MFA (403 STEP_UP_REQUIRED). Granting to yourself is 403; duplicate active grant 409.
     PostOrdersCancellationRequestsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-028: expectedVersion, reasonCode, note; accepted or later; no direct transition"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: >-
+        For own orders after acceptance and before a terminal state. Opens a HIGH CANCELLATION_REQUEST case (one open per order) and never
+        changes the order; staff decide. Pending orders use API-027 instead (409).
+      required: [expectedVersion, reasonCode]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reasonCode:
+          type: string
+          enum: [CHANGED_MIND, ORDERED_BY_MISTAKE, TOO_SLOW, OTHER]
+        note:
+          type: string
+          maxLength: 3900
     PostOrdersReviewsRequest:
       type: object
       description: "PENDING typed schema. Request for API-029: rating, text; completed only, unique order"
@@ -5781,8 +5990,20 @@ components:
       x-schema-status: PENDING
     PostSupportCasesMessagesRequest:
       type: object
-      description: "PENDING typed schema. Request for API-038: body, attachmentIds; customer-visible; Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Always PUBLIC. A reply reopens a waiting or resolved case; closed cases accept no messages (409).
+      required: [body]
+      properties:
+        body:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        attachmentIds:
+          type: array
+          maxItems: 0
+          items:
+            type: string
+            format: uuid
     PostUploadsCompleteRequest:
       type: object
       additionalProperties: false
@@ -6130,8 +6351,67 @@ components:
           type: boolean
     StaffSupportCase:
       type: object
-      description: PENDING typed schema. Response for API-079.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Staff view including STAFF_ONLY notes (detail only). SLA targets are proposed defaults - CRITICAL 30 min, HIGH 2 h, NORMAL 24 h to the first public staff response.
+      required: [id, reference, orderId, orderNumber, customerId, category, severity, state, description, cancellationReason, assigneeId, slaDueAt, overdue,
+                 firstResponseAt, escalatedAt, resolutionCode, resolvedAt, createdAt, updatedAt, messages, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference:
+          type: string
+        orderId:
+          type: string
+          format: uuid
+        orderNumber:
+          type: [string, "null"]
+        customerId:
+          type: string
+          format: uuid
+        category:
+          $ref: "#/components/schemas/CaseCategory"
+        severity:
+          type: string
+          enum: [NORMAL, HIGH, CRITICAL]
+        state:
+          $ref: "#/components/schemas/CaseState"
+        description:
+          type: string
+        cancellationReason:
+          type: [string, "null"]
+        assigneeId:
+          type: [string, "null"]
+          format: uuid
+        slaDueAt:
+          type: string
+          format: date-time
+        overdue:
+          type: boolean
+        firstResponseAt:
+          type: [string, "null"]
+          format: date-time
+        escalatedAt:
+          type: [string, "null"]
+          format: date-time
+        resolutionCode:
+          type: [string, "null"]
+        resolvedAt:
+          type: [string, "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseMessage"
+        version:
+          type: integer
+          minimum: 0
     StatementPage:
       type: object
       additionalProperties: false
@@ -6207,32 +6487,91 @@ components:
           type: boolean
     SupportCase:
       type: object
-      description: PENDING typed schema. Response for API-028.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Customer view of an own case. Lists omit messages; the detail carries PUBLIC messages only. No severity, SLA or assignee.
+      required: [id, reference, orderId, orderNumber, category, state, description, resolutionCode, createdAt, updatedAt, messages, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        reference:
+          type: string
+          pattern: "^CS-[0-9A-F]{8}$"
+        orderId:
+          type: string
+          format: uuid
+        orderNumber:
+          type: [string, "null"]
+        category:
+          $ref: "#/components/schemas/CaseCategory"
+        state:
+          $ref: "#/components/schemas/CaseState"
+        description:
+          type: string
+        resolutionCode:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/CaseMessage"
+        version:
+          type: integer
+          minimum: 0
     SupportCaseCreate:
       type: object
       additionalProperties: false
-      required:
-        - orderId
-        - category
-        - description
+      description: A case about one of the caller's own orders (another customer's order is 404). Attachments are not accepted yet.
+      required: [orderId, category, description]
       properties:
-        orderId: *a1
+        orderId:
+          type: string
+          format: uuid
         category:
           type: string
-          maxLength: 64
+          enum: [LATE, MISSING_ITEM, QUALITY, FOOD_SAFETY, CASH, HANDOVER, OTHER]
         description:
           type: string
-          minLength: 1
+          minLength: 10
           maxLength: 4000
         attachmentIds:
           type: array
-          items: *a1
-          maxItems: 5
+          maxItems: 0
+          items:
+            type: string
+            format: uuid
     SupportCasePage:
       type: object
-      description: PENDING typed schema. Response for API-036.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportCase"
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
+    StaffSupportCasePage:
+      type: object
+      additionalProperties: false
+      description: Most urgent first (severity, then SLA due time). Items omit messages.
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StaffSupportCase"
+        nextCursor:
+          type: [string, "null"]
+        hasMore:
+          type: boolean
     TransitionCommand:
       type: object
       additionalProperties: false

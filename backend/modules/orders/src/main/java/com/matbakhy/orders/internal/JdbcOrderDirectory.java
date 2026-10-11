@@ -21,4 +21,11 @@ class JdbcOrderDirectory implements OrderDirectory {
                 (rs, n) -> new Parties(rs.getObject(1, UUID.class), rs.getString(2), rs.getObject(3, UUID.class), rs.getObject(4, UUID.class)),
                 orderId).stream().findFirst();
     }
+
+    @Override
+    public Optional<Status> status(UUID orderId) {
+        return jdbc.query("SELECT id, public_number, customer_id, kitchen_id, state, version FROM customer_order WHERE id = ?",
+                (rs, n) -> new Status(rs.getObject(1, UUID.class), rs.getString(2), rs.getObject(3, UUID.class), rs.getObject(4, UUID.class),
+                        rs.getString(5), rs.getLong(6)), orderId).stream().findFirst();
+    }
 }
