@@ -6,7 +6,7 @@
 #   scripts/dev.sh down     stop containers (data volume kept)
 #   scripts/dev.sh reset    stop and delete this local stack's data volume (refuses non-local env files)
 #   scripts/dev.sh verify   doctor + up + smoke in an isolated, throwaway compose project, then clean up
-#   scripts/dev.sh e2e      throwaway stack + operations web + real-API browser workflows (Playwright), then clean up
+#   scripts/dev.sh e2e      throwaway stack + operations and customer web + real-API browser workflows (Playwright), then clean up
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -171,18 +171,24 @@ e2e() {
   doctor
   throwaway_env e2e
   E2E_WEB_PID=""
-  trap '[ -n "$E2E_WEB_PID" ] && kill "$E2E_WEB_PID" 2>/dev/null; compose down --volumes >/dev/null 2>&1 || true; rm -rf "$VERIFY_TMP"' EXIT
+  E2E_CUSTOMER_PID=""
+  trap '[ -n "$E2E_WEB_PID" ] && kill "$E2E_WEB_PID" 2>/dev/null; [ -n "$E2E_CUSTOMER_PID" ] && kill "$E2E_CUSTOMER_PID" 2>/dev/null; compose down --volumes >/dev/null 2>&1 || true; rm -rf "$VERIFY_TMP"' EXIT
   up
   info "starting operations web on http://localhost:5174"
   (cd "$ROOT/apps/operations-web" && VITE_API_BASE_URL="http://localhost:${API_PORT}" exec pnpm exec vite --port 5174 --strictPort) \
     >"$VERIFY_TMP/web.log" 2>&1 &
   E2E_WEB_PID=$!
-  for _ in $(seq 1 60); do curl -fs -o /dev/null http://localhost:5174/ && break; sleep 1; done
+  info "starting customer web on http://localhost:5173"
+  (cd "$ROOT/apps/customer-web" && VITE_API_BASE_URL="http://localhost:${API_PORT}" exec pnpm exec vite --port 5173 --strictPort) \
+    >"$VERIFY_TMP/customer.log" 2>&1 &
+  E2E_CUSTOMER_PID=$!
+  for _ in $(seq 1 60); do curl -fs -o /dev/null http://localhost:5174/ && curl -fs -o /dev/null http://localhost:5173/ && break; sleep 1; done
   curl -fsS -o /dev/null http://localhost:5174/ || { cat "$VERIFY_TMP/web.log"; die "operations web did not start"; }
+  curl -fsS -o /dev/null http://localhost:5173/ || { cat "$VERIFY_TMP/customer.log"; die "customer web did not start"; }
   local psql
   psql="[\"docker\",\"compose\",\"--env-file\",\"$ENV_FILE\",\"-f\",\"$INFRA/compose.yaml\",\"exec\",\"-T\",\"postgres\",\"psql\",\"-U\",\"$POSTGRES_USER\",\"-d\",\"$POSTGRES_DB\"]"
   info "running browser workflows"
-  (cd "$ROOT/apps/operations-web" && E2E_API_URL="http://localhost:${API_PORT}" E2E_OPS_URL="http://localhost:5174" \
+  (cd "$ROOT/apps/operations-web" && E2E_API_URL="http://localhost:${API_PORT}" E2E_OPS_URL="http://localhost:5174" E2E_CUSTOMER_URL="http://localhost:5173" \
     E2E_USER_PASSWORD="$DEV_USER_PASSWORD" E2E_PSQL="$psql" E2E_OUTPUT_DIR="${E2E_OUTPUT_DIR:-$VERIFY_TMP/results}" \
     pnpm exec playwright test)
 }

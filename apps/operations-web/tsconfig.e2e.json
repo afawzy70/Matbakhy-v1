@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["node"]
   },
-  "include": ["e2e", "playwright.config.ts", "src/i18n.ts"]
+  "include": ["e2e", "playwright.config.ts", "src/i18n.ts", "../customer-web/src/i18n.ts"]
 }

@@ -224,3 +224,9 @@ Online payment/courier routes are conditional and not part of cash-first API acc
 - Staff permissions (API-091..093, MB-011) gain an operations web screen: grants and revocations with reasons and MFA step-up; the server keeps refusing self-escalation and removal of the last administrator.
 - Operations web configuration screen: policy summary, ordering switch, zone fees and availability, change log; step-up prompt when MFA is needed.
 
+## Customer web purchase flow (MB-027, client only)
+
+- `apps/customer-web` uses only existing APIs: zones and meal discovery, meal detail with orderable slots, a per-browser cart (one kitchen and slot; no prices stored), sign-in through `/oauth2/authorization/keycloak?returnTo=` back to the cart, phone verification, own addresses, server quote (totals, synthetic-policy warning, cash on receipt), and placement.
+- Placement stores the client request id and idempotency key in the browser before sending. After a lost response the customer retries with the same keys and sees the one existing order; after a reload the cart page asks `GET /api/v1/orders/by-request/{clientRequestId}` first. A definitive 4xx (expired quote, price change) clears the stored keys and shows the server reason.
+- Order page refreshes every 10 seconds: state, timeline, handover code when the server provides it, kitchen contact after acceptance, cancel while pending and a cancellation request after acceptance. Loading, empty, error-with-retry, offline and signed-out states are explicit. Arabic RTL by default, English LTR; draft brand tokens until the owner's visual approval (O05).
+

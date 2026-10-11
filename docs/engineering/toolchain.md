@@ -84,7 +84,7 @@ Android native compilation needs the Android SDK, platform tools and a JDK suppo
 | `scripts/dev.sh smoke` | API health, Flyway baseline, Keycloak `matbakhy` realm OIDC discovery, S3 buckets, mail sink capture of a synthetic message, PKCE enforced for the native client, anonymous `/api/v1/me` is 401, and a full web OIDC login through the API returning the profile |
 | `scripts/dev.sh down` / `reset` | Stop / stop and delete the data volume; refuses env files not marked `MATBAKHY_ENV_MARKER=local` |
 | `scripts/dev.sh verify` | All of the above in a throwaway compose project on alternate ports, then removes it (P01-CHECK-3) |
-| `scripts/dev.sh e2e` | Throwaway stack as in `verify`, the operations web dev server on 5174, then the Playwright browser workflows in `apps/operations-web/e2e` against the real API; removes everything afterwards (P05-CHECK-1). Set `E2E_CHROMIUM` to use a preinstalled Chromium |
+| `scripts/dev.sh e2e` | Throwaway stack as in `verify`, the operations web (5174) and customer web (5173) dev servers, then the Playwright browser workflows in `apps/operations-web/e2e` against the real API; removes everything afterwards (P05-CHECK-1). Set `E2E_CHROMIUM` to use a preinstalled Chromium |
 
 Services (`infra/compose.yaml`, ports bound to 127.0.0.1, images pinned by digest): PostgreSQL 16.15 (5432), Keycloak 26.8.0 dev mode with realm import from `infra/identity` (8180), Adobe S3Mock 5.2.3 as a local S3 emulator (9090, buckets `matbakhy-private` and `matbakhy-public`), Mailpit 1.31.5 mail sink (UI 8025, SMTP 1025) and the API (8080). The API image (`backend/Dockerfile`) copies the jar built on the host and runs as a non-root user on Temurin 21 JRE.
 

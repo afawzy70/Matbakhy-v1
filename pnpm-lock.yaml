@@ -75,6 +75,9 @@ importers:
       '@fontsource/ibm-plex-sans-arabic':
         specifier: 5.3.0
         version: 5.3.0
+      '@matbakhy/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
       '@matbakhy/design-tokens':
         specifier: workspace:*
         version: link:../../packages/design-tokens
