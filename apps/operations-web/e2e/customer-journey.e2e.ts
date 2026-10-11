@@ -213,41 +213,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   expect(sql(`SELECT count(*) FROM audit_event WHERE action = 'review.moderation'`)).toBe("1");
   await opsContext.close();
 
-  // Layout in the approved direction at phone widths, on real data.
-  const kitchenSlug = sql(`SELECT public_slug FROM kitchen k JOIN meal m ON m.kitchen_id = k.id WHERE m.title_ar = 'كشري تجريبي'`);
   const mealId = sql(`SELECT id FROM meal WHERE title_ar = 'كشري تجريبي'`);
-  for (const width of [320, 360, 390, 420, 768, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
-    for (const route of ["#/", "#/kitchen/" + kitchenSlug, "#/meal/" + mealId]) {
-      for (const locale of ["ar", "en"] as const) {
-        await page.goto(`${CUSTOMER}/${route}`);
-        await page.reload(); // a hash-only navigation keeps the in-page language choice
-        if (locale === "en") {
-          await page.getByRole("button", { name: "English" }).click();
-        }
-        const s = locale === "ar" ? c : customerStrings.en;
-        await expect(page.locator("html")).toHaveAttribute("dir", locale === "ar" ? "rtl" : "ltr");
-        await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
-        if (route === "#/") {
-          await expect(page.getByRole("button", { name: s.home.intents.SELF.title })).toBeVisible();
-        }
-        const where = `${locale} ${width} ${route}`;
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${where}`).toBe(true);
-        const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
-          els.filter((e) => {
-            const r = e.getBoundingClientRect();
-            return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
-          }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
-        expect(undersized, `touch targets ${where}`).toEqual([]);
-        if (width === 390 || width === 1440) {
-          await axe(page, where);
-        }
-        if (process.env.E2E_SCREENSHOT_DIR && (width === 320 || width === 390 || width === 420 || width === 1440)) {
-          await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${locale}${route.replace(/[#/]+/g, "_").slice(0, 12)}-${width}.png`, fullPage: true });
-        }
-      }
-    }
-  }
   await page.goto(`${CUSTOMER}/#/`);
   await page.getByRole("button", { name: c.home.kitchens }).click();
   await expect(page.getByRole("article", { name: /.+/ }).first()).toBeVisible();
@@ -286,3 +252,49 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await cookContext.close();
   await customerContext.close();
 });
+
+/**
+ * MB-029 / approved direction on real data (after the journey above): home, kitchen and meal pages in Arabic RTL and
+ * English LTR at 320-1440 px have no horizontal overflow, every control is at least 44 px, and the automated WCAG 2.2
+ * A/AA rules (axe-core) report no serious or critical finding at 390 and 1440 px. Automated rules are not a full audit.
+ */
+test("customer screens keep the approved layout across widths and both directions", async ({ browser }) => {
+  const kitchenSlug = sql(`SELECT public_slug FROM kitchen k JOIN meal m ON m.kitchen_id = k.id WHERE m.title_ar = 'كشري تجريبي'`);
+  const mealId = sql(`SELECT id FROM meal WHERE title_ar = 'كشري تجريبي'`);
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  for (const width of [320, 360, 390, 420, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ["#/", "#/kitchen/" + kitchenSlug, "#/meal/" + mealId]) {
+      for (const locale of ["ar", "en"] as const) {
+        await page.goto(`${CUSTOMER}/${route}`);
+        await page.reload(); // a hash-only navigation keeps the in-page language choice
+        if (locale === "en") {
+          await page.getByRole("button", { name: "English" }).click();
+        }
+        const s = locale === "ar" ? c : customerStrings.en;
+        await expect(page.locator("html")).toHaveAttribute("dir", locale === "ar" ? "rtl" : "ltr");
+        await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
+        if (route === "#/") {
+          await expect(page.getByRole("button", { name: s.home.intents.SELF.title })).toBeVisible();
+        }
+        const where = `${locale} ${width} ${route}`;
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${where}`).toBe(true);
+        const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
+          els.filter((e) => {
+            const r = e.getBoundingClientRect();
+            return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
+          }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
+        expect(undersized, `touch targets ${where}`).toEqual([]);
+        if (width === 390 || width === 1440) {
+          await axe(page, where);
+        }
+        if (process.env.E2E_SCREENSHOT_DIR && (width === 320 || width === 390 || width === 420 || width === 1440)) {
+          await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${locale}${route.replace(/[#/]+/g, "_").slice(0, 12)}-${width}.png`, fullPage: true });
+        }
+      }
+    }
+  }
+  await context.close();
+});
+
