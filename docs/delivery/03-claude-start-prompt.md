@@ -19,6 +19,7 @@ First read CLAUDE.md and AGENTS.md. Then read:
 7. docs/quality/01-verification.md and 02-release-gates.md
 8. planning/backlog.json, planning/scenarios.json, planning/gates.json and planning/execution-state.json
 9. Applicable operations documents and contracts/endpoints.json.
+10. docs/delivery/05-progress-reporting.md and docs/delivery/04-resume-and-recovery.md when present.
 
 Inspect actual files, git status, remote branch/head, repository protections, installed tools and credentials availability without exposing secrets. Do not assume any application code exists. Reconcile the checkpoint with actual source and evidence. Run python3 scripts/validate_blueprint.py and python3 scripts/next_task.py.
 
@@ -36,7 +37,15 @@ Configure actual verification commands as code appears. Missing checks are BLOCK
 
 After three materially different unsuccessful repair attempts for a root cause, preserve logs, checkpoint the blocker and move to independent work. On pause/stop, stop new work and checkpoint safely. After interruption, re-inspect source and resume idempotently.
 
+Use an existing documented implementation branch if one is active; otherwise create implementation/mvp from the verified latest main without discarding local changes. Keep related implementation on this integration branch so an unmerged PR does not stall the next story. Publish a draft PR at the first meaningful pushed checkpoint if access permits, describing scope and incomplete gates. Do not merge without applicable owner authorization. Never overwrite concurrent work: fetch, inspect and reconcile before pushing; never force-push. If GitHub credentials are unavailable, continue locally, record publication as BLOCKED and give one precise setup request without exposing credentials.
+
+Follow docs/delivery/05-progress-reporting.md. Push scoped checkpoint commits after completed stories, before a deliberate pause, and at safe boundaries during long work (aim for 30–60 minutes while actively executing). A checkpoint may explicitly be WIP; it is not a passing gate. Publish tested source commits and their evidence without claiming that a later documentation-only evidence commit was itself the tested source. Do not create noisy empty heartbeat commits. Keep docs/status/latest.md and the cumulative Kuwait-date docs/status/daily/YYYY-MM-DD.md current. Review actual remote CI results when available; a successful push is not successful CI. Scheduled external reviews observe GitHub; they do not run, restart or supervise your local process.
+
 Keep planning/execution-state.json, backlog/scenario status and verification/runs current. Report concrete progress regularly: current story, implemented behavior, checks actually run, defects/blockers and next action. Distinguish planning complete, implemented, verified, staged, submitted and released.
+
+For ordinary reversible implementation choices, choose the simplest option consistent with the repository, document the reason and continue. Do not ask me to select libraries or repeat decisions already documented. Do not silently decide unresolved commercial/legal policies: use clearly labelled development fixtures and block only dependent live behavior. If two authoritative requirements conflict, record the conflict and work on independent tasks. Ask only for a decision or access that materially blocks all remaining eligible work, or for a required concrete approval; batch related questions and include your recommendation and exact affected task IDs. Never bypass your runtime's permission or security controls.
+
+Before context limits or session exit, write a durable checkpoint including dirty/unpublished work, last tested source SHA, failures, remaining repair attempts, next command and exact resumption procedure. On resumption re-read repository instructions and validate actual Git/evidence state before proceeding; do not trust conversation memory alone. Do not claim a prompt can keep a closed or quota-limited session alive.
 
 Begin now with the repository preflight and first eligible story. Continue until all authorized unblocked work is complete, I stop you, or every remaining task has a documented external/decision blocker. Return a self-contained checkpoint with exact resume action.
 ```
