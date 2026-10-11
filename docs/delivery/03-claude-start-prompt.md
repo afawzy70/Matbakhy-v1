@@ -1,5 +1,7 @@
 # Claude Code start prompt
 
+> Current owner policy: use this as the master execution contract inside a fresh daily prompt. Read `06-daily-execution.md`. Work only within the dated noon–midnight Kuwait session; the first session starts with Opus, and subsequent models are selected from daily evidence.
+
 Copy everything in the fenced block into Claude Code from the cloned repository root. The instructions select implementation; they do not execute just by being stored here.
 
 ```text
@@ -47,7 +49,7 @@ For ordinary reversible implementation choices, choose the simplest option consi
 
 Before context limits or session exit, write a durable checkpoint including dirty/unpublished work, last tested source SHA, failures, remaining repair attempts, next command and exact resumption procedure. On resumption re-read repository instructions and validate actual Git/evidence state before proceeding; do not trust conversation memory alone. Do not claim a prompt can keep a closed or quota-limited session alive.
 
-Begin now with the repository preflight and first eligible story. Continue until all authorized unblocked work is complete, I stop you, or every remaining task has a documented external/decision blocker. Return a self-contained checkpoint with exact resume action.
+Begin now with the repository preflight and first eligible story. Continue within today's authorized noon–midnight Asia/Kuwait window until all authorized unblocked work is complete, I stop you, every remaining task has a documented external/decision blocker, or the daily cutoff is reached. Follow docs/delivery/06-daily-execution.md; begin safe wrap-up around 23:30 and checkpoint by midnight. Return a self-contained checkpoint with exact resume action.
 ```
 
 ## Local starting commands

@@ -2,7 +2,7 @@
 
 ## Purpose and authority
 
-Enable the owner and scheduled read-only reviews to inspect implementation without repeated chat prompts. This supplements the execution protocol; it never weakens acceptance criteria or gate evidence. All timestamps include an offset. Product scheduling uses Africa/Cairo; owner reporting days use Asia/Kuwait. The owner's current review schedule is approximately 08:00, 15:00 and 19:00 Kuwait time, with an evening daily summary. Scheduled review is external to this repo and does not control Claude, run tests or guarantee continuous execution.
+Enable the owner and scheduled read-only reviews to inspect implementation without repeated chat prompts. This supplements the execution protocol; it never weakens acceptance criteria or gate evidence. All timestamps include an offset. Product scheduling uses Africa/Cairo; owner reporting days use Asia/Kuwait. The owner's current review schedule is approximately 12:00, 18:00 and 00:15 Kuwait time. Noon provides the daily execution prompt and model choice; 00:15 summarizes the preceding noon-to-midnight workday. See `06-daily-execution.md` for the authoritative work-window and adaptive model policy. Scheduled review is external to this repo and does not control Claude, run tests or guarantee continuous execution.
 
 ## Branch and publication
 
@@ -42,7 +42,7 @@ DONE requires the repository's mapped scenarios, review and mandatory evidence, 
 
 Read main for instructions, then discover the active branch from execution state, this branch convention and open implementation PRs. Inspect branch checkpoint files, current PR head, recent relevant commits, verification artifacts and actual CI results. Compare the same source revisions; distinguish current failures from earlier repaired runs. Report claimed completion separately from corroborated evidence. Do not equate story counts with effort, passing unit tests with release approval, or no recent commits with a stopped agent.
 
-Morning/afternoon reports summarize changes since the last available review, checks, blockers and next work. The evening report covers the Kuwait calendar day with progress per surface, failed/repaired gates, unresolved risks and next priorities. When previous review context is unavailable, say so and use a stated observation window. If GitHub access fails, report the failed observation explicitly. No published changes means runtime state unknown; local unpushed work is invisible.
+The noon report supplies a current-evidence daily prompt and model recommendation. The 18:00 report summarizes changes, checks, blockers and needed corrections. The 00:15 report covers the previous starting-date workday (noon through midnight Kuwait time), with progress per surface, failed/repaired gates, unresolved risks and next priorities. Start the first session with Opus, then recommend staying, moving to Sonnet, or escalating a bounded task based on evidence and actual usage when available; never invent usage or quota data. When previous review context is unavailable, say so and use a stated observation window. If GitHub access fails, report the failed observation explicitly. No published changes means runtime state unknown; local unpushed work is invisible.
 
 ## Recovery and stopping
 
