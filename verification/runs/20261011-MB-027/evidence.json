@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-027",
+  "phase": "P06",
+  "source_commit": "0da4477465ccf40997dd72a8fb748b43dea003cf",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T17:42:32.544742+00:00",
+  "finished_at": "2026-10-11T17:54:21.239796+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-027/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-027/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-027/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Cook, staff and customer browser workflows against the real local stack (Playwright, Chromium)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-027/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-027/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-027/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-044",
+      "status": "PASS",
+      "observed": "Browser journey (scripts/dev.sh e2e): the first POST /api/v1/orders reaches the server and commits, then the response is aborted; the customer web shows the retry prompt, the retry with the stored keys shows the existing order and the database holds exactly one order for the customer. A mutation using fresh keys on retry failed the journey. Component tests: both attempts carry the same Idempotency-Key and clientRequestId, keys are stored before sending and cleared with the cart afterwards; after a reload a stored pending placement is resolved by the by-request lookup without a new POST."
+    },
+    {
+      "id": "TC-045",
+      "status": "PASS",
+      "observed": "Component tests: discovery shows a retry action after a server error and an empty state after retry; signed-out checkout asks to sign in with a return address to the cart; an offline banner reacts to the browser offline event; placement shows the server reason for definitive errors and never shows success without a server order. Browser journey: loading and success states through discovery, cart, quote and order page."
+    },
+    {
+      "id": "TC-127",
+      "status": "PASS",
+      "observed": "Browser journey on PostgreSQL, Keycloak, S3 emulator and API: customer-b searches the customer web, opens the published meal, chooses a slot, adds it to the cart, signs in through Keycloak and returns to the cart, adds a delivery address in the UI, gets a server quote (synthetic policy warning, cash on receipt), places the order (lost-response retry) and follows it: the cook accepts, prepares and marks it ready in the operations web; the customer page shows ACCEPTED, then the handover code; the cook dispatches and enters the code; the customer page shows COMPLETED. A pickup order is then placed; the customer's order list shows both. Arabic RTL default verified."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-027/BACKEND-VERIFY.log",
+    "verification/runs/20261011-MB-027/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-027/LOCAL-STACK.log",
+    "verification/runs/20261011-MB-027/BROWSER-E2E.log",
+    "verification/runs/20261011-MB-027/SECRET-SCAN.log",
+    "verification/runs/20261011-MB-027/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-027/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Stable-key placement verified in the browser against the real API; mutation detected.",
+      "No client-side prices; server reasons shown for definitive errors.",
+      "Residual: draft visual design until O05 (P06 gate blocked on O05); synthetic phone verification in the journey."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

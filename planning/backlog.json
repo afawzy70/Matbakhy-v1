@@ -973,7 +973,7 @@
       "id": "MB-027",
       "phase": "P06",
       "title": "Complete customer web purchase flow",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-016",
@@ -1004,9 +1004,11 @@
         "TC-045",
         "TC-127"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-027/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Customer web purchase flow on the real API with stable-key placement verified in the browser; self-reviewed; draft visuals until O05."
     },
     {
       "id": "MB-028",

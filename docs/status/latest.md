@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T20:26+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-11T20:54+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P06 / MB-027 next (P05 complete: MB-022 to MB-026 DONE; P00–P05 gates PASS on self-reviewed evidence; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
+- Phase/story: P06 / MB-028 next (MB-027 DONE; P05 complete: MB-022 to MB-026 DONE; P00–P05 gates PASS on self-reviewed evidence; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -18,6 +18,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-027 Complete customer web purchase flow | DONE (self-review); draft visuals until O05 | [run](../../verification/runs/20261011-MB-027/evidence.json) at `0da4477` |
 | MB-026 Build operating configuration and staff controls | DONE (self-review) | [run](../../verification/runs/20261011-MB-026/evidence.json) at `c96535b` |
 | MB-025 Build finance operations | DONE (self-review) | [run](../../verification/runs/20261011-MB-025/evidence.json) at `ad3f425`; finance UI not in the browser workflow |
 | MB-024 Build support and order exceptions | DONE (self-review) | [run](../../verification/runs/20261011-MB-024/evidence.json) at `ba81dd1` |
@@ -38,7 +39,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-26 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+27 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
@@ -48,7 +49,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Support and order exceptions (MB-024): order-scoped cases (customer APIs; customer web screens are MB-027/MB-028), staff-only notes never shown to customers, FOOD_SAFETY escalated as critical, proposed SLA defaults, cancellation requests after acceptance that never change the order and are resolved through the audited exception cancellation, ops order monitoring with failure flags.
 - Finance operations (MB-025): full refunds bounded by verified collection less committed refunds (approval is not payment), one commission reversal per verified refund, settlement batches with unique lines, immutable after review, external remittance reference and second-person reconciliation; statements show direction, reversed, settled and outstanding commission. Proposed defaults await O04.
 - Configuration and staff controls (MB-026): versioned commerce policy, zone fees/availability and an ordering switch, each change reasoned, MFA-gated, append-only and audited; real policies need an approval reference; only new quotes use changes. Staff permission screen over the MB-011 grants.
-- Customer web: React + Vite shell (Arabic RTL default, English LTR). No product screens yet (MB-027).
+- Customer web (MB-027): discovery, meal detail, cart, sign-in return to the cart, phone verification, addresses, server quote, placement with keys stored before sending (lost-response retry verified in the browser: one order), reload recovery, order tracking with handover code and cancellation. Draft brand tokens until O05.
 - Design tokens: editable draft brand (name, slogan, light/dark palette, typography); WCAG contrast tested; specimens rendered.
 - Contract: OpenAPI 3.1 for 97 planned operations; implemented operations are typed, and a backend test checks that registry `implemented` flags equal the served routes. Generated TypeScript client.
 - Android / iOS: Expo SDK 57 shell compiles natively: Android debug APK (Gradle) and iOS simulator app (Xcode, unsigned) on GitHub-hosted runners at `34be845`. **No emulator, simulator-launch or device verification yet** (P07).
@@ -86,4 +87,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-MB-027 customer web purchase flow (P06). Final branded visuals depend on the pending owner visual approval (O05); functional screens on draft tokens can proceed.
+MB-028 customer account and trust features (P06), including review moderation carried from MB-023. The P06 gate also needs owner decision O05 (visual approval).

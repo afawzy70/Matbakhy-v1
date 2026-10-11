@@ -825,8 +825,10 @@
       "given": "Connection drops after server commit",
       "when": "Customer refreshes and retries",
       "then": "Existing order displayed; no second order or silent empty basket",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-027/evidence.json"
+      ]
     },
     {
       "id": "TC-045",
@@ -841,8 +843,10 @@
       "given": "Catalogue, checkout or order request fails",
       "when": "Customer retries or navigates back",
       "then": "Clear state and retained safe input; no fabricated success",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-027/evidence.json"
+      ]
     },
     {
       "id": "TC-046",
@@ -1661,8 +1665,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Responsive discovery/details/cart/address/quote/checkout/order status; auth return path; retry with stable key; empty/loading/error/offline states",
       "then": "Real browser customer places delivery and pickup orders and tracks actual cook actions without mocks",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-027/evidence.json"
+      ]
     },
     {
       "id": "TC-128",
