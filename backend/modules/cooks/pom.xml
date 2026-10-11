@@ -23,6 +23,10 @@
     </dependency>
     <dependency>
       <groupId>com.matbakhy</groupId>
+      <artifactId>matbakhy-catalog</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.matbakhy</groupId>
       <artifactId>matbakhy-operations</artifactId>
     </dependency>
     <dependency>

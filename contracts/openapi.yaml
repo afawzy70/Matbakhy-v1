@@ -1178,12 +1178,12 @@ paths:
       description: purpose, filename, contentType, bytes, sha256; scoped storage key/expiry
       x-matbakhy-id: API-039
       x-permission: AUTHENTICATED_SCOPED
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -1208,7 +1208,7 @@ paths:
       description: checksum, upload completion; quarantine and scan
       x-matbakhy-id: API-040
       x-permission: UPLOAD_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1243,7 +1243,7 @@ paths:
       description: state or authorized private signed read; no public private-doc URL
       x-matbakhy-id: API-041
       x-permission: UPLOAD_OWNER_OR_REVIEWER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3334,7 +3334,7 @@ components:
       type: object
       additionalProperties: false
       description: Immutable submitted snapshot; decision fields are set once.
-      required: [revision, publicName, bio, contactPhone, privateLocation, pickupEnabled, zoneIds, submittedAt, decision, decisionReason, reviewerId, decidedAt]
+      required: [revision, publicName, bio, contactPhone, privateLocation, pickupEnabled, zoneIds, documentIds, submittedAt, decision, decisionReason, reviewerId, decidedAt]
       properties:
         revision:
           type: integer
@@ -3351,6 +3351,13 @@ components:
           type: boolean
         zoneIds:
           type: array
+          items:
+            type: string
+            format: uuid
+        documentIds:
+          type: array
+          maxItems: 10
+          description: Approved COOK_DOCUMENT uploads owned by the applicant; private, never public
           items:
             type: string
             format: uuid
@@ -3529,7 +3536,7 @@ components:
     CookApplicationDraft:
       type: object
       additionalProperties: false
-      required: [publicName, bio, contactPhone, privateLocation, pickupEnabled, zoneIds]
+      required: [publicName, bio, contactPhone, privateLocation, pickupEnabled, zoneIds, documentIds]
       properties:
         publicName:
           type:
@@ -3558,6 +3565,13 @@ components:
         zoneIds:
           type: array
           maxItems: 20
+          items:
+            type: string
+            format: uuid
+        documentIds:
+          type: array
+          maxItems: 10
+          description: Approved COOK_DOCUMENT uploads owned by the applicant; private, never public
           items:
             type: string
             format: uuid
@@ -3920,8 +3934,58 @@ components:
       description: Public meal card; never contains kitchen private location.
     MediaStatus:
       type: object
-      description: PENDING typed schema. Response for API-040.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: PENDING_UPLOAD, QUARANTINED, APPROVED or REJECTED. publicUrl exists only for APPROVED public-purpose media; privateReadUrl only for an APPROVED document and only for its owner or a scoped reviewer (expires after 5 minutes).
+      required: [id, purpose, state, rejectionReason, contentType, bytes, width, height, publicUrl, privateReadUrl, privateReadExpiresAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        purpose:
+          type: string
+          enum: [MEAL_PHOTO, COOK_DOCUMENT]
+        state:
+          type: string
+          enum: [PENDING_UPLOAD, QUARANTINED, APPROVED, REJECTED]
+        rejectionReason:
+          type:
+            - string
+            - "null"
+          enum: [SIZE_MISMATCH, CHECKSUM_MISMATCH, TYPE_MISMATCH, UNSUPPORTED_TYPE, DIMENSIONS, UNREADABLE, ACTIVE_CONTENT, MALWARE, MISSING_OBJECT, null]
+        contentType:
+          type:
+            - string
+            - "null"
+        bytes:
+          type:
+            - integer
+            - "null"
+        width:
+          type:
+            - integer
+            - "null"
+        height:
+          type:
+            - integer
+            - "null"
+        publicUrl:
+          type:
+            - string
+            - "null"
+          format: uri
+        privateReadUrl:
+          type:
+            - string
+            - "null"
+          format: uri
+        privateReadExpiresAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
     Money:
       type: object
       additionalProperties: false
@@ -4484,12 +4548,36 @@ components:
       x-schema-status: PENDING
     PostUploadsCompleteRequest:
       type: object
-      description: "PENDING typed schema. Request for API-040: checksum, upload completion; quarantine and scan"
-      x-schema-status: PENDING
+      additionalProperties: false
+      properties:
+        sha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          description: Optional; must equal the declared checksum
     PostUploadsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-039: purpose, filename, contentType, bytes, sha256; scoped storage key/expiry"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Declared metadata; the server verifies every value against the uploaded bytes. MEAL_PHOTO accepts image/jpeg and image/png up to 8 MiB; COOK_DOCUMENT accepts image/jpeg, image/png and application/pdf up to 10 MiB.
+      required: [purpose, filename, contentType, bytes, sha256]
+      properties:
+        purpose:
+          type: string
+          enum: [MEAL_PHOTO, COOK_DOCUMENT]
+        filename:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Display only; path components are removed and it never becomes a storage key
+        contentType:
+          type: string
+          enum: [image/jpeg, image/png, application/pdf]
+        bytes:
+          type: integer
+          minimum: 1
+          maximum: 10485760
+        sha256:
+          type: string
+          pattern: ^[0-9a-f]{64}$
     PublicConfiguration:
       type: object
       description: PENDING typed schema. Response for API-001.
@@ -4520,6 +4608,13 @@ components:
         zoneIds:
           type: array
           maxItems: 20
+          items:
+            type: string
+            format: uuid
+        documentIds:
+          type: array
+          maxItems: 10
+          description: Approved COOK_DOCUMENT uploads owned by the applicant; private, never public
           items:
             type: string
             format: uuid
@@ -4831,8 +4926,26 @@ components:
           maxLength: 500
     UploadTicket:
       type: object
-      description: PENDING typed schema. Response for API-039.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Signed, short-lived direct upload to a private key. Send exactly the declared bytes with the listed headers.
+      required: [uploadId, uploadUrl, method, requiredHeaders, expiresAt]
+      properties:
+        uploadId:
+          type: string
+          format: uuid
+        uploadUrl:
+          type: string
+          format: uri
+        method:
+          type: string
+          enum: [PUT]
+        requiredHeaders:
+          type: object
+          additionalProperties:
+            type: string
+        expiresAt:
+          type: string
+          format: date-time
     VerificationResult:
       type: object
       additionalProperties: false

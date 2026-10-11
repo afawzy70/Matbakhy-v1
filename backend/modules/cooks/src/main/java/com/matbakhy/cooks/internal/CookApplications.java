@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class CookApplications {
 
     public record Draft(String publicName, String bio, String contactPhone, String privateLocation, boolean pickupEnabled,
-                        List<UUID> zoneIds) {
+                        List<UUID> zoneIds, List<UUID> documentIds) {
     }
 
     public record Application(UUID id, UUID userId, String state, Draft draft, int currentRevision, Instant createdAt,
@@ -26,12 +26,12 @@ public class CookApplications {
     }
 
     public record Revision(int revision, String publicName, String bio, String contactPhone, String privateLocation,
-                           boolean pickupEnabled, List<UUID> zoneIds, Instant submittedAt, String decision, String decisionReason,
-                           UUID reviewerId, Instant decidedAt) {
+                           boolean pickupEnabled, List<UUID> zoneIds, List<UUID> documentIds, Instant submittedAt, String decision,
+                           String decisionReason, UUID reviewerId, Instant decidedAt) {
     }
 
     private static final String COLUMNS = "id, user_id, state, public_name, bio, contact_phone, private_location, pickup_enabled, "
-            + "zone_ids, current_revision, created_at, updated_at, version";
+            + "zone_ids, document_ids, current_revision, created_at, updated_at, version";
 
     private final JdbcTemplate jdbc;
 
@@ -51,12 +51,12 @@ public class CookApplications {
 
     List<Revision> revisions(UUID applicationId) {
         return jdbc.query("""
-                SELECT revision, public_name, bio, contact_phone, private_location, pickup_enabled, zone_ids, submitted_at,
+                SELECT revision, public_name, bio, contact_phone, private_location, pickup_enabled, zone_ids, document_ids, submitted_at,
                        decision, decision_reason, reviewer_id, decided_at
                 FROM cook_application_revision WHERE application_id = ? ORDER BY revision""",
                 (rs, n) -> new Revision(rs.getInt("revision"), rs.getString("public_name"), rs.getString("bio"),
                         rs.getString("contact_phone"), rs.getString("private_location"), rs.getBoolean("pickup_enabled"),
-                        uuids(rs.getArray("zone_ids")), instant(rs, "submitted_at"), rs.getString("decision"),
+                        uuids(rs.getArray("zone_ids")), uuids(rs.getArray("document_ids")), instant(rs, "submitted_at"), rs.getString("decision"),
                         rs.getString("decision_reason"), rs.getObject("reviewer_id", UUID.class), instant(rs, "decided_at")),
                 applicationId);
     }
@@ -81,7 +81,8 @@ public class CookApplications {
     private static Application map(ResultSet rs, int n) throws SQLException {
         return new Application(rs.getObject("id", UUID.class), rs.getObject("user_id", UUID.class), rs.getString("state"),
                 new Draft(rs.getString("public_name"), rs.getString("bio"), rs.getString("contact_phone"),
-                        rs.getString("private_location"), rs.getBoolean("pickup_enabled"), uuids(rs.getArray("zone_ids"))),
+                        rs.getString("private_location"), rs.getBoolean("pickup_enabled"), uuids(rs.getArray("zone_ids")),
+                        uuids(rs.getArray("document_ids"))),
                 rs.getInt("current_revision"), instant(rs, "created_at"), instant(rs, "updated_at"), rs.getLong("version"));
     }
 }

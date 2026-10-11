@@ -30,7 +30,7 @@ class CookApplicationController {
 
     record DraftRequest(@Size(max = 200) String publicName, @Size(max = 2000) String bio, @Size(max = 32) String contactPhone,
                         @Size(max = 600) String privateLocation, Boolean pickupEnabled, @Size(max = 50) List<@NotNull UUID> zoneIds,
-                        @Min(0) Long expectedVersion) {
+                        @Size(max = 20) List<@NotNull UUID> documentIds, @Min(0) Long expectedVersion) {
     }
 
     record SubmitRequest(@NotNull @Min(0) Long expectedVersion) {
@@ -44,7 +44,7 @@ class CookApplicationController {
     @PutMapping("/api/v1/cook/application")
     CookApplication save(@AuthenticationPrincipal CurrentAccount actor, @Valid @RequestBody DraftRequest body) {
         return applications.saveDraft(actor.id(), body.expectedVersion(), new DraftInput(body.publicName(), body.bio(),
-                body.contactPhone(), body.privateLocation(), body.pickupEnabled(), body.zoneIds()));
+                body.contactPhone(), body.privateLocation(), body.pickupEnabled(), body.zoneIds(), body.documentIds()));
     }
 
     @PostMapping("/api/v1/cook/application/submit")

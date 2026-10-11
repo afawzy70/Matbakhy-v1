@@ -352,7 +352,7 @@
       "permission": "AUTHENTICATED_SCOPED",
       "response_type": "UploadTicket",
       "contract": "purpose, filename, contentType, bytes, sha256; scoped storage key/expiry",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-040",
@@ -361,7 +361,7 @@
       "permission": "UPLOAD_OWNER",
       "response_type": "MediaStatus",
       "contract": "checksum, upload completion; quarantine and scan",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-041",
@@ -370,7 +370,7 @@
       "permission": "UPLOAD_OWNER_OR_REVIEWER",
       "response_type": "MediaStatus",
       "contract": "state or authorized private signed read; no public private-doc URL",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-042",

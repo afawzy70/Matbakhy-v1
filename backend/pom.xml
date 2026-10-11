@@ -38,11 +38,21 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <archunit.version>1.5.1</archunit.version>
     <!-- Production database major version; digest pinned (PostgreSQL 16.15, alpine, multi-arch index). -->
+    <aws.sdk.version>2.55.0</aws.sdk.version>
+    <!-- Local S3-compatible emulator used by integration tests (same image as infra/compose.yaml). -->
+    <s3mock.test.image>adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92</s3mock.test.image>
     <postgres.test.image>postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea</postgres.test.image>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws.sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
       <dependency>
         <groupId>com.matbakhy</groupId>
         <artifactId>matbakhy-shared</artifactId>
@@ -110,6 +120,7 @@
           <configuration>
             <systemPropertyVariables>
               <matbakhy.test.postgres-image>${postgres.test.image}</matbakhy.test.postgres-image>
+              <matbakhy.test.s3mock-image>${s3mock.test.image}</matbakhy.test.s3mock-image>
             </systemPropertyVariables>
           </configuration>
         </plugin>

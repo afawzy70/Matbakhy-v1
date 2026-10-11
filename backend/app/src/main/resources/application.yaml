@@ -50,6 +50,16 @@ matbakhy:
     resend-interval: 60s
     max-sends-per-account-per-hour: ${PHONE_MAX_SENDS_PER_ACCOUNT_PER_HOUR:5}
     max-sends-per-phone-per-hour: ${PHONE_MAX_SENDS_PER_PHONE_PER_HOUR:5}
+  storage:
+    # Defaults target the local S3 emulator (infra/compose.yaml); deployed environments must override them.
+    endpoint: ${OBJECT_STORAGE_ENDPOINT:http://localhost:9090}
+    client-endpoint: ${OBJECT_STORAGE_CLIENT_ENDPOINT:}
+    region: ${OBJECT_STORAGE_REGION:eu-central-1}
+    access-key: ${OBJECT_STORAGE_ACCESS_KEY:local-emulator-only}
+    secret-key: ${OBJECT_STORAGE_SECRET_KEY:local-emulator-only}
+    private-bucket: ${OBJECT_STORAGE_PRIVATE_BUCKET:matbakhy-private}
+    public-bucket: ${OBJECT_STORAGE_PUBLIC_BUCKET:matbakhy-public}
+    public-base-url: ${OBJECT_STORAGE_PUBLIC_BASE_URL:}
   # Required: LOCAL, CI, STAGING or PRODUCTION. No default, so a deployment cannot start unconfigured.
   environment: ${APP_ENV}
   market:

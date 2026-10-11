@@ -110,7 +110,26 @@ smoke() {
   case "$location" in "http://localhost:${API_PORT}/login/oauth2/code/keycloak"*) ;; *) die "login did not return to the API callback";; esac
   curl -s -c "$jar" -b "$jar" -o /dev/null "$location"
   curl -s -c "$jar" -b "$jar" "http://localhost:${API_PORT}/api/v1/me" | grep -q '"emailVerified":true' || { rm -f "$jar"; die "authenticated /api/v1/me failed"; }
-  rm -f "$jar"
+  info "signed private upload round trip (synthetic PDF): ticket, direct PUT, server verification, signed read"
+  local doc xsrf sha ticket upload_url upload_id done read_url
+  doc="$(mktemp)"
+  printf '%%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%%%EOF\n' > "$doc"
+  sha="$(openssl dgst -sha256 -r "$doc" | cut -d' ' -f1)"
+  xsrf="$(awk '$6 == "XSRF-TOKEN" { print $7 }' "$jar" | tail -1)"
+  [ -n "$xsrf" ] || { rm -f "$jar" "$doc"; die "no CSRF token cookie after login"; }
+  ticket="$(curl -s -c "$jar" -b "$jar" -H "X-XSRF-TOKEN: $xsrf" -H 'Content-Type: application/json' \
+    --data "{\"purpose\":\"COOK_DOCUMENT\",\"filename\":\"smoke.pdf\",\"contentType\":\"application/pdf\",\"bytes\":$(wc -c < "$doc" | tr -d ' '),\"sha256\":\"$sha\"}" \
+    "http://localhost:${API_PORT}/api/v1/uploads")"
+  upload_url="$(echo "$ticket" | sed -n 's/.*"uploadUrl":"\([^"]*\)".*/\1/p')"
+  upload_id="$(echo "$ticket" | sed -n 's/.*"uploadId":"\([^"]*\)".*/\1/p')"
+  case "$upload_url" in "http://localhost:${OBJECT_STORAGE_PORT}/matbakhy-private/"*X-Amz-Signature=*) ;; *) rm -f "$jar" "$doc"; die "upload ticket missing or not signed for the local storage port";; esac
+  curl -fsS -o /dev/null -X PUT -H 'Content-Type: application/pdf' --data-binary "@$doc" "$upload_url" || { rm -f "$jar" "$doc"; die "direct upload failed"; }
+  done="$(curl -s -c "$jar" -b "$jar" -H "X-XSRF-TOKEN: $xsrf" -H 'Content-Type: application/json' --data '{}' \
+    "http://localhost:${API_PORT}/api/v1/uploads/$upload_id/complete")"
+  echo "$done" | grep -q '"state":"APPROVED"' && echo "$done" | grep -q '"publicUrl":null' || { rm -f "$jar" "$doc"; die "upload was not approved as a private document"; }
+  read_url="$(echo "$done" | sed -n 's/.*"privateReadUrl":"\([^"]*\)".*/\1/p')"
+  curl -fsS "$read_url" | cmp -s - "$doc" || { rm -f "$jar" "$doc"; die "signed read did not return the uploaded bytes"; }
+  rm -f "$jar" "$doc"
   echo "PASS: local stack smoke checks"
 }
 

@@ -1846,6 +1846,8 @@ export interface components {
             privateLocation: string;
             pickupEnabled: boolean;
             zoneIds: string[];
+            /** @description Approved COOK_DOCUMENT uploads owned by the applicant; private, never public */
+            documentIds: string[];
             /** Format: date-time */
             submittedAt: string;
             /** @enum {string|null} */
@@ -1922,6 +1924,8 @@ export interface components {
             privateLocation: string | null;
             pickupEnabled: boolean;
             zoneIds: string[];
+            /** @description Approved COOK_DOCUMENT uploads owned by the applicant; private, never public */
+            documentIds: string[];
         };
         CookApplicationHistoryEntry: {
             revision: number;
@@ -2060,8 +2064,28 @@ export interface components {
             /** @enum {string} */
             availability: "AVAILABLE" | "SOLD_OUT" | "UNAVAILABLE";
         };
-        /** @description PENDING typed schema. Response for API-040. */
-        MediaStatus: Record<string, never>;
+        /** @description PENDING_UPLOAD, QUARANTINED, APPROVED or REJECTED. publicUrl exists only for APPROVED public-purpose media; privateReadUrl only for an APPROVED document and only for its owner or a scoped reviewer (expires after 5 minutes). */
+        MediaStatus: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            purpose: "MEAL_PHOTO" | "COOK_DOCUMENT";
+            /** @enum {string} */
+            state: "PENDING_UPLOAD" | "QUARANTINED" | "APPROVED" | "REJECTED";
+            /** @enum {string|null} */
+            rejectionReason: "SIZE_MISMATCH" | "CHECKSUM_MISMATCH" | "TYPE_MISMATCH" | "UNSUPPORTED_TYPE" | "DIMENSIONS" | "UNREADABLE" | "ACTIVE_CONTENT" | "MALWARE" | "MISSING_OBJECT" | null;
+            contentType: string | null;
+            bytes: number | null;
+            width: number | null;
+            height: number | null;
+            /** Format: uri */
+            publicUrl: string | null;
+            /** Format: uri */
+            privateReadUrl: string | null;
+            /** Format: date-time */
+            privateReadExpiresAt: string | null;
+            version: number;
+        };
         /** @description Authoritative money amount. Clients never send prices, totals, tax or commission. */
         Money: {
             /**
@@ -2309,10 +2333,21 @@ export interface components {
         PostReviewsReportsRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-038: body, attachmentIds; customer-visible; Idempotency-Key */
         PostSupportCasesMessagesRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-040: checksum, upload completion; quarantine and scan */
-        PostUploadsCompleteRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-039: purpose, filename, contentType, bytes, sha256; scoped storage key/expiry */
-        PostUploadsRequest: Record<string, never>;
+        PostUploadsCompleteRequest: {
+            /** @description Optional; must equal the declared checksum */
+            sha256?: string;
+        };
+        /** @description Declared metadata; the server verifies every value against the uploaded bytes. MEAL_PHOTO accepts image/jpeg and image/png up to 8 MiB; COOK_DOCUMENT accepts image/jpeg, image/png and application/pdf up to 10 MiB. */
+        PostUploadsRequest: {
+            /** @enum {string} */
+            purpose: "MEAL_PHOTO" | "COOK_DOCUMENT";
+            /** @description Display only; path components are removed and it never becomes a storage key */
+            filename: string;
+            /** @enum {string} */
+            contentType: "image/jpeg" | "image/png" | "application/pdf";
+            bytes: number;
+            sha256: string;
+        };
         /** @description PENDING typed schema. Response for API-001. */
         PublicConfiguration: Record<string, never>;
         /** @description Full replacement of the working draft. Omitted fields become empty. expectedVersion is required once the application exists. */
@@ -2324,6 +2359,8 @@ export interface components {
             privateLocation?: string;
             pickupEnabled?: boolean;
             zoneIds?: string[];
+            /** @description Approved COOK_DOCUMENT uploads owned by the applicant; private, never public */
+            documentIds?: string[];
             expectedVersion?: number;
         };
         /** @description PENDING typed schema. Request for API-033: platform, pushToken, environment, appVersion; encrypt token */
@@ -2448,8 +2485,20 @@ export interface components {
             reasonCode?: string;
             note?: string;
         };
-        /** @description PENDING typed schema. Response for API-039. */
-        UploadTicket: Record<string, never>;
+        /** @description Signed, short-lived direct upload to a private key. Send exactly the declared bytes with the listed headers. */
+        UploadTicket: {
+            /** Format: uuid */
+            uploadId: string;
+            /** Format: uri */
+            uploadUrl: string;
+            /** @enum {string} */
+            method: "PUT";
+            requiredHeaders: {
+                [key: string]: string;
+            };
+            /** Format: date-time */
+            expiresAt: string;
+        };
         /** @description 422 VERIFICATION_FAILED for wrong, expired or used codes (indistinguishable); 429 after 5 attempts; 404 for another account's challenge. */
         VerificationResult: {
             phoneVerified: boolean;
@@ -3485,7 +3534,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

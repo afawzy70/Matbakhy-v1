@@ -1,5 +1,7 @@
 package com.matbakhy.cooks.internal;
 
+import com.matbakhy.catalog.api.MediaLibrary;
+import com.matbakhy.catalog.api.MediaLibrary.Purpose;
 import com.matbakhy.cooks.internal.CookApplications.Application;
 import com.matbakhy.cooks.internal.CookApplications.Draft;
 import com.matbakhy.cooks.internal.CookApplications.Revision;
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CookApplicationService {
 
     static final int MAX_ZONES = 20;
+    static final int MAX_DOCUMENTS = 10;
     private static final Set<String> EDITABLE = Set.of("DRAFT", "CHANGES_REQUESTED");
 
     /** The applicant's own view: draft, state and decision history (reviewer identity is internal). */
@@ -43,19 +46,22 @@ public class CookApplicationService {
     }
 
     public record DraftInput(String publicName, String bio, String contactPhone, String privateLocation, Boolean pickupEnabled,
-                             List<UUID> zoneIds) {
+                             List<UUID> zoneIds, List<UUID> documentIds) {
     }
 
     private final JdbcTemplate jdbc;
     private final CookApplications applications;
     private final ServiceZoneLookup zones;
+    private final MediaLibrary media;
     private final AuditLog audit;
     private final Clock clock;
 
-    CookApplicationService(JdbcTemplate jdbc, CookApplications applications, ServiceZoneLookup zones, AuditLog audit, Clock clock) {
+    CookApplicationService(JdbcTemplate jdbc, CookApplications applications, ServiceZoneLookup zones, MediaLibrary media, AuditLog audit,
+                           Clock clock) {
         this.jdbc = jdbc;
         this.applications = applications;
         this.zones = zones;
+        this.media = media;
         this.audit = audit;
         this.clock = clock;
     }
@@ -67,7 +73,7 @@ public class CookApplicationService {
 
     @Transactional
     public CookApplication saveDraft(UUID userId, Long expectedVersion, DraftInput in) {
-        Draft draft = normalize(in);
+        Draft draft = normalize(userId, in);
         Timestamp now = Timestamp.from(clock.instant());
         var existing = applications.byUser(userId, true);
         if (existing.isEmpty()) {
@@ -77,10 +83,10 @@ public class CookApplicationService {
             jdbc.queryForObject("SELECT id FROM app_user WHERE id = ? FOR UPDATE", UUID.class, userId);
             int inserted = jdbc.update("""
                     INSERT INTO cook_application (id, user_id, public_name, bio, contact_phone, private_location, pickup_enabled,
-                                                 zone_ids, created_at, updated_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?::uuid[], ?, ?) ON CONFLICT (user_id) DO NOTHING""",
+                                                 zone_ids, document_ids, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?::uuid[], ?::uuid[], ?, ?) ON CONFLICT (user_id) DO NOTHING""",
                     UUID.randomUUID(), userId, draft.publicName(), draft.bio(), draft.contactPhone(), draft.privateLocation(),
-                    draft.pickupEnabled(), CookApplications.uuidArray(draft.zoneIds()), now, now);
+                    draft.pickupEnabled(), CookApplications.uuidArray(draft.zoneIds()), CookApplications.uuidArray(draft.documentIds()), now, now);
             if (inserted == 0) {
                 throw new ApiException(ErrorCode.VERSION_CONFLICT, "application created concurrently");
             }
@@ -93,10 +99,10 @@ public class CookApplicationService {
         }
         jdbc.update("""
                 UPDATE cook_application SET public_name = ?, bio = ?, contact_phone = ?, private_location = ?, pickup_enabled = ?,
-                       zone_ids = ?::uuid[], updated_at = ?, version = version + 1
+                       zone_ids = ?::uuid[], document_ids = ?::uuid[], updated_at = ?, version = version + 1
                 WHERE id = ?""",
                 draft.publicName(), draft.bio(), draft.contactPhone(), draft.privateLocation(), draft.pickupEnabled(),
-                CookApplications.uuidArray(draft.zoneIds()), now, app.id());
+                CookApplications.uuidArray(draft.zoneIds()), CookApplications.uuidArray(draft.documentIds()), now, app.id());
         return get(userId);
     }
 
@@ -108,16 +114,16 @@ public class CookApplicationService {
         if (!EDITABLE.contains(app.state())) {
             throw new ApiException(ErrorCode.STATE_CONFLICT, "application cannot be submitted in " + app.state());
         }
-        requireComplete(app.draft());
+        requireComplete(userId, app.draft());
         Draft d = app.draft();
         int revision = app.currentRevision() + 1;
         Instant now = clock.instant();
         jdbc.update("""
                 INSERT INTO cook_application_revision (application_id, revision, public_name, bio, contact_phone, private_location,
-                                                       pickup_enabled, zone_ids, submitted_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?::uuid[], ?)""",
+                                                       pickup_enabled, zone_ids, document_ids, submitted_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?::uuid[], ?::uuid[], ?)""",
                 app.id(), revision, d.publicName(), d.bio(), d.contactPhone(), d.privateLocation(), d.pickupEnabled(),
-                CookApplications.uuidArray(d.zoneIds()), Timestamp.from(now));
+                CookApplications.uuidArray(d.zoneIds()), CookApplications.uuidArray(d.documentIds()), Timestamp.from(now));
         jdbc.update("""
                 UPDATE cook_application SET state = 'SUBMITTED', current_revision = ?, updated_at = ?, version = version + 1
                 WHERE id = ?""", revision, Timestamp.from(now), app.id());
@@ -126,7 +132,7 @@ public class CookApplicationService {
         return get(userId);
     }
 
-    private void requireComplete(Draft d) {
+    private void requireComplete(UUID userId, Draft d) {
         List<FieldError> missing = new ArrayList<>();
         if (d.publicName() == null) {
             missing.add(new FieldError("publicName", "REQUIRED"));
@@ -149,12 +155,15 @@ public class CookApplicationService {
                 break;
             }
         }
+        if (d.documentIds().stream().anyMatch(doc -> !media.approvedFor(userId, doc, Purpose.COOK_DOCUMENT))) {
+            missing.add(new FieldError("documentIds", "DOCUMENT_NOT_APPROVED"));
+        }
         if (!missing.isEmpty()) {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "incomplete cook application", missing);
         }
     }
 
-    private Draft normalize(DraftInput in) {
+    private Draft normalize(UUID userId, DraftInput in) {
         List<FieldError> errors = new ArrayList<>();
         String name = text(in.publicName(), "publicName", 2, 80, errors);
         String bio = text(in.bio(), "bio", 1, 1000, errors);
@@ -172,10 +181,16 @@ public class CookApplicationService {
         } else if (zoneIds.stream().anyMatch(z -> !zones.isActive(z))) {
             errors.add(new FieldError("zoneIds", "ZONE_NOT_SERVICEABLE"));
         }
+        List<UUID> documentIds = in.documentIds() == null ? List.of() : List.copyOf(new LinkedHashSet<>(in.documentIds()));
+        if (documentIds.size() > MAX_DOCUMENTS) {
+            errors.add(new FieldError("documentIds", "MAX_10"));
+        } else if (documentIds.stream().anyMatch(doc -> !media.approvedFor(userId, doc, Purpose.COOK_DOCUMENT))) {
+            errors.add(new FieldError("documentIds", "DOCUMENT_NOT_APPROVED"));
+        }
         if (!errors.isEmpty()) {
             throw new ApiException(ErrorCode.VALIDATION_FAILED, "invalid cook application draft", errors);
         }
-        return new Draft(name, bio, phone, location, Boolean.TRUE.equals(in.pickupEnabled()), zoneIds);
+        return new Draft(name, bio, phone, location, Boolean.TRUE.equals(in.pickupEnabled()), zoneIds, documentIds);
     }
 
     private static String text(String value, String field, int min, int max, List<FieldError> errors) {
