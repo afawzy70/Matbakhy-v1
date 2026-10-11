@@ -4,7 +4,7 @@
   "status": "IN_PROGRESS",
   "current_phase": "P06",
   "current_story": "MB-029",
-  "last_tested_commit": "bec58308ae0805cb1ef3f4a8e3fd87937c9bd8d4",
+  "last_tested_commit": "bad288fd8367efc7475153ad8ad2204d711ba85d",
   "last_completed_story": "MB-028",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "Restyle the customer web (home/discovery, kitchen, meal, cart, checkout, order status, account) to the owner-selected terracotta/Cairo hierarchy in docs/design/approved (tokens and Cairo already applied), keeping server-side search, prices and capacity and one kitchen+slot per basket; then MB-029 accessibility/RTL/responsive verification. P06 gate still needs O05 whole-product approval.",
-  "updated_at": "2026-10-11T18:47:00Z",
+  "next_action": "MB-029 (IN_PROGRESS): keyboard-only journeys and dialog focus restoration (customer replacement prompt, checkout), operations web at 360/390/768/1440 and in English, long values in tables, then evidence for TC-046/TC-047/TC-129. Owner decisions needed: structured portion size (approved one-person/two-people filters) and descriptions in discovery cards. P06 gate also needs O05 whole-product approval.",
+  "updated_at": "2026-10-11T19:46:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
