@@ -1,0 +1,84 @@
+{
+  "run_id": "20261011-MB-006",
+  "story_id": "MB-006",
+  "phase": "P01",
+  "checks": [
+    {
+      "id": "P01-CHECK-1",
+      "name": "Backend workspace and PostgreSQL baseline (mvnw verify with Testcontainers)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Regression: clean-clone workspace check",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-106",
+      "observed": "MigrationIntegrationTest on Testcontainers PostgreSQL 16 (server_version_num asserted): blank database migrated by Flyway to version 1 with app_user and idempotency_record; duplicate issuer+subject and duplicate actor+command+key raise DuplicateKeyException while other actor/command succeed; locale, E.164 phone, phone-verified-without-phone, status, idempotency hash and <24h retention CHECKs and actor FK reject invalid rows. ModuleBoundaryTest: all nine modules declared and imported; production code passes api-only, acyclic, layering rules; the same rules report the fixture's finance.internal -> orders.internal dependency and its api-level cycle. ApiErrorIntegrationTest: 404/400/415/405/422/409/500 return the standard body with request ID and no internal detail."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-006/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Initial run: module presence test failed because documentation-only package-info files produce no class files and the jar import filter excluded reactor module jars; repaired with @DomainModule package annotations and package-based import (assertions unchanged, strengthened to require annotation name = package).",
+      "Catch-all exception handler will need explicit Spring Security mappings (401/403) in MB-009 so authentication failures are not reported as 500.",
+      "app_user/idempotency_record schemas follow docs/engineering/02-data-model.md; UUIDs assigned by the application (version selected when identity/orders services are written).",
+      "Domain modules contain only declarations and api packages so far; no behavior is claimed for them."
+    ]
+  },
+  "open_defects": []
+}

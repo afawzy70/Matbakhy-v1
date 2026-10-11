@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P01",
-  "current_story": "MB-006",
-  "last_tested_commit": "babfe81253eafdeb3947194ed2a08914aa1a39a5",
-  "last_completed_story": "MB-005",
+  "current_story": "MB-007",
+  "last_tested_commit": "845b6cabe68ce974240283d6b2da85cd5ac92fdc",
+  "last_completed_story": "MB-006",
   "last_successful_gate": null,
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -20,8 +20,8 @@
       "next_action": "Provide an environment allowing dl.google.com or a CI runner with Android SDK, and a macOS runner; MB-047 then runs native builds"
     }
   ],
-  "next_action": "MB-006: module boundaries, Flyway baseline, PostgreSQL Testcontainers, architecture tests; then MB-007, MB-003, MB-008.",
-  "updated_at": "2026-10-11T08:33:00Z",
+  "next_action": "MB-007: typed OpenAPI from endpoint registry, validation, generated TS client, money/pagination/error schemas, drift check; then MB-003, MB-008.",
+  "updated_at": "2026-10-11T08:41:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active."
 }

@@ -163,7 +163,7 @@
       "id": "MB-006",
       "phase": "P01",
       "title": "Establish database and module boundaries",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -185,9 +185,11 @@
       "scenario_ids": [
         "TC-106"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-006/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 845b6cabe68ce974240283d6b2da85cd5ac92fdc; SELF_REVIEW only"
     },
     {
       "id": "MB-007",

@@ -1112,8 +1112,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Create module interfaces and schema migration baseline; configure PostgreSQL/Testcontainers; add architecture constraints and consistent errors; isolate dev fixtures",
       "then": "Blank PostgreSQL migrates; duplicate constraints fail; forbidden module dependency test fails when violated",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-006/evidence.json"
+      ]
     },
     {
       "id": "TC-107",
