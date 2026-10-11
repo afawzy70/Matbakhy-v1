@@ -37,7 +37,7 @@
       "permission": "PUBLIC",
       "response_type": "MealDetail",
       "contract": "published public meal or 404",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-005",
@@ -415,7 +415,7 @@
       "permission": "COOK",
       "response_type": "CookMealPage",
       "contract": "status, q, cursor, limit; own kitchen",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-047",
@@ -424,7 +424,7 @@
       "permission": "COOK",
       "response_type": "CookMeal",
       "contract": "localized fields, portion, price, ingredients, allergens, approved media refs",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-048",
@@ -433,7 +433,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookMeal",
       "contract": "editable fields and expectedVersion; no kitchen reassignment",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-049",
@@ -442,7 +442,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookMeal",
       "contract": "action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-050",

@@ -117,9 +117,15 @@ paths:
       description: published public meal or 404
       x-matbakhy-id: API-004
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Arabic by default; English when preferred and available
+          schema:
+            type: string
         - name: mealId
           in: path
           required: true
@@ -1379,11 +1385,23 @@ paths:
       description: status, q, cursor, limit; own kitchen
       x-matbakhy-id: API-046
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [DRAFT, PUBLISHED, PAUSED, ARCHIVED]
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 80
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -1405,12 +1423,12 @@ paths:
       description: localized fields, portion, price, ingredients, allergens, approved media refs
       x-matbakhy-id: API-047
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -1435,7 +1453,7 @@ paths:
       description: editable fields and expectedVersion; no kitchen reassignment
       x-matbakhy-id: API-048
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1470,7 +1488,7 @@ paths:
       description: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards
       x-matbakhy-id: API-049
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3607,12 +3625,157 @@ components:
       x-schema-status: PENDING
     CookMeal:
       type: object
-      description: PENDING typed schema. Response for API-047.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [id, kitchenId, status, content, revision, publishedAt, archivedAt, updatedAt, version]
+      properties:
+        id:
+          type: string
+          format: uuid
+        kitchenId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, PAUSED, ARCHIVED]
+        content:
+          $ref: "#/components/schemas/MealContent"
+        revision:
+          type: integer
+          minimum: 1
+        publishedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        archivedAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
+    MealContent:
+      type: object
+      additionalProperties: false
+      description: Versioned meal content (one immutable revision per change). Arabic text is required to publish; English is optional.
+      required: [titleAr, titleEn, descriptionAr, descriptionEn, portionAr, portionEn, ingredientsAr, ingredientsEn, allergenDeclaration, allergenCodes, allergenNote, priceMinor, currency, photos]
+      properties:
+        titleAr:
+          type:
+            - string
+            - "null"
+          minLength: 2
+          maxLength: 120
+        titleEn:
+          type:
+            - string
+            - "null"
+          minLength: 2
+          maxLength: 120
+        descriptionAr:
+          type:
+            - string
+            - "null"
+          minLength: 10
+          maxLength: 2000
+        descriptionEn:
+          type:
+            - string
+            - "null"
+          minLength: 10
+          maxLength: 2000
+        portionAr:
+          type:
+            - string
+            - "null"
+          minLength: 2
+          maxLength: 120
+        portionEn:
+          type:
+            - string
+            - "null"
+          minLength: 2
+          maxLength: 120
+        ingredientsAr:
+          type:
+            - string
+            - "null"
+          minLength: 3
+          maxLength: 2000
+        ingredientsEn:
+          type:
+            - string
+            - "null"
+          minLength: 3
+          maxLength: 2000
+        allergenDeclaration:
+          type:
+            - string
+            - "null"
+          enum: [CONTAINS, NONE_DECLARED, UNKNOWN, null]
+        allergenCodes:
+          type: array
+          items:
+            type: string
+            enum: [GLUTEN, CRUSTACEANS, EGGS, FISH, PEANUTS, SOY, MILK, TREE_NUTS, CELERY, MUSTARD, SESAME, SULPHITES, LUPIN, MOLLUSCS]
+        allergenNote:
+          type:
+            - string
+            - "null"
+          maxLength: 500
+        priceMinor:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          maximum: 1000000
+          description: Integer piastres (EGP minor units)
+        currency:
+          type: string
+          enum: [EGP]
+        photos:
+          type: array
+          maxItems: 6
+          items:
+            $ref: "#/components/schemas/MealPhotoRef"
+    MealPhotoRef:
+      type: object
+      additionalProperties: false
+      required: [mediaId]
+      properties:
+        mediaId:
+          type: string
+          format: uuid
+          description: APPROVED MEAL_PHOTO upload owned by the cook
+        altAr:
+          type:
+            - string
+            - "null"
+          maxLength: 200
+        altEn:
+          type:
+            - string
+            - "null"
+          maxLength: 200
     CookMealPage:
       type: object
-      description: PENDING typed schema. Response for API-046.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CookMeal"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     CookOrderPage:
       type: object
       description: PENDING typed schema. Response for API-053.
@@ -4208,8 +4371,58 @@ components:
       x-schema-status: PENDING
     PatchCookMealsByIdRequest:
       type: object
-      description: "PENDING typed schema. Request for API-048: editable fields and expectedVersion; no kitchen reassignment"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Omitted fields stay unchanged; an empty string clears optional text; photos replaces the list. A changed published meal must stay publishable. Each change creates a new revision.
+      required: [expectedVersion]
+      properties:
+        titleAr:
+          type: string
+          maxLength: 120
+        titleEn:
+          type: string
+          maxLength: 120
+        descriptionAr:
+          type: string
+          maxLength: 2000
+        descriptionEn:
+          type: string
+          maxLength: 2000
+        portionAr:
+          type: string
+          maxLength: 120
+        portionEn:
+          type: string
+          maxLength: 120
+        ingredientsAr:
+          type: string
+          maxLength: 2000
+        ingredientsEn:
+          type: string
+          maxLength: 2000
+        allergenDeclaration:
+          type: string
+          enum: [CONTAINS, NONE_DECLARED, UNKNOWN]
+        allergenCodes:
+          type: array
+          maxItems: 14
+          items:
+            type: string
+            enum: [GLUTEN, CRUSTACEANS, EGGS, FISH, PEANUTS, SOY, MILK, TREE_NUTS, CELERY, MUSTARD, SESAME, SULPHITES, LUPIN, MOLLUSCS]
+        allergenNote:
+          type: string
+          maxLength: 500
+        priceMinor:
+          type: integer
+          minimum: 1
+          maximum: 1000000
+        photos:
+          type: array
+          maxItems: 6
+          items:
+            $ref: "#/components/schemas/MealPhotoRef"
+        expectedVersion:
+          type: integer
+          minimum: 0
     PatchCookSettingsRequest:
       type: object
       description: "PENDING typed schema. Request for API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension"
@@ -4340,12 +4553,66 @@ components:
           minimum: 0
     PostCookMealsPublicationRequest:
       type: object
-      description: "PENDING typed schema. Request for API-049: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: PUBLISH (from DRAFT or PAUSED; requires complete declarations, an approved photo and an ACTIVE kitchen), PAUSE (from PUBLISHED), ARCHIVE (final; history kept).
+      required: [action, expectedVersion]
+      properties:
+        action:
+          type: string
+          enum: [PUBLISH, PAUSE, ARCHIVE]
+        expectedVersion:
+          type: integer
+          minimum: 0
     PostCookMealsRequest:
       type: object
-      description: "PENDING typed schema. Request for API-047: localized fields, portion, price, ingredients, allergens, approved media refs"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Creates a DRAFT in the caller's own kitchen (never client-chosen). All fields optional for a draft.
+      properties:
+        titleAr:
+          type: string
+          maxLength: 120
+        titleEn:
+          type: string
+          maxLength: 120
+        descriptionAr:
+          type: string
+          maxLength: 2000
+        descriptionEn:
+          type: string
+          maxLength: 2000
+        portionAr:
+          type: string
+          maxLength: 120
+        portionEn:
+          type: string
+          maxLength: 120
+        ingredientsAr:
+          type: string
+          maxLength: 2000
+        ingredientsEn:
+          type: string
+          maxLength: 2000
+        allergenDeclaration:
+          type: string
+          enum: [CONTAINS, NONE_DECLARED, UNKNOWN]
+        allergenCodes:
+          type: array
+          maxItems: 14
+          items:
+            type: string
+            enum: [GLUTEN, CRUSTACEANS, EGGS, FISH, PEANUTS, SOY, MILK, TREE_NUTS, CELERY, MUSTARD, SESAME, SULPHITES, LUPIN, MOLLUSCS]
+        allergenNote:
+          type: string
+          maxLength: 500
+        priceMinor:
+          type: integer
+          minimum: 1
+          maximum: 1000000
+        photos:
+          type: array
+          maxItems: 6
+          items:
+            $ref: "#/components/schemas/MealPhotoRef"
     PostCookOrdersDispatchRequest:
       type: object
       description: "PENDING typed schema. Request for API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only"

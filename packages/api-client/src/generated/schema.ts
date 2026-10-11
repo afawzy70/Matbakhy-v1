@@ -1939,10 +1939,57 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-045. */
         CookDashboard: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-047. */
-        CookMeal: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-046. */
-        CookMealPage: Record<string, never>;
+        CookMeal: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            kitchenId: string;
+            /** @enum {string} */
+            status: "DRAFT" | "PUBLISHED" | "PAUSED" | "ARCHIVED";
+            content: components["schemas"]["MealContent"];
+            revision: number;
+            /** Format: date-time */
+            publishedAt: string | null;
+            /** Format: date-time */
+            archivedAt: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            version: number;
+        };
+        /** @description Versioned meal content (one immutable revision per change). Arabic text is required to publish; English is optional. */
+        MealContent: {
+            titleAr: string | null;
+            titleEn: string | null;
+            descriptionAr: string | null;
+            descriptionEn: string | null;
+            portionAr: string | null;
+            portionEn: string | null;
+            ingredientsAr: string | null;
+            ingredientsEn: string | null;
+            /** @enum {string|null} */
+            allergenDeclaration: "CONTAINS" | "NONE_DECLARED" | "UNKNOWN" | null;
+            allergenCodes: ("GLUTEN" | "CRUSTACEANS" | "EGGS" | "FISH" | "PEANUTS" | "SOY" | "MILK" | "TREE_NUTS" | "CELERY" | "MUSTARD" | "SESAME" | "SULPHITES" | "LUPIN" | "MOLLUSCS")[];
+            allergenNote: string | null;
+            /** @description Integer piastres (EGP minor units) */
+            priceMinor: number | null;
+            /** @enum {string} */
+            currency: "EGP";
+            photos: components["schemas"]["MealPhotoRef"][];
+        };
+        MealPhotoRef: {
+            /**
+             * Format: uuid
+             * @description APPROVED MEAL_PHOTO upload owned by the cook
+             */
+            mediaId: string;
+            altAr?: string | null;
+            altEn?: string | null;
+        };
+        CookMealPage: {
+            items: components["schemas"]["CookMeal"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
         /** @description PENDING typed schema. Response for API-053. */
         CookOrderPage: Record<string, never>;
         /** @description PENDING typed schema. Response for API-054. */
@@ -2165,8 +2212,24 @@ export interface components {
         };
         /** @description PENDING typed schema. Response for API-097. */
         OutboxStatus: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-048: editable fields and expectedVersion; no kitchen reassignment */
-        PatchCookMealsByIdRequest: Record<string, never>;
+        /** @description Omitted fields stay unchanged; an empty string clears optional text; photos replaces the list. A changed published meal must stay publishable. Each change creates a new revision. */
+        PatchCookMealsByIdRequest: {
+            titleAr?: string;
+            titleEn?: string;
+            descriptionAr?: string;
+            descriptionEn?: string;
+            portionAr?: string;
+            portionEn?: string;
+            ingredientsAr?: string;
+            ingredientsEn?: string;
+            /** @enum {string} */
+            allergenDeclaration?: "CONTAINS" | "NONE_DECLARED" | "UNKNOWN";
+            allergenCodes?: ("GLUTEN" | "CRUSTACEANS" | "EGGS" | "FISH" | "PEANUTS" | "SOY" | "MILK" | "TREE_NUTS" | "CELERY" | "MUSTARD" | "SESAME" | "SULPHITES" | "LUPIN" | "MOLLUSCS")[];
+            allergenNote?: string;
+            priceMinor?: number;
+            photos?: components["schemas"]["MealPhotoRef"][];
+            expectedVersion: number;
+        };
         /** @description PENDING typed schema. Request for API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension */
         PatchCookSettingsRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-052: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations */
@@ -2235,10 +2298,29 @@ export interface components {
         PostCookApplicationSubmitRequest: {
             expectedVersion: number;
         };
-        /** @description PENDING typed schema. Request for API-049: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards */
-        PostCookMealsPublicationRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-047: localized fields, portion, price, ingredients, allergens, approved media refs */
-        PostCookMealsRequest: Record<string, never>;
+        /** @description PUBLISH (from DRAFT or PAUSED; requires complete declarations, an approved photo and an ACTIVE kitchen), PAUSE (from PUBLISHED), ARCHIVE (final; history kept). */
+        PostCookMealsPublicationRequest: {
+            /** @enum {string} */
+            action: "PUBLISH" | "PAUSE" | "ARCHIVE";
+            expectedVersion: number;
+        };
+        /** @description Creates a DRAFT in the caller's own kitchen (never client-chosen). All fields optional for a draft. */
+        PostCookMealsRequest: {
+            titleAr?: string;
+            titleEn?: string;
+            descriptionAr?: string;
+            descriptionEn?: string;
+            portionAr?: string;
+            portionEn?: string;
+            ingredientsAr?: string;
+            ingredientsEn?: string;
+            /** @enum {string} */
+            allergenDeclaration?: "CONTAINS" | "NONE_DECLARED" | "UNKNOWN";
+            allergenCodes?: ("GLUTEN" | "CRUSTACEANS" | "EGGS" | "FISH" | "PEANUTS" | "SOY" | "MILK" | "TREE_NUTS" | "CELERY" | "MUSTARD" | "SESAME" | "SULPHITES" | "LUPIN" | "MOLLUSCS")[];
+            allergenNote?: string;
+            priceMinor?: number;
+            photos?: components["schemas"]["MealPhotoRef"][];
+        };
         /** @description PENDING typed schema. Request for API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only */
         PostCookOrdersDispatchRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-060: expectedVersion, code, Idempotency-Key; correct mode/state */
@@ -2608,7 +2690,10 @@ export interface operations {
     getMealsById: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Arabic by default; English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path: {
                 mealId: string;
             };
@@ -3697,6 +3782,8 @@ export interface operations {
     getCookMeals: {
         parameters: {
             query?: {
+                status?: "DRAFT" | "PUBLISHED" | "PAUSED" | "ARCHIVED";
+                q?: string;
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -3734,7 +3821,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

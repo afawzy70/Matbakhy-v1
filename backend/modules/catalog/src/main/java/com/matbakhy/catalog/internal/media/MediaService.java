@@ -225,7 +225,9 @@ public class MediaService implements MediaLibrary {
     @Transactional
     public void delete(UUID ownerId, UUID mediaId) {
         Row row = lockOwned(ownerId, mediaId);
-        if (access.stream().anyMatch(a -> a.referenced(mediaId))) {
+        Boolean inMeal = jdbc.queryForObject("SELECT EXISTS (SELECT 1 FROM meal_media mm JOIN meal m ON m.id = mm.meal_id "
+                + "WHERE mm.media_id = ? AND m.status <> 'ARCHIVED')", Boolean.class, mediaId);
+        if (Boolean.TRUE.equals(inMeal) || access.stream().anyMatch(a -> a.referenced(mediaId))) {
             throw new ApiException(ErrorCode.STATE_CONFLICT, "media referenced by a preserved record");
         }
         jdbc.update("""
@@ -235,6 +237,12 @@ public class MediaService implements MediaLibrary {
         if (row.publicKey() != null) {
             storage.delete(Bucket.PUBLIC, row.publicKey());
         }
+    }
+
+    /** Public URL of an approved public variant, if any. */
+    public java.util.Optional<java.net.URI> publicUrl(UUID mediaId) {
+        return jdbc.query("SELECT public_key FROM media_asset WHERE id = ? AND state = 'APPROVED' AND public_key IS NOT NULL",
+                (rs, n) -> rs.getString(1), mediaId).stream().findFirst().map(storage::publicUrl);
     }
 
     @Override
