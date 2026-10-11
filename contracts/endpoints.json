@@ -875,6 +875,15 @@
       "response_type": "OutboxStatus",
       "contract": "reason, expectedVersion, Idempotency-Key; safe predefined replay only",
       "implemented": true
+    },
+    {
+      "id": "API-098",
+      "method": "GET",
+      "path": "/api/v1/ops/reviews",
+      "permission": "CONTENT_MODERATE",
+      "response_type": "ReviewQueue",
+      "contract": "moderation queue; reported visible or hidden reviews, bounded",
+      "implemented": true
     }
   ]
 }

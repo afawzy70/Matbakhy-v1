@@ -121,4 +121,124 @@ describe("customer web", () => {
     const links = screen.getAllByRole("link", { name: "تسجيل الدخول" });
     expect(links[links.length - 1]?.getAttribute("href")).toMatch(/returnTo=.*checkout/);
   });
+
+  it("toggles a favorite on the meal page and reports a review with the server's visible summary", async () => {
+    window.location.hash = "#/meal/22222222-2222-4222-8222-222222222222";
+    let favorites: { mealId: string }[] = [];
+    const meal = {
+      id: "22222222-2222-4222-8222-222222222222",
+      title: "Koshari",
+      kitchen: { id: "33333333-3333-4333-8333-333333333333", name: "Mona's kitchen" },
+      portionText: "1 bowl",
+      price: egp(12000),
+      description: "",
+      ingredients: "",
+      allergenCodes: [],
+      allergenStatement: null,
+      photo: null,
+      nextSlots: [],
+      availability: "AVAILABLE",
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      [`GET /api/v1/meals/${meal.id}`]: () => ({ status: 200, body: meal }),
+      "GET /api/v1/me/favorites": () => ({ status: 200, body: { items: favorites.map((f) => ({ ...f, title: "Koshari", kitchenName: "Mona", priceMinor: 12000, available: true })), nextCursor: null, hasMore: false } }),
+      [`PUT /api/v1/me/favorites/${meal.id}`]: () => {
+        favorites = [{ mealId: meal.id }];
+        return { status: 200, body: {} };
+      },
+      [`DELETE /api/v1/me/favorites/${meal.id}`]: () => {
+        favorites = [];
+        return { status: 204 };
+      },
+      [`GET /api/v1/kitchens/${meal.kitchen.id}/reviews`]: () => ({
+        status: 200,
+        body: { items: [{ id: "r1", rating: 4, text: "Tasty", createdAt: "2026-10-10T10:00:00Z" }], summary: { count: 1, averageTenths: 40 }, nextCursor: null, hasMore: false },
+      }),
+      "POST /api/v1/reviews/r1/reports": () => ({ status: 204 }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Add to favorites" }));
+    const remove = await screen.findByRole("button", { name: "Remove from favorites" });
+    expect(remove.getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(remove);
+    expect(await screen.findByRole("button", { name: "Add to favorites" })).toBeTruthy();
+    expect(await screen.findByText("4.0 of 5 (1 reviews)")).toBeTruthy();
+    fireEvent.change(screen.getByRole("combobox", { name: "Report" }), { target: { value: "SPAM" } });
+    expect(await screen.findByText("Reported. Thank you.")).toBeTruthy();
+    expect(calls.find((c) => c.method === "POST" && c.path === "/api/v1/reviews/r1/reports")?.body).toEqual({ reasonCode: "SPAM" });
+    expect(calls.filter((c) => c.method === "PUT").length).toBe(1);
+  });
+
+  it("reviews a completed order once and offers ordering again at a new price", async () => {
+    window.location.hash = `#/orders/${order.id}`;
+    let reviewed = false;
+    const view = {
+      ...order,
+      version: 3,
+      state: "COMPLETED",
+      fulfillmentMode: "PICKUP",
+      items: [{ mealId: "m1", title: "Koshari", quantity: 1, unitPrice: egp(12000), lineTotal: egp(12000) }],
+      subtotal: egp(12000),
+      deliveryFee: egp(0),
+      tax: egp(0),
+      total: egp(12000),
+      slot: { id: "s1", startsAt: "2026-10-10T10:00:00Z" },
+      acceptBy: "2026-10-10T09:00:00Z",
+      events: [],
+      allowedActions: [],
+      cashState: "COLLECTED",
+      fulfillmentNote: null,
+      dispatchReference: null,
+      contact: null,
+      handoverCode: null,
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      [`GET /api/v1/orders/${order.id}`]: () => ({ status: 200, body: view }),
+      [`POST /api/v1/orders/${order.id}/reviews`]: () => {
+        if (reviewed) {
+          return { status: 409, body: { code: "STATE_CONFLICT" } };
+        }
+        reviewed = true;
+        return { status: 201, body: {} };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.change(await screen.findByRole("combobox", { name: "Rating (1 to 5)" }), { target: { value: "4" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Comment (optional)" }), { target: { value: " Very good " } });
+    fireEvent.click(screen.getByRole("button", { name: "Submit review" }));
+    expect(await screen.findByText("Thank you for your review.")).toBeTruthy();
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ rating: 4, text: "Very good" });
+    expect(screen.getByRole("link", { name: "Order again (at today's price)" }).getAttribute("href")).toBe("#/meal/m1");
+  });
+
+  it("shows the account page only when signed in and sends the deletion request after confirmation", async () => {
+    window.location.hash = "#/account";
+    const empty = { status: 200, body: { items: [], nextCursor: null, hasMore: false } };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/favorites": () => ({
+        status: 200,
+        body: { items: [{ mealId: "m9", title: "Molokhia", kitchenName: "Mona", priceMinor: null, available: false }], nextCursor: null, hasMore: false },
+      }),
+      "GET /api/v1/notifications": () => empty,
+      "GET /api/v1/support/cases": () => empty,
+      "GET /api/v1/orders": () => empty,
+      "GET /api/v1/me/addresses": () => empty,
+      "POST /api/v1/me/deletion-requests": () => ({ status: 202, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByText("Not available right now")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Molokhia" })).toBeNull();
+    const del = screen.getByRole("button", { name: "Request account deletion" }) as HTMLButtonElement;
+    expect(del.disabled).toBe(true);
+    fireEvent.click(screen.getByRole("checkbox", { name: "I confirm I want my account deleted" }));
+    fireEvent.click(del);
+    expect(await screen.findByText("Deletion request received; the account is disabled.")).toBeTruthy();
+    expect(calls.find((c) => c.path === "/api/v1/me/deletion-requests")?.body).toEqual({ confirm: true, policyVersion: "retention-policy-draft" });
+  });
 });

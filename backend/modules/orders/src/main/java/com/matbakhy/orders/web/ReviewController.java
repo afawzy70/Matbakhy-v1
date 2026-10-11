@@ -2,6 +2,7 @@ package com.matbakhy.orders.web;
 
 import com.matbakhy.identity.api.CurrentAccount;
 import com.matbakhy.orders.internal.ReviewService;
+import com.matbakhy.orders.internal.ReviewService.QueuedReview;
 import com.matbakhy.orders.internal.ReviewService.Review;
 import com.matbakhy.orders.internal.ReviewService.ReviewPage;
 import com.matbakhy.shared.web.RequestContext;
@@ -9,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/** API-007, API-029, API-030 and API-073: verified-order reviews, reports and staff moderation. */
+/** API-007, API-029, API-030, API-073 and API-098: verified-order reviews, reports and staff moderation. */
 @RestController
 class ReviewController {
 
@@ -55,6 +57,15 @@ class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void report(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID reviewId, @Valid @RequestBody ReportBody body) {
         reviews.report(actor.id(), reviewId, body.reasonCode(), body.description());
+    }
+
+    record ReviewQueue(List<QueuedReview> items) {
+    }
+
+    @GetMapping("/api/v1/ops/reviews")
+    @PreAuthorize("hasAuthority('PERM_content.moderate')")
+    ReviewQueue queue(@RequestParam(defaultValue = "VISIBLE") String visibility, @RequestParam(defaultValue = "50") int limit) {
+        return new ReviewQueue(reviews.queue(visibility, limit));
     }
 
     @PostMapping("/api/v1/ops/reviews/{reviewId}/moderation")

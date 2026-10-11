@@ -1,0 +1,242 @@
+import { useState } from "react";
+import { formatMoney, formatTime, type Schemas } from "./api";
+import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
+
+const CASE_CATEGORIES = ["LATE", "MISSING_ITEM", "QUALITY", "FOOD_SAFETY", "CASH", "HANDOVER", "OTHER"] as const;
+
+/** The customer's own data: profile, addresses, favorites, inbox, support cases and the deletion request. */
+export function Account({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["CustomerProfile"]; onMeChanged: () => void }) {
+  return (
+    <div className="stack">
+      <Profile ctx={ctx} me={me} onMeChanged={onMeChanged} />
+      <Favorites ctx={ctx} />
+      <Inbox ctx={ctx} />
+      <Support ctx={ctx} />
+      <Addresses ctx={ctx} />
+      <Deletion ctx={ctx} onMeChanged={onMeChanged} />
+    </div>
+  );
+}
+
+function Profile({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["CustomerProfile"]; onMeChanged: () => void }) {
+  const { t } = ctx;
+  const [name, setName] = useState(me.displayName ?? "");
+  const [done, setDone] = useState(false);
+  const { run, error, busy } = useMutation(ctx, onMeChanged);
+  return (
+    <section className="card form" aria-labelledby="profile-heading">
+      <h2 id="profile-heading">{t.profile}</h2>
+      <label>
+        {t.displayName} <input maxLength={120} value={name} onChange={(e) => setName(e.target.value)} />
+      </label>
+      <button
+        type="button"
+        disabled={busy || !name.trim()}
+        onClick={() =>
+          void run(() => ctx.api.PATCH("/api/v1/me", { body: { expectedVersion: me.version, displayName: name.trim() } })).then((ok) => setDone(ok))
+        }
+      >
+        {t.save}
+      </button>
+      {done ? <p role="status">{t.saved}</p> : null}
+      <ErrorLine message={error} />
+    </section>
+  );
+}
+
+function Favorites({ ctx }: { ctx: Ctx }) {
+  const { t, locale } = ctx;
+  const [state, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/me/favorites"), locale);
+  const { run, error } = useMutation(ctx, reload);
+  return (
+    <section className="card" aria-labelledby="fav-heading">
+      <h2 id="fav-heading">{t.favorites}</h2>
+      <Status ctx={ctx} state={state} onRetry={reload}>
+        {(page) => (
+          <ul className="rows">
+            {page.items.map((f) => (
+              <li key={f.mealId}>
+                {f.available ? <a href={`#/meal/${f.mealId}`}>{f.title}</a> : <span>{f.title}</span>} · {f.kitchenName}
+                {f.priceMinor != null ? ` · ${formatMoney(f.priceMinor, locale)}` : ""}
+                {!f.available ? <span className="badge"> {t.unavailable}</span> : null}{" "}
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => void run(() => ctx.api.DELETE("/api/v1/me/favorites/{mealId}", { params: { path: { mealId: f.mealId } } }))}
+                >
+                  {t.remove}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Status>
+      <ErrorLine message={error} />
+    </section>
+  );
+}
+
+function Inbox({ ctx }: { ctx: Ctx }) {
+  const { t, locale } = ctx;
+  const [state, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/notifications", { params: { query: { limit: 20 } } }));
+  const { run } = useMutation(ctx, reload);
+  return (
+    <section className="card" aria-labelledby="inbox-heading">
+      <h2 id="inbox-heading">{t.inbox}</h2>
+      <Status ctx={ctx} state={state} onRetry={reload}>
+        {(page) => (
+          <ul className="rows">
+            {page.items.map((n) => (
+              <li key={n.id} className={n.readAt ? "muted" : undefined}>
+                {formatTime(n.createdAt, locale)} · {n.params.orderNumber ?? ""} · {t.state[n.params.state ?? ""] ?? n.type}
+                {n.orderId ? (
+                  <>
+                    {" "}
+                    <a href={`#/orders/${n.orderId}`}>{n.params.orderNumber}</a>
+                  </>
+                ) : null}
+                {!n.readAt ? (
+                  <button
+                    type="button"
+                    className="link"
+                    onClick={() => void run(() => ctx.api.PUT("/api/v1/notifications/{notificationId}/read", { params: { path: { notificationId: n.id } } }))}
+                  >
+                    {" "}
+                    {t.markRead}
+                  </button>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Status>
+    </section>
+  );
+}
+
+function Support({ ctx }: { ctx: Ctx }) {
+  const { t } = ctx;
+  const [cases, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/support/cases"));
+  const [orders] = useServer(ctx, () => ctx.api.GET("/api/v1/orders", { params: { query: { limit: 20 } } }));
+  const [orderId, setOrderId] = useState("");
+  const [category, setCategory] = useState<(typeof CASE_CATEGORIES)[number]>("QUALITY");
+  const [description, setDescription] = useState("");
+  const { run, error, busy } = useMutation(ctx, reload);
+  return (
+    <section className="card form" aria-labelledby="support-heading">
+      <h2 id="support-heading">{t.support}</h2>
+      <Status ctx={ctx} state={cases} onRetry={reload}>
+        {(page) => (
+          <ul className="rows">
+            {page.items.map((c) => (
+              <li key={c.id}>
+                {c.reference} · {c.orderNumber} · {t.caseCategories[c.category]} · {c.state}
+              </li>
+            ))}
+          </ul>
+        )}
+      </Status>
+      <h3>{t.openCase}</h3>
+      <label>
+        {t.caseOrder}{" "}
+        <select value={orderId} onChange={(e) => setOrderId(e.target.value)}>
+          <option value="">—</option>
+          {orders.status === "ok"
+            ? orders.data.items.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.publicNumber}
+                </option>
+              ))
+            : null}
+        </select>
+      </label>
+      <label>
+        {t.caseCategory}{" "}
+        <select value={category} onChange={(e) => setCategory(e.target.value as (typeof CASE_CATEGORIES)[number])}>
+          {CASE_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {t.caseCategories[c]}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        {t.caseDescription} <textarea maxLength={4000} value={description} onChange={(e) => setDescription(e.target.value)} />
+      </label>
+      <button
+        type="button"
+        disabled={busy || !orderId || description.trim().length < 10}
+        onClick={() =>
+          void run(() => ctx.api.POST("/api/v1/support/cases", { body: { orderId, category, description: description.trim() } })).then(
+            (ok) => ok && setDescription(""),
+          )
+        }
+      >
+        {t.openCase}
+      </button>
+      <ErrorLine message={error} />
+    </section>
+  );
+}
+
+function Addresses({ ctx }: { ctx: Ctx }) {
+  const { t } = ctx;
+  const [state, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/me/addresses"));
+  const { run, error } = useMutation(ctx, reload);
+  return (
+    <section className="card" aria-labelledby="addr-heading">
+      <h2 id="addr-heading">{t.addresses}</h2>
+      <Status ctx={ctx} state={state} onRetry={reload}>
+        {(page) => (
+          <ul className="rows">
+            {page.items.map((a) => (
+              <li key={a.id}>
+                {a.label} · {a.street} {a.building}{" "}
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => void run(() => ctx.api.DELETE("/api/v1/me/addresses/{addressId}", { params: { path: { addressId: a.id } } }))}
+                >
+                  {t.remove}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Status>
+      <ErrorLine message={error} />
+    </section>
+  );
+}
+
+function Deletion({ ctx, onMeChanged }: { ctx: Ctx; onMeChanged: () => void }) {
+  const { t } = ctx;
+  const [confirm, setConfirm] = useState(false);
+  const [done, setDone] = useState(false);
+  const { run, error, busy } = useMutation(ctx, () => undefined);
+  return (
+    <section className="card form" aria-labelledby="delete-heading">
+      <h2 id="delete-heading">{t.deleteAccount}</h2>
+      <label className="check">
+        <input type="checkbox" checked={confirm} onChange={(e) => setConfirm(e.target.checked)} /> {t.deleteConfirm}
+      </label>
+      <button
+        type="button"
+        className="danger"
+        disabled={busy || !confirm || done}
+        onClick={() =>
+          void run(() => ctx.api.POST("/api/v1/me/deletion-requests", { body: { confirm: true, policyVersion: "retention-policy-draft" } })).then((ok) => {
+            if (ok) {
+              setDone(true);
+              onMeChanged();
+            }
+          })
+        }
+      >
+        {t.deleteAccount}
+      </button>
+      {done ? <p role="status">{t.deletionRequested}</p> : null}
+      <ErrorLine message={error} />
+    </section>
+  );
+}

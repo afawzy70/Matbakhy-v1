@@ -149,6 +149,14 @@ class ReviewsAndFavoritesIntegrationTest {
         assertThat(after.get("summary").get("averageTenths").asInt()).isEqualTo(20);
         assertThat(call(post("/api/v1/reviews/" + reviewId + "/reports").content("{\"reasonCode\":\"SPAM\"}"), other).getStatus())
                 .as("hidden reviews cannot be reported").isEqualTo(404);
+        JsonNode hiddenQueue = ok(call(get("/api/v1/ops/reviews").param("visibility", "HIDDEN"), moderator), 200);
+        JsonNode hiddenEntry = entry(hiddenQueue, reviewId);
+        assertThat(hiddenEntry).as("hidden review listed for restoring").isNotNull();
+        assertThat(hiddenEntry.get("moderationReason").asString()).isEqualTo("personal data");
+        assertThat(hiddenEntry.get("version").asInt()).isEqualTo(1);
+        assertThat(call(get("/api/v1/ops/reviews"), cook).getStatus()).isEqualTo(403);
+        assertThat(call(get("/api/v1/ops/reviews"), other).getStatus()).isEqualTo(403);
+        assertThat(call(get("/api/v1/ops/reviews").param("visibility", "ALL"), moderator).getStatus()).isEqualTo(422);
         ok(call(post("/api/v1/ops/reviews/" + reviewId + "/moderation").content("{\"visibility\":\"VISIBLE\",\"reason\":\"edited by support\",\"expectedVersion\":1}"),
                 moderator), 200);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'review.moderation' AND object_id = ?", Integer.class, reviewId))
@@ -159,7 +167,26 @@ class ReviewsAndFavoritesIntegrationTest {
         assertThat(call(post("/api/v1/reviews/" + reviewId + "/reports").content("{\"reasonCode\":\"OFFENSIVE\"}"), other).getStatus()).isEqualTo(204);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM review_report WHERE review_id = ?::uuid", Integer.class, reviewId)).as("once per reporter")
                 .isEqualTo(1);
+        JsonNode reportedQueue = ok(call(get("/api/v1/ops/reviews"), moderator), 200);
+        JsonNode reported = entry(reportedQueue, reviewId);
+        assertThat(reported).as("reported visible review queued").isNotNull();
+        assertThat(reported.get("reportCount").asInt()).isEqualTo(1);
+        assertThat(reported.get("reportReasons").toString()).isEqualTo("[\"OFFENSIVE\"]");
+        assertThat(reported.get("version").asInt()).isEqualTo(2);
+        String reporterId = jdbc.queryForObject("SELECT reporter_id::text FROM review_report WHERE review_id = ?::uuid", String.class, reviewId);
+        assertThat(reportedQueue.toString()).as("no reporter identity").doesNotContain(reporterId).doesNotContain("reporter");
+        String unreported = jdbc.queryForObject("SELECT id::text FROM review WHERE order_id = ?", String.class, otherDone);
+        assertThat(entry(reportedQueue, unreported)).as("unreported reviews are not queued").isNull();
         assertThat(call(post("/api/v1/reviews/" + reviewId + "/reports").content("{\"reasonCode\":\"OFFENSIVE\"}"), null).getStatus()).isEqualTo(401);
+    }
+
+    private static JsonNode entry(JsonNode queue, String id) {
+        for (JsonNode item : queue.get("items")) {
+            if (item.get("id").asString().equals(id)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     @Test

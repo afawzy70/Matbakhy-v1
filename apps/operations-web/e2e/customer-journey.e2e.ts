@@ -10,6 +10,10 @@ import { env, sql } from "./fixtures";
  * committed, and the retry with the same stored keys shows the one existing order. The cook accepts, prepares and
  * hands over in the operations web while the customer's order page follows each state and shows the handover code.
  * A pickup order is placed too. Phone verification is synthetic SQL (the fake SMS code is not exposed).
+ *
+ * MB-028 (TC-128): the customer reviews the completed order once, sees the visible rating on the meal page, keeps the
+ * meal as a favorite in the account page and reports the review; a moderator (ops-a, granted by the cook workflow)
+ * finds it in the reported-review queue and hides it with a reason, after which it leaves the public list and rating.
  */
 const c = customerStrings.ar;
 const t = strings.ar;
@@ -110,6 +114,17 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await card.getByRole("button", { name: t.action.HANDOVER as string }).click();
   await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.COMPLETED as string)).toBeVisible({ timeout: 20_000 });
 
+  // One review per completed order, sent through the order page.
+  await page.getByLabel(c.rating).selectOption("4");
+  await page.getByLabel(c.comment).fill("طعم ممتاز - مراجعة تجريبية");
+  await page.getByRole("button", { name: c.submitReview }).click();
+  await expect(page.getByText(c.reviewed)).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("button", { name: c.submitReview })).toBeVisible();
+  await page.getByRole("button", { name: c.submitReview }).click();
+  await expect(page.getByText(c.reviewed), "the server refuses a second review of the same order").toBeVisible();
+  expect(sql(`SELECT count(*) FROM review r JOIN customer_order o ON o.id = r.order_id WHERE o.public_number = '${number}'`)).toBe("1");
+
   // A pickup order as well.
   await addToCart(page);
   await page.getByRole("link", { name: c.nav.cart }).click();
@@ -120,6 +135,40 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.PENDING_ACCEPTANCE as string)).toBeVisible();
   await page.getByRole("link", { name: c.nav.orders }).click();
   await expect(page.getByRole("link", { name: /^MB-/ })).toHaveCount(2);
+
+  // Favorite the meal, see it in the account page, and see the visible review and rating on the meal page.
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByLabel(c.search).fill("كشري");
+  await page.getByRole("search").getByRole("button", { name: c.search }).click();
+  await page.getByRole("link", { name: "كشري تجريبي" }).click();
+  await page.getByRole("button", { name: c.favorite }).click();
+  await expect(page.getByRole("button", { name: c.unfavorite })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toBeVisible();
+  await expect(page.getByText(/من 5/)).toBeVisible();
+  await page.getByRole("link", { name: c.nav.account }).click();
+  await expect(page.getByRole("region", { name: c.favorites }).getByRole("link", { name: "كشري تجريبي" })).toBeVisible();
+  await page.goBack();
+  await page.getByLabel(c.report).selectOption("SPAM");
+  await expect(page.getByText(c.reported)).toBeVisible();
+
+  // A moderator hides the reported review with a reason; it leaves the public list.
+  const opsContext = await browser.newContext({ baseURL: env("E2E_OPS_URL") });
+  const ops = await opsContext.newPage();
+  await ops.goto("/");
+  await ops.getByRole("link", { name: t.signIn }).click();
+  await idpLogin(ops, "ops-a");
+  await ops.getByRole("button", { name: t.ops.catalogue }).click();
+  const reviewCard = ops.getByRole("article", { name: /طعم ممتاز - مراجعة تجريبية/ });
+  await expect(reviewCard.getByText(t.ops.reportCount(1))).toBeVisible();
+  await reviewCard.getByLabel(t.reason).fill("e2e synthetic moderation");
+  await reviewCard.getByRole("button", { name: t.ops.hide }).click();
+  await expect(reviewCard).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("button", { name: c.unfavorite })).toBeVisible();
+  await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toHaveCount(0);
+  await expect(page.getByText(c.noReviews)).toBeVisible();
+  expect(sql(`SELECT count(*) FROM audit_event WHERE action = 'review.moderation'`)).toBe("1");
+  await opsContext.close();
 
   await cookContext.close();
   await customerContext.close();

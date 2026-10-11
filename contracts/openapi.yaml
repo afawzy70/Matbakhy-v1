@@ -2445,6 +2445,39 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PostOpsMealsModerationRequest"
+  /api/v1/ops/reviews:
+    get:
+      operationId: getOpsReviews
+      tags:
+        - operations
+      summary: "API-098: moderation queue; reported visible or hidden reviews, bounded"
+      description: VISIBLE lists reported visible reviews, most reported first; HIDDEN lists hidden reviews for restoring. Reporter identities are not exposed.
+      x-matbakhy-id: API-098
+      x-permission: CONTENT_MODERATE
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: visibility
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [VISIBLE, HIDDEN]
+            default: VISIBLE
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewQueue"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
   /api/v1/ops/reviews/{reviewId}/moderation:
     post:
       operationId: postOpsReviewsModeration
@@ -6600,6 +6633,53 @@ components:
         version:
           type: integer
           minimum: 0
+    ReviewQueue:
+      type: object
+      additionalProperties: false
+      description: Staff moderation queue (API-098). Report counts and reasons only; no reporter or customer identities.
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [id, orderId, kitchenId, rating, text, visibility, moderationReason, reportCount, reportReasons, createdAt, version]
+            properties:
+              id:
+                type: string
+                format: uuid
+              orderId:
+                type: string
+                format: uuid
+              kitchenId:
+                type: string
+                format: uuid
+              rating:
+                type: integer
+                minimum: 1
+                maximum: 5
+              text:
+                type: [string, "null"]
+              visibility:
+                type: string
+                enum: [VISIBLE, HIDDEN]
+              moderationReason:
+                type: [string, "null"]
+              reportCount:
+                type: integer
+                minimum: 0
+              reportReasons:
+                type: array
+                items:
+                  type: string
+                  enum: [OFFENSIVE, PRIVATE_INFO, SPAM, NOT_ABOUT_ORDER, OTHER]
+              createdAt:
+                type: string
+                format: date-time
+              version:
+                type: integer
+                minimum: 0
     ReviewPage:
       type: object
       additionalProperties: false

@@ -327,6 +327,41 @@ describe("operations-web cook workspace", () => {
     expect(calls.find((c) => c.method === "POST")?.body).toEqual({ action: "HIDE", reason: "misleading photo", expectedVersion: 4 });
   });
 
+  it("lists reported reviews and hides one only with a reason, sending the review version", async () => {
+    const review = {
+      id: "r1",
+      orderId: "o1",
+      kitchenId: "k1",
+      rating: 1,
+      text: "call me on 0100",
+      visibility: "VISIBLE",
+      moderationReason: null,
+      reportCount: 2,
+      reportReasons: ["PRIVATE_INFO", "SPAM"],
+      createdAt: SERVER_NOW,
+      version: 0,
+    };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/cooks": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/catalogue": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/ops/reviews": () => ({ status: 200, body: { items: [review] } }),
+      "POST /api/v1/ops/reviews/r1/moderation": () => ({ status: 200, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    const card = await screen.findByRole("article", { name: "1/5 call me on 0100" });
+    expect(within(card).getByText("2 بلاغ")).toBeTruthy();
+    expect(within(card).getByText("PRIVATE_INFO · SPAM")).toBeTruthy();
+    const hide = within(card).getByRole("button", { name: "إخفاء" }) as HTMLButtonElement;
+    expect(hide.disabled).toBe(true);
+    fireEvent.change(within(card).getByLabelText("السبب"), { target: { value: "phone number" } });
+    fireEvent.click(hide);
+    await waitFor(() => expect(calls.some((c) => c.method === "POST")).toBe(true));
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ visibility: "HIDDEN", reason: "phone number", expectedVersion: 0 });
+    expect(calls.some((c) => c.method === "GET" && c.path === "/api/v1/ops/reviews?visibility=VISIBLE&limit=50")).toBe(true);
+  });
+
   it("shows the support queue most urgent first and sends internal notes as staff-only by default", async () => {
     const base = {
       orderId: "o1",

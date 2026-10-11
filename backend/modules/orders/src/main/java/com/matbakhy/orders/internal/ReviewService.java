@@ -44,6 +44,11 @@ public class ReviewService implements KitchenRatings {
     public record ReviewPage(List<PublicReview> items, Rating summary, String nextCursor, boolean hasMore) {
     }
 
+    /** Staff moderation queue entry: reports are counted by reason; reporter identities are not exposed. */
+    public record QueuedReview(UUID id, UUID orderId, UUID kitchenId, int rating, String text, String visibility, String moderationReason,
+                               int reportCount, List<String> reportReasons, Instant createdAt, long version) {
+    }
+
     private final JdbcTemplate jdbc;
     private final AuditLog audit;
     private final Clock clock;
@@ -150,6 +155,31 @@ public class ReviewService implements KitchenRatings {
         audit.record(new Entry(staffId, "review.moderation", Permission.CONTENT_MODERATE.code(), "review", reviewId.toString(), Outcome.ALLOWED, why,
                 requestId, Map.of("visibility", visibility)));
         return review(reviewId);
+    }
+
+    /**
+     * API-098: VISIBLE returns reported visible reviews (most reported first); HIDDEN returns hidden reviews so staff can
+     * restore them. Newest first within equal report counts; bounded by limit.
+     */
+    public List<QueuedReview> queue(String visibility, int limit) {
+        if (!Set.of("VISIBLE", "HIDDEN").contains(visibility)) {
+            throw invalid("visibility", "VISIBLE_OR_HIDDEN");
+        }
+        if (limit < 1 || limit > 100) {
+            throw invalid("limit", "RANGE_1_100");
+        }
+        return jdbc.query("""
+                SELECT r.id, r.order_id, r.kitchen_id, r.rating, r.text, r.visibility, r.moderation_reason, count(rr.id),
+                       coalesce(array_agg(DISTINCT rr.reason_code ORDER BY rr.reason_code) FILTER (WHERE rr.id IS NOT NULL), '{}'),
+                       r.created_at, r.version
+                FROM review r LEFT JOIN review_report rr ON rr.review_id = r.id
+                WHERE r.visibility = ?
+                GROUP BY r.id
+                HAVING r.visibility = 'HIDDEN' OR count(rr.id) > 0
+                ORDER BY count(rr.id) DESC, r.created_at DESC, r.id DESC
+                LIMIT ?""", (rs, n) -> new QueuedReview(rs.getObject(1, UUID.class), rs.getObject(2, UUID.class), rs.getObject(3, UUID.class),
+                rs.getInt(4), rs.getString(5), rs.getString(6), rs.getString(7), rs.getInt(8), List.of((String[]) rs.getArray(9).getArray()),
+                rs.getTimestamp(10).toInstant(), rs.getLong(11)), visibility, limit);
     }
 
     public Review review(UUID id) {

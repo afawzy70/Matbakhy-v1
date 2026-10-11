@@ -53,7 +53,86 @@ export function Catalogue({ ctx }: { ctx: Ctx }) {
           )
         }
       </Status>
+      <ReviewQueue ctx={ctx} />
     </div>
+  );
+}
+
+type QueuedReview = Schemas["ReviewQueue"]["items"][number];
+
+/** API-098 + API-073: reported visible reviews (most reported first) and hidden reviews; every change needs a reason. */
+function ReviewQueue({ ctx }: { ctx: Ctx }) {
+  const { t } = ctx;
+  const [visibility, setVisibility] = useState<"VISIBLE" | "HIDDEN">("VISIBLE");
+  const [state, reload] = useServer<Schemas["ReviewQueue"]>(ctx, () => ctx.api.GET("/api/v1/ops/reviews", { params: { query: { visibility, limit: 50 } } }), visibility);
+  return (
+    <section className="stack" aria-labelledby="review-queue-heading">
+      <h2 id="review-queue-heading">{t.ops.customerReviews}</h2>
+      <div role="group" aria-label={t.ops.customerReviews} className="segmented">
+        {(["VISIBLE", "HIDDEN"] as const).map((v) => (
+          <button key={v} type="button" aria-pressed={visibility === v} onClick={() => setVisibility(v)}>
+            {v === "VISIBLE" ? t.ops.reportedReviews : t.ops.hidden}
+          </button>
+        ))}
+      </div>
+      <Status ctx={ctx} state={state} onRetry={reload}>
+        {(page) =>
+          page.items.length === 0 ? (
+            <p className="muted">{t.ops.noQueuedReviews}</p>
+          ) : (
+            <ul className="cards">
+              {page.items.map((r) => (
+                <li key={r.id}>
+                  <ReviewCard ctx={ctx} review={r} refresh={reload} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </Status>
+    </section>
+  );
+}
+
+function ReviewCard({ ctx, review, refresh }: { ctx: Ctx; review: QueuedReview; refresh: () => void }) {
+  const { t } = ctx;
+  const [reason, setReason] = useState("");
+  const { run, error, busy } = useMutation(ctx, refresh);
+  const hidden = review.visibility === "HIDDEN";
+  return (
+    <article className="card" aria-label={`${review.rating}/5 ${review.text ?? ""}`.trim()}>
+      <header className="card-head">
+        <h3>{"★".repeat(review.rating)}</h3>
+        <span className="badge">{t.ops.reportCount(review.reportCount)}</span>
+        <span className={hidden ? "badge badge-suspended" : "badge badge-active"}>{hidden ? t.ops.hidden : t.ops.visible}</span>
+      </header>
+      <p>{review.text ?? "—"}</p>
+      {review.reportReasons.length > 0 ? <p className="muted">{review.reportReasons.join(" · ")}</p> : null}
+      {hidden && review.moderationReason ? (
+        <p className="muted">
+          {t.reason}: {review.moderationReason}
+        </p>
+      ) : null}
+      <label>
+        {t.reason} <input maxLength={1000} value={reason} onChange={(e) => setReason(e.target.value)} />
+      </label>
+      <button
+        type="button"
+        className={hidden ? undefined : "danger"}
+        disabled={busy || reason.trim().length < 3}
+        onClick={() =>
+          void run(() =>
+            ctx.api.POST("/api/v1/ops/reviews/{reviewId}/moderation", {
+              params: { path: { reviewId: review.id } },
+              body: { visibility: hidden ? "VISIBLE" : "HIDDEN", reason: reason.trim(), expectedVersion: review.version },
+            }),
+          )
+        }
+      >
+        {hidden ? t.ops.restore : t.ops.hide}
+      </button>
+      <ErrorLine message={error} />
+    </article>
   );
 }
 

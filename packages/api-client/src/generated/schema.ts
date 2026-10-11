@@ -1284,6 +1284,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ops/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-098: moderation queue; reported visible or hidden reviews, bounded
+         * @description VISIBLE lists reported visible reviews, most reported first; HIDDEN lists hidden reviews for restoring. Reporter identities are not exposed.
+         */
+        get: operations["getOpsReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ops/reviews/{reviewId}/moderation": {
         parameters: {
             query?: never;
@@ -3083,6 +3103,27 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             version: number;
+        };
+        /** @description Staff moderation queue (API-098). Report counts and reasons only; no reporter or customer identities. */
+        ReviewQueue: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                orderId: string;
+                /** Format: uuid */
+                kitchenId: string;
+                rating: number;
+                text: string | null;
+                /** @enum {string} */
+                visibility: "VISIBLE" | "HIDDEN";
+                moderationReason: string | null;
+                reportCount: number;
+                reportReasons: ("OFFENSIVE" | "PRIVATE_INFO" | "SPAM" | "NOT_ABOUT_ORDER" | "OTHER")[];
+                /** Format: date-time */
+                createdAt: string;
+                version: number;
+            }[];
         };
         /** @description Visible reviews of a kitchen, newest first, with the visible-only rating summary. No customer or order data. */
         ReviewPage: {
@@ -5329,6 +5370,31 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CookMeal"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getOpsReviews: {
+        parameters: {
+            query?: {
+                visibility?: "VISIBLE" | "HIDDEN";
+                limit?: components["parameters"]["Limit"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewQueue"];
                 };
             };
             "4XX": components["responses"]["Error"];

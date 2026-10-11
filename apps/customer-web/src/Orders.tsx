@@ -105,8 +105,52 @@ export function OrderDetail({ ctx, id }: { ctx: Ctx; id: string }) {
           ) : null}
           {requested ? <p role="status">{t.cancellationRequested}</p> : null}
           <ErrorLine message={error} />
+          {o.state === "COMPLETED" ? <ReviewForm ctx={ctx} orderId={o.id} /> : null}
+          {o.items[0] ? <a href={`#/meal/${o.items[0].mealId}`}>{t.orderAgain}</a> : null}
         </article>
       )}
     </Status>
+  );
+}
+
+/** One review per completed own order; the server enforces ownership, state and uniqueness (409 when already reviewed). */
+function ReviewForm({ ctx, orderId }: { ctx: Ctx; orderId: string }) {
+  const { t } = ctx;
+  const [rating, setRating] = useState(5);
+  const [text, setText] = useState("");
+  const [done, setDone] = useState(false);
+  const { run, error, code, busy } = useMutation(ctx, () => undefined);
+  if (done || code === "STATE_CONFLICT") {
+    return <p role="status">{t.reviewed}</p>;
+  }
+  return (
+    <section className="form" aria-labelledby="review-heading">
+      <h3 id="review-heading">{t.rateOrder}</h3>
+      <label>
+        {t.rating}{" "}
+        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+          {[5, 4, 3, 2, 1].map((n) => (
+            <option key={n} value={n}>
+              {n}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        {t.comment} <textarea maxLength={1000} value={text} onChange={(e) => setText(e.target.value)} />
+      </label>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() =>
+          void run(() =>
+            ctx.api.POST("/api/v1/orders/{orderId}/reviews", { params: { path: { orderId } }, body: text.trim() ? { rating, text: text.trim() } : { rating } }),
+          ).then((ok) => ok && setDone(true))
+        }
+      >
+        {t.submitReview}
+      </button>
+      <ErrorLine message={error} />
+    </section>
   );
 }

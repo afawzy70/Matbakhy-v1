@@ -1,6 +1,7 @@
 import { brand, direction, type Locale } from "@matbakhy/design-tokens";
 import { useEffect, useMemo, useState } from "react";
 import { createApi, loginUrl, type Schemas } from "./api";
+import { Account } from "./Account";
 import { Browse } from "./Browse";
 import { Checkout } from "./Checkout";
 import { strings } from "./i18n";
@@ -16,7 +17,7 @@ function currentRoute(): string {
   return window.location.hash.replace(/^#/, "") || "/";
 }
 
-/** Customer web (MB-027): browsing is public; ordering needs a session and a verified phone. The server owns all prices. */
+/** Customer web (MB-027, MB-028): browsing is public; ordering needs a session and a verified phone. The server owns all prices. */
 export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
   const [locale, setLocale] = useState<Locale>("ar");
   const [route, setRoute] = useState(currentRoute);
@@ -89,6 +90,11 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
               {t.nav.orders}
             </a>
           ) : null}
+          {me ? (
+            <a className="button secondary" href="#/account" aria-current={route === "/account" ? "page" : undefined}>
+              {t.nav.account}
+            </a>
+          ) : null}
         </nav>
         <div className="topbar-actions">
           <button type="button" onClick={() => setLocale(locale === "ar" ? "en" : "ar")}>
@@ -107,9 +113,10 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
         </p>
       ) : null}
       <main className="shell">
-        {mealMatch?.[1] ? <Meal ctx={ctx} id={mealMatch[1]} /> : null}
+        {mealMatch?.[1] ? <Meal ctx={ctx} id={mealMatch[1]} signedIn={me !== null} /> : null}
         {orderMatch?.[1] ? <OrderDetail ctx={ctx} id={orderMatch[1]} /> : null}
         {route === "/orders" ? <OrderList ctx={ctx} /> : null}
+        {route === "/account" && me ? <Account ctx={ctx} me={me} onMeChanged={() => setMeVersion((v) => v + 1)} /> : null}
         {route === "/checkout" ? <Checkout ctx={ctx} me={me} onMeChanged={() => setMeVersion((v) => v + 1)} /> : null}
         {route === "/" ? (
           <>
