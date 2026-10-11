@@ -203,8 +203,10 @@
       "given": "A draft lacks an allergen declaration",
       "when": "Cook tries to publish",
       "then": "Validation identifies the missing field and meal stays non-public",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-014/evidence.json"
+      ]
     },
     {
       "id": "TC-012",
@@ -219,8 +221,10 @@
       "given": "An order exists and its meal is edited/archived",
       "when": "Customer opens order and tries reorder",
       "then": "History unchanged; reorder uses current serviceability and price or reports unavailable",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-014/evidence.json"
+      ]
     },
     {
       "id": "TC-013",
@@ -1303,8 +1307,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Meal CRUD with translations/portion/ingredients/allergens; versioning; publication guards; archive semantics; public/private DTO split",
       "then": "Required declarations and approval enforced; historical order snapshot unaffected by later meal changes",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-014/evidence.json"
+      ]
     },
     {
       "id": "TC-115",
