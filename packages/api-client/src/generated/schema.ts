@@ -3227,7 +3227,10 @@ export interface operations {
     postQuotes: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Line titles in Arabic by default, English when preferred and available */
+                "Accept-Language"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -3238,7 +3241,7 @@ export interface operations {
         };
         responses: {
             /** @description Success */
-            200: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

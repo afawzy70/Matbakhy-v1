@@ -190,7 +190,7 @@
       "permission": "CUSTOMER",
       "response_type": "QuoteResponse",
       "contract": "QuoteRequest; verified contact; one cook/slot; authoritative amounts",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-022",

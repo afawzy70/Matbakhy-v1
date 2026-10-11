@@ -701,12 +701,19 @@ paths:
       description: QuoteRequest; verified contact; one cook/slot; authoritative amounts
       x-matbakhy-id: API-021
       x-permission: CUSTOMER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
+      parameters:
+        - name: Accept-Language
+          in: header
+          required: false
+          description: Line titles in Arabic by default, English when preferred and available
+          schema:
+            type: string
       responses:
-        "200":
+        "201":
           description: Success
           content:
             application/json:
@@ -5209,7 +5216,7 @@ components:
           items:
             $ref: "#/components/schemas/QuoteItemRequest"
           minItems: 1
-          maxItems: 50
+          maxItems: 20
         slotId: *a1
         fulfillmentMode:
           $ref: "#/components/schemas/FulfillmentMode"

@@ -11,12 +11,12 @@ import com.matbakhy.catalog.internal.meal.MealService.MealInput;
 import com.matbakhy.catalog.internal.meal.MealService.Photo;
 import com.matbakhy.catalog.internal.meal.MealService.MealDetail;
 import com.matbakhy.identity.api.CurrentAccount;
+import com.matbakhy.shared.web.Languages;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import java.util.UUID;
@@ -70,15 +70,7 @@ class MealController {
     }
 
     static String preferredLanguage(String acceptLanguage) {
-        if (acceptLanguage == null || acceptLanguage.isBlank()) {
-            return "ar";
-        }
-        try {
-            String tag = Locale.lookupTag(Locale.LanguageRange.parse(acceptLanguage), List.of("ar", "en"));
-            return tag == null ? "ar" : tag;
-        } catch (IllegalArgumentException e) {
-            return "ar";
-        }
+        return Languages.prefersEnglish(acceptLanguage) ? "en" : "ar";
     }
 
     @GetMapping("/api/v1/cook/meals")
