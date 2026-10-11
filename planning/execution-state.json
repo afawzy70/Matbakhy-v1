@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P05",
-  "current_story": "MB-023",
-  "last_tested_commit": "fff7a28f75640991e8fa8085ab211ce051d2fa4b",
-  "last_completed_story": "MB-022",
+  "current_story": "MB-024",
+  "last_tested_commit": "1ce81e4244814d75b8c3cf11139161a4621c121b",
+  "last_completed_story": "MB-023",
   "last_successful_gate": "P04 at 8412e873d28f2dab1388275a7ee32c9f9ccc4067 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-023 operations approval and moderation (P05); review moderation needs reviews from MB-028.",
-  "updated_at": "2026-10-11T15:24:00Z",
+  "next_action": "MB-024 support cases and order exceptions (P05).",
+  "updated_at": "2026-10-11T16:05:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

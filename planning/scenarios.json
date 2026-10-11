@@ -1562,8 +1562,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Cook review queue/document viewer; reasoned decisions; meal/review moderation; suspend/restore workflow; active-order impact summary",
       "then": "Approval/suspension reflected in discovery and checkout; private docs never appear in public network responses",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-023/evidence.json"
+      ]
     },
     {
       "id": "TC-124",

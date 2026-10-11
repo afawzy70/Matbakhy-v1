@@ -819,7 +819,7 @@
       "id": "MB-023",
       "phase": "P05",
       "title": "Build operations approval and moderation",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-012",
@@ -845,9 +845,11 @@
       "scenario_ids": [
         "TC-123"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-023/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Staff review queue, kitchen state with impact, meal moderation and step-up prompt; self-reviewed. Review moderation (API-073) carried to MB-028 because customer reviews do not exist before it; not claimed here."
     },
     {
       "id": "MB-024",
@@ -1018,7 +1020,8 @@
         "favorites/share links",
         "verified-order reviews/report",
         "reorder via new quote",
-        "inbox/support"
+        "inbox/support",
+        "Review moderation for staff (API-073), carried from MB-023 because reviews are created in this story"
       ],
       "artifacts": [
         "apps/customer-web",
