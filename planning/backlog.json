@@ -537,7 +537,7 @@
       "id": "MB-016",
       "phase": "P03",
       "title": "Implement serviceable discovery",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-014",
@@ -565,9 +565,11 @@
         "TC-017",
         "TC-116"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-016/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: favorites unavailable presentation (MB-028); search index/EXPLAIN before pilot; zones cityId filter not implemented."
     },
     {
       "id": "MB-017",

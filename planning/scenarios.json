@@ -293,8 +293,10 @@
       "given": "A matching meal is outside the initial page",
       "when": "Customer changes filter",
       "then": "The meal can appear in a fresh server result, not just a filtered local subset",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-016/evidence.json"
+      ]
     },
     {
       "id": "TC-017",
@@ -309,8 +311,10 @@
       "given": "Kitchen is paused and meal is favorited",
       "when": "Discovery and favorites load",
       "then": "Discovery excludes purchase; favorite explains unavailability without broken route",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-016/evidence.json"
+      ]
     },
     {
       "id": "TC-018",
@@ -1352,8 +1356,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Zone-based filtering/search/sort/cursor pagination; public cook/meal details; unavailable/favorite presentation; full server query on filter changes",
       "then": "Filtering searches all matching stored data; unpublished/suspended supply excluded; stable pagination has no duplicates",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-016/evidence.json"
+      ]
     },
     {
       "id": "TC-117",

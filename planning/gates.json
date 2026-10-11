@@ -171,21 +171,32 @@
           "id": "P03-CHECK-1",
           "name": "Media publication and discovery integration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "MediaIntegrationTest",
+            "MealIntegrationTest",
+            "DiscoveryIntegrationTest",
+            "ContractRoutesTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16 and the digest-pinned S3 emulator (Testcontainers; Docker required): signed uploads, type/size/dimension checks, fail-closed scan, metadata-free public variants, scoped document reads, meal publication guards and revisions, discovery filters/pagination/eligibility, registry-route parity. Fails if any named class did not run."
         },
         {
           "id": "P03-CHECK-2",
           "name": "Availability cutoff timezone and stock constraints",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "SlotIntegrationTest",
+            "MigrationIntegrationTest",
+            "ModuleBoundaryTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16: Cairo/DST scheduling, server-time cutoff, capacity bounds against obligations at meal and slot level, migrations and module boundaries. Fails if any named class did not run."
         }
       ]
     },

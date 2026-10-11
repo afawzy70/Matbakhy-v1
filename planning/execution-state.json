@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P03",
-  "current_story": "MB-016",
-  "last_tested_commit": "c8039c285a97acfe7029a19b562556679e0a9422",
-  "last_completed_story": "MB-015",
+  "current_story": "MB-017",
+  "last_tested_commit": "03aa8d0fc92e17f7b4f60b10f56dca331436d2e4",
+  "last_completed_story": "MB-016",
   "last_successful_gate": "P02 at b2260d37e0ecbc165529f1e980656ea5063d382e (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-016 serviceable discovery per scripts/next_task.py.",
-  "updated_at": "2026-10-11T12:02:00Z",
+  "next_action": "Run the P03 gate (P03-CHECK-1/2 configured) at one candidate commit, then MB-017 authoritative quotes (P04).",
+  "updated_at": "2026-10-11T12:22:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
