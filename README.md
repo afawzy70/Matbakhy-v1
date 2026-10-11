@@ -36,7 +36,7 @@ The proposed initial commercial path is one cook and fulfillment slot per order,
 
 | Area | Files |
 |---|---|
-| Product | [Context/decisions](docs/product/01-context-and-decisions.md), [scope/personas](docs/product/02-product-specification.md), [rules](docs/product/03-business-rules.md), [states](docs/product/04-state-machines.md), [screens](docs/product/05-screen-specification.md), [roles](docs/product/06-permissions.md), [branding/content](docs/product/07-brand-and-content.md) |
+| Product | [Context/decisions](docs/product/01-context-and-decisions.md), [scope/personas](docs/product/02-product-specification.md), [rules](docs/product/03-business-rules.md), [states](docs/product/04-state-machines.md), [screens](docs/product/05-screen-specification.md), [roles](docs/product/06-permissions.md), [branding/content](docs/product/07-brand-and-content.md), [traceability matrix](docs/product/08-traceability.md) |
 | Engineering | [Architecture](docs/engineering/01-architecture.md), [data](docs/engineering/02-data-model.md), [API](docs/engineering/03-api-contract.md), [security](docs/engineering/04-security.md), [mobile](docs/engineering/05-mobile.md), [engineering standards](docs/engineering/06-standards.md), [integration extensions](docs/engineering/07-integrations.md) |
 | Delivery | [Roadmap](docs/delivery/01-roadmap.md), [autonomous protocol](docs/delivery/02-execution-protocol.md), [start](docs/delivery/03-claude-start-prompt.md), [resume/recovery](docs/delivery/04-resume-and-recovery.md) |
 | Quality | [Verification strategy](docs/quality/01-verification.md), [scenario catalogue](planning/scenarios.json), [release gates](docs/quality/02-release-gates.md), [gate definitions](planning/gates.json) |

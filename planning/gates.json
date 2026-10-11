@@ -11,11 +11,14 @@
           "id": "P00-CHECK-1",
           "name": "Scope and traceability review",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "python3",
+            "scripts/check_scope.py"
+          ],
+          "timeout_seconds": 120,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Inventory, decision register, rule/story/scenario traceability, client targets, deferred scope and generated matrix (scripts/check_scope.py). Planning scope only."
         },
         {
           "id": "P00-CHECK-2",

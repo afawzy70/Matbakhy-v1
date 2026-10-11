@@ -61,3 +61,20 @@ Machine-readable status, owners and deadlines are in [decisions.json](../../plan
 | O10 | Confirm whether social feed/follows/comments are launch-critical | P00 scope review; default deferred, never describe as previously rejected |
 
 Resolve decisions by recording actual owner text/reference, date, status, affected requirements, migration/contract implications and approval scope. Do not put personal transcripts or private credentials in this public repository. A missing answer blocks only dependent work.
+
+## Repository baseline reconciliation — MB-001, 2026-10-11
+
+Observed at `49f54d14d6512f4fd82a4ff72189a72caef20209` (main) before implementation began on branch `implementation/mvp`:
+
+- The repository contains only the planning pack: instructions, product/engineering/delivery/quality/operations documents, planning JSON, the endpoint registry, verification templates, Python planning tools and a planning-integrity GitHub workflow. No backend, web, mobile, infrastructure or test code exists. No other remote branch or open implementation PR existed.
+- All 46 stories were TODO, all 110 scenarios NOT_RUN and all 11 gates NOT_RUN. The execution checkpoint had no working branch or tested commit. This matches the documented state, so no stale progress claims needed correcting.
+- The [repository inventory](../../planning/inventory.json) lists every top-level path as PRESENT or PLANNED with its owning story. `python3 scripts/check_scope.py` fails when the inventory, this register and `decisions.json`, or the generated [traceability matrix](08-traceability.md) disagree with reality.
+- Development host observed for this session (cloud container, not a supported-platform claim): OpenJDK 21.0.12, Maven 3.9.11, Node 22.22.0, pnpm 10.28.0, Docker 29.8.2 (daemon started manually), PostgreSQL 16 client/server binaries, Python 3.13. No Android SDK, macOS or Xcode, so native Android/iOS build and device checks will be BLOCKED in this environment until a suitable runner exists.
+
+Decision status is unchanged by this reconciliation: D01–D10 remain PROPOSED_DEFAULT (working baseline, not historical approvals) and O01–O10 remain OPEN. O10 (social feed/follows/comments) is nominally due at P00. Implementation proceeds with the D07 default (favorites and share links now; feed/follows/comments deferred, never described as rejected). The owner decision is still requested and blocks only social-extension scope, not P00/P01 foundation work.
+
+### Owner direction recorded 2026-10-11
+
+- Daily execution policy: one fresh owner prompt per workday, 12:00–00:00 Asia/Kuwait, Opus for the first session and evidence-based model selection afterwards ([daily execution](../delivery/06-daily-execution.md)).
+- The owner instructed "Begin" at 11:17 Asia/Kuwait on 2026-10-11, before the noon window. That explicit instruction is treated as authorizing that day's session to start early; it does not change the standing window.
+- Superseded ideas remain as listed above: Kuwait geography/KNET/vendors, FlutterFlow/Flutter and earlier web UI library options, and the mock-data social prototype are not carried into the build baseline.
