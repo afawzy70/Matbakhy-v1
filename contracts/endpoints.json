@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "DESIGN_NOT_IMPLEMENTED",
-  "note": "OIDC authorization/callback/logout routes are framework-managed and must be documented after provider/client spike. This inventory is not complete OpenAPI. Expand validated request/response schemas in MB-007 before client implementation.",
+  "note": "Route inventory. contracts/openapi.yaml (MB-007) is the typed contract; packages/api-client tests fail when the two disagree on method, path, permission or implementation state. OIDC authorization/callback/logout routes are framework-managed and documented in MB-009.",
   "endpoints": [
     {
       "id": "API-001",

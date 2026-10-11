@@ -33,6 +33,9 @@ step "Backend: ./mvnw verify"
 step "Workspace install from lockfile"
 pnpm install --frozen-lockfile
 
+step "API contract: OpenAPI lint and generated client drift"
+REDOCLY_TELEMETRY=off pnpm contract:check
+
 step "Typecheck, lint, unit tests and web builds"
 pnpm typecheck
 pnpm lint

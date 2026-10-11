@@ -42,8 +42,9 @@ public record Money(long amountMinor, String currency) {
         return new Money(Math.multiplyExact(amountMinor, (long) quantity), currency);
     }
 
-    public boolean isNegative() {
-        return amountMinor < 0;
+    /** -1, 0 or 1. Deliberately not a bean-style getter so it is never serialized as a field. */
+    public int signum() {
+        return Long.signum(amountMinor);
     }
 
     private void requireSameCurrency(Money other) {

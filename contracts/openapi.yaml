@@ -1,0 +1,4092 @@
+# Matbakhy API contract. Source of truth for clients; see docs/engineering/03-api-contract.md.
+openapi: 3.1.1
+info:
+  title: Matbakhy API
+  version: 0.1.0
+  description: "Contract for the Matbakhy MVP (Egypt, EGP, Africa/Cairo). Generated from contracts/endpoints.json in MB-007 and maintained by hand since. Operations with x-implemented: false are designed, not implemented. Schemas marked x-schema-status: PENDING are untyped placeholders that their owning story must define before client use. OIDC login/callback/logout routes are framework-managed and documented in MB-009."
+servers:
+  - url: /
+tags:
+  - name: account
+    description: Customer profile, phone verification, addresses, favorites, devices and deletion requests
+  - name: configuration
+    description: Public, non-sensitive configuration
+  - name: cook
+    description: "Cook workspace: application, meals, slots, orders, cash reports and statements"
+  - name: kitchens
+    description: Public kitchen profiles, slots and reviews
+  - name: meals
+    description: Public meal discovery and detail
+  - name: notifications
+    description: Customer in-app notification inbox
+  - name: operations
+    description: "Platform backoffice: approvals, moderation, orders, support, finance, configuration, staff and audit"
+  - name: orders
+    description: Customer orders, events, cancellation and reviews
+  - name: policies
+    description: Published policy documents
+  - name: quotes
+    description: Authoritative server quotes
+  - name: reviews
+    description: Review reporting
+  - name: support
+    description: Customer support cases
+  - name: uploads
+    description: Scoped media and document uploads
+  - name: zones
+    description: Service zones
+paths:
+  /api/v1/configuration/public:
+    get:
+      operationId: getConfigurationPublic
+      tags:
+        - configuration
+      summary: "API-001: locale, zones summary, enabled fulfillment modes, support/public policy versions only"
+      description: locale, zones summary, enabled fulfillment modes, support/public policy versions only
+      x-matbakhy-id: API-001
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicConfiguration"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/zones:
+    get:
+      operationId: getZones
+      tags:
+        - zones
+      summary: "API-002: cityId, active=true, cursor, limit; no private cook locations"
+      description: cityId, active=true, cursor, limit; no private cook locations
+      x-matbakhy-id: API-002
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ZonePage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/meals:
+    get:
+      operationId: getMeals
+      tags:
+        - meals
+      summary: "API-003: q, zoneId, date, slotId, categoryId, minPriceMinor, maxPriceMinor, sort, cursor, limit"
+      description: q, zoneId, date, slotId, categoryId, minPriceMinor, maxPriceMinor, sort, cursor, limit
+      x-matbakhy-id: API-003
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/meals/{mealId}:
+    get:
+      operationId: getMealsById
+      tags:
+        - meals
+      summary: "API-004: published public meal or 404"
+      description: published public meal or 404
+      x-matbakhy-id: API-004
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: &a1
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealDetail"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/kitchens/{slug}:
+    get:
+      operationId: getKitchensById
+      tags:
+        - kitchens
+      summary: "API-005: public profile, operational approval label and visible rating summary"
+      description: public profile, operational approval label and visible rating summary
+      x-matbakhy-id: API-005
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[a-z0-9-]{3,80}$
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPublic"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/kitchens/{kitchenId}/slots:
+    get:
+      operationId: getKitchensSlots
+      tags:
+        - kitchens
+      summary: "API-006: date, fulfillmentMode, zoneId; future eligible slots"
+      description: date, fulfillmentMode, zoneId; future eligible slots
+      x-matbakhy-id: API-006
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - name: kitchenId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SlotPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/kitchens/{kitchenId}/reviews:
+    get:
+      operationId: getKitchensReviews
+      tags:
+        - kitchens
+      summary: "API-007: visible only, cursor, limit"
+      description: visible only, cursor, limit
+      x-matbakhy-id: API-007
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - name: kitchenId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/policies/{key}:
+    get:
+      operationId: getPoliciesById
+      tags:
+        - policies
+      summary: "API-008: published version, locale, effectiveAt; draft only in dev"
+      description: published version, locale, effectiveAt; draft only in dev
+      x-matbakhy-id: API-008
+      x-permission: PUBLIC
+      x-implemented: false
+      security: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: &a3
+            type: string
+            pattern: ^[a-z0-9-]{1,64}$
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyDocument"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/me:
+    get:
+      operationId: getMe
+      tags:
+        - account
+      summary: "API-009: current subject mapping, contact verification, locale and scoped capabilities"
+      description: current subject mapping, contact verification, locale and scoped capabilities
+      x-matbakhy-id: API-009
+      x-permission: AUTHENTICATED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    patch:
+      operationId: patchMe
+      tags:
+        - account
+      summary: "API-010: displayName, locale, expectedVersion; no role fields"
+      description: displayName, locale, expectedVersion; no role fields
+      x-matbakhy-id: API-010
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchMeRequest"
+  /api/v1/me/phone/challenges:
+    post:
+      operationId: postMePhoneChallenges
+      tags:
+        - account
+      summary: "API-011: phoneE164; generic response, expiry/resend limit; dev OTP never in production response"
+      description: phoneE164; generic response, expiry/resend limit; dev OTP never in production response
+      x-matbakhy-id: API-011
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhoneChallenge"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostMePhoneChallengesRequest"
+  /api/v1/me/phone/challenges/{challengeId}/verify:
+    post:
+      operationId: postMePhoneChallengesVerify
+      tags:
+        - account
+      summary: "API-012: code, expected challenge ownership; single use"
+      description: code, expected challenge ownership; single use
+      x-matbakhy-id: API-012
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: challengeId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerificationResult"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostMePhoneChallengesVerifyRequest"
+  /api/v1/me/addresses:
+    get:
+      operationId: getMeAddresses
+      tags:
+        - account
+      summary: "API-013: own addresses only"
+      description: own addresses only
+      x-matbakhy-id: API-013
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddressPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    post:
+      operationId: postMeAddresses
+      tags:
+        - account
+      summary: "API-014: label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates"
+      description: label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates
+      x-matbakhy-id: API-014
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostMeAddressesRequest"
+  /api/v1/me/addresses/{addressId}:
+    patch:
+      operationId: patchMeAddressesById
+      tags:
+        - account
+      summary: "API-015: allowed address fields, expectedVersion"
+      description: allowed address fields, expectedVersion
+      x-matbakhy-id: API-015
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Address"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchMeAddressesByIdRequest"
+    delete:
+      operationId: deleteMeAddressesById
+      tags:
+        - account
+      summary: "API-016: archive own address; historical snapshots retained"
+      description: archive own address; historical snapshots retained
+      x-matbakhy-id: API-016
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: addressId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "204":
+          description: No content
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/me/deletion-requests:
+    post:
+      operationId: postMeDeletionRequests
+      tags:
+        - account
+      summary: "API-017: confirmed intent and current policy; idempotent request"
+      description: confirmed intent and current policy; idempotent request
+      x-matbakhy-id: API-017
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeletionRequest"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostMeDeletionRequestsRequest"
+  /api/v1/me/favorites:
+    get:
+      operationId: getMeFavorites
+      tags:
+        - account
+      summary: "API-018: own, cursor, limit; unavailable items annotated"
+      description: own, cursor, limit; unavailable items annotated
+      x-matbakhy-id: API-018
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoritePage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/me/favorites/{mealId}:
+    put:
+      operationId: putMeFavoritesById
+      tags:
+        - account
+      summary: "API-019: idempotent add"
+      description: idempotent add
+      x-matbakhy-id: API-019
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Favorite"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutMeFavoritesByIdRequest"
+    delete:
+      operationId: deleteMeFavoritesById
+      tags:
+        - account
+      summary: "API-020: idempotent remove"
+      description: idempotent remove
+      x-matbakhy-id: API-020
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "204":
+          description: No content
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/quotes:
+    post:
+      operationId: postQuotes
+      tags:
+        - quotes
+      summary: "API-021: QuoteRequest; verified contact; one cook/slot; authoritative amounts"
+      description: QuoteRequest; verified contact; one cook/slot; authoritative amounts
+      x-matbakhy-id: API-021
+      x-permission: CUSTOMER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuoteResponse"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuoteRequest"
+  /api/v1/orders:
+    post:
+      operationId: postOrders
+      tags:
+        - orders
+      summary: "API-022: PlaceOrderRequest; Idempotency-Key required; returns 201 plus Location"
+      description: PlaceOrderRequest; Idempotency-Key required; returns 201 plus Location
+      x-matbakhy-id: API-022
+      x-permission: CUSTOMER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+          headers:
+            Location:
+              schema:
+                type: string
+            Idempotent-Replay:
+              schema:
+                type: boolean
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PlaceOrderRequest"
+    get:
+      operationId: getOrders
+      tags:
+        - orders
+      summary: "API-023: state group, cursor, limit; own orders"
+      description: state group, cursor, limit; own orders
+      x-matbakhy-id: API-023
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/orders/by-request/{clientRequestId}:
+    get:
+      operationId: getOrdersByRequestById
+      tags:
+        - orders
+      summary: "API-024: lookup permanent request reference for unknown response recovery"
+      description: lookup permanent request reference for unknown response recovery
+      x-matbakhy-id: API-024
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: clientRequestId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/orders/{orderId}:
+    get:
+      operationId: getOrdersById
+      tags:
+        - orders
+      summary: "API-025: customer-scoped fields including available handover challenge"
+      description: customer-scoped fields including available handover challenge
+      x-matbakhy-id: API-025
+      x-permission: ORDER_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/orders/{orderId}/events:
+    get:
+      operationId: getOrdersEvents
+      tags:
+        - orders
+      summary: "API-026: afterSequence, cursor, limit; chronological immutable events"
+      description: afterSequence, cursor, limit; chronological immutable events
+      x-matbakhy-id: API-026
+      x-permission: ORDER_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderEventPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/orders/{orderId}/cancel:
+    post:
+      operationId: postOrdersCancel
+      tags:
+        - orders
+      summary: "API-027: expectedVersion, reasonCode; pending only; Idempotency-Key"
+      description: expectedVersion, reasonCode; pending only; Idempotency-Key
+      x-matbakhy-id: API-027
+      x-permission: ORDER_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/orders/{orderId}/cancellation-requests:
+    post:
+      operationId: postOrdersCancellationRequests
+      tags:
+        - orders
+      summary: "API-028: expectedVersion, reasonCode, note; accepted or later; no direct transition"
+      description: expectedVersion, reasonCode, note; accepted or later; no direct transition
+      x-matbakhy-id: API-028
+      x-permission: ORDER_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportCase"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOrdersCancellationRequestsRequest"
+  /api/v1/orders/{orderId}/reviews:
+    post:
+      operationId: postOrdersReviews
+      tags:
+        - orders
+      summary: "API-029: rating, text; completed only, unique order"
+      description: rating, text; completed only, unique order
+      x-matbakhy-id: API-029
+      x-permission: ORDER_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOrdersReviewsRequest"
+  /api/v1/reviews/{reviewId}/reports:
+    post:
+      operationId: postReviewsReports
+      tags:
+        - reviews
+      summary: "API-030: reasonCode, bounded description; rate limit"
+      description: reasonCode, bounded description; rate limit
+      x-matbakhy-id: API-030
+      x-permission: AUTHENTICATED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostReviewsReportsRequest"
+  /api/v1/notifications:
+    get:
+      operationId: getNotifications
+      tags:
+        - notifications
+      summary: "API-031: unreadOnly, cursor, limit"
+      description: unreadOnly, cursor, limit
+      x-matbakhy-id: API-031
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/notifications/{notificationId}/read:
+    put:
+      operationId: putNotificationsRead
+      tags:
+        - notifications
+      summary: "API-032: idempotent mark read"
+      description: idempotent mark read
+      x-matbakhy-id: API-032
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutNotificationsReadRequest"
+  /api/v1/me/devices/{installationId}:
+    put:
+      operationId: putMeDevicesById
+      tags:
+        - account
+      summary: "API-033: platform, pushToken, environment, appVersion; encrypt token"
+      description: platform, pushToken, environment, appVersion; encrypt token
+      x-matbakhy-id: API-033
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: installationId
+          in: path
+          required: true
+          schema: &a2
+            type: string
+            minLength: 8
+            maxLength: 128
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeviceRegistration"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutMeDevicesByIdRequest"
+    delete:
+      operationId: deleteMeDevicesById
+      tags:
+        - account
+      summary: "API-034: unregister current owned installation"
+      description: unregister current owned installation
+      x-matbakhy-id: API-034
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: installationId
+          in: path
+          required: true
+          schema: *a2
+      responses:
+        "204":
+          description: No content
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/support/cases:
+    post:
+      operationId: postSupportCases
+      tags:
+        - support
+      summary: "API-035: orderId, category, description, attachmentIds; scope"
+      description: orderId, category, description, attachmentIds; scope
+      x-matbakhy-id: API-035
+      x-permission: CUSTOMER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportCase"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SupportCaseCreate"
+    get:
+      operationId: getSupportCases
+      tags:
+        - support
+      summary: "API-036: own cases only, cursor, limit"
+      description: own cases only, cursor, limit
+      x-matbakhy-id: API-036
+      x-permission: SELF
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportCasePage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/support/cases/{caseId}:
+    get:
+      operationId: getSupportCasesById
+      tags:
+        - support
+      summary: "API-037: public messages only, no private notes"
+      description: public messages only, no private notes
+      x-matbakhy-id: API-037
+      x-permission: CASE_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportCase"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/support/cases/{caseId}/messages:
+    post:
+      operationId: postSupportCasesMessages
+      tags:
+        - support
+      summary: "API-038: body, attachmentIds; customer-visible; Idempotency-Key"
+      description: body, attachmentIds; customer-visible; Idempotency-Key
+      x-matbakhy-id: API-038
+      x-permission: CASE_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseMessage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostSupportCasesMessagesRequest"
+  /api/v1/uploads:
+    post:
+      operationId: postUploads
+      tags:
+        - uploads
+      summary: "API-039: purpose, filename, contentType, bytes, sha256; scoped storage key/expiry"
+      description: purpose, filename, contentType, bytes, sha256; scoped storage key/expiry
+      x-matbakhy-id: API-039
+      x-permission: AUTHENTICATED_SCOPED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UploadTicket"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostUploadsRequest"
+  /api/v1/uploads/{uploadId}/complete:
+    post:
+      operationId: postUploadsComplete
+      tags:
+        - uploads
+      summary: "API-040: checksum, upload completion; quarantine and scan"
+      description: checksum, upload completion; quarantine and scan
+      x-matbakhy-id: API-040
+      x-permission: UPLOAD_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaStatus"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostUploadsCompleteRequest"
+  /api/v1/uploads/{uploadId}:
+    get:
+      operationId: getUploadsById
+      tags:
+        - uploads
+      summary: "API-041: state or authorized private signed read; no public private-doc URL"
+      description: state or authorized private signed read; no public private-doc URL
+      x-matbakhy-id: API-041
+      x-permission: UPLOAD_OWNER_OR_REVIEWER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MediaStatus"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/cook/application:
+    get:
+      operationId: getCookApplication
+      tags:
+        - cook
+      summary: "API-042: current own revision and decision history"
+      description: current own revision and decision history
+      x-matbakhy-id: API-042
+      x-permission: COOK_APPLICANT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookApplication"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    put:
+      operationId: putCookApplication
+      tags:
+        - cook
+      summary: "API-043: public profile, contact/location refs, documents, zones, expectedVersion"
+      description: public profile, contact/location refs, documents, zones, expectedVersion
+      x-matbakhy-id: API-043
+      x-permission: COOK_APPLICANT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookApplication"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutCookApplicationRequest"
+  /api/v1/cook/application/submit:
+    post:
+      operationId: postCookApplicationSubmit
+      tags:
+        - cook
+      summary: "API-044: expectedVersion; full validation"
+      description: expectedVersion; full validation
+      x-matbakhy-id: API-044
+      x-permission: COOK_APPLICANT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookApplication"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCookApplicationSubmitRequest"
+  /api/v1/cook/dashboard:
+    get:
+      operationId: getCookDashboard
+      tags:
+        - cook
+      summary: "API-045: own active queue counts/slot totals and deadlines"
+      description: own active queue counts/slot totals and deadlines
+      x-matbakhy-id: API-045
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookDashboard"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/cook/meals:
+    get:
+      operationId: getCookMeals
+      tags:
+        - cook
+      summary: "API-046: status, q, cursor, limit; own kitchen"
+      description: status, q, cursor, limit; own kitchen
+      x-matbakhy-id: API-046
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookMealPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    post:
+      operationId: postCookMeals
+      tags:
+        - cook
+      summary: "API-047: localized fields, portion, price, ingredients, allergens, approved media refs"
+      description: localized fields, portion, price, ingredients, allergens, approved media refs
+      x-matbakhy-id: API-047
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookMeal"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCookMealsRequest"
+  /api/v1/cook/meals/{mealId}:
+    patch:
+      operationId: patchCookMealsById
+      tags:
+        - cook
+      summary: "API-048: editable fields and expectedVersion; no kitchen reassignment"
+      description: editable fields and expectedVersion; no kitchen reassignment
+      x-matbakhy-id: API-048
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookMeal"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchCookMealsByIdRequest"
+  /api/v1/cook/meals/{mealId}/publication:
+    post:
+      operationId: postCookMealsPublication
+      tags:
+        - cook
+      summary: "API-049: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards"
+      description: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards
+      x-matbakhy-id: API-049
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookMeal"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCookMealsPublicationRequest"
+  /api/v1/cook/slots:
+    get:
+      operationId: getCookSlots
+      tags:
+        - cook
+      summary: "API-050: date range, cursor, limit"
+      description: date range, cursor, limit
+      x-matbakhy-id: API-050
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookSlotPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    post:
+      operationId: postCookSlots
+      tags:
+        - cook
+      summary: "API-051: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities"
+      description: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities
+      x-matbakhy-id: API-051
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookSlot"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCookSlotsRequest"
+  /api/v1/cook/slots/{slotId}:
+    patch:
+      operationId: patchCookSlotsById
+      tags:
+        - cook
+      summary: "API-052: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations"
+      description: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations
+      x-matbakhy-id: API-052
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: slotId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookSlot"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchCookSlotsByIdRequest"
+  /api/v1/cook/orders:
+    get:
+      operationId: getCookOrders
+      tags:
+        - cook
+      summary: "API-053: state, from, to, sort, cursor, limit"
+      description: state, from, to, sort, cursor, limit
+      x-matbakhy-id: API-053
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookOrderPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/cook/orders/{orderId}:
+    get:
+      operationId: getCookOrdersById
+      tags:
+        - cook
+      summary: "API-054: own kitchen, minimum fulfillment contact, no customer handover code"
+      description: own kitchen, minimum fulfillment contact, no customer handover code
+      x-matbakhy-id: API-054
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookOrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/cook/orders/{orderId}/accept:
+    post:
+      operationId: postCookOrdersAccept
+      tags:
+        - cook
+      summary: "API-055: expectedVersion, Idempotency-Key; before acceptBy"
+      description: expectedVersion, Idempotency-Key; before acceptBy
+      x-matbakhy-id: API-055
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/cook/orders/{orderId}/reject:
+    post:
+      operationId: postCookOrdersReject
+      tags:
+        - cook
+      summary: "API-056: expectedVersion, reasonCode, Idempotency-Key"
+      description: expectedVersion, reasonCode, Idempotency-Key
+      x-matbakhy-id: API-056
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/cook/orders/{orderId}/prepare:
+    post:
+      operationId: postCookOrdersPrepare
+      tags:
+        - cook
+      summary: "API-057: expectedVersion, Idempotency-Key"
+      description: expectedVersion, Idempotency-Key
+      x-matbakhy-id: API-057
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/cook/orders/{orderId}/ready:
+    post:
+      operationId: postCookOrdersReady
+      tags:
+        - cook
+      summary: "API-058: expectedVersion, Idempotency-Key"
+      description: expectedVersion, Idempotency-Key
+      x-matbakhy-id: API-058
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/cook/orders/{orderId}/dispatch:
+    post:
+      operationId: postCookOrdersDispatch
+      tags:
+        - cook
+      summary: "API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only"
+      description: expectedVersion, delivery reference, Idempotency-Key; delivery only
+      x-matbakhy-id: API-059
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCookOrdersDispatchRequest"
+  /api/v1/cook/orders/{orderId}/handover:
+    post:
+      operationId: postCookOrdersHandover
+      tags:
+        - cook
+      summary: "API-060: expectedVersion, code, Idempotency-Key; correct mode/state"
+      description: expectedVersion, code, Idempotency-Key; correct mode/state
+      x-matbakhy-id: API-060
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCookOrdersHandoverRequest"
+  /api/v1/cook/orders/{orderId}/delivery-failure:
+    post:
+      operationId: postCookOrdersDeliveryFailure
+      tags:
+        - cook
+      summary: "API-061: expectedVersion, reasonCode, note, Idempotency-Key"
+      description: expectedVersion, reasonCode, note, Idempotency-Key
+      x-matbakhy-id: API-061
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/cook/orders/{orderId}/cancel:
+    post:
+      operationId: postCookOrdersCancel
+      tags:
+        - cook
+      summary: "API-062: expectedVersion, reasonCode; ACCEPTED before preparation only; Idempotency-Key"
+      description: expectedVersion, reasonCode; ACCEPTED before preparation only; Idempotency-Key
+      x-matbakhy-id: API-062
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/cook/orders/{orderId}/cash-reports:
+    post:
+      operationId: postCookOrdersCashReports
+      tags:
+        - cook
+      summary: "API-063: CashReport, Idempotency-Key; no finance verification authority"
+      description: CashReport, Idempotency-Key; no finance verification authority
+      x-matbakhy-id: API-063
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CashCollection"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CashReport"
+  /api/v1/cook/statements:
+    get:
+      operationId: getCookStatements
+      tags:
+        - cook
+      summary: "API-064: period, cursor, limit; own receivables/refunds/remittances"
+      description: period, cursor, limit; own receivables/refunds/remittances
+      x-matbakhy-id: API-064
+      x-permission: COOK
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatementPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/cook/settings:
+    patch:
+      operationId: patchCookSettings
+      tags:
+        - cook
+      summary: "API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension"
+      description: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension
+      x-matbakhy-id: API-065
+      x-permission: COOK_OWNER
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookSettings"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchCookSettingsRequest"
+  /api/v1/ops/dashboard:
+    get:
+      operationId: getOpsDashboard
+      tags:
+        - operations
+      summary: "API-066: role-scoped metrics and exception counts"
+      description: role-scoped metrics and exception counts
+      x-matbakhy-id: API-066
+      x-permission: OPS_SCOPED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpsDashboard"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/cooks:
+    get:
+      operationId: getOpsCooks
+      tags:
+        - operations
+      summary: "API-067: state, q, cursor, limit"
+      description: state, q, cursor, limit
+      x-matbakhy-id: API-067
+      x-permission: COOK_REVIEW
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/cooks/{applicationId}:
+    get:
+      operationId: getOpsCooksById
+      tags:
+        - operations
+      summary: "API-068: revision, private documents via expiring scoped access"
+      description: revision, private documents via expiring scoped access
+      x-matbakhy-id: API-068
+      x-permission: COOK_REVIEW
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationReview"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/cooks/{applicationId}/decision:
+    post:
+      operationId: postOpsCooksDecision
+      tags:
+        - operations
+      summary: "API-069: decision, reason, revision, expectedVersion, Idempotency-Key"
+      description: decision, reason, revision, expectedVersion, Idempotency-Key
+      x-matbakhy-id: API-069
+      x-permission: COOK_REVIEW
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookApplication"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsCooksDecisionRequest"
+  /api/v1/ops/kitchens/{kitchenId}/operating-state:
+    post:
+      operationId: postOpsKitchensOperatingState
+      tags:
+        - operations
+      summary: "API-070: pause/suspend/restore, reason, expectedVersion; affected order review"
+      description: pause/suspend/restore, reason, expectedVersion; affected order review
+      x-matbakhy-id: API-070
+      x-permission: COOK_REVIEW
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: kitchenId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenAdmin"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsKitchensOperatingStateRequest"
+  /api/v1/ops/catalogue:
+    get:
+      operationId: getOpsCatalogue
+      tags:
+        - operations
+      summary: "API-071: flags/status/kitchen/query pagination"
+      description: flags/status/kitchen/query pagination
+      x-matbakhy-id: API-071
+      x-permission: CONTENT_MODERATE
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/meals/{mealId}/moderation:
+    post:
+      operationId: postOpsMealsModeration
+      tags:
+        - operations
+      summary: "API-072: action, reason, expectedVersion"
+      description: action, reason, expectedVersion
+      x-matbakhy-id: API-072
+      x-permission: CONTENT_MODERATE
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookMeal"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsMealsModerationRequest"
+  /api/v1/ops/reviews/{reviewId}/moderation:
+    post:
+      operationId: postOpsReviewsModeration
+      tags:
+        - operations
+      summary: "API-073: visibility, reason, expectedVersion"
+      description: visibility, reason, expectedVersion
+      x-matbakhy-id: API-073
+      x-permission: CONTENT_MODERATE
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: reviewId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsReviewsModerationRequest"
+  /api/v1/ops/orders:
+    get:
+      operationId: getOpsOrders
+      tags:
+        - operations
+      summary: "API-074: state, kitchen, date, exceptions, cursor, limit"
+      description: state, kitchen, date, exceptions, cursor, limit
+      x-matbakhy-id: API-074
+      x-permission: ORDER_OPS
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpsOrderPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/orders/{orderId}:
+    get:
+      operationId: getOpsOrdersById
+      tags:
+        - operations
+      summary: "API-075: events/stock/finance refs with scoped contact fields"
+      description: events/stock/finance refs with scoped contact fields
+      x-matbakhy-id: API-075
+      x-permission: ORDER_OPS
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OpsOrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/orders/{orderId}/exception-cancel:
+    post:
+      operationId: postOpsOrdersExceptionCancel
+      tags:
+        - operations
+      summary: "API-076: expectedVersion, reasonCode, caseId, Idempotency-Key"
+      description: expectedVersion, reasonCode, caseId, Idempotency-Key
+      x-matbakhy-id: API-076
+      x-permission: ORDER_EXCEPTION_CANCEL
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/ops/orders/{orderId}/handover-override:
+    post:
+      operationId: postOpsOrdersHandoverOverride
+      tags:
+        - operations
+      summary: "API-077: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key"
+      description: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key
+      x-matbakhy-id: API-077
+      x-permission: ORDER_HANDOVER_OVERRIDE
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsOrdersHandoverOverrideRequest"
+  /api/v1/ops/cases:
+    get:
+      operationId: getOpsCases
+      tags:
+        - operations
+      summary: "API-078: category/severity/assignee/state/SLA pagination"
+      description: category/severity/assignee/state/SLA pagination
+      x-matbakhy-id: API-078
+      x-permission: SUPPORT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportCasePage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/cases/{caseId}:
+    get:
+      operationId: getOpsCasesById
+      tags:
+        - operations
+      summary: "API-079: staff notes included only with staff scope"
+      description: staff notes included only with staff scope
+      x-matbakhy-id: API-079
+      x-permission: SUPPORT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffSupportCase"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    patch:
+      operationId: patchOpsCasesById
+      tags:
+        - operations
+      summary: "API-081: assignment/state/resolution, reason, expectedVersion"
+      description: assignment/state/resolution, reason, expectedVersion
+      x-matbakhy-id: API-081
+      x-permission: SUPPORT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffSupportCase"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchOpsCasesByIdRequest"
+  /api/v1/ops/cases/{caseId}/messages:
+    post:
+      operationId: postOpsCasesMessages
+      tags:
+        - operations
+      summary: "API-080: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key"
+      description: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key
+      x-matbakhy-id: API-080
+      x-permission: SUPPORT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CaseMessage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsCasesMessagesRequest"
+  /api/v1/ops/finance/cash-reports:
+    get:
+      operationId: getOpsFinanceCashReports
+      tags:
+        - operations
+      summary: "API-082: state/kitchen/period pagination"
+      description: state/kitchen/period pagination
+      x-matbakhy-id: API-082
+      x-permission: FINANCE
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CashPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/finance/cash-reports/{reportId}/verification:
+    post:
+      operationId: postOpsFinanceCashReportsVerification
+      tags:
+        - operations
+      summary: "API-083: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key"
+      description: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key
+      x-matbakhy-id: API-083
+      x-permission: FINANCE_VERIFY
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CashCollection"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsFinanceCashReportsVerificationRequest"
+  /api/v1/ops/finance/refunds:
+    post:
+      operationId: postOpsFinanceRefunds
+      tags:
+        - operations
+      summary: "API-084: orderId, caseId, fullAmountMinor, reason, Idempotency-Key"
+      description: orderId, caseId, fullAmountMinor, reason, Idempotency-Key
+      x-matbakhy-id: API-084
+      x-permission: FINANCE_REFUND
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsFinanceRefundsRequest"
+  /api/v1/ops/finance/refunds/{refundId}/action:
+    post:
+      operationId: postOpsFinanceRefundsAction
+      tags:
+        - operations
+      summary: "API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key"
+      description: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key
+      x-matbakhy-id: API-085
+      x-permission: FINANCE_REFUND
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: refundId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsFinanceRefundsActionRequest"
+  /api/v1/ops/finance/statements:
+    get:
+      operationId: getOpsFinanceStatements
+      tags:
+        - operations
+      summary: "API-086: kitchen/period/state pagination; direction explicit"
+      description: kitchen/period/state pagination; direction explicit
+      x-matbakhy-id: API-086
+      x-permission: FINANCE
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatementPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/finance/settlements:
+    post:
+      operationId: postOpsFinanceSettlements
+      tags:
+        - operations
+      summary: "API-087: kitchenId, period, entryIds, Idempotency-Key"
+      description: kitchenId, period, entryIds, Idempotency-Key
+      x-matbakhy-id: API-087
+      x-permission: FINANCE_SETTLEMENT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settlement"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsFinanceSettlementsRequest"
+  /api/v1/ops/finance/settlements/{batchId}/action:
+    post:
+      operationId: postOpsFinanceSettlementsAction
+      tags:
+        - operations
+      summary: "API-088: action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key"
+      description: action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key
+      x-matbakhy-id: API-088
+      x-permission: FINANCE_SETTLEMENT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Settlement"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsFinanceSettlementsActionRequest"
+  /api/v1/ops/configuration:
+    get:
+      operationId: getOpsConfiguration
+      tags:
+        - operations
+      summary: "API-089: permission-filtered operational and finance policies"
+      description: permission-filtered operational and finance policies
+      x-matbakhy-id: API-089
+      x-permission: CONFIG_READ
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConfigurationVersions"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/configuration/{key}/versions:
+    post:
+      operationId: postOpsConfigurationVersions
+      tags:
+        - operations
+      summary: "API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up"
+      description: value, effectiveAt, reason, approvalReference, expectedVersion; step-up
+      x-matbakhy-id: API-090
+      x-permission: CONFIG_WRITE_SCOPED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: *a3
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PolicyVersion"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsConfigurationVersionsRequest"
+  /api/v1/ops/staff:
+    get:
+      operationId: getOpsStaff
+      tags:
+        - operations
+      summary: "API-091: scoped roles/status, cursor, limit"
+      description: scoped roles/status, cursor, limit
+      x-matbakhy-id: API-091
+      x-permission: STAFF_GRANT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StaffPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/staff/{userId}/grants:
+    post:
+      operationId: postOpsStaffGrants
+      tags:
+        - operations
+      summary: "API-092: permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation"
+      description: permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation
+      x-matbakhy-id: API-092
+      x-permission: STAFF_GRANT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Grant"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsStaffGrantsRequest"
+  /api/v1/ops/staff/{userId}/grant-revocations:
+    post:
+      operationId: postOpsStaffGrantRevocations
+      tags:
+        - operations
+      summary: "API-093: grantId, reason, expectedVersion; last-admin protection"
+      description: grantId, reason, expectedVersion; last-admin protection
+      x-matbakhy-id: API-093
+      x-permission: STAFF_GRANT
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Grant"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsStaffGrantRevocationsRequest"
+  /api/v1/ops/audit:
+    get:
+      operationId: getOpsAudit
+      tags:
+        - operations
+      summary: "API-094: actor/object/date/action, cursor, limit; redacted"
+      description: actor/object/date/action, cursor, limit; redacted
+      x-matbakhy-id: API-094
+      x-permission: AUDIT_READ_SCOPED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuditPage"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/audit/export:
+    get:
+      operationId: getOpsAuditExport
+      tags:
+        - operations
+      summary: "API-095: bounded date range, same scopes, formula neutralization, audited download"
+      description: bounded date range, same scopes, formula neutralization, audited download
+      x-matbakhy-id: API-095
+      x-permission: AUDIT_EXPORT_SCOPED
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            text/csv:
+              schema:
+                type: string
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/integrations:
+    get:
+      operationId: getOpsIntegrations
+      tags:
+        - operations
+      summary: "API-096: redacted health and dead-letter counts; no secrets"
+      description: redacted health and dead-letter counts; no secrets
+      x-matbakhy-id: API-096
+      x-permission: INTEGRATION_OPS
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IntegrationHealth"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/outbox/{eventId}/retry:
+    post:
+      operationId: postOpsOutboxRetry
+      tags:
+        - operations
+      summary: "API-097: reason, expectedVersion, Idempotency-Key; safe predefined replay only"
+      description: reason, expectedVersion, Idempotency-Key; safe predefined replay only
+      x-matbakhy-id: API-097
+      x-permission: INTEGRATION_OPS
+      x-implemented: false
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema: *a1
+        - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutboxStatus"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostOpsOutboxRetryRequest"
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: MATBAKHY_SESSION
+      description: Server-managed web session (HttpOnly, Secure, SameSite); mutations also require the CSRF token. Final cookie name fixed in MB-009.
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Native app access token from OIDC authorization code + PKCE.
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+        maxLength: 512
+      description: Opaque cursor from a previous page
+    Limit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+        pattern: ^[A-Za-z0-9-]+$
+      description: Persisted random UUID reused on every retry of the same command
+  responses:
+    Error:
+      description: Standard error
+      headers:
+        X-Request-Id:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ApiError"
+  schemas:
+    Address:
+      type: object
+      description: PENDING typed schema. Response for API-014.
+      x-schema-status: PENDING
+    AddressPage:
+      type: object
+      description: PENDING typed schema. Response for API-013.
+      x-schema-status: PENDING
+    ApiError:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - messageKey
+        - fieldErrors
+        - requestId
+        - retryable
+      properties:
+        code:
+          type: string
+          enum:
+            - MALFORMED_REQUEST
+            - UNAUTHENTICATED
+            - FORBIDDEN
+            - NOT_FOUND
+            - METHOD_NOT_ALLOWED
+            - UNSUPPORTED_MEDIA_TYPE
+            - VALIDATION_FAILED
+            - STATE_CONFLICT
+            - VERSION_CONFLICT
+            - IDEMPOTENCY_CONFLICT
+            - STOCK_CHANGED
+            - PRICE_CHANGED
+            - QUOTE_EXPIRED
+            - SLOT_CLOSED
+            - KITCHEN_UNAVAILABLE
+            - RATE_LIMITED
+            - DEPENDENCY_UNAVAILABLE
+            - INTERNAL_ERROR
+        messageKey:
+          type: string
+          pattern: ^error\.[a-z_]+$
+        fieldErrors:
+          type: array
+          items:
+            $ref: "#/components/schemas/FieldError"
+        requestId:
+          type:
+            - string
+            - "null"
+        retryable:
+          type: boolean
+      description: Standard error body; matches backend ErrorCode/ApiError.
+    ApplicationPage:
+      type: object
+      description: PENDING typed schema. Response for API-067.
+      x-schema-status: PENDING
+    ApplicationReview:
+      type: object
+      description: PENDING typed schema. Response for API-068.
+      x-schema-status: PENDING
+    AuditPage:
+      type: object
+      description: PENDING typed schema. Response for API-094.
+      x-schema-status: PENDING
+    CaseMessage:
+      type: object
+      description: PENDING typed schema. Response for API-038.
+      x-schema-status: PENDING
+    CashCollection:
+      type: object
+      description: PENDING typed schema. Response for API-063.
+      x-schema-status: PENDING
+    CashPage:
+      type: object
+      description: PENDING typed schema. Response for API-082.
+      x-schema-status: PENDING
+    CashReport:
+      type: object
+      additionalProperties: false
+      required:
+        - amountMinor
+        - currency
+        - collectedAt
+        - method
+        - expectedVersion
+      properties:
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 9007199254740991
+        currency:
+          type: string
+          enum:
+            - EGP
+        collectedAt:
+          type: string
+          format: date-time
+        method:
+          type: string
+          enum:
+            - CASH
+        externalReference:
+          type: string
+          maxLength: 128
+        expectedVersion:
+          type: integer
+          minimum: 0
+      description: Cook declaration only; finance verifies separately.
+    ConfigurationVersions:
+      type: object
+      description: PENDING typed schema. Response for API-089.
+      x-schema-status: PENDING
+    CookApplication:
+      type: object
+      description: PENDING typed schema. Response for API-042.
+      x-schema-status: PENDING
+    CookDashboard:
+      type: object
+      description: PENDING typed schema. Response for API-045.
+      x-schema-status: PENDING
+    CookMeal:
+      type: object
+      description: PENDING typed schema. Response for API-047.
+      x-schema-status: PENDING
+    CookMealPage:
+      type: object
+      description: PENDING typed schema. Response for API-046.
+      x-schema-status: PENDING
+    CookOrderPage:
+      type: object
+      description: PENDING typed schema. Response for API-053.
+      x-schema-status: PENDING
+    CookOrderView:
+      type: object
+      description: PENDING typed schema. Response for API-054.
+      x-schema-status: PENDING
+    CookSettings:
+      type: object
+      description: PENDING typed schema. Response for API-065.
+      x-schema-status: PENDING
+    CookSlot:
+      type: object
+      description: PENDING typed schema. Response for API-051.
+      x-schema-status: PENDING
+    CookSlotPage:
+      type: object
+      description: PENDING typed schema. Response for API-050.
+      x-schema-status: PENDING
+    CustomerProfile:
+      type: object
+      description: PENDING typed schema. Response for API-009.
+      x-schema-status: PENDING
+    DeletionRequest:
+      type: object
+      description: PENDING typed schema. Response for API-017.
+      x-schema-status: PENDING
+    DeviceRegistration:
+      type: object
+      description: PENDING typed schema. Response for API-033.
+      x-schema-status: PENDING
+    Favorite:
+      type: object
+      description: PENDING typed schema. Response for API-019.
+      x-schema-status: PENDING
+    FavoritePage:
+      type: object
+      description: PENDING typed schema. Response for API-018.
+      x-schema-status: PENDING
+    FieldError:
+      type: object
+      additionalProperties: false
+      required:
+        - field
+        - code
+      properties:
+        field:
+          type: string
+        code:
+          type: string
+    FulfillmentMode:
+      type: string
+      enum:
+        - DELIVERY
+        - PICKUP
+    Grant:
+      type: object
+      description: PENDING typed schema. Response for API-092.
+      x-schema-status: PENDING
+    IntegrationHealth:
+      type: object
+      description: PENDING typed schema. Response for API-096.
+      x-schema-status: PENDING
+    KitchenAdmin:
+      type: object
+      description: PENDING typed schema. Response for API-070.
+      x-schema-status: PENDING
+    KitchenPublic:
+      type: object
+      description: PENDING typed schema. Response for API-005.
+      x-schema-status: PENDING
+    KitchenSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - slug
+        - name
+        - ratingSummary
+      properties:
+        id: *a1
+        slug:
+          type: string
+        name:
+          type: string
+        ratingSummary:
+          $ref: "#/components/schemas/RatingSummary"
+    MealDetail:
+      allOf:
+        - $ref: "#/components/schemas/MealSummary"
+        - type: object
+          additionalProperties: false
+          required:
+            - description
+            - ingredients
+            - allergenCodes
+            - allergenStatement
+            - photos
+            - reviewSummary
+            - publishedRevision
+          properties:
+            description:
+              type: string
+            ingredients:
+              type: string
+            allergenCodes:
+              type: array
+              items:
+                type: string
+              minItems: 1
+              description: Cook declaration; NONE_DECLARED and UNKNOWN are explicit values
+            allergenStatement:
+              type: string
+            photos:
+              type: array
+              items:
+                $ref: "#/components/schemas/Photo"
+            reviewSummary:
+              $ref: "#/components/schemas/RatingSummary"
+            publishedRevision:
+              type: integer
+              minimum: 1
+      unevaluatedProperties: false
+    MealPage:
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - hasMore
+        - nextCursor
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealSummary"
+        nextCursor:
+          type:
+            - string
+            - "null"
+          maxLength: 512
+        hasMore:
+          type: boolean
+    MealSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - kitchen
+        - title
+        - photo
+        - portionText
+        - price
+        - nextSlots
+        - availability
+      properties:
+        id: *a1
+        kitchen:
+          $ref: "#/components/schemas/KitchenSummary"
+        title:
+          type: string
+        photo:
+          oneOf:
+            - $ref: "#/components/schemas/Photo"
+            - type: "null"
+        portionText:
+          type: string
+        price:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        nextSlots:
+          type: array
+          items:
+            $ref: "#/components/schemas/SlotAvailability"
+          maxItems: 5
+        availability:
+          type: string
+          enum:
+            - AVAILABLE
+            - SOLD_OUT
+            - UNAVAILABLE
+      description: Public meal card; never contains kitchen private location.
+    MediaStatus:
+      type: object
+      description: PENDING typed schema. Response for API-040.
+      x-schema-status: PENDING
+    Money:
+      type: object
+      additionalProperties: false
+      required:
+        - amountMinor
+        - currency
+      properties:
+        amountMinor:
+          type: integer
+          format: int64
+          minimum: -9007199254740991
+          maximum: 9007199254740991
+          description: Integer minor units (piastres for EGP). Never a decimal or formatted string.
+        currency:
+          type: string
+          enum:
+            - EGP
+      description: Authoritative money amount. Clients never send prices, totals, tax or commission.
+    NonNegativeMoney:
+      allOf:
+        - $ref: "#/components/schemas/Money"
+        - type: object
+          properties:
+            amountMinor:
+              minimum: 0
+    Notification:
+      type: object
+      description: PENDING typed schema. Response for API-032.
+      x-schema-status: PENDING
+    NotificationPage:
+      type: object
+      description: PENDING typed schema. Response for API-031.
+      x-schema-status: PENDING
+    OpsDashboard:
+      type: object
+      description: PENDING typed schema. Response for API-066.
+      x-schema-status: PENDING
+    OpsOrderPage:
+      type: object
+      description: PENDING typed schema. Response for API-074.
+      x-schema-status: PENDING
+    OpsOrderView:
+      type: object
+      description: PENDING typed schema. Response for API-075.
+      x-schema-status: PENDING
+    OrderEvent:
+      type: object
+      additionalProperties: false
+      required:
+        - sequence
+        - toState
+        - occurredAt
+        - actorType
+      properties:
+        sequence:
+          type: integer
+          minimum: 1
+        fromState:
+          oneOf:
+            - $ref: "#/components/schemas/OrderState"
+            - type: "null"
+        toState:
+          $ref: "#/components/schemas/OrderState"
+        occurredAt:
+          type: string
+          format: date-time
+        actorType:
+          type: string
+          enum:
+            - CUSTOMER
+            - COOK
+            - STAFF
+            - SYSTEM
+        reasonCode:
+          type:
+            - string
+            - "null"
+    OrderEventPage:
+      type: object
+      description: PENDING typed schema. Response for API-026.
+      x-schema-status: PENDING
+    OrderLine:
+      type: object
+      additionalProperties: false
+      required:
+        - mealId
+        - title
+        - allergenStatement
+        - quantity
+        - unitPrice
+        - lineTotal
+      properties:
+        mealId: *a1
+        title:
+          type: string
+        allergenStatement:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        lineTotal:
+          $ref: "#/components/schemas/NonNegativeMoney"
+    OrderPage:
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - hasMore
+        - nextCursor
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderView"
+        nextCursor:
+          type:
+            - string
+            - "null"
+          maxLength: 512
+        hasMore:
+          type: boolean
+    OrderState:
+      type: string
+      enum:
+        - PENDING_ACCEPTANCE
+        - ACCEPTED
+        - PREPARING
+        - READY
+        - OUT_FOR_DELIVERY
+        - COMPLETED
+        - REJECTED
+        - EXPIRED
+        - CANCELLED
+        - DELIVERY_FAILED
+    OrderView:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - publicNumber
+        - version
+        - state
+        - fulfillmentMode
+        - items
+        - subtotal
+        - deliveryFee
+        - tax
+        - total
+        - slot
+        - acceptBy
+        - events
+        - allowedActions
+        - cashState
+        - supportCaseIds
+      properties:
+        id: *a1
+        publicNumber:
+          type: string
+        version:
+          type: integer
+          minimum: 0
+        state:
+          $ref: "#/components/schemas/OrderState"
+        fulfillmentMode:
+          $ref: "#/components/schemas/FulfillmentMode"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderLine"
+          minItems: 1
+        subtotal:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        deliveryFee:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        tax:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        total:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        slot:
+          $ref: "#/components/schemas/SlotAvailability"
+        acceptBy:
+          type: string
+          format: date-time
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderEvent"
+        allowedActions:
+          type: array
+          items:
+            type: string
+        cashState:
+          type: string
+          enum:
+            - DUE
+            - REPORTED
+            - VERIFIED
+            - DISPUTED
+            - NOT_DUE
+        supportCaseIds:
+          type: array
+          items: *a1
+        handoverCode:
+          type:
+            - string
+            - "null"
+          pattern: ^[0-9]{6}$
+          description: Order owner only, when READY or OUT_FOR_DELIVERY; never in cook/staff views
+        contact:
+          type:
+            - object
+            - "null"
+          description: Actor-specific contact snapshot; schema defined by MB-019
+      description: Monetary amounts are immutable snapshots from placement.
+    OutboxStatus:
+      type: object
+      description: PENDING typed schema. Response for API-097.
+      x-schema-status: PENDING
+    PatchCookMealsByIdRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-048: editable fields and expectedVersion; no kitchen reassignment"
+      x-schema-status: PENDING
+    PatchCookSettingsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-065: public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension"
+      x-schema-status: PENDING
+    PatchCookSlotsByIdRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-052: capacity, mealCapacities, state, expectedVersion; cannot undercut obligations"
+      x-schema-status: PENDING
+    PatchMeAddressesByIdRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-015: allowed address fields, expectedVersion"
+      x-schema-status: PENDING
+    PatchMeRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-010: displayName, locale, expectedVersion; no role fields"
+      x-schema-status: PENDING
+    PatchOpsCasesByIdRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-081: assignment/state/resolution, reason, expectedVersion"
+      x-schema-status: PENDING
+    PhoneChallenge:
+      type: object
+      description: PENDING typed schema. Response for API-011.
+      x-schema-status: PENDING
+    Photo:
+      type: object
+      additionalProperties: false
+      required:
+        - url
+        - alt
+      properties:
+        url:
+          type: string
+          format: uri
+        alt:
+          type: string
+    PlaceOrderRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - quoteId
+        - clientRequestId
+        - acceptedPolicyVersions
+      properties:
+        quoteId: *a1
+        clientRequestId:
+          type: string
+          format: uuid
+          description: Persisted before the first attempt; reused on every retry
+        acceptedPolicyVersions:
+          type: object
+          additionalProperties:
+            type: string
+          required:
+            - terms
+            - cancellation
+          properties:
+            terms:
+              type: string
+            cancellation:
+              type: string
+        fulfillmentNote:
+          type: string
+          maxLength: 500
+      description: No status, role, customerId or price override is accepted.
+    PolicyDocument:
+      type: object
+      description: PENDING typed schema. Response for API-008.
+      x-schema-status: PENDING
+    PolicyVersion:
+      type: object
+      description: PENDING typed schema. Response for API-090.
+      x-schema-status: PENDING
+    PostCookApplicationSubmitRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-044: expectedVersion; full validation"
+      x-schema-status: PENDING
+    PostCookMealsPublicationRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-049: action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards"
+      x-schema-status: PENDING
+    PostCookMealsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-047: localized fields, portion, price, ingredients, allergens, approved media refs"
+      x-schema-status: PENDING
+    PostCookOrdersDispatchRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only"
+      x-schema-status: PENDING
+    PostCookOrdersHandoverRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-060: expectedVersion, code, Idempotency-Key; correct mode/state"
+      x-schema-status: PENDING
+    PostCookSlotsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-051: localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities"
+      x-schema-status: PENDING
+    PostMeAddressesRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-014: label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates"
+      x-schema-status: PENDING
+    PostMeDeletionRequestsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-017: confirmed intent and current policy; idempotent request"
+      x-schema-status: PENDING
+    PostMePhoneChallengesRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-011: phoneE164; generic response, expiry/resend limit; dev OTP never in production response"
+      x-schema-status: PENDING
+    PostMePhoneChallengesVerifyRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-012: code, expected challenge ownership; single use"
+      x-schema-status: PENDING
+    PostOpsCasesMessagesRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-080: body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsConfigurationVersionsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-090: value, effectiveAt, reason, approvalReference, expectedVersion; step-up"
+      x-schema-status: PENDING
+    PostOpsCooksDecisionRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-069: decision, reason, revision, expectedVersion, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsFinanceCashReportsVerificationRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-083: decision, verified amount/ref, expectedVersion, reason, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsFinanceRefundsActionRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-085: action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsFinanceRefundsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-084: orderId, caseId, fullAmountMinor, reason, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsFinanceSettlementsActionRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-088: action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsFinanceSettlementsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-087: kitchenId, period, entryIds, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsKitchensOperatingStateRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-070: pause/suspend/restore, reason, expectedVersion; affected order review"
+      x-schema-status: PENDING
+    PostOpsMealsModerationRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-072: action, reason, expectedVersion"
+      x-schema-status: PENDING
+    PostOpsOrdersHandoverOverrideRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-077: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key"
+      x-schema-status: PENDING
+    PostOpsOutboxRetryRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-097: reason, expectedVersion, Idempotency-Key; safe predefined replay only"
+      x-schema-status: PENDING
+    PostOpsReviewsModerationRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-073: visibility, reason, expectedVersion"
+      x-schema-status: PENDING
+    PostOpsStaffGrantRevocationsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-093: grantId, reason, expectedVersion; last-admin protection"
+      x-schema-status: PENDING
+    PostOpsStaffGrantsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-092: permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation"
+      x-schema-status: PENDING
+    PostOrdersCancellationRequestsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-028: expectedVersion, reasonCode, note; accepted or later; no direct transition"
+      x-schema-status: PENDING
+    PostOrdersReviewsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-029: rating, text; completed only, unique order"
+      x-schema-status: PENDING
+    PostReviewsReportsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-030: reasonCode, bounded description; rate limit"
+      x-schema-status: PENDING
+    PostSupportCasesMessagesRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-038: body, attachmentIds; customer-visible; Idempotency-Key"
+      x-schema-status: PENDING
+    PostUploadsCompleteRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-040: checksum, upload completion; quarantine and scan"
+      x-schema-status: PENDING
+    PostUploadsRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-039: purpose, filename, contentType, bytes, sha256; scoped storage key/expiry"
+      x-schema-status: PENDING
+    PublicConfiguration:
+      type: object
+      description: PENDING typed schema. Response for API-001.
+      x-schema-status: PENDING
+    PutCookApplicationRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-043: public profile, contact/location refs, documents, zones, expectedVersion"
+      x-schema-status: PENDING
+    PutMeDevicesByIdRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-033: platform, pushToken, environment, appVersion; encrypt token"
+      x-schema-status: PENDING
+    PutMeFavoritesByIdRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-019: idempotent add"
+      x-schema-status: PENDING
+    PutNotificationsReadRequest:
+      type: object
+      description: "PENDING typed schema. Request for API-032: idempotent mark read"
+      x-schema-status: PENDING
+    QuoteItemRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - mealId
+        - quantity
+      properties:
+        mealId: *a1
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+          description: Upper bound is configured server-side and may be lower
+    QuoteLine:
+      type: object
+      additionalProperties: false
+      required:
+        - mealId
+        - mealRevision
+        - title
+        - quantity
+        - unitPrice
+        - lineTotal
+      properties:
+        mealId: *a1
+        mealRevision:
+          type: integer
+          minimum: 1
+        title:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        unitPrice:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        lineTotal:
+          $ref: "#/components/schemas/NonNegativeMoney"
+    QuoteRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - slotId
+        - fulfillmentMode
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteItemRequest"
+          minItems: 1
+          maxItems: 50
+        slotId: *a1
+        fulfillmentMode:
+          $ref: "#/components/schemas/FulfillmentMode"
+        addressId:
+          type: string
+          format: uuid
+          description: Required when fulfillmentMode is DELIVERY
+      description: No client price, tax, fee or commission fields are accepted.
+    QuoteResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - quoteId
+        - expiresAt
+        - kitchenId
+        - items
+        - subtotal
+        - deliveryFee
+        - tax
+        - total
+        - cancellationPolicyVersion
+        - acceptanceDeadlinePreview
+        - warnings
+      properties:
+        quoteId: *a1
+        expiresAt:
+          type: string
+          format: date-time
+        kitchenId: *a1
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuoteLine"
+          minItems: 1
+        subtotal:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        deliveryFee:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        tax:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        total:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        cancellationPolicyVersion:
+          type: string
+        acceptanceDeadlinePreview:
+          type: string
+          format: date-time
+        warnings:
+          type: array
+          items:
+            type: string
+    RatingSummary:
+      type: object
+      additionalProperties: false
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          minimum: 0
+        averageTenths:
+          type:
+            - integer
+            - "null"
+          minimum: 10
+          maximum: 50
+          description: Average rating x10 (e.g. 43 = 4.3); null without visible reviews
+    Refund:
+      type: object
+      description: PENDING typed schema. Response for API-084.
+      x-schema-status: PENDING
+    Report:
+      type: object
+      description: PENDING typed schema. Response for API-030.
+      x-schema-status: PENDING
+    Review:
+      type: object
+      description: PENDING typed schema. Response for API-029.
+      x-schema-status: PENDING
+    ReviewPage:
+      type: object
+      description: PENDING typed schema. Response for API-007.
+      x-schema-status: PENDING
+    Settlement:
+      type: object
+      description: PENDING typed schema. Response for API-087.
+      x-schema-status: PENDING
+    SlotAvailability:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - startsAt
+        - endsAt
+        - timezone
+        - cutoffAt
+        - availablePortions
+        - fulfillmentModes
+      properties:
+        id: *a1
+        startsAt:
+          type: string
+          format: date-time
+        endsAt:
+          type: string
+          format: date-time
+        timezone:
+          type: string
+          enum:
+            - Africa/Cairo
+        cutoffAt:
+          type: string
+          format: date-time
+        availablePortions:
+          type: integer
+          minimum: 0
+          description: Advisory until order submission
+        fulfillmentModes:
+          type: array
+          items:
+            $ref: "#/components/schemas/FulfillmentMode"
+          minItems: 1
+          uniqueItems: true
+    SlotPage:
+      type: object
+      additionalProperties: false
+      required:
+        - items
+        - hasMore
+        - nextCursor
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SlotAvailability"
+        nextCursor:
+          type:
+            - string
+            - "null"
+          maxLength: 512
+        hasMore:
+          type: boolean
+    StaffPage:
+      type: object
+      description: PENDING typed schema. Response for API-091.
+      x-schema-status: PENDING
+    StaffSupportCase:
+      type: object
+      description: PENDING typed schema. Response for API-079.
+      x-schema-status: PENDING
+    StatementPage:
+      type: object
+      description: PENDING typed schema. Response for API-064.
+      x-schema-status: PENDING
+    SupportCase:
+      type: object
+      description: PENDING typed schema. Response for API-028.
+      x-schema-status: PENDING
+    SupportCaseCreate:
+      type: object
+      additionalProperties: false
+      required:
+        - orderId
+        - category
+        - description
+      properties:
+        orderId: *a1
+        category:
+          type: string
+          maxLength: 64
+        description:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        attachmentIds:
+          type: array
+          items: *a1
+          maxItems: 5
+    SupportCasePage:
+      type: object
+      description: PENDING typed schema. Response for API-036.
+      x-schema-status: PENDING
+    TransitionCommand:
+      type: object
+      additionalProperties: false
+      required:
+        - expectedVersion
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reasonCode:
+          type: string
+          maxLength: 64
+        note:
+          type: string
+          maxLength: 500
+    UploadTicket:
+      type: object
+      description: PENDING typed schema. Response for API-039.
+      x-schema-status: PENDING
+    VerificationResult:
+      type: object
+      description: PENDING typed schema. Response for API-012.
+      x-schema-status: PENDING
+    ZonePage:
+      type: object
+      description: PENDING typed schema. Response for API-002.
+      x-schema-status: PENDING

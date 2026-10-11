@@ -1,6 +1,6 @@
 # API contract and wire semantics
 
-The [endpoint registry](../../contracts/endpoints.json) is the planned route inventory, not an implemented API or complete OpenAPI document. In P01 create `contracts/openapi.yaml`, validated with a pinned OpenAPI validator; expand typed request/response schemas before each dependent story. UI work cannot invent incompatible DTOs. Add schema/contract tests and regenerate clients in the same change.
+The [endpoint registry](../../contracts/endpoints.json) is the planned route inventory. [`contracts/openapi.yaml`](../../contracts/openapi.yaml) (OpenAPI 3.1, MB-007) is the typed contract: linted with pinned Redocly CLI, and `packages/api-client` generates TypeScript types from it with a drift check (`pnpm contract:check`). Schemas marked `x-schema-status: PENDING` are explicit placeholders; the owning story must type them before any client uses them. The backend rejects unknown JSON fields, decimal-to-integer truncation and string-to-number coercion. UI work cannot invent incompatible DTOs. Add schema/contract tests and regenerate clients in the same change.
 
 ## Conventions
 

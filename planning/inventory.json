@@ -76,9 +76,9 @@
     },
     {
       "path": "packages",
-      "state": "PLANNED",
-      "owner_story": "MB-003",
-      "purpose": "design-tokens, api-client and i18n shared packages"
+      "state": "PRESENT",
+      "owner_story": "MB-007",
+      "purpose": "api-client (MB-007); design-tokens (MB-003) and i18n added later"
     },
     {
       "path": "infra",
