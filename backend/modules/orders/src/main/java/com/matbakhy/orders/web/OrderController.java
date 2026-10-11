@@ -1,6 +1,8 @@
 package com.matbakhy.orders.web;
 
 import com.matbakhy.identity.api.CurrentAccount;
+import com.matbakhy.orders.internal.OrderLifecycleService;
+import com.matbakhy.orders.internal.OrderLifecycleService.Command;
 import com.matbakhy.orders.internal.OrderService;
 import com.matbakhy.orders.internal.OrderService.OrderEventPage;
 import com.matbakhy.orders.internal.OrderService.OrderPage;
@@ -29,9 +31,24 @@ import org.springframework.web.bind.annotation.RestController;
 class OrderController {
 
     private final OrderService orders;
+    private final OrderLifecycleService lifecycle;
 
-    OrderController(OrderService orders) {
+    OrderController(OrderService orders, OrderLifecycleService lifecycle) {
         this.orders = orders;
+        this.lifecycle = lifecycle;
+    }
+
+    record CancelBody(@NotNull Long expectedVersion, @NotBlank @Size(max = 64) String reasonCode, @Size(max = 500) String note) {
+    }
+
+    /** API-027: pending orders only; afterwards 409 CANCELLATION_REQUEST_REQUIRED (requests arrive with support, MB-024). */
+    @PostMapping("/api/v1/orders/{orderId}/cancel")
+    OrderView cancel(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID orderId,
+                     @RequestHeader(name = "Idempotency-Key", required = false) String idempotencyKey,
+                     @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String acceptLanguage,
+                     @Valid @RequestBody CancelBody body) {
+        lifecycle.customerCancel(actor.id(), idempotencyKey, new Command(orderId, "cancel", body.expectedVersion(), body.reasonCode(), null, null, null));
+        return orders.get(actor.id(), orderId, Languages.prefersEnglish(acceptLanguage));
     }
 
     record AcceptedPolicies(@NotBlank @Size(max = 40) String terms, @NotBlank @Size(max = 40) String cancellation) {

@@ -65,6 +65,12 @@ public class KitchenService implements KitchenDirectory {
                 .stream().findFirst();
     }
 
+    @Override
+    public Optional<FulfillmentContact> fulfillmentContact(UUID kitchenId) {
+        return jdbc.query("SELECT display_name, contact_phone, private_location FROM kitchen WHERE id = ?",
+                (rs, n) -> new FulfillmentContact(rs.getString(1), rs.getString(2), rs.getString(3)), kitchenId).stream().findFirst();
+    }
+
     /** Called inside the approval transaction. */
     void createFromApproval(UUID applicationId, UUID ownerId, Revision approved) {
         UUID kitchenId = UUID.randomUUID();

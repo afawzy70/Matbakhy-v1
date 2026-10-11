@@ -1991,10 +1991,47 @@ export interface components {
             nextCursor: string | null;
             hasMore: boolean;
         };
-        /** @description PENDING typed schema. Response for API-053. */
-        CookOrderPage: Record<string, never>;
-        /** @description PENDING typed schema. Response for API-054. */
-        CookOrderView: Record<string, never>;
+        CookOrderPage: {
+            items: components["schemas"]["CookOrderView"][];
+            nextCursor: string | null;
+            hasMore: boolean;
+        };
+        /** @description Cook view of an order of the own kitchen. Never contains the customer's handover code. Customer contact (and delivery address) only while ACCEPTED, PREPARING, READY or OUT_FOR_DELIVERY. */
+        CookOrderView: {
+            /** Format: uuid */
+            id: string;
+            publicNumber: string;
+            version: number;
+            state: components["schemas"]["OrderState"];
+            fulfillmentMode: components["schemas"]["FulfillmentMode"];
+            items: components["schemas"]["OrderLine"][];
+            subtotal: components["schemas"]["NonNegativeMoney"];
+            deliveryFee: components["schemas"]["NonNegativeMoney"];
+            tax: components["schemas"]["NonNegativeMoney"];
+            total: components["schemas"]["NonNegativeMoney"];
+            slot: components["schemas"]["SlotAvailability"];
+            /** Format: date-time */
+            acceptBy: string;
+            events: components["schemas"]["OrderEvent"][];
+            allowedActions: ("ACCEPT" | "REJECT" | "PREPARE" | "CANCEL" | "READY" | "DISPATCH" | "HANDOVER" | "DELIVERY_FAILURE")[];
+            /** @enum {string} */
+            cashState: "DUE" | "REPORTED" | "VERIFIED" | "DISPUTED" | "NOT_DUE";
+            fulfillmentNote: string | null;
+            dispatchReference: string | null;
+            contact: components["schemas"]["CustomerFulfillmentContact"] | null;
+        };
+        CustomerFulfillmentContact: {
+            name: string | null;
+            phone: string;
+            /** @description Address snapshot for delivery orders */
+            deliveryAddress: Record<string, never> | null;
+        };
+        /** @description Shown to the order owner after acceptance; pickupLocation only for pickup orders. */
+        KitchenFulfillmentContact: {
+            kitchenName: string;
+            phone: string;
+            pickupLocation: string | null;
+        };
         /** @description PENDING typed schema. Response for API-065. */
         CookSettings: Record<string, never>;
         /** @description Own-kitchen slot with counters (reserved by placed orders, allocated by accepted orders, consumed in preparation). orderable means OPEN and before cutoffAt by server time. */
@@ -2256,8 +2293,7 @@ export interface components {
             supportCaseIds: string[];
             /** @description Order owner only, when READY or OUT_FOR_DELIVERY; never in cook/staff views */
             handoverCode?: string | null;
-            /** @description Actor-specific contact snapshot; schema defined by MB-019 */
-            contact?: Record<string, never> | null;
+            contact?: components["schemas"]["KitchenFulfillmentContact"] | null;
         };
         /** @description PENDING typed schema. Response for API-097. */
         OutboxStatus: Record<string, never>;
@@ -2378,10 +2414,16 @@ export interface components {
             category?: components["schemas"]["MealCategory"];
             photos?: components["schemas"]["MealPhotoRef"][];
         };
-        /** @description PENDING typed schema. Request for API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only */
-        PostCookOrdersDispatchRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-060: expectedVersion, code, Idempotency-Key; correct mode/state */
-        PostCookOrdersHandoverRequest: Record<string, never>;
+        PostCookOrdersDispatchRequest: {
+            expectedVersion: number;
+            /** @description Delivery arrangement (rider/courier reference) */
+            deliveryReference: string;
+        };
+        /** @description Six-digit code shown to the customer. Wrong codes are 422 VERIFICATION_FAILED; the fifth wrong attempt locks the challenge (ops override path); per-actor attempts are rate limited. */
+        PostCookOrdersHandoverRequest: {
+            expectedVersion: number;
+            code: string;
+        };
         /** @description Local Cairo date and times on one local date. A time skipped by daylight saving is 422 NONEXISTENT_LOCAL_TIME; a repeated time needs startOffset/endOffset (422 AMBIGUOUS_LOCAL_TIME otherwise). Cutoff (start minus leadMinutes, default 120) must be in the future; at most 60 days ahead; no overlap with another slot of the kitchen (409). Created as DRAFT. */
         PostCookSlotsRequest: {
             /** Format: date */
@@ -2456,8 +2498,19 @@ export interface components {
         };
         /** @description PENDING typed schema. Request for API-072: action, reason, expectedVersion */
         PostOpsMealsModerationRequest: Record<string, never>;
-        /** @description PENDING typed schema. Request for API-077: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key */
-        PostOpsOrdersHandoverOverrideRequest: Record<string, never>;
+        PostOpsOrdersExceptionCancelRequest: {
+            expectedVersion: number;
+            /** @enum {string} */
+            reasonCode: "SAFETY" | "OPERATIONAL" | "OTHER";
+            /** @description Support case reference (cases are delivered with MB-024) */
+            caseId: string;
+            note?: string;
+        };
+        PostOpsOrdersHandoverOverrideRequest: {
+            expectedVersion: number;
+            reason: string;
+            evidenceRef: string;
+        };
         /** @description PENDING typed schema. Request for API-097: reason, expectedVersion, Idempotency-Key; safe predefined replay only */
         PostOpsOutboxRetryRequest: Record<string, never>;
         /** @description PENDING typed schema. Request for API-073: visibility, reason, expectedVersion */
@@ -4099,6 +4152,7 @@ export interface operations {
     getCookOrders: {
         parameters: {
             query?: {
+                state?: components["schemas"]["OrderState"];
                 /** @description Opaque cursor from a previous page */
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
@@ -4170,7 +4224,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4201,7 +4255,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4232,7 +4286,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4263,7 +4317,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4294,7 +4348,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4325,7 +4379,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4356,7 +4410,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4387,7 +4441,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderView"];
+                    "application/json": components["schemas"]["CookOrderView"];
                 };
             };
             "4XX": components["responses"]["Error"];
@@ -4756,7 +4810,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["TransitionCommand"];
+                "application/json": components["schemas"]["PostOpsOrdersExceptionCancelRequest"];
             };
         };
         responses: {

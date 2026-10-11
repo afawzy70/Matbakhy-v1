@@ -929,7 +929,7 @@ paths:
       description: expectedVersion, reasonCode; pending only; Idempotency-Key
       x-matbakhy-id: API-027
       x-permission: ORDER_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1757,11 +1757,16 @@ paths:
       description: state, from, to, sort, cursor, limit
       x-matbakhy-id: API-053
       x-permission: COOK
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
       parameters:
+        - name: state
+          in: query
+          required: false
+          schema:
+            $ref: "#/components/schemas/OrderState"
         - $ref: "#/components/parameters/Cursor"
         - $ref: "#/components/parameters/Limit"
       responses:
@@ -1784,7 +1789,7 @@ paths:
       description: own kitchen, minimum fulfillment contact, no customer handover code
       x-matbakhy-id: API-054
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1813,7 +1818,7 @@ paths:
       description: expectedVersion, Idempotency-Key; before acceptBy
       x-matbakhy-id: API-055
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1829,7 +1834,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -1849,7 +1854,7 @@ paths:
       description: expectedVersion, reasonCode, Idempotency-Key
       x-matbakhy-id: API-056
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1865,7 +1870,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -1885,7 +1890,7 @@ paths:
       description: expectedVersion, Idempotency-Key
       x-matbakhy-id: API-057
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1901,7 +1906,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -1921,7 +1926,7 @@ paths:
       description: expectedVersion, Idempotency-Key
       x-matbakhy-id: API-058
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1937,7 +1942,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -1957,7 +1962,7 @@ paths:
       description: expectedVersion, delivery reference, Idempotency-Key; delivery only
       x-matbakhy-id: API-059
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -1973,7 +1978,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -1993,7 +1998,7 @@ paths:
       description: expectedVersion, code, Idempotency-Key; correct mode/state
       x-matbakhy-id: API-060
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2009,7 +2014,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2029,7 +2034,7 @@ paths:
       description: expectedVersion, reasonCode, note, Idempotency-Key
       x-matbakhy-id: API-061
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2045,7 +2050,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2065,7 +2070,7 @@ paths:
       description: expectedVersion, reasonCode; ACCEPTED before preparation only; Idempotency-Key
       x-matbakhy-id: API-062
       x-permission: COOK_OWNER
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2081,7 +2086,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OrderView"
+                $ref: "#/components/schemas/CookOrderView"
         4XX:
           $ref: "#/components/responses/Error"
         5XX:
@@ -2509,7 +2514,7 @@ paths:
       description: expectedVersion, reasonCode, caseId, Idempotency-Key
       x-matbakhy-id: API-076
       x-permission: ORDER_EXCEPTION_CANCEL
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -2535,7 +2540,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/TransitionCommand"
+              $ref: "#/components/schemas/PostOpsOrdersExceptionCancelRequest"
   /api/v1/ops/orders/{orderId}/handover-override:
     post:
       operationId: postOpsOrdersHandoverOverride
@@ -2545,7 +2550,7 @@ paths:
       description: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key
       x-matbakhy-id: API-077
       x-permission: ORDER_HANDOVER_OVERRIDE
-      x-implemented: false
+      x-implemented: true
       security:
         - sessionCookie: []
         - bearerAuth: []
@@ -3925,12 +3930,108 @@ components:
           type: boolean
     CookOrderPage:
       type: object
-      description: PENDING typed schema. Response for API-053.
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [items, nextCursor, hasMore]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CookOrderView"
+        nextCursor:
+          type:
+            - string
+            - "null"
+        hasMore:
+          type: boolean
     CookOrderView:
       type: object
-      description: PENDING typed schema. Response for API-054.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Cook view of an order of the own kitchen. Never contains the customer's handover code. Customer contact (and delivery address) only while ACCEPTED, PREPARING, READY or OUT_FOR_DELIVERY.
+      required: [id, publicNumber, version, state, fulfillmentMode, items, subtotal, deliveryFee, tax, total, slot, acceptBy, events, allowedActions, cashState, fulfillmentNote, dispatchReference, contact]
+      properties:
+        id:
+          type: string
+          format: uuid
+        publicNumber:
+          type: string
+        version:
+          type: integer
+          minimum: 0
+        state:
+          $ref: "#/components/schemas/OrderState"
+        fulfillmentMode:
+          $ref: "#/components/schemas/FulfillmentMode"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderLine"
+        subtotal:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        deliveryFee:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        tax:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        total:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        slot:
+          $ref: "#/components/schemas/SlotAvailability"
+        acceptBy:
+          type: string
+          format: date-time
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderEvent"
+        allowedActions:
+          type: array
+          items:
+            type: string
+            enum: [ACCEPT, REJECT, PREPARE, CANCEL, READY, DISPATCH, HANDOVER, DELIVERY_FAILURE]
+        cashState:
+          type: string
+          enum: [DUE, REPORTED, VERIFIED, DISPUTED, NOT_DUE]
+        fulfillmentNote:
+          type:
+            - string
+            - "null"
+        dispatchReference:
+          type:
+            - string
+            - "null"
+        contact:
+          oneOf:
+            - $ref: "#/components/schemas/CustomerFulfillmentContact"
+            - type: "null"
+    CustomerFulfillmentContact:
+      type: object
+      additionalProperties: false
+      required: [name, phone, deliveryAddress]
+      properties:
+        name:
+          type:
+            - string
+            - "null"
+        phone:
+          type: string
+        deliveryAddress:
+          type:
+            - object
+            - "null"
+          description: Address snapshot for delivery orders
+    KitchenFulfillmentContact:
+      type: object
+      additionalProperties: false
+      description: Shown to the order owner after acceptance; pickupLocation only for pickup orders.
+      required: [kitchenName, phone, pickupLocation]
+      properties:
+        kitchenName:
+          type: string
+        phone:
+          type: string
+        pickupLocation:
+          type:
+            - string
+            - "null"
     CookSettings:
       type: object
       description: PENDING typed schema. Response for API-065.
@@ -4621,10 +4722,9 @@ components:
           pattern: ^[0-9]{6}$
           description: Order owner only, when READY or OUT_FOR_DELIVERY; never in cook/staff views
         contact:
-          type:
-            - object
-            - "null"
-          description: Actor-specific contact snapshot; schema defined by MB-019
+          oneOf:
+            - $ref: "#/components/schemas/KitchenFulfillmentContact"
+            - type: "null"
       description: Monetary amounts are immutable snapshots from placement.
     OutboxStatus:
       type: object
@@ -4897,12 +4997,29 @@ components:
             $ref: "#/components/schemas/MealPhotoRef"
     PostCookOrdersDispatchRequest:
       type: object
-      description: "PENDING typed schema. Request for API-059: expectedVersion, delivery reference, Idempotency-Key; delivery only"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [expectedVersion, deliveryReference]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        deliveryReference:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Delivery arrangement (rider/courier reference)
     PostCookOrdersHandoverRequest:
       type: object
-      description: "PENDING typed schema. Request for API-060: expectedVersion, code, Idempotency-Key; correct mode/state"
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Six-digit code shown to the customer. Wrong codes are 422 VERIFICATION_FAILED; the fifth wrong attempt locks the challenge (ops override path); per-actor attempts are rate limited.
+      required: [expectedVersion, code]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
     PostCookSlotsRequest:
       type: object
       additionalProperties: false
@@ -5070,10 +5187,41 @@ components:
       type: object
       description: "PENDING typed schema. Request for API-072: action, reason, expectedVersion"
       x-schema-status: PENDING
+    PostOpsOrdersExceptionCancelRequest:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, reasonCode, caseId]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reasonCode:
+          type: string
+          enum: [SAFETY, OPERATIONAL, OTHER]
+        caseId:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Support case reference (cases are delivered with MB-024)
+        note:
+          type: string
+          maxLength: 1000
     PostOpsOrdersHandoverOverrideRequest:
       type: object
-      description: "PENDING typed schema. Request for API-077: fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key"
-      x-schema-status: PENDING
+      additionalProperties: false
+      required: [expectedVersion, reason, evidenceRef]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reason:
+          type: string
+          minLength: 10
+          maxLength: 1000
+        evidenceRef:
+          type: string
+          minLength: 1
+          maxLength: 200
     PostOpsOutboxRetryRequest:
       type: object
       description: "PENDING typed schema. Request for API-097: reason, expectedVersion, Idempotency-Key; safe predefined replay only"

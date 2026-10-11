@@ -33,4 +33,10 @@ public interface KitchenDirectory {
     Optional<KitchenStatus> find(UUID kitchenId);
 
     Optional<KitchenStatus> ownedBy(UUID ownerId);
+
+    /** Private fulfillment contact, only for an order owner after acceptance (never in public DTOs). */
+    record FulfillmentContact(String displayName, String contactPhone, String pickupLocation) {
+    }
+
+    Optional<FulfillmentContact> fulfillmentContact(UUID kitchenId);
 }

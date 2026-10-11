@@ -15,4 +15,16 @@ public interface SlotInventory {
     }
 
     List<Reservation> reserve(UUID slotId, Map<UUID, Integer> quantityByMeal);
+
+    enum Stage { RESERVED, ALLOCATED, CONSUMED }
+
+    record Line(UUID mealSlotId, int quantity) {
+    }
+
+    /**
+     * Moves portions between counters at meal and slot level with the same lock order: RESERVED to ALLOCATED on
+     * acceptance, ALLOCATED to CONSUMED on preparation, or out of {@code from} entirely when {@code to} is null
+     * (release). Fails without changes if a counter would go negative. Callers guarantee each move happens once.
+     */
+    void move(UUID slotId, List<Line> lines, Stage from, Stage to);
 }

@@ -27,6 +27,14 @@
     </dependency>
     <dependency>
       <groupId>com.matbakhy</groupId>
+      <artifactId>matbakhy-cooks</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.matbakhy</groupId>
+      <artifactId>matbakhy-operations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.matbakhy</groupId>
       <artifactId>matbakhy-availability</artifactId>
     </dependency>
     <dependency>

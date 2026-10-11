@@ -50,6 +50,17 @@ matbakhy:
     resend-interval: 60s
     max-sends-per-account-per-hour: ${PHONE_MAX_SENDS_PER_ACCOUNT_PER_HOUR:5}
     max-sends-per-phone-per-hour: ${PHONE_MAX_SENDS_PER_PHONE_PER_HOUR:5}
+  handover:
+    # Defaults are accepted only in LOCAL/CI; deployed environments must provide both keys (base64, 32 bytes for encryption).
+    hash-key: ${HANDOVER_HASH_KEY:local-dev-only-handover-hash-key-not-secret}
+    encryption-key: ${HANDOVER_ENCRYPTION_KEY:local-dev-only-handover-encryption-key-not-secret}
+    max-attempts: 5
+    expiry-after-slot-end: 2h
+    max-attempts-per-actor-per-hour: 30
+  orders:
+    expiry-job:
+      enabled: ${ORDER_EXPIRY_JOB_ENABLED:true}
+      interval: 30s
   storage:
     # Defaults target the local S3 emulator (infra/compose.yaml); deployed environments must override them.
     endpoint: ${OBJECT_STORAGE_ENDPOINT:http://localhost:9090}

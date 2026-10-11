@@ -43,7 +43,9 @@ class JdbcIdempotentCommands implements IdempotentCommands {
     }
 
     @Override
-    @Transactional(propagation = Propagation.MANDATORY)
+    // Business failures (ApiException) leave the rollback decision to the caller's transaction, so a caller can keep
+    // deliberate writes such as counted failed attempts; any other failure marks the transaction for rollback.
+    @Transactional(propagation = Propagation.MANDATORY, noRollbackFor = ApiException.class)
     public <T> T execute(UUID actorId, String command, String idempotencyKey, Object request, Class<T> resultType, Supplier<T> action) {
         if (idempotencyKey == null || !KEY.matcher(idempotencyKey).matches()) {
             throw new ApiException(ErrorCode.MALFORMED_REQUEST, "Idempotency-Key missing or malformed",

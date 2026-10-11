@@ -244,7 +244,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode; pending only; Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-028",
@@ -478,7 +478,7 @@
       "permission": "COOK",
       "response_type": "CookOrderPage",
       "contract": "state, from, to, sort, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-054",
@@ -487,7 +487,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookOrderView",
       "contract": "own kitchen, minimum fulfillment contact, no customer handover code",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-055",
@@ -496,7 +496,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, Idempotency-Key; before acceptBy",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-056",
@@ -505,7 +505,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-057",
@@ -514,7 +514,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-058",
@@ -523,7 +523,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-059",
@@ -532,7 +532,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, delivery reference, Idempotency-Key; delivery only",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-060",
@@ -541,7 +541,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, code, Idempotency-Key; correct mode/state",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-061",
@@ -550,7 +550,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode, note, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-062",
@@ -559,7 +559,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode; ACCEPTED before preparation only; Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-063",
@@ -685,7 +685,7 @@
       "permission": "ORDER_EXCEPTION_CANCEL",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode, caseId, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-077",
@@ -694,7 +694,7 @@
       "permission": "ORDER_HANDOVER_OVERRIDE",
       "response_type": "OrderView",
       "contract": "fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-078",

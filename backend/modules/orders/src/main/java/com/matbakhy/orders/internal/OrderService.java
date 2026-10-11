@@ -3,6 +3,8 @@ package com.matbakhy.orders.internal;
 import com.matbakhy.availability.api.SlotInventory;
 import com.matbakhy.availability.api.SlotInventory.Reservation;
 import com.matbakhy.catalog.api.MealCatalog;
+import com.matbakhy.cooks.api.KitchenDirectory;
+import com.matbakhy.cooks.api.KitchenDirectory.FulfillmentContact;
 import com.matbakhy.identity.api.AddressDirectory;
 import com.matbakhy.identity.api.AddressDirectory.OwnedAddress;
 import com.matbakhy.identity.api.CheckoutContactPolicy;
@@ -62,7 +64,24 @@ public class OrderService {
     public record OrderView(UUID id, String publicNumber, long version, String state, String fulfillmentMode, List<OrderLine> items,
                             Money subtotal, Money deliveryFee, Money tax, Money total, SlotView slot, Instant acceptBy,
                             List<OrderEvent> events, List<String> allowedActions, String cashState, List<UUID> supportCaseIds,
-                            String handoverCode, Object contact) {
+                            String handoverCode, KitchenContact contact) {
+    }
+
+    /** Kitchen contact for the order owner after acceptance; the pickup location only for pickup orders. */
+    public record KitchenContact(String kitchenName, String phone, String pickupLocation) {
+    }
+
+    /** Minimum fulfillment contact for the cook while the order is active; never the handover code. */
+    public record CustomerContact(String name, String phone, Object deliveryAddress) {
+    }
+
+    public record CookOrderView(UUID id, String publicNumber, long version, String state, String fulfillmentMode, List<OrderLine> items,
+                                Money subtotal, Money deliveryFee, Money tax, Money total, SlotView slot, Instant acceptBy,
+                                List<OrderEvent> events, List<String> allowedActions, String cashState, String fulfillmentNote,
+                                String dispatchReference, CustomerContact contact) {
+    }
+
+    public record CookOrderPage(List<CookOrderView> items, String nextCursor, boolean hasMore) {
     }
 
     public record OrderPage(List<OrderView> items, String nextCursor, boolean hasMore) {
@@ -79,10 +98,13 @@ public class OrderService {
     private final CheckoutContactPolicy contact;
     private final IdempotentCommands idempotency;
     private final JsonMapper json;
+    private final KitchenDirectory kitchens;
+    private final HandoverCodes codes;
     private final Clock clock;
 
     OrderService(JdbcTemplate jdbc, QuoteDirectory quotes, SlotInventory inventory, MealCatalog meals, AddressDirectory addresses,
-                 CheckoutContactPolicy contact, IdempotentCommands idempotency, JsonMapper json, Clock clock) {
+                 CheckoutContactPolicy contact, IdempotentCommands idempotency, JsonMapper json, KitchenDirectory kitchens,
+                 HandoverCodes codes, Clock clock) {
         this.jdbc = jdbc;
         this.quotes = quotes;
         this.inventory = inventory;
@@ -91,6 +113,8 @@ public class OrderService {
         this.contact = contact;
         this.idempotency = idempotency;
         this.json = json;
+        this.kitchens = kitchens;
+        this.codes = codes;
         this.clock = clock;
     }
 
@@ -273,10 +297,118 @@ public class OrderService {
                 "Africa/Cairo", ((Timestamp) o.get("cutoff_at")).toInstant(), Math.max(0, ((Number) o.get("slot_available")).intValue()),
                 List.of((String) o.get("fulfillment_mode")));
         List<String> actions = "PENDING_ACCEPTANCE".equals(state) ? List.of("CANCEL") : List.of();
-        return new OrderView(orderId, (String) o.get("public_number"), (Long) o.get("version"), state, (String) o.get("fulfillment_mode"), lines,
+        String mode = (String) o.get("fulfillment_mode");
+        KitchenContact kitchenContact = null;
+        if (CONTACT_STATES.contains(state)) {
+            FulfillmentContact k = kitchens.fulfillmentContact((UUID) o.get("kitchen_id")).orElse(null);
+            if (k != null) {
+                kitchenContact = new KitchenContact(k.displayName(), k.contactPhone(), "PICKUP".equals(mode) ? k.pickupLocation() : null);
+            }
+        }
+        return new OrderView(orderId, (String) o.get("public_number"), (Long) o.get("version"), state, mode, lines,
                 egp((Long) o.get("subtotal_minor")), egp((Long) o.get("delivery_fee_minor")), egp((Long) o.get("tax_minor")),
                 egp((Long) o.get("total_minor")), slot, ((Timestamp) o.get("accept_by")).toInstant(), eventsAfter(orderId, 0, 1000), actions,
-                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), List.of(), null, null);
+                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), List.of(), handoverCode(orderId, state), kitchenContact);
+    }
+
+    static final Set<String> CONTACT_STATES = Set.of("ACCEPTED", "PREPARING", "READY", "OUT_FOR_DELIVERY");
+
+    /** Only for the order owner, while READY or out for delivery and the challenge is usable. */
+    private String handoverCode(UUID orderId, String state) {
+        if (!"READY".equals(state) && !"OUT_FOR_DELIVERY".equals(state)) {
+            return null;
+        }
+        return jdbc.query("SELECT ciphertext, nonce FROM handover_challenge "
+                + "WHERE order_id = ? AND consumed_at IS NULL AND locked_at IS NULL AND expires_at > ?",
+                rs -> rs.next() ? codes.reveal(orderId, rs.getBytes(1), rs.getBytes(2)) : null, orderId, Timestamp.from(clock.instant()));
+    }
+
+    /** Staff view after an ops command: never the customer's handover code or contact details. */
+    public OrderView staffView(UUID orderId) {
+        UUID customer = jdbc.query("SELECT customer_id FROM customer_order WHERE id = ?", rs -> rs.next() ? rs.getObject(1, UUID.class) : null, orderId);
+        if (customer == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "order not found");
+        }
+        OrderView v = view(customer, orderId, false);
+        return new OrderView(v.id(), v.publicNumber(), v.version(), v.state(), v.fulfillmentMode(), v.items(), v.subtotal(), v.deliveryFee(), v.tax(),
+                v.total(), v.slot(), v.acceptBy(), v.events(), List.of(), v.cashState(), v.supportCaseIds(), null, null);
+    }
+
+    // ---- cook reads ----
+
+    private UUID cookKitchen(UUID cookId) {
+        return kitchens.ownedBy(cookId).map(KitchenDirectory.KitchenStatus::kitchenId)
+                .orElseThrow(() -> new ApiException(ErrorCode.FORBIDDEN, "not a cook"));
+    }
+
+    public CookOrderPage cookOrders(UUID cookId, String state, String cursor, int limit, boolean english) {
+        UUID kitchen = cookKitchen(cookId);
+        if (state != null && !OrderLifecycleService.TERMINAL.contains(state) && !ACTIVE.contains(state)) {
+            throw invalid("state", "UNKNOWN_STATE");
+        }
+        if (limit < 1 || limit > 100) {
+            throw invalid("limit", "RANGE_1_100");
+        }
+        Instant afterTime = Instant.EPOCH;
+        UUID afterId = new UUID(0, 0);
+        if (cursor != null) {
+            try {
+                String[] parts = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8).split("\\|", 2);
+                afterTime = Instant.parse(parts[0]);
+                afterId = UUID.fromString(parts[1]);
+            } catch (RuntimeException e) {
+                throw invalid("cursor", "INVALID");
+            }
+        }
+        List<Map<String, Object>> rows = jdbc.queryForList("SELECT id, created_at FROM customer_order WHERE kitchen_id = ? "
+                + "AND (?::text IS NULL OR state = ?) AND (created_at, id) > (?, ?) ORDER BY created_at, id LIMIT ?",
+                kitchen, state, state, Timestamp.from(afterTime), afterId, limit + 1);
+        boolean more = rows.size() > limit;
+        List<Map<String, Object>> page = more ? rows.subList(0, limit) : rows;
+        String next = null;
+        if (more) {
+            Map<String, Object> last = page.getLast();
+            next = Base64.getUrlEncoder().withoutPadding().encodeToString((((Timestamp) last.get("created_at")).toInstant() + "|" + last.get("id"))
+                    .getBytes(StandardCharsets.UTF_8));
+        }
+        return new CookOrderPage(page.stream().map(r -> cookView(kitchen, (UUID) r.get("id"), english)).toList(), next, more);
+    }
+
+    public CookOrderView cookOrder(UUID cookId, UUID orderId, boolean english) {
+        return cookView(cookKitchen(cookId), orderId, english);
+    }
+
+    /** Cook view scoped to the kitchen (another kitchen's order is 404); contact only while the order is active. */
+    private CookOrderView cookView(UUID kitchenId, UUID orderId, boolean english) {
+        UUID customer = jdbc.query("SELECT customer_id FROM customer_order WHERE id = ? AND kitchen_id = ?",
+                rs -> rs.next() ? rs.getObject(1, UUID.class) : null, orderId, kitchenId);
+        if (customer == null) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "order not found");
+        }
+        OrderView v = view(customer, orderId, english);
+        Map<String, Object> o = jdbc.queryForMap("SELECT contact_snapshot::text AS contact, address_snapshot::text AS address, "
+                + "fulfillment_note, dispatch_reference FROM customer_order WHERE id = ?", orderId);
+        CustomerContact contact = null;
+        if (CONTACT_STATES.contains(v.state())) {
+            JsonNode c = json.readTree((String) o.get("contact"));
+            Object address = o.get("address") == null ? null : json.readTree((String) o.get("address"));
+            contact = new CustomerContact(text(c, "displayName"), text(c, "phoneE164"), address);
+        }
+        boolean showNote = CONTACT_STATES.contains(v.state()) || "PENDING_ACCEPTANCE".equals(v.state());
+        return new CookOrderView(v.id(), v.publicNumber(), v.version(), v.state(), v.fulfillmentMode(), v.items(), v.subtotal(), v.deliveryFee(),
+                v.tax(), v.total(), v.slot(), v.acceptBy(), v.events(), cookActions(v.state(), v.fulfillmentMode()), v.cashState(),
+                showNote ? (String) o.get("fulfillment_note") : null, (String) o.get("dispatch_reference"), contact);
+    }
+
+    private static List<String> cookActions(String state, String mode) {
+        return switch (state) {
+            case "PENDING_ACCEPTANCE" -> List.of("ACCEPT", "REJECT");
+            case "ACCEPTED" -> List.of("PREPARE", "CANCEL");
+            case "PREPARING" -> List.of("READY");
+            case "READY" -> "PICKUP".equals(mode) ? List.of("HANDOVER") : List.of("DISPATCH");
+            case "OUT_FOR_DELIVERY" -> List.of("HANDOVER", "DELIVERY_FAILURE");
+            default -> List.of();
+        };
     }
 
     private static String text(JsonNode node, String field) {
