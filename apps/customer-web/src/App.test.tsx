@@ -266,12 +266,12 @@ describe("customer web", () => {
     render(<App fetchImpl={fetchImpl} />);
     fireEvent.click(screen.getByRole("button", { name: "English" }));
     fireEvent.click(await screen.findByRole("radio"));
-    fireEvent.click(screen.getByRole("button", { name: "Add to cart" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
     const prompt = await screen.findByRole("alertdialog", { name: "Replace your cart?" });
     fireEvent.click(within(prompt).getByRole("button", { name: "Keep my current cart" }));
     expect(screen.getByText("Your cart is unchanged.")).toBeTruthy();
     expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").kitchenId).toBe("k1");
-    fireEvent.click(screen.getByRole("button", { name: "Add to cart" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
     fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: "Replace cart" }));
     const cart = JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}");
     expect(cart.kitchenId).toBe("k2");
@@ -293,7 +293,7 @@ describe("customer web", () => {
     render(<App fetchImpl={fetchImpl} />);
     fireEvent.click(screen.getByRole("button", { name: "English" }));
     fireEvent.click(await screen.findByRole("radio"));
-    fireEvent.click(screen.getByRole("button", { name: "Add to cart" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
     expect(await screen.findByText("An order from your cart is still being confirmed. Finish it on the cart page first.")).toBeTruthy();
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").kitchenId).toBe("k1");
@@ -357,6 +357,27 @@ describe("customer web", () => {
     expect(await screen.findByRole("heading", { name: "Amina" })).toBeTruthy();
     expect(screen.getByText(/not a food-safety certification/)).toBeTruthy();
     await waitFor(() => expect(calls.some((c) => c.path.startsWith("/api/v1/meals?") && c.path.includes("kitchenId=k5"))).toBe(true));
+  });
+
+  it("bounds the quantity by the slot's remaining portions, shows the line total and explains unknown allergens", async () => {
+    window.location.hash = "#/meal/66666666-6666-4666-8666-666666666666";
+    const { fetchImpl } = server({
+      "GET /api/v1/meals/66666666-6666-4666-8666-666666666666": () => ({
+        status: 200,
+        body: { id: "66666666-6666-4666-8666-666666666666", title: "Okra", kitchen: { id: "k6", slug: "k-six", name: "K6" }, portionText: "Serves two", price: egp(18000), description: "Okra stew", ingredients: "Okra, tomato", allergenCodes: ["UNKNOWN"], allergenStatement: null, photo: null, nextSlots: [{ id: "s6", startsAt: "2026-10-12T12:00:00Z", availablePortions: 2, fulfillmentModes: ["PICKUP"] }], availability: "AVAILABLE" },
+      }),
+      "GET /api/v1/kitchens/k6/reviews": () => ({ status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByText(/Detailed allergy information is not available/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("radio"));
+    const minus = screen.getByRole("button", { name: "Decrease quantity" }) as HTMLButtonElement;
+    const plus = screen.getByRole("button", { name: "Increase quantity" }) as HTMLButtonElement;
+    expect(minus.disabled).toBe(true);
+    fireEvent.click(plus);
+    expect(plus.disabled).toBe(true);
+    expect(screen.getByRole("button", { name: /^Add to cart/ }).textContent).toMatch(/360/);
   });
 });
 

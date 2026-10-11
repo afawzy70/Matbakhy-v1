@@ -3,6 +3,11 @@ import { formatMoney, formatTime } from "./api";
 import { loadCart, loadPending, saveCart, type Cart } from "./cart";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
+/** Quantity is bounded by the chosen slot's remaining portions (server value) and the order line maximum of 20. */
+function maxQuantity(slot: { availablePortions: number } | null): number {
+  return slot ? Math.max(1, Math.min(20, slot.availablePortions)) : 20;
+}
+
 export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: boolean }) {
   const { t, locale } = ctx;
   const [meal, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/meals/{mealId}", { params: { path: { mealId: id } } }), `${id}|${locale}`);
@@ -16,36 +21,74 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
       {(m) => {
         const slot = m.nextSlots.find((s) => s.id === slotId) ?? null;
         return (
-          <article className="card stack" aria-labelledby="meal-title">
+          <article className="meal-detail stack" aria-labelledby="meal-title">
             <a href="#/">{t.back}</a>
-            {m.photo ? <img src={m.photo.url} alt={m.photo.alt} /> : null}
-            <h2 id="meal-title">{m.title}</h2>
-            <p className="muted">
-              {m.kitchen.name} · {m.portionText}
-            </p>
-            <p>
-              <strong>{formatMoney(m.price.amountMinor, locale)}</strong>
-            </p>
-            <p>{m.description}</p>
-            <p className="muted">{m.ingredients}</p>
-            <p className="notice">
-              {m.allergenCodes.join(" · ")}
-              {m.allergenStatement ? ` — ${m.allergenStatement}` : ""}
-            </p>
-            <fieldset>
+            {m.photo ? <img className="hero" src={m.photo.url} alt={m.photo.alt} /> : <div className="hero" aria-hidden="true" />}
+            <div className="row between">
+              <h2 id="meal-title">{m.title}</h2>
+              <span className="price">
+                <bdi>{formatMoney(m.price.amountMinor, locale)}</bdi>
+              </span>
+            </div>
+            <a className="kitchen-link" href={`#/kitchen/${m.kitchen.slug}`}>
+              {m.kitchen.name}
+            </a>
+            <section className="card pad stack-sm" aria-label={t.portion}>
+              <strong>{m.portionText}</strong>
+            </section>
+            <section className="stack-sm" aria-labelledby="about-heading">
+              <h3 id="about-heading">{t.aboutDish}</h3>
+              <p>{m.description}</p>
+            </section>
+            <section className="card pad stack-sm" aria-labelledby="ingredients-heading">
+              <h3 id="ingredients-heading">{t.ingredientsAllergens}</h3>
+              <p>{m.ingredients}</p>
+              <p className={m.allergenCodes.includes("UNKNOWN") ? "notice" : undefined}>
+                {m.allergenCodes.includes("UNKNOWN")
+                  ? t.allergenUnknown
+                  : m.allergenCodes.includes("NONE_DECLARED")
+                    ? t.allergenNone
+                    : `${t.allergenContains}: ${m.allergenCodes.map((a) => t.allergenNames[a] ?? a).join("، ")}`}
+                {m.allergenStatement ? ` — ${m.allergenStatement}` : ""}
+              </p>
+            </section>
+            <fieldset className="slots">
               <legend>{t.slots}</legend>
               {m.nextSlots.length === 0 ? <p className="muted">{t.noSlots}</p> : null}
               {m.nextSlots.map((s) => (
-                <label key={s.id} className="check">
-                  <input type="radio" name="slot" checked={slotId === s.id} onChange={() => setSlotId(s.id)} /> {formatTime(s.startsAt, locale)} ·{" "}
-                  {t.portionsLeft(s.availablePortions)} · {s.fulfillmentModes.map((f) => t.mode[f]).join(" / ")}
+                <label key={s.id} className="slot-option">
+                  <input
+                    type="radio"
+                    name="slot"
+                    checked={slotId === s.id}
+                    onChange={() => {
+                      setSlotId(s.id);
+                      setQuantity((q) => Math.min(q, Math.max(1, Math.min(20, s.availablePortions))));
+                    }}
+                  />
+                  <span>
+                    {formatTime(s.startsAt, locale)} · {t.portionsLeft(s.availablePortions)} · {s.fulfillmentModes.map((f) => t.mode[f]).join(" / ")}
+                  </span>
                 </label>
               ))}
             </fieldset>
-            <label>
-              {t.quantity}{" "}
-              <input type="number" min={1} max={20} value={quantity} onChange={(e) => setQuantity(Math.max(1, Math.min(20, Number(e.target.value) || 1)))} />
-            </label>
+            <div className="buy-bar">
+              <div className="qty" role="group" aria-label={t.quantity}>
+                <button type="button" className="secondary" aria-label={t.decrease} disabled={quantity <= 1} onClick={() => setQuantity(quantity - 1)}>
+                  −
+                </button>
+                <input
+                  type="number"
+                  aria-label={t.quantity}
+                  min={1}
+                  max={maxQuantity(slot)}
+                  value={quantity}
+                  onChange={(e) => setQuantity(Math.max(1, Math.min(maxQuantity(slot), Number(e.target.value) || 1)))}
+                />
+                <button type="button" className="secondary" aria-label={t.increase} disabled={quantity >= maxQuantity(slot)} onClick={() => setQuantity(quantity + 1)}>
+                  +
+                </button>
+              </div>
             <button
               type="button"
               disabled={!slot || m.availability !== "AVAILABLE"}
@@ -73,8 +116,10 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                 setMessage(t.added);
               }}
             >
-              {t.addToCart}
+              {t.addToCart} · <bdi>{formatMoney(m.price.amountMinor * quantity, locale)}</bdi>
             </button>
+            </div>
+            <p className="muted small">{t.totalNote}</p>
             {replacement ? (
               <div role="alertdialog" aria-labelledby="replace-title" aria-describedby="replace-text" className="notice stack">
                 <h3 id="replace-title">{t.replaceTitle}</h3>

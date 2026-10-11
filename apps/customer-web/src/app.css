@@ -632,3 +632,86 @@ button.link {
   align-items: center;
   min-block-size: var(--mb-touch-target-min);
 }
+
+a {
+  color: var(--mb-color-primary);
+}
+
+.meal-detail h2 {
+  margin: 0;
+  font-size: var(--mb-font-size-lg);
+}
+
+.meal-detail h3 {
+  margin: 0;
+  font-size: var(--mb-font-size-md);
+}
+
+.hero {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  block-size: 15rem;
+  object-fit: cover;
+  border-radius: var(--mb-radius-lg);
+  background: var(--mb-color-surface-muted);
+}
+
+.slots {
+  display: grid;
+  gap: var(--mb-space-xs);
+  margin: 0;
+  border: 1px solid var(--mb-color-border);
+  border-radius: var(--mb-radius-lg);
+  padding: var(--mb-space-md);
+}
+
+.slot-option {
+  display: flex;
+  align-items: center;
+  gap: var(--mb-space-sm);
+  min-block-size: var(--mb-touch-target-min);
+}
+
+.slot-option input {
+  flex-shrink: 0;
+  inline-size: var(--mb-touch-target-min);
+  block-size: var(--mb-touch-target-min);
+  margin: 0;
+  accent-color: var(--mb-color-primary);
+}
+
+.buy-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mb-space-sm);
+  align-items: center;
+}
+
+.buy-bar > button {
+  flex: 1;
+  min-block-size: 3.25rem;
+  font-weight: var(--mb-font-weight-bold);
+}
+
+.qty {
+  display: flex;
+  align-items: center;
+  gap: var(--mb-space-xs);
+  padding: var(--mb-space-xs);
+  border-radius: var(--mb-radius-md);
+  background: var(--mb-color-surface-muted);
+}
+
+.qty input {
+  inline-size: 3.5rem;
+  min-block-size: var(--mb-touch-target-min);
+  box-sizing: border-box;
+  border: 1px solid var(--mb-color-border-strong);
+  border-radius: var(--mb-radius-sm);
+  text-align: center;
+  font: inherit;
+}
+
+.search-bar label.grow {
+  flex-basis: 100%;
+}
