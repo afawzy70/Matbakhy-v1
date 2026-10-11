@@ -41,7 +41,8 @@ class BlueprintGuards(unittest.TestCase):
         self.assertTrue(any("DONE without evidence" in x for x in validate(self.root)))
 
     def test_scenario_pass_without_evidence_is_rejected(self):
-        self.change("planning/scenarios.json", lambda d: d["scenarios"][0].update(status="PASS"))
+        # Clear evidence explicitly so the check is exercised whatever the scenario's real status is.
+        self.change("planning/scenarios.json", lambda d: d["scenarios"][0].update(status="PASS", evidence=[]))
         self.assertTrue(any("PASS without observed" in x for x in validate(self.root)))
 
     def test_rule_losing_coverage_is_rejected(self):
