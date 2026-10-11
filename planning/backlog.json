@@ -498,7 +498,7 @@
       "id": "MB-015",
       "phase": "P03",
       "title": "Implement dated slots and capacity",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-014"
@@ -527,9 +527,11 @@
         "TC-015",
         "TC-115"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-015/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: counters written by MB-018/019; slot cancellation with obligations via ops (MB-019/023); one-local-date slots (proposed default)."
     },
     {
       "id": "MB-016",

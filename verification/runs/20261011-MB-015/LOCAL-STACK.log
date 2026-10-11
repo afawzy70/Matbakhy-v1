@@ -1,0 +1,119 @@
+ok: docker CLI
+ok: docker daemon
+ok: docker compose v2
+ok: JDK 21
+ok: Node.js 24.21.0
+ok: pnpm (corepack)
+ok: curl
+ok: openssl
+-- building API jar
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=41913 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+-- starting stack (project matbakhy-verify-14419)
+ Image matbakhy-verify-14419-api Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 528B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 501B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 86B done
+#4 DONE 0.0s
+
+#5 [1/4] FROM docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+#5 resolve docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555 0.1s done
+#5 DONE 0.1s
+
+#6 [internal] load build context
+#6 transferring context: 45.93MB 0.4s done
+#6 DONE 0.4s
+
+#7 [2/4] RUN addgroup -S matbakhy && adduser -S -G matbakhy matbakhy
+#7 CACHED
+
+#8 [3/4] WORKDIR /app
+#8 CACHED
+
+#9 [4/4] COPY app/target/matbakhy-app-0.1.0-SNAPSHOT.jar /app/matbakhy-api.jar
+#9 DONE 0.2s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 2.0s done
+#10 exporting manifest sha256:9c8d460e14b260fae9e87847884c36755487ec6754addf5262df7969cef909c8
+#10 exporting manifest sha256:9c8d460e14b260fae9e87847884c36755487ec6754addf5262df7969cef909c8 done
+#10 exporting config sha256:fc3b56ed3d3f656f58e1d8ac6c7c6c1f6b3970d200d5ecf1a90230848a3d45fe done
+#10 exporting attestation manifest sha256:80a9eea6a2d11d2edd218c32bcf0c7f9577531993dd1ae03ea473223fe766daf done
+#10 exporting manifest list sha256:0d08735b820431f0c6b4ec771c9b57182e9d0b548af55dca346a8d2948314502 done
+#10 naming to docker.io/library/matbakhy-verify-14419-api:latest done
+#10 unpacking to docker.io/library/matbakhy-verify-14419-api:latest
+#10 unpacking to docker.io/library/matbakhy-verify-14419-api:latest 0.6s done
+#10 DONE 2.7s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s
+ Image matbakhy-verify-14419-api Built 
+ Network matbakhy-verify-14419_default Creating 
+ Network matbakhy-verify-14419_default Creating 
+ Volume matbakhy-verify-14419_postgres-data Creating 
+ Volume matbakhy-verify-14419_postgres-data Creating 
+ Volume matbakhy-verify-14419_postgres-data Created 
+ Volume matbakhy-verify-14419_postgres-data Created 
+ Network matbakhy-verify-14419_default Created 
+ Network matbakhy-verify-14419_default Created 
+ Container matbakhy-verify-14419-object-storage-1 Creating 
+ Container matbakhy-verify-14419-postgres-1 Creating 
+ Container matbakhy-verify-14419-identity-1 Creating 
+ Container matbakhy-verify-14419-mail-1 Creating 
+ Container matbakhy-verify-14419-mail-1 Created 
+ Container matbakhy-verify-14419-identity-1 Created 
+ Container matbakhy-verify-14419-object-storage-1 Created 
+ Container matbakhy-verify-14419-postgres-1 Created 
+ Container matbakhy-verify-14419-api-1 Creating 
+ Container matbakhy-verify-14419-api-1 Created 
+ Container matbakhy-verify-14419-mail-1 Starting 
+ Container matbakhy-verify-14419-identity-1 Starting 
+ Container matbakhy-verify-14419-object-storage-1 Starting 
+ Container matbakhy-verify-14419-postgres-1 Starting 
+ Container matbakhy-verify-14419-mail-1 Started 
+ Container matbakhy-verify-14419-identity-1 Started 
+ Container matbakhy-verify-14419-object-storage-1 Started 
+ Container matbakhy-verify-14419-postgres-1 Started 
+ Container matbakhy-verify-14419-postgres-1 Waiting 
+ Container matbakhy-verify-14419-identity-1 Waiting 
+ Container matbakhy-verify-14419-postgres-1 Healthy 
+ Container matbakhy-verify-14419-identity-1 Healthy 
+ Container matbakhy-verify-14419-api-1 Starting 
+ Container matbakhy-verify-14419-api-1 Started 
+ Container matbakhy-verify-14419-api-1 Waiting 
+ Container matbakhy-verify-14419-postgres-1 Waiting 
+ Container matbakhy-verify-14419-identity-1 Waiting 
+ Container matbakhy-verify-14419-object-storage-1 Waiting 
+ Container matbakhy-verify-14419-mail-1 Waiting 
+ Container matbakhy-verify-14419-object-storage-1 Healthy 
+ Container matbakhy-verify-14419-identity-1 Healthy 
+ Container matbakhy-verify-14419-postgres-1 Healthy 
+ Container matbakhy-verify-14419-mail-1 Healthy 
+ Container matbakhy-verify-14419-api-1 Healthy 
+NAME                                     IMAGE                                                                                              COMMAND                  SERVICE          CREATED          STATUS                    PORTS
+matbakhy-verify-14419-api-1              matbakhy-verify-14419-api                                                                          "java -XX:MaxRAMPerc…"   api              50 seconds ago   Up 13 seconds (healthy)   127.0.0.1:18080->8080/tcp
+matbakhy-verify-14419-identity-1         keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741   "/opt/keycloak/bin/k…"   identity         50 seconds ago   Up 49 seconds (healthy)   8443/tcp, 9000/tcp, 127.0.0.1:18180->8080/tcp
+matbakhy-verify-14419-mail-1             axllent/mailpit:v1.31.5@sha256:94f6b70c1436defae6799d9ac7ff0eeff9540465b842026d5cdb018f1c0234ea    "/mailpit"               mail             50 seconds ago   Up 49 seconds (healthy)   1110/tcp, 127.0.0.1:11025->1025/tcp, 127.0.0.1:18025->8025/tcp
+matbakhy-verify-14419-object-storage-1   adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92         "/cnb/process/web"       object-storage   50 seconds ago   Up 49 seconds             127.0.0.1:19090->9090/tcp
+matbakhy-verify-14419-postgres-1         postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea      "docker-entrypoint.s…"   postgres         50 seconds ago   Up 49 seconds (healthy)   127.0.0.1:15432->5432/tcp
+-- API health
+-- database migrated by Flyway
+-- synthetic development zones loaded (dev profile)
+-- OIDC discovery for realm matbakhy
+-- object storage buckets
+-- mail sink captures a synthetic message
+-- native client enforces PKCE (authorization without code_challenge is refused)
+-- anonymous private API call is denied
+-- web OIDC login through the API with a synthetic user
+-- signed private upload round trip (synthetic PDF): ticket, direct PUT, server verification, signed read
+PASS: local stack smoke checks

@@ -239,8 +239,10 @@
       "given": "Slot has five obligated portions",
       "when": "Cook lowers capacity to four",
       "then": "409; obligations and capacity remain consistent",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-015/evidence.json"
+      ]
     },
     {
       "id": "TC-014",
@@ -255,8 +257,10 @@
       "given": "A slot boundary falls on a timezone offset change",
       "when": "Slot is created and shown on clients",
       "then": "A single correct instant is used; invalid/ambiguous input handled explicitly",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-015/evidence.json"
+      ]
     },
     {
       "id": "TC-015",
@@ -271,8 +275,10 @@
       "given": "Server time reaches slot cutoff",
       "when": "A quote/order or slot edit is attempted",
       "then": "New order is rejected regardless of device clock",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-015/evidence.json"
+      ]
     },
     {
       "id": "TC-016",
@@ -1327,8 +1333,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Cook/meal slot tables and constraints; cutoff/timezone rules; pause/close; capacity edit bounds; aggregate stock counters",
       "then": "Cairo time boundaries, last available portion and capacity reductions below obligations are handled",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-015/evidence.json"
+      ]
     },
     {
       "id": "TC-116",
