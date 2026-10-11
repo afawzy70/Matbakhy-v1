@@ -673,8 +673,10 @@
       "given": "Email/push provider times out after order commit",
       "when": "Worker retries and customer reloads",
       "then": "Order/inbox present, retry count bounded, operator can see failure",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-021/evidence.json"
+      ]
     },
     {
       "id": "TC-038",
@@ -689,8 +691,10 @@
       "given": "Two workers and duplicate/out-of-order events",
       "when": "Both deliver and clients refresh",
       "then": "No duplicate inbox record; UI resolves current server state",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-021/evidence.json"
+      ]
     },
     {
       "id": "TC-039",
@@ -1503,8 +1507,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Persist inbox; lease worker; email/push adapters; retry and dead-letter; dedup recipient/event; unread/read operations",
       "then": "Provider outage leaves order committed; restart/multiple workers deliver effective notification once",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261011-MB-021/evidence.json"
+      ]
     },
     {
       "id": "TC-122",

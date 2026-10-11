@@ -219,21 +219,32 @@
           "id": "P04-CHECK-1",
           "name": "Transactional order lifecycle and concurrency",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "QuoteIntegrationTest",
+            "OrderPlacementIntegrationTest",
+            "OrderLifecycleIntegrationTest",
+            "CommerceConfigurationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16 (Testcontainers; Docker required): server-owned quotes, atomic placement with idempotency and a 20-customer capacity race, injected-failure rollback, legal transitions only, expiry/accept races, stock moves exactly once, secure handover. Fails if any named class did not run."
         },
         {
           "id": "P04-CHECK-2",
           "name": "Cash ledger and outbox failure recovery",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "CashAndLedgerIntegrationTest",
+            "NotificationIntegrationTest",
+            "ProviderConfigurationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16: completion never implies payment, separated cash verification, balanced once-only commission groups, provider outage leaves order/inbox committed with bounded retries and visible dead letters, leased workers and duplicate events deliver once, operator replay of failed events. Fails if any named class did not run."
         }
       ]
     },

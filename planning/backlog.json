@@ -744,7 +744,7 @@
       "id": "MB-021",
       "phase": "P04",
       "title": "Implement outbox and notifications",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-018"
@@ -772,9 +772,11 @@
         "TC-038",
         "TC-121"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-021/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Leased outbox dispatch, persistent inbox, bounded email/push delivery with dead letter, encrypted devices, ops health/replay; self-reviewed; providers are LOCAL/CI stand-ins until O07."
     },
     {
       "id": "MB-022",
