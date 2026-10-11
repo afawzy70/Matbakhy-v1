@@ -26,3 +26,15 @@ All user-facing text uses translation keys with explicit fallback. No raw backen
 These are draft tone examples, not approved legal text. Required terms, privacy notices, cancellation wording and ingredient/allergen statements need owner-approved content before pilot. Never generate a dietary suitability guarantee from a label.
 
 Minimum accessibility target is WCAG 2.2 AA for web; test native screen readers, dynamic text and touch targets. Color never carries status alone. Respect reduced motion. Every form has visible labels, associated errors and a sensible focus order.
+
+## Editable brand system (MB-003, draft)
+
+Status: **DRAFT, pending owner approval (O05)**. Trademark clearance has not been searched or registered.
+
+- Source of truth: [`packages/design-tokens/tokens.json`](../../packages/design-tokens/tokens.json). It holds the brand name and slogan (Arabic/English), light and dark semantic colors, typography, spacing, radii, elevation, touch-target minimum, usage notes and the required contrast pairs.
+- Web apps import the generated `tokens.css` (`--mb-*` custom properties) and the font. The native app imports the same TypeScript tokens. App titles and headings read the brand name from tokens; HTML titles are injected at build time. Tests fail if app source hard-codes the brand name or a hex color, so renaming or recoloring needs only `tokens.json` (then `pnpm --filter @matbakhy/design-tokens generate`).
+- Draft wordmark: `wordmarkSvg()` draws a cooking-pot mark with steam plus the brand name from tokens. It is a placeholder for review, not an approved logo.
+- Font: IBM Plex Sans Arabic (Arabic and Latin glyphs), SIL Open Font License 1.1, from `@fontsource/ibm-plex-sans-arabic` 5.3.0. The OFL permits bundling and embedding in apps; the license text ships with the package.
+- Contrast: every listed pair is tested against WCAG 2.2 thresholds in both themes (4.5:1 for text, 3:1 for focus indicators and `borderStrong` component boundaries). `border` is for decorative dividers only.
+- Bidirectional content: wrap embedded opposite-direction runs (amounts with currency, Latin inside Arabic, mixed addresses) in `<bdi>` or `unicode-bidi: isolate`.
+- Specimens: `pnpm --filter @matbakhy/design-tokens specimen <dir>` renders light/dark × Arabic/English × phone/desktop with Chromium and fails unless the Arabic font actually loaded.

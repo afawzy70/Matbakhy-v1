@@ -1,0 +1,73 @@
+/* Generated from packages/design-tokens/tokens.json by `pnpm --filter @matbakhy/design-tokens generate`. Do not edit. */
+
+:root {
+  --mb-font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  --mb-font-size-xs: 12px;
+  --mb-font-size-sm: 14px;
+  --mb-font-size-md: 16px;
+  --mb-font-size-lg: 20px;
+  --mb-font-size-xl: 24px;
+  --mb-font-size-xxl: 32px;
+  --mb-font-weight-regular: 400;
+  --mb-font-weight-medium: 500;
+  --mb-font-weight-bold: 700;
+  --mb-line-height-tight: 1.25;
+  --mb-line-height-normal: 1.6;
+  --mb-space-xxs: 2px;
+  --mb-space-xs: 4px;
+  --mb-space-sm: 8px;
+  --mb-space-md: 12px;
+  --mb-space-lg: 16px;
+  --mb-space-xl: 24px;
+  --mb-space-xxl: 32px;
+  --mb-space-xxxl: 48px;
+  --mb-radius-sm: 4px;
+  --mb-radius-md: 8px;
+  --mb-radius-lg: 16px;
+  --mb-radius-pill: 999px;
+  --mb-elevation-none: none;
+  --mb-elevation-card: 0 1px 2px rgba(43, 29, 20, 0.12), 0 2px 8px rgba(43, 29, 20, 0.08);
+  --mb-elevation-overlay: 0 8px 24px rgba(43, 29, 20, 0.18);
+  --mb-touch-target-min: 44px;
+  --mb-color-background: #FFFBF5;
+  --mb-color-surface: #FFFFFF;
+  --mb-color-surface-muted: #F6EFE6;
+  --mb-color-foreground: #2B1D14;
+  --mb-color-foreground-muted: #5E4B3C;
+  --mb-color-primary: #A63D12;
+  --mb-color-on-primary: #FFFFFF;
+  --mb-color-accent: #2F6B3A;
+  --mb-color-on-accent: #FFFFFF;
+  --mb-color-border: #D9CBBB;
+  --mb-color-border-strong: #7E6A58;
+  --mb-color-focus: #1F5FBF;
+  --mb-color-danger: #A4161A;
+  --mb-color-on-danger: #FFFFFF;
+  --mb-color-warning: #7A4B00;
+  --mb-color-warning-surface: #FFF1D6;
+  --mb-color-success: #1E6B33;
+  --mb-color-success-surface: #E3F4E6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --mb-color-background: #17110C;
+    --mb-color-surface: #211912;
+    --mb-color-surface-muted: #2C2219;
+    --mb-color-foreground: #F7EEE4;
+    --mb-color-foreground-muted: #CDBBA8;
+    --mb-color-primary: #F29B6B;
+    --mb-color-on-primary: #2B1206;
+    --mb-color-accent: #8FD19A;
+    --mb-color-on-accent: #0E2A14;
+    --mb-color-border: #4A3B2E;
+    --mb-color-border-strong: #9A8672;
+    --mb-color-focus: #8DB8FF;
+    --mb-color-danger: #FF8A80;
+    --mb-color-on-danger: #3A0606;
+    --mb-color-warning: #F5C26B;
+    --mb-color-warning-surface: #3A2A10;
+    --mb-color-success: #8FD19A;
+    --mb-color-success-surface: #15301B;
+  }
+}

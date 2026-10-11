@@ -11,6 +11,7 @@
     "bundle:native": "expo export --platform android --platform ios --output-dir dist --no-minify"
   },
   "dependencies": {
+    "@matbakhy/design-tokens": "workspace:*",
     "expo": "57.0.27",
     "expo-status-bar": "57.0.1",
     "react": "19.2.3",

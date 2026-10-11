@@ -1,0 +1,29 @@
+body {
+  margin: 0;
+  background: var(--mb-color-background);
+  color: var(--mb-color-foreground);
+  font-family: var(--mb-font-family);
+  font-size: var(--mb-font-size-md);
+  line-height: var(--mb-line-height-normal);
+}
+
+.shell {
+  padding-block: var(--mb-space-xxl);
+  padding-inline: var(--mb-space-xl);
+}
+
+.shell button {
+  min-block-size: var(--mb-touch-target-min);
+  min-inline-size: var(--mb-touch-target-min);
+  padding-inline: var(--mb-space-lg);
+  border: 0;
+  border-radius: var(--mb-radius-md);
+  background: var(--mb-color-primary);
+  color: var(--mb-color-on-primary);
+  font: inherit;
+}
+
+.shell button:focus-visible {
+  outline: 3px solid var(--mb-color-focus);
+  outline-offset: 2px;
+}
