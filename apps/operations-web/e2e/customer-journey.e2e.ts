@@ -221,6 +221,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
     for (const route of ["#/", "#/kitchen/" + kitchenSlug, "#/meal/" + mealId]) {
       for (const locale of ["ar", "en"] as const) {
         await page.goto(`${CUSTOMER}/${route}`);
+        await page.reload(); // a hash-only navigation keeps the in-page language choice
         if (locale === "en") {
           await page.getByRole("button", { name: "English" }).click();
         }
