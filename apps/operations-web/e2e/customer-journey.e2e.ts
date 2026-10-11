@@ -1,8 +1,7 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { strings as customerStrings } from "../../customer-web/src/i18n";
 import { strings } from "../src/i18n";
-import { env, sql } from "./fixtures";
+import { axe, env, sql } from "./fixtures";
 
 /**
  * TC-127 against the real local stack, after the cook workflow has published "كشري تجريبي" with an open slot: a
@@ -39,15 +38,6 @@ async function idpLogin(page: Page, user: string) {
  * Phone-width layout check of the current screen (approved direction): no horizontal overflow and every visible
  * control at least 44 px at 320 and 390 px. With E2E_SCREENSHOT_DIR set, review screenshots are saved as well.
  */
-/** WCAG 2.2 A/AA automated rules (axe-core); serious and critical findings fail. Automated rules are not a full audit. */
-async function axe(page: Page, name: string) {
-  const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
-  const blocking = result.violations
-    .filter((v) => v.impact === "serious" || v.impact === "critical")
-    .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(" | ")}`);
-  expect(blocking, `axe ${name}`).toEqual([]);
-}
-
 async function shot(page: Page, name: string) {
   await axe(page, name);
   const viewport = page.viewportSize();

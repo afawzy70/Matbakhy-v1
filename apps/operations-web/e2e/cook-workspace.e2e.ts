@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type BrowserContext, type Page } from "@playwright/test";
 import { strings } from "../src/i18n";
-import { cairoDate, env, png, sql } from "./fixtures";
+import { axe, cairoDate, env, png, sql } from "./fixtures";
 
 /**
  * TC-122 against the real local stack: a cook signs in through the identity provider, waits for approval, creates and
@@ -164,7 +164,9 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await cook.getByRole("button", { name: t.tabs.dashboard }).click();
   await expect(cook.getByRole("button", { name: pickup.number })).toBeVisible();
   await expect(cook.getByText(/باقي \d+ دقيقة/).first()).toBeVisible();
+  await axe(cook, "cook dashboard");
   await cook.getByRole("button", { name: t.tabs.orders }).click();
+  await axe(cook, "cook orders");
 
   async function act(order: { number: string }, action: string) {
     const c = card(cook, order.number);
@@ -221,6 +223,7 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await expect(cook.getByRole("cell", { name: pickup.number })).toBeVisible();
   await expect(cook.getByRole("cell", { name: delivery.number })).toBeVisible();
   await expect(cook.getByText(t.statementNote)).toBeVisible();
+  await axe(cook, "cook statement");
 
   // ---- pause stops new sales; resume restores them ----
   await cook.getByRole("button", { name: t.tabs.settings }).click();
@@ -250,6 +253,8 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   // Hide the meal: no longer sold or shown; restore: sold again.
   await ops.getByRole("button", { name: t.ops.catalogue }).click();
   const modCard = ops.getByRole("article", { name: "كشري تجريبي" });
+  await expect(modCard).toBeVisible();
+  await axe(ops, "ops catalogue and review queue");
   await modCard.getByLabel(t.reason).fill("e2e moderation check");
   await modCard.getByRole("button", { name: t.ops.hide }).click();
   await expect(modCard.getByText(t.ops.hidden, { exact: true })).toBeVisible();
@@ -296,6 +301,7 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await ops.getByRole("button", { name: t.ops.cases }).click();
   const firstRow = ops.getByRole("listitem").filter({ hasText: safety.body.reference as string });
   await expect(firstRow.getByText(label(t.ops.severity.CRITICAL))).toBeVisible();
+  await axe(ops, "ops support cases");
   await firstRow.getByRole("button", { name: safety.body.reference as string }).click();
   await ops.getByRole("textbox", { name: t.ops.staffOnly }).fill("Synthetic internal note: check kitchen hygiene record");
   await ops.getByRole("button", { name: t.ops.send }).click();

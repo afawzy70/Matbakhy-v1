@@ -1,3 +1,5 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, type Page } from "@playwright/test";
 import { execFileSync } from "node:child_process";
 import { crc32, deflateSync } from "node:zlib";
 
@@ -50,4 +52,13 @@ export function png(width: number, height: number): Buffer {
 export function cairoDate(days: number): string {
   const d = new Date(Date.now() + days * 86_400_000);
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Cairo" }).format(d);
+}
+
+/** WCAG 2.2 A/AA automated rules (axe-core); serious and critical findings fail. Automated rules are not a full audit. */
+export async function axe(page: Page, name: string) {
+  const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  const blocking = result.violations
+    .filter((v) => v.impact === "serious" || v.impact === "critical")
+    .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(" | ")}`);
+  expect(blocking, `axe ${name}`).toEqual([]);
 }
