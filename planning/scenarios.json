@@ -16,7 +16,8 @@
       "then": "It returns 401 or scoped denial without private data",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-009/evidence.json"
+        "verification/runs/20261011-MB-009/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -34,7 +35,8 @@
       "then": "The unsafe requests are rejected and no mutation occurs",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-009/evidence.json"
+        "verification/runs/20261011-MB-009/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -52,7 +54,8 @@
       "then": "Checkout requires verification of the new number",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-010/evidence.json"
+        "verification/runs/20261011-MB-010/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -70,7 +73,8 @@
       "then": "Verification fails; the account is not marked verified; sensitive value is absent from logs",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-010/evidence.json"
+        "verification/runs/20261011-MB-010/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -88,7 +92,8 @@
       "then": "No A address data leaks and order creation fails",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-010/evidence.json"
+        "verification/runs/20261011-MB-010/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -106,7 +111,8 @@
       "then": "No cross-owner data or state change occurs",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-011/evidence.json"
+        "verification/runs/20261011-MB-011/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -124,7 +130,8 @@
       "then": "Denied with a redacted auditable event",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-011/evidence.json"
+        "verification/runs/20261011-MB-011/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -142,7 +149,8 @@
       "then": "Publication/acceptance denied and review history preserved",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-012/evidence.json"
+        "verification/runs/20261011-MB-012/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -160,7 +168,8 @@
       "then": "No new sales/acceptance; accepted-order safe fulfillment/ops controls remain available",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-012/evidence.json"
+        "verification/runs/20261011-MB-012/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -1195,7 +1204,8 @@
       "then": "Anonymous and expired sessions denied; logout revokes intended session; role claims cannot be forged",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-009/evidence.json"
+        "verification/runs/20261011-MB-009/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -1215,7 +1225,8 @@
       "then": "OTP expiry/replay/rate limits and address object authorization pass with isolated fake sender",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-010/evidence.json"
+        "verification/runs/20261011-MB-010/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -1234,7 +1245,8 @@
       "then": "Cross-customer and cross-cook access matrix denied; privilege escalation and audit-redaction checks pass",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-011/evidence.json"
+        "verification/runs/20261011-MB-011/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {
@@ -1253,7 +1265,8 @@
       "then": "Only scoped reviewer can approve; incomplete application cannot publish; rejected revision history preserved",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261011-MB-012/evidence.json"
+        "verification/runs/20261011-MB-012/evidence.json",
+        "verification/runs/20261011-P02-gate/evidence.json"
       ]
     },
     {

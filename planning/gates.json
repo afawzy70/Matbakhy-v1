@@ -112,7 +112,7 @@
     },
     {
       "id": "P02",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -150,7 +150,16 @@
           "configured": true,
           "setup_note": "PostgreSQL 16 (Testcontainers): deny-by-default object scope, grants/step-up/revocation, append-only audit, cook application review/approval/operating state, module boundaries, registry-route parity and migrations. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "b2260d37e0ecbc165529f1e980656ea5063d382e",
+        "runs": [
+          "verification/runs/20261011-P02-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P02 --commit b2260d37e0ecbc165529f1e980656ea5063d382e",
+        "review": "SELF_REVIEW",
+        "note": "Local container evidence; no independent security review. Carried residuals listed in the gate evidence review findings."
+      }
     },
     {
       "id": "P03",
