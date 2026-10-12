@@ -1,4 +1,4 @@
-name: Native builds (MB-005 Android Gradle and iOS Xcode compilation)
+name: Native builds (MB-005 compilation, MB-031 launch on emulator/simulator)
 # Compiles the minimal customer-mobile shell natively on GitHub-hosted runners (no signing, no
 # store upload, no device). Android and iOS are separate jobs and produce separate evidence.
 on:
@@ -53,6 +53,16 @@ jobs:
           ls -l "$APK" && sha256sum "$APK"
           "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/aapt dump badging "$APK" | grep -E "^package:|sdkVersion|targetSdkVersion"
           java -version 2>&1 | head -1; ./gradlew --version | grep -E "Gradle|Kotlin|JVM"
+      - name: Gradle assembleRelease (JS bundle embedded; debug-keystore signed; not a store build)
+        working-directory: apps/customer-mobile/android
+        run: ./gradlew --no-daemon assembleRelease && sha256sum app/build/outputs/apk/release/app-release.apk
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: MB-031 launch on Android emulator
+        working-directory: apps/customer-mobile
+        run: scripts/launch-android.sh android/app/build/outputs/apk/release/app-release.apk
 
   ios:
     name: iOS simulator build (Xcode, unsigned)
@@ -91,3 +101,16 @@ jobs:
           echo "$APP" && /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
           /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist"
           shasum -a 256 "$APP/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")"
+      - name: xcodebuild Release for iOS Simulator (JS bundle embedded, no code signing)
+        working-directory: apps/customer-mobile/ios
+        run: |
+          set +e
+          xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Release \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-release CODE_SIGNING_ALLOWED=NO build > "$RUNNER_TEMP/xcodebuild-release.log" 2>&1
+          status=$?
+          grep -nE "error:|\*\* BUILD" "$RUNNER_TEMP/xcodebuild-release.log" | head -60
+          exit $status
+      - name: MB-031 launch on iOS Simulator
+        working-directory: apps/customer-mobile
+        run: scripts/launch-ios.sh "$(find ios/build-release/Build/Products -maxdepth 2 -name '*.app' | head -1)"
