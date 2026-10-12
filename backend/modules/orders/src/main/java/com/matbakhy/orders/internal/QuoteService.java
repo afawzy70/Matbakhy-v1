@@ -56,7 +56,7 @@ public class QuoteService implements QuoteDirectory {
                                 List<String> warnings) {
     }
 
-    static final int MAX_ITEMS = 20;
+    static final int MAX_ITEMS = CommercePolicies.MAX_LINES_PER_ORDER;
 
     private final JdbcTemplate jdbc;
     private final CommercePolicies policies;

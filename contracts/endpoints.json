@@ -9,8 +9,8 @@
       "path": "/api/v1/configuration/public",
       "permission": "PUBLIC",
       "response_type": "PublicConfiguration",
-      "contract": "locale, zones summary, enabled fulfillment modes, support/public policy versions only",
-      "implemented": false
+      "contract": "Ordering availability and order limits from the active commerce policy (per-line quantity limit, lines per order, policy version); locale, zones summary, fulfillment modes and support/public policy versions are not served yet; never commission, tax or staff-only fields",
+      "implemented": true
     },
     {
       "id": "API-002",

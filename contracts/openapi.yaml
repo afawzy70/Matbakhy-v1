@@ -41,11 +41,13 @@ paths:
       operationId: getConfigurationPublic
       tags:
         - configuration
-      summary: "API-001: locale, zones summary, enabled fulfillment modes, support/public policy versions only"
-      description: locale, zones summary, enabled fulfillment modes, support/public policy versions only
+      summary: "API-001: public configuration (ordering availability and order limits)"
+      description: Ordering availability and the active commerce policy's order limits, so clients bound quantity controls by the
+        server's value. The quote remains the enforcement point. Locale, zones summary, fulfillment modes and support/public policy
+        versions are planned additions. Never exposes commission, tax or staff-only policy fields.
       x-matbakhy-id: API-001
       x-permission: PUBLIC
-      x-implemented: false
+      x-implemented: true
       security: []
       responses:
         "200":
@@ -6347,8 +6349,33 @@ components:
           pattern: ^[0-9a-f]{64}$
     PublicConfiguration:
       type: object
-      description: PENDING typed schema. Response for API-001.
-      x-schema-status: PENDING
+      additionalProperties: false
+      description: Response for API-001.
+      required: [orderingAvailable, orderLimits]
+      properties:
+        orderingAvailable:
+          type: boolean
+          description: False while ordering is paused or no usable commerce policy is active; orderLimits is then null.
+        orderLimits:
+          oneOf:
+            - $ref: "#/components/schemas/OrderLimits"
+            - type: "null"
+    OrderLimits:
+      type: object
+      additionalProperties: false
+      required: [maxQuantityPerLine, maxLinesPerOrder, policyVersion]
+      properties:
+        maxQuantityPerLine:
+          type: integer
+          minimum: 1
+          maximum: 99
+          description: The active commerce policy's per-line quantity limit; quotes above it are refused.
+        maxLinesPerOrder:
+          type: integer
+          minimum: 1
+        policyVersion:
+          type: integer
+          minimum: 1
     PutCookApplicationRequest:
       type: object
       additionalProperties: false

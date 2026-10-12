@@ -12,8 +12,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * API-001: locale, zones summary, enabled fulfillment modes, support/public policy versions only
-         * @description locale, zones summary, enabled fulfillment modes, support/public policy versions only
+         * API-001: public configuration (ordering availability and order limits)
+         * @description Ordering availability and the active commerce policy's order limits, so clients bound quantity controls by the server's value. The quote remains the enforcement point. Locale, zones summary, fulfillment modes and support/public policy versions are planned additions. Never exposes commission, tax or staff-only policy fields.
          */
         get: operations["getConfigurationPublic"];
         put?: never;
@@ -2973,8 +2973,18 @@ export interface components {
             bytes: number;
             sha256: string;
         };
-        /** @description PENDING typed schema. Response for API-001. */
-        PublicConfiguration: Record<string, never>;
+        /** @description Response for API-001. */
+        PublicConfiguration: {
+            /** @description False while ordering is paused or no usable commerce policy is active; orderLimits is then null. */
+            orderingAvailable: boolean;
+            orderLimits: components["schemas"]["OrderLimits"] | null;
+        };
+        OrderLimits: {
+            /** @description The active commerce policy's per-line quantity limit; quotes above it are refused. */
+            maxQuantityPerLine: number;
+            maxLinesPerOrder: number;
+            policyVersion: number;
+        };
         /** @description Full replacement of the working draft. Omitted fields become empty. expectedVersion is required once the application exists. */
         PutCookApplicationRequest: {
             publicName?: string;

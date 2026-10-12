@@ -19,6 +19,9 @@ public class CommercePolicies {
                          int acceptanceWindowMinutes, int minAcceptanceMinutes, String cancellationPolicyVersion, String termsVersion) {
     }
 
+    /** Lines per order (a server constant, not a policy value); published by API-001 together with the policy's per-line limit. */
+    public static final int MAX_LINES_PER_ORDER = 20;
+
     private final JdbcTemplate jdbc;
     private final SyntheticPolicyPermission synthetic;
 
