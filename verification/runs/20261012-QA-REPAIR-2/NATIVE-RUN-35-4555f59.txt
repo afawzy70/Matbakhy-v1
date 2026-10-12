@@ -1,0 +1,5 @@
+Native run 35: https://github.com/afawzy70/Matbakhy-v1/actions/runs/38296110431 at source 4555f599411da9683453bee209559c8d1f11cded
+Android emulator job 114967467885 "Android debug APK (Gradle)": conclusion success (MB-031 auth round trip; MB-032/MB-033 ordering script incl. quantity limit, lowered limit, delivery checkout, order deep link warm and cold)
+iOS simulator job 114967468287 "iOS simulator build (Xcode, unsigned)": conclusion success (MB-031 auth round trip; ordering phases A-F incl. deep link)
+Conclusions read from the GitHub Actions API by the implementation agent (job step logs not excerpted here; see run 34 excerpts for the same phases at f5d2ba0).
+Emulator/simulator only; no physical device (BLK-004).
