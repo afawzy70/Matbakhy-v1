@@ -17,6 +17,7 @@ xcodegen generate --quiet
 export TEST_RUNNER_MB031_USER_PASSWORD="$MB031_USER_PASSWORD"
 set +e
 xcodebuild test -project MB031NativeChecks.xcodeproj -scheme SignInUITests -destination "id=$UDID" \
+  -only-testing:SignInUITests/SignInRoundTripTests \
   -resultBundlePath "$RUNNER_TEMP/mb031-ios.xcresult" 2>&1 | tee "$RUNNER_TEMP/mb031-ios-test.log" \
   | grep -E "Test Case|error:|XCTAssert|failed|passed|\*\* TEST" 
 status=${PIPESTATUS[0]}

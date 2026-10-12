@@ -1,4 +1,4 @@
-name: Native builds (MB-005 compilation, MB-031 launch on emulator/simulator)
+name: Native builds (MB-005 compilation, MB-031/MB-032 checks on emulator/simulator)
 # Compiles the minimal customer-mobile shell natively on GitHub-hosted runners (no signing, no
 # store upload, no device). Android and iOS are separate jobs and produce separate evidence.
 on:
@@ -70,6 +70,8 @@ jobs:
         run: scripts/launch-android.sh android/app/build/outputs/apk/release/app-release.apk
       - name: MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)
         run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/auth-roundtrip-android.sh
+      - name: MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)
+        run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/order-roundtrip-android.sh
       - name: Stack logs on failure
         if: failure()
         run: docker compose --env-file infra/.env -f infra/compose.yaml logs --tail 60 api identity || true
@@ -129,3 +131,5 @@ jobs:
         run: apps/customer-mobile/scripts/native-stack-macos.sh
       - name: MB-031 native sign-in round trip on iOS (XCUITest; system browser, PKCE, secure storage, sign-out, account switch)
         run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
+      - name: MB-032 native ordering on iOS (basket replacement, app terminated during submit, offline reopen, recovery without duplicate)
+        run: apps/customer-mobile/scripts/order-roundtrip-ios.sh
