@@ -216,7 +216,7 @@ public class SupportService implements OrderCases {
     }
 
     @Transactional
-    public Message staffMessage(UUID staffId, String key, UUID caseId, String body, String visibility) {
+    public Message staffMessage(UUID staffId, String key, UUID caseId, String body, String visibility, String requestId) {
         if (!Set.of("PUBLIC", "STAFF_ONLY").contains(visibility)) {
             throw invalid("visibility", "PUBLIC_OR_STAFF_ONLY");
         }
@@ -233,7 +233,7 @@ public class SupportService implements OrderCases {
                            state = CASE WHEN state = 'OPEN' THEN 'IN_PROGRESS' ELSE state END, updated_at = ?, version = version + 1 WHERE id = ?""",
                     visibility, Timestamp.from(now), Timestamp.from(now), caseId);
             audit.record(new Entry(staffId, "case.message", Permission.SUPPORT_CASE.code(), "support_case", caseId.toString(), Outcome.ALLOWED, null,
-                    null, Map.of("visibility", visibility)));
+                    requestId, Map.of("visibility", visibility)));
             return m;
         });
         return message(id);

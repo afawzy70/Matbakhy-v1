@@ -61,8 +61,10 @@ class StaffCaseController {
     @PostMapping("/api/v1/ops/cases/{caseId}/messages")
     @ResponseStatus(HttpStatus.CREATED)
     Message message(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID caseId,
-                    @RequestHeader(name = "Idempotency-Key", required = false) String key, @Valid @RequestBody StaffMessageBody body) {
-        return support.staffMessage(actor.id(), key, caseId, body.body(), body.visibility());
+                    @RequestHeader(name = "Idempotency-Key", required = false) String key, @Valid @RequestBody StaffMessageBody body,
+                    HttpServletRequest request) {
+        Object requestId = request.getAttribute(RequestContext.REQUEST_ID_ATTRIBUTE);
+        return support.staffMessage(actor.id(), key, caseId, body.body(), body.visibility(), requestId == null ? null : requestId.toString());
     }
 
     @PatchMapping("/api/v1/ops/cases/{caseId}")

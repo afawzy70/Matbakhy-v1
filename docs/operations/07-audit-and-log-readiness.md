@@ -35,7 +35,7 @@ Not every read should be audited. These are the ones that expose protected data 
 3. **Staff case view** (`GET /api/v1/ops/cases/{id}`): **closed in this session.** Each view writes `access.support_case` (actor, case, request ID; no case content). Test first: `RED-staff-case-view-audit.log`; assertion in SupportIntegrationTest.
 4. **Account deletion request** (customer self-service): only the later erasure job is audited, with no actor. Proposal: record the request with the customer as actor.
 5. **Cash report submission by a cook**: business record only. Probably sufficient (it is business history); listed for the owner's view.
-6. **Request IDs missing** on `case.message` (hard-coded null). System jobs (`staff.bootstrap`, `media.rejected`, `account.erasure`) have none by design.
+6. **Request IDs missing** on `case.message`: **closed in this session** (red first: `RED-case-message-request-id.log`). System jobs (`staff.bootstrap`, `media.rejected`, `account.erasure`) have none by design.
 7. **Not-found as denial:** object-level authorization that answers 404 (to hide existence) writes no audit row. This is intended; it is listed so that it is not mistaken for coverage.
 8. **Settlement audit rows** have no direct test assertion.
 

@@ -163,8 +163,11 @@ class SupportIntegrationTest {
                 .content("{\"body\":\"Kitchen has a history of this; check photos\",\"visibility\":\"STAFF_ONLY\"}"), agentSubject), 201);
         assertThat(ok(call(get("/api/v1/ops/cases/" + caseId), agentSubject), 200).get("firstResponseAt").isNull())
                 .as("a private note is not a response").isTrue();
-        ok(call(post("/api/v1/ops/cases/" + caseId + "/messages").header("Idempotency-Key", key())
+        ok(call(post("/api/v1/ops/cases/" + caseId + "/messages").header("Idempotency-Key", key()).header("X-Request-Id", "trace-case-msg-0001")
                 .content("{\"body\":\"Sorry about that, we are checking with the kitchen\",\"visibility\":\"PUBLIC\"}"), agentSubject), 201);
+        // MB-039: the staff message audit row carries the request ID, so it can be correlated with the request's logs.
+        assertThat(jdbc.queryForList("SELECT request_id FROM audit_event WHERE action = 'case.message' AND object_id = ? AND details->>'visibility' = 'PUBLIC'",
+                String.class, caseId)).containsExactly("trace-case-msg-0001");
         ok(call(post("/api/v1/support/cases/" + caseId + "/messages").header("Idempotency-Key", key()).content("{\"body\":\"Thank you\"}"),
                 customerSubject), 201);
 
