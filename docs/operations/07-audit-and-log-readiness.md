@@ -65,7 +65,7 @@ Not every read should be audited. These are the ones that expose protected data 
 
 ## 4. Data protection in logs
 
-**Audit details redaction limitation (found while testing):** the phone pattern in `Redaction` also matches UUIDs (digit groups joined by hyphens). Identifiers inside audit `details` are therefore masked. This errs on the safe side but loses identifiers, so identifiers belong in `object_id`, which is not redacted. Proposal: exempt values that are well-formed UUIDs from the phone pattern, with a test. Not changed today.
+**Audit details redaction (found while testing, fixed in this session):** the phone pattern in `Redaction` also matched UUIDs, so identifiers in audit `details` were masked. A value that is exactly a UUID is now kept. A UUID or phone number inside free text is still masked, and sensitive keys still mask any value. Red first: `RED-redaction-uuid.log`.
 
 Existing redaction evidence (TC-056, LogRedactionIntegrationTest) with synthetic canaries: name, e-mail, phone, street, recipient, push token, bearer token, one-time and handover codes are absent from captured logs across OTP, address, order, handover, provider failure and an unexpected error. Request and response bodies are not logged. Limitation: this covers the flows exercised, not every possible log statement.
 

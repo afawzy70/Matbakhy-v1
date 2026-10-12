@@ -1,0 +1,11 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.identity.StaffAccessIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 25.74 s <<< FAILURE! -- in com.matbakhy.app.identity.StaffAccessIntegrationTest
+com.matbakhy.app.identity.StaffAccessIntegrationTest.redaction_masks_sensitive_detail_keys_and_values -- Time elapsed: 0.025 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+expected: "6b501317-3613-4278-bedd-26f8399ab196"
+ but was: "6b[REDACTED]-bedd-26f8399ab196"
+	at com.matbakhy.app.identity.StaffAccessIntegrationTest.redaction_masks_sensitive_detail_keys_and_values(StaffAccessIntegrationTest.java:239)
+

@@ -12,6 +12,8 @@ public final class Redaction {
             "(?i).*(token|password|secret|otp|code|cookie|authorization|session|phone|email|address|document|pepper).*");
     private static final Pattern PHONE = Pattern.compile("\\+?[0-9\\u0660-\\u0669][0-9\\u0660-\\u0669 ()-]{6,}[0-9\\u0660-\\u0669]");
     private static final Pattern EMAIL = Pattern.compile("[^\\s@]+@[^\\s@]+\\.[^\\s@]+");
+    /** A whole value that is exactly a UUID is an identifier; without this the phone pattern would mask its digit groups. */
+    private static final Pattern UUID_VALUE = Pattern.compile("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
     private static final Pattern JWT = Pattern.compile("eyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]*");
 
     private Redaction() {
@@ -35,7 +37,7 @@ public final class Redaction {
             if (SENSITIVE_KEY.matcher(key).matches()) {
                 out.put(key, MASK);
             } else if (value instanceof String s) {
-                out.put(key, text(s));
+                out.put(key, UUID_VALUE.matcher(s).matches() ? s : text(s));
             } else if (value instanceof Number || value instanceof Boolean || value == null) {
                 out.put(key, value);
             } else {

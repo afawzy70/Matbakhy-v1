@@ -231,6 +231,14 @@ class StaffAccessIntegrationTest {
         assertThat(out.get("accessToken")).isEqualTo(Redaction.MASK);
         assertThat((String) out.get("note")).doesNotContain("٠١٠١٢٣٤٥٦٧٨", "a@b.co");
         assertThat(out.get("count")).isEqualTo(3);
+
+        // MB-039: a value that is exactly a UUID is an identifier, not a phone number; a phone or UUID inside text is still
+        // masked, and a sensitive key still masks whatever its value.
+        Map<String, Object> ids = Redaction.details(Map.of("orderId", "6b501317-3613-4278-bedd-26f8399ab196",
+                "note", "order 6b501317-3613-4278-bedd-26f8399ab196 for 01012345678", "sessionId", "6b501317-3613-4278-bedd-26f8399ab196"));
+        assertThat(ids.get("orderId")).isEqualTo("6b501317-3613-4278-bedd-26f8399ab196");
+        assertThat((String) ids.get("note")).doesNotContain("01012345678");
+        assertThat(ids.get("sessionId")).isEqualTo(Redaction.MASK);
     }
 
     // ---- TC-006: object scope across customers, cooks and staff ----
