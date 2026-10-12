@@ -757,6 +757,7 @@ fieldset {
 /* Transactional screens (cart, checkout, order status, account) in the approved system (docs/design/approved):
    a readable single column on desktop, the same cards, pills, prices and primary actions as the homepage. */
 .transaction {
+  box-sizing: border-box;
   inline-size: 100%;
   max-inline-size: 42rem;
   margin-inline: auto;
