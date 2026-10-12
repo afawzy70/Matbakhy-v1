@@ -2,9 +2,10 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-12T14:25+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
+- Observed: 2026-10-12T15:31+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P07 / MB-032 IN_PROGRESS (native discovery and ordering implemented; native checks pending); MB-031 DONE at `fd689aa` (native Android and iOS sign-in round trips); MB-037 DONE at `e512ac4`; MB-039 IN_PROGRESS; MB-029 BLOCKED on screen-reader testing (BLK-003; TC-046, TC-129 PASS at `6a84b26`; TC-047 BLOCKED); MB-028 DONE; P00–P05 gates PASS (self-reviewed evidence); P06 gate not passed (O05 open, MB-029/MB-030 not DONE)
+- **Codex QA repair candidate:** `c35ad2d0be06f045059e19fbcc1c6e25209cb645`. Six-check evidence PASS ([run](../../verification/runs/20261012-QA-REPAIR/evidence.json)); Product CI success. MBQA-002, MBQA-001 and FG-001 are FIXED_PENDING_INDEPENDENT_RETEST, not closed by independent QA ([repair record](../quality/07-codex-qa-repair.md)). RQ-001/002/003 and Q1 remain open.
+- Phase/story: P07 / MB-032 IN_PROGRESS (native discovery, ordering and basket editing implemented; native run 24: iOS testA/testB passed and testC's harness was fixed; Android harness scroll fixed; native run 25 at `c35ad2d` in progress); MB-031 DONE at `fd689aa` (native Android and iOS sign-in round trips); MB-037 DONE at `e512ac4`; MB-039 IN_PROGRESS; MB-029 BLOCKED on screen-reader testing (BLK-003; TC-046, TC-129 PASS at `6a84b26`; TC-047 BLOCKED); MB-028 DONE; P00–P05 gates PASS (self-reviewed evidence); P06 gate not passed (O05 open, MB-029/MB-030 not DONE)
 - Model: `claude-opus-5-5`, effort `medium` (observed from session metadata at 14:20); token usage and cost not recorded here
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -18,13 +19,13 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
-| MB-032 Implement native discovery and ordering | IN_PROGRESS | Screens, generated client, basket rule, stored placement keys with recovery; 24 unit/UI tests pass; native checks (TC-148, TC-049, TC-132) on emulator/simulator pending; delivery checkout not exercised natively |
+| MB-032 Implement native discovery and ordering | IN_PROGRESS | Screens, generated client, basket rule and editing, stored placement keys with recovery; 28 unit/UI tests pass. Native run 24: iOS keep/replace, kill during submit (one order) and offline reopen passed; recovery step's harness fixed. Android ordering harness scroll fixed. Native run 25 pending. Delivery checkout not exercised natively |
 | MB-031 Build native shell and authentication | DONE (self-review) | [run](../../verification/runs/20261012-MB-031/evidence.json) at `fd689aa`; native run [38226241501](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501): Android emulator and iOS simulator launch and system-browser PKCE sign-in round trip |
 | MB-037 Prove concurrency retries and recovery | DONE (self-review) | [run](../../verification/runs/20261012-MB-037/evidence.json) at `e512ac4` |
 | MB-029 Verify accessibility RTL and responsive behavior | BLOCKED (BLK-003) | [run](../../verification/runs/20261012-MB-029/evidence.json) at `6a84b26`; TC-047 screen-reader testing NOT_RUN |
 | MB-039 Implement privacy observability and recovery tooling | IN_PROGRESS | Erasure, log redaction, gauges, local backup/restore rehearsal tested; staging restore needs O07; document retention needs O06 |
 | MB-028 Complete customer account and trust features | DONE (self-review) | [run](../../verification/runs/20261011-MB-028/evidence.json) at `bec5830` (attempt 1 at `fe94d8b` failed the stale traceability matrix); includes API-098 and the web basket-replacement confirmation (TC-147) |
-| MB-027 Complete customer web purchase flow | DONE (self-review); draft visuals until O05 | [run](../../verification/runs/20261011-MB-027/evidence.json) at `0da4477` |
+| MB-027 Complete customer web purchase flow | DONE (self-review); draft visuals until O05 | [run](../../verification/runs/20261011-MB-027/evidence.json) at `0da4477`. CW05 basket editing was incomplete (QA FG-001) until `f600577`; repairs and TC-149/150/151 [run](../../verification/runs/20261012-QA-REPAIR/evidence.json) at `c35ad2d` (pending independent retest) |
 | MB-026 Build operating configuration and staff controls | DONE (self-review) | [run](../../verification/runs/20261011-MB-026/evidence.json) at `c96535b` |
 | MB-025 Build finance operations | DONE (self-review) | [run](../../verification/runs/20261011-MB-025/evidence.json) at `ad3f425`; finance UI not in the browser workflow |
 | MB-024 Build support and order exceptions | DONE (self-review) | [run](../../verification/runs/20261011-MB-024/evidence.json) at `ba81dd1` |

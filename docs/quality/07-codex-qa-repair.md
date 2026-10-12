@@ -11,7 +11,7 @@ The implementation agent wrote this repair record; it is **self-review**, not in
 | Report | `qa/independent-eb1a671/report.md` on that branch |
 | Application tested by QA | `eb1a6717b3304d3a02e6a46d06c77ed5d43ac144` |
 | Repairs made on | `implementation/mvp` from `5bd7681`; newer work on the branch kept |
-| Fixed candidate SHA for retest | the closing entry of `docs/status/latest.md` and the evidence file below |
+| **Fixed candidate SHA for retest** | **`c35ad2d0be06f045059e19fbcc1c6e25209cb645`**: six-check evidence PASS; Product CI run 220 (push) and 221 (PR) success; Blueprint integrity success |
 
 The QA failures and evidence on the QA branch are unchanged. The red-phase logs below were produced on the implementation branch.
 
@@ -83,7 +83,7 @@ The QA failures and evidence on the QA branch are unchanged. The red-phase logs 
 | Native tests: `pnpm exec jest` (apps/customer-mobile) | 28 passed (4 new: MBQA-002 on native, three basket-editing tests) |
 | `tsc --noEmit` (web, mobile, operations web) and `eslint` (all three apps) | clean |
 | Red-phase logs | `verification/runs/20261012-QA-REPAIR/RED-*.log` |
-| Six-check evidence run (backend verify, clean-clone workspace, local stack, browser journeys, secret scan, guardrails) | `verification/runs/20261012-QA-REPAIR/evidence.json` |
+| Six-check evidence run (backend verify, clean-clone workspace, local stack, browser journeys, secret scan, guardrails) at `c35ad2d` | all six PASS: `verification/runs/20261012-QA-REPAIR/evidence.json`; scenarios TC-149, TC-150 and TC-151 PASS (self-review) |
 
 ## Requirement questions (proposals only; not resolved)
 
@@ -126,7 +126,7 @@ This is a reporting correction only. It is separate from the product repairs, an
 
 ## For the Codex retest
 
-- **Revision:** check out the fixed candidate SHA from `docs/status/latest.md`, not the branch head.
+- **Revision:** check out `c35ad2d0be06f045059e19fbcc1c6e25209cb645`, not the branch head.
 - **Startup:** start as in `docs/quality/06-codex-qa-handoff.md`; the isolated stack and synthetic fixtures are unchanged.
 - **Retest only:**
   1. IQA-09 mixed-stock selection;

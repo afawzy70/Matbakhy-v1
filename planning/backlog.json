@@ -1002,10 +1002,14 @@
       "scenario_ids": [
         "TC-044",
         "TC-045",
-        "TC-127"
+        "TC-127",
+        "TC-149",
+        "TC-150",
+        "TC-151"
       ],
       "evidence": [
-        "verification/runs/20261011-MB-027/evidence.json"
+        "verification/runs/20261011-MB-027/evidence.json",
+        "verification/runs/20261012-QA-REPAIR/evidence.json"
       ],
       "review_status": "PASS",
       "completion_note": "Customer web purchase flow on the real API with stable-key placement verified in the browser; self-reviewed; draft visuals until O05."

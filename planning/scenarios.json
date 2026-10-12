@@ -2041,8 +2041,10 @@
       "given": "The web basket holds one or more lines of one kitchen and slot",
       "when": "The customer changes quantities, removes lines, or adds from another kitchen or slot and keeps or replaces the basket",
       "then": "Quantities stay within 1 and the line limit; removal and the estimated subtotal use integer minor units; the kitchen is shown; removing the last line shows the empty state; the estimate is labelled separately from the server quote, an edit discards any quote shown, and a pending order locks the basket",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-QA-REPAIR/evidence.json"
+      ]
     },
     {
       "id": "TC-150",
@@ -2057,8 +2059,10 @@
       "given": "Published meals and kitchens with Arabic and English content",
       "when": "The customer switches Arabic to English and back on browse, meal detail and kitchen pages, including while an earlier answer is still in flight",
       "then": "Each request carries the chosen language, the content shown is in that language, and an answer for a language already left is never shown",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-QA-REPAIR/evidence.json"
+      ]
     },
     {
       "id": "TC-151",
@@ -2074,8 +2078,10 @@
       "given": "A meal with one slot at 0 remaining portions and another with stock",
       "when": "The customer selects the exhausted slot and tries to add it, then selects the slot with stock",
       "then": "Nothing is written to the basket for the exhausted slot and it is explained as sold out; the slot with stock adds at most its remaining portions; an entirely sold-out meal stays unpurchasable",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-QA-REPAIR/evidence.json"
+      ]
     }
   ]
 }
