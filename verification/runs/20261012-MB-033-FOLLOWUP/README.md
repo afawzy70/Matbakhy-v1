@@ -56,4 +56,6 @@ Review findings:
 
 ## Native runs
 
-Filled in after the runs complete.
+| Run | Source | Android emulator | iOS simulator |
+|---|---|---|---|
+| 32 ([38283912106](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38283912106)) | `e3ba61a` | **FAIL (harness):** quantity cap at 10 and the lowered-limit block passed; the script could not reach the basket line's decrease control (scrolled below it). Delivery not reached. [log](ANDROID-NATIVE-e3ba61a-FAIL.log) | **PASS:** phases D and E (cap 10; lowered limit blocks the quote, one quote after correction; delivery MB-100002 stored DELIVERY/3000/63000 with address snapshot, kitchen one; app EGP 630.00 and fee EGP 30.00). [log](IOS-NATIVE-e3ba61a.log) |

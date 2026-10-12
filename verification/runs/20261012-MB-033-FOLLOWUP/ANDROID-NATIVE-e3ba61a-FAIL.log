@@ -1,0 +1,14 @@
+Native run 32 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38283912106), job 114927569219, source e3ba61acb7b7c5cbd12d50641ec99064551e86c6
+Android emulator, step "MB-032 native ordering on Android" (excerpt): conclusion FAILURE (harness)
+side effects ...: 1|1|1|1|1|1|1
+order MB-100001; database (number|total_minor): MB-100001|9000; app shows text="Total: EGP 90.00"; quote showed text="Total: EGP 90.00"
+== MB-033 Q1: the quantity control stops at min(policy limit, availability)
+ok: the control stopped at 10 of 15 available portions and is disabled there
+== MB-033 Q1: a lowered limit makes the saved basket invalid and blocks the quote
+screenshot 6-over-limit-blocked
+FAIL: no decrease control on the basket line
+visible: ... text="At most 5 per meal can be ordered now. Reduce the quantity to continue." ... content-desc="Calculate total" ... text="EGP 1,200.00" ...
+Diagnosis: harness fault. The script had scrolled down to the disabled quote button; the basket line (and its decrease
+control) was above the visible area and the scroll helper only scrolls down. The product behaved as expected up to here:
+quantity capped at 10, over-limit notice shown, quote disabled (asserted before this step). Delivery checkout on Android
+was not reached in this run.

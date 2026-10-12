@@ -83,6 +83,15 @@ wait_scrolled() {
   done
   return 1
 }
+# Content above the fold after scrolling down (the basket line above the quote button, native run 32): scroll back up.
+wait_scrolled_up() {
+  local deadline=$((SECONDS + $2))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    wait_for "$1" 4 >/dev/null && return 0
+    adb shell input swipe $((SCREEN_W / 2)) $((SCREEN_H / 4)) $((SCREEN_W / 2)) $((SCREEN_H * 3 / 4)) 400
+  done
+  return 1
+}
 absent() { dump; if [ -n "$(center_of "$1")" ]; then fail "unexpectedly visible: $1"; fi; }
 launch() {
   adb shell am force-stop "$PKG"
@@ -234,7 +243,7 @@ grep -qE 'resource-id="get-quote"[^>]*enabled="false"|enabled="false"[^>]*resour
 shot over-limit-blocked
 QUOTES_AFTER=$(psql_q -c "SELECT count(*) FROM quote q JOIN app_user u ON u.id = q.customer_id WHERE u.phone_e164 = '+201005550001'")
 [ "$QUOTES_BEFORE" = "$QUOTES_AFTER" ] || fail "a quote was created for an over-limit basket ($QUOTES_BEFORE -> $QUOTES_AFTER)"
-pos=$(wait_scrolled 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 && center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"') || fail "no decrease control on the basket line"
+pos=$(wait_scrolled_up 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 && center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"') || fail "no decrease control on the basket line"
 for _ in $(seq 5); do adb shell input tap $pos; sleep 0.5; done
 wait_for 'text="5 × Native Dish One[^"]*"' 20 >/dev/null || fail "basket line not reduced to 5"
 absent 'text="At most 5 per meal[^"]*"'
