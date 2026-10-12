@@ -8,6 +8,7 @@
 # Expects: emulator running with the app installed (launch-android.sh), stack up (scripts/dev.sh up), USER_PASSWORD.
 set -euo pipefail
 PKG=com.matbakhy.customer.dev
+export PATH="$ANDROID_HOME/platform-tools:$PATH"
 : "${USER_PASSWORD:?synthetic user password}"
 OUT="${RUNNER_TEMP:-/tmp}/mb031-roundtrip"
 mkdir -p "$OUT"
