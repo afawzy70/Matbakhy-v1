@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-12T07:35+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
+- Observed: 2026-10-12T12:31+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P06 / MB-029 BLOCKED on screen-reader testing (BLK-003); evidence at `6a84b26` (TC-046, TC-129 PASS; TC-047 BLOCKED); MB-028 DONE; P00–P05 gates PASS (self-reviewed evidence); P06 gate not passed (O05 open, MB-029/MB-030 not DONE)
+- Phase/story: P07 / MB-031 DONE at `fd689aa` (native Android and iOS sign-in round trips); MB-037 DONE at `e512ac4`; MB-039 IN_PROGRESS; next MB-032. MB-029 BLOCKED on screen-reader testing (BLK-003; TC-046, TC-129 PASS at `6a84b26`; TC-047 BLOCKED); MB-028 DONE; P00–P05 gates PASS (self-reviewed evidence); P06 gate not passed (O05 open, MB-029/MB-030 not DONE)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -18,6 +18,10 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-031 Build native shell and authentication | DONE (self-review) | [run](../../verification/runs/20261012-MB-031/evidence.json) at `fd689aa`; native run [38226241501](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501): Android emulator and iOS simulator launch and system-browser PKCE sign-in round trip |
+| MB-037 Prove concurrency retries and recovery | DONE (self-review) | [run](../../verification/runs/20261012-MB-037/evidence.json) at `e512ac4` |
+| MB-029 Verify accessibility RTL and responsive behavior | BLOCKED (BLK-003) | [run](../../verification/runs/20261012-MB-029/evidence.json) at `6a84b26`; TC-047 screen-reader testing NOT_RUN |
+| MB-039 Implement privacy observability and recovery tooling | IN_PROGRESS | Erasure, log redaction, gauges, local backup/restore rehearsal tested; staging restore needs O07; document retention needs O06 |
 | MB-028 Complete customer account and trust features | DONE (self-review) | [run](../../verification/runs/20261011-MB-028/evidence.json) at `bec5830` (attempt 1 at `fe94d8b` failed the stale traceability matrix); includes API-098 and the web basket-replacement confirmation (TC-147) |
 | MB-027 Complete customer web purchase flow | DONE (self-review); draft visuals until O05 | [run](../../verification/runs/20261011-MB-027/evidence.json) at `0da4477` |
 | MB-026 Build operating configuration and staff controls | DONE (self-review) | [run](../../verification/runs/20261011-MB-026/evidence.json) at `c96535b` |
@@ -40,7 +44,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-28 of 46 stories DONE (MB-029 BLOCKED) (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+30 of 46 stories DONE (MB-029 BLOCKED; MB-039 IN_PROGRESS) (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
@@ -57,7 +61,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Customer web restyle (checkpoint evidence at `bad288f`, all six checks PASS, self-review): home, kitchen and meal pages follow the approved hierarchy on real data and are checked at 320/360/390/420/768/1440 px in Arabic RTL and English LTR (no overflow, 44 px controls); checkout and order status at 320/390 px; axe WCAG 2.2 A/AA scans show no serious/critical findings on these and five operations screens. Cart, checkout, order status and account use the new tokens and form controls but keep their earlier card layout; owner review of those screens is pending. **Decisions needed:** structured portion size (for the approved one-person/two-people filters) and a description in discovery cards both require meal data/contract changes; until decided, intent tiles reveal only sort and clear.
 - TC-018 correction: TC-018 now covers only server rejection of mixed baskets; client confirmation is TC-147 (web, PASS at `bec5830`) and TC-148 (native, NOT_RUN).
 - Contract: OpenAPI 3.1 for 98 planned operations; implemented operations are typed, and a backend test checks that registry `implemented` flags equal the served routes. Generated TypeScript client.
-- Android / iOS: Expo SDK 57 shell compiles natively: Android debug APK (Gradle) and iOS simulator app (Xcode, unsigned) on GitHub-hosted runners at `34be845`. **No emulator, simulator-launch or device verification yet** (P07).
+- Android / iOS (MB-031): Expo SDK 57 shell with environment config, Arabic/English, system-browser PKCE sign-in (fresh login every time; ephemeral on iOS), tokens in the OS secure store, account switch and sign-out that clear private data, crash boundary. Release variants launch on an Android emulator (API 35) and an iOS simulator, and the native sign-in round trip (customer-a, sign-out, customer-b, cancelled switch) passes on both in CI against the local Keycloak and API with synthetic users. **No physical device, signed or store build yet** (MB-034/MB-035).
 
 ## Checks
 
@@ -93,9 +97,12 @@ Implementation-agent report (self-reported, not an independent review certificat
 ## Today (2026-10-12)
 
 - D11/D12 applied (`5cc88c8`). Remaining customer screens restyled in the approved light system with a derived desktop layout; screenshots for owner review in [docs/design/review](../design/review/README.md).
-- MB-029: browser evidence at `6a84b26`, all six checks PASS: layout matrices for customer and operations at the required widths in both directions, keyboard-only journeys including checkout, axe scans. **TC-047 BLOCKED (BLK-003): no screen reader available; screen-reader testing NOT_RUN.** MB-029 is BLOCKED, not DONE; MB-030 not started.
+- MB-029: browser evidence at `6a84b26`, all six checks PASS. **TC-047 BLOCKED (BLK-003): no screen reader available; screen-reader testing NOT_RUN.** MB-029 is BLOCKED, not DONE; MB-030 not started.
 - External-QA handoff and staging readiness: [docs/quality/04-external-qa-handoff.md](../quality/04-external-qa-handoff.md). Staging needs owner approval of O07 and its recurring costs.
-- GitHub CI on `6a84b26`: Product CI and Blueprint integrity success.
+- MB-037 DONE (`e512ac4`): races, deadline boundary, database outage and restart recovery; found and fixed requests hanging forever when the database stopped answering (now bounded timeouts and a retryable 503).
+- MB-039 IN_PROGRESS: account erasure after a grace period (proposed default pending O06), request-ID tracing and redacted logs (TC-056), operational gauges, backup/restore scripts with reconciliation rehearsed locally (TC-057; staging needs O07). See [docs/operations/04-privacy-and-recovery.md](../operations/04-privacy-and-recovery.md).
+- MB-031 DONE (`fd689aa`): native Android and iOS sign-in round trips in CI. Found and fixed a defect: after sign-out or on account switch, the previous person was silently signed back in by the provider's browser session.
+- GitHub CI: Product CI success on `d59cd26` (includes MB-039 backend); native builds success on `fd689aa` (run 19). Earlier native failures (runs 9, 11–13, 15–18) were harness problems fixed one by one; they stay visible in the Actions history.
 
 ## Owner decisions 2026-10-12
 
@@ -104,4 +111,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-Continue MB-029: keyboard-only journeys and dialog focus restoration, operations web at 360/390/768/1440 px and in English, long values in tables, then evidence for TC-046/TC-047/TC-129. Owner decisions needed: structured portion size and descriptions in discovery cards. The P06 gate also needs O05 whole-product approval; the selected homepage direction does not by itself close O05.
+MB-032: native discovery and ordering on the generated client (list, details, cart, address, checkout, orders, account, review, support), same totals and errors as web, uncertain-order recovery after app kill. Owner decisions still needed: O05 (whole-product visual approval, screenshots in docs/design/review), BLK-003 (screen-reader testing), O06 (retention policy), O07 (staging hosting and budget).
