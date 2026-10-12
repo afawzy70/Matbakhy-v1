@@ -75,6 +75,8 @@ jobs:
         run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/auth-roundtrip-android.sh
       - name: MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)
         run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/order-roundtrip-android.sh
+      - name: Independent Android basket background process and Arabic checks
+        run: bash iqa-controls/qa/independent-cross-role-4eaee3a/native/android-extra.sh
       - name: Independent native outcome and reservation correlation
         if: always()
         env:
@@ -151,10 +153,21 @@ jobs:
         run: scripts/launch-ios.sh "$(find ios/build-release/Build/Products -maxdepth 2 -name '*.app' | head -1)"
       - name: Start identity provider and API natively for the sign-in round trip (no Docker on macOS runners; synthetic users)
         run: apps/customer-mobile/scripts/native-stack-macos.sh
+      - name: Independent iOS simulator readiness and test controls
+        run: |
+          cp iqa-controls/qa/independent-cross-role-4eaee3a/native/IndependentQATests.swift apps/customer-mobile/e2e-ios/UITests/
+          UDID=$(xcrun simctl list devices booted -j | python3 -c 'import json,sys; print(next(x["udid"] for xs in json.load(sys.stdin)["devices"].values() for x in xs if x["name"].startswith("iPhone")))')
+          xcrun simctl shutdown "$UDID"
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl launch "$UDID" com.matbakhy.customer.dev
+          xcrun simctl terminate "$UDID" com.matbakhy.customer.dev
       - name: MB-031 native sign-in round trip on iOS (XCUITest; system browser, PKCE, secure storage, sign-out, account switch)
         run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
       - name: MB-032 native ordering on iOS (basket replacement, app terminated during submit, offline reopen, recovery without duplicate)
-        run: apps/customer-mobile/scripts/order-roundtrip-ios.sh
+        run: |
+          python3 iqa-controls/qa/independent-cross-role-4eaee3a/native/ios-order-extra.py
+          bash iqa-order-ios.sh
 
       - name: Independent native outcome and reservation correlation
         if: always()
