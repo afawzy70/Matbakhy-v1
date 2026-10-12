@@ -15,6 +15,8 @@ OUT="${QA_EVIDENCE_DIR:-$HERE/evidence/$(date -u +%Y%m%dT%H%M%SZ)}"
 CHROME="${KANE_CLI_CHROME_PATH:-$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)}"
 export KANE_CLI_CHROME_PATH="$CHROME"
 : "${LT_USERNAME:?LT_USERNAME missing}" "${LT_ACCESS_KEY:?LT_ACCESS_KEY missing}"
+# Stray whitespace from pasting into environment settings is not part of either value.
+LT_USERNAME="$(printf %s "$LT_USERNAME" | tr -d '[:space:]')"; LT_ACCESS_KEY="$(printf %s "$LT_ACCESS_KEY" | tr -d '[:space:]')"
 mkdir -p "$OUT"
 
 mask() { sed -e "s/${LT_ACCESS_KEY}/***ACCESS_KEY***/g" -e "s/${LT_USERNAME}/***USERNAME***/g"; }

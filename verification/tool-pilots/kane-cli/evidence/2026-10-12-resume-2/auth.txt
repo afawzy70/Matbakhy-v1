@@ -1,0 +1,14 @@
+# 2026-10-12T09:27:36Z kane-cli 0.8.22
+$ kane-cli login --username *** --access-key *** (leading whitespace removed from key)
+Skill update available: not installed → 0.1.2 — run `kane-cli install skill`
+
+Credentials not valid. Please use valid credentials.
+exit=1
+$ kane-cli balance
+Not authenticated [prod]. Run "kane-cli login" first.
+exit=2
+$ GET api.lambdatest.com/automation/api/v1/builds?limit=1 (trimmed pair)
+401
+$ httpbin basic-auth control (dummy a:b / a:c)
+200
+401
