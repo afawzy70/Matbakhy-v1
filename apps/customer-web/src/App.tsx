@@ -26,6 +26,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
   const [meVersion, setMeVersion] = useState(0);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
   const api = useMemo(() => createApi(fetchImpl), [fetchImpl]);
+
   const t = strings[locale];
 
   useEffect(() => {
@@ -84,7 +85,12 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
           <a className="button secondary" href="#/checkout" aria-current={route === "/checkout" ? "page" : undefined}>
             {t.nav.cart}
           </a>
-          <button type="button" className="secondary" onClick={() => setLocale(locale === "ar" ? "en" : "ar")}>
+          <button type="button" className="secondary" onClick={() => {
+              const next: Locale = locale === "ar" ? "en" : "ar";
+              // Requests switch language in the same event as the state, before any child loads for the new language.
+              api.setLanguage(next);
+              setLocale(next);
+            }}>
             {t.language}
           </button>
           {me ? null : (

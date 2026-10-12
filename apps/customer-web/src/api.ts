@@ -13,14 +13,17 @@ function cookie(name: string): string | undefined {
 }
 
 /**
- * Typed client for the cook workspace: credentials are the HttpOnly session cookie; mutations echo the CSRF cookie
- * and send the UI language (the document language set by the app). The server owns state, prices, deadlines and permissions; the UI only renders them.
+ * Typed client for the customer web: credentials are the HttpOnly session cookie; mutations echo the CSRF cookie.
+ * Every request carries the language the customer chose, set through {@code setLanguage} in the same event that changes
+ * it. It must not come from the document: the document language is updated in an effect, after children have already
+ * sent their requests for the new language (MBQA-001). The server owns state, prices, deadlines and permissions; the UI only renders them.
  */
 export function createApi(fetchImpl?: typeof fetch) {
+  let language = "ar";
   const client = createApiClient({ baseUrl: API_BASE, credentials: "include", ...(fetchImpl ? { fetch: fetchImpl } : {}) });
   client.use({
     onRequest({ request }) {
-      request.headers.set("Accept-Language", document.documentElement.lang || "ar");
+      request.headers.set("Accept-Language", language);
       if (request.method !== "GET") {
         const token = cookie("XSRF-TOKEN");
         if (token) {
@@ -30,7 +33,11 @@ export function createApi(fetchImpl?: typeof fetch) {
       return request;
     },
   });
-  return client;
+  return Object.assign(client, {
+    setLanguage(next: string) {
+      language = next;
+    },
+  });
 }
 
 export type Api = ReturnType<typeof createApi>;

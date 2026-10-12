@@ -26,6 +26,9 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
     <Status ctx={ctx} state={meal} onRetry={reload}>
       {(m) => {
         const slot = m.nextSlots.find((s) => s.id === slotId) ?? null;
+        // CW03 / BR-013: the selected slot itself must have the portions; the meal being AVAILABLE through another slot is not enough.
+        const slotExhausted = slot !== null && slot.availablePortions < 1;
+        const purchasable = slot !== null && m.availability === "AVAILABLE" && !slotExhausted && quantity <= slot.availablePortions;
         return (
           <article className="meal-detail stack" aria-labelledby="meal-title">
             <a href="#/">{t.back}</a>
@@ -98,9 +101,9 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
             <button
               ref={addButton}
               type="button"
-              disabled={!slot || m.availability !== "AVAILABLE"}
+              disabled={!purchasable}
               onClick={() => {
-                if (!slot) {
+                if (!slot || !purchasable) {
                   return;
                 }
                 const cart = loadCart();
@@ -126,6 +129,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
               {t.addToCart} · <bdi>{formatMoney(m.price.amountMinor * quantity, locale)}</bdi>
             </button>
             </div>
+            {slotExhausted ? <p className="notice">{t.slotSoldOut}</p> : null}
             <p className="muted small">{t.totalNote}</p>
             {replacement ? (
               <div

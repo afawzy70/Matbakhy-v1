@@ -470,3 +470,189 @@ describe("retrospective regression: basket rules", () => {
     expect(window.localStorage.getItem("matbakhy.cart")).toBeNull();
   });
 });
+
+/**
+ * Repairs for the independent Codex QA findings on eb1a671 (qa/independent-eb1a671/report.md). Each test reproduces
+ * the reported behaviour and was run against the unchanged product code before the fix.
+ */
+describe("QA repair MBQA-002: an exhausted selected slot cannot be added", () => {
+  const id = "a1a1a1a1-0000-4000-8000-000000000001";
+  const mixed = {
+    id,
+    title: "QA Meal A1",
+    kitchen: { id: "kA", slug: "kitchen-a", name: "Kitchen A" },
+    portionText: "1 plate",
+    price: egp(12025),
+    description: "",
+    ingredients: "",
+    allergenCodes: ["NONE_DECLARED"],
+    allergenStatement: null,
+    photo: null,
+    // The meal as a whole is AVAILABLE because S2 has stock; S1 is exhausted (the QA fixture).
+    nextSlots: [
+      { id: "S1", startsAt: "2026-10-13T10:00:00Z", availablePortions: 0, fulfillmentModes: ["PICKUP"] },
+      { id: "S2", startsAt: "2026-10-13T13:00:00Z", availablePortions: 3, fulfillmentModes: ["PICKUP"] },
+    ],
+    availability: "AVAILABLE",
+  };
+  const reviews = { status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } };
+
+  it("refuses the exhausted slot without writing the basket, and adds the slot that has stock up to its portions", async () => {
+    const { fetchImpl } = server({
+      [`GET /api/v1/meals/${id}`]: () => ({ status: 200, body: mixed }),
+      "GET /api/v1/kitchens/kA/reviews": () => reviews,
+    });
+    window.location.hash = `#/meal/${id}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const [s1, s2] = (await screen.findAllByRole("radio")) as HTMLInputElement[];
+    expect(screen.getByText(/0 left/)).toBeTruthy();
+    fireEvent.click(s1 as HTMLInputElement);
+    const add = () => screen.getByRole("button", { name: /^Add to cart/ }) as HTMLButtonElement;
+    expect(add().disabled).toBe(true);
+    fireEvent.click(add());
+    expect(screen.queryByText("Added to cart.")).toBeNull();
+    expect(window.localStorage.getItem("matbakhy.cart")).toBeNull();
+
+    fireEvent.click(s2 as HTMLInputElement);
+    const plus = screen.getByRole("button", { name: "Increase quantity" }) as HTMLButtonElement;
+    for (let i = 0; i < 5; i++) {
+      fireEvent.click(plus);
+    }
+    expect((screen.getByRole("spinbutton", { name: "Quantity" }) as HTMLInputElement).value).toBe("3");
+    expect(plus.disabled).toBe(true);
+    expect(add().disabled).toBe(false);
+    fireEvent.click(add());
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    const cart = JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}");
+    expect(cart.slotId).toBe("S2");
+    expect(cart.lines.map((l: { mealId: string; quantity: number }) => [l.mealId, l.quantity])).toEqual([[id, 3]]);
+
+    // Switching back to the exhausted slot after choosing a quantity still cannot write the basket.
+    fireEvent.click(s1 as HTMLInputElement);
+    expect(add().disabled).toBe(true);
+    fireEvent.click(add());
+    expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").slotId).toBe("S2");
+  });
+
+  it("keeps an entirely sold-out meal unpurchasable", async () => {
+    const { fetchImpl } = server({
+      [`GET /api/v1/meals/${id}`]: () => ({
+        status: 200,
+        body: { ...mixed, availability: "SOLD_OUT", nextSlots: mixed.nextSlots.map((s) => ({ ...s, availablePortions: 0 })) },
+      }),
+      "GET /api/v1/kitchens/kA/reviews": () => reviews,
+    });
+    window.location.hash = `#/meal/${id}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    for (const radio of (await screen.findAllByRole("radio")) as HTMLInputElement[]) {
+      fireEvent.click(radio);
+      const add = screen.getByRole("button", { name: /^Add to cart/ }) as HTMLButtonElement;
+      expect(add.disabled).toBe(true);
+      fireEvent.click(add);
+    }
+    expect(window.localStorage.getItem("matbakhy.cart")).toBeNull();
+  });
+});
+
+describe("QA repair MBQA-001: catalogue requests use the language the customer just chose", () => {
+  // A fresh page starts as index.html declares it (Arabic); earlier tests in this file leave the document in English.
+  beforeEach(() => {
+    document.documentElement.lang = "ar";
+    document.documentElement.dir = "rtl";
+  });
+  const mealId = "b1b1b1b1-0000-4000-8000-000000000001";
+  // Bilingual fixture: the fake API answers in the language of the request, like the real API.
+  const t = (req: Request, ar: string, en: string) => (req.headers.get("Accept-Language") === "en" ? en : ar);
+  const card = (req: Request) => ({
+    id: mealId,
+    title: t(req, "كشري", "Koshari"),
+    description: t(req, "عدس وأرز", "Lentils and rice"),
+    kitchen: { id: "kB", slug: "kitchen-b", name: t(req, "مطبخ منى", "Mona's kitchen"), ratingSummary: { count: 0, averageTenths: null } },
+    photo: null,
+    portionText: t(req, "طبق واحد", "One plate"),
+    price: egp(9550),
+    nextSlots: [],
+    availability: "AVAILABLE",
+  });
+  const routes = {
+    "GET /api/v1/zones": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    "GET /api/v1/meals": (req: Request) => ({ status: 200, body: { items: [card(req)], nextCursor: null, hasMore: false } }),
+    [`GET /api/v1/meals/${mealId}`]: (req: Request) => ({
+      status: 200,
+      body: { ...card(req), kitchen: { id: "kB", slug: "kitchen-b", name: t(req, "مطبخ منى", "Mona's kitchen") }, ingredients: "", allergenCodes: ["NONE_DECLARED"], allergenStatement: null },
+    }),
+    "GET /api/v1/kitchens/kB/reviews": () => ({ status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } }),
+    "GET /api/v1/kitchens/kitchen-b": (req: Request) => ({
+      status: 200,
+      body: { kitchenId: "kB", slug: "kitchen-b", displayName: t(req, "مطبخ منى", "Mona's kitchen"), description: t(req, "أكل بيتي", "Home food"), verificationLabel: "OPERATIONALLY_VERIFIED", available: true, pickupEnabled: true, deliveryZoneIds: [] },
+    }),
+  };
+  const lastLanguage = (calls: { path: string; headers: Headers }[], prefix: string) => calls.filter((c) => c.path.startsWith(prefix)).at(-1)?.headers.get("Accept-Language");
+
+  it("browse: switching Arabic → English → Arabic requests and shows each language", async () => {
+    const { fetchImpl, calls } = server(routes);
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("article", { name: "كشري" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const en = await screen.findByRole("article", { name: "Koshari" });
+    expect(within(en).getByText("Lentils and rice")).toBeTruthy();
+    expect(within(en).getByText("One plate")).toBeTruthy();
+    expect(lastLanguage(calls, "/api/v1/meals")).toBe("en");
+    fireEvent.click(screen.getByRole("button", { name: "العربية" }));
+    const ar = await screen.findByRole("article", { name: "كشري" });
+    expect(within(ar).getByText("عدس وأرز")).toBeTruthy();
+    expect(screen.queryByRole("article", { name: "Koshari" })).toBeNull();
+    expect(lastLanguage(calls, "/api/v1/meals")).toBe("ar");
+  });
+
+  it("meal detail and kitchen page follow both switch directions", async () => {
+    const { fetchImpl, calls } = server(routes);
+    window.location.hash = `#/meal/${mealId}`;
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("heading", { name: "كشري" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByRole("heading", { name: "Koshari" })).toBeTruthy();
+    expect(screen.getByText("Lentils and rice")).toBeTruthy();
+    expect(lastLanguage(calls, `/api/v1/meals/${mealId}`)).toBe("en");
+    fireEvent.click(screen.getByRole("button", { name: "العربية" }));
+    expect(await screen.findByRole("heading", { name: "كشري" })).toBeTruthy();
+    expect(lastLanguage(calls, `/api/v1/meals/${mealId}`)).toBe("ar");
+    cleanup();
+
+    window.location.hash = "#/kitchen/kitchen-b";
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("heading", { name: "مطبخ منى" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByRole("heading", { name: "Mona's kitchen" })).toBeTruthy();
+    expect(screen.getByText("Home food")).toBeTruthy();
+    expect(await screen.findByRole("article", { name: "Koshari" })).toBeTruthy();
+    expect(lastLanguage(calls, "/api/v1/kitchens/kitchen-b")).toBe("en");
+    fireEvent.click(screen.getByRole("button", { name: "العربية" }));
+    expect(await screen.findByRole("heading", { name: "مطبخ منى" })).toBeTruthy();
+    expect(await screen.findByRole("article", { name: "كشري" })).toBeTruthy();
+  });
+
+  it("a slow answer for a language the customer already left is never shown", async () => {
+    const held: (() => void)[] = [];
+    const base = server(routes);
+    // English answers are held until released; Arabic answers return at once.
+    const fetchImpl = (async (input: Request) => {
+      if (input.headers.get("Accept-Language") === "en") {
+        await new Promise<void>((resolve) => held.push(resolve));
+      }
+      return base.fetchImpl(input);
+    }) as unknown as typeof fetch;
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("article", { name: "كشري" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(screen.getByRole("button", { name: "العربية" }));
+    expect(await screen.findByRole("article", { name: "كشري" })).toBeTruthy();
+    held.forEach((release) => release());
+    await new Promise((r) => setTimeout(r, 20));
+    expect(screen.queryByRole("article", { name: "Koshari" })).toBeNull();
+    expect(screen.getByRole("article", { name: "كشري" })).toBeTruthy();
+    expect(document.documentElement.lang).toBe("ar");
+  });
+});

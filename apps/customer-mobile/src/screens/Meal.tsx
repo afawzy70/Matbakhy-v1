@@ -59,6 +59,9 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
       <StatusView t={t} locale={locale} state={meal} onRetry={reload}>
         {(m) => {
           const slot = m.nextSlots.find((s) => s.id === slotId) ?? null;
+          // CW03 / BR-013: the selected slot itself must have the portions; the meal being AVAILABLE through another slot is not enough.
+          const slotExhausted = slot !== null && slot.availablePortions < 1;
+          const purchasable = slot !== null && m.availability === "AVAILABLE" && !slotExhausted && quantity <= slot.availablePortions;
           return (
             <View style={{ gap: 12 }}>
               <Title locale={locale}>{m.title}</Title>
@@ -112,9 +115,9 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
               <Button
                 testID="add-to-cart"
                 label={`${t.addToCart} · ${formatMoney(m.price.amountMinor * quantity, locale)}`}
-                disabled={!slot || m.availability !== "AVAILABLE"}
+                disabled={!purchasable}
                 onPress={() => {
-                  if (slot) {
+                  if (slot && purchasable) {
                     void add(
                       { kitchenId: m.kitchen.id, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes },
                       { mealId: m.id, title: m.title, quantity },
@@ -122,6 +125,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                   }
                 }}
               />
+              {slotExhausted ? <Notice locale={locale}>{t.slotSoldOut}</Notice> : null}
               <Body locale={locale} muted>
                 {t.totalNote}
               </Body>

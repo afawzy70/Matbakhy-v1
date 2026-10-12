@@ -209,3 +209,36 @@ describe("native discovery and ordering (MB-032)", () => {
     expect(mockStore.has("matbakhy.basket.v1")).toBe(false);
   });
 });
+
+/** Repair for the independent QA finding MBQA-002 (web) applied to the same rule on native; run red before the fix. */
+describe("QA repair MBQA-002 on native: an exhausted selected slot cannot be added", () => {
+  const mixed = {
+    ...meal("mx", "k1"),
+    nextSlots: [
+      { ...slot("sx-empty"), availablePortions: 0 },
+      { ...slot("sx-stock"), startsAt: "2026-10-13T13:00:00Z", availablePortions: 3 },
+    ],
+  };
+  const routes = { "GET /api/v1/meals": () => json(200, { items: [mixed], nextCursor: null, hasMore: false }), "GET /api/v1/meals/mx": () => json(200, mixed) };
+
+  it("refuses the exhausted slot without writing the basket and adds the slot that has stock up to its portions", async () => {
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api(routes)} />);
+    await fireEvent.press(await screen.findByTestId("meal-mx"));
+    await fireEvent.press(await screen.findByTestId("slot-0", {}, { timeout: 5000 }));
+    await fireEvent.press(screen.getByTestId("add-to-cart"));
+    await act(async () => undefined);
+    expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
+    expect(screen.queryByText(t.added)).toBeNull();
+    expect(screen.getByText(t.slotSoldOut)).toBeTruthy();
+
+    await fireEvent.press(screen.getByTestId("slot-1"));
+    for (let i = 0; i < 5; i++) {
+      await fireEvent.press(screen.getByLabelText(t.increase));
+    }
+    await fireEvent.press(screen.getByTestId("add-to-cart"));
+    expect(await screen.findByText(t.added)).toBeTruthy();
+    const basket = JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}");
+    expect(basket.slotId).toBe("sx-stock");
+    expect(basket.lines).toEqual([{ mealId: "mx", title: "Dish mx", quantity: 3 }]);
+  });
+});
