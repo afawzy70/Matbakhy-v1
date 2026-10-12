@@ -20,6 +20,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 | Configuration | policy, zones, feature flags | `config.change` | staff / config key | reason required; approval reference for a real policy | ConfigurationIntegrationTest |
 | Finance | refunds; settlements; cash verification; own report refused | `refund.*`, `settlement.*`, `cash.verify` | staff / refund, batch, report | reason or evidence depending on action | FinanceOperationsIntegrationTest, CashAndLedgerIntegrationTest |
 | Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest |
+| Orders (protected data) | staff view disclosing customer contact | `access.order_contact` | staff / order | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support | staff message, case update | `case.message`, `case.update` | staff / case | reason for some transitions | SupportIntegrationTest |
 | Privacy | account erasure (job); legal hold | `account.erasure` | system / account | counts only, no personal data | AccountErasureIntegrationTest |
 
@@ -27,7 +28,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 
 Not every read should be audited. These are the ones that expose protected data or change sensitive state:
 
-1. **Staff view of an order with customer contact** (`GET /api/v1/ops/orders/{id}` returns name, phone and address): not audited. Proposal: an `access.order_contact` row per staff view, in the same style as `access.media`.
+1. **Staff view of an order with customer contact** (`GET /api/v1/ops/orders/{id}` returns name, phone and address): **closed in this session.** Each view that discloses contact now writes `access.order_contact` (actor, order, request ID; no contact data). Test first: `RED-staff-order-contact-audit.log`; assertion in SupportIntegrationTest.
 2. **Audit log reads** (`GET /api/v1/ops/audit`): not audited. Proposal: `audit.read` with the filter used.
 3. **Staff case view** (`GET /api/v1/ops/cases/{id}`): not audited. Proposal: as item 1.
 4. **Account deletion request** (customer self-service): only the later erasure job is audited, with no actor. Proposal: record the request with the customer as actor.

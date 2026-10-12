@@ -1,5 +1,8 @@
 package com.matbakhy.orders.internal;
 
+import com.matbakhy.operations.api.AuditLog;
+import com.matbakhy.operations.api.AuditLog.Entry;
+import com.matbakhy.operations.api.AuditLog.Outcome;
 import com.matbakhy.orders.api.OrderCases;
 import com.matbakhy.orders.internal.OrderService.Money;
 import com.matbakhy.orders.internal.OrderService.OrderView;
@@ -54,8 +57,10 @@ public class OpsOrderService {
     private final OrderCases cases;
     private final JsonMapper json;
     private final Clock clock;
+    private final AuditLog audit;
 
-    OpsOrderService(JdbcTemplate jdbc, OrderService orders, OrderCases cases, JsonMapper json, Clock clock) {
+    OpsOrderService(JdbcTemplate jdbc, OrderService orders, OrderCases cases, JsonMapper json, Clock clock, AuditLog audit) {
+        this.audit = audit;
         this.jdbc = jdbc;
         this.orders = orders;
         this.cases = cases;
@@ -111,7 +116,8 @@ public class OpsOrderService {
         return new OpsOrderPage(page, next, more);
     }
 
-    public OpsOrderView view(UUID orderId) {
+    /** A view that discloses the customer's contact (name, phone, address) is audited; the row holds no contact data (MB-039). */
+    public OpsOrderView view(UUID orderId, UUID staffId, String requestId) {
         OrderView order = orders.staffView(orderId);
         Map<String, Object> o = jdbc.queryForMap("""
                 SELECT o.kitchen_id, o.customer_id, o.accept_by, o.contact_snapshot::text AS contact, o.address_snapshot::text AS address,
@@ -120,6 +126,8 @@ public class OpsOrderService {
         if (OrderService.CONTACT_STATES.contains(order.state()) || "PENDING_ACCEPTANCE".equals(order.state())) {
             JsonNode c = json.readTree((String) o.get("contact"));
             contact = new Contact(text(c, "displayName"), text(c, "phoneE164"), o.get("address") == null ? null : json.readTree((String) o.get("address")));
+            audit.record(new Entry(staffId, "access.order_contact", "order.ops", "order", orderId.toString(), Outcome.ALLOWED,
+                    "staff view of customer contact", requestId, Map.of()));
         }
         UUID[] withCases = cases.ordersWithOpenCases().toArray(UUID[]::new);
         OpsOrderSummary s = summary(orderId, order.publicNumber(), order.state(), order.fulfillmentMode(), (UUID) o.get("kitchen_id"),

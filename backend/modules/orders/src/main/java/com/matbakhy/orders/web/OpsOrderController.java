@@ -50,8 +50,8 @@ class OpsOrderController {
 
     @GetMapping("/api/v1/ops/orders/{orderId}")
     @PreAuthorize("hasAuthority('PERM_order.ops')")
-    OpsOrderView view(@PathVariable UUID orderId) {
-        return queue.view(orderId);
+    OpsOrderView view(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID orderId, HttpServletRequest request) {
+        return queue.view(orderId, actor.id(), requestId(request));
     }
 
     record ExceptionCancelBody(@NotNull Long expectedVersion, @NotBlank @Size(max = 40) String reasonCode, @NotBlank @Size(max = 100) String caseId,

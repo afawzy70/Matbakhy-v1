@@ -255,6 +255,9 @@ class SupportIntegrationTest {
         assertThat(opsView.get("exceptions").toString()).contains("OPEN_CASE");
         assertThat(opsView.get("caseIds").toString()).contains(caseId);
         assertThat(opsView.get("customerContact").get("phone").asString()).startsWith("+20");
+        // MB-039: a staff view that discloses customer contact leaves one audit row (no contact data in it).
+        assertThat(jdbc.queryForList("SELECT action || '|' || outcome || '|' || coalesce(details::text, '') FROM audit_event WHERE object_type = 'order' AND object_id = ?",
+                String.class, order.toString())).containsExactly("access.order_contact|ALLOWED|{}");
         assertThat(opsView.get("order").get("handoverCode").isNull()).isTrue();
         assertThat(call(get("/api/v1/ops/orders"), agentSubject).getStatus()).isEqualTo(403);
         assertThat(call(get("/api/v1/ops/orders").param("exception", "WHATEVER"), opsSubject).getStatus()).isEqualTo(422);
