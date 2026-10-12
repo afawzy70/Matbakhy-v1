@@ -23,7 +23,7 @@ phase() {
   set +e
   xcodebuild test-without-building -project MB031NativeChecks.xcodeproj -scheme SignInUITests -destination "id=$UDID" \
     -only-testing:"SignInUITests/OrderingTests/$name" -resultBundlePath "$RUNNER_TEMP/mb032-$name.xcresult" 2>&1 \
-    | tee "$RUNNER_TEMP/mb032-$name.log" | grep -E "Test Case|error:|MB032-" 
+    | tee "$RUNNER_TEMP/mb032-$name.log" | grep -E "Test Case|error:|MB03[23]-" 
   status=${PIPESTATUS[0]}
   set -e
   if [ "$status" -ne 0 ]; then
@@ -46,6 +46,8 @@ customer_orders() { psql_q -c "SELECT count(*) FROM customer_order o JOIN app_us
 echo "== seed synthetic kitchens and meals"
 psql_q < "$HERE/e2e-native/seed.sql" >/dev/null
 psql_q -c "UPDATE app_user SET phone_e164 = '+201005550002', phone_verified_at = now() WHERE display_name LIKE '%SyntheticA%'" >/dev/null
+# One saved delivery address in the synthetic "Test zone A" for the MB-033 delivery checkout (phase E).
+psql_q -v phone=+201005550002 < "$HERE/e2e-native/delivery-address.sql" >/dev/null
 
 echo "== the API moves to 8090; port 8080 becomes a proxy that holds responses back for 8 seconds"
 export JAVA_HOME="${JAVA_HOME_21_arm64:-${JAVA_HOME_21_X64:?}}"; export PATH="$JAVA_HOME/bin:$PATH"
@@ -88,4 +90,32 @@ DB=$(psql_q -c "SELECT total_minor FROM customer_order WHERE public_number = '$N
 echo "order $NUMBER; stored total_minor $DB; app shows: ${SHOWN:-<not captured>}"
 [ "$DB" = "9000" ] || { echo "FAIL: unexpected stored total $DB"; exit 1; }
 echo "$SHOWN" | grep -qE 'EGP.90\.00' || { echo "FAIL: app total differs from the stored total"; exit 1; }
-echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total"
+
+echo "== phase D (MB-033 Q1): the quantity control stops at min(policy limit 10, 15 available portions)"
+phase testD_QuantityStopsAtThePolicyLimit
+quotes() { psql_q -c "SELECT count(*) FROM quote q JOIN app_user u ON u.id = q.customer_id WHERE u.phone_e164 = '+201005550002'"; }
+QUOTES_BEFORE=$(quotes)
+
+echo "== phase E (MB-033 Q1 + delivery): the limit drops to 5; the saved basket must be corrected before a delivery order"
+# Test-only change of the synthetic CI policy row; the server reads the active policy on every request.
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 5 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+trap 'kill $PROXY $API 2>/dev/null || true; psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = '"'"'ACTIVE'"'"' AND synthetic" >/dev/null || true' EXIT
+phase testE_LoweredLimitBlocksQuoteThenDeliveryOrder
+LOG_E="$RUNNER_TEMP/mb032-testE_LoweredLimitBlocksQuoteThenDeliveryOrder.log"
+DNUMBER=$(grep -o 'MB033-DELIVERY-ORDER-NUMBER [^ ]*' "$LOG_E" | head -1 | cut -d' ' -f2)
+DSHOWN=$(grep -o 'MB033-DELIVERY-QUOTE-TOTAL .*' "$LOG_E" | head -1)
+DFEE=$(grep -o 'MB033-DELIVERY-FEE .*' "$LOG_E" | head -1)
+# Exactly one quote was created in phase E: the one after the correction (none while the line was over the limit).
+QUOTES_AFTER=$(quotes)
+echo "quotes for the customer: $QUOTES_BEFORE before phase E, $QUOTES_AFTER after"
+[ "$QUOTES_AFTER" = "$((QUOTES_BEFORE + 1))" ] || { echo "FAIL: expected exactly one new quote (after the correction), found $((QUOTES_AFTER - QUOTES_BEFORE))"; exit 1; }
+DROW=$(psql_q -c "SELECT o.fulfillment_mode || '|' || o.delivery_fee_minor || '|' || o.total_minor || '|' || (o.address_snapshot IS NOT NULL) || '|' || o.kitchen_id || '|' || o.state FROM customer_order o WHERE o.public_number = '$DNUMBER'")
+echo "delivery order $DNUMBER (mode|fee|total|address snapshot|kitchen|state): $DROW; app showed: $DSHOWN; $DFEE"
+case "$DROW" in
+  "DELIVERY|3000|63000|true|00000000-0000-4000-8000-00000000a0d1|"*) ;;
+  *) echo "FAIL: delivery order not persisted as expected: $DROW"; exit 1 ;;
+esac
+echo "$DSHOWN" | grep -qE 'EGP.630\.00' || { echo "FAIL: app delivery total differs from the stored total 63000"; exit 1; }
+echo "$DFEE" | grep -qE 'EGP.30\.00' || { echo "FAIL: app delivery fee differs from the zone fee 3000"; exit 1; }
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total"

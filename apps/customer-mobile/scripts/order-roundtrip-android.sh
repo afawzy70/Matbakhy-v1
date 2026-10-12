@@ -93,6 +93,8 @@ echo "== seed synthetic kitchens and meals"
 psql_q < "$HERE/e2e-native/seed.sql" >/dev/null
 CUSTOMER="customer-a"
 psql_q -c "UPDATE app_user SET phone_e164 = '+201005550001', phone_verified_at = now() WHERE display_name LIKE '%SyntheticA%'" >/dev/null
+# One saved delivery address in the synthetic "Test zone A" for the MB-033 delivery checkout below.
+psql_q -v phone=+201005550001 < "$HERE/e2e-native/delivery-address.sql" >/dev/null
 
 echo "== TC-148: basket replacement asks first"
 launch
@@ -205,5 +207,62 @@ for shown in "$SHOWN_QUOTE" "$SHOWN_TOTAL"; do
   echo "$shown" | grep -qE 'EGP.90\.00' || fail "app total ($shown) differs from the server's stored total 9000"
 done
 [ -n "$SHOWN_QUOTE$SHOWN_TOTAL" ] || fail "no total visible"
+echo "== MB-033 Q1: the quantity control stops at min(policy limit, availability)"
+# Native Dish One's slot has 15 portions; the synthetic policy allows 10 per line (fixture value, not an owner decision: O04).
+launch
+tap 'content-desc="Native Dish One[^"]*"' 90
+tap 'resource-id="slot-0"'
+pos=$(wait_for 'content-desc="Increase"' 30) || fail "no increase control"
+for _ in $(seq 14); do adb shell input tap $pos; sleep 0.4; done
+wait_for 'text="10"' 20 >/dev/null || fail "quantity did not stop at the policy limit of 10"
+dump; grep -qE 'content-desc="Increase"[^>]*enabled="false"' "$UI" || fail "increase still enabled at the limit"
+shot quantity-at-limit
+tap_scrolled 'resource-id="add-to-cart"'
+wait_for 'text="Added to cart."' 30 >/dev/null || fail "ten portions not added"
+echo "ok: the control stopped at 10 of 15 available portions and is disabled there"
+
+echo "== MB-033 Q1: a lowered limit makes the saved basket invalid and blocks the quote"
+QUOTES_BEFORE=$(psql_q -c "SELECT count(*) FROM quote q JOIN app_user u ON u.id = q.customer_id WHERE u.phone_e164 = '+201005550001'")
+# Test-only change of the synthetic CI policy row; the server reads the active policy on every request.
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 5 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+trap 'kill $PROXY 2>/dev/null || true; psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = '"'"'ACTIVE'"'"' AND synthetic" >/dev/null || true' EXIT
+launch
+tap 'resource-id="open-cart"' 90
+wait_scrolled 'text="At most 5 per meal can be ordered now. Reduce the quantity to continue."' 60 || fail "over-limit basket line not flagged"
+wait_scrolled 'resource-id="get-quote"' 30 || fail "no quote button"
+grep -qE 'resource-id="get-quote"[^>]*enabled="false"|enabled="false"[^>]*resource-id="get-quote"' "$UI" || fail "quote still possible with an over-limit quantity"
+shot over-limit-blocked
+QUOTES_AFTER=$(psql_q -c "SELECT count(*) FROM quote q JOIN app_user u ON u.id = q.customer_id WHERE u.phone_e164 = '+201005550001'")
+[ "$QUOTES_BEFORE" = "$QUOTES_AFTER" ] || fail "a quote was created for an over-limit basket ($QUOTES_BEFORE -> $QUOTES_AFTER)"
+pos=$(wait_scrolled 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 && center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"') || fail "no decrease control on the basket line"
+for _ in $(seq 5); do adb shell input tap $pos; sleep 0.5; done
+wait_for 'text="5 × Native Dish One[^"]*"' 20 >/dev/null || fail "basket line not reduced to 5"
+absent 'text="At most 5 per meal[^"]*"'
+echo "ok: the saved basket was flagged, no quote was requested, and reducing to 5 cleared it"
+
+echo "== MB-033 delivery checkout: saved address, zone fee, total parity, persisted fulfilment"
+tap_scrolled 'resource-id="mode-DELIVERY"'
+wait_scrolled 'text="Home · Synthetic street 1"|content-desc="Home · Synthetic street 1[^"]*"' 30 || fail "saved delivery address not offered"
+tap_scrolled 'resource-id="get-quote"'
+wait_scrolled 'text="Total: [^"]*"' 60 || fail "no delivery quote"
+DELIVERY_QUOTE=$(grep -o 'text="Total: [^"]*"' "$UI" | head -1)
+grep -qE 'text="Delivery: EGP.30\.00"' "$UI" || fail "zone fee (Delivery: EGP 30.00) not shown with the quote"
+echo "$DELIVERY_QUOTE" | grep -qE 'EGP.630\.00' || fail "delivery quote $DELIVERY_QUOTE is not 5 x 120.00 + 30.00 fee"
+shot delivery-quote
+tap_scrolled 'resource-id="accept-terms"'
+tap_scrolled 'resource-id="place-order"'
+wait_for 'text="MB-[^"]*"' 60 >/dev/null || fail "delivery order not confirmed"
+DNUMBER=$(grep -o 'text="MB-[^"]*"' "$UI" | head -1 | sed 's/text="\(.*\)"/\1/')
+[ "$DNUMBER" != "$NUMBER" ] || fail "delivery order shows the earlier order number"
+shot delivery-order
+DROW=$(psql_q -c "SELECT o.fulfillment_mode || '|' || o.delivery_fee_minor || '|' || o.total_minor || '|' || (o.address_snapshot IS NOT NULL) || '|' || o.kitchen_id || '|' || o.state FROM customer_order o WHERE o.public_number = '$DNUMBER'")
+echo "delivery order $DNUMBER (mode|fee|total|address snapshot|kitchen|state): $DROW"
+case "$DROW" in
+  "DELIVERY|3000|63000|true|00000000-0000-4000-8000-00000000a0d1|"*) ;;
+  *) fail "delivery order not persisted as expected: $DROW" ;;
+esac
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+echo "ok: delivery order persisted with the zone fee, the address snapshot and the quoted total, in kitchen one's queue"
+
 if adb logcat -d | grep -E "FATAL EXCEPTION"; then fail "fatal exception"; fi
-echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total"
+echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total"

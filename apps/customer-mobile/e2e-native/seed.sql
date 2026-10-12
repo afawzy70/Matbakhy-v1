@@ -26,9 +26,12 @@ INSERT INTO meal_revision (meal_id, revision, snapshot, price_minor) VALUES
 
 WITH s AS (SELECT date_trunc('minute', now() + interval '1 day') AS starts)
 INSERT INTO cook_slot (id, kitchen_id, local_date, starts_at, ends_at, lead_minutes, cutoff_at, max_portions, state)
-SELECT v.id, v.kitchen, (s.starts AT TIME ZONE 'Africa/Cairo')::date, s.starts, s.starts + interval '1 hour', 120, s.starts - interval '2 hours', 10, 'OPEN'
-FROM s, (VALUES ('00000000-0000-4000-8000-00000000a051'::uuid, '00000000-0000-4000-8000-00000000a0d1'::uuid),
-                ('00000000-0000-4000-8000-00000000a052'::uuid, '00000000-0000-4000-8000-00000000a0d2'::uuid)) AS v(id, kitchen);
+SELECT v.id, v.kitchen, (s.starts AT TIME ZONE 'Africa/Cairo')::date, s.starts, s.starts + interval '1 hour', 120, s.starts - interval '2 hours', v.portions, 'OPEN'
+FROM s, (VALUES ('00000000-0000-4000-8000-00000000a051'::uuid, '00000000-0000-4000-8000-00000000a0d1'::uuid, 15),
+                ('00000000-0000-4000-8000-00000000a052'::uuid, '00000000-0000-4000-8000-00000000a0d2'::uuid, 10)) AS v(id, kitchen, portions);
+-- Kitchen one's slot has 15 portions, more than the synthetic policy's per-line limit (10), for the Q1 check; it also
+-- delivers to the synthetic "Test zone A" (db/devdata) for the native delivery checkout.
 INSERT INTO meal_slot (id, cook_slot_id, meal_id, capacity) VALUES
-  ('00000000-0000-4000-8000-00000000a061', '00000000-0000-4000-8000-00000000a051', '00000000-0000-4000-8000-00000000a0b1', 10),
+  ('00000000-0000-4000-8000-00000000a061', '00000000-0000-4000-8000-00000000a051', '00000000-0000-4000-8000-00000000a0b1', 15),
   ('00000000-0000-4000-8000-00000000a062', '00000000-0000-4000-8000-00000000a052', '00000000-0000-4000-8000-00000000a0b2', 10);
+INSERT INTO kitchen_zone (kitchen_id, zone_id) VALUES ('00000000-0000-4000-8000-00000000a0d1', '00000000-0000-4000-8000-00000000a001');

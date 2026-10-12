@@ -6,6 +6,10 @@ import XCTest
 ///          and terminate the app while the response is held back by a slow proxy (TC-049).
 ///   testB  (API unreachable) reopened, the cart says the order is unconfirmed and that the app is offline.
 ///   testC  (API back) reopening shows the one order with the server's total, by itself or after "Check and retry" (TC-049, TC-132).
+/// MB-033 follow-up (the script lowers the synthetic policy limit from 10 to 5 between D and E):
+///   testD  the quantity control stops at min(policy limit 10, 15 available portions) and the ten are added to the basket.
+///   testE  the saved basket is flagged and cannot be quoted; reducing to 5 restores the quote; a delivery order to the
+///          saved address shows the zone fee and the server's total.
 final class OrderingTests: XCTestCase {
     let app = XCUIApplication(bundleIdentifier: "com.matbakhy.customer.dev")
     let authUI = XCUIApplication(bundleIdentifier: "com.apple.SafariViewService")
@@ -155,5 +159,64 @@ final class OrderingTests: XCTestCase {
             print("MB032-ORDER-TOTAL \(total.label)")
         }
         shot("recovered-order")
+    }
+
+    func testD_QuantityStopsAtThePolicyLimit() {
+        app.launch()
+        let meal = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Native Dish One")).firstMatch
+        expect(meal, "Native Dish One not listed", timeout: 90)
+        meal.tap()
+        expect(element("slot-0"), "no slot")
+        element("slot-0").tap()
+        let increase = app.buttons["Increase"]
+        expect(increase, "no increase control")
+        for _ in 0..<14 where increase.isEnabled {
+            increase.tap()
+        }
+        expect(app.staticTexts["10"], "quantity did not stop at the policy limit of 10", timeout: 10)
+        XCTAssertFalse(increase.isEnabled, "increase still enabled at the limit")
+        print("MB033-QUANTITY-STOPPED-AT 10")
+        shot("quantity-at-limit")
+        tapScrolled("add-to-cart")
+        expect(text("Added to cart."), "ten portions not added")
+        app.terminate()
+    }
+
+    func testE_LoweredLimitBlocksQuoteThenDeliveryOrder() {
+        app.launch()
+        expect(element("open-cart"), "cart shortcut missing", timeout: 90)
+        element("open-cart").tap()
+        expect(text("At most 5 per meal can be ordered now"), "over-limit basket line not flagged")
+        let quote = element("get-quote")
+        expect(quote, "no quote button")
+        XCTAssertFalse(quote.isEnabled, "quote still possible with an over-limit quantity")
+        print("MB033-OVER-LIMIT-BLOCKED")
+        shot("over-limit-blocked")
+        let decrease = element("qty-dec-00000000-0000-4000-8000-00000000a0b1")
+        expect(decrease, "no decrease control on the basket line")
+        for _ in 0..<5 {
+            decrease.tap()
+        }
+        expect(text("5 × Native Dish One"), "basket line not reduced to 5", timeout: 10)
+        XCTAssertFalse(text("At most 5 per meal").exists, "over-limit notice still shown after the correction")
+
+        tapScrolled("mode-DELIVERY")
+        // The saved address is a choice (a button on iOS), preselected as the first address.
+        expect(app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "Home · Synthetic street 1")).firstMatch,
+               "saved delivery address not offered")
+        tapScrolled("get-quote")
+        let total = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Total: ")).firstMatch
+        expect(total, "no delivery quote")
+        print("MB033-DELIVERY-QUOTE-TOTAL \(total.label)")
+        let fee = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Delivery: ")).firstMatch
+        expect(fee, "zone fee not shown", timeout: 5)
+        print("MB033-DELIVERY-FEE \(fee.label)")
+        shot("delivery-quote")
+        tapScrolled("accept-terms")
+        tapScrolled("place-order")
+        let number = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "MB-")).firstMatch
+        expect(number, "delivery order not confirmed")
+        print("MB033-DELIVERY-ORDER-NUMBER \(number.label)")
+        shot("delivery-order")
     }
 }
