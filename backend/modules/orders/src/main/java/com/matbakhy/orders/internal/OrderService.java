@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,8 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Service
 public class OrderService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     public static final Set<String> ACTIVE = Set.of("PENDING_ACCEPTANCE", "ACCEPTED", "PREPARING", "READY", "OUT_FOR_DELIVERY");
 
@@ -190,12 +194,13 @@ public class OrderService {
                 INSERT INTO order_event (id, order_id, sequence, from_state, to_state, actor_type, actor_id, occurred_at)
                 VALUES (?, ?, 1, NULL, 'PENDING_ACCEPTANCE', 'CUSTOMER', ?, ?)""", UUID.randomUUID(), orderId, customerId, Timestamp.from(now));
         jdbc.update("""
-                INSERT INTO outbox_event (id, aggregate_type, aggregate_id, event_type, payload, available_at, created_at)
-                VALUES (?, 'order', ?, 'ORDER_PLACED', ?::jsonb, ?, ?)""",
+                INSERT INTO outbox_event (id, aggregate_type, aggregate_id, event_type, payload, available_at, created_at, request_id)
+                VALUES (?, 'order', ?, 'ORDER_PLACED', ?::jsonb, ?, ?, ?)""",
                 UUID.randomUUID(), orderId, json.writeValueAsString(Map.of("orderId", orderId.toString(), "kitchenId", q.kitchenId().toString())),
-                Timestamp.from(now), Timestamp.from(now));
+                Timestamp.from(now), Timestamp.from(now), org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY));
         jdbc.update("INSERT INTO cash_obligation (id, order_id, amount_minor, state, created_at) VALUES (?, ?, ?, 'DUE', ?)",
                 UUID.randomUUID(), orderId, q.totalMinor(), Timestamp.from(now));
+        log.info("order {} recorded in its placement transaction", orderId);
         return orderId;
     }
 

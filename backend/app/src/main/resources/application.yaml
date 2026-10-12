@@ -25,6 +25,11 @@ spring:
     timeout: ${WEB_SESSION_TIMEOUT:30m}
     jdbc:
       initialize-schema: never
+logging:
+  # Every line carries the request ID (MB-039, TC-056). Deployed environments switch the console to structured JSON
+  # with LOGGING_STRUCTURED_FORMAT_CONSOLE=ecs; the MDC request ID becomes a JSON field there.
+  pattern:
+    level: "%5p [%X{requestId:-}]"
 server:
   error:
     include-stacktrace: never

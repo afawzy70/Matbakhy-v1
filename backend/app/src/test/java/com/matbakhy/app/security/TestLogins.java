@@ -27,6 +27,11 @@ public class TestLogins {
         return mapper.map(ISSUER, subject, Map.of("email_verified", true, "name", name));
     }
 
+    /** A login whose provider claims also carry an email address. */
+    public AccountAuthentication loginWithEmail(String subject, String name, String email) {
+        return mapper.map(ISSUER, subject, Map.of("email_verified", true, "name", name, "email", email));
+    }
+
     /** Same identity, with provider-asserted recent MFA (acr=2, auth_time=now) as a step-up login would carry. */
     public AccountAuthentication loginWithMfa(String subject, String name) {
         return mapper.map(ISSUER, subject, Map.of("email_verified", true, "name", name, "acr", "2",

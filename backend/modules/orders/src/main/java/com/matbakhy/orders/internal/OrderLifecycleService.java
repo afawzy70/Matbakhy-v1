@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,8 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Service
 public class OrderLifecycleService {
+
+    private static final Logger log = LoggerFactory.getLogger(OrderLifecycleService.class);
 
     public static final Set<String> TERMINAL = Set.of("COMPLETED", "REJECTED", "EXPIRED", "CANCELLED", "DELIVERY_FAILED");
     static final Map<String, Set<String>> REASONS = Map.of(
@@ -354,10 +358,11 @@ public class OrderLifecycleService {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 UUID.randomUUID(), o.id(), seq, o.state(), to, actorType, actorId, reasonCode, Timestamp.from(now));
         jdbc.update("""
-                INSERT INTO outbox_event (id, aggregate_type, aggregate_id, event_type, payload, available_at, created_at)
-                VALUES (?, 'order', ?, ?, ?::jsonb, ?, ?)""",
+                INSERT INTO outbox_event (id, aggregate_type, aggregate_id, event_type, payload, available_at, created_at, request_id)
+                VALUES (?, 'order', ?, ?, ?::jsonb, ?, ?, ?)""",
                 UUID.randomUUID(), o.id(), "ORDER_" + to, json.writeValueAsString(Map.of("orderId", o.id().toString(), "state", to)),
-                Timestamp.from(now), Timestamp.from(now));
+                Timestamp.from(now), Timestamp.from(now), org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY));
+        log.info("order {} {} -> {} by {}", o.id(), o.state(), to, actorType);
     }
 
     private void issueChallenge(Order o) {

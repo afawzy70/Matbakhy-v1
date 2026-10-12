@@ -10,6 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.matbakhy.shared.web.RequestContext;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -24,6 +29,10 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Component
 public class DeliveryWorker {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DeliveryWorker.class);
+    /** Provider error text is kept only when it is a plain code; anything else could carry provider-echoed content. */
+    private static final Pattern SAFE_ERROR = Pattern.compile("[A-Za-z0-9_.-]{1,80}");
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
@@ -111,11 +120,23 @@ public class DeliveryWorker {
         tx.executeWithoutResult(s -> jdbc.update("""
                 UPDATE notification_delivery SET status = ?, attempts = ?, next_attempt_at = ?, last_error = ?, lease_owner = NULL, leased_until = NULL
                 WHERE id = ? AND lease_owner = ? AND status = 'PENDING'""",
-                status, attempts, Timestamp.from(now.plus(dispatcher.backoff(attempts))), truncate(result.error()), id, worker));
+                status, attempts, Timestamp.from(now.plus(dispatcher.backoff(attempts))), safeError(result.error()), id, worker));
+        logFailure(id, attempts, status, safeError(result.error()));
         return false;
     }
 
-    private static String truncate(String error) {
-        return error == null ? null : error.length() > 500 ? error.substring(0, 500) : error;
+    /** Logs the failure under the request ID that caused the notification, so one ID traces request, order and provider. */
+    private void logFailure(UUID id, int attempts, String status, String error) {
+        String requestId = jdbc.queryForList("""
+                SELECT e.request_id FROM notification_delivery d JOIN notification n ON n.id = d.notification_id
+                JOIN outbox_event e ON e.id = n.source_event_id WHERE d.id = ?""", String.class, id).stream().findFirst().orElse(null);
+        try (var traced = MDC.putCloseable(RequestContext.REQUEST_ID_MDC_KEY, requestId)) {
+            LOG.warn("notification delivery {} failed on attempt {}: {} (now {})", id, attempts, error, status);
+        }
+    }
+
+    /** Stored and logged provider errors are plain codes; free text (which may echo a recipient or token) is replaced. */
+    private static String safeError(String error) {
+        return error == null ? null : SAFE_ERROR.matcher(error).matches() ? error : "PROVIDER_ERROR";
     }
 }

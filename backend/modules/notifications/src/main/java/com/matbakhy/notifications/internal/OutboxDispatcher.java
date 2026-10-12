@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import com.matbakhy.shared.web.RequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -28,6 +32,8 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @Component
 public class OutboxDispatcher {
+
+    private static final Logger LOG = LoggerFactory.getLogger(OutboxDispatcher.class);
 
     static final Set<String> CUSTOMER_EVENTS = Set.of("ORDER_ACCEPTED", "ORDER_PREPARING", "ORDER_READY", "ORDER_OUT_FOR_DELIVERY",
             "ORDER_COMPLETED", "ORDER_REJECTED", "ORDER_EXPIRED", "ORDER_DELIVERY_FAILED", "ORDER_CANCELLED");
@@ -59,7 +65,7 @@ public class OutboxDispatcher {
                 UPDATE outbox_event SET lease_owner = ?, leased_until = ? WHERE id IN (
                     SELECT id FROM outbox_event WHERE status = 'PENDING' AND available_at <= ? AND (leased_until IS NULL OR leased_until < ?)
                     ORDER BY created_at, id LIMIT ? FOR UPDATE SKIP LOCKED)
-                RETURNING id, aggregate_type, aggregate_id, event_type, payload::text AS payload, attempts, created_at""",
+                RETURNING id, aggregate_type, aggregate_id, event_type, payload::text AS payload, attempts, created_at, request_id""",
                 worker, Timestamp.from(now.plus(props.lease())), Timestamp.from(now), Timestamp.from(now), limit));
         // RETURNING does not keep the subquery order; process in occurrence order.
         claimed.sort(Comparator.comparing((Map<String, Object> e) -> (Timestamp) e.get("created_at")).thenComparing(e -> (UUID) e.get("id")));
@@ -78,7 +84,7 @@ public class OutboxDispatcher {
                     done++;
                 }
             } catch (RuntimeException failure) {
-                fail(id, worker, ((Integer) e.get("attempts")) + 1, failure);
+                fail(id, worker, ((Integer) e.get("attempts")) + 1, failure, (String) e.get("request_id"));
             }
         }
         return done;
@@ -123,10 +129,13 @@ public class OutboxDispatcher {
         }
     }
 
-    private void fail(UUID id, String worker, int attempts, RuntimeException failure) {
+    private void fail(UUID id, String worker, int attempts, RuntimeException failure, String requestId) {
         boolean dead = attempts >= props.maxAttempts();
         Instant next = clock.instant().plus(backoff(attempts));
         String error = failure.getClass().getSimpleName();
+        try (var traced = MDC.putCloseable(RequestContext.REQUEST_ID_MDC_KEY, requestId)) {
+            LOG.warn("outbox event {} dispatch failed on attempt {}: {}{}", id, attempts, error, dead ? " (moved to FAILED)" : "");
+        }
         tx.executeWithoutResult(s -> jdbc.update("""
                 UPDATE outbox_event SET attempts = ?, status = ?, available_at = ?, last_error = ?, lease_owner = NULL, leased_until = NULL,
                        version = version + 1 WHERE id = ? AND lease_owner = ?""",

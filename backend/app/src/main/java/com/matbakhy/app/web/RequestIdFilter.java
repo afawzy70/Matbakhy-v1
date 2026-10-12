@@ -33,11 +33,11 @@ public class RequestIdFilter extends OncePerRequestFilter {
         String requestId = inbound != null && ACCEPTED.matcher(inbound).matches() ? inbound : UUID.randomUUID().toString();
         request.setAttribute(ATTRIBUTE, requestId);
         response.setHeader(HEADER, requestId);
-        MDC.put("requestId", requestId);
+        MDC.put(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY, requestId);
         try {
             chain.doFilter(request, response);
         } finally {
-            MDC.remove("requestId");
+            MDC.remove(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY);
         }
     }
 

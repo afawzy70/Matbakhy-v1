@@ -36,7 +36,7 @@ Check exact artifact/config/migration and health/business smoke. Stop rollout, a
 
 ## Backup restoration drill
 
-Restore to isolated environment with outbound providers disabled, never over live data for a drill. Verify schema, row counts/hashes where useful, pending orders, allocations, finance balances and outbox. Measure recovery time and data age. Rotate/restage credentials and enable providers only after duplicate-side-effect review. A file existing in a bucket is not a successful backup test.
+Restore to isolated environment with outbound providers disabled, never over live data for a drill. Verify schema, row counts/hashes where useful, pending orders, allocations, finance balances and outbox. Measure recovery time and data age. Rotate/restage credentials and enable providers only after duplicate-side-effect review. A file existing in a bucket is not a successful backup test. Tooling: `scripts/db-backup.sh`, `scripts/db-restore.sh` and `infra/db/reconcile.sql`; see `04-privacy-and-recovery.md`.
 
 ## Account compromise / lost staff access
 

@@ -98,7 +98,7 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> unexpected(Exception e, HttpServletRequest request) {
-        log.error("Unhandled failure", e);
+        log.error("Unhandled failure", RedactedThrowable.of(e));
         return respond(ErrorCode.INTERNAL_ERROR, List.of(), request);
     }
 
