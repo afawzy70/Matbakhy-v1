@@ -121,9 +121,15 @@ shot cart-replaced
 echo "ok: keep leaves the basket; replace replaces it"
 
 echo "== sign in from the cart"
+# The cart is longer since basket editing, so "Sign in" sits at the bottom edge of the small default AVD screen and a
+# tap there did not open the login (native run 26): scroll it into full view first, and tap once more if no form came.
+adb shell input swipe $((SCREEN_W / 2)) $((SCREEN_H * 3 / 4)) $((SCREEN_W / 2)) $((SCREEN_H / 4)) 400
 tap 'text="Sign in"'
 # Fresh login (prompt=login) in Chrome Custom Tabs; the form fields are the provider's.
-wait_for 'resource-id="username"|hint="Username or email"|text="Username or email"' 120 >/dev/null || fail "login form missing"
+if ! wait_for 'resource-id="username"|hint="Username or email"|text="Username or email"' 60 >/dev/null; then
+  pos=$(wait_for 'text="Sign in"' 5) && adb shell input tap $pos
+  wait_for 'resource-id="username"|hint="Username or email"|text="Username or email"' 90 >/dev/null || fail "login form missing"
+fi
 pos=$(wait_for 'resource-id="username"|hint="Username or email"|text="Username or email"' 5); adb shell input tap $pos; sleep 2; adb shell input text "$CUSTOMER"
 pos=$(wait_for 'resource-id="password"|hint="Password"|text="Password"' 10); adb shell input tap $pos; sleep 2; adb shell input text "$USER_PASSWORD"
 tap 'resource-id="kc-login"|text="Sign In"'
