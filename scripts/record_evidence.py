@@ -24,6 +24,11 @@ def git(*args):
     return subprocess.run(["git", *args], cwd=ROOT, text=True, capture_output=True, check=True).stdout.strip()
 
 
+def dirty_outside_runs(porcelain):
+    """Paths changed outside verification/runs, from `git status --porcelain` printed as is (status columns kept)."""
+    return [line[3:] for line in porcelain.splitlines() if line and not line[3:].startswith(ALLOWED_DIRTY_PREFIX)]
+
+
 def tool_version(cmd):
     try:
         out = subprocess.run(cmd, text=True, capture_output=True, timeout=60)
@@ -40,8 +45,9 @@ def main():
     args = parser.parse_args()
     spec_path = Path(args.spec).resolve()
     spec = json.loads(spec_path.read_text(encoding="utf-8"))
-    dirty = [line[3:] for line in git("status", "--porcelain", "--untracked-files=all").splitlines()
-             if not line[3:].startswith(ALLOWED_DIRTY_PREFIX)]
+    # Not git(): it strips the output, which would cut the leading status space of the first line.
+    dirty = dirty_outside_runs(subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT, text=True,
+                                              capture_output=True, check=True).stdout)
     if dirty:
         print("BLOCKED: source tree is dirty outside verification/runs: " + ", ".join(dirty[:10]))
         return 2
