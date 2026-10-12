@@ -285,6 +285,11 @@ class DiscoveryIntegrationTest {
         JsonNode en = ok(get("/api/v1/meals").param("kitchenId", kitchen.toString()).param("sort", "PRICE_DESC").header("Accept-Language", "en"));
         assertThat(en.get("items").get(0).get("title").asString()).isEqualTo("Lentil Koshari");
         assertThat(en.get("items").get(1).get("title").asString()).as("Arabic fallback").startsWith("فول مدمس");
+        jdbc.update("UPDATE meal SET description_en = 'Synthetic lentil koshari description' WHERE id = ?", koshari);
+        JsonNode described = ok(get("/api/v1/meals").param("kitchenId", kitchen.toString()).param("sort", "PRICE_DESC").header("Accept-Language", "en"));
+        assertThat(described.get("items").get(0).get("description").asString()).as("D12: the meal's own description, localized")
+                .isEqualTo("Synthetic lentil koshari description");
+        assertThat(described.get("items").get(1).get("description").asString()).as("Arabic description fallback").isEqualTo("وصف تجريبي للوجبة");
         String text = en.toString();
         assertThat(text).doesNotContain("Synthetic fixture location").doesNotContain("+20100").doesNotContain("\"status\"");
     }

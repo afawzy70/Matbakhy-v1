@@ -733,3 +733,14 @@ label:has(> input[type="checkbox"]) {
   gap: var(--mb-space-sm);
   min-block-size: var(--mb-touch-target-min);
 }
+
+/* D12: the meal's own description on cards, clamped to three lines; the full text is on the meal page. */
+.dish-description {
+  margin: 0;
+  color: var(--mb-color-foreground-muted);
+  font-size: var(--mb-font-size-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

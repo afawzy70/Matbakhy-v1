@@ -309,6 +309,7 @@ describe("customer web", () => {
     const meal = {
       id: "55555555-5555-4555-8555-555555555555",
       title: "Mahshi",
+      description: "Stuffed vine leaves and courgettes",
       kitchen: { id: "k5", slug: "amina-kitchen", name: "Amina", ratingSummary: { count: 0, averageTenths: null } },
       photo: null,
       portionText: "Serves two",
@@ -330,16 +331,25 @@ describe("customer web", () => {
     expect(screen.queryByLabelText("Helpful choices")).toBeNull();
     fireEvent.click(intents[0] as HTMLElement);
     expect(screen.getByLabelText("Helpful choices")).toBeTruthy();
-    fireEvent.click(screen.getByRole("button", { name: "Lowest price" }));
+    // D11: no portion-size control and no sort standing in for a filter in the intent panel.
+    expect(screen.queryByText(/one person|two people/i, { selector: "button" })).toBeNull();
+    expect(within(screen.getByLabelText("Helpful choices")).queryByRole("button", { name: "Lowest price" })).toBeNull();
+    fireEvent.change(screen.getByLabelText("Your budget per dish (maximum price, EGP)"), { target: { value: "250" } });
+    fireEvent.click(within(screen.getByLabelText("Helpful choices")).getByRole("button", { name: "Show results" }));
+    await waitFor(() => expect(calls.some((c) => c.path.includes("maxPriceMinor=25000"))).toBe(true));
+    fireEvent.click(screen.getByRole("button", { name: "Filter results" }));
+    fireEvent.change(screen.getByLabelText("Sort results"), { target: { value: "PRICE_ASC" } });
+    fireEvent.click(screen.getAllByRole("button", { name: "Show results" }).at(-1) as HTMLElement);
     await waitFor(() => expect(calls.some((c) => c.path.includes("sort=PRICE_ASC"))).toBe(true));
     const card = await screen.findByRole("article", { name: "Mahshi" });
     expect(within(card).getByText("Serves two")).toBeTruthy();
+    expect(within(card).getByText("Stuffed vine leaves and courgettes")).toBeTruthy();
     expect(within(card).getByRole("link", { name: "Amina" }).getAttribute("href")).toBe("#/kitchen/amina-kitchen");
     fireEvent.click(screen.getByRole("button", { name: "Soups" }));
     await waitFor(() => expect(calls.some((c) => c.path.includes("categoryId=SOUPS"))).toBe(true));
     fireEvent.click(screen.getByRole("button", { name: "Filter results" }));
     fireEvent.change(screen.getByLabelText("Maximum price (EGP)"), { target: { value: "100" } });
-    fireEvent.click(screen.getByRole("button", { name: "Show results" }));
+    fireEvent.click(screen.getAllByRole("button", { name: "Show results" }).at(-1) as HTMLElement);
     expect(await screen.findByText("No meals match this search.")).toBeTruthy();
     expect(calls.some((c) => c.path.includes("maxPriceMinor=10000"))).toBe(true);
     fireEvent.click(screen.getAllByRole("button", { name: "Clear filters" })[0] as HTMLElement);

@@ -50,14 +50,16 @@ public class DiscoveryService {
     public record Money(long amountMinor, String currency) {
     }
 
-    public record MealSummary(UUID id, KitchenSummary kitchen, String title, Photo photo, String portionText, Money price,
+    /** {@code description} is the meal's own published description (D12), localized like the title; null when absent. */
+    public record MealSummary(UUID id, KitchenSummary kitchen, String title, String description, Photo photo, String portionText, Money price,
                               List<SlotOffer> nextSlots, String availability) {
     }
 
     public record MealPage(List<MealSummary> items, String nextCursor, boolean hasMore) {
     }
 
-    private record Row(UUID id, UUID kitchenId, String slug, String kitchenName, String titleAr, String titleEn, String portionAr,
+    private record Row(UUID id, UUID kitchenId, String slug, String kitchenName, String titleAr, String titleEn, String descriptionAr,
+                       String descriptionEn, String portionAr,
                        String portionEn, long price, Instant publishedAt, String photoKey, String altAr, String altEn,
                        boolean pickup, boolean delivers) {
     }
@@ -99,7 +101,7 @@ public class DiscoveryService {
         Instant now = clock.instant();
 
         StringBuilder sql = new StringBuilder("""
-                SELECT m.id, m.kitchen_id, k.public_slug, k.display_name, m.title_ar, m.title_en, m.portion_ar, m.portion_en, m.price_minor,
+                SELECT m.id, m.kitchen_id, k.public_slug, k.display_name, m.title_ar, m.title_en, m.description_ar, m.description_en, m.portion_ar, m.portion_en, m.price_minor,
                        m.published_at, k.pickup_enabled,
                        EXISTS (SELECT 1 FROM kitchen_zone kz WHERE kz.kitchen_id = k.id AND kz.delivery_enabled
                                AND (?::uuid IS NULL OR kz.zone_id = ?)) AS delivers,
@@ -175,7 +177,7 @@ public class DiscoveryService {
 
         List<Row> rows = jdbc.query(sql.toString(), (rs, n) -> new Row(rs.getObject("id", UUID.class), rs.getObject("kitchen_id", UUID.class),
                 rs.getString("public_slug"), rs.getString("display_name"), rs.getString("title_ar"), rs.getString("title_en"),
-                rs.getString("portion_ar"), rs.getString("portion_en"), rs.getLong("price_minor"), rs.getTimestamp("published_at").toInstant(),
+                rs.getString("description_ar"), rs.getString("description_en"), rs.getString("portion_ar"), rs.getString("portion_en"), rs.getLong("price_minor"), rs.getTimestamp("published_at").toInstant(),
                 rs.getString("public_key"), rs.getString("alt_ar"), rs.getString("alt_en"), rs.getBoolean("pickup_enabled"),
                 rs.getBoolean("delivers")), args.toArray());
         boolean more = rows.size() > in.limit();
@@ -201,7 +203,7 @@ public class DiscoveryService {
             Photo photo = r.photoKey() == null ? null : new Photo(storage.publicUrl(r.photoKey()).toString(),
                     en && r.altEn() != null ? r.altEn() : r.altAr() != null ? r.altAr() : "");
             return new MealSummary(r.id(), new KitchenSummary(r.kitchenId(), r.slug(), r.kitchenName(), new RatingSummary(rating.count(), rating.averageTenths())),
-                    en && r.titleEn() != null ? r.titleEn() : r.titleAr(), photo, en && r.portionEn() != null ? r.portionEn() : r.portionAr(),
+                    en && r.titleEn() != null ? r.titleEn() : r.titleAr(), en && r.descriptionEn() != null ? r.descriptionEn() : r.descriptionAr(), photo, en && r.portionEn() != null ? r.portionEn() : r.portionAr(),
                     new Money(r.price(), "EGP"), offer.nextSlots(), offer.availability());
         }).toList();
         String next = null;

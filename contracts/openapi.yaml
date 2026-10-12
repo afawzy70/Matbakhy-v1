@@ -4997,6 +4997,7 @@ components:
         - id
         - kitchen
         - title
+        - description
         - photo
         - portionText
         - price
@@ -5008,6 +5009,9 @@ components:
           $ref: "#/components/schemas/KitchenSummary"
         title:
           type: string
+        description:
+          type: [string, "null"]
+          description: The meal's own published description (D12), localized like the title; null when absent. Never generated.
         photo:
           oneOf:
             - $ref: "#/components/schemas/Photo"

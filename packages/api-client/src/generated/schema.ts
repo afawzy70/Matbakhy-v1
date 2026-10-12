@@ -2409,6 +2409,8 @@ export interface components {
             id: string;
             kitchen: components["schemas"]["KitchenSummary"];
             title: string;
+            /** @description The meal's own published description (D12), localized like the title; null when absent. Never generated. */
+            description: string | null;
             photo: components["schemas"]["Photo"] | null;
             portionText: string;
             price: components["schemas"]["NonNegativeMoney"];

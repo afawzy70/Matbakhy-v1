@@ -11,9 +11,9 @@ type Sort = "NEWEST" | "PRICE_ASC" | "PRICE_DESC";
 type Meal = Schemas["MealSummary"];
 
 /**
- * Home in the owner-selected hierarchy (docs/design/approved): brand strip, three intent tiles that reveal contextual
- * filters, dishes/kitchens switch, search and filter action, category chips, stacked food cards. Every filter is a
- * server query parameter; the client never filters, prices or ranks meals itself.
+ * Home in the owner-selected hierarchy (docs/design/approved): brand strip, three intent tiles that reveal a contextual
+ * budget filter (portion-size filters are deferred, D11), dishes/kitchens switch, search and filter action, category
+ * chips, stacked food cards. Every filter is a server query parameter; the client never filters, prices or ranks meals.
  */
 export function Browse({ ctx }: { ctx: Ctx }) {
   const { t, locale } = ctx;
@@ -78,19 +78,29 @@ export function Browse({ ctx }: { ctx: Ctx }) {
           ))}
         </div>
         {intent ? (
-          <div className="contextual card" id="contextual" aria-label={t.home.contextual}>
-            <span className="small muted">{t.home.sortLabel}</span>
-            <div className="chips">
-              {(["NEWEST", "PRICE_ASC", "PRICE_DESC"] as const).map((s) => (
-                <button key={s} type="button" aria-pressed={sort === s} onClick={() => setSort(s)}>
-                  {t.home.sort[s]}
-                </button>
-              ))}
+          <form
+            className="contextual card"
+            id="contextual"
+            aria-label={t.home.contextual}
+            onSubmit={(e) => {
+              e.preventDefault();
+              setMaxPriceMinor(maxPrice.trim() ? egpToMinor(maxPrice) : null);
+            }}
+          >
+            {/* D11: portion-size filters are deferred; only filters the server supports are offered here. */}
+            <label>
+              {t.home.budget} <input inputMode="decimal" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+            </label>
+            {maxPrice.trim() && egpToMinor(maxPrice) === null ? <p className="field-error">{t.home.invalidPrice}</p> : null}
+            <div className="row">
+              <button type="submit" disabled={maxPrice.trim() !== "" && egpToMinor(maxPrice) === null}>
+                {t.home.showResults}
+              </button>
+              <button type="button" className="link" onClick={clear} disabled={!filtered}>
+                {t.home.clear}
+              </button>
             </div>
-            <button type="button" className="link" onClick={clear} disabled={!filtered}>
-              {t.home.clear}
-            </button>
-          </div>
+          </form>
         ) : null}
       </section>
 
@@ -141,6 +151,16 @@ export function Browse({ ctx }: { ctx: Ctx }) {
                     </option>
                   ))
                 : null}
+            </select>
+          </label>
+          <label>
+            {t.home.sortLabel}{" "}
+            <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+              {(["NEWEST", "PRICE_ASC", "PRICE_DESC"] as const).map((o) => (
+                <option key={o} value={o}>
+                  {t.home.sort[o]}
+                </option>
+              ))}
             </select>
           </label>
           <label>
@@ -216,6 +236,7 @@ export function FoodCard({ ctx, meal: m }: { ctx: Ctx; meal: Meal }) {
         <a className="kitchen-link" href={`#/kitchen/${m.kitchen.slug}`}>
           {m.kitchen.name}
         </a>
+        {m.description ? <p className="dish-description">{m.description}</p> : null}
         <div className="row between card-actions">
           <span className="pill portion">{m.portionText}</span>
           {unavailable ? (

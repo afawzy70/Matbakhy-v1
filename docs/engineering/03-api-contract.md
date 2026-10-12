@@ -241,3 +241,8 @@ Online payment/courier routes are conditional and not part of cash-first API acc
 - Operations web: the catalogue tab also shows the review queue (reported / hidden) with hide and restore, each requiring a reason.
 - Not included: kitchen share links beyond the meal page address; notification preferences screen; the deletion request uses the draft retention policy version (`retention-policy-draft`) pending owner decision on the retention policy.
 
+## Owner decisions D11 and D12 (2026-10-12)
+
+- D11: structured portion-size filtering is deferred from MVP. The customer home shows no one-person/two-people control; the intent tiles reveal a real server filter (budget = `maxPriceMinor`) and clear, never a sort presented as a filter. Sort lives in the "Filter results" panel, labelled as sorting.
+- D12: `MealSummary.description` (API-003) carries the meal's own published description, localized like the title (English falls back to Arabic), and is null when absent. Cards clamp it to three lines and omit it when null. No generated or invented text; no new content feature.
+
