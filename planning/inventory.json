@@ -139,6 +139,12 @@
       "state": "PRESENT",
       "owner_story": "MB-005",
       "purpose": "Shared strict TypeScript settings"
+    },
+    {
+      "path": "deploy",
+      "state": "PRESENT",
+      "owner_story": "MB-040",
+      "purpose": "Deployment packages; web-preview is an early, access-restricted synthetic-data preview (owner direction 2026-10-12), not MB-040 staging"
     }
   ]
 }
