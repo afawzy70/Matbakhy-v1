@@ -2120,7 +2120,7 @@
               "dispatchReference": null,
               "contact": "[REDACTED]"
             },
-            "key": "ops-e347cac3-4bc3-4e5a-be12-dfc3feeaeb7e",
+            "key": "[REDACTED IDEMPOTENCY KEY]",
             "body": {
               "expectedVersion": 0
             }
@@ -2316,7 +2316,7 @@
               "dispatchReference": null,
               "contact": "[REDACTED]"
             },
-            "key": "ops-6078660c-bb22-4ef3-b6af-96db03ae1895",
+            "key": "[REDACTED IDEMPOTENCY KEY]",
             "body": {
               "expectedVersion": 1
             }
@@ -2423,7 +2423,7 @@
               "dispatchReference": null,
               "contact": "[REDACTED]"
             },
-            "key": "ops-c1a5dcad-bab2-4ca3-8143-197f01b12a31",
+            "key": "[REDACTED IDEMPOTENCY KEY]",
             "body": {
               "expectedVersion": 2
             }
@@ -2536,7 +2536,7 @@
               "dispatchReference": null,
               "contact": null
             },
-            "key": "ops-0a67ea07-f9e7-4623-a773-7b63b429f105",
+            "key": "[REDACTED IDEMPOTENCY KEY]",
             "body": {
               "expectedVersion": 3,
               "code": "[REDACTED]"
@@ -2787,7 +2787,7 @@
               "body": "QA PRIVATE NOTE NEVER FOR CUSTOMER",
               "visibility": "STAFF_ONLY"
             },
-            "key": "ops-c7abff57-d28a-4fc9-9c1f-38525711c4f8"
+            "key": "[REDACTED IDEMPOTENCY KEY]"
           }
         },
         {
@@ -2807,7 +2807,7 @@
               "body": "QA PUBLIC REPLY FOR CUSTOMER",
               "visibility": "PUBLIC"
             },
-            "key": "ops-35c301f6-388b-4eb6-aa0b-542c14ec1f2f"
+            "key": "[REDACTED IDEMPOTENCY KEY]"
           }
         },
         {
@@ -3064,7 +3064,7 @@
               "expectedVersion": 0,
               "reasonCode": "CHANGED_MIND"
             },
-            "key": "web-4fa62a2b-d389-4af0-aeb6-f6a56b84b49a"
+            "key": "[REDACTED IDEMPOTENCY KEY]"
           }
         },
         {
@@ -3566,7 +3566,7 @@
               "externalReference": "QA-CASH-EVIDENCE",
               "expectedVersion": 4
             },
-            "key": "ops-a3b34361-6af4-4b0a-903f-ce66a23e766a"
+            "key": "[REDACTED IDEMPOTENCY KEY]"
           }
         },
         {
@@ -3657,7 +3657,7 @@
               "fullAmountMinor": 24050,
               "reason": "Synthetic full refund request; no money moved"
             },
-            "key": "ops-5fb04300-eef0-4b91-b212-6cfc7f39d7a4"
+            "key": "[REDACTED IDEMPOTENCY KEY]"
           }
         },
         {
@@ -3829,7 +3829,7 @@
                 "c8451550-5e7c-45b6-beba-8858f7c13d05"
               ]
             },
-            "key": "ops-684da202-77fc-48cd-a5f6-7a557e127f55"
+            "key": "[REDACTED IDEMPOTENCY KEY]"
           }
         },
         {
@@ -4844,7 +4844,7 @@
             "status": 200,
             "data": {
               "id": "3f9d32cc-dfb1-4236-92a5-7eb762ab00f8",
-              "key": "zone:00000000-0000-4000-8000-00000000a001",
+              "key": "[REDACTED IDEMPOTENCY KEY]",
               "version": 1,
               "value": {
                 "active": true,
@@ -4874,7 +4874,7 @@
             "changes": [
               {
                 "id": "3f9d32cc-dfb1-4236-92a5-7eb762ab00f8",
-                "key": "zone:00000000-0000-4000-8000-00000000a001",
+                "key": "[REDACTED IDEMPOTENCY KEY]",
                 "version": 1,
                 "value": {
                   "active": true,

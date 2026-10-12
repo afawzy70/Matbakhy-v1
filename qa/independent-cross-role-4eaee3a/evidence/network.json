@@ -62391,7 +62391,7 @@
     "status": 200,
     "body": {
       "id": "3f9d32cc-dfb1-4236-92a5-7eb762ab00f8",
-      "key": "zone:00000000-0000-4000-8000-00000000a001",
+      "key": "[REDACTED IDEMPOTENCY KEY]",
       "version": 1,
       "value": {
         "active": true,
@@ -62481,7 +62481,7 @@
       "changes": [
         {
           "id": "3f9d32cc-dfb1-4236-92a5-7eb762ab00f8",
-          "key": "zone:00000000-0000-4000-8000-00000000a001",
+          "key": "[REDACTED IDEMPOTENCY KEY]",
           "version": 1,
           "value": {
             "active": true,
@@ -62573,7 +62573,7 @@
       "changes": [
         {
           "id": "3f9d32cc-dfb1-4236-92a5-7eb762ab00f8",
-          "key": "zone:00000000-0000-4000-8000-00000000a001",
+          "key": "[REDACTED IDEMPOTENCY KEY]",
           "version": 1,
           "value": {
             "active": true,
@@ -62595,7 +62595,7 @@
     "status": 200,
     "body": {
       "id": "bad5f5f0-e651-4e99-97f3-67e35b1df39e",
-      "key": "zone:00000000-0000-4000-8000-00000000a001",
+      "key": "[REDACTED IDEMPOTENCY KEY]",
       "version": 2,
       "value": {
         "active": true,

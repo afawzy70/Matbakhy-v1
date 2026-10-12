@@ -1,0 +1,7 @@
+{
+  "scope": "current QA directory",
+  "scanner": "digest-pinned gitleaks8.30.1",
+  "findings": 0,
+  "historyScan": "BLOCKED: shared worktree gitdir not mounted in original repository helper; 0 commits is not PASS",
+  "initialMatches": "20 UUID idempotency RPC keys; reviewed as command nonces, masked in current evidence, no login secrets identified"
+}

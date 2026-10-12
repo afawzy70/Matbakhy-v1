@@ -9,8 +9,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: independent-qa-native-${{ github.ref }}
-  cancel-in-progress: true
+  group: independent-qa-native-${{ github.ref }}-${{ contains(github.event.head_commit.message, '[ios-only]') && 'ios' || contains(github.event.head_commit.message, '[android-only]') && 'android' || 'both' }}
+  cancel-in-progress: false
 env:
   NODE_VERSION: "24.21.0"
   COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
@@ -19,6 +19,7 @@ env:
 
 jobs:
   android:
+    if: ${{ !contains(github.event.head_commit.message, '[ios-only]') }}
     name: Android debug APK (Gradle)
     runs-on: ubuntu-24.04
     timeout-minutes: 80
@@ -158,6 +159,7 @@ jobs:
       - name: Independent iOS simulator readiness and test controls
         run: |
           cp iqa-controls/qa/independent-cross-role-4eaee3a/native/IndependentQATests.swift apps/customer-mobile/e2e-ios/UITests/
+          python3 iqa-controls/qa/independent-cross-role-4eaee3a/native/ios-auth-controls.py
           UDID=$(xcrun simctl list devices booted -j | python3 -c 'import json,sys; print(next(x["udid"] for xs in json.load(sys.stdin)["devices"].values() for x in xs if x["name"].startswith("iPhone")))')
           xcrun simctl shutdown "$UDID"
           xcrun simctl boot "$UDID"
