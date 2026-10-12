@@ -44,3 +44,7 @@ Egypt / EGP / Africa/Cairo. Server owns price, capacity, roles and transitions. 
 Report completed work, changed commit, executed checks, failures/blocked checks, decisions needed and the exact next task. Never use PASS for NOT_RUN. Do not describe self-review as independent review. Prefer short plain-language updates; owner explanations can be in Egyptian Arabic when requested.
 
 Follow `docs/delivery/05-progress-reporting.md`. Publish safe checkpoints to the active implementation branch, and maintain `docs/status/latest.md` and cumulative daily reports. A GitHub push does not prove CI passed, and silence does not prove the local agent stopped.
+
+## Queued owner direction: audit and log readiness (2026-10-12)
+
+Read `docs/operations/05-observability-readiness.md` when resuming MB-039 or preparing any external staging/web preview. The work is recorded in MB-039/MB-040 in the backlog. Preserve the active MB-032 and independent QA work; implement remaining controls at the next eligible checkpoint and verify deployed readiness before inviting testers. This is not a completion claim or authorization for spending/public deployment.

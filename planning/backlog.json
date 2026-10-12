@@ -1440,15 +1440,18 @@
         "redacted structured logs/metrics/alerts",
         "migration checks",
         "backup/restore automation",
-        "provider outage dashboards"
+        "provider outage dashboards",
+        "Complete owner-requested audit/log readiness work package in docs/operations/05-observability-readiness.md at the next eligible checkpoint; preserve active MB-032 and QA work"
       ],
       "artifacts": [
         "infra",
         "scripts",
-        "docs/operations"
+        "docs/operations",
+        "docs/operations/05-observability-readiness.md"
       ],
       "acceptance": [
-        "No PII/secrets in captured logs; restored staging database reconciles orders/stock/ledger; deletion policy enforced"
+        "No PII/secrets in captured logs; restored staging database reconciles orders/stock/ledger; deletion policy enforced",
+        "Audit transaction/permission coverage, redacted cross-worker log correlation, bounded searchable logs and exercised operational alerts have exact-SHA evidence per docs/operations/05-observability-readiness.md; deployed checks remain explicit until executed"
       ],
       "rule_ids": [
         "BR-055",
@@ -1484,14 +1487,16 @@
         "separate sandbox credentials",
         "TLS/config checks",
         "deploy pinned artifacts and migrations",
-        "smoke and rollback rehearsal"
+        "smoke and rollback rehearsal",
+        "Verify AUD-01/LOG-01/OPS-01..03 from docs/operations/05-observability-readiness.md before external tester access, including an early web preview; preserve full-story dependencies"
       ],
       "artifacts": [
         "infra",
         "verification/runs"
       ],
       "acceptance": [
-        "Staging web/ops/native point to same tested API; restored/redeployed release works without fake production providers"
+        "Staging web/ops/native point to same tested API; restored/redeployed release works without fake production providers",
+        "Deployed audit/log readiness checklist is evidenced before external tester access; local evidence alone does not satisfy staging readiness"
       ],
       "rule_ids": [
         "BR-060"
