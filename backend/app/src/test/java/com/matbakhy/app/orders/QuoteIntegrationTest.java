@@ -402,4 +402,27 @@ class QuoteIntegrationTest {
         assertThatThrownBy(() -> jdbc.update("UPDATE quote_item SET unit_price_minor = 1 WHERE quote_id = ?", q)).hasMessageContaining("immutable");
         assertThatThrownBy(() -> jdbc.update("DELETE FROM quote WHERE id = ?", q)).hasMessageContaining("immutable");
     }
+
+    // ---- Retrospective regression coverage (2026-10-12 hardening pass; expectations from BR-013 and BR-017) ----
+
+    @Test
+    void lines_of_different_meals_together_cannot_exceed_the_cook_slot_total() throws Exception {
+        UUID tight = slot(kitchen, 8, 5, mealA, 5, mealB, 5);
+        MockHttpServletResponse over = quote(pickup(tight, item(mealA, 3) + "," + item(mealB, 3)));
+        assertThat(over.getStatus()).as("3 + 3 portions in a slot of 5: " + over.getContentAsString()).isIn(409, 422);
+        assertThat(over.getContentAsString()).contains("INSUFFICIENT_PORTIONS");
+        created(quote(pickup(tight, item(mealA, 3) + "," + item(mealB, 2))));
+    }
+
+    @Test
+    void paused_archived_and_hidden_meals_cannot_be_quoted_even_inside_an_open_slot() throws Exception {
+        int before = quoteCount();
+        jdbc.update("UPDATE meal SET status = 'PAUSED' WHERE id = ?", mealA);
+        assertThat(quote(pickup(slot, item(mealA, 1))).getStatus()).as("paused meal").isIn(404, 409, 422);
+        jdbc.update("UPDATE meal SET status = 'ARCHIVED', archived_at = now() WHERE id = ?", mealA);
+        assertThat(quote(pickup(slot, item(mealA, 1))).getStatus()).as("archived meal").isIn(404, 409, 422);
+        jdbc.update("UPDATE meal SET moderation_state = 'HIDDEN', moderation_reason = 'synthetic moderation' WHERE id = ?", mealB);
+        assertThat(quote(pickup(slot, item(mealB, 1))).getStatus()).as("hidden meal").isIn(404, 409, 422);
+        assertThat(quoteCount()).as("no quote is stored for unavailable meals").isEqualTo(before);
+    }
 }

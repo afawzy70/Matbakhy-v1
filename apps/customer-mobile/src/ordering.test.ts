@@ -128,3 +128,27 @@ describe("platform fetch compatibility (native run 21)", () => {
     expect(r.data).toMatchObject({ displayName: "Mona" });
   });
 });
+
+/** Retrospective regression coverage (2026-10-12 hardening pass); expected behaviour from BR-018, BR-044 and CW05. */
+describe("retrospective regression: basket and placement", () => {
+  it("keeps the basket after a definitive refusal (no surprise clearing) while dropping the spent keys (CW05)", async () => {
+    const basket: Basket = { ...target, lines: [line("m1", 2)] };
+    await saveBasket(basket);
+    await savePending(pending);
+    for (const [status, code] of [[409, "STOCK_CHANGED"], [422, "VALIDATION_FAILED"], [409, "QUOTE_EXPIRED"]] as const) {
+      await savePending(pending);
+      const refused = server(() => json(status, { code }));
+      expect(await place(apiFor(refused.fetchImpl), pending)).toEqual({ kind: "rejected", code });
+      expect(await loadPending()).toBeNull();
+      expect(await loadBasket()).toEqual(basket);
+    }
+  });
+
+  it("asks before replacing when the same kitchen offers another slot (BR-018)", () => {
+    const basket: Basket = { ...target, lines: [line("m1")] };
+    expect(decideAdd(basket, null, { ...target, slotId: "s2", slotStartsAt: "2026-10-14T10:00:00Z" }, line("m1"))).toEqual({
+      kind: "confirmReplace",
+      replacement: { ...target, slotId: "s2", slotStartsAt: "2026-10-14T10:00:00Z", lines: [line("m1")] },
+    });
+  });
+});

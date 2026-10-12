@@ -397,3 +397,76 @@ describe("customer web", () => {
   });
 });
 
+
+/**
+ * Retrospective regression coverage (2026-10-12, owner-requested hardening pass). Added after the features were
+ * implemented; expected behaviour is taken from the approved rules (BR-017, BR-018, CW03/CW05), not from the code.
+ */
+describe("retrospective regression: basket rules", () => {
+  const meal = (id: string, kitchenId: string, slotId: string, availability = "AVAILABLE") => ({
+    id,
+    title: `Dish ${id.slice(0, 4)}`,
+    kitchen: { id: kitchenId, slug: kitchenId, name: `Kitchen ${kitchenId}` },
+    portionText: "1 plate",
+    price: egp(10000),
+    description: "",
+    ingredients: "",
+    allergenCodes: ["NONE_DECLARED"],
+    allergenStatement: null,
+    photo: null,
+    nextSlots: [{ id: slotId, startsAt: "2026-10-12T10:00:00Z", availablePortions: 5, fulfillmentModes: ["PICKUP"] }],
+    availability,
+  });
+  const reviews = { status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } };
+
+  it("adds another meal of the same kitchen and slot without asking, and re-adding a meal updates its line instead of duplicating it (BR-018)", async () => {
+    const m1 = "99999999-9999-4999-8999-999999999991";
+    const m2 = "99999999-9999-4999-8999-999999999992";
+    window.localStorage.setItem(
+      "matbakhy.cart",
+      JSON.stringify({ kitchenId: "k1", slotId: "s1", slotStartsAt: "2026-10-12T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: m1, title: "Dish one", quantity: 2 }] }),
+    );
+    const { fetchImpl } = server({
+      [`GET /api/v1/meals/${m1}`]: () => ({ status: 200, body: meal(m1, "k1", "s1") }),
+      [`GET /api/v1/meals/${m2}`]: () => ({ status: 200, body: meal(m2, "k1", "s1") }),
+      "GET /api/v1/kitchens/k1/reviews": () => reviews,
+    });
+    const lines = () => JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").lines as { mealId: string; quantity: number }[];
+
+    window.location.hash = `#/meal/${m2}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio"));
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(lines().map((l) => [l.mealId, l.quantity])).toEqual([[m1, 2], [m2, 1]]);
+
+    cleanup();
+    window.location.hash = `#/meal/${m1}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio"));
+    fireEvent.click(screen.getByRole("button", { name: "Increase quantity" }));
+    fireEvent.click(screen.getByRole("button", { name: "Increase quantity" }));
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(lines().filter((l) => l.mealId === m1)).toEqual([expect.objectContaining({ mealId: m1, quantity: 3 })]);
+    expect(lines()).toHaveLength(2);
+  });
+
+  it("cannot add a sold-out or unavailable meal to the basket (BR-017, CW03)", async () => {
+    const sold = "88888888-8888-4888-8888-888888888888";
+    const { fetchImpl } = server({
+      [`GET /api/v1/meals/${sold}`]: () => ({ status: 200, body: meal(sold, "k8", "s8", "SOLD_OUT") }),
+      "GET /api/v1/kitchens/k8/reviews": () => reviews,
+    });
+    window.location.hash = `#/meal/${sold}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio"));
+    expect((screen.getByRole("button", { name: /^Add to cart/ }) as HTMLButtonElement).disabled).toBe(true);
+    expect(window.localStorage.getItem("matbakhy.cart")).toBeNull();
+  });
+});

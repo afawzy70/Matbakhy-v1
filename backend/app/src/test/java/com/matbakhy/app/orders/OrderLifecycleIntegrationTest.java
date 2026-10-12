@@ -542,4 +542,22 @@ class OrderLifecycleIntegrationTest {
         cookOk(accepted, "ready", "");
         jdbc.update("UPDATE kitchen SET operating_state = 'ACTIVE' WHERE id = ?", kitchen);
     }
+
+    // ---- Retrospective regression coverage (2026-10-12 hardening pass; expectation from BR-026 actor scope) ----
+
+    @Test
+    void the_ordering_customer_cannot_run_cook_commands_and_the_cook_cannot_use_the_customer_cancel() throws Exception {
+        UUID o = order(false);
+        long before = version(o);
+        for (String action : new String[] {"accept", "reject", "prepare", "ready", "handover"}) {
+            MockHttpServletResponse r = cook(customerSubject, o, action, action.equals("reject") ? ",\"reasonCode\":\"KITCHEN_BUSY\"" : "", key());
+            assertThat(r.getStatus()).as("customer running cook " + action).isIn(403, 404);
+        }
+        MockHttpServletResponse cookCancel = call(post("/api/v1/orders/" + o + "/cancel").header("Idempotency-Key", key())
+                .content("{\"expectedVersion\":" + before + ",\"reasonCode\":\"CHANGED_MIND\"}"), as(cookSubject));
+        assertThat(cookCancel.getStatus()).as("cook using the customer cancel").isIn(403, 404);
+        assertThat(state(o)).isEqualTo("PENDING_ACCEPTANCE");
+        assertThat(version(o)).as("nothing changed").isEqualTo(before);
+        assertThat(counters()).as("stock still reserved for the order").containsExactly(2, 0, 0);
+    }
 }

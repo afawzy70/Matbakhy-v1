@@ -426,4 +426,44 @@ class OrderPlacementIntegrationTest {
         assertThat(events.get("items").get(0).get("sequence").asInt()).isEqualTo(1);
         assertThat(call(get("/api/v1/orders").param("stateGroup", "ALL"), customerSubject).getStatus()).isEqualTo(422);
     }
+
+    // ---- Retrospective regression coverage (2026-10-12 hardening pass; expectations from BR-006, BR-022, BR-025) ----
+
+    private UUID quoteIn(String subject, UUID slotId, String items) throws Exception {
+        MockHttpServletResponse r = call(post("/api/v1/quotes").content(
+                "{\"items\":[" + items + "],\"slotId\":\"" + slotId + "\",\"fulfillmentMode\":\"PICKUP\"}"), subject);
+        assertThat(r.getStatus()).as(r.getContentAsString()).isEqualTo(201);
+        return UUID.fromString(body(r).get("quoteId").asString());
+    }
+
+    @Test
+    void a_two_meal_order_is_refused_without_partial_reservation_once_the_kitchen_slot_total_is_used_up() throws Exception {
+        UUID tight = fx.slot(kitchen, 600, 4, mealA, 5, mealB, 5);
+        UUID twoMeals = quoteIn(customerSubject, tight, item(mealA, 2) + "," + item(mealB, 2));
+        String otherSubject = UUID.randomUUID().toString();
+        customer(otherSubject);
+        MockHttpServletResponse first = place(otherSubject, key(), placeBody(quoteIn(otherSubject, tight, item(mealA, 2)), UUID.randomUUID()));
+        assertThat(first.getStatus()).as(first.getContentAsString()).isEqualTo(201);
+
+        MockHttpServletResponse late = place(customerSubject, key(), placeBody(twoMeals, UUID.randomUUID()));
+        assertThat(late.getStatus()).as(late.getContentAsString()).isEqualTo(409);
+        assertThat(late.getContentAsString()).contains("STOCK_CHANGED");
+        assertThat(count("SELECT count(*) FROM customer_order WHERE customer_id = ?", customer)).isZero();
+        assertThat(count("SELECT reserved FROM cook_slot WHERE id = ?", tight)).as("only the first order's portions").isEqualTo(2);
+        assertThat(count("SELECT coalesce(sum(reserved), 0) FROM meal_slot WHERE cook_slot_id = ?", tight)).isEqualTo(2);
+        assertThat(count("SELECT count(*) FROM stock_allocation a JOIN customer_order o ON o.id = a.order_id WHERE o.customer_id = ?", customer)).isZero();
+    }
+
+    @Test
+    void another_customer_cannot_find_an_order_by_its_client_request_id() throws Exception {
+        UUID requestId = UUID.randomUUID();
+        MockHttpServletResponse placed = place(customerSubject, key(), placeBody(quote(customerSubject, item(mealA, 1), false, null), requestId));
+        assertThat(placed.getStatus()).as(placed.getContentAsString()).isEqualTo(201);
+        String otherSubject = UUID.randomUUID().toString();
+        customer(otherSubject);
+        MockHttpServletResponse foreign = call(get("/api/v1/orders/by-request/" + requestId), otherSubject);
+        assertThat(foreign.getStatus()).isEqualTo(404);
+        assertThat(foreign.getContentAsString()).doesNotContain(body(placed).get("id").asString());
+        assertThat(call(get("/api/v1/orders/by-request/" + requestId), customerSubject).getStatus()).isEqualTo(200);
+    }
 }
