@@ -31,8 +31,8 @@
       "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
     }
   ],
-  "next_action": "Start MB-032 (native discovery and ordering) on the generated client, with the native sign-in round trip in CI as the base. MB-029 stays BLOCKED (BLK-003, screen reader); MB-030 not eligible. MB-039 IN_PROGRESS: erasure (TC-055, customers), log redaction (TC-056) and local backup/restore rehearsal (TC-057) implemented and tested; staging restore needs O07, cook/applicant document retention needs O06.",
-  "updated_at": "2026-10-12T09:29:12Z",
+  "next_action": "MB-032 IN_PROGRESS: native screens, ordering logic and unit/UI tests are on the branch; native emulator/simulator checks for basket keep/replace (TC-148), app kill during submit with offline reopen and no duplicate order (TC-049) and total parity (TC-132) are wired into native-build.yml and pending a green run. Delivery checkout is not exercised natively (known gap). Then record MB-032 evidence. MB-029 stays BLOCKED (BLK-003). MB-039 IN_PROGRESS (staging restore needs O07; document retention needs O06). Q1 (per-line quantity limit) awaits an owner decision.",
+  "updated_at": "2026-10-12T11:21:35Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

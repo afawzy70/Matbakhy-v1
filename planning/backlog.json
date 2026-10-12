@@ -1172,7 +1172,7 @@
       "id": "MB-032",
       "phase": "P07",
       "title": "Implement native discovery and ordering",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-031",
