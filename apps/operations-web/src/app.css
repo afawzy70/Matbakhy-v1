@@ -291,3 +291,24 @@ input[type="radio"] {
   outline: 3px solid var(--mb-color-focus);
   outline-offset: 2px;
 }
+
+/* Narrow screens (MB-029): grid children may shrink, and text-like fields fill their column instead of forcing it wider. */
+.shell > *,
+.stack > *,
+.form > *,
+.inline-form > *,
+.form label,
+.inline-form label {
+  min-inline-size: 0;
+}
+
+.form input:not([type="checkbox"]):not([type="radio"]),
+.form select,
+.form textarea,
+.inline-form input:not([type="checkbox"]):not([type="radio"]),
+.inline-form select {
+  box-sizing: border-box;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
