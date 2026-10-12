@@ -9,11 +9,17 @@ API_LEVEL=35
 IMAGE="system-images;android-${API_LEVEL};google_apis;x86_64"
 export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$PATH"
 
-yes | sdkmanager --licenses >/dev/null 2>&1 || true
-sdkmanager "emulator" "platform-tools" "$IMAGE" >/dev/null
+# sdkmanager asks to accept licenses for new packages and would otherwise wait forever on stdin (first CI run hung
+# here); every waiting step is also time-bounded so a failure is reported instead of hitting the job timeout.
+set +o pipefail
+yes | timeout 300 sdkmanager --licenses >/dev/null 2>&1
+yes | timeout 900 sdkmanager --install "emulator" "platform-tools" "$IMAGE" >"$RUNNER_TEMP/sdkmanager.log" 2>&1
+set -o pipefail
+tail -3 "$RUNNER_TEMP/sdkmanager.log"
+[ -d "$ANDROID_HOME/system-images/android-${API_LEVEL}/google_apis/x86_64" ] || { echo "system image not installed"; tail -30 "$RUNNER_TEMP/sdkmanager.log"; exit 1; }
 echo no | avdmanager create avd -n mb031 -k "$IMAGE" --force >/dev/null
 emulator -avd mb031 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect >"$RUNNER_TEMP/emulator.log" 2>&1 &
-adb wait-for-device
+timeout 300 adb wait-for-device || { echo "emulator did not appear"; tail -50 "$RUNNER_TEMP/emulator.log"; exit 1; }
 for _ in $(seq 1 120); do
   [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ] && break
   sleep 5
