@@ -48,11 +48,25 @@ final class SignInRoundTripTests: XCTestCase {
     private func login(_ username: String) {
         guard let user = field(secure: false) else { return XCTFail("login form did not appear") }
         shot("login-form-\(username)")
-        user.tap()
-        user.typeText(username)
+        type(username, into: user)
         guard let secret = field(secure: true, timeout: 10) else { return XCTFail("password field missing") }
-        secret.tap()
-        secret.typeText(password + "\n")
+        type(password + "\n", into: secret)
+    }
+
+    /// Typing is only possible once the web field really has keyboard focus (native run 16 typed too early).
+    private func type(_ text: String, into element: XCUIElement) {
+        for _ in 0..<5 {
+            element.tap()
+            let deadline = Date().addingTimeInterval(3)
+            while Date() < deadline {
+                if (element.value(forKey: "hasKeyboardFocus") as? Bool) == true {
+                    element.typeText(text)
+                    return
+                }
+                Thread.sleep(forTimeInterval: 0.3)
+            }
+        }
+        XCTFail("field never received keyboard focus")
     }
 
     /// Waits for an element; on timeout prints what the app shows (marker for the CI script) and fails.

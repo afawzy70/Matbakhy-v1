@@ -11,6 +11,8 @@ c=[x for rt,ds in d.items() if 'iOS' in rt for x in ds if x['name'].startswith('
 print(c[-1]['udid'] if c else '')")
 [ -n "$UDID" ] || { echo "no iPhone simulator available"; exit 1; }
 xcrun simctl list devices available | grep "$UDID"
+# Software keyboard for UI tests: a connected hardware keyboard keeps web fields from taking keyboard focus.
+defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false || true
 xcrun simctl boot "$UDID" || true
 xcrun simctl bootstatus "$UDID" -b
 xcrun simctl install "$UDID" "$APP"
