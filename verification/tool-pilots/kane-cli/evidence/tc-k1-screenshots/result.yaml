@@ -1,0 +1,55 @@
+evidence: '0.1'
+test: qa-tc-k1-r2-1fb4f206
+status: passed
+duration_ms: 47232
+definition:
+  path: test.md
+  sha256: sha256:3de4fabdcf8a6f605e033b9f28f39e72088346c8fd472de2df0ef2f245965cad
+definition_id: sha256:4e7600aa7a32303d11334b1d2d4e9e8e76a14c5bbcb1844cb3fb39b14350467d
+external_id:
+  session_id: 467c4f5b-1a46-49e7-a5cc-7afc2c311fb9
+  commit_id: 467c4f5b-1a46-49e7-a5cc-7afc2c311fb9
+  test_id: 6abb2bf3-77aa-423c-b17d-21a925380199
+  testcase_id: 01M4QSA6918P35PJ6X6TKVWJCM
+  project_id: 01M4QQF5GQVYT89T8BA5QYHYTA
+  folder_id: 01M4QQF5SR09RSS7GBNGG9TAVS
+  org_id: '2616808'
+  session_name: qa_tc_k1_r2
+  user_name: ahmedfawzy70
+  user_email: ahmedfawzy70@gmail.com
+  sharable_link: https://test-manager.lambdatest.com/projects/01M4QQF5GQVYT89T8BA5QYHYTA/test-cases/01M4QSA6918P35PJ6X6TKVWJCM/dashboard/share/US_N3YIWBSGSW32N9IDYPWL5A6FCHGHH6ARV4IGNR4M4OW6PUS3DRT5BWPUJNV4LZYW?type=summary&agentView=true&fqdn=summary-page
+  execution_id: 31a5bdb6-78b0-4913-b1c7-ce24b9ba5fba
+environment:
+  model: v16-alpha
+  os: Linux
+  browser: Chrome
+  browser_version: '141'
+  resolution: 1920x1080
+  platform: Desktop
+  platform_type: web
+  os_version: 6.18.44-fc-v114
+steps:
+  - id: 0-1
+    ordinal: 1
+    status: passed
+    kind: navigate
+    duration_ms: 0
+    action_id: 947a188f-f207-4eeb-8d9e-b7227668eb0e
+  - id: 0-2
+    ordinal: 2
+    status: passed
+    kind: wait
+    duration_ms: 6700
+    action_id: f8fd011c-6236-4cb5-a06a-d5f2fa7489bc
+  - id: 0-3
+    ordinal: 3
+    status: passed
+    kind: analyze
+    duration_ms: 20100
+    action_id: ad2c368c-07b1-46ff-8e53-1cd23cc34a73
+  - id: 0-4
+    ordinal: 4
+    status: passed
+    kind: assert
+    duration_ms: 0
+    action_id: 6b5aa498-33ba-459c-ba94-7a1afd174341
