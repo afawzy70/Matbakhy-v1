@@ -1,0 +1,18 @@
+Native run 34 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38291984205), job 114953998401 iOS simulator, source f5d2ba0dc84db57d69c23f12a39602aa08845c29: conclusion success (Android job 114953998714: success)
+Test Case '-[SignInUITests.OrderingTests testB_ReopenedOfflineSaysUnconfirmed]' passed (9.479 seconds).
+Test Case '-[SignInUITests.OrderingTests testC_BackOnlineRecoversTheOneOrder]' passed (10.693 seconds).
+side effects (...): 1|1|1|1|1|1|1
+order MB-100001; stored total_minor 9000; app shows: MB032-ORDER-TOTAL Total: EGP 90.00
+MB033-QUANTITY-STOPPED-AT 10
+Test Case '-[SignInUITests.OrderingTests testD_QuantityStopsAtThePolicyLimit]' passed (21.785 seconds).
+MB033-OVER-LIMIT-BLOCKED
+MB033-DELIVERY-QUOTE-TOTAL Total: EGP 630.00
+MB033-DELIVERY-FEE Delivery: EGP 30.00
+MB033-DELIVERY-ORDER-NUMBER MB-100002
+Test Case '-[SignInUITests.OrderingTests testE_LoweredLimitBlocksQuoteThenDeliveryOrder]' passed (26.670 seconds).
+quotes for the customer: 1 before phase E, 2 after
+delivery order MB-100002 (mode|fee|total|address snapshot|kitchen|state): DELIVERY|3000|63000|true|00000000-0000-4000-8000-00000000a0d1|PENDING_ACCEPTANCE
+== phase F (MB-033): the order link opens the order warm and cold
+MB033-DEEP-LINK-OK MB-100002
+Test Case '-[SignInUITests.OrderingTests testF_OrderDeepLinkWarmAndCold]' passed (17.317 seconds).
+PASS: iOS ...; delivery order with zone fee and matching total; order deep link warm and cold
