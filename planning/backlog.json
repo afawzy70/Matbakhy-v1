@@ -1134,7 +1134,7 @@
       "id": "MB-031",
       "phase": "P07",
       "title": "Build native shell and authentication",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005",
@@ -1162,9 +1162,11 @@
         "TC-048",
         "TC-131"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261012-MB-031/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Native shell and authentication: release variants launch and the system-browser PKCE sign-in round trip passes on an Android emulator and an iOS simulator (native run 19) at fd689aa; fixed a defect where sign-in after sign-out or account switch silently reused the previous person's browser login. Emulator/simulator only; device and store builds are MB-034/MB-035. TC-048 order-link clause verified server-side; native re-check in MB-033."
     },
     {
       "id": "MB-032",
@@ -1422,7 +1424,7 @@
       "id": "MB-039",
       "phase": "P08",
       "title": "Implement privacy observability and recovery tooling",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-010",

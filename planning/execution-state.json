@@ -2,10 +2,10 @@
   "schema_version": 1,
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
-  "current_phase": "P06",
-  "current_story": "MB-029",
-  "last_tested_commit": "6a84b26bdab9b1c9dbe3b74022450132e89ae62c",
-  "last_completed_story": "MB-028",
+  "current_phase": "P07",
+  "current_story": "MB-032",
+  "last_tested_commit": "fd689aa901e5fef2d3188bc583d2de8fc104e85d",
+  "last_completed_story": "MB-031",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -31,8 +31,8 @@
       "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
     }
   ],
-  "next_action": "Awaiting the 2026-10-12 window (12:00-00:00 Asia/Kuwait). Then, in order: (1) apply D11 - remove the intent tiles' sort-only contextual panel and any one-person/two-people control; (2) apply D12 - add optional description to the discovery MealSummary from the existing published description, render when present; (3) MB-029 remaining checks (keyboard journeys, dialog focus in the browser, operations web at 360/390/768/1440 RTL/LTR, long table values) and evidence for TC-046/TC-047/TC-129, screen-reader testing reported separately (NOT_RUN unless actually performed); (4) approved light design for cart, checkout, order status and account with screenshots and the derived desktop layout for owner review (dark palette stays unapproved, not default); (5) re-run customer and kitchen journeys on the candidate revision and record CI; (6) external-QA handoff and staging-readiness assessment (no deployment or purchase); (7) MB-030 only after MB-029 is DONE. O05 stays open.",
-  "updated_at": "2026-10-12T03:22:00Z",
+  "next_action": "Start MB-032 (native discovery and ordering) on the generated client, with the native sign-in round trip in CI as the base. MB-029 stays BLOCKED (BLK-003, screen reader); MB-030 not eligible. MB-039 IN_PROGRESS: erasure (TC-055, customers), log redaction (TC-056) and local backup/restore rehearsal (TC-057) implemented and tested; staging restore needs O07, cook/applicant document retention needs O06.",
+  "updated_at": "2026-10-12T09:29:12Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

@@ -1,0 +1,17 @@
+Source: GitHub Actions native run 19, https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501
+Job "iOS simulator build (Xcode, unsigned)" (macos-26), head fd689aa901e5fef2d3188bc583d2de8fc104e85d. Excerpt copied by the implementation agent.
+
+Steps (all success): xcodebuild Debug for iOS Simulator (no signing); xcodebuild Release for iOS Simulator (JS bundle embedded;
+ad-hoc signed for the simulator keychain; no team or certificate); launch on iOS Simulator; identity provider and API started
+natively (PostgreSQL 16 Homebrew, Keycloak 26.8.0 release archive sha1-checked, API jar; synthetic users); XCUITest round trip.
+
+-- MB-031 launch on iOS Simulator
+PASS: iOS release simulator build launched and stayed running; no crash report
+
+-- MB-031 native sign-in round trip on iOS (XCUITest, apps/customer-mobile/e2e-ios)
+stack ready: identity http://localhost:8180, API http://localhost:8080
+Test Case '-[SignInUITests.SignInRoundTripTests testSignInSignOutAndAccountSwitchLeaveNoPreviousUserSession]' started.
+Test Case '-[SignInUITests.SignInRoundTripTests testSignInSignOutAndAccountSwitchLeaveNoPreviousUserSession]' passed (144.350 seconds).
+Test Suite 'All tests' passed at 2026-10-12 09:09:57.442.
+** TEST SUCCEEDED **
+PASS: iOS system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data

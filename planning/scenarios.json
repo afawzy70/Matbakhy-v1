@@ -901,8 +901,10 @@
       "given": "User A logs out then user B signs in",
       "when": "App restores cache or opens previous order link",
       "then": "A's data/tokens absent; B cannot access A's order",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-031/evidence.json"
+      ]
     },
     {
       "id": "TC-049",
@@ -1745,8 +1747,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Expo navigation/locales/environment config; PKCE/deep links; secure token storage; account switch/logout; crash boundary",
       "then": "Development builds launch on Android and iOS; invalid redirect/token state rejected; private cache cleared",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-031/evidence.json"
+      ]
     },
     {
       "id": "TC-132",

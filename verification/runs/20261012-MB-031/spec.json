@@ -1,0 +1,120 @@
+{
+  "run_id": "20261012-MB-031",
+  "story_id": "MB-031",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "manual_checks": [
+    {
+      "id": "ANDROID-NATIVE-LAUNCH-AND-SIGN-IN",
+      "name": "Android emulator (API 35): release-variant launch and system-browser PKCE sign-in round trip against local Keycloak and API",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501 (job: Android debug APK (Gradle)) at fd689aa",
+      "log_path": "verification/runs/20261012-MB-031/ANDROID-NATIVE.log"
+    },
+    {
+      "id": "IOS-NATIVE-LAUNCH-AND-SIGN-IN",
+      "name": "iOS simulator: release launch and XCUITest system-browser PKCE sign-in round trip against local Keycloak and API",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501 (job: iOS simulator build (Xcode, unsigned)) at fd689aa",
+      "log_path": "verification/runs/20261012-MB-031/IOS-NATIVE.log"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-048",
+      "observed": "On both an Android emulator (API 35, Chrome Custom Tabs) and an iOS simulator (ASWebAuthenticationSession, ephemeral), the release-variant app signs in with authorization code + PKCE in the system browser against the local Keycloak and API with synthetic users. Tokens live only in the OS secure store (session restored after an app restart). After customer-a signs out and the app restarts it is signed out and shows nothing of A; the next sign-in shows the provider's login form again (prompt=login; a defect where the previous person was silently signed back in was found and fixed); customer-b signs in and A's name is absent; 'Switch account' also demands a fresh login and cancelling leaves the app signed out with nothing of B. Client unit tests show cached private data is dropped when the subject changes. Scope note: the app has no order screens yet (MB-032), so opening A's previous order link from the app is not exercisable; the server refuses another customer's order (owner-only order views, MB-018/MB-019 backend tests in BACKEND-VERIFY), and MB-033's acceptance re-checks it natively once order screens exist."
+    },
+    {
+      "id": "TC-131",
+      "observed": "Expo shell with environment configuration (HTTPS required outside development), Arabic default and English with direction, system-browser PKCE with strict redirect checking (wrong scheme/path, forged or missing state, provider error and missing code rejected; unit tests), secure token storage that deletes corrupt, incomplete or expired-unrefreshable sessions, account switch and sign-out that clear private data, and a crash boundary. Release variants with the JS bundle embedded launch on the Android emulator and the iOS simulator with no crash, and the native sign-in round trip passes on both (TC-048). These are emulator/simulator builds, not store or signed device builds (MB-034/MB-035)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-MB-031/ANDROID-NATIVE.log",
+    "verification/runs/20261012-MB-031/IOS-NATIVE.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Native evidence comes from GitHub-hosted emulator/simulator runs at the same source commit; no physical device, store build or signing identity was used.",
+      "Defect found and fixed during review: interactive sign-in reused the provider's browser session, so after sign-out or on account switch the previous person was signed back in without a login form; now prompt=login and an ephemeral iOS session (unit test; mutation removing prompt=login fails it).",
+      "The development-identifier Android app permits cleartext to localhost/10.0.2.2 only (config plugin, skipped unless extra.environment is development); the iOS simulator Release build is ad-hoc signed so its keychain works. Neither applies to staging/production builds (O08).",
+      "TC-048's order-link clause is covered server-side now and natively in MB-033; this is stated in the scenario observation rather than claimed as exercised in the app."
+    ]
+  },
+  "open_defects": []
+}
