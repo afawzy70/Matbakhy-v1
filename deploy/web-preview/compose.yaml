@@ -113,6 +113,8 @@ services:
       # Synthetic commerce policy and service zones (db/devdata); EnvironmentGuard allows them only in LOCAL/CI/PREVIEW.
       SPRING_PROFILES_ACTIVE: dev
       LOGGING_STRUCTURED_FORMAT_CONSOLE: ecs
+      # Source commit the API image was built from (preview-images.yml tags it); emitted as service.version in every log line.
+      MATBAKHY_VERSION: ${SOURCE_SHA:?set SOURCE_SHA in .env}
       # Behind the proxy: build https://api.<domain> URLs (OIDC redirect) from X-Forwarded-* sent by the internal proxy.
       SERVER_FORWARD_HEADERS_STRATEGY: native
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"

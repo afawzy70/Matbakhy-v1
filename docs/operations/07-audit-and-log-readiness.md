@@ -55,7 +55,7 @@ Not every read should be audited. These are the ones that expose protected data 
 ## 3. Application logs
 
 - **Format:** ECS JSON on the console when `LOGGING_STRUCTURED_FORMAT_CONSOLE=ecs` (set in `deploy/web-preview/compose.yaml`); plain text locally.
-- **Stable fields:** Spring Boot's ECS format writes `@timestamp`, `log.level`, `log.logger` (component), `process.thread.name`, `message`, the MDC `requestId` when there is one, and `error.*` with a redacted stack trace on failures. Tests assert `message` and `requestId` only; the other field names are the framework's and were not separately checked. Environment and version are **not yet** emitted (gap: add `service.environment` and `service.version` from configuration in MB-040). Order and event IDs appear in the message text, not as separate fields.
+- **Stable fields:** Spring Boot's ECS format writes `@timestamp`, `log.level`, `log.logger` (component), `process.thread.name`, `message`, the MDC `requestId` when there is one, and `error.*` with a redacted stack trace on failures. Tests assert `message` and `requestId` only; the other field names are the framework's and were not separately checked. `service.name` (`matbakhy-api`), `service.environment` (from `APP_ENV`) and `service.version` (from `MATBAKHY_VERSION`; the preview sets it to the source SHA) are now emitted and asserted (AuditAndCorrelationReadinessIntegrationTest). Order and event IDs appear in the message text, not as separate fields.
 - **Correlation:**
   - request → committed order → notification delivery failure under one request ID: PASS (LogRedactionIntegrationTest);
   - request → outbox dispatch failure under the request ID stored with the event: PASS (new test, failure forced by a test-only trigger);

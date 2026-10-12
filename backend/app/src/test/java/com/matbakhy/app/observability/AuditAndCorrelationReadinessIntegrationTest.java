@@ -136,5 +136,15 @@ class AuditAndCorrelationReadinessIntegrationTest {
         }
         List<JsonNode> failures = lines.stream().filter(l -> l.path("message").asString().startsWith("outbox event " + event + " dispatch failed")).toList();
         assertThat(failures).hasSize(2).allSatisfy(l -> assertThat(l.path("requestId").asString()).isEqualTo("trace-outbox-0003"));
+        // LOG-01 stable fields: service name, environment and version on every structured line.
+        assertThat(failures).allSatisfy(l -> {
+            JsonNode service = l.path("service");
+            String name = service.isObject() ? service.path("name").asString() : l.path("service.name").asString();
+            String environment = service.isObject() ? service.path("environment").asString() : l.path("service.environment").asString();
+            String version = service.isObject() ? service.path("version").asString() : l.path("service.version").asString();
+            assertThat(name).isEqualTo("matbakhy-api");
+            assertThat(environment).isNotBlank();
+            assertThat(version).isNotBlank();
+        });
     }
 }

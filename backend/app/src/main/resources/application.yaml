@@ -30,6 +30,13 @@ logging:
   # with LOGGING_STRUCTURED_FORMAT_CONSOLE=ecs; the MDC request ID becomes a JSON field there.
   pattern:
     level: "%5p [%X{requestId:-}]"
+  # Stable ECS service fields (MB-039): environment from APP_ENV, version from the deployed image's source SHA.
+  structured:
+    ecs:
+      service:
+        name: matbakhy-api
+        environment: ${APP_ENV:LOCAL}
+        version: ${MATBAKHY_VERSION:unknown}
 server:
   error:
     include-stacktrace: never
