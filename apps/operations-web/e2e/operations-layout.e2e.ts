@@ -11,8 +11,8 @@ import { axe, env, sql } from "./fixtures";
  * (test-only SQL) to exercise long values in lists and tables. Automated rules are not a full audit.
  */
 const PASSWORD = env("E2E_USER_PASSWORD");
-const LONG_TITLE =
-  "كشري تجريبي بعنوان طويل جدًا لاختبار التفاف النص في الجداول والقوائم ومراجعة الأطباق VeryLongUnbrokenSyntheticTokenWithoutSpaces1234567890";
+// At the 120-character maximum for meal titles, with a long unbroken Latin token.
+const LONG_TITLE = "كشري تجريبي بعنوان طويل لاختبار التفاف النص في الجداول والقوائم VeryLongUnbrokenSyntheticTokenWithoutSpaces1234567890";
 
 async function idpLogin(page: Page, user: string) {
   await page.locator("#username").fill(user);
