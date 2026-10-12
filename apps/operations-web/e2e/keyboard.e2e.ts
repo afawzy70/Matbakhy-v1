@@ -6,7 +6,8 @@ import { env } from "./fixtures";
 /**
  * MB-029 / TC-047 keyboard-only journeys on the real stack (after the purchase journey, which leaves two open slots of
  * the synthetic kitchen). Customer: search, open a meal, choose a slot, add to the cart, meet the replacement prompt
- * for another slot (focus moves into it, Escape closes it and focus returns to the add button), open the cart. Cook:
+ * for another slot (focus moves into it, Escape closes it and focus returns to the add button), open the cart, sign in,
+ * choose pickup, get the server quote, accept the terms and place the order. Cook:
  * sign in and switch sections. Every element reached with Tab must show a visible focus indicator. No pointer input.
  */
 const c = customerStrings.ar;
@@ -81,6 +82,27 @@ test("keyboard-only customer and cook journeys with visible focus and focus rest
   await tabTo(page, (e) => e.tag === "A" && e.text === c.nav.cart, "cart link");
   await page.keyboard.press("Enter");
   await expect(page.getByText("1 × كشري تجريبي")).toBeVisible();
+
+  // Checkout without a pointer: sign in, pickup, server quote, terms, place the order.
+  await tabTo(page, (e) => e.tag === "A" && e.text === c.signIn, "sign in");
+  await page.keyboard.press("Enter");
+  await page.locator("#username").focus();
+  await page.keyboard.type("customer-b");
+  await page.keyboard.press("Tab");
+  await page.keyboard.type(PASSWORD);
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { name: c.checkout })).toBeVisible();
+  await tabTo(page, (e) => e.tag === "BUTTON" && e.text === c.mode.PICKUP, "pickup");
+  await page.keyboard.press("Enter");
+  await tabTo(page, (e) => e.tag === "BUTTON" && e.text === c.getQuote, "get quote");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText(c.total, { exact: true })).toBeVisible();
+  await tabTo(page, (e) => e.tag === "INPUT" && e.type === "checkbox", "terms");
+  await page.keyboard.press("Space");
+  await expect(page.getByLabel(c.terms)).toBeChecked();
+  await tabTo(page, (e) => e.tag === "BUTTON" && e.text === c.placeOrder, "place order");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.PENDING_ACCEPTANCE as string)).toBeVisible();
   await context.close();
 
   // Cook: sign in with the keyboard and move between sections.
