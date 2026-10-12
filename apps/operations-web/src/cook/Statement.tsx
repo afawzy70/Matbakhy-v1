@@ -60,7 +60,7 @@ export function Statement({ ctx }: { ctx: Ctx }) {
                 <strong>{formatMoney(s.summary.commissionOutstanding.amountMinor, locale)}</strong>
               </dd>
             </dl>
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0} role="region" aria-label={t.statement}>
               <table>
                 <thead>
                   <tr>

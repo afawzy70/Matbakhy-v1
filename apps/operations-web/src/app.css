@@ -87,10 +87,9 @@ button.danger {
   color: var(--mb-color-on-danger);
 }
 
+/* Link-style buttons keep the 44 px target (MB-029); only their look is a link. */
 button.link {
-  min-block-size: auto;
-  min-inline-size: auto;
-  padding: 0;
+  padding-inline: var(--mb-space-xs);
   background: none;
   color: var(--mb-color-primary);
   text-decoration: underline;
@@ -274,4 +273,21 @@ td {
   padding-inline: var(--mb-space-lg);
   padding-block: var(--mb-space-lg);
   font-size: var(--mb-font-size-xs);
+}
+
+/* Checkboxes and radios: palette accent and the 44 px target (MB-029). */
+input[type="checkbox"],
+input[type="radio"] {
+  flex-shrink: 0;
+  inline-size: var(--mb-touch-target-min);
+  block-size: var(--mb-touch-target-min);
+  margin: 0;
+  vertical-align: middle;
+  accent-color: var(--mb-color-primary);
+}
+
+/* A scrollable table region is focusable so keyboard users can scroll it (axe scrollable-region-focusable). */
+.table-wrap:focus-visible {
+  outline: 3px solid var(--mb-color-focus);
+  outline-offset: 2px;
 }
