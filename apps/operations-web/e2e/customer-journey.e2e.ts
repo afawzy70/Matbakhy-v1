@@ -41,8 +41,8 @@ async function idpLogin(page: Page, user: string) {
 async function shot(page: Page, name: string) {
   await axe(page, name);
   const viewport = page.viewportSize();
-  for (const width of [320, 390]) {
-    await page.setViewportSize({ width, height: 844 });
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${width} ${name}`).toBe(true);
     const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
       els.filter((e) => {
@@ -168,6 +168,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.PENDING_ACCEPTANCE as string)).toBeVisible();
   await page.getByRole("link", { name: c.nav.orders }).click();
   await expect(page.getByRole("link", { name: /^MB-/ })).toHaveCount(2);
+  await shot(page, "order-list");
 
   // Favorite the meal, see it in the account page, and see the visible review and rating on the meal page.
   await page.goto(`${CUSTOMER}/#/`);
@@ -179,6 +180,8 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toBeVisible();
   await expect(page.getByText(/من 5/)).toBeVisible();
   await page.getByRole("link", { name: c.nav.account }).click();
+  await expect(page.getByRole("heading", { name: c.favorites })).toBeVisible();
+  await shot(page, "account");
   await expect(page.getByRole("region", { name: c.favorites }).getByRole("link", { name: "كشري تجريبي" })).toBeVisible();
   await page.goBack();
   await page.getByLabel(c.report).selectOption("SPAM");

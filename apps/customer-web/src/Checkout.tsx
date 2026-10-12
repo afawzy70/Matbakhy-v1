@@ -11,20 +11,29 @@ export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; on
   const { t, locale } = ctx;
   const [cart, setCart] = useState(loadCart);
   if (!cart || cart.lines.length === 0) {
-    return <p className="card muted">{t.cartEmpty}</p>;
+    return (
+      <div className="transaction">
+        <p className="card muted">{t.cartEmpty}</p>
+        <a className="button" href="#/">
+          {t.nav.browse}
+        </a>
+      </div>
+    );
   }
   return (
-    <div className="stack">
+    <div className="transaction stack">
       <section className="card" aria-labelledby="cart-heading">
         <h2 id="cart-heading">{t.nav.cart}</h2>
-        <ul className="rows">
+        <ul className="line-items">
           {cart.lines.map((l) => (
             <li key={l.mealId}>
               {l.quantity} × {l.title}
             </li>
           ))}
         </ul>
-        <p className="muted">{formatTime(cart.slotStartsAt, locale)}</p>
+        <p>
+          <span className="pill slot-pill">{formatTime(cart.slotStartsAt, locale)}</span>
+        </p>
         <button
           type="button"
           className="secondary"
@@ -174,7 +183,7 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
           </button>
         </div>
       ) : null}
-      <div role="group" aria-label={t.checkout} className="segmented">
+      <div role="group" aria-label={t.checkout} className="mode-switch">
         {(["DELIVERY", "PICKUP"] as const)
           .filter((m) => cart.modes.includes(m))
           .map((m) => (
@@ -197,7 +206,7 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
             <fieldset>
               <legend>{t.address}</legend>
               {page.items.map((a) => (
-                <label key={a.id} className="check">
+                <label key={a.id} className="option-card">
                   <input
                     type="radio"
                     name="address"
@@ -217,6 +226,7 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
       ) : null}
       <button
         type="button"
+        className="cta"
         disabled={quoting.busy || (mode === "DELIVERY" && !addressId)}
         onClick={() =>
           void quoting.run(async () => {
@@ -245,8 +255,8 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
             <dd>{formatMoney(quote.deliveryFee.amountMinor, locale)}</dd>
             <dt>{t.tax}</dt>
             <dd>{formatMoney(quote.tax.amountMinor, locale)}</dd>
-            <dt>{t.total}</dt>
-            <dd>
+            <dt className="summary-total">{t.total}</dt>
+            <dd className="summary-total">
               <strong>{formatMoney(quote.total.amountMinor, locale)}</strong>
             </dd>
           </dl>
@@ -257,6 +267,7 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
           </label>
           <button
             type="button"
+            className="cta"
             disabled={!accepted || placing || pending !== null}
             onClick={() => {
               // Keys are fixed and stored before the request so a retry can never create a second order.

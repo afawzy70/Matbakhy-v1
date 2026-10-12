@@ -11,10 +11,14 @@ export function OrderList({ ctx }: { ctx: Ctx }) {
         page.items.length === 0 ? (
           <p className="card muted">{t.noOrders}</p>
         ) : (
-          <ul className="rows card">
+          <ul className="order-list transaction">
             {page.items.map((o) => (
-              <li key={o.id}>
-                <a href={`#/orders/${o.id}`}>{o.publicNumber}</a> · {t.state[o.state]} · {formatMoney(o.total.amountMinor, locale)}
+              <li key={o.id} className="card row between">
+                <a href={`#/orders/${o.id}`}>{o.publicNumber}</a>
+                <span className="pill state-pill">{t.state[o.state]}</span>
+                <span className="price">
+                  <bdi>{formatMoney(o.total.amountMinor, locale)}</bdi>
+                </span>
               </li>
             ))}
           </ul>
@@ -37,11 +41,11 @@ export function OrderDetail({ ctx, id }: { ctx: Ctx; id: string }) {
   return (
     <Status ctx={ctx} state={order} onRetry={reload}>
       {(o) => (
-        <article className="card stack" aria-labelledby="order-number">
+        <article className="card stack transaction" aria-labelledby="order-number">
           <h2 id="order-number">
             {o.publicNumber} · <span aria-live="polite">{t.state[o.state]}</span>
           </h2>
-          <ul className="rows">
+          <ul className="line-items">
             {o.items.map((i) => (
               <li key={i.mealId}>
                 {i.quantity} × {i.title} — {formatMoney(i.lineTotal.amountMinor, locale)}
@@ -52,7 +56,7 @@ export function OrderDetail({ ctx, id }: { ctx: Ctx; id: string }) {
             {t.total}: <strong>{formatMoney(o.total.amountMinor, locale)}</strong> · {formatTime(o.slot.startsAt, locale)}
           </p>
           {o.handoverCode ? (
-            <p className="notice">
+            <p className="notice handover">
               {t.handoverCode}: <strong dir="ltr">{o.handoverCode}</strong>
             </p>
           ) : null}
@@ -62,7 +66,7 @@ export function OrderDetail({ ctx, id }: { ctx: Ctx; id: string }) {
               {o.contact.pickupLocation ? ` · ${t.pickupLocation}: ${o.contact.pickupLocation}` : ""}
             </p>
           ) : null}
-          <ol className="rows" aria-label={t.timeline}>
+          <ol className="timeline" aria-label={t.timeline}>
             {o.events.map((e) => (
               <li key={e.sequence}>
                 {formatTime(e.occurredAt, locale)} · {t.state[e.toState] ?? e.toState}

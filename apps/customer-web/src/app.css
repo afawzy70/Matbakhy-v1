@@ -753,3 +753,122 @@ body {
 fieldset {
   min-inline-size: 0;
 }
+
+/* Transactional screens (cart, checkout, order status, account) in the approved system (docs/design/approved):
+   a readable single column on desktop, the same cards, pills, prices and primary actions as the homepage. */
+.transaction {
+  inline-size: 100%;
+  max-inline-size: 42rem;
+  margin-inline: auto;
+}
+
+.transaction h2 {
+  margin: 0;
+  font-size: var(--mb-font-size-lg);
+}
+
+.line-items {
+  display: grid;
+  gap: var(--mb-space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-weight: var(--mb-font-weight-bold);
+}
+
+.line-items li {
+  padding-block: var(--mb-space-xs);
+  border-block-end: 1px solid var(--mb-color-surface-muted);
+}
+
+.slot-pill,
+.state-pill {
+  background: var(--mb-color-surface-muted);
+  font-size: var(--mb-font-size-sm);
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  gap: var(--mb-space-sm);
+  min-block-size: var(--mb-touch-target-min);
+  padding: var(--mb-space-sm);
+  border: 1px solid var(--mb-color-border);
+  border-radius: var(--mb-radius-md);
+  background: var(--mb-color-surface);
+}
+
+.option-card:has(input:checked) {
+  border-color: var(--mb-color-primary);
+  background: var(--mb-color-surface-low);
+}
+
+.summary {
+  padding-block: var(--mb-space-sm);
+  border-block: 1px solid var(--mb-color-surface-muted);
+}
+
+.summary dd {
+  text-align: end;
+}
+
+.summary .summary-total {
+  padding-block-start: var(--mb-space-sm);
+  border-block-start: 1px solid var(--mb-color-border);
+  color: var(--mb-color-primary);
+  font-size: var(--mb-font-size-lg);
+}
+
+button.cta {
+  inline-size: 100%;
+  min-block-size: 3.25rem;
+  font-weight: var(--mb-font-weight-bold);
+}
+
+.order-list {
+  display: grid;
+  gap: var(--mb-space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order-list .card {
+  flex-wrap: wrap;
+  padding: var(--mb-space-md);
+}
+
+.handover strong {
+  font-size: var(--mb-font-size-xl);
+  letter-spacing: 0.1em;
+}
+
+.timeline {
+  display: grid;
+  gap: var(--mb-space-sm);
+  margin: 0;
+  padding-inline-start: var(--mb-space-lg);
+  border-inline-start: 2px solid var(--mb-color-border);
+  list-style: none;
+}
+
+.timeline li {
+  position: relative;
+  color: var(--mb-color-foreground-muted);
+}
+
+.timeline li::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(-1 * var(--mb-space-lg) - 6px);
+  inset-block-start: 0.55em;
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 50%;
+  background: var(--mb-color-primary);
+}
+
+.timeline li:last-child {
+  color: var(--mb-color-foreground);
+  font-weight: var(--mb-font-weight-bold);
+}

@@ -7,7 +7,7 @@ const CASE_CATEGORIES = ["LATE", "MISSING_ITEM", "QUALITY", "FOOD_SAFETY", "CASH
 /** The customer's own data: profile, addresses, favorites, inbox, support cases and the deletion request. */
 export function Account({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["CustomerProfile"]; onMeChanged: () => void }) {
   return (
-    <div className="stack">
+    <div className="transaction stack">
       <Profile ctx={ctx} me={me} onMeChanged={onMeChanged} />
       <Favorites ctx={ctx} />
       <Inbox ctx={ctx} />
