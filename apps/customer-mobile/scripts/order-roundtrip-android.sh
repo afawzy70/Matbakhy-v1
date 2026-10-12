@@ -73,6 +73,16 @@ tap_scrolled() {
   done
   fail "not found after scrolling: $1"
 }
+# Waits for content that appears below the fold (the quote under "Calculate total" on the small default AVD screen,
+# native run 25): checks what is visible, then scrolls on, until the deadline.
+wait_scrolled() {
+  local deadline=$((SECONDS + $2))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    wait_for "$1" 4 >/dev/null && return 0
+    adb shell input swipe $((SCREEN_W / 2)) $((SCREEN_H * 3 / 4)) $((SCREEN_W / 2)) $((SCREEN_H / 4)) 400
+  done
+  return 1
+}
 absent() { dump; if [ -n "$(center_of "$1")" ]; then fail "unexpectedly visible: $1"; fi; }
 launch() {
   adb shell am force-stop "$PKG"
@@ -126,7 +136,7 @@ trap 'kill $PROXY 2>/dev/null || true' EXIT
 sleep 1
 tap 'resource-id="mode-PICKUP"'
 tap_scrolled 'resource-id="get-quote"'
-wait_for 'resource-id="quote"|text="Total: [^"]*"' 60 >/dev/null || fail "no quote"
+wait_scrolled 'text="Total: [^"]*"' 60 || fail "no quote"
 SHOWN_QUOTE=$(grep -o 'text="Total: [^"]*"' "$UI" | head -1)
 tap_scrolled 'resource-id="accept-terms"'
 adb reverse tcp:8080 tcp:8081 >/dev/null
@@ -144,7 +154,7 @@ echo "== reopen offline"
 adb reverse --remove tcp:8080 >/dev/null
 launch
 tap 'resource-id="open-cart"' 60
-wait_for 'text="You.re offline. We couldn.t confirm whether your order arrived[^"]*"' 60 >/dev/null || fail "offline uncertainty not stated"
+wait_scrolled 'text="You.re offline. We couldn.t confirm whether your order arrived[^"]*"' 60 || fail "offline uncertainty not stated"
 absent 'resource-id="place-order"'
 absent 'text="MB-[0-9]+"'
 shot reopened-offline
@@ -152,7 +162,7 @@ echo "ok: offline and unconfirmed, nothing claimed"
 
 echo "== back online: recover the one order"
 adb reverse tcp:8080 tcp:8080 >/dev/null
-tap 'resource-id="retry-order"'
+tap_scrolled 'resource-id="retry-order"'
 wait_for 'text="MB-[^"]*"' 60 >/dev/null || fail "recovered order not shown"
 NUMBER=$(grep -o 'text="MB-[^"]*"' "$UI" | head -1 | sed 's/text="\(.*\)"/\1/')
 shot recovered-order
