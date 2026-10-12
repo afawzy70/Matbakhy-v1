@@ -41,7 +41,15 @@ export async function saveSession(session: StoredSession): Promise<void> {
 }
 
 export async function loadSession(now: number = Date.now()): Promise<StoredSession | null> {
-  const raw = await SecureStore.getItemAsync(KEY, OPTIONS);
+  // One retry of a failed read (as for the basket): a keystore that is not ready yet must not look like a sign-out.
+  let raw: string | null;
+  try {
+    raw = await SecureStore.getItemAsync(KEY, OPTIONS);
+  } catch (e) {
+    console.warn(`secure storage read failed for the session (${e instanceof Error ? e.name : typeof e}); retrying`);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    raw = await SecureStore.getItemAsync(KEY, OPTIONS);
+  }
   if (raw === null) {
     return null;
   }

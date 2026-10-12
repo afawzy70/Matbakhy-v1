@@ -1,6 +1,6 @@
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { AppState, Pressable, View } from "react-native";
 import { useApp } from "../AppContext";
 import { errorCode, formatMoney, formatTime, newKey } from "../mobileApi";
 import { Body, Button, Card, Choice, ErrorLine, Field, Notice, Screen, StatusView, Title } from "../ui";
@@ -57,7 +57,21 @@ export function OrdersScreen({ navigation }: TabProps<"Orders">) {
 }
 
 /** Order status from the server, refreshed every 10 seconds; actions are only those the server allows. */
-export function OrderScreen({ route, navigation }: RootProps<"Order">) {
+export function OrderScreen(props: RootProps<"Order">) {
+  const { t, locale, auth, startSignIn } = useApp();
+  // Opened from a link while signed out: ask for sign-in; the order loads for the account that signs in, if it is theirs.
+  if (auth.kind !== "signedIn") {
+    return (
+      <Screen locale={locale} testID="order-sign-in">
+        <Body locale={locale}>{t.signInRequired}</Body>
+        <Button label={t.signIn} onPress={() => void startSignIn()} />
+      </Screen>
+    );
+  }
+  return <SignedInOrder key={auth.profile?.id ?? "account"} {...props} />;
+}
+
+function SignedInOrder({ route, navigation }: RootProps<"Order">) {
   const { api, t, locale } = useApp();
   const { orderId } = route.params;
   const [order, reload] = useServer(() => api.GET("/api/v1/orders/{orderId}", { params: { path: { orderId } } }), `${orderId}|${locale}`);
@@ -66,7 +80,12 @@ export function OrderScreen({ route, navigation }: RootProps<"Order">) {
   const [requested, setRequested] = useState(false);
   useEffect(() => {
     const timer = setInterval(reload, 10_000);
-    return () => clearInterval(timer);
+    // Back in the foreground the server's current state is fetched at once instead of at the next tick (MB-033).
+    const foreground = AppState.addEventListener("change", (s) => s === "active" && reload());
+    return () => {
+      clearInterval(timer);
+      foreground.remove();
+    };
   }, [reload]);
 
   async function command(fn: () => Promise<{ data?: unknown; error?: unknown }>, after?: () => void) {

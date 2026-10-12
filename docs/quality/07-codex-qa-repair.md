@@ -2,12 +2,21 @@
 
 The implementation agent wrote this repair record; it is **self-review**, not independent verification. The findings below are **FIXED_PENDING_INDEPENDENT_RETEST**: Codex has not retested them. Nothing is closed by independent QA, and no release gate is approved.
 
-## Recommended retest revision (updated 2026-10-12, 19:20 Asia/Kuwait)
+## Retest revisions (updated 2026-10-12, 20:50 Asia/Kuwait)
 
-**Retest `cdc592a2492a691de714a3d0bf23b31f25599480`** (full SHA). It supersedes the earlier candidate `c35ad2d`.
-- **CI:** Product CI run 243 (PR) succeeded at this commit.
-- **Local six-check evidence:** recorded in `verification/runs/20261012-MB-032/evidence.json` once it completes (see `docs/status/latest.md`).
-- **Not independently verified:** no Codex result exists yet for this commit or for `c35ad2d`.
+Two immutable revisions are offered. Neither has been retested by Codex; nothing here is independent verification.
+
+| | **A. Original defects fixed: `cdc592a2492a691de714a3d0bf23b31f25599480`** | **B. Newer candidate: `<NEWER>`** |
+|---|---|---|
+| Purpose | Retest MBQA-001, MBQA-002, FG-001 and Q1 exactly as repaired | Retest the same, plus everything changed since A |
+| Evidence | Six local checks PASS (`verification/runs/20261012-MB-032/`); Product CI run 243 success; native run 31 success on Android and iOS | `<NEWER-EVIDENCE>` |
+| Customer web and operations web code | As repaired | Identical to A (no web client change after A) |
+| Native app | Basket editing, recovery, Q1 limits | A plus: one recovery check at a time ("Check and retry"), order deep links, sign-in prompt on a linked order, refresh on return to the foreground (MB-033) |
+| Native checks | MB-031/MB-032 | A plus quantity limit, lowered limit, delivery checkout and deep links on Android and iOS |
+| Backend | As repaired | A plus: `APP_ENV=PREVIEW` (inactive locally), denial audit on long paths fixed, staff view of order contact audited (MB-039) |
+| Native fixtures | — | Kitchen one delivers to Test zone A; its slot has 15 portions |
+
+**Recommendation:** use **B** for a combined retest. Use **A** only to confirm the original findings in isolation.
 
 **Fixes included in `cdc592a`:**
 
@@ -40,7 +49,8 @@ The implementation agent wrote this repair record; it is **self-review**, not in
 | Report | `qa/independent-eb1a671/report.md` on that branch |
 | Application tested by QA | `eb1a6717b3304d3a02e6a46d06c77ed5d43ac144` |
 | Repairs made on | `implementation/mvp` from `5bd7681`; newer work on the branch kept |
-| **Fixed candidate SHA for retest** | **`c35ad2d0be06f045059e19fbcc1c6e25209cb645`**: six-check evidence PASS; Product CI run 220 (push) and 221 (PR) success; Blueprint integrity success |
+| First repair candidate (superseded) | `c35ad2d0be06f045059e19fbcc1c6e25209cb645`: six-check evidence PASS; Product CI runs 220 and 221 success |
+| **Current retest revisions** | **A `cdc592a…`** and **B `<NEWER>`**: see "Retest revisions" above |
 
 The QA failures and evidence on the QA branch are unchanged. The red-phase logs below were produced on the implementation branch.
 
@@ -137,9 +147,9 @@ These are proposals for the owner. Behaviour was not changed for them.
   - *Proposal:* keep showing SOLD_OUT/UNAVAILABLE meals honestly, labelled and not purchasable, after the available ones. Excluding them would make shared links and favorites appear broken.
   - The alternative is to exclude them from browse, as the journey text says, and keep them only in favorites and history.
   - Either way is a small change. Owner choice.
-- **Q1 (still open): per-line quantity limit.** Client 20 versus the synthetic policy limit 10. See `docs/product/q1-quantity-limit-decision.md`.
-  - The new basket controls use the same cap as the meal page, min(20, portions).
-  - Option A in the Q1 note would replace 20 with the published policy limit in both places.
+- **Q1: per-line quantity limit.**
+  - The mechanism is implemented at A (option A): clients follow the server's published limit (API-001).
+  - The value is still open (O04). The synthetic policy uses 10, which is a fixture, not a commercial decision. See `docs/product/q1-quantity-limit-decision.md`.
 
 ## Reporting correction: the Kane comparison
 
@@ -158,14 +168,19 @@ This is a reporting correction only. It is separate from the product repairs, an
 
 ## For the Codex retest
 
-- **Revision:** check out `c35ad2d0be06f045059e19fbcc1c6e25209cb645`, not the branch head.
-- **Startup:** start as in `docs/quality/06-codex-qa-handoff.md`; the isolated stack and synthetic fixtures are unchanged.
-- **Retest only:**
-  1. IQA-09 mixed-stock selection;
-  2. IQA-01 language switch, both directions, on browse, meal and kitchen;
-  3. IQA-04 to IQA-08, now including the basket totals;
-  4. the adjacent add and checkout flow.
-- **Not in this candidate:**
-  - native emulator/simulator verification of the basket (MB-032; native cart editing is implemented and unit-tested);
-  - RQ-001/002/003 and Q1 decisions;
-  - screen-reader testing (BLK-003).
+- **Revision:** check out **B `<NEWER>`** (or A `cdc592a…` for the original findings alone), not the branch head.
+- **Startup:** as in `docs/quality/06-codex-qa-handoff.md`.
+  - Isolated compose project and the synthetic users from the realm.
+  - Dev-profile policy (version 1, limit 10) and zones.
+  - Your own synthetic catalogue SQL.
+  - The clients call `GET /api/v1/configuration/public` for limits.
+- **Retest:**
+  1. IQA-09 mixed-stock selection. The quantity cap is now min(published limit 10, slot portions).
+  2. IQA-01 language switch, both directions, on browse, meal and kitchen.
+  3. IQA-04 to IQA-08, including the basket totals.
+  4. The adjacent add and checkout flow.
+- **Remaining platform gaps (not covered by either revision):**
+  - physical Android and iOS devices (only emulator and simulator runs exist);
+  - screen-reader testing (BLK-003; MB-029/TC-047 stay blocked);
+  - push notifications (no provider; O07);
+  - RQ-001/002/003 and the O04 limit value.

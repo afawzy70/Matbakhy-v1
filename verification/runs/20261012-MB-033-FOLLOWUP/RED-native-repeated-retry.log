@@ -1,0 +1,68 @@
+  console.error
+    You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+
+      at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+      at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+
+  console.error
+    You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+
+      at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+      at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+
+  console.error
+    You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+
+      at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+      at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+
+FAIL src/App.test.tsx
+  customer app shell (MB-031, kept in MB-032)
+    ○ skipped signs in through the injected PKCE flow from the Account tab, shows the profile and switches language
+    ○ skipped ends the session and clears private data, basket and pending order when the server says 401
+    ○ skipped signs out through the provider hook, clearing the session and the basket
+    ○ skipped shows a recoverable crash screen without technical details
+  native discovery and ordering (MB-032)
+    ○ skipped adds a meal and slot to an empty basket without asking
+    ○ skipped asks before replacing the basket with another kitchen's meal: keep leaves it, replace replaces it (TC-148)
+    ○ skipped after a restart with an unconfirmed order: says plainly it is offline, then shows the one recovered order (TC-049)
+  repeated Check and retry
+    ✕ two presses in the same frame send one recovery check and at most one re-send with the same keys (402 ms)
+  QA repair MBQA-002 on native: an exhausted selected slot cannot be added
+    ○ skipped refuses the exhausted slot without writing the basket and adds the slot that has stock up to its portions
+  native basket editing (CW05, MB-032; parity with QA finding FG-001)
+    ○ skipped records the price, portion limit and kitchen when adding, for the estimate only
+    ○ skipped edits quantities and removes lines with integer arithmetic, then shows the empty state
+    ○ skipped keeps quantity between 1 and the line's limit, and locks the basket while an order is unconfirmed
+  the unconfirmed order stays reachable after a restart (TC-049, MB-032)
+    ○ skipped shows the cart shortcut when an order is pending even if the basket cannot be found
+    ○ skipped retries a failed secure-storage read once instead of hiding the basket
+  Q1 on native: quantity limits come from the server's active policy
+    ○ skipped caps the meal quantity at the policy limit although the slot has more portions
+    ○ skipped explains a basket line above a lowered limit, and lets the customer reduce it
+
+  ● repeated Check and retry › two presses in the same frame send one recovery check and at most one re-send with the same keys
+
+    expect(received).toHaveLength(expected)
+
+    Expected length: 1
+    Received length: 2
+    Received array:  ["GET /api/v1/orders/by-request/33333333-3333-4333-8333-333333333333", "GET /api/v1/orders/by-request/33333333-3333-4333-8333-333333333333"]
+
+      262 |     expect(await screen.findByText("MB-000124")).toBeTruthy();
+      263 |     const calls = (fetchImpl as jest.Mock).mock.calls.slice(before).map((c) => `${(c[0] as Request).method} ${new URL((c[0] as Request).url).pathname}`);
+    > 264 |     expect(calls.filter((c) => c === `GET /api/v1/orders/by-request/${pendingKeys.clientRequestId}`)).toHaveLength(1);
+          |                                                                                                       ^
+      265 |     const posts = (fetchImpl as jest.Mock).mock.calls.filter((c) => (c[0] as Request).method === "POST");
+      266 |     expect(posts).toHaveLength(1);
+      267 |     expect((posts[0][0] as Request).headers.get("Idempotency-Key")).toBe("app-k2");
+
+      at Object.toHaveLength (src/App.test.tsx:264:103)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 15 skipped, 16 total
+Snapshots:   0 total
+Time:        2.377 s, estimated 15 s
+Ran all test suites matching /src\/App.test.tsx/i with tests matching "repeated Check and retry".

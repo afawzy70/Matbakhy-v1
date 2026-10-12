@@ -264,5 +264,18 @@ esac
 psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
 echo "ok: delivery order persisted with the zone fee, the address snapshot and the quoted total, in kitchen one's queue"
 
+echo "== MB-033 deep link to the order: warm (app running on Discover) and cold (process stopped)"
+DID=$(psql_q -c "SELECT id FROM customer_order WHERE public_number = '$DNUMBER'")
+launch
+wait_for 'content-desc="Native Dish One[^"]*"|resource-id="open-cart"|resource-id="tab-discover"' 60 >/dev/null || fail "Discover not shown before the warm link"
+adb shell am start -W -a android.intent.action.VIEW -d "matbakhy-dev://orders/$DID" "$PKG" >/dev/null
+wait_for "text=\"$DNUMBER\"" 60 >/dev/null || fail "warm deep link did not open order $DNUMBER"
+shot deep-link-warm
+adb shell am force-stop "$PKG"
+adb shell am start -W -a android.intent.action.VIEW -d "matbakhy-dev://orders/$DID" "$PKG" >/dev/null
+wait_for "text=\"$DNUMBER\"" 90 >/dev/null || fail "cold deep link did not open order $DNUMBER"
+shot deep-link-cold
+echo "ok: the order link opens order $DNUMBER warm and cold"
+
 if adb logcat -d | grep -E "FATAL EXCEPTION"; then fail "fatal exception"; fi
-echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total"
+echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold"

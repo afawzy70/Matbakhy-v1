@@ -1,0 +1,786 @@
+FAIL src/App.test.tsx
+  ● deep links (MB-033) › opens the linked order for the signed-in customer
+
+    Unable to find an element with text: MB-000900
+
+    [36m<View>[39m
+      [36m<RNSScreenStack>[39m
+        [36m<RNSScreen[39m
+          [33maria-hidden[39m=[32m{false}[39m
+        [36m>[39m
+          [36m<RNSScreenContentWrapper>[39m
+            [36m<View>[39m
+              [36m<RNSScreenNavigationContainer>[39m
+                [36m<RNSScreen[39m
+                  [33mpointerEvents[39m=[32m"box-none"[39m
+                [36m>[39m
+                  [36m<View[39m
+                    [33maria-hidden[39m=[32m{false}[39m
+                  [36m>[39m
+                    [36m<View>[39m
+                      [36m<View[39m
+                        [33mpointerEvents[39m=[32m"box-none"[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mpointerEvents[39m=[32m"box-none"[39m
+                        [36m>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"auto"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"none"[39m
+                          [36m/>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m>[39m
+                              [36m<Text[39m
+                                [33mrole[39m=[32m"heading"[39m
+                              [36m>[39m
+                                [0mDiscover[0m
+                              [36m</Text>[39m
+                            [36m</View>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                        [36m</View>[39m
+                      [36m</View>[39m
+                    [36m</View>[39m
+                    [36m<View>[39m
+                      [36m<RCTScrollView[39m
+                        [33mtestID[39m=[32m"discover"[39m
+                      [36m>[39m
+                        [36m<View>[39m
+                          [36m<View>[39m
+                            [36m<Text>[39m
+                              [0mSearch dishes or kitchens[0m
+                            [36m</Text>[39m
+                            [36m<TextInput[39m
+                              [33maccessibilityLabel[39m=[32m"Search dishes or kitchens"[39m
+                              [33mtestID[39m=[32m"search"[39m
+                              [33mvalue[39m=[32m""[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33maccessibilityLabel[39m=[32m"Search"[39m
+                            [33maccessibilityRole[39m=[32m"button"[39m
+                            [33maccessibilityState[39m=[32m{
+                              {
+                                "disabled": false,
+                              }
+                            }[39m
+                            [33maccessible[39m=[32m{true}[39m
+                          [36m>[39m
+                            [36m<Text>[39m
+                              [0mSearch[0m
+                            [36m</Text>[39m
+                          [36m</View>[39m
+                          [36m<Text>[39m
+                            [0mNo dishes are available right now.[0m
+                          [36m</Text>[39m
+                        [36m</View>[39m
+                      [36m</RCTScrollView>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</RNSScreen>[39m
+              [36m</RNSScreenNavigationContainer>[39m
+              [36m<View[39m
+                [33mpointerEvents[39m=[32m"auto"[39m
+              [36m>[39m
+                [36m<View[39m
+                  [33mpointerEvents[39m=[32m"none"[39m
+                [36m/>[39m
+                [36m<View[39m
+                  [33mrole[39m=[32m"tablist"[39m
+                [36m>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Discover, tab, 1 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": true,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-discover"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View />[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mDiscover[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Favorites, tab, 2 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-favorites"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mFavorites[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Orders, tab, 3 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-orders"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mOrders[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Account, tab, 4 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-account"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mAccount[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</View>[39m
+          [36m</RNSScreenContentWrapper>[39m
+          [36m<RNSScreenStackHeaderConfig[39m
+            [33mpointerEvents[39m=[32m"box-none"[39m
+            [33mtitle[39m=[32m"Tabs"[39m
+          [36m/>[39m
+        [36m</RNSScreen>[39m
+      [36m</RNSScreenStack>[39m
+    [36m</View>[39m
+
+      236 |     jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+      237 |     await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(200, order))} />);
+    > 238 |     expect(await screen.findByText("MB-000900")).toBeTruthy();
+          |                         ^
+      239 |   });
+      240 |
+      241 |   it("asks a signed-out visitor to sign in and requests nothing", async () => {
+
+      at Object.findByText (src/App.test.tsx:238:25)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● deep links (MB-033) › asks a signed-out visitor to sign in and requests nothing
+
+    Unable to find an element with testID: order-sign-in
+
+    [36m<View>[39m
+      [36m<RNSScreenStack>[39m
+        [36m<RNSScreen[39m
+          [33maria-hidden[39m=[32m{false}[39m
+        [36m>[39m
+          [36m<RNSScreenContentWrapper>[39m
+            [36m<View>[39m
+              [36m<RNSScreenNavigationContainer>[39m
+                [36m<RNSScreen[39m
+                  [33mpointerEvents[39m=[32m"box-none"[39m
+                [36m>[39m
+                  [36m<View[39m
+                    [33maria-hidden[39m=[32m{false}[39m
+                  [36m>[39m
+                    [36m<View>[39m
+                      [36m<View[39m
+                        [33mpointerEvents[39m=[32m"box-none"[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mpointerEvents[39m=[32m"box-none"[39m
+                        [36m>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"auto"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"none"[39m
+                          [36m/>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m>[39m
+                              [36m<Text[39m
+                                [33mrole[39m=[32m"heading"[39m
+                              [36m>[39m
+                                [0mDiscover[0m
+                              [36m</Text>[39m
+                            [36m</View>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                        [36m</View>[39m
+                      [36m</View>[39m
+                    [36m</View>[39m
+                    [36m<View>[39m
+                      [36m<RCTScrollView[39m
+                        [33mtestID[39m=[32m"discover"[39m
+                      [36m>[39m
+                        [36m<View>[39m
+                          [36m<View>[39m
+                            [36m<Text>[39m
+                              [0mSearch dishes or kitchens[0m
+                            [36m</Text>[39m
+                            [36m<TextInput[39m
+                              [33maccessibilityLabel[39m=[32m"Search dishes or kitchens"[39m
+                              [33mtestID[39m=[32m"search"[39m
+                              [33mvalue[39m=[32m""[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33maccessibilityLabel[39m=[32m"Search"[39m
+                            [33maccessibilityRole[39m=[32m"button"[39m
+                            [33maccessibilityState[39m=[32m{
+                              {
+                                "disabled": false,
+                              }
+                            }[39m
+                            [33maccessible[39m=[32m{true}[39m
+                          [36m>[39m
+                            [36m<Text>[39m
+                              [0mSearch[0m
+                            [36m</Text>[39m
+                          [36m</View>[39m
+                          [36m<Text>[39m
+                            [0mNo dishes are available right now.[0m
+                          [36m</Text>[39m
+                        [36m</View>[39m
+                      [36m</RCTScrollView>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</RNSScreen>[39m
+              [36m</RNSScreenNavigationContainer>[39m
+              [36m<View[39m
+                [33mpointerEvents[39m=[32m"auto"[39m
+              [36m>[39m
+                [36m<View[39m
+                  [33mpointerEvents[39m=[32m"none"[39m
+                [36m/>[39m
+                [36m<View[39m
+                  [33mrole[39m=[32m"tablist"[39m
+                [36m>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Discover, tab, 1 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": true,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-discover"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View />[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mDiscover[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Favorites, tab, 2 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-favorites"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mFavorites[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Orders, tab, 3 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-orders"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mOrders[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Account, tab, 4 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-account"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mAccount[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</View>[39m
+          [36m</RNSScreenContentWrapper>[39m
+          [36m<RNSScreenStackHeaderConfig[39m
+            [33mpointerEvents[39m=[32m"box-none"[39m
+            [33mtitle[39m=[32m"Tabs"[39m
+          [36m/>[39m
+        [36m</RNSScreen>[39m
+      [36m</RNSScreenStack>[39m
+    [36m</View>[39m
+
+      243 |     const fetchImpl = routes(() => json(200, order));
+      244 |     await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    > 245 |     expect(await screen.findByTestId("order-sign-in")).toBeTruthy();
+          |                         ^
+      246 |     const paths = (fetchImpl as unknown as jest.Mock).mock.calls.map((c) => new URL((c[0] as Request).url).pathname);
+      247 |     expect(paths).not.toContain("/api/v1/orders/o9");
+      248 |   });
+
+      at Object.findByTestId (src/App.test.tsx:245:25)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● deep links (MB-033) › shows another account's order as not found, with none of its data
+
+    Unable to find an element with testID: order
+
+    [36m<View>[39m
+      [36m<RNSScreenStack>[39m
+        [36m<RNSScreen[39m
+          [33maria-hidden[39m=[32m{false}[39m
+        [36m>[39m
+          [36m<RNSScreenContentWrapper>[39m
+            [36m<View>[39m
+              [36m<RNSScreenNavigationContainer>[39m
+                [36m<RNSScreen[39m
+                  [33mpointerEvents[39m=[32m"box-none"[39m
+                [36m>[39m
+                  [36m<View[39m
+                    [33maria-hidden[39m=[32m{false}[39m
+                  [36m>[39m
+                    [36m<View>[39m
+                      [36m<View[39m
+                        [33mpointerEvents[39m=[32m"box-none"[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mpointerEvents[39m=[32m"box-none"[39m
+                        [36m>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"auto"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"none"[39m
+                          [36m/>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m>[39m
+                              [36m<Text[39m
+                                [33mrole[39m=[32m"heading"[39m
+                              [36m>[39m
+                                [0mDiscover[0m
+                              [36m</Text>[39m
+                            [36m</View>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                        [36m</View>[39m
+                      [36m</View>[39m
+                    [36m</View>[39m
+                    [36m<View>[39m
+                      [36m<RCTScrollView[39m
+                        [33mtestID[39m=[32m"discover"[39m
+                      [36m>[39m
+                        [36m<View>[39m
+                          [36m<View>[39m
+                            [36m<Text>[39m
+                              [0mSearch dishes or kitchens[0m
+                            [36m</Text>[39m
+                            [36m<TextInput[39m
+                              [33maccessibilityLabel[39m=[32m"Search dishes or kitchens"[39m
+                              [33mtestID[39m=[32m"search"[39m
+                              [33mvalue[39m=[32m""[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33maccessibilityLabel[39m=[32m"Search"[39m
+                            [33maccessibilityRole[39m=[32m"button"[39m
+                            [33maccessibilityState[39m=[32m{
+                              {
+                                "disabled": false,
+                              }
+                            }[39m
+                            [33maccessible[39m=[32m{true}[39m
+                          [36m>[39m
+                            [36m<Text>[39m
+                              [0mSearch[0m
+                            [36m</Text>[39m
+                          [36m</View>[39m
+                          [36m<Text>[39m
+                            [0mNo dishes are available right now.[0m
+                          [36m</Text>[39m
+                        [36m</View>[39m
+                      [36m</RCTScrollView>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</RNSScreen>[39m
+              [36m</RNSScreenNavigationContainer>[39m
+              [36m<View[39m
+                [33mpointerEvents[39m=[32m"auto"[39m
+              [36m>[39m
+                [36m<View[39m
+                  [33mpointerEvents[39m=[32m"none"[39m
+                [36m/>[39m
+                [36m<View[39m
+                  [33mrole[39m=[32m"tablist"[39m
+                [36m>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Discover, tab, 1 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": true,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-discover"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View />[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mDiscover[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Favorites, tab, 2 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-favorites"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mFavorites[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Orders, tab, 3 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-orders"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mOrders[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Account, tab, 4 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-account"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mAccount[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</View>[39m
+          [36m</RNSScreenContentWrapper>[39m
+          [36m<RNSScreenStackHeaderConfig[39m
+            [33mpointerEvents[39m=[32m"box-none"[39m
+            [33mtitle[39m=[32m"Tabs"[39m
+          [36m/>[39m
+        [36m</RNSScreen>[39m
+      [36m</RNSScreenStack>[39m
+    [36m</View>[39m
+
+      251 |     jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+      252 |     await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(404, { code: "NOT_FOUND" }))} />);
+    > 253 |     expect(await screen.findByTestId("order")).toBeTruthy();
+          |                         ^
+      254 |     await waitFor(() => expect(screen.queryByText("MB-000900")).toBeNull());
+      255 |     expect(screen.queryByText(/Dish m1/)).toBeNull();
+      256 |   });
+
+      at Object.findByTestId (src/App.test.tsx:253:25)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       3 failed, 33 skipped, 1 passed, 37 total
+Snapshots:   0 total
+Time:        5.069 s
+Ran all test suites with tests matching "deep links".

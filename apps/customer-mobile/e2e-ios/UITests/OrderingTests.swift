@@ -10,6 +10,7 @@ import XCTest
 ///   testD  the quantity control stops at min(policy limit 10, 15 available portions) and the ten are added to the basket.
 ///   testE  the saved basket is flagged and cannot be quoted; reducing to 5 restores the quote; a delivery order to the
 ///          saved address shows the zone fee and the server's total.
+///   testF  the order link (matbakhy-dev://orders/<id>) opens that order while the app runs (warm) and after termination (cold).
 final class OrderingTests: XCTestCase {
     let app = XCUIApplication(bundleIdentifier: "com.matbakhy.customer.dev")
     let authUI = XCUIApplication(bundleIdentifier: "com.apple.SafariViewService")
@@ -218,5 +219,22 @@ final class OrderingTests: XCTestCase {
         expect(number, "delivery order not confirmed")
         print("MB033-DELIVERY-ORDER-NUMBER \(number.label)")
         shot("delivery-order")
+    }
+
+    func testF_OrderDeepLinkWarmAndCold() {
+        let env = ProcessInfo.processInfo.environment
+        guard let id = env["MB033_ORDER_ID"], let number = env["MB033_ORDER_NUMBER"], let url = URL(string: "matbakhy-dev://orders/\(id)") else {
+            return XCTFail("order id and number not passed by the script")
+        }
+        app.launch()
+        expect(element("tab-discover"), "Discover not shown before the warm link")
+        app.open(url)
+        expect(app.staticTexts[number], "warm deep link did not open \(number)")
+        shot("deep-link-warm")
+        app.terminate()
+        app.open(url)
+        expect(app.staticTexts[number], "cold deep link did not open \(number)", timeout: 90)
+        print("MB033-DEEP-LINK-OK \(number)")
+        shot("deep-link-cold")
     }
 }

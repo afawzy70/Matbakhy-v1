@@ -1,5 +1,5 @@
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../AppContext";
 import { estimateMinor, lineLimit, loadBasket, loadPending, saveBasket, savePending, type Basket, type BasketLine, type PendingPlacement } from "../basket";
@@ -39,13 +39,20 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
     [navigation],
   );
 
-  const recheck = useCallback(async () => {
-    setChecking(true);
-    try {
-      settleOutcome(await recover(api));
-    } finally {
-      setChecking(false);
+  // One recovery check at a time: a second press (or the check on focus) while one is running waits for it instead of
+  // sending another lookup and possibly a second re-send (MB-033 retry review; the server's idempotency stays the backstop).
+  const inFlight = useRef<Promise<void> | null>(null);
+  const recheck = useCallback(() => {
+    if (!inFlight.current) {
+      setChecking(true);
+      inFlight.current = recover(api)
+        .then(settleOutcome)
+        .finally(() => {
+          inFlight.current = null;
+          setChecking(false);
+        });
     }
+    return inFlight.current;
   }, [api, settleOutcome]);
 
   useFocusEffect(

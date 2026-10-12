@@ -17,6 +17,7 @@ import { CartScreen } from "./screens/Cart";
 import { DiscoverScreen } from "./screens/Discover";
 import { FavoritesScreen } from "./screens/Favorites";
 import { MealScreen } from "./screens/Meal";
+import { linkingFor } from "./linking";
 import type { RootParams, TabParams } from "./screens/navigation";
 import { NotificationsScreen } from "./screens/Notifications";
 import { OrderScreen, OrdersScreen } from "./screens/Orders";
@@ -66,9 +67,10 @@ function Tabs() {
 }
 
 function Navigation() {
-  const { t } = useApp();
+  const { t, config } = useApp();
+  const linking = useMemo(() => linkingFor(config.redirectUri), [config.redirectUri]);
   return (
-    <NavigationContainer theme={theme}>
+    <NavigationContainer theme={theme} linking={linking}>
       <Stack.Navigator screenOptions={{ headerBackTitle: t.back }}>
         <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
         <Stack.Screen name="Meal" component={MealScreen} options={{ title: "" }} />

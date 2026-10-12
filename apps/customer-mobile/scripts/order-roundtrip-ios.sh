@@ -118,4 +118,9 @@ esac
 echo "$DSHOWN" | grep -qE 'EGP.630\.00' || { echo "FAIL: app delivery total differs from the stored total 63000"; exit 1; }
 echo "$DFEE" | grep -qE 'EGP.30\.00' || { echo "FAIL: app delivery fee differs from the zone fee 3000"; exit 1; }
 psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
-echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total"
+
+echo "== phase F (MB-033): the order link opens the order warm and cold"
+export TEST_RUNNER_MB033_ORDER_ID="$(psql_q -c "SELECT id FROM customer_order WHERE public_number = '$DNUMBER'")"
+export TEST_RUNNER_MB033_ORDER_NUMBER="$DNUMBER"
+phase testF_OrderDeepLinkWarmAndCold
+echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold"

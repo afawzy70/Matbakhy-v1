@@ -1,6 +1,6 @@
 import { brand } from "@matbakhy/design-tokens";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native";
-import { Alert } from "react-native";
+import { Alert, Linking } from "react-native";
 import { App } from "./App";
 import type { AppConfig } from "./config";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -210,6 +210,140 @@ describe("native discovery and ordering (MB-032)", () => {
   });
 });
 
+/** MB-033 deep links in the app's scheme: an order link opens the order for the signed-in account only. */
+describe("deep links (MB-033)", () => {
+  const order = {
+    id: "o9", publicNumber: "MB-000900", version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP",
+    items: [{ mealId: "m1", title: "Dish m1", quantity: 1, unitPrice: money(12000), lineTotal: money(12000) }],
+    subtotal: money(12000), deliveryFee: money(0), tax: money(0), total: money(12000), slot: slot("slot-k1"),
+    acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], cashState: "DUE", supportCaseIds: [], handoverCode: null, contact: null,
+  };
+  const routes = (orderResponse: () => Response) =>
+    api({
+      "GET /api/v1/me": () => json(200, profile),
+      "GET /api/v1/meals": () => json(200, { items: [], nextCursor: null, hasMore: false }),
+      "GET /api/v1/configuration/public": () => json(200, { orderingAvailable: true, orderLimits: null }),
+      "GET /api/v1/orders/o9": orderResponse,
+    }) as unknown as typeof fetch;
+  async function signedIn() {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    return session;
+  }
+  afterEach(() => jest.restoreAllMocks());
+
+  it("opens the linked order for the signed-in customer", async () => {
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+    await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(200, order))} />);
+    expect(await screen.findByText("MB-000900")).toBeTruthy();
+  });
+
+  it("asks a signed-out visitor to sign in and requests nothing", async () => {
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+    const fetchImpl = routes(() => json(200, order));
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    expect(await screen.findByTestId("order-sign-in")).toBeTruthy();
+    const paths = (fetchImpl as unknown as jest.Mock).mock.calls.map((c) => new URL((c[0] as Request).url).pathname);
+    expect(paths).not.toContain("/api/v1/orders/o9");
+  });
+
+  it("shows another account's order as not found, with none of its data", async () => {
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+    await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(404, { code: "NOT_FOUND" }))} />);
+    expect(await screen.findByTestId("order")).toBeTruthy();
+    await waitFor(() => expect(screen.queryByText("MB-000900")).toBeNull());
+    expect(screen.queryByText(/Dish m1/)).toBeNull();
+  });
+
+  it("keeps the customer signed in when the first secure-storage read of the session fails", async () => {
+    const SecureStore = jest.requireMock<{ getItemAsync: jest.Mock }>("expo-secure-store");
+    const session = await signedIn();
+    const original = SecureStore.getItemAsync.getMockImplementation();
+    let failed = false;
+    SecureStore.getItemAsync.mockImplementation(async (k: string) => {
+      if (k.includes("session") && !failed) {
+        failed = true;
+        throw new Error("keystore not ready");
+      }
+      return mockStore.get(k) ?? null;
+    });
+    jest.spyOn(console, "warn").mockImplementation(() => undefined);
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+    try {
+      await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(200, order))} />);
+      expect(await screen.findByText("MB-000900")).toBeTruthy();
+      expect(failed).toBe(true);
+    } finally {
+      SecureStore.getItemAsync.mockImplementation(original);
+    }
+  });
+
+  it("never treats the sign-in callback as navigation", async () => {
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://auth/callback?code=x&state=y");
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(200, order))} />);
+    expect(await screen.findByTestId("tab-discover")).toBeTruthy();
+    expect(screen.queryByTestId("order-sign-in")).toBeNull();
+  });
+});
+
+/** MB-033 retry review: "Check and retry" pressed repeatedly while a check is still running sends one check at a time. */
+describe("repeated Check and retry", () => {
+  it("two presses in the same frame send one recovery check and at most one re-send with the same keys", async () => {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    const pendingKeys = { clientRequestId: "33333333-3333-4333-8333-333333333333", idempotencyKey: "app-k2", quoteId: "q", terms: "t", cancellation: "c" };
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "slot-k1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: "m1", title: "Dish m1", quantity: 1 }] }));
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify(pendingKeys));
+    let online = false;
+    let created = false;
+    const order = {
+      id: "o2", publicNumber: "MB-000124", version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP",
+      items: [{ mealId: "m1", title: "Dish m1", quantity: 1, unitPrice: money(12000), lineTotal: money(12000) }],
+      subtotal: money(12000), deliveryFee: money(0), tax: money(0), total: money(12000), slot: slot("slot-k1"),
+      acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], cashState: "DUE", supportCaseIds: [], handoverCode: null, contact: null,
+    };
+    let release: () => void = () => {};
+    const gate = new Promise<void>((r) => (release = r));
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const path = new URL(input.url).pathname;
+      if (!online) {
+        throw new TypeError("Network request failed");
+      }
+      if (path === `/api/v1/orders/by-request/${pendingKeys.clientRequestId}`) {
+        await gate;
+        return created ? json(200, order) : json(404, { code: "NOT_FOUND" });
+      }
+      if (input.method === "POST" && path === "/api/v1/orders") {
+        created = true;
+        return json(201, order);
+      }
+      if (path === "/api/v1/orders/o2") return json(200, order);
+      if (path === "/api/v1/me") return json(200, profile);
+      if (path === "/api/v1/meals") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (path === "/api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      throw new Error(`unrouted ${input.method} ${path}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+    expect(await screen.findByText(t.pendingOffline)).toBeTruthy();
+
+    online = true;
+    const before = (fetchImpl as jest.Mock).mock.calls.length;
+    const retry = screen.getByTestId("retry-order");
+    await act(async () => {
+      fireEvent.press(retry);
+      fireEvent.press(retry);
+    });
+    release();
+    expect(await screen.findByText("MB-000124")).toBeTruthy();
+    const calls = (fetchImpl as jest.Mock).mock.calls.slice(before).map((c) => `${(c[0] as Request).method} ${new URL((c[0] as Request).url).pathname}`);
+    expect(calls.filter((c) => c === `GET /api/v1/orders/by-request/${pendingKeys.clientRequestId}`)).toHaveLength(1);
+    const posts = (fetchImpl as jest.Mock).mock.calls.filter((c) => (c[0] as Request).method === "POST");
+    expect(posts).toHaveLength(1);
+    expect((posts[0][0] as Request).headers.get("Idempotency-Key")).toBe("app-k2");
+  });
+});
+
 /** Repair for the independent QA finding MBQA-002 (web) applied to the same rule on native; run red before the fix. */
 describe("QA repair MBQA-002 on native: an exhausted selected slot cannot be added", () => {
   const mixed = {
@@ -321,14 +455,26 @@ describe("the unconfirmed order stays reachable after a restart (TC-049, MB-032)
     mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: "m1", title: "Dish m1", quantity: 1 }] }));
     mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify(pending));
     const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
-    SecureStore.getItemAsync.mockImplementationOnce(async () => {
-      throw new Error("keystore not ready");
+    // The first read of the basket key fails (whatever else is read first, e.g. once deep links delay the first render).
+    const original = SecureStore.getItemAsync.getMockImplementation();
+    let failed = false;
+    SecureStore.getItemAsync.mockImplementation(async (k: string) => {
+      if (k === "matbakhy.basket.v1" && !failed) {
+        failed = true;
+        throw new Error("keystore not ready");
+      }
+      return mockStore.get(k) ?? null;
     });
-    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
-    await fireEvent.press(await screen.findByTestId("open-cart"));
-    expect(await screen.findByText(/1 × Dish m1/)).toBeTruthy();
-    expect(warn).toHaveBeenCalled();
-    warn.mockRestore();
+    try {
+      await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
+      await fireEvent.press(await screen.findByTestId("open-cart"));
+      expect(await screen.findByText(/1 × Dish m1/)).toBeTruthy();
+      expect(failed).toBe(true);
+      expect(warn).toHaveBeenCalled();
+    } finally {
+      SecureStore.getItemAsync.mockImplementation(original);
+      warn.mockRestore();
+    }
   });
 });
 
