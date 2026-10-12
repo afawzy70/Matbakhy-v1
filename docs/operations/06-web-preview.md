@@ -80,7 +80,32 @@ Results are in `verification/runs/20261012-STAGING-PREP/rehearsal.log`:
 
 ## Sizing
 
-The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Idle use measured about 1 GiB, and the container limits add up to about 5.3 GiB. Builds and heavy tests stay in CI. 4/8 leaves room for Keycloak and JVM peaks and for backups; 2 vCPU / 4 GB would probably run, but has no headroom. Load is not measured (MB-038).
+The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Builds and heavy tests stay in CI.
+
+- **Observation only, not capacity evidence:** in the local rehearsal, idle memory was about 1 GiB in total (API 277 MiB, Keycloak 557 MiB, PostgreSQL 84 MiB, SeaweedFS 69 MiB). Idle figures say nothing about peaks under use; load is not measured (MB-038).
+- **Container limits** (in `compose.yaml`; they add up to about 5.3 GiB, leaving room for the OS, backups and page cache):
+
+| Service | Memory | CPU | Logs (json-file) |
+|---|---|---|---|
+| API | 2 GiB | 1.5 | 10 MB × 3 |
+| Keycloak | 1 GiB | — | 10 MB × 3 |
+| PostgreSQL | 1.5 GiB | — | 10 MB × 3 |
+| Storage | 512 MiB | — | 10 MB × 3 |
+| Proxy | 256 MiB | — | 10 MB × 3 |
+
+- 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside.
+
+### Bounded load and smoke plan (prepared, NOT_RUN)
+
+Run only on the preview server, with synthetic users and data, from an allowed client. It is a sanity check for a handful of testers, not a capacity claim; the MB-038 load test remains the capacity evidence.
+
+1. **Smoke** (`deploy.sh smoke`, read-only): health through the proxy is not exposed; API-001, meal list, a public photo, the OIDC discovery document, the login redirect.
+2. **Step load**, at most 10 minutes in total, stopped at the first failed threshold:
+   - browse (meal list and meal detail, anonymous): 1, 5, then 10 concurrent virtual users, 2 minutes each;
+   - signed-in quote and order with the synthetic customers: at most 2 concurrent, 20 orders in total, each with its own idempotency key; afterwards the reconcile query (`/reconcile.sql`) must show stock, orders and cash obligations consistent.
+3. **Thresholds (provisional):** p95 below 800 ms for browse and 1.5 s for quote and order; no 5xx; no container restart or OOM kill (`docker inspect` restart count, kernel log); memory below 85 % of each limit; disk below 70 %.
+4. **Record:** tool and version, commands, start and end time, `docker stats` samples every 10 s, results against the thresholds, in `verification/runs/<date>-PREVIEW-LOAD/`.
+5. **Not in scope:** sustained or soak load, Keycloak brute-force behaviour, anything against a third-party service.
 
 ## Cost (UNVERIFIED)
 
@@ -99,6 +124,27 @@ Neither price is a prepaid promotional price. The script's own backups are free,
 
 **Recommendation:** Hetzner CX33 if it is available in an EU location, otherwise the fallback. Both have EU regions close enough to Egypt for a preview. Expected total: about €10–12 per month with IPv4 and provider backups, or about US$58 per month on the fallback, plus the domain. Unverified.
 
+## Tester access (recommendation; owner decision needed)
+
+The preview must stay **deny-by-default**: nothing reachable for a client that has not been let in. The current package does this with an IP allow-list (`ALLOWED_CLIENT_IPS` in Caddy). That works for fixed office or home lines but not for testers on mobile data or moving between Wi-Fi networks, whose public address changes; Egyptian mobile carriers also use carrier-grade NAT, so one allowed address can be shared with strangers.
+
+The access method must work for: browser sign-in and the OIDC redirects between `app.`/`ops.`, `id.` and `api.`; native app API calls (later, when native builds point at the preview); signed photo uploads to `media.`; and recovery testing (offline, restart, retry).
+
+| Option | Changing IPs | OIDC and native | Deny-by-default | Cost and effort | Notes |
+|---|---|---|---|---|---|
+| **A. Private network overlay (WireGuard, or a managed WireGuard service such as Tailscale)** — recommended | Yes: the device keeps its overlay address on any network | Yes: the same hostnames resolve to the server's overlay address (split DNS or a hosts entry); TLS certificates stay valid with a DNS-01 challenge, or an internal CA trusted on test devices | Yes: ports 80/443 are closed on the public interface; only the overlay and SSH (key only) are open | Plain WireGuard: free, one key per device, manual setup. Managed service: free personal tier exists (UNVERIFIED limits and terms) | Testers install a VPN app; recovery tests can still toggle the device network (switching the VPN off is an "offline" test) |
+| B. IP allow-list (current) | No: every address change locks the tester out until the list is edited | Yes | Yes | Free | Fine for the owner on a fixed line; poor for mobile testers; shared CGNAT addresses weaken it |
+| C. Identity-aware proxy in front of the apps (an extra login before the application, e.g. a forward-auth gateway or a hosted access service) | Yes | Fragile: a second login wraps the application's own OIDC flow; native API calls carry bearer tokens and cannot answer the proxy's browser login without per-device service tokens | Yes | Extra component or a third-party account | Adds a second sign-in and a new failure mode exactly where recovery testing needs clean behaviour |
+| D. Basic auth on the proxy | Yes | Breaks native calls and OIDC redirects unless excluded, and exclusions reopen the API | Partly | Free | Not recommended |
+
+**Recommendation: option A**, plain WireGuard to start (no new third-party account), keeping the IP allow-list as a second layer only for the owner's fixed line if wanted. The proxy's `remote_ip` matcher then lists the overlay range instead of public addresses. Nothing has been set up.
+
+**Owner decisions:**
+1. Access method: A (recommended), B, or another.
+2. If A: plain WireGuard (manual keys) or a managed service (a new third-party account; terms and limits to be checked by the owner).
+3. Who receives access, and on how many devices.
+4. Certificates for overlay-only hosts: DNS-01 with the DNS provider's API token (stored only on the server), or an internal CA installed on test devices.
+
 ## Owner inputs needed before anything is created
 
 1. **Hosting and budget:**
@@ -108,7 +154,7 @@ Neither price is a prepaid promotional price. The script's own backups are free,
 2. **Domain:**
    - the domain or subdomain to use;
    - DNS `A` (and `AAAA`) records for `app.`, `ops.`, `api.`, `id.` and `media.` pointing at the server, created by the owner when ready.
-3. **Access:** the testers' public IP addresses or ranges for `ALLOWED_CLIENT_IPS`.
+3. **Access:** the access method (see "Tester access"); for the IP allow-list, the testers' public IP addresses or ranges for `ALLOWED_CLIENT_IPS`; for the private network, the list of tester devices.
 4. **Certificates:** an e-mail address for the certificate authority (`ACME_EMAIL`).
 5. **Images:** approval to run `preview-images.yml`, which pushes two images to GHCR under the repository owner. Package visibility must be checked: the images contain no secrets, but the front image contains the domain.
 6. **Who may use it before the audit and log checks pass:** the owner alone, or nobody (see Readiness).

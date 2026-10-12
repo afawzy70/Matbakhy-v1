@@ -28,10 +28,17 @@ public class ApiSecurityErrors implements AuthenticationEntryPoint, AccessDenied
     public void auditDenial(HttpServletRequest request, Authentication authentication, ErrorCode code) {
         if (authentication != null && authentication.getPrincipal() instanceof CurrentAccount actor) {
             Object requestId = request.getAttribute(RequestIdFilter.ATTRIBUTE);
-            audit.record(new com.matbakhy.operations.api.AuditLog.Entry(actor.id(), "denied " + request.getMethod() + " " + request.getRequestURI(),
-                    null, "endpoint", request.getRequestURI(), com.matbakhy.operations.api.AuditLog.Outcome.DENIED, code.name(),
+            // Bounded so that a denial on an arbitrarily long path is still recorded: the action column holds 120 characters and
+            // the object ID is indexed (MB-039).
+            String uri = request.getRequestURI();
+            audit.record(new com.matbakhy.operations.api.AuditLog.Entry(actor.id(), bounded("denied " + request.getMethod() + " " + uri, 120),
+                    null, "endpoint", bounded(uri, 512), com.matbakhy.operations.api.AuditLog.Outcome.DENIED, code.name(),
                     requestId == null ? null : requestId.toString(), java.util.Map.of()));
         }
+    }
+
+    private static String bounded(String value, int max) {
+        return value.length() <= max ? value : value.substring(0, max - 1) + "…";
     }
 
     @Override
