@@ -96,7 +96,7 @@ function Inbox({ ctx }: { ctx: Ctx }) {
           <ul className="rows">
             {page.items.map((n) => (
               <li key={n.id} className={n.readAt ? "muted" : undefined}>
-                {formatTime(n.createdAt, locale)} · {n.params.orderNumber ?? ""} · {t.state[n.params.state ?? ""] ?? n.type}
+                {formatTime(n.createdAt, locale)} · {t.state[n.params.state ?? ""] ?? n.type}
                 {n.orderId ? (
                   <>
                     {" "}

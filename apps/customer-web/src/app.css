@@ -804,11 +804,13 @@ fieldset {
 }
 
 .summary {
+  column-gap: 0;
   padding-block: var(--mb-space-sm);
   border-block: 1px solid var(--mb-color-surface-muted);
 }
 
 .summary dd {
+  padding-inline-start: var(--mb-space-lg);
   text-align: end;
 }
 
@@ -871,4 +873,45 @@ button.cta {
 .timeline li:last-child {
   color: var(--mb-color-foreground);
   font-weight: var(--mb-font-weight-bold);
+}
+
+/* Derived desktop layout (owner review pending): the Home / Orders / Account navigation sits under the header
+   instead of a phone-style bottom bar; content keeps the same hierarchy. */
+@media (min-width: 64rem) {
+  .app {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    order: 0;
+  }
+
+  .app > :not(.topbar):not(.bottom-nav):not(main) {
+    order: 1;
+  }
+
+  .bottom-nav {
+    order: 1;
+    position: static;
+    justify-content: flex-start;
+    gap: var(--mb-space-md);
+    padding-block: var(--mb-space-xs);
+    padding-inline: var(--mb-space-lg);
+    border-block-start: 0;
+    border-block-end: 1px solid var(--mb-color-surface-muted);
+  }
+
+  .bottom-nav a {
+    flex: 0 0 auto;
+    padding-inline: var(--mb-space-md);
+  }
+
+  main {
+    order: 2;
+  }
+
+  .shell {
+    padding-block-end: var(--mb-space-xxxl);
+  }
 }
