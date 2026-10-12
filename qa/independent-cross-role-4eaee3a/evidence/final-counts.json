@@ -1,0 +1,34 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "unit": "[REDACTED]",
+  "web": {
+    "PASS": 30,
+    "FAIL": 3,
+    "BLOCKED": 3,
+    "NOT_RUN": 0
+  },
+  "android": {
+    "PASS": 3,
+    "FAIL": 0,
+    "BLOCKED": 1,
+    "NOT_RUN": 0
+  },
+  "ios": {
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 1,
+    "NOT_RUN": 3
+  },
+  "overall": {
+    "PASS": 33,
+    "FAIL": 3,
+    "BLOCKED": 5,
+    "NOT_RUN": 3
+  },
+  "totalEligibleGroups": 44,
+  "excluded": "unfinished/absent surfaces and full future gates; see eligibility.md/report.md",
+  "webBlocked": "RQ-004 oracle, positive phoneOTP, screenreader",
+  "nativeBlocked": "Android supplemental UI harness before quantity assertions; iOS auth UI-automation prerequisites",
+  "nativeNotRun": "iOS replacement/order-recovery/basket-lifecycle-language depend on completed auth",
+  "nativeProductFailureConfirmed": false
+}

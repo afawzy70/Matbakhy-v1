@@ -1,0 +1,28 @@
+{
+  "deniedWrite": {
+    "status": 403,
+    "data": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "b830383a-1ea0-48fa-9673-1e2404213c4c",
+      "retryable": false
+    }
+  },
+  "lastAdmin": {
+    "status": 409,
+    "data": {
+      "code": "STATE_CONFLICT",
+      "messageKey": "error.state_conflict",
+      "fieldErrors": [],
+      "requestId": "d08f52c8-d8e6-4dc9-a819-67c2c346c8ff",
+      "retryable": false
+    }
+  },
+  "protectedGrant": "219b657b-f612-4259-8054-587780702416",
+  "flagUnchanged": {
+    "key": "ordering-enabled",
+    "enabled": true,
+    "version": 0
+  }
+}

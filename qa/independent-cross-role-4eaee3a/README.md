@@ -44,6 +44,10 @@ node qa/independent-cross-role-4eaee3a/expanded.cjs
 node qa/independent-cross-role-4eaee3a/more.cjs
 node qa/independent-cross-role-4eaee3a/final-segments.cjs
 node qa/independent-cross-role-4eaee3a/finance-final.cjs
+node qa/independent-cross-role-4eaee3a/remaining.cjs
+node qa/independent-cross-role-4eaee3a/finance-synthetic.cjs
+node qa/independent-cross-role-4eaee3a/support-final.cjs
+node qa/independent-cross-role-4eaee3a/security-final.cjs
 python3 qa/independent-cross-role-4eaee3a/review-results.py
 ```
 
@@ -64,3 +68,7 @@ Cleanup uses only the dedicated compose files/project: `docker compose ... down 
 Publication hygiene review: the repository scanner's history mode could not resolve the shared worktree git directory inside its container and scanned0commits, so that output is not called a history PASS. Its working-tree scan flagged20 generic-api-key matches, all traced to UUID command idempotency keys in RPC evidence/case prose, not login credentials. Current evidence now masks these keys as well; the digest-pinned scanner independently scanned the QA directory and found0leaks. Historical QA checkpoint retains authenticated command nonce values, not reusable access credentials; no force-push/history rewrite was performed.
 
 Native harness amendments: Android extra journey now starts a new real foreground process after offline recovery, retaining session/storage. iOS attempt2 progressed beyond launch but met an OS Save Password? sheet; QA-only `ios-auth-controls.py` dismisses only that observed prompt with Not Now, keeping the same element/timeouts/assertions and never changing the product binary. Android-only and iOS-only commits run separate non-cancelling QA concurrency groups; they do not rerun the other surface or cancel its active session. Final outcomes must come from execution, not these harness changes.
+
+Further executed finance/accounting state tests explicitly use fictional QA-SYNTHETIC-NO-TRANSFER / QA-SYNTHETIC-NO-REFUND-TRANSFER external references. These exercise the delivered state/permission/idempotency/ledger behavior only, not a bank, actual cash or payment/refund integration. They do not process real payments.
+
+Final native attempts completed: Android3core journey groups PASS/extraBLOCKED; iOSauthBLOCKED/dependent3groupsNOT_RUN. See native-results.md. No native supplementary basket/layout PASS or iOS auth/recovery PASS is inferred from code/build/developerCI.

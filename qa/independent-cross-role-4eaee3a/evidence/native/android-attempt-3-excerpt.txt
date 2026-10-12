@@ -1,0 +1,10 @@
+Android debug APK (Gradle)	Gradle assembleDebug	2026-10-12T17:20:15.1619709Z Welcome to Gradle 9.3.1!
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T17:28:00.1694335Z sdkVersion:'24'
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T17:28:00.1694498Z targetSdkVersion:'36'
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T17:28:00.1931097Z openjdk version "17.0.20.1" 2026-08-18
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T17:28:00.6786924Z Gradle 9.3.1
+Android debug APK (Gradle)	MB-031 launch on Android emulator	2026-10-12T17:38:24.9099547Z PASS: Android release-variant build launched; Discover tab visible; no fatal errors
+Android debug APK (Gradle)	MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)	2026-10-12T17:40:03.9204902Z PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T17:42:13.3757754Z order MB-100001; database (number|total_minor): MB-100001|9000; app shows text="Total: EGP 90.00"; quote showed text="Total: EGP 90.00"
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T17:42:13.4432610Z PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total
+Android debug APK (Gradle)	Independent Android basket background process and Arabic checks	2026-10-12T17:42:49.4960419Z IQA FAIL: below-fold control unavailable

@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nHome\nOrders\nMeals\nSlots\nStatement\nSettings\nActive\nPause new sales\nKitchen settings\nPublic description\nPickup from the kitchen\nApproved delivery zones\nTest zone (inactive)\nTest zone A\nTest zone B\nSave\nAPI: http://localhost:38080",
+  "cart": null,
+  "pending": false
+}

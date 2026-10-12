@@ -1,0 +1,10 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "project": "matbakhy-cross-role-4eaee3a",
+  "finishedAt": "2026-10-12T18:06:09.246241+00:00",
+  "ownedContainersRemaining": 0,
+  "ownedVolumes": "deleted with own compose down --volumes",
+  "vitePorts35173And35174": "stopped only after PID cwd verified owned worktree",
+  "otherSessions": "no global kill/prune/production command performed",
+  "remoteNativeJobs": "both final platform-specific runs completed; no outstanding native execution"
+}

@@ -1,6 +1,6 @@
 # Executed web case record
 
-Application SHA: `4eaee3a1f53b929b9e7685fd30da689d470d095c`. Units:28 reviewed case groups (25PASS,3FAIL). Raw retries are evidence, not additional coverage.
+Application SHA: `4eaee3a1f53b929b9e7685fd30da689d470d095c`. Units:34 reviewed case groups (30PASS,3FAIL,1BLOCKED oracle). Raw retries are evidence, not additional coverage.
 
 Every case uses real local sessions/services. Synthetic actor/kitchen/meal/slot IDs are in `evidence/fixtures.json`; created connected slot/order in `created-fixtures.json`, `cross-role-order.json`, and `delivery-order.json`. Staff roles/grants are separate. No test uses production data.
 
@@ -910,3 +910,165 @@ Each subsection supplies requirement/preconditions/steps; exact per-subcheck exp
 
 **Execution review:** Latest execution; earlier attempts remain in results.json.
 
+
+## Additional executed cases during native runner preparation
+
+All use the identical productSHA and real owned sessions/services. No provider/real payment was called.
+
+## C-AFTER-ACCEPT — PASS
+
+**Actor/surface:** Customer/cook/ops web + API/database. **Requirement:** BR-028/029/031; MB-019/024.
+
+**Preconditions and steps:** Prerequisite: new B1×1/B2 slot order via real customer quote/place API, correct cook-b, fresh OTP ops-review. Accept; customer UI shows request only. Direct customer cancel409; UI cancellation request201 and same-key repeat same case; cookprepare; unauthorizedcookops403; fresh-MFA ops cancels with case/reason. Customer seesCancelled. Meal/slotconsumed1 remain, reserved/allocated0.
+
+**Expected/actual subchecks:**
+
+- **PASS** Separate correct cook accepts exact request. Expected: `"ACCEPTED"`. Actual: `{"status":200,"data":{"id":"b014ed5f-1447-417f-abde-f1eee5f304ca","publicNumber":"MB-100014","version":1,"state":"ACCEPTED","fulfillmentMode":"PICKUP","items":[{"mealId":"00000000-0000-0000-0000-00000000026d","title":"QA Meal B1","allergenStatement":"UNKNOWN","quantity":1,"unitPrice":{"amountMinor":8025,"currency":"EGP"},"lineTotal":{"amountMinor":8025,"currency":"EGP"}}],"subtotal":{"amountMinor":8025,"currency":"EGP"},"deliveryFee":{"amountMinor":0,"currency":"EGP"},"tax":{"amountMinor":0,"cur… [full in reviewed-results.json]`.
+
+- **PASS** Accepted customer has request action and no direct cancel. Expected: `"request only"`. Actual: `["العربية","Request cancellation (reviewed by support)"]`.
+
+- **PASS** Backend agrees accepted direct cancellation denied. Expected: `409`. Actual: `{"status":409,"data":{"code":"STATE_CONFLICT","messageKey":"error.state_conflict","fieldErrors":[{"field":"state","code":"CANCELLATION_REQUEST_REQUIRED"}],"requestId":"ba09ef62-25e9-40e1-aed5-c58fc3ca4314","retryable":false}}`.
+
+- **PASS** UI creates support request without cancelling order. Expected: `"case201; orderACCEPTED"`. Actual: `{"status":201,"data":{"id":"a1e44563-1634-4940-a104-592968c2caa0","reference":"CS-4F6BC132","orderId":"b014ed5f-1447-417f-abde-f1eee5f304ca","orderNumber":"MB-100014","category":"CANCELLATION_REQUEST","state":"OPEN","description":"Cancellation requested: CHANGED_MIND","resolutionCode":null,"createdAt":"2026-10-12T17:26:13.253329Z","updatedAt":"2026-10-12T17:26:13.253329Z","messages":[],"version":0},"body":{"expectedVersion":1,"reasonCode":"CHANGED_MIND"},"key":"[REDACTED IDEMPOTENCY KEY]"}`.
+
+- **PASS** Same-key cancellation request has one exact case. Expected: `"a1e44563-1634-4940-a104-592968c2caa0"`. Actual: `{"status":201,"data":{"id":"a1e44563-1634-4940-a104-592968c2caa0","reference":"CS-4F6BC132","orderId":"b014ed5f-1447-417f-abde-f1eee5f304ca","orderNumber":"MB-100014","category":"CANCELLATION_REQUEST","state":"OPEN","description":"Cancellation requested: CHANGED_MIND","resolutionCode":null,"createdAt":"2026-10-12T17:26:13.253329Z","updatedAt":"2026-10-12T17:26:13.253329Z","messages":[],"version":0}}`.
+
+- **PASS** Preparing consumes capacity. Expected: `"PREPARING"`. Actual: `{"status":200,"data":{"id":"b014ed5f-1447-417f-abde-f1eee5f304ca","publicNumber":"MB-100014","version":2,"state":"PREPARING","fulfillmentMode":"PICKUP","items":[{"mealId":"00000000-0000-0000-0000-00000000026d","title":"QA Meal B1","allergenStatement":"UNKNOWN","quantity":1,"unitPrice":{"amountMinor":8025,"currency":"EGP"},"lineTotal":{"amountMinor":8025,"currency":"EGP"}}],"subtotal":{"amountMinor":8025,"currency":"EGP"},"deliveryFee":{"amountMinor":0,"currency":"EGP"},"tax":{"amountMinor":0,"cu… [full in reviewed-results.json]`.
+
+- **PASS** Cook cannot perform operational exception. Expected: `403`. Actual: `{"status":403,"data":{"code":"FORBIDDEN","messageKey":"error.forbidden","fieldErrors":[],"requestId":"17531a74-4296-426d-8e47-b7487386acb8","retryable":false}}`.
+
+- **PASS** Fresh-MFA operational actor cancels with case/reason. Expected: `"CANCELLED"`. Actual: `{"status":200,"data":{"id":"b014ed5f-1447-417f-abde-f1eee5f304ca","publicNumber":"MB-100014","version":3,"state":"CANCELLED","fulfillmentMode":"PICKUP","items":[{"mealId":"00000000-0000-0000-0000-00000000026d","title":"وجبة تجريبية B1","allergenStatement":"UNKNOWN","quantity":1,"unitPrice":{"amountMinor":8025,"currency":"EGP"},"lineTotal":{"amountMinor":8025,"currency":"EGP"}}],"subtotal":{"amountMinor":8025,"currency":"EGP"},"deliveryFee":{"amountMinor":0,"currency":"EGP"},"tax":{"amountMinor":… [full in reviewed-results.json]`.
+
+- **PASS** After preparation cancellation retains consumed portion. Expected: `"both consumed1/reserved0/allocated0"`. Actual: `{"meal":{"reserved":0,"allocated":0,"consumed":1},"slot":{"reserved":0,"allocated":0,"consumed":1}}`.
+
+**Review:** Latest execution; earlier attempts remain in results.json.
+
+**Evidence:** [C-AFTER-ACCEPT-cancelled.png](evidence/C-AFTER-ACCEPT-cancelled.png), [C-AFTER-ACCEPT-cancelled.json](evidence/C-AFTER-ACCEPT-cancelled.json).
+
+## S-SETTINGS — PASS
+
+**Actor/surface:** Cook/customer web + API. **Requirement:** BR-008/017; MB-022.
+
+**Preconditions and steps:** Prerequisite cook-a own ACTIVE kitchen and historical completedMB-100005. Actual UI pause; publicmeal404, completedorder remains immutable24050. UIresume returnsACTIVE/public200. Edit publicdescription through Kitchen settings form; authorized restore of original synthetic description. Existing labels wrapped textarea include content; QA selector/form label corrected, not product changes.
+
+**Expected/actual subchecks:**
+
+- **PASS** Cook can pause own sales through delivered UI. Expected: `"PAUSED"`. Actual: `{"status":200,"data":{"kitchenId":"00000000-0000-0000-0000-00000000012d","publicSlug":"qa-kitchen-a","displayName":"مطبخ تجريبي A","description":"Synthetic independent QA kitchen","operatingState":"PAUSED","pausedBy":"COOK","pickupEnabled":true,"zones":[{"zoneId":"00000000-0000-4000-8000-00000000a003","nameAr":"منطقة تجريبية متوقفة","nameEn":"Test zone (inactive)","deliveryEnabled":true},{"zoneId":"00000000-0000-4000-8000-00000000a001","nameAr":"منطقة تجريبية أ","nameEn":"Test zone A","deliveryE… [full in reviewed-results.json]`.
+
+- **PASS** Paused kitchen cannot offer customer meal. Expected: `404`. Actual: `{"status":404,"data":{"code":"NOT_FOUND","messageKey":"error.not_found","fieldErrors":[],"requestId":"1956247d-4326-4ba4-9819-4dd275ef5574","retryable":false}}`.
+
+- **PASS** Historical completed order remains readable/immutable. Expected: `"COMPLETED24050"`. Actual: `{"status":200,"data":{"id":"620ab03d-db91-443f-8e32-d36cbd939e36","publicNumber":"MB-100005","version":4,"state":"COMPLETED","fulfillmentMode":"PICKUP","items":[{"mealId":"00000000-0000-0000-0000-000000000263","title":"QA Meal A1","allergenStatement":"UNKNOWN","quantity":2,"unitPrice":{"amountMinor":12025,"currency":"EGP"},"lineTotal":{"amountMinor":24050,"currency":"EGP"}}],"subtotal":{"amountMinor":24050,"currency":"EGP"},"deliveryFee":{"amountMinor":0,"currency":"EGP"},"tax":{"amountMinor":0,… [full in reviewed-results.json]`.
+
+- **PASS** Cook resumes own pause; customer offering returns. Expected: `"ACTIVE/public200"`. Actual: `{"status":200,"data":{"kitchenId":"00000000-0000-0000-0000-00000000012d","publicSlug":"qa-kitchen-a","displayName":"مطبخ تجريبي A","description":"Synthetic independent QA kitchen","operatingState":"ACTIVE","pausedBy":null,"pickupEnabled":true,"zones":[{"zoneId":"00000000-0000-4000-8000-00000000a003","nameAr":"منطقة تجريبية متوقفة","nameEn":"Test zone (inactive)","deliveryEnabled":true},{"zoneId":"00000000-0000-4000-8000-00000000a001","nameAr":"منطقة تجريبية أ","nameEn":"Test zone A","deliveryEna… [full in reviewed-results.json]`.
+
+- **PASS** Settings UI saves own public description. Expected: `"saved content"`. Actual: `{"status":200,"data":{"kitchenId":"00000000-0000-0000-0000-00000000012d","publicSlug":"qa-kitchen-a","displayName":"مطبخ تجريبي A","description":"Independent synthetic QA settings description","operatingState":"ACTIVE","pausedBy":null,"pickupEnabled":true,"zones":[{"zoneId":"00000000-0000-4000-8000-00000000a003","nameAr":"منطقة تجريبية متوقفة","nameEn":"Test zone (inactive)","deliveryEnabled":true},{"zoneId":"00000000-0000-4000-8000-00000000a001","nameAr":"منطقة تجريبية أ","nameEn":"Test zone A"… [full in reviewed-results.json]`.
+
+**Review:** Latest execution; earlier attempts remain in results.json.
+
+**Evidence:** [S-SETTINGS-resumed.png](evidence/S-SETTINGS-resumed.png), [S-SETTINGS-resumed.json](evidence/S-SETTINGS-resumed.json).
+
+## S-CONFIG-QUOTES — BLOCKED
+
+**Actor/surface:** Customer/admin API + customer web. **Requirement:** BR-021/042; immutable old quote vs new zone configuration.
+
+**Preconditions and steps:** Prerequisite UI-created own delivery address, active zone, A2/A5capacity25, freshOTP admin. Create old valid3000fee quote; adminversions fee3125; newquote3125; place old quote beforeexpiry. Actual409PRICE_CHANGED/TOTAL_CHANGED, notorder; restorefee. Initial expected honoroldquotedprice is retained. BR-042/backlog/contract/UI newquotesonly wording conflicts with verification stale-zone/policy expectation, so reviewedBLOCKEDoracle, notPASS or confirmed productdefect. Owner clarification pending.
+
+**Expected/actual subchecks:**
+
+- **PASS** Original quote snapshots active fee. Expected: `3000`. Actual: `{"status":201,"data":{"quoteId":"8670eb9f-d77b-44b3-b378-4695065d0897","expiresAt":"2026-10-12T17:34:35.354855647Z","kitchenId":"00000000-0000-0000-0000-00000000012d","items":[{"mealId":"00000000-0000-0000-0000-000000000264","mealRevision":1,"title":"QA Meal A2","quantity":1,"unitPrice":{"amountMinor":9550,"currency":"EGP"},"lineTotal":{"amountMinor":9550,"currency":"EGP"}}],"subtotal":{"amountMinor":9550,"currency":"EGP"},"deliveryFee":{"amountMinor":3000,"currency":"EGP"},"tax":{"amountMinor":… [full in reviewed-results.json]`.
+
+- **PASS** Actual fresh-MFA admin versions fee. Expected: `200`. Actual: `{"status":200,"data":{"id":"352b4537-ae9e-404b-ad2b-9f09557a9e97","key":"[REDACTED IDEMPOTENCY KEY]","version":5,"value":{"active":true,"deliveryFeeMinor":3125},"reason":"Synthetic old/new quote boundary","approvalReference":null,"actorId":"00000000-0000-0000-0000-0000000002c2","createdAt":"2026-10-12T17:29:35.374968272Z"}}`.
+
+- **PASS** New quote sees changed fee/version. Expected: `{"fee":3125}`. Actual: `{"status":201,"data":{"quoteId":"fa329877-2e85-41f0-a587-ab1a266fe70c","expiresAt":"2026-10-12T17:34:35.389263499Z","kitchenId":"00000000-0000-0000-0000-00000000012d","items":[{"mealId":"00000000-0000-0000-0000-000000000264","mealRevision":1,"title":"QA Meal A2","quantity":1,"unitPrice":{"amountMinor":9550,"currency":"EGP"},"lineTotal":{"amountMinor":9550,"currency":"EGP"}}],"subtotal":{"amountMinor":9550,"currency":"EGP"},"deliveryFee":{"amountMinor":3125,"currency":"EGP"},"tax":{"amountMinor":… [full in reviewed-results.json]`.
+
+- **FAIL** Unexpired old quote keeps agreed snapshot total. Expected: `{"total":12550}`. Actual: `{"status":409,"data":{"code":"PRICE_CHANGED","messageKey":"error.price_changed","fieldErrors":[{"field":"quoteId","code":"TOTAL_CHANGED"}],"requestId":"5a354a9b-5074-4a99-9f76-96e7559e8e93","retryable":false}}`.
+
+**Review:** Oracle conflict: BR-042/backlog/contract/UI new-quotes-only wording vs verification stale-zone/policy scenario and implementation. Initial failed expectation remains visible; not changed into a PASS. Owner clarification requested.
+
+**Evidence:** [S-CONFIG-QUOTES-conflict-context.png](evidence/S-CONFIG-QUOTES-conflict-context.png), [S-CONFIG-QUOTES-conflict-context.json](evidence/S-CONFIG-QUOTES-conflict-context.json).
+
+## S-FINANCE-SYNTHETIC-FINAL — PASS
+
+**Actor/surface:** Finance web/API/database with synthetic external-reference fixture. **Requirement:** BR-033/035/036; no actual bank/refund/payment integration.
+
+**Preconditions and steps:** Prerequisite real isolated verified fictionalcollection and reviewedunpaid settlement from S-FINANCE, separatefinance-a/b. Webrecord remittance using QA-SYNTHETIC-NO-TRANSFER; selfreconcile403, separate reconcileterminal; retryversionunchanged. Fullrefundrequest→separateapprove→webrecord QA-SYNTHETIC-NO-REFUND-TRANSFER→selfverify403→separateverify; retry yields1commissionreversal2405; ledgerbalanced; originalCOMPLETED24050immutable. All cash/externalreference fixtures fictional; no bank/payment integration tested.
+
+**Expected/actual subchecks:**
+
+- **PASS** Prerequisite reviewed settlement is unpaid. Expected: `"REVIEWED/no payment"`. Actual: `{"id":"d44c87e3-d3b2-4050-bead-2d4b43a61b8e","kitchenId":"00000000-0000-0000-0000-00000000012d","periodFrom":"2026-10-01","periodTo":"2026-10-12","state":"REVIEWED","total":{"amountMinor":2405,"currency":"EGP"},"direction":"COOK_PAYS_PLATFORM","lines":[{"ledgerGroupId":"c8451550-5e7c-45b6-beba-8858f7c13d05","kind":"COMMISSION","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","amount":{"amountMinor":2405,"currency":"EGP"}}],"createdBy":"00000000-0000-0000-0000-0000000002c5","reviewedBy":"00000000… [full in reviewed-results.json]`.
+
+- **PASS** UI records clearly synthetic external-reference state. Expected: `"PAYMENT_RECORDED fixture only"`. Actual: `{"status":200,"data":{"id":"d44c87e3-d3b2-4050-bead-2d4b43a61b8e","kitchenId":"00000000-0000-0000-0000-00000000012d","periodFrom":"2026-10-01","periodTo":"2026-10-12","state":"PAYMENT_RECORDED","total":{"amountMinor":2405,"currency":"EGP"},"direction":"COOK_PAYS_PLATFORM","lines":[{"ledgerGroupId":"c8451550-5e7c-45b6-beba-8858f7c13d05","kind":"COMMISSION","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","amount":{"amountMinor":2405,"currency":"EGP"}}],"createdBy":"00000000-0000-0000-0000-0000000… [full in reviewed-results.json]`.
+
+- **PASS** Payment recorder cannot reconcile own batch. Expected: `403`. Actual: `{"status":403,"data":{"code":"FORBIDDEN","messageKey":"error.forbidden","fieldErrors":[],"requestId":"f4b68fa3-4bd5-4d35-adb8-32c84b9d9d0a","retryable":false}}`.
+
+- **PASS** Separate reconciliation reaches terminal accounting state. Expected: `"RECONCILED"`. Actual: `{"status":200,"data":{"id":"d44c87e3-d3b2-4050-bead-2d4b43a61b8e","kitchenId":"00000000-0000-0000-0000-00000000012d","periodFrom":"2026-10-01","periodTo":"2026-10-12","state":"RECONCILED","total":{"amountMinor":2405,"currency":"EGP"},"direction":"COOK_PAYS_PLATFORM","lines":[{"ledgerGroupId":"c8451550-5e7c-45b6-beba-8858f7c13d05","kind":"COMMISSION","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","amount":{"amountMinor":2405,"currency":"EGP"}}],"createdBy":"00000000-0000-0000-0000-0000000002c5"… [full in reviewed-results.json]`.
+
+- **PASS** Repeated reconciliation returns same frozen batch. Expected: `"d44c87e3-d3b2-4050-bead-2d4b43a61b8e"`. Actual: `{"status":200,"data":{"id":"d44c87e3-d3b2-4050-bead-2d4b43a61b8e","kitchenId":"00000000-0000-0000-0000-00000000012d","periodFrom":"2026-10-01","periodTo":"2026-10-12","state":"RECONCILED","total":{"amountMinor":2405,"currency":"EGP"},"direction":"COOK_PAYS_PLATFORM","lines":[{"ledgerGroupId":"c8451550-5e7c-45b6-beba-8858f7c13d05","kind":"COMMISSION","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","amount":{"amountMinor":2405,"currency":"EGP"}}],"createdBy":"00000000-0000-0000-0000-0000000002c5"… [full in reviewed-results.json]`.
+
+- **PASS** Full synthetic verified collection request succeeds. Expected: `"REQUESTED"`. Actual: `{"status":200,"data":{"id":"a4d38205-48e1-467d-a7e6-fbef071493c6","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","kitchenId":"00000000-0000-0000-0000-00000000012d","caseReference":"CS-A12B4EF8","amount":{"amountMinor":24050,"currency":"EGP"},"state":"REQUESTED","reason":"Synthetic refund accounting test; no money transfer","requestedBy":"00000000-0000-0000-0000-0000000002c5","approvedBy":null,"paidBy":null,"paymentReference":null,"verifiedBy":null,"decisionReason":null,"createdAt":"2026-10-12T… [full in reviewed-results.json]`.
+
+- **PASS** Separate approval stays unpaid. Expected: `"APPROVED"`. Actual: `{"status":200,"data":{"id":"a4d38205-48e1-467d-a7e6-fbef071493c6","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","kitchenId":"00000000-0000-0000-0000-00000000012d","caseReference":"CS-A12B4EF8","amount":{"amountMinor":24050,"currency":"EGP"},"state":"APPROVED","reason":"Synthetic refund accounting test; no money transfer","requestedBy":"00000000-0000-0000-0000-0000000002c5","approvedBy":"00000000-0000-0000-0000-0000000002c6","paidBy":null,"paymentReference":null,"verifiedBy":null,"decisionReas… [full in reviewed-results.json]`.
+
+- **PASS** UI records explicit synthetic refund reference. Expected: `"PAID fixture only"`. Actual: `{"status":200,"data":{"id":"a4d38205-48e1-467d-a7e6-fbef071493c6","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","kitchenId":"00000000-0000-0000-0000-00000000012d","caseReference":"CS-A12B4EF8","amount":{"amountMinor":24050,"currency":"EGP"},"state":"PAID","reason":"Synthetic refund accounting test; no money transfer","requestedBy":"00000000-0000-0000-0000-0000000002c5","approvedBy":"00000000-0000-0000-0000-0000000002c6","paidBy":"00000000-0000-0000-0000-0000000002c5","paymentReference":"QA-SY… [full in reviewed-results.json]`.
+
+- **PASS** Payment recorder cannot verify own refund. Expected: `403`. Actual: `{"status":403,"data":{"code":"FORBIDDEN","messageKey":"error.forbidden","fieldErrors":[],"requestId":"3a58ea7f-c1fa-49c5-8f98-6a0df79d8667","retryable":false}}`.
+
+- **PASS** Separate verification completes accounting refund. Expected: `"VERIFIED"`. Actual: `{"status":200,"data":{"id":"a4d38205-48e1-467d-a7e6-fbef071493c6","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","kitchenId":"00000000-0000-0000-0000-00000000012d","caseReference":"CS-A12B4EF8","amount":{"amountMinor":24050,"currency":"EGP"},"state":"VERIFIED","reason":"Synthetic refund accounting test; no money transfer","requestedBy":"00000000-0000-0000-0000-0000000002c5","approvedBy":"00000000-0000-0000-0000-0000000002c6","paidBy":"00000000-0000-0000-0000-0000000002c5","paymentReference":"Q… [full in reviewed-results.json]`.
+
+- **PASS** Verification retry does not append second reversal. Expected: `3`. Actual: `{"status":200,"data":{"id":"a4d38205-48e1-467d-a7e6-fbef071493c6","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","kitchenId":"00000000-0000-0000-0000-00000000012d","caseReference":"CS-A12B4EF8","amount":{"amountMinor":24050,"currency":"EGP"},"state":"VERIFIED","reason":"Synthetic refund accounting test; no money transfer","requestedBy":"00000000-0000-0000-0000-0000000002c5","approvedBy":"00000000-0000-0000-0000-0000000002c6","paidBy":"00000000-0000-0000-0000-0000000002c5","paymentReference":"Q… [full in reviewed-results.json]`.
+
+- **PASS** Exactly one full snapshot commission reversal. Expected: `{"count":1,"amount":2405}`. Actual: `{"count":1,"amount":2405}`.
+
+- **PASS** Ledger still balances after refund and reconciliation. Expected: `0`. Actual: `0`.
+
+- **PASS** Refund never rewrites completed order. Expected: `"COMPLETED|24050"`. Actual: `"COMPLETED|24050"`.
+
+**Review:** Latest execution; earlier attempts remain in results.json.
+
+**Evidence:** [S-FINANCE-synthetic-final.png](evidence/S-FINANCE-synthetic-final.png), [S-FINANCE-synthetic-final.json](evidence/S-FINANCE-synthetic-final.json).
+
+## S-SUPPORT-RESOLVE — PASS
+
+**Actor:** Support web + customer API. **Requirement:** OP05/BR-041; MB-024 delivered staff case segment.
+
+**Preconditions/steps:** Existing real synthetic support case CS-A12B4EF8/public+private replies; support-a assigned/resolve/close in UI with reason/resolution; owncustomer API public-only; stale updates and closed-customer replies refused. Assignment actual assigneeId matches support-a, independently checked from captured response.
+
+**Expected/actual:**
+
+- **PASS** Delivered staff UI assigns actual case to current staff. Expected `200`, actual `{"status":200,"data":{"id":"385c1e8f-c6c2-4dba-8733-fd3f306a27e4","reference":"CS-A12B4EF8","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","orderNumber":"MB-100005","customerId":"00000000-0000-0000-0000-0000000002bd","category":"QUALITY","severity":"NORMAL","state":"IN_PROGRESS","description":"Independent synthetic QA support thread check.","cancellationReason":null,"assigneeId":"00000000-0000-0000-0000-0000000002c4","slaDueAt":"2026-10-13T16:56:14.267984Z","overdue":false,"firstResponseAt":"2… [full reviewed-results.json]`.
+
+- **PASS** Staff resolves case with explicit resolution. Expected `"RESOLVED/INFORMATION_PROVIDED"`, actual `{"status":200,"data":{"id":"385c1e8f-c6c2-4dba-8733-fd3f306a27e4","reference":"CS-A12B4EF8","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","orderNumber":"MB-100005","customerId":"00000000-0000-0000-0000-0000000002bd","category":"QUALITY","severity":"NORMAL","state":"RESOLVED","description":"Independent synthetic QA support thread check.","cancellationReason":null,"assigneeId":"00000000-0000-0000-0000-0000000002c4","slaDueAt":"2026-10-13T16:56:14.267984Z","overdue":false,"firstResponseAt":"2026… [full reviewed-results.json]`.
+
+- **PASS** Customer API keeps public reply and resolved status, never private note. Expected `"RESOLVED/public only"`, actual `{"id":"385c1e8f-c6c2-4dba-8733-fd3f306a27e4","reference":"CS-A12B4EF8","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","orderNumber":"MB-100005","category":"QUALITY","state":"RESOLVED","description":"Independent synthetic QA support thread check.","resolutionCode":"INFORMATION_PROVIDED","createdAt":"2026-10-12T16:56:14.267984Z","updatedAt":"2026-10-12T17:40:48.937419Z","messages":[{"id":"23d28554-1d79-4edc-bb16-d1cb2704c766","authorRole":"STAFF","visibility":"PUBLIC","body":"QA PUBLIC REPLY FOR… [full reviewed-results.json]`.
+
+- **PASS** Stale case update refused without state mutation. Expected `409`, actual `{"status":409,"data":{"code":"VERSION_CONFLICT","messageKey":"error.version_conflict","fieldErrors":[],"requestId":"e35d5a95-084b-45c0-a25a-58e71b2515c6","retryable":false}}`.
+
+- **PASS** Staff UI closes resolved case. Expected `"CLOSED"`, actual `{"status":200,"data":{"id":"385c1e8f-c6c2-4dba-8733-fd3f306a27e4","reference":"CS-A12B4EF8","orderId":"620ab03d-db91-443f-8e32-d36cbd939e36","orderNumber":"MB-100005","customerId":"00000000-0000-0000-0000-0000000002bd","category":"QUALITY","severity":"NORMAL","state":"CLOSED","description":"Independent synthetic QA support thread check.","cancellationReason":null,"assigneeId":"00000000-0000-0000-0000-0000000002c4","slaDueAt":"2026-10-13T16:56:14.267984Z","overdue":false,"firstResponseAt":"2026-1… [full reviewed-results.json]`.
+
+- **PASS** Repeated stale close refused. Expected `409`, actual `{"status":409,"data":{"code":"VERSION_CONFLICT","messageKey":"error.version_conflict","fieldErrors":[],"requestId":"6398d06d-2e65-42ba-b6a6-7762821c4fc6","retryable":false}}`.
+
+- **PASS** Closed-case reply rejected server-side. Expected `409`, actual `{"status":409,"data":{"code":"STATE_CONFLICT","messageKey":"error.state_conflict","fieldErrors":[],"requestId":"bfd1269b-f05e-442c-af49-87f66d86e3db","retryable":false}}`.
+
+- **PASS** Independent review: assigned staff identity equals actual support actor. Expected `"00000000-0000-0000-0000-0000000002c4"`, actual `"00000000-0000-0000-0000-0000000002c4"`.
+
+**Evidence:** [S-SUPPORT-RESOLVE-closed.png](evidence/S-SUPPORT-RESOLVE-closed.png), [S-SUPPORT-RESOLVE-closed.json](evidence/S-SUPPORT-RESOLVE-closed.json).
+
+## S-SECURITY-REVOKED — PASS
+
+**Actor:** Password-only customer/admin API; genuine admin OTP. **Requirement:** BR-007/043; supplements grant/revoke sensitive-command meaning.
+
+**Preconditions/steps:** Customer-a temporary config.write already revoked by prior genuine-MFA admin action; actual freshOTP ops-a. Invoke sensitive configwrite with correct currentversion,403FORBIDDEN; only recoverable admin staffgrant has1activeholder; attempt own protected revoke409 and verify grant and flag/version unchanged.
+
+**Expected/actual:**
+
+- **PASS** Temporary sensitive grant is actually revoked. Expected `0`, actual `0`.
+
+- **PASS** Revoked identity cannot perform sensitive configuration write. Expected `{"status":403,"code":"FORBIDDEN"}`, actual `{"status":403,"data":{"code":"FORBIDDEN","messageKey":"error.forbidden","fieldErrors":[],"requestId":"b830383a-1ea0-48fa-9673-1e2404213c4c","retryable":false}}`.
+
+- **PASS** Fresh-MFA last-admin removal is safely refused. Expected `{"status":409,"code":"STATE_CONFLICT"}`, actual `{"status":409,"data":{"code":"STATE_CONFLICT","messageKey":"error.state_conflict","fieldErrors":[],"requestId":"d08f52c8-d8e6-4dc9-a819-67c2c346c8ff","retryable":false}}`.
+
+- **PASS** Denied operation preserves recoverable administrator. Expected `"same active staff.grant"`, actual `[{"permission":"audit.read","grantId":"9a8a3a9c-1f32-4c54-b7e0-e8a536b3db28"},{"permission":"config.read","grantId":"bd8f50c2-21d5-486a-81b3-9af1c483e7c7"},{"permission":"config.write","grantId":"dc8c3bc8-adf4-4513-9063-268e8c07f510"},{"permission":"staff.grant","grantId":"219b657b-f612-4259-8054-587780702416"}]`.
+
+- **PASS** Denied write leaves flag/version unchanged. Expected `{"key":"ordering-enabled","enabled":true,"version":0}`, actual `{"key":"ordering-enabled","enabled":true,"version":0}`.
+
+**Evidence:** `security-revoked.json`, `network.json`, `reviewed-results.json`.

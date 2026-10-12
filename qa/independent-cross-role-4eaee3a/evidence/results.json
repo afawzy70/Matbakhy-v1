@@ -7244,6 +7244,2182 @@
       ],
       "status": "PASS",
       "finishedAt": "2026-10-12T17:05:54.034Z"
+    },
+    {
+      "id": "C-AFTER-ACCEPT",
+      "actor": "Customer/cook/ops web + API/database",
+      "requirement": "BR-028/029/031; MB-019/024",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:26:06.823Z",
+      "checks": [
+        {
+          "name": "Separate correct cook accepts exact request",
+          "status": "PASS",
+          "expected": "ACCEPTED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+              "publicNumber": "MB-100014",
+              "version": 1,
+              "state": "ACCEPTED",
+              "fulfillmentMode": "PICKUP",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-00000000026d",
+                  "title": "QA Meal B1",
+                  "allergenStatement": "UNKNOWN",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 8025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 8025,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 8025,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 8025,
+                "currency": "EGP"
+              },
+              "slot": {
+                "id": "00000000-0000-0000-0000-0000000001a6",
+                "startsAt": "2026-10-16T15:59:42.580575Z",
+                "endsAt": "2026-10-16T17:59:42.580575Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T13:59:42.580575Z",
+                "availablePortions": 49,
+                "fulfillmentModes": [
+                  "PICKUP"
+                ]
+              },
+              "acceptBy": "2026-10-12T17:41:12.922967Z",
+              "events": [
+                {
+                  "sequence": 1,
+                  "fromState": null,
+                  "toState": "PENDING_ACCEPTANCE",
+                  "occurredAt": "2026-10-12T17:26:12.933410Z",
+                  "actorType": "CUSTOMER",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 2,
+                  "fromState": "PENDING_ACCEPTANCE",
+                  "toState": "ACCEPTED",
+                  "occurredAt": "2026-10-12T17:26:13.009026Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                }
+              ],
+              "allowedActions": [
+                "PREPARE",
+                "CANCEL"
+              ],
+              "cashState": "DUE",
+              "fulfillmentNote": null,
+              "dispatchReference": null,
+              "contact": "[REDACTED]"
+            }
+          }
+        },
+        {
+          "name": "Accepted customer has request action and no direct cancel",
+          "status": "PASS",
+          "expected": "request only",
+          "actual": [
+            "العربية",
+            "Request cancellation (reviewed by support)"
+          ]
+        },
+        {
+          "name": "Backend agrees accepted direct cancellation denied",
+          "status": "PASS",
+          "expected": 409,
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "STATE_CONFLICT",
+              "messageKey": "error.state_conflict",
+              "fieldErrors": [
+                {
+                  "field": "state",
+                  "code": "CANCELLATION_REQUEST_REQUIRED"
+                }
+              ],
+              "requestId": "ba09ef62-25e9-40e1-aed5-c58fc3ca4314",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "UI creates support request without cancelling order",
+          "status": "PASS",
+          "expected": "case201; orderACCEPTED",
+          "actual": {
+            "status": 201,
+            "data": {
+              "id": "a1e44563-1634-4940-a104-592968c2caa0",
+              "reference": "CS-4F6BC132",
+              "orderId": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+              "orderNumber": "MB-100014",
+              "category": "CANCELLATION_REQUEST",
+              "state": "OPEN",
+              "description": "Cancellation requested: CHANGED_MIND",
+              "resolutionCode": null,
+              "createdAt": "2026-10-12T17:26:13.253329Z",
+              "updatedAt": "2026-10-12T17:26:13.253329Z",
+              "messages": [],
+              "version": 0
+            },
+            "body": {
+              "expectedVersion": 1,
+              "reasonCode": "CHANGED_MIND"
+            },
+            "key": "[REDACTED IDEMPOTENCY KEY]"
+          }
+        },
+        {
+          "name": "Same-key cancellation request has one exact case",
+          "status": "PASS",
+          "expected": "a1e44563-1634-4940-a104-592968c2caa0",
+          "actual": {
+            "status": 201,
+            "data": {
+              "id": "a1e44563-1634-4940-a104-592968c2caa0",
+              "reference": "CS-4F6BC132",
+              "orderId": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+              "orderNumber": "MB-100014",
+              "category": "CANCELLATION_REQUEST",
+              "state": "OPEN",
+              "description": "Cancellation requested: CHANGED_MIND",
+              "resolutionCode": null,
+              "createdAt": "2026-10-12T17:26:13.253329Z",
+              "updatedAt": "2026-10-12T17:26:13.253329Z",
+              "messages": [],
+              "version": 0
+            }
+          }
+        },
+        {
+          "name": "Preparing consumes capacity",
+          "status": "PASS",
+          "expected": "PREPARING",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+              "publicNumber": "MB-100014",
+              "version": 2,
+              "state": "PREPARING",
+              "fulfillmentMode": "PICKUP",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-00000000026d",
+                  "title": "QA Meal B1",
+                  "allergenStatement": "UNKNOWN",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 8025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 8025,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 8025,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 8025,
+                "currency": "EGP"
+              },
+              "slot": {
+                "id": "00000000-0000-0000-0000-0000000001a6",
+                "startsAt": "2026-10-16T15:59:42.580575Z",
+                "endsAt": "2026-10-16T17:59:42.580575Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T13:59:42.580575Z",
+                "availablePortions": 49,
+                "fulfillmentModes": [
+                  "PICKUP"
+                ]
+              },
+              "acceptBy": "2026-10-12T17:41:12.922967Z",
+              "events": [
+                {
+                  "sequence": 1,
+                  "fromState": null,
+                  "toState": "PENDING_ACCEPTANCE",
+                  "occurredAt": "2026-10-12T17:26:12.933410Z",
+                  "actorType": "CUSTOMER",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 2,
+                  "fromState": "PENDING_ACCEPTANCE",
+                  "toState": "ACCEPTED",
+                  "occurredAt": "2026-10-12T17:26:13.009026Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 3,
+                  "fromState": "ACCEPTED",
+                  "toState": "PREPARING",
+                  "occurredAt": "2026-10-12T17:26:13.325075Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                }
+              ],
+              "allowedActions": [
+                "READY"
+              ],
+              "cashState": "DUE",
+              "fulfillmentNote": null,
+              "dispatchReference": null,
+              "contact": "[REDACTED]"
+            }
+          }
+        },
+        {
+          "name": "Cook cannot perform operational exception",
+          "status": "PASS",
+          "expected": 403,
+          "actual": {
+            "status": 403,
+            "data": {
+              "code": "FORBIDDEN",
+              "messageKey": "error.forbidden",
+              "fieldErrors": [],
+              "requestId": "17531a74-4296-426d-8e47-b7487386acb8",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Fresh-MFA operational actor cancels with case/reason",
+          "status": "PASS",
+          "expected": "CANCELLED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+              "publicNumber": "MB-100014",
+              "version": 3,
+              "state": "CANCELLED",
+              "fulfillmentMode": "PICKUP",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-00000000026d",
+                  "title": "وجبة تجريبية B1",
+                  "allergenStatement": "UNKNOWN",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 8025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 8025,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 8025,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 8025,
+                "currency": "EGP"
+              },
+              "slot": {
+                "id": "00000000-0000-0000-0000-0000000001a6",
+                "startsAt": "2026-10-16T15:59:42.580575Z",
+                "endsAt": "2026-10-16T17:59:42.580575Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T13:59:42.580575Z",
+                "availablePortions": 49,
+                "fulfillmentModes": [
+                  "PICKUP"
+                ]
+              },
+              "acceptBy": "2026-10-12T17:41:12.922967Z",
+              "events": [
+                {
+                  "sequence": 1,
+                  "fromState": null,
+                  "toState": "PENDING_ACCEPTANCE",
+                  "occurredAt": "2026-10-12T17:26:12.933410Z",
+                  "actorType": "CUSTOMER",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 2,
+                  "fromState": "PENDING_ACCEPTANCE",
+                  "toState": "ACCEPTED",
+                  "occurredAt": "2026-10-12T17:26:13.009026Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 3,
+                  "fromState": "ACCEPTED",
+                  "toState": "PREPARING",
+                  "occurredAt": "2026-10-12T17:26:13.325075Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 4,
+                  "fromState": "PREPARING",
+                  "toState": "CANCELLED",
+                  "occurredAt": "2026-10-12T17:26:13.541077Z",
+                  "actorType": "STAFF",
+                  "reasonCode": "OPERATIONAL"
+                }
+              ],
+              "allowedActions": [],
+              "cashState": "DUE",
+              "supportCaseIds": [
+                "a1e44563-1634-4940-a104-592968c2caa0"
+              ],
+              "handoverCode": null,
+              "contact": null
+            }
+          }
+        },
+        {
+          "name": "After preparation cancellation retains consumed portion",
+          "status": "PASS",
+          "expected": "both consumed1/reserved0/allocated0",
+          "actual": {
+            "meal": {
+              "reserved": 0,
+              "allocated": 0,
+              "consumed": 1
+            },
+            "slot": {
+              "reserved": 0,
+              "allocated": 0,
+              "consumed": 1
+            }
+          }
+        }
+      ],
+      "evidence": [
+        "C-AFTER-ACCEPT-cancelled.png",
+        "C-AFTER-ACCEPT-cancelled.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T17:26:14.213Z"
+    },
+    {
+      "id": "S-SETTINGS",
+      "actor": "Cook/customer web + API",
+      "requirement": "BR-008/017; MB-022",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:26:14.351Z",
+      "checks": [
+        {
+          "name": "Cook can pause own sales through delivered UI",
+          "status": "PASS",
+          "expected": "PAUSED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Synthetic independent QA kitchen",
+              "operatingState": "PAUSED",
+              "pausedBy": "COOK",
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 1
+            },
+            "body": {
+              "paused": true,
+              "expectedVersion": 0
+            }
+          }
+        },
+        {
+          "name": "Paused kitchen cannot offer customer meal",
+          "status": "PASS",
+          "expected": 404,
+          "actual": {
+            "status": 404,
+            "data": {
+              "code": "NOT_FOUND",
+              "messageKey": "error.not_found",
+              "fieldErrors": [],
+              "requestId": "0f618580-4eb4-4afd-bb6d-afe010f56c4c",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Historical completed order remains readable/immutable",
+          "status": "PASS",
+          "expected": "COMPLETED24050",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "publicNumber": "MB-100005",
+              "version": 4,
+              "state": "COMPLETED",
+              "fulfillmentMode": "PICKUP",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000263",
+                  "title": "QA Meal A1",
+                  "allergenStatement": "UNKNOWN",
+                  "quantity": 2,
+                  "unitPrice": {
+                    "amountMinor": 12025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 24050,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "slot": {
+                "id": "d51ea2ec-9c6b-44da-b112-5f86fd3d5477",
+                "startsAt": "2026-10-20T10:00:00Z",
+                "endsAt": "2026-10-20T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-20T08:00:00Z",
+                "availablePortions": 6,
+                "fulfillmentModes": [
+                  "PICKUP"
+                ]
+              },
+              "acceptBy": "2026-10-12T16:52:15.173703Z",
+              "events": [
+                {
+                  "sequence": 1,
+                  "fromState": null,
+                  "toState": "PENDING_ACCEPTANCE",
+                  "occurredAt": "2026-10-12T16:37:15.202436Z",
+                  "actorType": "CUSTOMER",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 2,
+                  "fromState": "PENDING_ACCEPTANCE",
+                  "toState": "ACCEPTED",
+                  "occurredAt": "2026-10-12T16:37:19.174727Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 3,
+                  "fromState": "ACCEPTED",
+                  "toState": "PREPARING",
+                  "occurredAt": "2026-10-12T16:37:27.142698Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 4,
+                  "fromState": "PREPARING",
+                  "toState": "READY",
+                  "occurredAt": "2026-10-12T16:37:27.284389Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 5,
+                  "fromState": "READY",
+                  "toState": "COMPLETED",
+                  "occurredAt": "2026-10-12T16:37:27.485800Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                }
+              ],
+              "allowedActions": [],
+              "cashState": "VERIFIED",
+              "supportCaseIds": [
+                "a6ab92d2-8d58-4100-8e99-41e3c96d1fec",
+                "385c1e8f-c6c2-4dba-8733-fd3f306a27e4"
+              ],
+              "handoverCode": null,
+              "contact": null
+            }
+          }
+        },
+        {
+          "name": "Cook resumes own pause; customer offering returns",
+          "status": "PASS",
+          "expected": "ACTIVE/public200",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Synthetic independent QA kitchen",
+              "operatingState": "ACTIVE",
+              "pausedBy": null,
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 2
+            },
+            "body": {
+              "paused": false,
+              "expectedVersion": 1
+            }
+          }
+        },
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "locator.fill: Timeout 9000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Public description', { exact: true })\u001b[22m\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "locator.fill: Timeout 9000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByLabel('Public description', { exact: true })\u001b[22m\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T17:26:24.685Z"
+    },
+    {
+      "id": "S-CONFIG-QUOTES",
+      "actor": "Customer/admin API + customer web",
+      "requirement": "BR-021/042; immutable old quote vs new zone configuration",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:26:24.728Z",
+      "checks": [
+        {
+          "name": "Original quote snapshots active fee",
+          "status": "PASS",
+          "expected": 3000,
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "60b5dec9-89e7-4e01-b596-1c84b543c8c8",
+              "expiresAt": "2026-10-12T17:31:26.625691474Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000264",
+                  "mealRevision": 1,
+                  "title": "QA Meal A2",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 9550,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 3000,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 12550,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-12T17:41:26.625691474Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actual fresh-MFA admin versions fee",
+          "status": "PASS",
+          "expected": 200,
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "fb1418c3-c763-4586-bcb8-976244bbb3ad",
+              "key": "[REDACTED IDEMPOTENCY KEY]",
+              "version": 3,
+              "value": {
+                "active": true,
+                "deliveryFeeMinor": 3125
+              },
+              "reason": "Synthetic old/new quote boundary",
+              "approvalReference": null,
+              "actorId": "00000000-0000-0000-0000-0000000002c2",
+              "createdAt": "2026-10-12T17:26:26.660177167Z"
+            }
+          }
+        },
+        {
+          "name": "New quote sees changed fee/version",
+          "status": "PASS",
+          "expected": {
+            "fee": 3125
+          },
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "43433e81-89d8-4add-a26e-c2790edda557",
+              "expiresAt": "2026-10-12T17:31:26.677805666Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000264",
+                  "mealRevision": 1,
+                  "title": "QA Meal A2",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 9550,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 3125,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 12675,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-12T17:41:26.677805666Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unexpired old quote keeps agreed snapshot total",
+          "status": "FAIL",
+          "expected": {
+            "total": 12550
+          },
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "PRICE_CHANGED",
+              "messageKey": "error.price_changed",
+              "fieldErrors": [
+                {
+                  "field": "quoteId",
+                  "code": "TOTAL_CHANGED"
+                }
+              ],
+              "requestId": "f18226cd-fe64-4cb8-bc5c-d6a6ee722b7c",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "Command failed: docker compose --env-file /workspace/qa-tools/cross-role/stack/.env -f /workspace/matbakhy-cross-role-qa/infra/compose.yaml -f /workspace/qa-tools/cross-role/stack/override.yaml exec -T postgres psql -U matbakhy -d matbakhy -tA -v ON_ERROR_STOP=1 -c SELECT json_build_object('fee',delivery_fee_minor,'total',total_minor) FROM customer_order WHERE id='undefined'\nERROR:  invalid input syntax for type uuid: \"undefined\"\nLINE 1: ...'total',total_minor) FROM customer_order WHERE id='undefined...\n                                                             ^\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "Command failed: docker compose --env-file /workspace/qa-tools/cross-role/stack/.env -f /workspace/matbakhy-cross-role-qa/infra/compose.yaml -f /workspace/qa-tools/cross-role/stack/override.yaml exec -T postgres psql -U matbakhy -d matbakhy -tA -v ON_ERROR_STOP=1 -c SELECT json_build_object('fee',delivery_fee_minor,'total',total_minor) FROM customer_order WHERE id='undefined'\nERROR:  invalid input syntax for type uuid: \"undefined\"\nLINE 1: ...'total',total_minor) FROM customer_order WHERE id='undefined...\n                                                             ^\n",
+      "status": "FAIL",
+      "finishedAt": "2026-10-12T17:26:27.035Z"
+    },
+    {
+      "id": "S-SETTINGS",
+      "actor": "Cook/customer web + API",
+      "requirement": "BR-008/017; MB-022",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:29:22.332Z",
+      "checks": [
+        {
+          "name": "Cook can pause own sales through delivered UI",
+          "status": "PASS",
+          "expected": "PAUSED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Synthetic independent QA kitchen",
+              "operatingState": "PAUSED",
+              "pausedBy": "COOK",
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 3
+            },
+            "body": {
+              "paused": true,
+              "expectedVersion": 2
+            }
+          }
+        },
+        {
+          "name": "Paused kitchen cannot offer customer meal",
+          "status": "PASS",
+          "expected": 404,
+          "actual": {
+            "status": 404,
+            "data": {
+              "code": "NOT_FOUND",
+              "messageKey": "error.not_found",
+              "fieldErrors": [],
+              "requestId": "ce1127bb-24e4-4625-bc9a-71911401240e",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Historical completed order remains readable/immutable",
+          "status": "PASS",
+          "expected": "COMPLETED24050",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "publicNumber": "MB-100005",
+              "version": 4,
+              "state": "COMPLETED",
+              "fulfillmentMode": "PICKUP",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000263",
+                  "title": "QA Meal A1",
+                  "allergenStatement": "UNKNOWN",
+                  "quantity": 2,
+                  "unitPrice": {
+                    "amountMinor": 12025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 24050,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "slot": {
+                "id": "d51ea2ec-9c6b-44da-b112-5f86fd3d5477",
+                "startsAt": "2026-10-20T10:00:00Z",
+                "endsAt": "2026-10-20T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-20T08:00:00Z",
+                "availablePortions": 6,
+                "fulfillmentModes": [
+                  "PICKUP"
+                ]
+              },
+              "acceptBy": "2026-10-12T16:52:15.173703Z",
+              "events": [
+                {
+                  "sequence": 1,
+                  "fromState": null,
+                  "toState": "PENDING_ACCEPTANCE",
+                  "occurredAt": "2026-10-12T16:37:15.202436Z",
+                  "actorType": "CUSTOMER",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 2,
+                  "fromState": "PENDING_ACCEPTANCE",
+                  "toState": "ACCEPTED",
+                  "occurredAt": "2026-10-12T16:37:19.174727Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 3,
+                  "fromState": "ACCEPTED",
+                  "toState": "PREPARING",
+                  "occurredAt": "2026-10-12T16:37:27.142698Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 4,
+                  "fromState": "PREPARING",
+                  "toState": "READY",
+                  "occurredAt": "2026-10-12T16:37:27.284389Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 5,
+                  "fromState": "READY",
+                  "toState": "COMPLETED",
+                  "occurredAt": "2026-10-12T16:37:27.485800Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                }
+              ],
+              "allowedActions": [],
+              "cashState": "VERIFIED",
+              "supportCaseIds": [
+                "a6ab92d2-8d58-4100-8e99-41e3c96d1fec",
+                "385c1e8f-c6c2-4dba-8733-fd3f306a27e4"
+              ],
+              "handoverCode": null,
+              "contact": null
+            }
+          }
+        },
+        {
+          "name": "Cook resumes own pause; customer offering returns",
+          "status": "PASS",
+          "expected": "ACTIVE/public200",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Synthetic independent QA kitchen",
+              "operatingState": "ACTIVE",
+              "pausedBy": null,
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 4
+            },
+            "body": {
+              "paused": false,
+              "expectedVersion": 3
+            }
+          }
+        },
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "page.waitForResponse: Timeout 9000ms exceeded while waiting for event \"response\""
+        }
+      ],
+      "evidence": [],
+      "exception": "page.waitForResponse: Timeout 9000ms exceeded while waiting for event \"response\"",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T17:29:33.557Z"
+    },
+    {
+      "id": "S-CONFIG-QUOTES",
+      "actor": "Customer/admin API + customer web",
+      "requirement": "BR-021/042; immutable old quote vs new zone configuration",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:29:33.603Z",
+      "checks": [
+        {
+          "name": "Original quote snapshots active fee",
+          "status": "PASS",
+          "expected": 3000,
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "8670eb9f-d77b-44b3-b378-4695065d0897",
+              "expiresAt": "2026-10-12T17:34:35.354855647Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000264",
+                  "mealRevision": 1,
+                  "title": "QA Meal A2",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 9550,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 3000,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 12550,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-12T17:44:35.354855647Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actual fresh-MFA admin versions fee",
+          "status": "PASS",
+          "expected": 200,
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "352b4537-ae9e-404b-ad2b-9f09557a9e97",
+              "key": "[REDACTED IDEMPOTENCY KEY]",
+              "version": 5,
+              "value": {
+                "active": true,
+                "deliveryFeeMinor": 3125
+              },
+              "reason": "Synthetic old/new quote boundary",
+              "approvalReference": null,
+              "actorId": "00000000-0000-0000-0000-0000000002c2",
+              "createdAt": "2026-10-12T17:29:35.374968272Z"
+            }
+          }
+        },
+        {
+          "name": "New quote sees changed fee/version",
+          "status": "PASS",
+          "expected": {
+            "fee": 3125
+          },
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "fa329877-2e85-41f0-a587-ab1a266fe70c",
+              "expiresAt": "2026-10-12T17:34:35.389263499Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000264",
+                  "mealRevision": 1,
+                  "title": "QA Meal A2",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 9550,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 9550,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 3125,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 12675,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-12T17:44:35.389263499Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Unexpired old quote keeps agreed snapshot total",
+          "status": "FAIL",
+          "expected": {
+            "total": 12550
+          },
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "PRICE_CHANGED",
+              "messageKey": "error.price_changed",
+              "fieldErrors": [
+                {
+                  "field": "quoteId",
+                  "code": "TOTAL_CHANGED"
+                }
+              ],
+              "requestId": "5a354a9b-5074-4a99-9f76-96e7559e8e93",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Requirement conflict prevents product-defect verdict",
+          "status": "BLOCKED",
+          "reason": "BR-042/backlog/API/UI only new quotes vs verification plan stale zone/policy quote invalidation; expected not changed to implementation"
+        }
+      ],
+      "evidence": [
+        "S-CONFIG-QUOTES-conflict-context.png",
+        "S-CONFIG-QUOTES-conflict-context.json"
+      ],
+      "status": "FAIL",
+      "finishedAt": "2026-10-12T17:29:35.567Z"
+    },
+    {
+      "id": "S-FINANCE-SYNTHETIC-FINAL",
+      "actor": "Finance web/API/database with synthetic external-reference fixture",
+      "requirement": "BR-033/035/036; no actual bank/refund/payment integration",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:30:08.852Z",
+      "checks": [
+        {
+          "name": "Prerequisite reviewed settlement is unpaid",
+          "status": "PASS",
+          "expected": "REVIEWED/no payment",
+          "actual": {
+            "id": "d44c87e3-d3b2-4050-bead-2d4b43a61b8e",
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "periodFrom": "2026-10-01",
+            "periodTo": "2026-10-12",
+            "state": "REVIEWED",
+            "total": {
+              "amountMinor": 2405,
+              "currency": "EGP"
+            },
+            "direction": "COOK_PAYS_PLATFORM",
+            "lines": [
+              {
+                "ledgerGroupId": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+                "kind": "COMMISSION",
+                "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+                "amount": {
+                  "amountMinor": 2405,
+                  "currency": "EGP"
+                }
+              }
+            ],
+            "createdBy": "00000000-0000-0000-0000-0000000002c5",
+            "reviewedBy": "00000000-0000-0000-0000-0000000002c6",
+            "paymentReference": null,
+            "paymentRecordedBy": null,
+            "reconciledBy": null,
+            "createdAt": "2026-10-12T17:04:43.482052Z",
+            "updatedAt": "2026-10-12T17:04:43.539066Z",
+            "version": 1
+          }
+        },
+        {
+          "name": "UI records clearly synthetic external-reference state",
+          "status": "PASS",
+          "expected": "PAYMENT_RECORDED fixture only",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "d44c87e3-d3b2-4050-bead-2d4b43a61b8e",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "periodFrom": "2026-10-01",
+              "periodTo": "2026-10-12",
+              "state": "PAYMENT_RECORDED",
+              "total": {
+                "amountMinor": 2405,
+                "currency": "EGP"
+              },
+              "direction": "COOK_PAYS_PLATFORM",
+              "lines": [
+                {
+                  "ledgerGroupId": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+                  "kind": "COMMISSION",
+                  "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+                  "amount": {
+                    "amountMinor": 2405,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "createdBy": "00000000-0000-0000-0000-0000000002c5",
+              "reviewedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paymentReference": "QA-SYNTHETIC-NO-TRANSFER",
+              "paymentRecordedBy": "00000000-0000-0000-0000-0000000002c5",
+              "reconciledBy": null,
+              "createdAt": "2026-10-12T17:04:43.482052Z",
+              "updatedAt": "2026-10-12T17:30:11.606167Z",
+              "version": 2
+            },
+            "body": {
+              "action": "PAYMENT_RECORDED",
+              "expectedVersion": 1,
+              "evidenceRef": "QA-SYNTHETIC-NO-TRANSFER"
+            },
+            "key": "[REDACTED IDEMPOTENCY KEY]"
+          }
+        },
+        {
+          "name": "Payment recorder cannot reconcile own batch",
+          "status": "PASS",
+          "expected": 403,
+          "actual": {
+            "status": 403,
+            "data": {
+              "code": "FORBIDDEN",
+              "messageKey": "error.forbidden",
+              "fieldErrors": [],
+              "requestId": "f4b68fa3-4bd5-4d35-adb8-32c84b9d9d0a",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Separate reconciliation reaches terminal accounting state",
+          "status": "PASS",
+          "expected": "RECONCILED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "d44c87e3-d3b2-4050-bead-2d4b43a61b8e",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "periodFrom": "2026-10-01",
+              "periodTo": "2026-10-12",
+              "state": "RECONCILED",
+              "total": {
+                "amountMinor": 2405,
+                "currency": "EGP"
+              },
+              "direction": "COOK_PAYS_PLATFORM",
+              "lines": [
+                {
+                  "ledgerGroupId": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+                  "kind": "COMMISSION",
+                  "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+                  "amount": {
+                    "amountMinor": 2405,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "createdBy": "00000000-0000-0000-0000-0000000002c5",
+              "reviewedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paymentReference": "QA-SYNTHETIC-NO-TRANSFER",
+              "paymentRecordedBy": "00000000-0000-0000-0000-0000000002c5",
+              "reconciledBy": "00000000-0000-0000-0000-0000000002c6",
+              "createdAt": "2026-10-12T17:04:43.482052Z",
+              "updatedAt": "2026-10-12T17:30:11.643122Z",
+              "version": 3
+            }
+          }
+        },
+        {
+          "name": "Repeated reconciliation returns same frozen batch",
+          "status": "PASS",
+          "expected": "d44c87e3-d3b2-4050-bead-2d4b43a61b8e",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "d44c87e3-d3b2-4050-bead-2d4b43a61b8e",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "periodFrom": "2026-10-01",
+              "periodTo": "2026-10-12",
+              "state": "RECONCILED",
+              "total": {
+                "amountMinor": 2405,
+                "currency": "EGP"
+              },
+              "direction": "COOK_PAYS_PLATFORM",
+              "lines": [
+                {
+                  "ledgerGroupId": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+                  "kind": "COMMISSION",
+                  "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+                  "amount": {
+                    "amountMinor": 2405,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "createdBy": "00000000-0000-0000-0000-0000000002c5",
+              "reviewedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paymentReference": "QA-SYNTHETIC-NO-TRANSFER",
+              "paymentRecordedBy": "00000000-0000-0000-0000-0000000002c5",
+              "reconciledBy": "00000000-0000-0000-0000-0000000002c6",
+              "createdAt": "2026-10-12T17:04:43.482052Z",
+              "updatedAt": "2026-10-12T17:30:11.643122Z",
+              "version": 3
+            }
+          }
+        },
+        {
+          "name": "Full synthetic verified collection request succeeds",
+          "status": "PASS",
+          "expected": "REQUESTED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "a4d38205-48e1-467d-a7e6-fbef071493c6",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "caseReference": "CS-A12B4EF8",
+              "amount": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "state": "REQUESTED",
+              "reason": "Synthetic refund accounting test; no money transfer",
+              "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+              "approvedBy": null,
+              "paidBy": null,
+              "paymentReference": null,
+              "verifiedBy": null,
+              "decisionReason": null,
+              "createdAt": "2026-10-12T17:30:11.671148Z",
+              "updatedAt": "2026-10-12T17:30:11.671148Z",
+              "version": 0
+            }
+          }
+        },
+        {
+          "name": "Separate approval stays unpaid",
+          "status": "PASS",
+          "expected": "APPROVED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "a4d38205-48e1-467d-a7e6-fbef071493c6",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "caseReference": "CS-A12B4EF8",
+              "amount": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "state": "APPROVED",
+              "reason": "Synthetic refund accounting test; no money transfer",
+              "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+              "approvedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paidBy": null,
+              "paymentReference": null,
+              "verifiedBy": null,
+              "decisionReason": null,
+              "createdAt": "2026-10-12T17:30:11.671148Z",
+              "updatedAt": "2026-10-12T17:30:11.684592Z",
+              "version": 1
+            }
+          }
+        },
+        {
+          "name": "UI records explicit synthetic refund reference",
+          "status": "PASS",
+          "expected": "PAID fixture only",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "a4d38205-48e1-467d-a7e6-fbef071493c6",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "caseReference": "CS-A12B4EF8",
+              "amount": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "state": "PAID",
+              "reason": "Synthetic refund accounting test; no money transfer",
+              "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+              "approvedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paidBy": "00000000-0000-0000-0000-0000000002c5",
+              "paymentReference": "QA-SYNTHETIC-NO-REFUND-TRANSFER",
+              "verifiedBy": null,
+              "decisionReason": null,
+              "createdAt": "2026-10-12T17:30:11.671148Z",
+              "updatedAt": "2026-10-12T17:30:12.159975Z",
+              "version": 2
+            },
+            "body": {
+              "action": "PAYMENT_RECORDED",
+              "expectedVersion": 1,
+              "evidenceRef": "QA-SYNTHETIC-NO-REFUND-TRANSFER"
+            },
+            "key": "[REDACTED IDEMPOTENCY KEY]"
+          }
+        },
+        {
+          "name": "Payment recorder cannot verify own refund",
+          "status": "PASS",
+          "expected": 403,
+          "actual": {
+            "status": 403,
+            "data": {
+              "code": "FORBIDDEN",
+              "messageKey": "error.forbidden",
+              "fieldErrors": [],
+              "requestId": "3a58ea7f-c1fa-49c5-8f98-6a0df79d8667",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Separate verification completes accounting refund",
+          "status": "PASS",
+          "expected": "VERIFIED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "a4d38205-48e1-467d-a7e6-fbef071493c6",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "caseReference": "CS-A12B4EF8",
+              "amount": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "state": "VERIFIED",
+              "reason": "Synthetic refund accounting test; no money transfer",
+              "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+              "approvedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paidBy": "00000000-0000-0000-0000-0000000002c5",
+              "paymentReference": "QA-SYNTHETIC-NO-REFUND-TRANSFER",
+              "verifiedBy": "00000000-0000-0000-0000-0000000002c6",
+              "decisionReason": null,
+              "createdAt": "2026-10-12T17:30:11.671148Z",
+              "updatedAt": "2026-10-12T17:30:12.196835Z",
+              "version": 3
+            }
+          }
+        },
+        {
+          "name": "Verification retry does not append second reversal",
+          "status": "PASS",
+          "expected": 3,
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "a4d38205-48e1-467d-a7e6-fbef071493c6",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "caseReference": "CS-A12B4EF8",
+              "amount": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "state": "VERIFIED",
+              "reason": "Synthetic refund accounting test; no money transfer",
+              "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+              "approvedBy": "00000000-0000-0000-0000-0000000002c6",
+              "paidBy": "00000000-0000-0000-0000-0000000002c5",
+              "paymentReference": "QA-SYNTHETIC-NO-REFUND-TRANSFER",
+              "verifiedBy": "00000000-0000-0000-0000-0000000002c6",
+              "decisionReason": null,
+              "createdAt": "2026-10-12T17:30:11.671148Z",
+              "updatedAt": "2026-10-12T17:30:12.196835Z",
+              "version": 3
+            }
+          }
+        },
+        {
+          "name": "Exactly one full snapshot commission reversal",
+          "status": "PASS",
+          "expected": {
+            "count": 1,
+            "amount": 2405
+          },
+          "actual": {
+            "count": 1,
+            "amount": 2405
+          }
+        },
+        {
+          "name": "Ledger still balances after refund and reconciliation",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Refund never rewrites completed order",
+          "status": "PASS",
+          "expected": "COMPLETED|24050",
+          "actual": "COMPLETED|24050"
+        }
+      ],
+      "evidence": [
+        "S-FINANCE-synthetic-final.png",
+        "S-FINANCE-synthetic-final.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T17:30:13.308Z"
+    },
+    {
+      "id": "S-SETTINGS",
+      "actor": "Cook/customer web + API",
+      "requirement": "BR-008/017; MB-022",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:31:26.858Z",
+      "checks": [
+        {
+          "name": "Cook can pause own sales through delivered UI",
+          "status": "PASS",
+          "expected": "PAUSED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Synthetic independent QA kitchen",
+              "operatingState": "PAUSED",
+              "pausedBy": "COOK",
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 5
+            },
+            "body": {
+              "paused": true,
+              "expectedVersion": 4
+            }
+          }
+        },
+        {
+          "name": "Paused kitchen cannot offer customer meal",
+          "status": "PASS",
+          "expected": 404,
+          "actual": {
+            "status": 404,
+            "data": {
+              "code": "NOT_FOUND",
+              "messageKey": "error.not_found",
+              "fieldErrors": [],
+              "requestId": "1956247d-4326-4ba4-9819-4dd275ef5574",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Historical completed order remains readable/immutable",
+          "status": "PASS",
+          "expected": "COMPLETED24050",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "publicNumber": "MB-100005",
+              "version": 4,
+              "state": "COMPLETED",
+              "fulfillmentMode": "PICKUP",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000263",
+                  "title": "QA Meal A1",
+                  "allergenStatement": "UNKNOWN",
+                  "quantity": 2,
+                  "unitPrice": {
+                    "amountMinor": 12025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 24050,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "slot": {
+                "id": "d51ea2ec-9c6b-44da-b112-5f86fd3d5477",
+                "startsAt": "2026-10-20T10:00:00Z",
+                "endsAt": "2026-10-20T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-20T08:00:00Z",
+                "availablePortions": 6,
+                "fulfillmentModes": [
+                  "PICKUP"
+                ]
+              },
+              "acceptBy": "2026-10-12T16:52:15.173703Z",
+              "events": [
+                {
+                  "sequence": 1,
+                  "fromState": null,
+                  "toState": "PENDING_ACCEPTANCE",
+                  "occurredAt": "2026-10-12T16:37:15.202436Z",
+                  "actorType": "CUSTOMER",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 2,
+                  "fromState": "PENDING_ACCEPTANCE",
+                  "toState": "ACCEPTED",
+                  "occurredAt": "2026-10-12T16:37:19.174727Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 3,
+                  "fromState": "ACCEPTED",
+                  "toState": "PREPARING",
+                  "occurredAt": "2026-10-12T16:37:27.142698Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 4,
+                  "fromState": "PREPARING",
+                  "toState": "READY",
+                  "occurredAt": "2026-10-12T16:37:27.284389Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                },
+                {
+                  "sequence": 5,
+                  "fromState": "READY",
+                  "toState": "COMPLETED",
+                  "occurredAt": "2026-10-12T16:37:27.485800Z",
+                  "actorType": "COOK",
+                  "reasonCode": null
+                }
+              ],
+              "allowedActions": [],
+              "cashState": "VERIFIED",
+              "supportCaseIds": [
+                "a6ab92d2-8d58-4100-8e99-41e3c96d1fec",
+                "385c1e8f-c6c2-4dba-8733-fd3f306a27e4"
+              ],
+              "handoverCode": null,
+              "contact": null
+            }
+          }
+        },
+        {
+          "name": "Cook resumes own pause; customer offering returns",
+          "status": "PASS",
+          "expected": "ACTIVE/public200",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Synthetic independent QA kitchen",
+              "operatingState": "ACTIVE",
+              "pausedBy": null,
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 6
+            },
+            "body": {
+              "paused": false,
+              "expectedVersion": 5
+            }
+          }
+        },
+        {
+          "name": "Settings UI saves own public description",
+          "status": "PASS",
+          "expected": "saved content",
+          "actual": {
+            "status": 200,
+            "data": {
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "publicSlug": "qa-kitchen-a",
+              "displayName": "مطبخ تجريبي A",
+              "description": "Independent synthetic QA settings description",
+              "operatingState": "ACTIVE",
+              "pausedBy": null,
+              "pickupEnabled": true,
+              "zones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "nameAr": "منطقة تجريبية متوقفة",
+                  "nameEn": "Test zone (inactive)",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "nameAr": "منطقة تجريبية أ",
+                  "nameEn": "Test zone A",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "nameAr": "منطقة تجريبية ب",
+                  "nameEn": "Test zone B",
+                  "deliveryEnabled": true
+                }
+              ],
+              "version": 7
+            },
+            "body": {
+              "description": "Independent synthetic QA settings description",
+              "pickupEnabled": true,
+              "deliveryZones": [
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a003",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a001",
+                  "deliveryEnabled": true
+                },
+                {
+                  "zoneId": "00000000-0000-4000-8000-00000000a002",
+                  "deliveryEnabled": true
+                }
+              ],
+              "expectedVersion": 6
+            }
+          }
+        }
+      ],
+      "evidence": [
+        "S-SETTINGS-resumed.png",
+        "S-SETTINGS-resumed.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T17:31:30.664Z"
+    },
+    {
+      "id": "S-SUPPORT-RESOLVE",
+      "actor": "Support web + customer API",
+      "requirement": "OP05/BR-041; MB-024 delivered staff case segment",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:40:44.833Z",
+      "checks": [
+        {
+          "name": "Delivered staff UI assigns actual case to current staff",
+          "status": "PASS",
+          "expected": 200,
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "385c1e8f-c6c2-4dba-8733-fd3f306a27e4",
+              "reference": "CS-A12B4EF8",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "orderNumber": "MB-100005",
+              "customerId": "00000000-0000-0000-0000-0000000002bd",
+              "category": "QUALITY",
+              "severity": "NORMAL",
+              "state": "IN_PROGRESS",
+              "description": "Independent synthetic QA support thread check.",
+              "cancellationReason": null,
+              "assigneeId": "00000000-0000-0000-0000-0000000002c4",
+              "slaDueAt": "2026-10-13T16:56:14.267984Z",
+              "overdue": false,
+              "firstResponseAt": "2026-10-12T16:56:16.407661Z",
+              "escalatedAt": null,
+              "resolutionCode": null,
+              "resolvedAt": null,
+              "createdAt": "2026-10-12T16:56:14.267984Z",
+              "updatedAt": "2026-10-12T17:40:48.833266Z",
+              "messages": [
+                {
+                  "id": "1a3ecc60-f00b-441f-81fe-841471e0acf5",
+                  "authorRole": "STAFF",
+                  "visibility": "STAFF_ONLY",
+                  "body": "QA PRIVATE NOTE NEVER FOR CUSTOMER",
+                  "createdAt": "2026-10-12T16:56:16.111624Z"
+                },
+                {
+                  "id": "23d28554-1d79-4edc-bb16-d1cb2704c766",
+                  "authorRole": "STAFF",
+                  "visibility": "PUBLIC",
+                  "body": "QA PUBLIC REPLY FOR CUSTOMER",
+                  "createdAt": "2026-10-12T16:56:16.406198Z"
+                }
+              ],
+              "version": 3
+            },
+            "body": {
+              "assignToMe": true,
+              "expectedVersion": 2
+            }
+          }
+        },
+        {
+          "name": "Staff resolves case with explicit resolution",
+          "status": "PASS",
+          "expected": "RESOLVED/INFORMATION_PROVIDED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "385c1e8f-c6c2-4dba-8733-fd3f306a27e4",
+              "reference": "CS-A12B4EF8",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "orderNumber": "MB-100005",
+              "customerId": "00000000-0000-0000-0000-0000000002bd",
+              "category": "QUALITY",
+              "severity": "NORMAL",
+              "state": "RESOLVED",
+              "description": "Independent synthetic QA support thread check.",
+              "cancellationReason": null,
+              "assigneeId": "00000000-0000-0000-0000-0000000002c4",
+              "slaDueAt": "2026-10-13T16:56:14.267984Z",
+              "overdue": false,
+              "firstResponseAt": "2026-10-12T16:56:16.407661Z",
+              "escalatedAt": null,
+              "resolutionCode": "INFORMATION_PROVIDED",
+              "resolvedAt": "2026-10-12T17:40:48.937419Z",
+              "createdAt": "2026-10-12T16:56:14.267984Z",
+              "updatedAt": "2026-10-12T17:40:48.937419Z",
+              "messages": [
+                {
+                  "id": "1a3ecc60-f00b-441f-81fe-841471e0acf5",
+                  "authorRole": "STAFF",
+                  "visibility": "STAFF_ONLY",
+                  "body": "QA PRIVATE NOTE NEVER FOR CUSTOMER",
+                  "createdAt": "2026-10-12T16:56:16.111624Z"
+                },
+                {
+                  "id": "23d28554-1d79-4edc-bb16-d1cb2704c766",
+                  "authorRole": "STAFF",
+                  "visibility": "PUBLIC",
+                  "body": "QA PUBLIC REPLY FOR CUSTOMER",
+                  "createdAt": "2026-10-12T16:56:16.406198Z"
+                }
+              ],
+              "version": 4
+            },
+            "body": {
+              "state": "RESOLVED",
+              "resolutionCode": "INFORMATION_PROVIDED",
+              "reason": "Synthetic QA case-resolution workflow",
+              "expectedVersion": 3
+            }
+          }
+        },
+        {
+          "name": "Customer API keeps public reply and resolved status, never private note",
+          "status": "PASS",
+          "expected": "RESOLVED/public only",
+          "actual": {
+            "id": "385c1e8f-c6c2-4dba-8733-fd3f306a27e4",
+            "reference": "CS-A12B4EF8",
+            "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+            "orderNumber": "MB-100005",
+            "category": "QUALITY",
+            "state": "RESOLVED",
+            "description": "Independent synthetic QA support thread check.",
+            "resolutionCode": "INFORMATION_PROVIDED",
+            "createdAt": "2026-10-12T16:56:14.267984Z",
+            "updatedAt": "2026-10-12T17:40:48.937419Z",
+            "messages": [
+              {
+                "id": "23d28554-1d79-4edc-bb16-d1cb2704c766",
+                "authorRole": "STAFF",
+                "visibility": "PUBLIC",
+                "body": "QA PUBLIC REPLY FOR CUSTOMER",
+                "createdAt": "2026-10-12T16:56:16.406198Z"
+              }
+            ],
+            "version": 4
+          }
+        },
+        {
+          "name": "Stale case update refused without state mutation",
+          "status": "PASS",
+          "expected": 409,
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "VERSION_CONFLICT",
+              "messageKey": "error.version_conflict",
+              "fieldErrors": [],
+              "requestId": "e35d5a95-084b-45c0-a25a-58e71b2515c6",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Staff UI closes resolved case",
+          "status": "PASS",
+          "expected": "CLOSED",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "385c1e8f-c6c2-4dba-8733-fd3f306a27e4",
+              "reference": "CS-A12B4EF8",
+              "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+              "orderNumber": "MB-100005",
+              "customerId": "00000000-0000-0000-0000-0000000002bd",
+              "category": "QUALITY",
+              "severity": "NORMAL",
+              "state": "CLOSED",
+              "description": "Independent synthetic QA support thread check.",
+              "cancellationReason": null,
+              "assigneeId": "00000000-0000-0000-0000-0000000002c4",
+              "slaDueAt": "2026-10-13T16:56:14.267984Z",
+              "overdue": false,
+              "firstResponseAt": "2026-10-12T16:56:16.407661Z",
+              "escalatedAt": null,
+              "resolutionCode": "INFORMATION_PROVIDED",
+              "resolvedAt": "2026-10-12T17:40:48.937419Z",
+              "createdAt": "2026-10-12T16:56:14.267984Z",
+              "updatedAt": "2026-10-12T17:40:49.066608Z",
+              "messages": [
+                {
+                  "id": "1a3ecc60-f00b-441f-81fe-841471e0acf5",
+                  "authorRole": "STAFF",
+                  "visibility": "STAFF_ONLY",
+                  "body": "QA PRIVATE NOTE NEVER FOR CUSTOMER",
+                  "createdAt": "2026-10-12T16:56:16.111624Z"
+                },
+                {
+                  "id": "23d28554-1d79-4edc-bb16-d1cb2704c766",
+                  "authorRole": "STAFF",
+                  "visibility": "PUBLIC",
+                  "body": "QA PUBLIC REPLY FOR CUSTOMER",
+                  "createdAt": "2026-10-12T16:56:16.406198Z"
+                }
+              ],
+              "version": 5
+            },
+            "body": {
+              "state": "CLOSED",
+              "reason": "Synthetic QA closure after information provided",
+              "expectedVersion": 4
+            }
+          }
+        },
+        {
+          "name": "Repeated stale close refused",
+          "status": "PASS",
+          "expected": 409,
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "VERSION_CONFLICT",
+              "messageKey": "error.version_conflict",
+              "fieldErrors": [],
+              "requestId": "6398d06d-2e65-42ba-b6a6-7762821c4fc6",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Closed-case reply rejected server-side",
+          "status": "PASS",
+          "expected": 409,
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "STATE_CONFLICT",
+              "messageKey": "error.state_conflict",
+              "fieldErrors": [],
+              "requestId": "bfd1269b-f05e-442c-af49-87f66d86e3db",
+              "retryable": false
+            }
+          }
+        }
+      ],
+      "evidence": [
+        "S-SUPPORT-RESOLVE-closed.png",
+        "S-SUPPORT-RESOLVE-closed.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T17:40:49.286Z"
+    },
+    {
+      "id": "S-SECURITY-REVOKED",
+      "actor": "Password-only customer/admin API; genuine admin OTP",
+      "requirement": "BR-007/043; supplements grant/revoke sensitive-command meaning",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T17:44:28.966Z",
+      "checks": [
+        {
+          "name": "Temporary sensitive grant is actually revoked",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Revoked identity cannot perform sensitive configuration write",
+          "status": "PASS",
+          "expected": {
+            "status": 403,
+            "code": "FORBIDDEN"
+          },
+          "actual": {
+            "status": 403,
+            "data": {
+              "code": "FORBIDDEN",
+              "messageKey": "error.forbidden",
+              "fieldErrors": [],
+              "requestId": "b830383a-1ea0-48fa-9673-1e2404213c4c",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Fresh-MFA last-admin removal is safely refused",
+          "status": "PASS",
+          "expected": {
+            "status": 409,
+            "code": "STATE_CONFLICT"
+          },
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "STATE_CONFLICT",
+              "messageKey": "error.state_conflict",
+              "fieldErrors": [],
+              "requestId": "d08f52c8-d8e6-4dc9-a819-67c2c346c8ff",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Denied operation preserves recoverable administrator",
+          "status": "PASS",
+          "expected": "same active staff.grant",
+          "actual": [
+            {
+              "permission": "audit.read",
+              "grantId": "9a8a3a9c-1f32-4c54-b7e0-e8a536b3db28"
+            },
+            {
+              "permission": "config.read",
+              "grantId": "bd8f50c2-21d5-486a-81b3-9af1c483e7c7"
+            },
+            {
+              "permission": "config.write",
+              "grantId": "dc8c3bc8-adf4-4513-9063-268e8c07f510"
+            },
+            {
+              "permission": "staff.grant",
+              "grantId": "219b657b-f612-4259-8054-587780702416"
+            }
+          ]
+        },
+        {
+          "name": "Denied write leaves flag/version unchanged",
+          "status": "PASS",
+          "expected": {
+            "key": "ordering-enabled",
+            "enabled": true,
+            "version": 0
+          },
+          "actual": {
+            "key": "ordering-enabled",
+            "enabled": true,
+            "version": 0
+          }
+        }
+      ],
+      "evidence": [],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T17:44:33.857Z"
     }
   ]
 }

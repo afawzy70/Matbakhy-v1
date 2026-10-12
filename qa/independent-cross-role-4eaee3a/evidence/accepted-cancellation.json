@@ -1,0 +1,120 @@
+{
+  "order": {
+    "id": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+    "publicNumber": "MB-100014",
+    "version": 3,
+    "state": "CANCELLED",
+    "fulfillmentMode": "PICKUP",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-00000000026d",
+        "title": "وجبة تجريبية B1",
+        "allergenStatement": "UNKNOWN",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 8025,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 8025,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 8025,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 8025,
+      "currency": "EGP"
+    },
+    "slot": {
+      "id": "00000000-0000-0000-0000-0000000001a6",
+      "startsAt": "2026-10-16T15:59:42.580575Z",
+      "endsAt": "2026-10-16T17:59:42.580575Z",
+      "timezone": "Africa/Cairo",
+      "cutoffAt": "2026-10-16T13:59:42.580575Z",
+      "availablePortions": 49,
+      "fulfillmentModes": [
+        "PICKUP"
+      ]
+    },
+    "acceptBy": "2026-10-12T17:41:12.922967Z",
+    "events": [
+      {
+        "sequence": 1,
+        "fromState": null,
+        "toState": "PENDING_ACCEPTANCE",
+        "occurredAt": "2026-10-12T17:26:12.933410Z",
+        "actorType": "CUSTOMER",
+        "reasonCode": null
+      },
+      {
+        "sequence": 2,
+        "fromState": "PENDING_ACCEPTANCE",
+        "toState": "ACCEPTED",
+        "occurredAt": "2026-10-12T17:26:13.009026Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 3,
+        "fromState": "ACCEPTED",
+        "toState": "PREPARING",
+        "occurredAt": "2026-10-12T17:26:13.325075Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 4,
+        "fromState": "PREPARING",
+        "toState": "CANCELLED",
+        "occurredAt": "2026-10-12T17:26:13.541077Z",
+        "actorType": "STAFF",
+        "reasonCode": "OPERATIONAL"
+      }
+    ],
+    "allowedActions": [],
+    "cashState": "DUE",
+    "supportCaseIds": [
+      "a1e44563-1634-4940-a104-592968c2caa0"
+    ],
+    "handoverCode": null,
+    "contact": null
+  },
+  "case": {
+    "id": "a1e44563-1634-4940-a104-592968c2caa0",
+    "reference": "CS-4F6BC132",
+    "orderId": "b014ed5f-1447-417f-abde-f1eee5f304ca",
+    "orderNumber": "MB-100014",
+    "category": "CANCELLATION_REQUEST",
+    "state": "OPEN",
+    "description": "Cancellation requested: CHANGED_MIND",
+    "resolutionCode": null,
+    "createdAt": "2026-10-12T17:26:13.253329Z",
+    "updatedAt": "2026-10-12T17:26:13.253329Z",
+    "messages": [],
+    "version": 0
+  },
+  "counters": {
+    "meal": {
+      "reserved": 0,
+      "allocated": 0,
+      "consumed": 1
+    },
+    "slot": {
+      "reserved": 0,
+      "allocated": 0,
+      "consumed": 1
+    }
+  }
+}

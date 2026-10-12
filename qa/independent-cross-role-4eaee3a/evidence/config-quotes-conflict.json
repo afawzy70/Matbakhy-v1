@@ -1,0 +1,106 @@
+{
+  "oldQuote": {
+    "quoteId": "8670eb9f-d77b-44b3-b378-4695065d0897",
+    "expiresAt": "2026-10-12T17:34:35.354855647Z",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000264",
+        "mealRevision": 1,
+        "title": "QA Meal A2",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 9550,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3000,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 12550,
+      "currency": "EGP"
+    },
+    "cancellationPolicyVersion": "synthetic-cancel-v1",
+    "termsVersion": "synthetic-terms-v1",
+    "acceptanceDeadlinePreview": "2026-10-12T17:44:35.354855647Z",
+    "warnings": [
+      "SYNTHETIC_POLICY"
+    ]
+  },
+  "newQuote": {
+    "quoteId": "fa329877-2e85-41f0-a587-ab1a266fe70c",
+    "expiresAt": "2026-10-12T17:34:35.389263499Z",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000264",
+        "mealRevision": 1,
+        "title": "QA Meal A2",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 9550,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3125,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 12675,
+      "currency": "EGP"
+    },
+    "cancellationPolicyVersion": "synthetic-cancel-v1",
+    "termsVersion": "synthetic-terms-v1",
+    "acceptanceDeadlinePreview": "2026-10-12T17:44:35.389263499Z",
+    "warnings": [
+      "SYNTHETIC_POLICY"
+    ]
+  },
+  "placement": {
+    "status": 409,
+    "data": {
+      "code": "PRICE_CHANGED",
+      "messageKey": "error.price_changed",
+      "fieldErrors": [
+        {
+          "field": "quoteId",
+          "code": "TOTAL_CHANGED"
+        }
+      ],
+      "requestId": "5a354a9b-5074-4a99-9f76-96e7559e8e93",
+      "retryable": false
+    }
+  },
+  "observedAt": "2026-10-12T17:29:35.411Z",
+  "expected": "BR-042/new quotes only: unexpired original quote remains valid",
+  "conflictingReference": "docs/quality/01-verification.md stale quotes after zone/policy updates; developer implementation uses revalidation"
+}

@@ -1,0 +1,70 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "platform": "android",
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "execution": "real emulator/simulator; existing native UI harness invoked independently and assertions reviewed",
+  "checks": [
+    {
+      "name": "Exactly one customer-a order after uncertain recovery",
+      "expected": 1,
+      "actual": 1,
+      "status": "PASS"
+    },
+    {
+      "name": "Correct recovered slot and authoritative total",
+      "expected": {
+        "slotId": "00000000-0000-4000-8000-00000000a052",
+        "totalMinor": 9000
+      },
+      "actual": {
+        "id": "95d644e0-b86f-40e2-b064-4b9374d84d9e",
+        "publicNumber": "MB-100001",
+        "customerId": "e625e25a-58c3-4334-8845-8e7ad853eebb",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 9000,
+        "slotId": "00000000-0000-4000-8000-00000000a052"
+      },
+      "status": "PASS"
+    },
+    {
+      "name": "Single reservation/effect in both capacity counters",
+      "expected": [
+        1,
+        1
+      ],
+      "actual": [
+        1,
+        1
+      ],
+      "status": "PASS"
+    }
+  ],
+  "database": {
+    "orders": [
+      {
+        "id": "95d644e0-b86f-40e2-b064-4b9374d84d9e",
+        "publicNumber": "MB-100001",
+        "customerId": "e625e25a-58c3-4334-8845-8e7ad853eebb",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 9000,
+        "slotId": "00000000-0000-4000-8000-00000000a052"
+      }
+    ],
+    "slotCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a052",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ],
+    "mealCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a062",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ]
+  }
+}

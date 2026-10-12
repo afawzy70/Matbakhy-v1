@@ -1,0 +1,24 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "scope": "Read-only post-campaign dedicated synthetic database; not a concurrency/load gate",
+  "expected": {
+    "overMealCapacity": 0,
+    "overKitchenCapacity": 0,
+    "incorrectOrderTotals": 0,
+    "duplicateCustomerRequest": 0,
+    "unbalancedLedgerGroups": 0
+  },
+  "actual": {
+    "overMealCapacity": 0,
+    "overKitchenCapacity": 0,
+    "incorrectOrderTotals": 0,
+    "duplicateCustomerRequest": 0,
+    "unbalancedLedgerGroups": 0,
+    "orderStates": {
+      "COMPLETED": 2,
+      "EXPIRED": 5,
+      "CANCELLED": 7
+    },
+    "migrations": 24
+  }
+}

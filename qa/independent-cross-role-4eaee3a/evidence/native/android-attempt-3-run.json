@@ -1,0 +1,162 @@
+{
+  "conclusion": "failure",
+  "databaseId": 38283483353,
+  "headSha": "8707b2329c539168403ff868641bb9d77116b9f4",
+  "jobs": [
+    {
+      "completedAt": "2026-10-12T17:42:55Z",
+      "conclusion": "failure",
+      "databaseId": 114926150246,
+      "name": "Android debug APK (Gradle)",
+      "startedAt": "2026-10-12T17:19:57Z",
+      "status": "completed",
+      "steps": [
+        {
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 2,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Checkout independent QA controls separately",
+          "number": 3,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install pinned Node.js (checksum verified)",
+          "number": 4,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Toolchain (JDK 17 for Android Gradle Plugin, preinstalled Android SDK)",
+          "number": 5,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Install workspace from lockfile",
+          "number": 6,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Generate native Android project (Expo prebuild)",
+          "number": 7,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Gradle assembleDebug",
+          "number": 8,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Record artifact identity",
+          "number": 9,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Gradle assembleRelease (JS bundle embedded; debug-keystore signed; not a store build)",
+          "number": 10,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Start the local stack for the sign-in round trip (PostgreSQL, Keycloak, API; synthetic users, random local passwords)",
+          "number": 11,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Enable KVM for the emulator",
+          "number": 12,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "MB-031 launch on Android emulator",
+          "number": 13,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)",
+          "number": 14,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)",
+          "number": 15,
+          "status": "completed"
+        },
+        {
+          "conclusion": "failure",
+          "name": "Independent Android basket background process and Arabic checks",
+          "number": 16,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Independent native outcome and reservation correlation",
+          "number": 17,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Upload sanitized independent evidence",
+          "number": 18,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Stack logs on failure",
+          "number": 19,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Checkout independent QA controls separately",
+          "number": 37,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+          "number": 38,
+          "status": "completed"
+        },
+        {
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 39,
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38283483353/job/114926150246"
+    },
+    {
+      "completedAt": "2026-10-12T17:19:55Z",
+      "conclusion": "skipped",
+      "databaseId": 114926151552,
+      "name": "iOS simulator build (Xcode, unsigned)",
+      "startedAt": "2026-10-12T17:19:55Z",
+      "status": "completed",
+      "steps": [],
+      "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38283483353/job/114926151552"
+    }
+  ],
+  "status": "completed",
+  "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38283483353"
+}

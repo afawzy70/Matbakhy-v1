@@ -1,0 +1,19 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "platform": "ios",
+  "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "execution": "real emulator/simulator; existing native UI harness invoked independently and assertions reviewed",
+  "checks": [
+    {
+      "name": "Exactly one customer-a order after uncertain recovery",
+      "expected": 1,
+      "actual": 0,
+      "status": "FAIL"
+    }
+  ],
+  "database": {
+    "orders": [],
+    "slotCounters": [],
+    "mealCounters": []
+  }
+}

@@ -16,6 +16,7 @@ def q(v): return "'" + str(v).replace("'", "''") + "'"
 def chunk(k, b):
     return struct.pack('!I', len(b)) + k + b + struct.pack('!I', zlib.crc32(k+b))
 image = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('!IIBBBBB',800,600,8,2,0,0,0)) + chunk(b'IDAT', zlib.compress((b'\x00'+bytes([180,90,50])*800)*600)) + chunk(b'IEND',b'')
+(state.parent/'solid.png').write_bytes(image)
 urllib.request.urlopen(urllib.request.Request('http://localhost:39090/matbakhy-public/iqa.png', data=image, method='PUT', headers={'Content-Type':'image/png'})).read()
 sql=['BEGIN;']
 actors={}
