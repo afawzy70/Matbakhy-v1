@@ -49,8 +49,22 @@ final class SignInRoundTripTests: XCTestCase {
         guard let user = field(secure: false) else { return XCTFail("login form did not appear") }
         shot("login-form-\(username)")
         type(username, into: user)
+        dismissKeyboard()
         guard let secret = field(secure: true, timeout: 10) else { return XCTFail("password field missing") }
         type(password + "\n", into: secret)
+    }
+
+    /// With the software keyboard up, its form-assistant bar can cover the password field (native run 18): tap the page
+    /// heading to blur the username field and let the keyboard go down before the next field is tapped.
+    private func dismissKeyboard() {
+        for root in [app, authUI] {
+            let heading = root.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Sign in to")).firstMatch
+            if heading.exists {
+                heading.tap()
+                break
+            }
+        }
+        Thread.sleep(forTimeInterval: 1.5)
     }
 
     /// Web fields in the system sign-in sheet do not report keyboard focus to XCUITest; tap, let the keyboard settle,
