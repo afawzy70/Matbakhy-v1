@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { strings } from "../src/i18n";
-import { axe, env, sql } from "./fixtures";
+import { axe, env, overflowing, sql } from "./fixtures";
 
 /**
  * MB-029 on the operations web, after the cook and customer workflows have created real data: the cook (cook-a) and a
@@ -22,17 +22,7 @@ async function idpLogin(page: Page, user: string) {
 
 async function checkSection(page: Page, where: string, scan: boolean) {
   await page.waitForLoadState("networkidle");
-  const overflowing = await page.evaluate(() =>
-    document.documentElement.scrollWidth <= window.innerWidth
-      ? []
-      : [...document.querySelectorAll<HTMLElement>("body *")]
-          .filter((e) => {
-            const r = e.getBoundingClientRect();
-            return r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1) && !e.closest(".table-wrap");
-          })
-          .slice(0, 5)
-          .map((e) => `${e.tagName}.${e.className}:${(e.textContent ?? "").trim().slice(0, 25)}`));
-  expect.soft(overflowing, `overflow ${where}`).toEqual([]);
+  expect.soft(await overflowing(page), `overflow ${where}`).toEqual([]);
   const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible, textarea:visible").evaluateAll((els) =>
     els.filter((e) => {
       const r = e.getBoundingClientRect();

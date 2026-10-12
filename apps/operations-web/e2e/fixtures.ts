@@ -62,3 +62,17 @@ export async function axe(page: Page, name: string) {
     .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).slice(0, 3).join(" | ")}`);
   expect.soft(blocking, `axe ${name}`).toEqual([]);
 }
+
+/** Elements that stick out of the viewport horizontally (empty when the page does not overflow); tables scroll inside .table-wrap. */
+export async function overflowing(page: Page): Promise<string[]> {
+  return page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth
+      ? []
+      : [...document.querySelectorAll<HTMLElement>("body *")]
+          .filter((e) => {
+            const r = e.getBoundingClientRect();
+            return r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1) && !e.closest(".table-wrap");
+          })
+          .slice(0, 5)
+          .map((e) => `${e.tagName}.${e.className}:${(e.textContent ?? "").trim().slice(0, 25)}`));
+}

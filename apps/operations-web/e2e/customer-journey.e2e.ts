@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { strings as customerStrings } from "../../customer-web/src/i18n";
 import { strings } from "../src/i18n";
-import { axe, env, sql } from "./fixtures";
+import { axe, env, overflowing, sql } from "./fixtures";
 
 /**
  * TC-127 against the real local stack, after the cook workflow has published "كشري تجريبي" with an open slot: a
@@ -43,7 +43,7 @@ async function shot(page: Page, name: string) {
   const viewport = page.viewportSize();
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${width} ${name}`).toBe(true);
+    expect(await overflowing(page), `overflow ${width} ${name}`).toEqual([]);
     const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
       els.filter((e) => {
         const r = e.getBoundingClientRect();
@@ -272,7 +272,7 @@ test("customer screens keep the approved layout across widths and both direction
           await expect(page.getByRole("button", { name: s.home.intents.SELF.title })).toBeVisible();
         }
         const where = `${locale} ${width} ${route}`;
-        expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${where}`).toBe(true);
+        expect(await overflowing(page), `overflow ${where}`).toEqual([]);
         const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
           els.filter((e) => {
             const r = e.getBoundingClientRect();
