@@ -1,0 +1,38 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "inspectedOnly": true,
+  "runs": [
+    {
+      "id": 38272607044,
+      "name": "Product CI (build, test, contract, local stack, secrets)",
+      "sha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38272607044"
+    },
+    {
+      "id": 38272607011,
+      "name": "Blueprint integrity (not product verification)",
+      "sha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38272607011"
+    },
+    {
+      "id": 38272600321,
+      "name": "Blueprint integrity (not product verification)",
+      "sha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38272600321"
+    },
+    {
+      "id": 38272600348,
+      "name": "Product CI (build, test, contract, local stack, secrets)",
+      "sha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "status": "in_progress",
+      "conclusion": null,
+      "url": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38272600348"
+    }
+  ]
+}

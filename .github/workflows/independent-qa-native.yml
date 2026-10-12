@@ -1,0 +1,170 @@
+name: Independent QA native execution (product pinned 4eaee3a)
+# Compiles the minimal customer-mobile shell natively on GitHub-hosted runners (no signing, no
+# store upload, no device). Android and iOS are separate jobs and produce separate evidence.
+on:
+  push:
+    branches: [qa/independent-cross-role-4eaee3a-20261012]
+    paths: [.github/workflows/independent-qa-native.yml, qa/independent-cross-role-4eaee3a/native/**]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: independent-qa-native-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NODE_VERSION: "24.21.0"
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+  CI: "1"
+  EXPO_NO_TELEMETRY: "1"
+
+jobs:
+  android:
+    name: Android debug APK (Gradle)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 4eaee3a1f53b929b9e7685fd30da689d470d095c
+      - name: Checkout independent QA controls separately
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          path: iqa-controls
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Toolchain (JDK 17 for Android Gradle Plugin, preinstalled Android SDK)
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_17_X64" >> "$GITHUB_ENV"
+          echo "ANDROID_HOME=$ANDROID_HOME, ANDROID_NDK_LATEST_HOME=${ANDROID_NDK_LATEST_HOME:-unset}"
+      - name: Install workspace from lockfile
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Generate native Android project (Expo prebuild)
+        working-directory: apps/customer-mobile
+        run: pnpm exec expo prebuild --platform android --no-install --clean
+      - name: Gradle assembleDebug
+        working-directory: apps/customer-mobile/android
+        run: ./gradlew --no-daemon assembleDebug
+      - name: Record artifact identity
+        working-directory: apps/customer-mobile/android
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          ls -l "$APK" && sha256sum "$APK"
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/aapt dump badging "$APK" | grep -E "^package:|sdkVersion|targetSdkVersion"
+          java -version 2>&1 | head -1; ./gradlew --version | grep -E "Gradle|Kotlin|JVM"
+      - name: Gradle assembleRelease (JS bundle embedded; debug-keystore signed; not a store build)
+        working-directory: apps/customer-mobile/android
+        run: ./gradlew --no-daemon assembleRelease && sha256sum app/build/outputs/apk/release/app-release.apk
+      - name: Start the local stack for the sign-in round trip (PostgreSQL, Keycloak, API; synthetic users, random local passwords)
+        run: |
+          export JAVA_HOME="$JAVA_HOME_21_X64" PATH="$JAVA_HOME_21_X64/bin:$PATH"
+          scripts/dev.sh up
+          echo "::add-mask::$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)"
+      - name: Enable KVM for the emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: MB-031 launch on Android emulator
+        working-directory: apps/customer-mobile
+        run: scripts/launch-android.sh android/app/build/outputs/apk/release/app-release.apk
+      - name: MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)
+        run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/auth-roundtrip-android.sh
+      - name: MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)
+        run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/order-roundtrip-android.sh
+      - name: Independent native outcome and reservation correlation
+        if: always()
+        env:
+          IQA_PLATFORM: android
+        run: python3 iqa-controls/qa/independent-cross-role-4eaee3a/native/collect.py
+      - name: Upload sanitized independent evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: independent-android
+          path: iqa-native-evidence/
+          retention-days: 7
+      - name: Stack logs on failure
+        if: failure()
+        run: docker compose --env-file infra/.env -f infra/compose.yaml logs --tail 60 api identity || true
+
+  ios:
+    name: iOS simulator build (Xcode, unsigned)
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 4eaee3a1f53b929b9e7685fd30da689d470d095c
+      - name: Checkout independent QA controls separately
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          path: iqa-controls
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-darwin-arm64.tar.xz"
+          echo "6239d4cf92d864487ec8cd3615038f7b67e7f58b77b21cd2f09ea9fbd68065fe  node-v${NODE_VERSION}-darwin-arm64.tar.xz" | shasum -a 256 -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-darwin-arm64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Toolchain versions
+        run: ls -d /Applications/Xcode*.app; xcodebuild -version && pod --version && sw_vers
+      - name: Install workspace from lockfile
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Generate native iOS project (Expo prebuild) and install pods
+        working-directory: apps/customer-mobile
+        run: pnpm exec expo prebuild --platform ios --clean
+      - name: xcodebuild for iOS Simulator (no code signing)
+        working-directory: apps/customer-mobile/ios
+        run: |
+          set +e
+          xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > "$RUNNER_TEMP/xcodebuild.log" 2>&1
+          status=$?
+          grep -nE "error:|\*\* BUILD" "$RUNNER_TEMP/xcodebuild.log" | head -60
+          tail -20 "$RUNNER_TEMP/xcodebuild.log"
+          exit $status
+      - name: Record artifact identity
+        working-directory: apps/customer-mobile/ios
+        run: |
+          APP=$(find build/Build/Products -maxdepth 2 -name '*.app' | head -1)
+          echo "$APP" && /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
+          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist"
+          shasum -a 256 "$APP/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")"
+      - name: xcodebuild Release for iOS Simulator (JS bundle embedded; ad-hoc signed so the simulator keychain works; no team or certificate)
+        working-directory: apps/customer-mobile/ios
+        run: |
+          set +e
+          xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Release \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build-release CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
+            PROVISIONING_PROFILE_SPECIFIER= build > "$RUNNER_TEMP/xcodebuild-release.log" 2>&1
+          status=$?
+          grep -nE "error:|\*\* BUILD" "$RUNNER_TEMP/xcodebuild-release.log" | head -60
+          exit $status
+      - name: MB-031 launch on iOS Simulator
+        working-directory: apps/customer-mobile
+        run: scripts/launch-ios.sh "$(find ios/build-release/Build/Products -maxdepth 2 -name '*.app' | head -1)"
+      - name: Start identity provider and API natively for the sign-in round trip (no Docker on macOS runners; synthetic users)
+        run: apps/customer-mobile/scripts/native-stack-macos.sh
+      - name: MB-031 native sign-in round trip on iOS (XCUITest; system browser, PKCE, secure storage, sign-out, account switch)
+        run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
+      - name: MB-032 native ordering on iOS (basket replacement, app terminated during submit, offline reopen, recovery without duplicate)
+        run: apps/customer-mobile/scripts/order-roundtrip-ios.sh
+
+      - name: Independent native outcome and reservation correlation
+        if: always()
+        env:
+          IQA_PLATFORM: ios
+        run: python3 iqa-controls/qa/independent-cross-role-4eaee3a/native/collect.py
+      - name: Upload sanitized independent evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: independent-ios
+          path: iqa-native-evidence/
+          retention-days: 7
