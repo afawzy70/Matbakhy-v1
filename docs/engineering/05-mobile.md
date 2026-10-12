@@ -33,3 +33,26 @@ Expo Go or web preview is useful during development but does not satisfy native 
 Owner supplies identifiers/accounts/signing permissions and approves spend/submission. Prepare icons/splash, screenshots in both locales as required, version/build numbering, support/privacy/deletion URLs, truthful data-use declarations, test/reviewer credentials in a private channel and production backend availability. Verify current Apple/Google policies when submitting; do not invent exemptions or claim policy approval in advance.
 
 Record separate states for build created, installed/tested, submitted, in review, rejected, approved and released. TestFlight/Play internal acceptance does not equal public availability. Over-the-air updates, if later enabled, require compatible runtime/version targeting and rollback strategy; do not silently change reviewed native permissions or APIs.
+
+## Implemented native shell and authentication (MB-031)
+
+- **Configuration (`src/config.ts`):** API base URL, OIDC issuer and client id come from `EXPO_PUBLIC_*` build variables, with local development defaults. Outside development, plain HTTP is refused. The redirect is `<scheme>://auth/callback` (the development scheme is `matbakhy-dev`; production identifiers are O08).
+- **Sign-in (`src/auth.ts`):** authorization code + PKCE (S256) through the system browser (`expo-auth-session` / `expo-web-browser`: ASWebAuthenticationSession on iOS, Custom Tabs on Android), never an embedded web view. Before any token exchange, `src/redirect.ts` requires all of the following, and refuses the response otherwise:
+  - the exact redirect URI;
+  - the generated `state`;
+  - no provider error;
+  - a code.
+- **Tokens (`src/tokenStore.ts`):**
+  - Stored only in `expo-secure-store` (Keychain / Keystore-backed), with `WHEN_UNLOCKED_THIS_DEVICE_ONLY`.
+  - A stored value that is not a well-formed session, or that is expired with no refresh token, is deleted and treated as signed out.
+  - Tokens are never logged.
+- **Account switch and logout (`src/session.ts`):**
+  - Private data is cached in memory per subject.
+  - Signing in as a different subject, signing out, a 401 from the API or an invalid stored session clears every private cache.
+  - Logout also revokes the refresh token when the provider supports revocation (best effort).
+- **Crash boundary:** a rendering error shows a recoverable screen without technical detail.
+- **Locale:** Arabic by default, or English when the device language is English, with a toggle.
+- **Verification:**
+  - Unit tests cover redirect rejection, secure-store handling, account switch and logout, configuration and the crash boundary.
+  - The native workflow builds release-variant apps (JS bundle embedded, not store builds), launches them on an Android emulator and an iOS simulator, and records the result in the job log.
+  - A full native sign-in round trip against the identity provider is not yet automated.
