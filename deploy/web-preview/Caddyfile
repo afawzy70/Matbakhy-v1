@@ -45,7 +45,7 @@ api.{$PREVIEW_DOMAIN} {
 
 id.{$PREVIEW_DOMAIN} {
 	import restricted
-	# Keycloak's admin console is not published; administer it through an SSH tunnel (see docs/operations/05-web-preview.md).
+	# Keycloak's admin console is not published; administer it through an SSH tunnel (see docs/operations/06-web-preview.md).
 	@admin path /admin /admin/*
 	respond @admin 404
 	reverse_proxy identity:8080

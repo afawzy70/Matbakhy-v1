@@ -111,7 +111,8 @@ Neither price is a prepaid promotional price. The script's own backups are free,
 3. **Access:** the testers' public IP addresses or ranges for `ALLOWED_CLIENT_IPS`.
 4. **Certificates:** an e-mail address for the certificate authority (`ACME_EMAIL`).
 5. **Images:** approval to run `preview-images.yml`, which pushes two images to GHCR under the repository owner. Package visibility must be checked: the images contain no secrets, but the front image contains the domain.
-6. **Limitations to acknowledge:**
+6. **Who may use it before the audit and log checks pass:** the owner alone, or nobody (see Readiness).
+7. **Limitations to acknowledge:**
    - synthetic data only;
    - no real SMS, e-mail, push or malware scanning;
    - a synthetic commerce policy (O04 open);
@@ -152,6 +153,11 @@ Neither price is a prepaid promotional price. The script's own backups are free,
 
 ## Readiness
 
+- **Audit and log readiness (owner direction 2026-10-12, [05-observability-readiness.md](05-observability-readiness.md)):**
+  - AUD-01, LOG-01 and OPS-01..03 must be shown on the preview itself before external testers get access.
+  - Today this package provides only part of them: ECS JSON logs, bounded container log files and health checks.
+  - It does not yet provide searchable log collection, restricted metrics, exercised alerts, the audit coverage matrix or the troubleshooting runbook. Those are queued under MB-039 and verified under MB-040.
+  - All five checks are **NOT_RUN**. An owner-only smoke deployment would still need the owner's explicit acceptance of this gap; external testers stay blocked until the checks pass.
 - **Early web preview:** package prepared and rehearsed locally (above), not deployed. Ready to deploy once the owner inputs exist; the remaining checks are listed under NOT_RUN.
 - **MB-040 controlled staging:** not started and blocked by:
   - MB-034/035/036/038;
