@@ -32,3 +32,4 @@ apps/customer-mobile/ios/
 # Rendered local identity realm (contains generated local secrets)
 infra/.generated/
 docs/design/approved/homepage-review.png
+apps/customer-mobile/e2e-ios/*.xcodeproj/
