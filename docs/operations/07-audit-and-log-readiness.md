@@ -74,7 +74,7 @@ Existing redaction evidence (TC-056, LogRedactionIntegrationTest) with synthetic
 Not done locally in this session:
 - **Log access and lifecycle:** proposal is Docker json-file rotation (already capped at 10 MB × 3 per container in the preview package) plus a small searchable store on the same host (for example Loki with a disk cap), operator access only through the private network. Needs a test of retention across restart/redeploy and of disk pressure. Retention periods are O06; none is invented here.
 - **Metrics and alerts:** operational gauges exist (OperationalMetricsIntegrationTest); actuator is not exposed through the preview proxy. Collection, dashboards and alert delivery to a test sink are NOT_RUN.
-- **Runbook:** to be written with the log store chosen above.
+- **Runbook:** draft at [08-troubleshooting-runbook.md](08-troubleshooting-runbook.md) (order failure by request/order ID, audit trail, dead letters, missing telemetry, configuration/retention/restore dependencies); not yet exercised on a deployment.
 
 ## Preview checks
 
