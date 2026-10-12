@@ -22,13 +22,13 @@ async function idpLogin(page: Page, user: string) {
 
 async function checkSection(page: Page, where: string, scan: boolean) {
   await page.waitForLoadState("networkidle");
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${where}`).toBe(true);
+  expect.soft(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${where}`).toBe(true);
   const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible, textarea:visible").evaluateAll((els) =>
     els.filter((e) => {
       const r = e.getBoundingClientRect();
       return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
     }).map((e) => `${e.tagName}:${(e.textContent ?? (e as HTMLInputElement).name ?? "").trim().slice(0, 30)}`));
-  expect(undersized, `touch targets ${where}`).toEqual([]);
+  expect.soft(undersized, `touch targets ${where}`).toEqual([]);
   const clippedTables = await page.locator("table:visible").evaluateAll((tables) =>
     tables.filter((table) => {
       let el: HTMLElement | null = table.parentElement;
@@ -44,7 +44,7 @@ async function checkSection(page: Page, where: string, scan: boolean) {
       }
       return table.scrollWidth > window.innerWidth;
     }).length);
-  expect(clippedTables, `tables without their own scroll container ${where}`).toBe(0);
+  expect.soft(clippedTables, `tables without their own scroll container ${where}`).toBe(0);
   if (scan) {
     await axe(page, where);
   }
