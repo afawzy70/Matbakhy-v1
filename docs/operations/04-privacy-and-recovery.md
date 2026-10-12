@@ -24,6 +24,23 @@ Status on 2026-10-12: implemented and tested locally on PostgreSQL. The retentio
 - Provider error text is stored and logged only if it is a plain code. Anything else becomes `PROVIDER_ERROR`.
 - `LogRedactionIntegrationTest` runs OTP, address, push device, order, handover, provider outage and unexpected-error flows with distinctive synthetic data. It scans the captured JSON logs for that data and checks the request-ID trace.
 
+## Operational metrics
+
+`OperationalMetrics` registers whole-system gauges read from the database. They carry no labels, so no personal or per-order data:
+
+| Gauge | Proposed alert |
+|---|---|
+| `matbakhy.outbox.oldest.pending.age` | warning above 5 minutes |
+| `matbakhy.outbox.failed` | above 0 goes to operations |
+| `matbakhy.notifications.dead` | growing; provider outage |
+| `matbakhy.notifications.oldest.pending.age` | provider outage indicator |
+| `matbakhy.ledger.unbalanced.groups` | critical above 0 |
+| `matbakhy.orders.acceptance.overdue` | expiry job lagging |
+
+- A gauge reports NaN, not 0, when the database cannot be read.
+- Only `/actuator/health` is exposed over HTTP. Publishing metrics, a metrics backend, dashboards and alert routing need the O07 hosting choice and a restricted management port.
+- `OperationalMetricsIntegrationTest` covers the gauges against PostgreSQL.
+
 ## Backup and restore (BR-057, TC-057)
 
 | Step | Command |
