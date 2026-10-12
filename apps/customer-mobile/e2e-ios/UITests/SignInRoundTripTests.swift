@@ -53,20 +53,13 @@ final class SignInRoundTripTests: XCTestCase {
         type(password + "\n", into: secret)
     }
 
-    /// Typing is only possible once the web field really has keyboard focus (native run 16 typed too early).
+    /// Web fields in the system sign-in sheet do not report keyboard focus to XCUITest; tap, let the keyboard settle,
+    /// then type (native runs 16-17).
     private func type(_ text: String, into element: XCUIElement) {
-        for _ in 0..<5 {
-            element.tap()
-            let deadline = Date().addingTimeInterval(3)
-            while Date() < deadline {
-                if (element.value(forKey: "hasKeyboardFocus") as? Bool) == true {
-                    element.typeText(text)
-                    return
-                }
-                Thread.sleep(forTimeInterval: 0.3)
-            }
-        }
-        XCTFail("field never received keyboard focus")
+        element.tap()
+        Thread.sleep(forTimeInterval: 1.5)
+        element.typeText(text)
+        Thread.sleep(forTimeInterval: 0.5)
     }
 
     /// Waits for an element; on timeout prints what the app shows (marker for the CI script) and fails.

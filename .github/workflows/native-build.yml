@@ -111,13 +111,14 @@ jobs:
           echo "$APP" && /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
           /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist"
           shasum -a 256 "$APP/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")"
-      - name: xcodebuild Release for iOS Simulator (JS bundle embedded, no code signing)
+      - name: xcodebuild Release for iOS Simulator (JS bundle embedded; ad-hoc signed so the simulator keychain works; no team or certificate)
         working-directory: apps/customer-mobile/ios
         run: |
           set +e
           xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Release \
             -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build-release CODE_SIGNING_ALLOWED=NO build > "$RUNNER_TEMP/xcodebuild-release.log" 2>&1
+            -derivedDataPath build-release CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- DEVELOPMENT_TEAM= \
+            PROVISIONING_PROFILE_SPECIFIER= build > "$RUNNER_TEMP/xcodebuild-release.log" 2>&1
           status=$?
           grep -nE "error:|\*\* BUILD" "$RUNNER_TEMP/xcodebuild-release.log" | head -60
           exit $status
