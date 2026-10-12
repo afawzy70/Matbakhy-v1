@@ -2,7 +2,7 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-11T22:42+03:00 (Asia/Kuwait); workday 2026-10-11 (window 12:00–00:00)
+- Observed: 2026-10-12T06:22+03:00 (Asia/Kuwait); preflight outside the 2026-10-12 window (12:00–00:00); no implementation since `a791b46`
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
 - Phase/story: P06 / MB-029 IN_PROGRESS (customer restyle to the approved design checkpointed at `bad288f`; MB-028 DONE; owner design PR #2 integrated; MB-027 DONE; P05 complete: MB-022 to MB-026 DONE; P00–P05 gates PASS on self-reviewed evidence; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
@@ -89,6 +89,11 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Pending owner decision: proposed MB-047 split ([decision register](../product/01-context-and-decisions.md)); not applied.
 - O01–O10 remain OPEN. O06 now also covers cook documents and reapplication after rejection (REJECTED is final until decided).
 - Carried residuals: real MFA/OTP login in local Keycloak not configured (step-up tested with provider claims); audit CSV export (API-095); quote-path contact/address checks in MB-017; meal publication and order acceptance must use `KitchenDirectory` (MB-014/MB-019).
+
+## Owner decisions 2026-10-12
+
+- D11 ACCEPTED: structured portion-size filtering deferred from MVP; hide the one-person/two-people controls and do not substitute sorting for a filtering control (the current sort-only intent panel will be removed).
+- D12 ACCEPTED: meal-card descriptions optional; reuse the existing published description through the discovery contract, omit when absent.
 
 ## Next action
 

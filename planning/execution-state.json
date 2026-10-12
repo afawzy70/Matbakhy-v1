@@ -20,8 +20,8 @@
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
     }
   ],
-  "next_action": "MB-029 (IN_PROGRESS): keyboard-only journeys and dialog focus restoration (customer replacement prompt, checkout), operations web at 360/390/768/1440 and in English, long values in tables, then evidence for TC-046/TC-047/TC-129. Owner decisions needed: structured portion size (approved one-person/two-people filters) and descriptions in discovery cards. P06 gate also needs O05 whole-product approval.",
-  "updated_at": "2026-10-11T19:42:00Z",
+  "next_action": "Awaiting the 2026-10-12 window (12:00-00:00 Asia/Kuwait). Then, in order: (1) apply D11 - remove the intent tiles' sort-only contextual panel and any one-person/two-people control; (2) apply D12 - add optional description to the discovery MealSummary from the existing published description, render when present; (3) MB-029 remaining checks (keyboard journeys, dialog focus in the browser, operations web at 360/390/768/1440 RTL/LTR, long table values) and evidence for TC-046/TC-047/TC-129, screen-reader testing reported separately (NOT_RUN unless actually performed); (4) approved light design for cart, checkout, order status and account with screenshots and the derived desktop layout for owner review (dark palette stays unapproved, not default); (5) re-run customer and kitchen journeys on the candidate revision and record CI; (6) external-QA handoff and staging-readiness assessment (no deployment or purchase); (7) MB-030 only after MB-029 is DONE. O05 stays open.",
+  "updated_at": "2026-10-12T03:22:00Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

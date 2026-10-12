@@ -40,6 +40,8 @@ The recurring recovered product concept is a marketplace connecting home cooks a
 | D08 Identity | OIDC provider (local Keycloak reference), email sign-in; verified phone at first checkout | Avoid custom password/token infrastructure; mobile PKCE; production IdP/SMS selection is a launch dependency |
 | D09 Locales | Arabic default, English available; EGP; Africa/Cairo | Applies to web, mobile, notifications and ops |
 | D10 Commercial model | Configurable per-order commission; no customer service fee in baseline | Commission remains provisional; configure before live ordering |
+| D11 Portion-size filtering | **ACCEPTED owner decision (2026-10-12): deferred from MVP.** Hide the one-person/two-people filter controls of the approved homepage; no sort substitute for a filtering control; no data-model/API change now | Explicit deferred scope item; portion stays free text until a later decision |
+| D12 Meal-card descriptions | **ACCEPTED owner decision (2026-10-12): optional.** Reuse the existing published meal description through the existing discovery contract; omit cleanly when absent | No invented text and no new content-management feature |
 
 These choices authorize a coherent local/staging implementation plan when the owner hands the start prompt to Claude. They do not approve financial terms, legal text, branding, provider contracts or production publication.
 

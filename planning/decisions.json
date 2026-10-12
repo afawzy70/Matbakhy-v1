@@ -210,6 +210,26 @@
       "approval_reference": null,
       "build_with_default": true,
       "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "D11",
+      "topic": "Structured portion-size filtering",
+      "status": "ACCEPTED",
+      "value": "Deferred from MVP. Hide the approved homepage's one-person/two-people filter controls; do not substitute sorting for a control that implies filtering; no data-model or API change for portion filtering now. Explicit deferred scope item.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-12 06:21 Asia/Kuwait (MVP decisions 1 and 2)",
+      "build_with_default": false
+    },
+    {
+      "id": "D12",
+      "topic": "Meal-card descriptions in discovery",
+      "status": "ACCEPTED",
+      "value": "Optional. Reuse the existing published meal description through the existing discovery contract when available; omit cleanly when absent. Do not invent descriptions or add a content-management feature.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-12 06:21 Asia/Kuwait (MVP decisions 1 and 2)",
+      "build_with_default": false
     }
   ]
 }
