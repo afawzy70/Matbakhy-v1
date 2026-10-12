@@ -106,7 +106,8 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
         </p>
       ) : null}
       <main className="shell">
-        {mealMatch?.[1] ? <Meal ctx={ctx} id={mealMatch[1]} signedIn={me !== null} /> : null}
+        {/* Keyed by meal so a slot or quantity chosen for one meal never carries over to another. */}
+        {mealMatch?.[1] ? <Meal key={mealMatch[1]} ctx={ctx} id={mealMatch[1]} signedIn={me !== null} /> : null}
         {kitchenMatch?.[1] ? <Kitchen ctx={ctx} slug={kitchenMatch[1]} /> : null}
         {orderMatch?.[1] ? <OrderDetail ctx={ctx} id={orderMatch[1]} /> : null}
         {route === "/orders" ? <OrderList ctx={ctx} /> : null}

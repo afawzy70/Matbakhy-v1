@@ -1,5 +1,5 @@
 import { brand } from "@matbakhy/design-tokens";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { App, title } from "./App";
 import { savePending } from "./cart";
@@ -282,7 +282,8 @@ describe("customer web", () => {
     const cart = JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}");
     expect(cart.kitchenId).toBe("k2");
     expect(cart.slotId).toBe("s2");
-    expect(cart.lines).toEqual([{ mealId: meal.id, title: "Fatta", quantity: 1 }]);
+    expect(cart.kitchenName).toBe("Other kitchen");
+    expect(cart.lines).toEqual([{ mealId: meal.id, title: "Fatta", quantity: 1, unitPriceMinor: 15000, maxQuantity: 5 }]);
   });
 
   it("does not replace the basket while a placement from it is still pending", async () => {
@@ -654,5 +655,192 @@ describe("QA repair MBQA-001: catalogue requests use the language the customer j
     expect(screen.queryByRole("article", { name: "Koshari" })).toBeNull();
     expect(screen.getByRole("article", { name: "كشري" })).toBeTruthy();
     expect(document.documentElement.lang).toBe("ar");
+  });
+});
+
+/**
+ * FG-001 (CW05): quantity editing, individual removal, an estimated subtotal clearly separate from the server quote,
+ * and the kitchen shown. Fixture prices follow the QA report (A1 120.25, A2 95.50, B1 80.25 EGP, in piastres).
+ */
+describe("QA repair FG-001: the basket can be edited and shows an estimate (CW05)", () => {
+  const A1 = "a1a1a1a1-0000-4000-8000-0000000000a1";
+  const A2 = "a2a2a2a2-0000-4000-8000-0000000000a2";
+  const B1 = "b1b1b1b1-0000-4000-8000-0000000000b1";
+  const slotsA = [
+    { id: "S1", startsAt: "2026-10-13T10:00:00Z", availablePortions: 3, fulfillmentModes: ["PICKUP"] },
+    { id: "S2", startsAt: "2026-10-13T13:00:00Z", availablePortions: 3, fulfillmentModes: ["PICKUP"] },
+  ];
+  const meal = (id: string, title: string, kitchen: { id: string; name: string }, amountMinor: number, nextSlots: unknown[]) => ({
+    id,
+    title,
+    kitchen: { ...kitchen, slug: kitchen.id },
+    portionText: "1 plate",
+    price: egp(amountMinor),
+    description: "",
+    ingredients: "",
+    allergenCodes: ["NONE_DECLARED"],
+    allergenStatement: null,
+    photo: null,
+    nextSlots,
+    availability: "AVAILABLE",
+  });
+  const kitchenA = { id: "kA", name: "Kitchen A" };
+  const kitchenB = { id: "kB", name: "Kitchen B" };
+  const reviews = { status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } };
+  const routes = {
+    [`GET /api/v1/meals/${A1}`]: () => ({ status: 200, body: meal(A1, "QA Meal A1", kitchenA, 12025, slotsA) }),
+    [`GET /api/v1/meals/${A2}`]: () => ({ status: 200, body: meal(A2, "QA Meal A2", kitchenA, 9550, slotsA) }),
+    [`GET /api/v1/meals/${B1}`]: () => ({
+      status: 200,
+      body: meal(B1, "QA Meal B1", kitchenB, 8025, [{ id: "BS1", startsAt: "2026-10-13T11:00:00Z", availablePortions: 5, fulfillmentModes: ["PICKUP"] }]),
+    }),
+    "GET /api/v1/kitchens/kA/reviews": () => reviews,
+    "GET /api/v1/kitchens/kB/reviews": () => reviews,
+  };
+
+  async function go(hash: string) {
+    await act(async () => {
+      window.location.hash = hash;
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+  }
+
+  async function addFromMeal(id: string, slotIndex: number, quantity: number) {
+    await go(`#/meal/${id}`);
+    const radios = await screen.findAllByRole("radio");
+    fireEvent.click(radios[slotIndex] as HTMLElement);
+    for (let i = 1; i < quantity; i++) {
+      fireEvent.click(screen.getByRole("button", { name: "Increase quantity" }));
+    }
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
+  }
+
+  const cartSection = async () => (await screen.findByRole("heading", { name: "Cart", level: 2 })).closest("section") as HTMLElement;
+  const estimate = async () => within(await cartSection()).getByText("Estimated subtotal").nextElementSibling?.textContent ?? "";
+  const saved = () => JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "null") as { kitchenId: string; slotId: string; lines: { mealId: string; quantity: number }[] } | null;
+  const savedLines = () => saved()?.lines.map((l) => [l.mealId, l.quantity]);
+
+  it("edits quantities and removes lines with correct integer arithmetic, then shows the empty state", async () => {
+    const { fetchImpl } = server(routes);
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    await addFromMeal(A1, 0, 2);
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    await addFromMeal(A2, 0, 1);
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    await go("#/checkout");
+    const cart = await cartSection();
+    expect(within(cart).getByText("Kitchen A")).toBeTruthy();
+    expect(await estimate()).toMatch(/336\.00/); // 2 × 120.25 + 95.50
+    expect(within(cart).getByText(/estimate/i, { selector: "p" }).textContent).toMatch(/Calculate total/);
+
+    fireEvent.click(within(cart).getByRole("button", { name: "Increase quantity: QA Meal A2" }));
+    expect(await estimate()).toMatch(/431\.50/); // 2 × 120.25 + 2 × 95.50
+    fireEvent.click(within(cart).getByRole("button", { name: "Decrease quantity: QA Meal A1" }));
+    expect(await estimate()).toMatch(/311\.25/); // 120.25 + 2 × 95.50
+    expect(savedLines()).toEqual([
+      [A1, 1],
+      [A2, 2],
+    ]);
+    fireEvent.click(within(cart).getByRole("button", { name: "Remove QA Meal A1" }));
+    expect(await estimate()).toMatch(/191\.00/);
+    expect(within(await cartSection()).queryByText(/QA Meal A1/)).toBeNull();
+    expect(savedLines()).toEqual([[A2, 2]]);
+    fireEvent.click(within(await cartSection()).getByRole("button", { name: "Remove QA Meal A2" }));
+    expect(await screen.findByText("Your cart is empty.")).toBeTruthy();
+    expect(saved()).toBeNull();
+  });
+
+  it("keeps each line's quantity between 1 and the portions that were available, up to 20", async () => {
+    const { fetchImpl } = server(routes);
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    await addFromMeal(A1, 0, 1);
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    await go("#/checkout");
+    const cart = await cartSection();
+    const minus = within(cart).getByRole("button", { name: "Decrease quantity: QA Meal A1" }) as HTMLButtonElement;
+    const plus = within(cart).getByRole("button", { name: "Increase quantity: QA Meal A1" }) as HTMLButtonElement;
+    expect(minus.disabled).toBe(true);
+    fireEvent.click(plus);
+    fireEvent.click(plus);
+    expect(plus.disabled).toBe(true); // the slot had 3 portions
+    fireEvent.click(plus);
+    expect(savedLines()).toEqual([[A1, 3]]);
+    expect(await estimate()).toMatch(/360\.75/);
+  });
+
+  it("all four replacement paths keep or replace the basket and its estimate exactly (TC-147)", async () => {
+    const { fetchImpl } = server(routes);
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const prompt = async (choice: "Keep my current cart" | "Replace cart") =>
+      fireEvent.click(within(await screen.findByRole("alertdialog")).getByRole("button", { name: choice }));
+    const expectCart = async (kitchen: string, lines: (string | number)[][], amount: RegExp, slotId: string) => {
+      await go("#/checkout");
+      expect(within(await cartSection()).getByText(kitchen)).toBeTruthy();
+      expect(await estimate()).toMatch(amount);
+      expect(savedLines()).toEqual(lines);
+      expect(saved()?.slotId).toBe(slotId);
+    };
+
+    await addFromMeal(A1, 0, 2);
+    await addFromMeal(B1, 0, 1); // another kitchen: cancel
+    await prompt("Keep my current cart");
+    await expectCart("Kitchen A", [[A1, 2]], /240\.50/, "S1");
+    await addFromMeal(B1, 0, 1); // another kitchen: confirm
+    await prompt("Replace cart");
+    await expectCart("Kitchen B", [[B1, 1]], /80\.25/, "BS1");
+
+    fireEvent.click(within(await cartSection()).getByRole("button", { name: "Empty cart" }));
+    await addFromMeal(A1, 0, 2);
+    await addFromMeal(A2, 1, 1); // same kitchen, another slot: cancel
+    await prompt("Keep my current cart");
+    await expectCart("Kitchen A", [[A1, 2]], /240\.50/, "S1");
+    await addFromMeal(A2, 1, 1); // same kitchen, another slot: confirm
+    await prompt("Replace cart");
+    await expectCart("Kitchen A", [[A2, 1]], /95\.50/, "S2");
+  });
+
+  it("an edit discards a quote already shown, so only a fresh server quote can be accepted; a pending order locks the basket", async () => {
+    window.localStorage.setItem(
+      "matbakhy.cart",
+      JSON.stringify({ kitchenId: "kA", kitchenName: "Kitchen A", slotId: "S1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: A1, title: "QA Meal A1", quantity: 1, unitPriceMinor: 12025, maxQuantity: 3 }] }),
+    );
+    const quotes: unknown[] = [];
+    const { fetchImpl } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: { ...me, locale: "en" } }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "POST /api/v1/quotes": (_req, body) => {
+        quotes.push(body);
+        return {
+          status: 201,
+          body: { quoteId: `q${quotes.length}`, expiresAt: "2026-10-13T09:05:00Z", kitchenId: "kA", items: [], subtotal: egp(12025), deliveryFee: egp(0), tax: egp(1684), total: egp(13709), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T09:15:00Z", warnings: [] },
+        };
+      },
+    });
+    window.location.hash = "#/checkout";
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Calculate total" }));
+    expect(await screen.findByText("Total")).toBeTruthy();
+    // The estimate and the server quote are separate figures with separate labels.
+    expect(await estimate()).toMatch(/120\.25/);
+    expect(screen.getByText(/137\.09/)).toBeTruthy();
+    fireEvent.click(within(await cartSection()).getByRole("button", { name: "Increase quantity: QA Meal A1" }));
+    await waitFor(() => expect(screen.queryByText("Total")).toBeNull());
+    expect(screen.queryByRole("button", { name: "Place order" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Calculate total" }));
+    await waitFor(() => expect(quotes).toHaveLength(2));
+    expect((quotes[1] as { items: unknown[] }).items).toEqual([{ mealId: A1, quantity: 2 }]);
+    cleanup();
+
+    savePending({ clientRequestId: "c1", idempotencyKey: "i1", quoteId: "q2", terms: "t1", cancellation: "c1" });
+    window.location.hash = "#/checkout";
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const cart = await cartSection();
+    expect((within(cart).getByRole("button", { name: "Increase quantity: QA Meal A1" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((within(cart).getByRole("button", { name: "Remove QA Meal A1" }) as HTMLButtonElement).disabled).toBe(true);
   });
 });

@@ -781,6 +781,26 @@ fieldset {
   border-block-end: 1px solid var(--mb-color-surface-muted);
 }
 
+/* CW05 basket line: title, quantity, line estimate and remove wrap onto two rows at narrow widths. */
+.cart-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mb-space-xs) var(--mb-space-sm);
+}
+
+.cart-line-title {
+  flex: 1 1 10rem;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.qty output {
+  min-inline-size: 2rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .slot-pill,
 .state-pill {
   background: var(--mb-color-surface-muted);

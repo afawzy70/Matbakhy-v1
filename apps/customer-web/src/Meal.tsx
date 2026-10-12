@@ -107,8 +107,8 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                   return;
                 }
                 const cart = loadCart();
-                const next: Cart = { kitchenId: m.kitchen.id, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes, lines: [] };
-                const line = { mealId: m.id, title: m.title, quantity };
+                const next: Cart = { kitchenId: m.kitchen.id, kitchenName: m.kitchen.name, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes, lines: [] };
+                const line = { mealId: m.id, title: m.title, quantity, unitPriceMinor: m.price.amountMinor, maxQuantity: maxQuantity(slot) };
                 if (cart && cart.lines.length > 0 && (cart.kitchenId !== m.kitchen.id || cart.slotId !== slot.id)) {
                   if (loadPending()) {
                     // An order may already exist for the current basket; it is resolved at checkout before any change.

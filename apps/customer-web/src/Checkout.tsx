@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { errorCode, formatMoney, formatTime, loginUrl, newIdempotencyKey, type Schemas } from "./api";
-import { loadCart, loadPending, saveCart, savePending, type PendingPlacement } from "./cart";
+import { estimateMinor, LINE_MAX, loadCart, loadPending, saveCart, savePending, type CartLine, type PendingPlacement } from "./cart";
 import { errorText } from "./i18n";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
@@ -10,6 +10,8 @@ type Quote = Schemas["QuoteResponse"];
 export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; onMeChanged: () => void }) {
   const { t, locale } = ctx;
   const [cart, setCart] = useState(loadCart);
+  // While an order from this basket may exist, the basket cannot change (CW05: no surprise changes to a sent order).
+  const [locked, setLocked] = useState(() => loadPending() !== null);
   if (!cart || cart.lines.length === 0) {
     return (
       <div className="transaction">
@@ -24,19 +26,42 @@ export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; on
     <div className="transaction stack">
       <section className="card" aria-labelledby="cart-heading">
         <h2 id="cart-heading">{t.nav.cart}</h2>
-        <ul className="line-items">
-          {cart.lines.map((l) => (
-            <li key={l.mealId}>
-              {l.quantity} × {l.title}
-            </li>
-          ))}
-        </ul>
+        {cart.kitchenName ? (
+          <p>
+            <span className="muted">{t.kitchenLabel}: </span>
+            <strong>{cart.kitchenName}</strong>
+          </p>
+        ) : null}
         <p>
           <span className="pill slot-pill">{formatTime(cart.slotStartsAt, locale)}</span>
         </p>
+        <ul className="line-items">
+          {cart.lines.map((l) => (
+            <CartLineRow
+              key={l.mealId}
+              ctx={ctx}
+              line={l}
+              locked={locked}
+              onChange={(next) => {
+                const lines = cart.lines.flatMap((x) => (x.mealId !== l.mealId ? [x] : next ? [next] : []));
+                const updated = lines.length > 0 ? { ...cart, lines } : null;
+                saveCart(updated);
+                setCart(updated);
+              }}
+            />
+          ))}
+        </ul>
+        <dl className="summary">
+          <dt>{t.estimatedSubtotal}</dt>
+          <dd>
+            <bdi>{estimateText(cart, locale, t.estimateUnavailable)}</bdi>
+          </dd>
+        </dl>
+        <p className="muted small">{t.estimateNote}</p>
         <button
           type="button"
           className="secondary"
+          disabled={locked}
           onClick={() => {
             saveCart(null);
             setCart(null);
@@ -55,9 +80,39 @@ export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; on
       ) : !me.phoneVerified ? (
         <PhoneVerification ctx={ctx} onVerified={onMeChanged} />
       ) : (
-        <OrderForm ctx={ctx} cart={cart} />
+        // Any edit changes the key, so a quote for the previous basket can never be accepted for the new one.
+        <OrderForm key={cart.lines.map((l) => `${l.mealId}:${l.quantity}`).join("|")} ctx={ctx} cart={cart} onPending={setLocked} />
       )}
     </div>
+  );
+}
+
+function estimateText(cart: NonNullable<ReturnType<typeof loadCart>>, locale: string, unavailable: string): string {
+  const amount = estimateMinor(cart);
+  return amount === null ? unavailable : formatMoney(amount, locale);
+}
+
+/** One basket line: quantity within 1..maxQuantity (at most 20), removal, and the line estimate when known. */
+function CartLineRow({ ctx, line, locked, onChange }: { ctx: Ctx; line: CartLine; locked: boolean; onChange: (next: CartLine | null) => void }) {
+  const { t, locale } = ctx;
+  const max = Math.min(LINE_MAX, line.maxQuantity ?? LINE_MAX);
+  return (
+    <li className="cart-line">
+      <span className="cart-line-title">{line.title}</span>
+      <div className="qty" role="group" aria-label={t.quantityOf(line.title)}>
+        <button type="button" className="secondary" aria-label={t.decreaseOf(line.title)} disabled={locked || line.quantity <= 1} onClick={() => onChange({ ...line, quantity: line.quantity - 1 })}>
+          −
+        </button>
+        <output aria-live="polite">{line.quantity}</output>
+        <button type="button" className="secondary" aria-label={t.increaseOf(line.title)} disabled={locked || line.quantity >= max} onClick={() => onChange({ ...line, quantity: line.quantity + 1 })}>
+          +
+        </button>
+      </div>
+      {line.unitPriceMinor !== undefined ? <bdi className="muted">{formatMoney(line.unitPriceMinor * line.quantity, locale)}</bdi> : null}
+      <button type="button" className="secondary" aria-label={t.removeLine(line.title)} disabled={locked} onClick={() => onChange(null)}>
+        {t.remove}
+      </button>
+    </li>
   );
 }
 
@@ -111,7 +166,7 @@ function PhoneVerification({ ctx, onVerified }: { ctx: Ctx; onVerified: () => vo
   );
 }
 
-function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeof loadCart>> }) {
+function OrderForm({ ctx, cart, onPending }: { ctx: Ctx; cart: NonNullable<ReturnType<typeof loadCart>>; onPending: (pending: boolean) => void }) {
   const { t, locale } = ctx;
   const [mode, setMode] = useState<"DELIVERY" | "PICKUP">(cart.modes.includes("DELIVERY") ? "DELIVERY" : "PICKUP");
   const [addressId, setAddressId] = useState<string | null>(null);
@@ -163,6 +218,7 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
       // The server answered definitively; this request can never succeed with these keys.
       savePending(null);
       setPending(null);
+      onPending(false);
       setQuote(null);
       setError(errorText(t, errorCode(r.error)));
     } catch {
@@ -280,6 +336,7 @@ function OrderForm({ ctx, cart }: { ctx: Ctx; cart: NonNullable<ReturnType<typeo
               };
               savePending(p);
               setPending(p);
+              onPending(true);
               void place(p);
             }}
           >

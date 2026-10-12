@@ -81,7 +81,16 @@ test("keyboard-only customer and cook journeys with visible focus and focus rest
   await page.keyboard.press("Shift+Tab");
   await tabTo(page, (e) => e.tag === "A" && e.text === c.nav.cart, "cart link");
   await page.keyboard.press("Enter");
-  await expect(page.getByText("1 × كشري تجريبي")).toBeVisible();
+  // CW05 basket line: the quantity can be changed from the keyboard and the estimate follows it.
+  const quantity = page.getByRole("group", { name: c.quantityOf("كشري تجريبي") }).locator("output");
+  await expect(quantity).toHaveText("1");
+  await tabTo(page, (e) => e.tag === "BUTTON" && e.label === c.increaseOf("كشري تجريبي"), "increase quantity");
+  await page.keyboard.press("Enter");
+  await expect(quantity).toHaveText("2");
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Enter");
+  await expect(quantity).toHaveText("1");
+  await expect(page.getByText(c.estimatedSubtotal)).toBeVisible();
 
   // Checkout without a pointer: sign in, pickup, server quote, terms, place the order.
   await tabTo(page, (e) => e.tag === "A" && e.text === c.signIn, "sign in");
