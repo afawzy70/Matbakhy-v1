@@ -70,6 +70,12 @@ matbakhy:
     posting-job:
       enabled: ${LEDGER_POSTING_JOB_ENABLED:true}
       interval: 30s
+  privacy:
+    # PROPOSED default pending O06 (privacy and retention policy): erase personal data 14 days after a deletion request,
+    # once the customer has no active order. Change only with an approved policy version.
+    deletion-grace: ${PRIVACY_DELETION_GRACE:P14D}
+    erasure-job:
+      enabled: ${PRIVACY_ERASURE_JOB_ENABLED:true}
   notifications:
     # Development keys are accepted only in LOCAL/CI (providers are refused elsewhere until O07 is decided).
     token-hash-key: ${PUSH_TOKEN_HASH_KEY:local-dev-only-push-token-hash-key-not-secret}
