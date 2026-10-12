@@ -10,7 +10,7 @@ jest.mock("expo-secure-store", () => ({
   getItemAsync: jest.fn(async (k: string) => mockStore.get(k) ?? null),
   deleteItemAsync: jest.fn(async (k: string) => void mockStore.delete(k)),
 }));
-jest.mock("expo-crypto", () => ({ randomUUID: () => require("crypto").randomUUID() }));
+jest.mock("expo-crypto", () => ({ randomUUID: () => jest.requireActual<{ randomUUID: () => string }>("crypto").randomUUID() }));
 
 beforeEach(() => mockStore.clear());
 
@@ -104,5 +104,27 @@ describe("placement that cannot duplicate an order (BR-023, TC-049)", () => {
     expect(missing.calls[1]?.headers.get("Idempotency-Key")).toBe("app-key-1");
     expect(JSON.parse(missing.calls[1]?.body ?? "{}").clientRequestId).toBe(pending.clientRequestId);
     expect(await recover(apiFor(missing.fetchImpl))).toBeNull();
+  });
+});
+
+describe("platform fetch compatibility (native run 21)", () => {
+  it("reads responses whose class is not the global Response, as React Native/Expo fetch returns", async () => {
+    class PlatformResponse {
+      readonly status = 200;
+      readonly ok = true;
+      readonly headers = new Headers({ "Content-Type": "application/json" });
+      async text() {
+        return JSON.stringify({ id: "u", displayName: "Mona" });
+      }
+      async json() {
+        return JSON.parse(await this.text());
+      }
+      clone() {
+        return this;
+      }
+    }
+    const fetchImpl = jest.fn(async () => new PlatformResponse()) as unknown as typeof fetch;
+    const r = await apiFor(fetchImpl).GET("/api/v1/me");
+    expect(r.data).toMatchObject({ displayName: "Mona" });
   });
 });

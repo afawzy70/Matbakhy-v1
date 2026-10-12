@@ -16,9 +16,9 @@ jest.mock("expo-secure-store", () => ({
   deleteItemAsync: jest.fn(async (k: string) => void mockStore.delete(k)),
 }));
 jest.mock("expo-localization", () => ({ getLocales: () => [{ languageCode: "en" }] }));
-jest.mock("expo-crypto", () => ({ randomUUID: () => require("crypto").randomUUID() }));
+jest.mock("expo-crypto", () => ({ randomUUID: () => jest.requireActual<{ randomUUID: () => string }>("crypto").randomUUID() }));
 jest.mock("./auth", () => ({ signIn: jest.fn(), signOut: jest.fn(), SignInCancelled: class extends Error {} }));
-jest.mock("react-native-safe-area-context", () => require("react-native-safe-area-context/jest/mock").default);
+jest.mock("react-native-safe-area-context", () => jest.requireActual("react-native-safe-area-context/jest/mock").default);
 
 beforeEach(() => mockStore.clear());
 

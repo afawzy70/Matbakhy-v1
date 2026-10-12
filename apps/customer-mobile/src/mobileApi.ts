@@ -18,6 +18,9 @@ export interface RequestContext {
 
 export function createMobileApi(config: AppConfig, session: Session, context: RequestContext, fetchImpl?: typeof fetch) {
   const client = createApiClient({ baseUrl: config.apiBaseUrl, ...(fetchImpl ? { fetch: fetchImpl } : {}) });
+  // The middleware only sets headers and observes responses; it returns nothing, so openapi-fetch keeps the original
+  // objects. Returning them fails its `instanceof Response` check when the platform fetch (React Native/Expo) yields a
+  // Response class other than the global one, which turned every API answer into an error on iOS (native run 21).
   client.use({
     onRequest({ request }) {
       request.headers.set("Accept-Language", context.locale);
@@ -25,14 +28,12 @@ export function createMobileApi(config: AppConfig, session: Session, context: Re
       if (token) {
         request.headers.set("Authorization", `Bearer ${token}`);
       }
-      return request;
     },
     async onResponse({ request, response }) {
       if (response.status === 401 && request.headers.has("Authorization")) {
         await session.signOut();
         context.onSignedOut();
       }
-      return response;
     },
   });
   return client;

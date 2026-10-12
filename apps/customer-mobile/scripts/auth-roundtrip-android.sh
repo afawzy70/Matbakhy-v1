@@ -9,6 +9,16 @@
 set -euo pipefail
 PKG=com.matbakhy.customer.dev
 export PATH="$ANDROID_HOME/platform-tools:$PATH"
+# The emulator's adb connection can drop briefly ("device offline", native run 21): reconnect, bounded.
+adb_ready() {
+  for _ in $(seq 1 30); do
+    adb shell true >/dev/null 2>&1 && return 0
+    adb reconnect offline >/dev/null 2>&1 || true
+    sleep 2
+  done
+  echo "FAIL: emulator not reachable over adb"; exit 1
+}
+adb_ready
 : "${USER_PASSWORD:?synthetic user password}"
 OUT="${RUNNER_TEMP:-/tmp}/mb031-roundtrip"
 mkdir -p "$OUT"
@@ -17,7 +27,8 @@ STEP=0
 
 echo "browsers: $(adb shell pm list packages | tr -d '\r' | grep -iE 'chrome|browser' | tr '\n' ' ')"
 # Skip Chrome's first-run screens (emulator images allow adb root; best effort).
-adb root >/dev/null 2>&1 && sleep 3 && adb wait-for-device || true
+adb root >/dev/null 2>&1 && sleep 3 || true
+adb_ready
 adb shell 'echo "chrome --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line' || true
 adb shell 'cp /data/local/tmp/chrome-command-line /data/local/chrome-command-line 2>/dev/null; chmod 644 /data/local/tmp/chrome-command-line' || true
 adb shell am force-stop com.android.chrome || true
