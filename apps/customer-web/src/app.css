@@ -744,3 +744,12 @@ label:has(> input[type="checkbox"]) {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Long values (MB-029): unbroken words wrap instead of widening the page; fieldsets may shrink below min-content. */
+body {
+  overflow-wrap: anywhere;
+}
+
+fieldset {
+  min-inline-size: 0;
+}
