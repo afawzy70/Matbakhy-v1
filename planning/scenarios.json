@@ -919,8 +919,10 @@
       "given": "App is killed during submit and later reopened offline then online",
       "when": "Customer opens orders/retries",
       "then": "No duplicate; offline state explicit; authoritative status reloaded",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-032/evidence.json"
+      ]
     },
     {
       "id": "TC-050",
@@ -1765,8 +1767,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Native list/details/cart/address/checkout/orders/account/review/support; generated client; same totals/errors; uncertain-order recovery",
       "then": "Cross-client parity of order totals/states; app kill during submit and retry cannot duplicate order",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-032/evidence.json"
+      ]
     },
     {
       "id": "TC-133",
@@ -2024,8 +2028,10 @@
       "given": "The native basket holds cook A items for one slot",
       "when": "The customer adds a meal of cook B or another slot",
       "then": "The app asks before replacing; cancelling keeps the previous basket; confirming replaces it (Android and iOS verified separately)",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-032/evidence.json"
+      ]
     },
     {
       "id": "TC-149",
@@ -2081,6 +2087,24 @@
       "status": "PASS",
       "evidence": [
         "verification/runs/20261012-QA-REPAIR/evidence.json"
+      ]
+    },
+    {
+      "id": "TC-152",
+      "title": "Quantity controls follow the server's published per-line limit (Q1 option A, API-001)",
+      "rule_ids": [
+        "BR-019"
+      ],
+      "story_id": "MB-027",
+      "phase": "P06",
+      "level": "integration",
+      "severity": "medium",
+      "given": "An active commerce policy with a per-line quantity limit lower than a slot's remaining portions",
+      "when": "A customer chooses a quantity on web or native, or opens a basket saved under a higher limit",
+      "then": "The quantity stops at min(published limit, portions); a line above a lowered limit is explained and gets no quote until reduced; without the published limit clients fall back to min(20, portions) and the quote still enforces the policy; the public configuration exposes no commission or tax",
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-032/evidence.json"
       ]
     }
   ]

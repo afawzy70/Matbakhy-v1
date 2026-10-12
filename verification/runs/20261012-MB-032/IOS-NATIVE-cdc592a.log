@@ -1,0 +1,19 @@
+# Excerpt of GitHub Actions native run 31 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484),
+# job "iOS simulator build (Xcode, unsigned)" (114892251603), source cdc592a2492a691de714a3d0bf23b31f25599480.
+# Retrieved with the GitHub API job-log tool and inspected by the implementation agent.
+PASS: iOS release simulator build launched and stayed running; no crash report
+PASS: iOS system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data
+== seed synthetic kitchens and meals
+== the API moves to 8090; port 8080 becomes a proxy that holds responses back for 8 seconds
+== phase A: basket replacement, sign-in, quote; the response is held back while the app is terminated
+Test Case '-[SignInUITests.OrderingTests testA_ReplacementPromptAndSubmitThenKill]' passed (95.113 seconds).
+orders in the database after termination: 1
+== phase B: API unreachable
+Test Case '-[SignInUITests.OrderingTests testB_ReopenedOfflineSaysUnconfirmed]' passed (10.340 seconds).
+== phase C: API reachable again
+MB032-ORDER-NUMBER MB-100001
+MB032-ORDER-TOTAL Total: EGP 90.00
+Test Case '-[SignInUITests.OrderingTests testC_BackOnlineRecoversTheOneOrder]' passed (11.421 seconds).
+side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1
+order MB-100001; stored total_minor 9000; app shows: MB032-ORDER-TOTAL Total: EGP 90.00
+PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total

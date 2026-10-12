@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P07",
-  "current_story": "MB-032",
-  "last_tested_commit": "fd689aa901e5fef2d3188bc583d2de8fc104e85d",
-  "last_completed_story": "MB-031",
+  "current_story": "MB-033",
+  "last_tested_commit": "cdc592a2492a691de714a3d0bf23b31f25599480",
+  "last_completed_story": "MB-032",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -31,8 +31,8 @@
       "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
     }
   ],
-  "next_action": "Codex QA repair candidate c35ad2d (six checks PASS, Product CI success; MBQA-002/MBQA-001/FG-001 FIXED_PENDING_INDEPENDENT_RETEST; record docs/quality/07-codex-qa-repair.md). Resume MB-032 (IN_PROGRESS): read native run 25 at c35ad2d (Android screen-relative scroll; iOS testC accepts automatic recovery); when TC-148/TC-049/TC-132 pass on both platforms record MB-032 evidence; delivery checkout not exercised natively (known gap). Open: RQ-001/002/003 proposals, Q1, operations-web language follow-up. MB-029 BLOCKED (BLK-003). MB-039 IN_PROGRESS (O07, O06).",
-  "updated_at": "2026-10-12T12:30:50Z",
+  "next_action": "MB-033 (native lifecycle, push and accessibility) is the next eligible story. Owner-queued audit/log readiness (docs/operations/05-observability-readiness.md) at the next MB-039 checkpoint. Web preview prepared (deploy/web-preview, docs/operations/06-web-preview.md) and rehearsed locally; deploying needs owner inputs (hosting/budget, domain/DNS, tester IPs, GHCR publication) and external testers need AUD-01/LOG-01/OPS-01..03. Codex retest candidate cdc592a (FIXED_PENDING_INDEPENDENT_RETEST). Open: RQ-001/002/003, Q1 value (O04), O05/O06/O07; MB-029 BLOCKED (BLK-003); MB-040 not started.",
+  "updated_at": "2026-10-12T16:43:53Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

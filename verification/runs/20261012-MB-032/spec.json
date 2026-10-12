@@ -1,0 +1,132 @@
+{
+  "run_id": "20261012-MB-032",
+  "story_id": "MB-032",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "manual_checks": [
+    {
+      "id": "ANDROID-NATIVE-ORDERING",
+      "name": "Android emulator (API 35): release-variant basket keep/replace, app killed during submit with the response held back, offline reopen, online recovery of exactly one order with one set of side effects and the server's total",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484 (job: Android debug APK (Gradle), 114892251241) at cdc592a",
+      "log_path": "verification/runs/20261012-MB-032/ANDROID-NATIVE-cdc592a.log"
+    },
+    {
+      "id": "IOS-NATIVE-ORDERING",
+      "name": "iOS simulator: release build, XCUITest basket keep/replace, app terminated during submit with the response held back, offline reopen, online recovery of exactly one order with one set of side effects and the server's total",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484 (job: iOS simulator build (Xcode, unsigned), 114892251603) at cdc592a",
+      "log_path": "verification/runs/20261012-MB-032/IOS-NATIVE-cdc592a.log"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-148",
+      "observed": "On an Android emulator (API 35) and an iOS simulator, release builds against the local stack with synthetic kitchens: adding a meal of another kitchen asks first (Alert 'Replace your cart?'); 'Keep cart' leaves the basket (cart still 1 x Native Dish One); repeating and choosing 'Replace cart' replaces it (cart 1 x Native Dish Two, Dish One absent). Unit/UI tests cover same kitchen another slot, dismissal and a pending order blocking replacement. Verified separately on each platform (native run 31, cdc592a)."
+    },
+    {
+      "id": "TC-049",
+      "observed": "Both platforms: signed in, quote for 1 x Native Dish Two, terms accepted, order placed while a proxy held the API response back; the app was killed/terminated before the answer arrived; the database then held exactly one order. Reopened with the API unreachable: the cart said the order could not be confirmed and that the device was offline; no order number and no Place order button were shown. Back online the order was recovered by its stored client request id (Android via 'Check and retry', iOS automatically on relaunch): order MB-100001 shown; still one order, and exactly one stock allocation, one portion reserved on the meal and cook slots, one cash obligation, one ORDER_PLACED outbox event and one order event (no duplicated side effect). Android runs 27-29 did not exercise this (harness redirected the API too late; fixed in f3ff3f0); run 30 and run 31 did."
+    },
+    {
+      "id": "TC-132",
+      "observed": "Native totals equal the server's: the quote and the recovered order both show EGP 90.00 and the stored order total_minor is 9000 on Android and iOS, the same API and pricing the web uses (browser journeys in BROWSER-E2E). App kill during submit and retry cannot duplicate the order (TC-049). Delivery checkout is not exercised natively (pickup only); delivery is covered on the server and in the browser."
+    },
+    {
+      "id": "TC-152",
+      "observed": "Q1 option A: GET /api/v1/configuration/public (public, no commission/tax fields) returns the active policy's per-line limit, a newly activated policy at once, and no limits while ordering is paused (backend integration tests, red first). Web and native cap the quantity at min(published limit, slot portions) (10 of 15 portions, 3 of 3), store that limit with the line, explain a basket line above a lowered limit and offer no quote until it is reduced (web: quote button disabled; native: notice and increase disabled), and fall back to min(20, portions) without the published limit; the quote still refuses anything above the policy (QuoteIntegrationTest). The limit value itself is unchanged (owner decision under O04)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-MB-032/ANDROID-NATIVE-cdc592a.log",
+    "verification/runs/20261012-MB-032/IOS-NATIVE-cdc592a.log",
+    "verification/runs/20261012-QA-REPAIR/RED-native-pending-reachable.log",
+    "verification/runs/20261012-Q1/RED-backend-API-001.log",
+    "verification/runs/20261012-Q1/RED-web-Q1.log",
+    "verification/runs/20261012-Q1/RED-native-Q1.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Native evidence comes from GitHub-hosted emulator/simulator runs at the same source commit (native run 31); no physical device, signed or store build.",
+      "Android runs 23-29 failed only on harness faults (off-screen swipes, below-the-fold elements, and a proxy redirect applied after the app had opened its connection, so TC-049 was not exercised); each was diagnosed from logs, and run 28's diagnostic showed the app still signed in. The defensive change in 9dd6fa2 (cart reachable while an order is pending, one retry of a failed secure-storage read) stays with tests; its suspected read failure was not the cause.",
+      "Product defects found and fixed during MB-032: middleware returning the response broke every API call on device (eb1a671); exhausted selected slot could be added (MBQA-002 parity, e2c6ebc).",
+      "Known gaps kept explicit: delivery checkout is not exercised natively; the native quote button's over-limit disabling is tested on web only; screen-reader verification remains BLK-003."
+    ]
+  },
+  "open_defects": []
+}

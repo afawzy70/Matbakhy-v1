@@ -1005,11 +1005,13 @@
         "TC-127",
         "TC-149",
         "TC-150",
-        "TC-151"
+        "TC-151",
+        "TC-152"
       ],
       "evidence": [
         "verification/runs/20261011-MB-027/evidence.json",
-        "verification/runs/20261012-QA-REPAIR/evidence.json"
+        "verification/runs/20261012-QA-REPAIR/evidence.json",
+        "verification/runs/20261012-MB-032/evidence.json"
       ],
       "review_status": "PASS",
       "completion_note": "Customer web purchase flow on the real API with stable-key placement verified in the browser; self-reviewed; draft visuals until O05."
@@ -1176,7 +1178,7 @@
       "id": "MB-032",
       "phase": "P07",
       "title": "Implement native discovery and ordering",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-031",
@@ -1206,9 +1208,11 @@
         "TC-132",
         "TC-148"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261012-MB-032/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source cdc592a (SELF_REVIEW): six local checks PASS; native run 31 Android emulator and iOS simulator ordering PASS (keep/replace, kill during submit, offline reopen, one recovered order with one set of side effects, total parity). Delivery checkout not exercised natively."
     },
     {
       "id": "MB-033",

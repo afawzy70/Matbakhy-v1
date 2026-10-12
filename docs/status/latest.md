@@ -2,10 +2,24 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-12T15:31+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
+- Observed: 2026-10-12T19:46+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- **Codex QA repair candidate:** `c35ad2d0be06f045059e19fbcc1c6e25209cb645`. Six-check evidence PASS ([run](../../verification/runs/20261012-QA-REPAIR/evidence.json)); Product CI success. MBQA-002, MBQA-001 and FG-001 are FIXED_PENDING_INDEPENDENT_RETEST, not closed by independent QA ([repair record](../quality/07-codex-qa-repair.md)). RQ-001/002/003 and Q1 remain open.
-- Phase/story: P07 / MB-032 IN_PROGRESS (native discovery, ordering and basket editing implemented; native run 24: iOS testA/testB passed and testC's harness was fixed; Android harness scroll fixed; native run 25 at `c35ad2d` in progress); MB-031 DONE at `fd689aa` (native Android and iOS sign-in round trips); MB-037 DONE at `e512ac4`; MB-039 IN_PROGRESS; MB-029 BLOCKED on screen-reader testing (BLK-003; TC-046, TC-129 PASS at `6a84b26`; TC-047 BLOCKED); MB-028 DONE; P00–P05 gates PASS (self-reviewed evidence); P06 gate not passed (O05 open, MB-029/MB-030 not DONE)
+- **Codex QA retest candidate:** `cdc592a2492a691de714a3d0bf23b31f25599480` (supersedes `c35ad2d`).
+  - **Contents:** MBQA-001/002, FG-001, the operations-web language fix and Q1 client limits.
+  - **Checks at this SHA:** Product CI success; six-check evidence PASS ([run](../../verification/runs/20261012-MB-032/evidence.json)).
+  - **Independent QA:** findings are FIXED_PENDING_INDEPENDENT_RETEST; no Codex result exists yet ([handoff](../quality/07-codex-qa-repair.md)).
+  - **Still open:** RQ-001/002/003.
+- Phase/story: P07. **MB-032 DONE** at `cdc592a` (self-review). Next eligible: MB-033.
+  - MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.
+  - MB-039 IN_PROGRESS: the owner's audit/log readiness work package is queued ([05-observability-readiness.md](../operations/05-observability-readiness.md)).
+  - MB-029 BLOCKED on screen-reader testing (BLK-003; TC-047 BLOCKED); MB-030 waits on MB-029.
+  - Gates: P00–P05 PASS (self-reviewed evidence). The P06 gate is not passed (O05 open; MB-029/MB-030 not DONE).
+- **Q1:** clients follow the server's published per-line limit (API-001), TC-152 PASS. The limit value itself remains an owner decision under O04 ([note](../product/q1-quantity-limit-decision.md)).
+- **Web preview:**
+  - **Prepared (not deployed):** `deploy/web-preview` and [06-web-preview.md](../operations/06-web-preview.md), rehearsed locally.
+  - **Blocked on owner inputs:** hosting, domain/DNS, tester IPs, GHCR publication.
+  - **External testers:** blocked until AUD-01/LOG-01/OPS-01..03 pass on the preview.
+  - MB-040 is not started.
 - Model: `claude-opus-5-5`, effort `medium` (observed from session metadata at 14:20); token usage and cost not recorded here
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -19,7 +33,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
-| MB-032 Implement native discovery and ordering | IN_PROGRESS | Screens, generated client, basket rule and editing, stored placement keys with recovery; 28 unit/UI tests pass. Native run 24: iOS keep/replace, kill during submit (one order) and offline reopen passed; recovery step's harness fixed. Android ordering harness scroll fixed. Native run 25 pending. Delivery checkout not exercised natively |
+| MB-032 Implement native discovery and ordering | DONE (self-review) | [run](../../verification/runs/20261012-MB-032/evidence.json) at `cdc592a`: six local checks PASS; native run [38273197484](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484) — Android emulator and iOS simulator: basket keep/replace, kill during submit, offline reopen, one recovered order with one set of side effects, total parity. Delivery checkout not exercised natively |
 | MB-031 Build native shell and authentication | DONE (self-review) | [run](../../verification/runs/20261012-MB-031/evidence.json) at `fd689aa`; native run [38226241501](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501): Android emulator and iOS simulator launch and system-browser PKCE sign-in round trip |
 | MB-037 Prove concurrency retries and recovery | DONE (self-review) | [run](../../verification/runs/20261012-MB-037/evidence.json) at `e512ac4` |
 | MB-029 Verify accessibility RTL and responsive behavior | BLOCKED (BLK-003) | [run](../../verification/runs/20261012-MB-029/evidence.json) at `6a84b26`; TC-047 screen-reader testing NOT_RUN |
@@ -46,7 +60,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-30 of 46 stories DONE (MB-029 BLOCKED; MB-039 IN_PROGRESS) (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+31 of 46 stories DONE (MB-029 BLOCKED; MB-039 IN_PROGRESS) (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
@@ -122,4 +136,14 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-Finish MB-032 native verification on Android and iOS (basket keep/replace, total parity, app kill during submit, offline reopen, no duplicate order), then record evidence. Prepare the fixed-SHA handoff for independent Codex QA and the Q1 decision note. Owner decisions still needed: O05 (visual approval), BLK-003 (screen-reader testing), O06 (retention), O07 (staging), Q1 (per-line quantity limit).
+**Next story:** MB-033 (native lifecycle, push and accessibility). The owner's audit and log readiness package follows at the next MB-039 checkpoint.
+
+**Owner decisions and inputs still needed:**
+- **Web preview:** hosting provider, plan and budget; domain and DNS; testers' IP addresses; approval to publish the two preview images to GHCR. See [06-web-preview.md](../operations/06-web-preview.md); prices are unverified.
+- **Policy and launch decisions:**
+  - O04: the real per-line quantity limit and commerce policy;
+  - O05: visual approval;
+  - O06: retention;
+  - O07: providers and staging.
+- **Requirement questions:** RQ-001, RQ-002, RQ-003.
+- **Screen-reader testing:** BLK-003.
