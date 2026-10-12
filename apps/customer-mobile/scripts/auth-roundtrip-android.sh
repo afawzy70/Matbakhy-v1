@@ -15,14 +15,18 @@ mkdir -p "$OUT"
 UI="$OUT/ui.xml"
 STEP=0
 
-adb reverse tcp:8080 tcp:8080 >/dev/null
-adb reverse tcp:8180 tcp:8180 >/dev/null
 echo "browsers: $(adb shell pm list packages | tr -d '\r' | grep -iE 'chrome|browser' | tr '\n' ' ')"
 # Skip Chrome's first-run screens (emulator images allow adb root; best effort).
 adb root >/dev/null 2>&1 && sleep 3 && adb wait-for-device || true
 adb shell 'echo "chrome --disable-fre --no-default-browser-check --no-first-run" > /data/local/tmp/chrome-command-line' || true
 adb shell 'cp /data/local/tmp/chrome-command-line /data/local/chrome-command-line 2>/dev/null; chmod 644 /data/local/tmp/chrome-command-line' || true
 adb shell am force-stop com.android.chrome || true
+# Port forwards come after `adb root`, which restarts adbd and drops them (native run 12).
+adb reverse tcp:8080 tcp:8080 >/dev/null
+adb reverse tcp:8180 tcp:8180 >/dev/null
+adb reverse --list
+adb shell "curl -s -o /dev/null -w 'device -> identity: %{http_code}\n' http://localhost:8180/realms/matbakhy/.well-known/openid-configuration" || true
+adb logcat -c
 
 dump() {
   adb shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1 || true
@@ -48,7 +52,11 @@ shot() {
   adb exec-out screencap -p > "$OUT/$STEP-$1.png"
   echo "screenshot $STEP-$1: $(sha256sum < "$OUT/$STEP-$1.png" | cut -c1-16)"
 }
-fail() { dump; echo "FAIL: $*"; echo "visible: $(texts)"; shot failure; exit 1; }
+fail() {
+  dump; echo "FAIL: $*"; echo "visible: $(texts)"; shot failure
+  echo "app log:"; adb logcat -d -s ReactNativeJS:V ReactNative:W | tail -40
+  exit 1
+}
 # wait_for <regex> <seconds> [dismiss-regex]: polls the screen; taps anything matching dismiss-regex meanwhile.
 wait_for() {
   local deadline=$((SECONDS + $2)) pos
