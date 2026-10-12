@@ -22,7 +22,17 @@ async function idpLogin(page: Page, user: string) {
 
 async function checkSection(page: Page, where: string, scan: boolean) {
   await page.waitForLoadState("networkidle");
-  expect.soft(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), `overflow ${where}`).toBe(true);
+  const overflowing = await page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth
+      ? []
+      : [...document.querySelectorAll<HTMLElement>("body *")]
+          .filter((e) => {
+            const r = e.getBoundingClientRect();
+            return r.width > 0 && (r.right > window.innerWidth + 1 || r.left < -1) && !e.closest(".table-wrap");
+          })
+          .slice(0, 5)
+          .map((e) => `${e.tagName}.${e.className}:${(e.textContent ?? "").trim().slice(0, 25)}`));
+  expect.soft(overflowing, `overflow ${where}`).toEqual([]);
   const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible, textarea:visible").evaluateAll((els) =>
     els.filter((e) => {
       const r = e.getBoundingClientRect();
