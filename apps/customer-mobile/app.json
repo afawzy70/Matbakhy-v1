@@ -15,6 +15,9 @@
     "extra": {
       "environment": "development",
       "note": "Development identifiers only. Production identifiers/signing are owner decision O08."
-    }
+    },
+    "plugins": [
+      "./plugins/withLocalhostCleartext.cjs"
+    ]
   }
 }

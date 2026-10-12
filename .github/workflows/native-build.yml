@@ -25,7 +25,7 @@ jobs:
   android:
     name: Android debug APK (Gradle)
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 80
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
       - name: Install pinned Node.js (checksum verified)
@@ -56,6 +56,11 @@ jobs:
       - name: Gradle assembleRelease (JS bundle embedded; debug-keystore signed; not a store build)
         working-directory: apps/customer-mobile/android
         run: ./gradlew --no-daemon assembleRelease && sha256sum app/build/outputs/apk/release/app-release.apk
+      - name: Start the local stack for the sign-in round trip (PostgreSQL, Keycloak, API; synthetic users, random local passwords)
+        run: |
+          export JAVA_HOME="$JAVA_HOME_21_X64" PATH="$JAVA_HOME_21_X64/bin:$PATH"
+          scripts/dev.sh up
+          echo "::add-mask::$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)"
       - name: Enable KVM for the emulator
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -63,6 +68,11 @@ jobs:
       - name: MB-031 launch on Android emulator
         working-directory: apps/customer-mobile
         run: scripts/launch-android.sh android/app/build/outputs/apk/release/app-release.apk
+      - name: MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)
+        run: USER_PASSWORD="$(grep '^DEV_USER_PASSWORD=' infra/.env | cut -d= -f2)" apps/customer-mobile/scripts/auth-roundtrip-android.sh
+      - name: Stack logs on failure
+        if: failure()
+        run: docker compose --env-file infra/.env -f infra/compose.yaml logs --tail 60 api identity || true
 
   ios:
     name: iOS simulator build (Xcode, unsigned)
