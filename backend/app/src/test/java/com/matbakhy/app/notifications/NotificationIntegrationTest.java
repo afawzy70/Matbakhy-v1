@@ -427,6 +427,48 @@ class NotificationIntegrationTest {
         assertThat(deliveryRow(email).get("status")).isEqualTo("SENT");
     }
 
+    /**
+     * MB-037: a worker that crashes after the provider accepted a message but before recording it. The delivery stays
+     * pending under the dead worker's lease; after expiry it is sent again with the same delivery id (the provider's
+     * idempotency reference) and exactly one result is recorded. External sends are at-least-once by design.
+     */
+    @Test
+    void a_crash_between_provider_send_and_recording_resends_with_the_same_delivery_id_and_records_once() throws Exception {
+        UUID order = placeOrder();
+        drainOutbox();
+        UUID email = delivery(cook, order, "ORDER_PLACED", "EMAIL");
+        jdbc.execute("""
+                CREATE FUNCTION test_fail_sent_record() RETURNS trigger LANGUAGE plpgsql AS $$
+                BEGIN RAISE EXCEPTION 'simulated crash before recording the provider result'; END $$""");
+        jdbc.execute("CREATE TRIGGER test_fail_sent_record BEFORE UPDATE ON notification_delivery FOR EACH ROW WHEN (NEW.status = 'SENT' AND NEW.id = '"
+                + email + "') EXECUTE FUNCTION test_fail_sent_record()");
+        try {
+            for (int i = 0; i < 5 && !channels.emailCalls.contains(email); i++) {
+                try {
+                    worker.deliverOnce("worker-a", 100);
+                } catch (RuntimeException expected) {
+                    // the "crash": the provider was called, the result was not recorded
+                }
+            }
+        } finally {
+            jdbc.execute("DROP TRIGGER IF EXISTS test_fail_sent_record ON notification_delivery");
+            jdbc.execute("DROP FUNCTION IF EXISTS test_fail_sent_record()");
+        }
+        assertThat(channels.emailCalls).contains(email);
+        assertThat(deliveryRow(email).get("status")).as("not recorded as sent").isEqualTo("PENDING");
+        worker.deliverOnce("worker-b", 100);
+        long callsBeforeExpiry = channels.emailCalls.stream().filter(email::equals).count();
+        jdbc.update("UPDATE notification_delivery SET leased_until = now() - interval '1 second' WHERE id = ? AND lease_owner IS NOT NULL", email);
+        makeDue(email);
+        worker.deliverOnce("worker-b", 100);
+        assertThat(deliveryRow(email).get("status")).isEqualTo("SENT");
+        assertThat(channels.emailCalls.stream().filter(email::equals).count()).as("resent once, with the same delivery id")
+                .isEqualTo(callsBeforeExpiry + 1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM notification_delivery WHERE id = ? AND status = 'SENT'", Integer.class, email)).isEqualTo(1);
+        worker.deliverOnce("worker-b", 100);
+        assertThat(channels.emailCalls.stream().filter(email::equals).count()).as("no further sends").isEqualTo(callsBeforeExpiry + 1);
+    }
+
     // ---- TC-121: inbox read state and device registrations ----
 
     @Test
