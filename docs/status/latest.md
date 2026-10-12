@@ -2,9 +2,9 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-12T06:22+03:00 (Asia/Kuwait); preflight outside the 2026-10-12 window (12:00–00:00); no implementation since `a791b46`
+- Observed: 2026-10-12T07:40+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- Phase/story: P06 / MB-029 IN_PROGRESS (customer restyle to the approved design checkpointed at `bad288f`; MB-028 DONE; owner design PR #2 integrated; MB-027 DONE; P05 complete: MB-022 to MB-026 DONE; P00–P05 gates PASS on self-reviewed evidence; P04 complete; P00–P04 gates PASS on self-reviewed evidence)
+- Phase/story: P06 / MB-029 BLOCKED on screen-reader testing (BLK-003); evidence at `6a84b26` (TC-046, TC-129 PASS; TC-047 BLOCKED); MB-028 DONE; P00–P05 gates PASS (self-reviewed evidence); P06 gate not passed (O05 open, MB-029/MB-030 not DONE)
 - Model: Claude Opus 5.5 (`claude-opus-5-5`, session-configured); effort, tokens, cost and quota UNKNOWN
 
 ## Story status (after the 2026-10-11 owner correction)
@@ -40,7 +40,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-28 of 46 stories DONE (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+28 of 46 stories DONE (MB-029 BLOCKED) (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
@@ -89,6 +89,13 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Pending owner decision: proposed MB-047 split ([decision register](../product/01-context-and-decisions.md)); not applied.
 - O01–O10 remain OPEN. O06 now also covers cook documents and reapplication after rejection (REJECTED is final until decided).
 - Carried residuals: real MFA/OTP login in local Keycloak not configured (step-up tested with provider claims); audit CSV export (API-095); quote-path contact/address checks in MB-017; meal publication and order acceptance must use `KitchenDirectory` (MB-014/MB-019).
+
+## Today (2026-10-12)
+
+- D11/D12 applied (`5cc88c8`). Remaining customer screens restyled in the approved light system with a derived desktop layout; screenshots for owner review in [docs/design/review](../design/review/README.md).
+- MB-029: browser evidence at `6a84b26`, all six checks PASS: layout matrices for customer and operations at the required widths in both directions, keyboard-only journeys including checkout, axe scans. **TC-047 BLOCKED (BLK-003): no screen reader available; screen-reader testing NOT_RUN.** MB-029 is BLOCKED, not DONE; MB-030 not started.
+- External-QA handoff and staging readiness: [docs/quality/04-external-qa-handoff.md](../quality/04-external-qa-handoff.md). Staging needs owner approval of O07 and its recurring costs.
+- GitHub CI on `6a84b26`: Product CI and Blueprint integrity success.
 
 ## Owner decisions 2026-10-12
 
