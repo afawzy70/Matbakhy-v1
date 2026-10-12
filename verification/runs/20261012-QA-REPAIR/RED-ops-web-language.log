@@ -1,0 +1,46 @@
+# Red phase: operations-web request language after a switch (MBQA-001 root cause), unchanged product code (HEAD 99b48ee2959e44f8a1a2b9048583cb46f92942d1, test uncommitted)
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/operations-web
+
+ ❯ src/App.test.tsx (16 tests | 1 failed | 15 skipped) 390ms
+   ❯ operations-web cook workspace (16)
+     × requests made after a language switch carry the new language in both directions 387ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > operations-web cook workspace > requests made after a language switch carry the new language in both directions
+AssertionError: expected [ …(6) ] to deeply equal [ …(6) ]
+
+- Expected
++ Received
+
+  [
+-   "/api/v1/cook/orders?state=PENDING_ACCEPTANCE&limit=50 ar",
+-   "/api/v1/cook/orders?state=ACCEPTED&limit=50 ar",
+-   "/api/v1/cook/orders?state=PREPARING&limit=50 ar",
+-   "/api/v1/cook/orders?state=READY&limit=50 ar",
+-   "/api/v1/cook/orders?state=OUT_FOR_DELIVERY&limit=50 ar",
++   "/api/v1/cook/orders?state=PENDING_ACCEPTANCE&limit=50 en",
++   "/api/v1/cook/orders?state=ACCEPTED&limit=50 en",
++   "/api/v1/cook/orders?state=PREPARING&limit=50 en",
++   "/api/v1/cook/orders?state=READY&limit=50 en",
++   "/api/v1/cook/orders?state=OUT_FOR_DELIVERY&limit=50 en",
+    "/api/v1/cook/dashboard ar",
+  ]
+
+ ❯ src/App.test.tsx:170:93
+    168|     fireEvent.click(await screen.findByRole("button", { name: "الرئيسي…
+    169|     await waitFor(() => expect(calls.length).toBeGreaterThan(before));
+    170|     expect(calls.slice(before).map((c) => `${c.path} ${c.headers.get("…
+       |                                                                                             ^
+    171|   });
+    172|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 15 skipped (16)
+   Start at  12:51:18
+   Duration  2.19s (transform 37%, environment 37%, tests 19%, import 7%)
+

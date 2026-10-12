@@ -41,7 +41,10 @@ The QA failures and evidence on the QA branch are unchanged. The red-phase logs 
 - **Assertions:** both the request header and the translated content (title, description, portion text, kitchen name), Arabic → English → Arabic, on browse, meal detail and kitchen page.
 - **Stale answers:** an English answer held back until after the customer switched back to Arabic is never shown, and the page stays Arabic.
 - **Native:** not affected. The native client is created per language and its loads are keyed by language.
-- **Related, not fixed in this batch:** the operations web (`apps/operations-web/src/api.ts`) uses the same document-language pattern. Its screens show the cook's or staff member's own data, but server error messages could arrive in the previous language after a switch. Recorded as a follow-up.
+- **Related, fixed after the candidate:** the operations web (`apps/operations-web/src/api.ts`) used the same document-language pattern.
+  - A new test reproduced it: after switching back to Arabic, the open Orders section reloaded in the same render and sent `en` (`RED-ops-web-language.log`).
+  - Fixed after `c35ad2d` with the same approach: the language is set on the client in the click.
+  - This fix is not part of the Codex candidate.
 
 ### FG-001 details
 
@@ -136,5 +139,4 @@ This is a reporting correction only. It is separate from the product repairs, an
 - **Not in this candidate:**
   - native emulator/simulator verification of the basket (MB-032; native cart editing is implemented and unit-tested);
   - RQ-001/002/003 and Q1 decisions;
-  - the operations-web language follow-up;
   - screen-reader testing (BLK-003).

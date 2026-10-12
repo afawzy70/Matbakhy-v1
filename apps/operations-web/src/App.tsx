@@ -139,7 +139,12 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
       <header className="topbar">
         <h1>{title(locale)}</h1>
         <div className="topbar-actions">
-          <button type="button" onClick={() => setLocale(locale === "ar" ? "en" : "ar")}>
+          <button type="button" onClick={() => {
+              const next: Locale = locale === "ar" ? "en" : "ar";
+              // Requests switch language in the same event as the state, before any section reloads for the new language.
+              api.setLanguage(next);
+              setLocale(next);
+            }}>
             {t.language}
           </button>
           {session.kind === "in" ? (

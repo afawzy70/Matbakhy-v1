@@ -149,6 +149,27 @@ describe("operations-web cook workspace", () => {
     expect(accept?.headers.get("Accept-Language")).toBe("ar");
   });
 
+  // Follow-up to customer-web QA finding MBQA-001 (same request-language pattern). Against the earlier code the
+  // open Orders section reloaded in the switching render and still sent the previous language (red log kept).
+  it("requests made after a language switch carry the new language in both directions", async () => {
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/orders": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("heading", { name: "مطبخ أم علي" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Orders" }));
+    await waitFor(() => expect(calls.some((c) => c.path.startsWith("/api/v1/cook/orders"))).toBe(true));
+    expect(calls.filter((c) => c.path.startsWith("/api/v1/cook/orders")).every((c) => c.headers.get("Accept-Language") === "en")).toBe(true);
+    const before = calls.length;
+    fireEvent.click(screen.getByRole("button", { name: "العربية" }));
+    fireEvent.click(await screen.findByRole("button", { name: "الرئيسية" }));
+    await waitFor(() => expect(calls.length).toBeGreaterThan(before));
+    expect(calls.slice(before).map((c) => `${c.path} ${c.headers.get("Accept-Language")}`)).toEqual(calls.slice(before).map((c) => `${c.path} ar`));
+  });
+
   it("shows the server's conflict and reloads instead of assuming the transition", async () => {
     const { fetchImpl, calls } = server({
       "GET /api/v1/me": me,
