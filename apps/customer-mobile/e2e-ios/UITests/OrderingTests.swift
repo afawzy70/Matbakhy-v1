@@ -74,12 +74,13 @@ final class OrderingTests: XCTestCase {
         user.tap()
         Thread.sleep(forTimeInterval: 1.5)
         user.typeText(username)
-        for root in [app, authUI] {
-            let heading = root.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Sign in to")).firstMatch
-            if heading.exists {
-                heading.tap()
-                break
-            }
+        // Tap the sign-in sheet's own heading to dismiss the keyboard. The app's tabs behind the sheet also contain
+        // "Sign in to see your orders…", which exists but is not hittable (native run 23), so require hittable.
+        let headings = [authUI, app].flatMap {
+            $0.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Sign in to")).allElementsBoundByIndex
+        }
+        if let heading = headings.first(where: { $0.exists && $0.isHittable }) {
+            heading.tap()
         }
         Thread.sleep(forTimeInterval: 1.5)
         guard let secret = webField(secure: true) else { return XCTFail("password field missing") }
