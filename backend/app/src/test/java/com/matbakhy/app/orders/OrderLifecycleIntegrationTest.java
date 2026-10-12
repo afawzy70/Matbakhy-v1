@@ -498,6 +498,28 @@ class OrderLifecycleIntegrationTest {
         assertThat(late.getStatus()).isEqualTo(409);
     }
 
+    /** MB-037: server-clock boundary — acceptance is allowed strictly before accept_by and refused at that instant. */
+    @Test
+    void acceptance_is_allowed_one_millisecond_before_the_deadline_and_refused_exactly_at_it() throws Exception {
+        UUID early = order(false);
+        Instant earlyDeadline = jdbc.queryForObject("SELECT accept_by FROM customer_order WHERE id = ?", Timestamp.class, early).toInstant();
+        ((MutableClock) clock).freezeAt(earlyDeadline.minusMillis(1));
+        assertThat(cook(early, "accept", "").getStatus()).as("1 ms before the deadline").isEqualTo(200);
+        assertThat(state(early)).isEqualTo("ACCEPTED");
+        cookOk(early, "cancel", ",\"reasonCode\":\"OTHER\"");
+
+        ((MutableClock) clock).reset();
+        UUID onTime = order(false);
+        Instant deadline = jdbc.queryForObject("SELECT accept_by FROM customer_order WHERE id = ?", Timestamp.class, onTime).toInstant();
+        ((MutableClock) clock).freezeAt(deadline);
+        assertThat(cook(onTime, "accept", "").getStatus()).as("exactly at the deadline").isEqualTo(409);
+        assertThat(state(onTime)).isIn("PENDING_ACCEPTANCE", "EXPIRED");
+        new OrderExpiryJob(lifecycle).expireDue();
+        assertThat(state(onTime)).isEqualTo("EXPIRED");
+        assertThat(counters()).containsExactly(0, 0, 0);
+        ((MutableClock) clock).reset();
+    }
+
     // ---- scope and suspension ----
 
     @Test

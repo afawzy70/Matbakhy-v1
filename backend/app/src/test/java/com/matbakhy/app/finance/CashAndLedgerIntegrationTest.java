@@ -16,7 +16,13 @@ import com.matbakhy.finance.internal.LedgerPostingJob;
 import com.matbakhy.finance.internal.LedgerService;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -213,6 +219,40 @@ class CashAndLedgerIntegrationTest {
         job.postPending();
         for (UUID o : new UUID[] {first, second}) {
             assertThat(jdbc.queryForObject("SELECT count(*) FROM ledger_group WHERE order_id = ?", Integer.class, o)).isEqualTo(1);
+        }
+    }
+
+    /** MB-037 / TC-058: two posting instances racing over the same completions post each one exactly once, balanced. */
+    @Test
+    void two_posting_instances_racing_post_each_completion_exactly_once_and_balanced() throws Exception {
+        List<UUID> orders = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            orders.add(completedOrder());
+        }
+        LedgerPostingJob first = new LedgerPostingJob(ledger);
+        LedgerPostingJob second = new LedgerPostingJob(ledger);
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService pool = Executors.newFixedThreadPool(4);
+        try {
+            List<Future<Integer>> runs = new ArrayList<>();
+            for (LedgerPostingJob job : List.of(first, second, first, second)) {
+                runs.add(pool.submit(() -> {
+                    start.await();
+                    return job.postPending();
+                }));
+            }
+            start.countDown();
+            for (Future<Integer> r : runs) {
+                r.get();
+            }
+        } finally {
+            pool.shutdownNow();
+        }
+        for (UUID o : orders) {
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM ledger_group WHERE order_id = ?", Integer.class, o)).as("one group per completion").isEqualTo(1);
+            assertThat(jdbc.queryForObject("""
+                    SELECT coalesce(sum(CASE WHEN e.direction = 'DEBIT' THEN e.amount_minor ELSE -e.amount_minor END), 0)
+                    FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id WHERE g.order_id = ?""", Long.class, o)).as("balanced").isZero();
         }
     }
 
