@@ -79,13 +79,29 @@ relaunch() {
   adb shell am start -W -n "$PKG/.MainActivity" >/dev/null
 }
 
+# Typing right after the tap can lose the first keystrokes (native run 13 typed "ustomer-a"): wait for focus, check
+# the field's value and retype once after clearing it.
+type_into() {
+  local attempt
+  for attempt in 1 2; do
+    tap "$1"; sleep 2
+    adb shell input keyevent KEYCODE_MOVE_END
+    for _ in $(seq 1 40); do adb shell input keyevent KEYCODE_DEL; done
+    adb shell input text "$2"; sleep 1
+    dump
+    if grep -q "text=\"$2\"" "$UI"; then return 0; fi
+    echo "field value not confirmed on attempt $attempt"
+  done
+  fail "could not type into $1"
+}
+
 CHROME_NOISE='text="(Use without an account|Accept & continue|No thanks|No, thanks|Got it|Continue|Not now)"'
 USERNAME_FIELD='resource-id="username"|hint="Username or email"|text="Username or email"'
 login_as() {
   wait_for "$USERNAME_FIELD" 120 "$CHROME_NOISE" >/dev/null || fail "login form did not appear (fresh login was not requested?)"
   shot "login-form-$1"
-  tap "$USERNAME_FIELD"; adb shell input text "$1"
-  tap 'resource-id="password"|hint="Password"|text="Password"'; adb shell input text "$USER_PASSWORD"
+  type_into "$USERNAME_FIELD" "$1"
+  tap 'resource-id="password"|hint="Password"|text="Password"'; sleep 2; adb shell input text "$USER_PASSWORD"
   tap 'resource-id="kc-login"|text="Sign In"'
 }
 
