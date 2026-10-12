@@ -31,7 +31,7 @@
       "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
     }
   ],
-  "next_action": "Bounded repair batch (owner, 14:47): MBQA-002, MBQA-001, FG-001 from the independent Codex QA report (QA branch qa/independent-browse-basket-eb1a671-20261012 @ a7ed1f3, tested eb1a671); test first, then fix; publish repair evidence and a fixed candidate SHA marked FIXED_PENDING_INDEPENDENT_RETEST. Then resume MB-032 (IN_PROGRESS): read the native run on 43f8737 (Android go-to-cart scroll and iOS hittable-heading harness fixes); when TC-148/TC-049/TC-132 pass on both platforms record evidence; delivery checkout not exercised natively (known gap). MB-029 BLOCKED (BLK-003). MB-039 IN_PROGRESS (O07, O06). Q1 awaits owner decision.",
+  "next_action": "Bounded repair batch (owner, 14:43): MBQA-002, MBQA-001, FG-001 from the independent Codex QA report (QA branch qa/independent-browse-basket-eb1a671-20261012 @ a7ed1f3, tested eb1a671); test first, then fix; publish repair evidence and a fixed candidate SHA marked FIXED_PENDING_INDEPENDENT_RETEST. Then resume MB-032 (IN_PROGRESS): read the native run on 43f8737 (Android go-to-cart scroll and iOS hittable-heading harness fixes); when TC-148/TC-049/TC-132 pass on both platforms record evidence; delivery checkout not exercised natively (known gap). MB-029 BLOCKED (BLK-003). MB-039 IN_PROGRESS (O07, O06). Q1 awaits owner decision.",
   "updated_at": "2026-10-12T11:43:42Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
