@@ -1,0 +1,21 @@
+Native run 33 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38288198395), job 114941529957 "Android debug APK (Gradle)", source a8132aaaa0eb325a827d294fc2e51a4d39aa5b33
+Android emulator (API 35), step "MB-032 native ordering on Android" (excerpt of the job log, 2026-10-12T18:29–18:33Z): conclusion success
+== TC-148: basket replacement asks first
+ok: keep leaves the basket; replace replaces it
+== TC-049: kill the app while the order response is held back
+app killed while the response was held back
+orders in the database after the kill: 1
+ok: offline and unconfirmed, nothing claimed
+side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1
+order MB-100001; database (number|total_minor): MB-100001|9000; app shows text="Total: EGP 90.00"; quote showed text="Total: EGP 90.00"
+== MB-033 Q1: the quantity control stops at min(policy limit, availability)
+ok: the control stopped at 10 of 15 available portions and is disabled there
+== MB-033 Q1: a lowered limit makes the saved basket invalid and blocks the quote
+ok: the saved basket was flagged, no quote was requested, and reducing to 5 cleared it
+== MB-033 delivery checkout: saved address, zone fee, total parity, persisted fulfilment
+delivery order MB-100002 (mode|fee|total|address snapshot|kitchen|state): DELIVERY|3000|63000|true|00000000-0000-4000-8000-00000000a0d1|PENDING_ACCEPTANCE
+ok: delivery order persisted with the zone fee, the address snapshot and the quoted total, in kitchen one's queue
+== MB-033 deep link to the order: warm (app running on Discover) and cold (process stopped)
+ok: the order link opens order MB-100002 warm and cold
+PASS: Android ...; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold
+(The script also checked "Delivery: EGP 30.00" and "Total: EGP 630.00" on screen; it fails otherwise.)

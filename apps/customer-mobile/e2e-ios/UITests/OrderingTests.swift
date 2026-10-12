@@ -223,6 +223,10 @@ final class OrderingTests: XCTestCase {
 
     func testF_OrderDeepLinkWarmAndCold() {
         let env = ProcessInfo.processInfo.environment
+        // XCUIApplication.open(_:) needs iOS 16.4; the CI simulator runtime is newer. An older runtime fails, never skips.
+        guard #available(iOS 16.4, *) else {
+            return XCTFail("deep-link check needs an iOS 16.4 or newer simulator")
+        }
         guard let id = env["MB033_ORDER_ID"], let number = env["MB033_ORDER_NUMBER"], let url = URL(string: "matbakhy-dev://orders/\(id)") else {
             return XCTFail("order id and number not passed by the script")
         }

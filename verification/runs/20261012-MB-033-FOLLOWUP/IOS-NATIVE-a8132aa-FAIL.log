@@ -1,0 +1,5 @@
+Native run 33 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38288198395), job 114941529615 iOS, source a8132aa: FAILURE (test code did not compile)
+OrderingTests.swift:231:13: error: 'open' is only available in iOS 16.4 or newer
+OrderingTests.swift:235:13: error: 'open' is only available in iOS 16.4 or newer
+FAIL: iOS sign-in round trip (xcodebuild exit 65)  -- the UI-test target failed to build, so no iOS check ran in this run.
+Fix: availability guard in testF (an older runtime fails the test, never skips it).
