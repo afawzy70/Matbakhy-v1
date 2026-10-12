@@ -1,6 +1,6 @@
 # Implementation preview for owner review — approved light terracotta/Cairo system (2026-10-12)
 
-These are **rendered screenshots of the running product** on a throwaway local stack with **synthetic data**: kitchen "مطبخ تجريبي", meal "كشري تجريبي", a solid-colour synthetic photo, and synthetic addresses and phone numbers. They were captured by the browser workflow (`scripts/dev.sh e2e` with `E2E_SCREENSHOT_DIR`) at the source revision named in `docs/status/latest.md`. They are review material, not approval. O05 (whole-product visual approval) stays open until the owner reviews them.
+These are **rendered screenshots of the running product** on a throwaway local stack with **synthetic data**: kitchen "مطبخ تجريبي", meal "كشري تجريبي", a solid-colour synthetic photo, and synthetic addresses and phone numbers. They were captured by the browser workflow (`scripts/dev.sh e2e` with `E2E_SCREENSHOT_DIR`) at source revision `7ad6c15` (application code; later commits only add documentation and evidence). They are review material, not approval. O05 (whole-product visual approval) stays open until the owner reviews them.
 
 What to review:
 
