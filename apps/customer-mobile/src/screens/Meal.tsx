@@ -119,8 +119,8 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                 onPress={() => {
                   if (slot && purchasable) {
                     void add(
-                      { kitchenId: m.kitchen.id, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes },
-                      { mealId: m.id, title: m.title, quantity },
+                      { kitchenId: m.kitchen.id, kitchenName: m.kitchen.name, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes },
+                      { mealId: m.id, title: m.title, quantity, unitPriceMinor: m.price.amountMinor, maxQuantity: maxQuantity(slot) },
                     );
                   }
                 }}

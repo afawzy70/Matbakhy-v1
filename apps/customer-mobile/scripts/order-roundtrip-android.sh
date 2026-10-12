@@ -59,11 +59,17 @@ wait_for() {
 tap() { local pos; pos=$(wait_for "$1" "${2:-60}") || fail "not found: $1"; adb shell input tap $pos; }
 # Scrolls the current screen up until the element is on screen (long forms).
 # Below-the-fold controls (the cart button sits under the meal details; native run 23): scroll up until visible.
+# Swipes relative to the real screen: the AVD has no device profile, so fixed coordinates
+# (y=1500, native run 24) fell outside the default screen and never scrolled.
+SCREEN=$(adb shell wm size | tr -d '\r' | sed -n 's/.*: \([0-9]*\)x\([0-9]*\).*/\1 \2/p' | tail -1)
+[ -n "$SCREEN" ] || fail "could not read the emulator screen size"
+SCREEN_W=${SCREEN% *}
+SCREEN_H=${SCREEN#* }
 tap_scrolled() {
   local pos
-  for _ in 1 2 3 4 5 6; do
+  for _ in 1 2 3 4 5 6 7 8; do
     pos=$(wait_for "$1" 4) && { adb shell input tap $pos; return 0; }
-    adb shell input swipe 540 1500 540 700 300
+    adb shell input swipe $((SCREEN_W / 2)) $((SCREEN_H * 3 / 4)) $((SCREEN_W / 2)) $((SCREEN_H / 4)) 400
   done
   fail "not found after scrolling: $1"
 }
@@ -93,14 +99,14 @@ shot replace-prompt
 tap 'text="Keep cart"|text="KEEP CART"'
 wait_for 'text="Your cart is unchanged."' 30 >/dev/null || fail "keep did not keep"
 tap_scrolled 'resource-id="go-to-cart"'
-wait_for 'text="1 × Native Dish One"' 30 >/dev/null || fail "basket changed after keep"
+wait_for 'text="1 × Native Dish One[^"]*"' 30 >/dev/null || fail "basket changed after keep"
 adb shell input keyevent 4
 tap_scrolled 'resource-id="add-to-cart"'
 tap 'text="Replace cart"|text="REPLACE CART"' 30
 wait_for 'text="Added to cart."' 30 >/dev/null || fail "replace did not add"
 tap_scrolled 'resource-id="go-to-cart"'
-wait_for 'text="1 × Native Dish Two"' 30 >/dev/null || fail "basket not replaced"
-absent 'text="1 × Native Dish One"'
+wait_for 'text="1 × Native Dish Two[^"]*"' 30 >/dev/null || fail "basket not replaced"
+absent 'text="1 × Native Dish One[^"]*"'
 shot cart-replaced
 echo "ok: keep leaves the basket; replace replaces it"
 

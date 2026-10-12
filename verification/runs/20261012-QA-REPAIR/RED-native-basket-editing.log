@@ -1,0 +1,783 @@
+# Red phase: native basket editing (CW05 / FG-001 parity, MB-032) against unchanged product code (HEAD f6005771489373ad014c67d8bbb0ccdae460dd99, tests uncommitted)
+FAIL src/App.test.tsx
+  ● native basket editing (CW05, MB-032; parity with QA finding FG-001) › records the price, portion limit and kitchen when adding, for the estimate only
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "Kitchen k1"
+    Received: undefined
+
+      263 |     expect(await screen.findByText(t.added)).toBeTruthy();
+      264 |     const basket = JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}");
+    > 265 |     expect(basket.kitchenName).toBe("Kitchen k1");
+          |                                ^
+      266 |     expect(basket.lines).toEqual([{ mealId: "m1", title: "Dish m1", quantity: 1, unitPriceMinor: 12000, maxQuantity: 5 }]);
+      267 |   });
+      268 |
+
+      at Object.toBe (src/App.test.tsx:265:32)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● native basket editing (CW05, MB-032; parity with QA finding FG-001) › edits quantities and removes lines with integer arithmetic, then shows the empty state
+
+    Unable to find an element with text: Kitchen k1
+
+    <View>
+      <RNSScreenStack>
+        <RNSScreen
+          aria-hidden={true}
+        >
+          <RNSScreenContentWrapper>
+            <View>
+              <RNSScreenNavigationContainer>
+                <RNSScreen
+                  pointerEvents="box-none"
+                >
+                  <View
+                    aria-hidden={false}
+                  >
+                    <View>
+                      <View
+                        pointerEvents="box-none"
+                      >
+                        <View
+                          pointerEvents="box-none"
+                        >
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="auto"
+                            />
+                          </View>
+                          <View
+                            pointerEvents="none"
+                          />
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="box-none"
+                            />
+                            <View
+                              pointerEvents="box-none"
+                            >
+                              <Text
+                                role="heading"
+                              >
+                                Discover
+                              </Text>
+                            </View>
+                            <View
+                              pointerEvents="box-none"
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <RCTScrollView
+                        testID="discover"
+                      >
+                        <View>
+                          <View
+                            accessibilityLabel="Cart (3)"
+                            accessibilityRole="button"
+                            accessibilityState={
+                              {
+                                "disabled": false,
+                              }
+                            }
+                            accessible={true}
+                            testID="open-cart"
+                          >
+                            <Text>
+                              Cart (3)
+                            </Text>
+                          </View>
+                          <View>
+                            <Text>
+                              Search dishes or kitchens
+                            </Text>
+                            <TextInput
+                              accessibilityLabel="Search dishes or kitchens"
+                              testID="search"
+                              value=""
+                            />
+                          </View>
+                          <View
+                            accessibilityLabel="Search"
+                            accessibilityRole="button"
+                            accessibilityState={
+                              {
+                                "disabled": false,
+                              }
+                            }
+                            accessible={true}
+                          >
+                            <Text>
+                              Search
+                            </Text>
+                          </View>
+                          <View>
+                            <View
+                              accessibilityLabel="Dish m1, Kitchen k1, EGP 120.00"
+                              accessibilityRole="button"
+                              accessible={true}
+                              testID="meal-m1"
+                            >
+                              <View>
+                                <Text>
+                                  Dish m1
+                                </Text>
+                                <Text>
+                                  Kitchen k1
+                                </Text>
+                                <Text>
+                                  EGP 120.00
+                                </Text>
+                              </View>
+                            </View>
+                            <View
+                              accessibilityLabel="Dish m2, Kitchen k2, EGP 120.00"
+                              accessibilityRole="button"
+                              accessible={true}
+                              testID="meal-m2"
+                            >
+                              <View>
+                                <Text>
+                                  Dish m2
+                                </Text>
+                                <Text>
+                                  Kitchen k2
+                                </Text>
+                                <Text>
+                                  EGP 120.00
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </RCTScrollView>
+                    </View>
+                  </View>
+                </RNSScreen>
+              </RNSScreenNavigationContainer>
+              <View
+                pointerEvents="auto"
+              >
+                <View
+                  pointerEvents="none"
+                />
+                <View
+                  role="tablist"
+                >
+                  <View>
+                    <View
+                      accessibilityLabel="Discover, tab, 1 of 4"
+                      accessibilityState={
+                        {
+                          "selected": true,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-discover"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View />
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                      </View>
+                      <Text>
+                        Discover
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Favorites, tab, 2 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-favorites"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Favorites
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Orders, tab, 3 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-orders"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Orders
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Account, tab, 4 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-account"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Account
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </RNSScreenContentWrapper>
+          <RNSScreenStackHeaderConfig
+            pointerEvents="box-none"
+            title="Tabs"
+          />
+        </RNSScreen>
+        <RNSScreen
+          aria-hidden={false}
+        >
+          <RNSScreenContentWrapper>
+            <RCTScrollView
+              testID="cart"
+            >
+              <View>
+                <Text
+                  accessibilityRole="header"
+                >
+                  Cart
+                </Text>
+                <View
+                  testID="cart-lines"
+                >
+                  <Text>
+                    2
+                     × 
+                    Dish m1
+                  </Text>
+                  <Text>
+                    1
+                     × 
+                    Dish m3
+                  </Text>
+                  <Text>
+                    13 Oct 2026, 13:00
+                  </Text>
+                  <View
+                    accessibilityLabel="Empty cart"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "disabled": false,
+                      }
+                    }
+                    accessible={true}
+                  >
+                    <Text>
+                      Empty cart
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <Text>
+                    Sign in to see your orders and favorites.
+                  </Text>
+                  <View
+                    accessibilityLabel="Sign in"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "disabled": false,
+                      }
+                    }
+                    accessible={true}
+                  >
+                    <Text>
+                      Sign in
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </RCTScrollView>
+          </RNSScreenContentWrapper>
+          <RNSScreenStackHeaderConfig
+            pointerEvents="box-none"
+            title="Cart"
+          />
+        </RNSScreen>
+      </RNSScreenStack>
+    </View>
+
+      270 |     seed([line("m1", "Dish m1", 2, 12000, 5), line("m3", "Dish m3", 1, 9000, 5)]);
+      271 |     await openCart(api(discover));
+    > 272 |     expect(await screen.findByText("Kitchen k1")).toBeTruthy();
+          |                         ^
+      273 |     expect(await estimate()).toMatch(/330\.00/);
+      274 |     expect(screen.getByText(t.estimateNote)).toBeTruthy();
+      275 |     await fireEvent.press(screen.getByTestId("qty-inc-m3"));
+
+      at Object.findByText (src/App.test.tsx:272:25)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● native basket editing (CW05, MB-032; parity with QA finding FG-001) › keeps quantity between 1 and the line's limit, and locks the basket while an order is unconfirmed
+
+    Unable to find an element with testID: qty-dec-m1
+
+    <View>
+      <RNSScreenStack>
+        <RNSScreen
+          aria-hidden={true}
+        >
+          <RNSScreenContentWrapper>
+            <View>
+              <RNSScreenNavigationContainer>
+                <RNSScreen
+                  pointerEvents="box-none"
+                >
+                  <View
+                    aria-hidden={false}
+                  >
+                    <View>
+                      <View
+                        pointerEvents="box-none"
+                      >
+                        <View
+                          pointerEvents="box-none"
+                        >
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="auto"
+                            />
+                          </View>
+                          <View
+                            pointerEvents="none"
+                          />
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="box-none"
+                            />
+                            <View
+                              pointerEvents="box-none"
+                            >
+                              <Text
+                                role="heading"
+                              >
+                                Discover
+                              </Text>
+                            </View>
+                            <View
+                              pointerEvents="box-none"
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <RCTScrollView
+                        testID="discover"
+                      >
+                        <View>
+                          <View
+                            accessibilityLabel="Cart (1)"
+                            accessibilityRole="button"
+                            accessibilityState={
+                              {
+                                "disabled": false,
+                              }
+                            }
+                            accessible={true}
+                            testID="open-cart"
+                          >
+                            <Text>
+                              Cart (1)
+                            </Text>
+                          </View>
+                          <View>
+                            <Text>
+                              Search dishes or kitchens
+                            </Text>
+                            <TextInput
+                              accessibilityLabel="Search dishes or kitchens"
+                              testID="search"
+                              value=""
+                            />
+                          </View>
+                          <View
+                            accessibilityLabel="Search"
+                            accessibilityRole="button"
+                            accessibilityState={
+                              {
+                                "disabled": false,
+                              }
+                            }
+                            accessible={true}
+                          >
+                            <Text>
+                              Search
+                            </Text>
+                          </View>
+                          <View>
+                            <View
+                              accessibilityLabel="Dish m1, Kitchen k1, EGP 120.00"
+                              accessibilityRole="button"
+                              accessible={true}
+                              testID="meal-m1"
+                            >
+                              <View>
+                                <Text>
+                                  Dish m1
+                                </Text>
+                                <Text>
+                                  Kitchen k1
+                                </Text>
+                                <Text>
+                                  EGP 120.00
+                                </Text>
+                              </View>
+                            </View>
+                            <View
+                              accessibilityLabel="Dish m2, Kitchen k2, EGP 120.00"
+                              accessibilityRole="button"
+                              accessible={true}
+                              testID="meal-m2"
+                            >
+                              <View>
+                                <Text>
+                                  Dish m2
+                                </Text>
+                                <Text>
+                                  Kitchen k2
+                                </Text>
+                                <Text>
+                                  EGP 120.00
+                                </Text>
+                              </View>
+                            </View>
+                          </View>
+                        </View>
+                      </RCTScrollView>
+                    </View>
+                  </View>
+                </RNSScreen>
+              </RNSScreenNavigationContainer>
+              <View
+                pointerEvents="auto"
+              >
+                <View
+                  pointerEvents="none"
+                />
+                <View
+                  role="tablist"
+                >
+                  <View>
+                    <View
+                      accessibilityLabel="Discover, tab, 1 of 4"
+                      accessibilityState={
+                        {
+                          "selected": true,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-discover"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View />
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                      </View>
+                      <Text>
+                        Discover
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Favorites, tab, 2 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-favorites"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Favorites
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Orders, tab, 3 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-orders"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Orders
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Account, tab, 4 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-account"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Account
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </RNSScreenContentWrapper>
+          <RNSScreenStackHeaderConfig
+            pointerEvents="box-none"
+            title="Tabs"
+          />
+        </RNSScreen>
+        <RNSScreen
+          aria-hidden={false}
+        >
+          <RNSScreenContentWrapper>
+            <RCTScrollView
+              testID="cart"
+            >
+              <View>
+                <Text
+                  accessibilityRole="header"
+                >
+                  Cart
+                </Text>
+                <View
+                  testID="cart-lines"
+                >
+                  <Text>
+                    1
+                     × 
+                    Dish m1
+                  </Text>
+                  <Text>
+                    13 Oct 2026, 13:00
+                  </Text>
+                  <View
+                    accessibilityLabel="Empty cart"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "disabled": false,
+                      }
+                    }
+                    accessible={true}
+                  >
+                    <Text>
+                      Empty cart
+                    </Text>
+                  </View>
+                </View>
+                <View>
+                  <Text>
+                    Sign in to see your orders and favorites.
+                  </Text>
+                  <View
+                    accessibilityLabel="Sign in"
+                    accessibilityRole="button"
+                    accessibilityState={
+                      {
+                        "disabled": false,
+                      }
+                    }
+                    accessible={true}
+                  >
+                    <Text>
+                      Sign in
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </RCTScrollView>
+          </RNSScreenContentWrapper>
+          <RNSScreenStackHeaderConfig
+            pointerEvents="box-none"
+            title="Cart"
+          />
+        </RNSScreen>
+      </RNSScreenStack>
+    </View>
+
+      288 |     seed([line("m1", "Dish m1", 1, 12000, 2)]);
+      289 |     await openCart(api(discover));
+    > 290 |     expect(screen.getByTestId("qty-dec-m1").props.accessibilityState.disabled).toBe(true);
+          |                   ^
+      291 |     await fireEvent.press(await screen.findByTestId("qty-inc-m1"));
+      292 |     await waitFor(() => expect(screen.getByTestId("qty-inc-m1").props.accessibilityState.disabled).toBe(true));
+      293 |     expect(await estimate()).toMatch(/240\.00/);
+
+      at Object.getByTestId (src/App.test.tsx:290:19)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       3 failed, 25 skipped, 28 total
+Snapshots:   0 total
+Time:        4.699 s, estimated 6 s
+Ran all test suites with tests matching "native basket editing".

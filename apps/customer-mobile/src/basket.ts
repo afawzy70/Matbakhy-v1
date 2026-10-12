@@ -1,7 +1,8 @@
 import * as SecureStore from "expo-secure-store";
 
 /**
- * The basket holds one kitchen and one slot (BR-018). Prices are never stored: the server quotes them. A pending
+ * The basket holds one kitchen and one slot (BR-018). The unit price and portion limit seen when a meal was added are
+ * kept only for the estimate and the quantity controls (CW05); they are never sent: the server quotes the price. A pending
  * placement keeps the client request id and idempotency key from before the request is sent, so a retry after the
  * app was killed or the response was lost can only find or repeat the same order (BR-023, TC-049). Both are kept in
  * the OS secure store and cleared on sign-out and account switch.
@@ -10,10 +11,18 @@ export interface BasketLine {
   mealId: string;
   title: string;
   quantity: number;
+  /** Integer piastres shown when added; estimate only. Absent in baskets saved before basket editing. */
+  unitPriceMinor?: number;
+  /** min(20, the slot's remaining portions when added); the server re-checks stock at quote and placement. */
+  maxQuantity?: number;
 }
+
+/** Order line maximum, matching the meal screen. Open question Q1: the active policy limit may be lower. */
+export const LINE_MAX = 20;
 
 export interface Basket {
   kitchenId: string;
+  kitchenName?: string;
   slotId: string;
   slotStartsAt: string;
   modes: string[];
@@ -79,4 +88,16 @@ export function decideAdd(current: Basket | null, pending: PendingPlacement | nu
   const lines = (current?.lines ?? []).filter((l) => l.mealId !== line.mealId);
   lines.push(line);
   return { kind: "added", basket: { ...target, lines } };
+}
+
+/** Sum of unit price × quantity in integer piastres; {@code null} when any line has no price snapshot. */
+export function estimateMinor(basket: Basket): number | null {
+  let total = 0;
+  for (const line of basket.lines) {
+    if (line.unitPriceMinor === undefined) {
+      return null;
+    }
+    total += line.unitPriceMinor * line.quantity;
+  }
+  return total;
 }

@@ -27,8 +27,12 @@ export function Title({ locale, children }: { locale: Locale; children: ReactNod
   );
 }
 
-export function Body({ locale, children, muted, strong }: { locale: Locale; children: ReactNode; muted?: boolean; strong?: boolean }) {
-  return <Text style={[styles.body, muted ? styles.muted : null, strong ? styles.strong : null, align(locale)]}>{children}</Text>;
+export function Body({ locale, children, muted, strong, testID }: { locale: Locale; children: ReactNode; muted?: boolean; strong?: boolean; testID?: string }) {
+  return (
+    <Text testID={testID} style={[styles.body, muted ? styles.muted : null, strong ? styles.strong : null, align(locale)]}>
+      {children}
+    </Text>
+  );
 }
 
 export function Card({ children, testID }: { children: ReactNode; testID?: string }) {

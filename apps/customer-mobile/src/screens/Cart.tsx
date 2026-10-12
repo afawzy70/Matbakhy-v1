@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../AppContext";
-import { loadBasket, loadPending, saveBasket, savePending, type Basket, type PendingPlacement } from "../basket";
+import { estimateMinor, LINE_MAX, loadBasket, loadPending, saveBasket, savePending, type Basket, type BasketLine, type PendingPlacement } from "../basket";
 import { errorText } from "../i18n";
 import { errorCode, formatMoney, formatTime, newKey, type Schemas } from "../mobileApi";
 import { place, recover, type PlacementOutcome } from "../placement";
@@ -83,13 +83,35 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
     <Screen locale={locale} testID="cart">
       <Title locale={locale}>{t.cart}</Title>
       <Card testID="cart-lines">
-        {basket.lines.map((l) => (
-          <Body key={l.mealId} locale={locale}>
-            {l.quantity} × {l.title}
+        {basket.kitchenName ? (
+          <Body locale={locale} strong>
+            {basket.kitchenName}
           </Body>
-        ))}
+        ) : null}
         <Body locale={locale} muted>
           {formatTime(basket.slotStartsAt, locale)}
+        </Body>
+        {basket.lines.map((l) => (
+          <BasketLineRow
+            key={l.mealId}
+            line={l}
+            locked={pending !== null}
+            onChange={(next) => {
+              const lines = basket.lines.flatMap((x) => (x.mealId !== l.mealId ? [x] : next ? [next] : []));
+              const updated = lines.length > 0 ? { ...basket, lines } : null;
+              setBasket(updated);
+              void saveBasket(updated);
+            }}
+          />
+        ))}
+        <Body locale={locale} strong>
+          {t.estimatedSubtotal}
+        </Body>
+        <Body locale={locale} strong testID="estimate">
+          {estimateText(basket, locale, t.estimateUnavailable)}
+        </Body>
+        <Body locale={locale} muted>
+          {t.estimateNote}
         </Body>
         <Button
           label={t.clearCart}
@@ -122,13 +144,39 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
           }}
         />
       ) : pending ? null : (
+        // Any edit changes the key, so a quote for the previous basket can never be accepted for the new one.
         <OrderForm
+          key={basket.lines.map((l) => `${l.mealId}:${l.quantity}`).join("|")}
           basket={basket}
           onPending={(p) => setPending(p)}
           onOutcome={settleOutcome}
         />
       )}
     </Screen>
+  );
+}
+
+function estimateText(basket: Basket, locale: "ar" | "en", unavailable: string): string {
+  const amount = estimateMinor(basket);
+  return amount === null ? unavailable : formatMoney(amount, locale);
+}
+
+/** One basket line: "quantity × title", quantity within 1..maxQuantity (at most 20), and removal. */
+function BasketLineRow({ line, locked, onChange }: { line: BasketLine; locked: boolean; onChange: (next: BasketLine | null) => void }) {
+  const { t, locale } = useApp();
+  const max = Math.min(LINE_MAX, line.maxQuantity ?? LINE_MAX);
+  return (
+    <View style={{ gap: 6 }}>
+      <Body locale={locale}>
+        {line.quantity} × {line.title}
+        {line.unitPriceMinor !== undefined ? ` · ${formatMoney(line.unitPriceMinor * line.quantity, locale)}` : ""}
+      </Body>
+      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
+        <Button testID={`qty-dec-${line.mealId}`} label="−" accessibilityLabel={t.decreaseOf(line.title)} variant="secondary" disabled={locked || line.quantity <= 1} onPress={() => onChange({ ...line, quantity: line.quantity - 1 })} />
+        <Button testID={`qty-inc-${line.mealId}`} label="+" accessibilityLabel={t.increaseOf(line.title)} variant="secondary" disabled={locked || line.quantity >= max} onPress={() => onChange({ ...line, quantity: line.quantity + 1 })} />
+        <Button testID={`remove-${line.mealId}`} label={t.remove} accessibilityLabel={t.removeLine(line.title)} variant="secondary" disabled={locked} onPress={() => onChange(null)} />
+      </View>
+    </View>
   );
 }
 

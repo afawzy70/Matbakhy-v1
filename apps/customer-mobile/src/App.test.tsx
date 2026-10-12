@@ -164,7 +164,7 @@ describe("native discovery and ordering (MB-032)", () => {
     await act(async () => replace?.onPress?.());
     expect(await screen.findByText(t.added)).toBeTruthy();
     expect(kitchenOf()).toBe("k2");
-    expect(JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}").lines).toEqual([{ mealId: "m2", title: "Dish m2", quantity: 1 }]);
+    expect(JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}").lines).toEqual([{ mealId: "m2", title: "Dish m2", quantity: 1, unitPriceMinor: 12000, maxQuantity: 5 }]);
     alert.mockRestore();
   });
 
@@ -239,6 +239,63 @@ describe("QA repair MBQA-002 on native: an exhausted selected slot cannot be add
     expect(await screen.findByText(t.added)).toBeTruthy();
     const basket = JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}");
     expect(basket.slotId).toBe("sx-stock");
-    expect(basket.lines).toEqual([{ mealId: "mx", title: "Dish mx", quantity: 3 }]);
+    expect(basket.lines).toEqual([{ mealId: "mx", title: "Dish mx", quantity: 3, unitPriceMinor: 12000, maxQuantity: 3 }]);
+  });
+});
+
+/** FG-001 (CW05) on native, part of MB-032: editable basket with an estimate kept separate from the server quote. */
+describe("native basket editing (CW05, MB-032; parity with QA finding FG-001)", () => {
+  const line = (mealId: string, title: string, quantity: number, unitPriceMinor: number, maxQuantity: number) => ({ mealId, title, quantity, unitPriceMinor, maxQuantity });
+  const seed = (lines: unknown[]) =>
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "slot-k1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines }));
+  const stored = () => JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "null") as { lines: { mealId: string; quantity: number }[] } | null;
+  const openCart = async (fetchImpl: typeof fetch, session = new Session()) => {
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+  };
+  const estimate = async () => (await screen.findByTestId("estimate")).props.children as string;
+
+  it("records the price, portion limit and kitchen when adding, for the estimate only", async () => {
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/meals/m1": () => json(200, meal("m1", "k1")) })} />);
+    await fireEvent.press(await screen.findByTestId("meal-m1"));
+    await fireEvent.press(await screen.findByTestId("slot-0", {}, { timeout: 5000 }));
+    await fireEvent.press(screen.getByTestId("add-to-cart"));
+    expect(await screen.findByText(t.added)).toBeTruthy();
+    const basket = JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}");
+    expect(basket.kitchenName).toBe("Kitchen k1");
+    expect(basket.lines).toEqual([{ mealId: "m1", title: "Dish m1", quantity: 1, unitPriceMinor: 12000, maxQuantity: 5 }]);
+  });
+
+  it("edits quantities and removes lines with integer arithmetic, then shows the empty state", async () => {
+    seed([line("m1", "Dish m1", 2, 12000, 5), line("m3", "Dish m3", 1, 9000, 5)]);
+    await openCart(api(discover));
+    expect(await screen.findByText("Kitchen k1")).toBeTruthy();
+    expect(await estimate()).toMatch(/330\.00/);
+    expect(screen.getByText(t.estimateNote)).toBeTruthy();
+    await fireEvent.press(screen.getByTestId("qty-inc-m3"));
+    expect(await estimate()).toMatch(/420\.00/);
+    await fireEvent.press(screen.getByTestId("qty-dec-m1"));
+    expect(await estimate()).toMatch(/300\.00/);
+    await waitFor(() => expect(stored()?.lines.map((l) => [l.mealId, l.quantity])).toEqual([["m1", 1], ["m3", 2]]));
+    await fireEvent.press(screen.getByTestId("remove-m1"));
+    expect(await estimate()).toMatch(/180\.00/);
+    await fireEvent.press(screen.getByTestId("remove-m3"));
+    expect(await screen.findByText(t.cartEmpty)).toBeTruthy();
+    await waitFor(() => expect(mockStore.has("matbakhy.basket.v1")).toBe(false));
+  });
+
+  it("keeps quantity between 1 and the line's limit, and locks the basket while an order is unconfirmed", async () => {
+    seed([line("m1", "Dish m1", 1, 12000, 2)]);
+    await openCart(api(discover));
+    expect(screen.getByTestId("qty-dec-m1").props.accessibilityState.disabled).toBe(true);
+    await fireEvent.press(await screen.findByTestId("qty-inc-m1"));
+    await waitFor(() => expect(screen.getByTestId("qty-inc-m1").props.accessibilityState.disabled).toBe(true));
+    expect(await estimate()).toMatch(/240\.00/);
+    await screen.unmount();
+
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify({ clientRequestId: "c1", idempotencyKey: "i1", quoteId: "q1", terms: "t1", cancellation: "c1" }));
+    await openCart(api(discover));
+    expect((await screen.findByTestId("qty-inc-m1")).props.accessibilityState.disabled).toBe(true);
+    expect(screen.getByTestId("remove-m1").props.accessibilityState.disabled).toBe(true);
   });
 });
