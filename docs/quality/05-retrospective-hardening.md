@@ -90,7 +90,7 @@ Earlier the same day, the native end-to-end work (MB-031/MB-032) found and fixed
 - The contract notes that the server bound "may be lower" but does not tell clients what it is.
 - The web and mobile apps allow up to 20, or the slot's remaining portions if fewer.
 
-So a customer can choose 11–20 portions and then receive a validation error at quote time. **Owner decision needed:** either expose the policy limit to clients (a contract change) or fix the policy limit at 20 (O04, commerce policy).
+So a customer can choose 11–20 portions and then receive a validation error at quote time. **Owner decision needed:** either expose the policy limit to clients (a contract change) or fix the policy limit at 20 (O04, commerce policy). Options, the recommendation and acceptance tests: `docs/product/q1-quantity-limit-decision.md`.
 
 ## Unfinished scope (outside this pass)
 
