@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-037",
+  "phase": "P06",
+  "source_commit": "e512ac4e88b0eb34cbd3e80b88f976228d85a8b1",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-12T05:05:39.495536+00:00",
+  "finished_at": "2026-10-12T05:18:00.727075+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-037/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-037/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-037/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-037/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-037/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-037/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-058",
+      "status": "PASS",
+      "observed": "Real PostgreSQL: outbox and delivery workers lease work with FOR UPDATE SKIP LOCKED; two workers and duplicate events give one inbox record and one send (NotificationIntegrationTest); a live lease of a dead worker is respected and an expired one reclaimed, also across an application restart (RestartRecoveryIntegrationTest: application A places three orders and stops after its worker claims their events; application B delivers exactly one notification per recipient/order/type after lease expiry, a second pass changes nothing; a mutation ignoring live leases fails); a crash between provider send and recording leaves the delivery pending, which is resent once with the same delivery id and recorded once; two LedgerPostingJob instances racing over five completions post exactly one balanced group each; twenty customers racing for the last portion produce exactly one order; accept/cancel/expire racing produce one legal transition and at most one stock release; an injected failure after the stock update rolls back and a retry completes once."
+    },
+    {
+      "id": "TC-137",
+      "status": "PASS",
+      "observed": "No oversell (last-portion race), no duplicate order (idempotency and request-id retries), no ledger imbalance (racing posting instances, balanced per group), recovery after restart (two application instances on the same real PostgreSQL), database outage (container paused: requests fail within the socket timeout as retryable 503 DEPENDENCY_UNAVAILABLE without internal detail, and the same running application serves reads and writes after unpause; the first run hung, which led to bounded connect/pool/socket timeouts), server-clock boundaries (acceptance allowed 1 ms before accept_by and refused exactly at it, expiry at that instant; mutation fails the test)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-MB-037/BACKEND-VERIFY.log",
+    "verification/runs/20261012-MB-037/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261012-MB-037/LOCAL-STACK.log",
+    "verification/runs/20261012-MB-037/BROWSER-E2E.log",
+    "verification/runs/20261012-MB-037/SECRET-SCAN.log",
+    "verification/runs/20261012-MB-037/GUARDRAIL-TESTS.log",
+    "verification/runs/20261012-MB-037/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Real defect found and fixed: no JDBC socket timeout, so requests hung indefinitely when the database froze.",
+      "Database unavailability now maps to a retryable 503 DEPENDENCY_UNAVAILABLE.",
+      "Residuals: external sends are at-least-once (stable delivery id for provider dedupe); an exception while recording one delivery ends that batch, delaying the remaining deliveries until their lease expires; load-level concurrency and multi-node deployment are P08/P09 capacity and staging work."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

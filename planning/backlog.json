@@ -1345,7 +1345,7 @@
       "id": "MB-037",
       "phase": "P08",
       "title": "Prove concurrency retries and recovery",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-019",
@@ -1375,9 +1375,11 @@
         "TC-058",
         "TC-137"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261012-MB-037/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Evidence at e512ac4: racing posting instances, exact deadline boundary, database outage (found and fixed missing socket timeout; 503 DEPENDENCY_UNAVAILABLE), restart recovery across two application instances, crash between provider send and recording. Residuals: at-least-once external sends; batch ends on a recording error (delay, not loss); load/multi-node in MB-038/staging."
     },
     {
       "id": "MB-038",

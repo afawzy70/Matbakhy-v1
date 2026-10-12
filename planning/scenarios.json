@@ -1061,8 +1061,10 @@
       "given": "Workers/API crash at selected boundaries",
       "when": "They restart and replay pending work",
       "then": "No duplicate orders/commission or permanently lost pending event",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-037/evidence.json"
+      ]
     },
     {
       "id": "TC-059",
@@ -1840,8 +1842,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Race stock/expire/cancel; kill workers around commit/send; two instances; dedup finance; database outage recovery; server clock boundary tests",
       "then": "No oversell/duplicate order/ledger imbalance; recovery after restart demonstrated with real PostgreSQL",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-037/evidence.json"
+      ]
     },
     {
       "id": "TC-138",
