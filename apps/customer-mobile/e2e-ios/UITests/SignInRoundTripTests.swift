@@ -55,6 +55,15 @@ final class SignInRoundTripTests: XCTestCase {
         secret.typeText(password + "\n")
     }
 
+    /// Waits for an element; on timeout prints what the app shows (marker for the CI script) and fails.
+    private func expect(_ element: XCUIElement, _ message: String, timeout: TimeInterval = 90) {
+        if element.waitForExistence(timeout: timeout) { return }
+        print("MB031-HIERARCHY-BEGIN (\(message))")
+        print(app.debugDescription)
+        print("MB031-HIERARCHY-END")
+        XCTFail(message)
+    }
+
     private func relaunch() {
         app.terminate()
         app.launch()
@@ -64,19 +73,19 @@ final class SignInRoundTripTests: XCTestCase {
         app.launch()
 
         // 1
-        XCTAssertTrue(button("Sign in").waitForExistence(timeout: 60))
+        expect(button("Sign in"), "sign-in button missing", timeout: 60)
         button("Sign in").tap()
         login("customer-a")
-        XCTAssertTrue(label(containing: "SyntheticA").waitForExistence(timeout: 90), "customer-a not signed in")
+        expect(label(containing: "SyntheticA"), "customer-a not signed in", timeout: 90)
         shot("signed-in-a")
         relaunch()
-        XCTAssertTrue(label(containing: "SyntheticA").waitForExistence(timeout: 60), "session not restored after restart")
+        expect(label(containing: "SyntheticA"), "session not restored after restart", timeout: 60)
 
         // 2
         button("Sign out").tap()
-        XCTAssertTrue(button("Sign in").waitForExistence(timeout: 60), "not signed out")
+        expect(button("Sign in"), "not signed out", timeout: 60)
         relaunch()
-        XCTAssertTrue(button("Sign in").waitForExistence(timeout: 60), "not signed out after restart")
+        expect(button("Sign in"), "not signed out after restart", timeout: 60)
         XCTAssertFalse(label(containing: "SyntheticA").exists, "customer-a still visible after sign-out")
         shot("signed-out-after-restart")
 
@@ -84,7 +93,7 @@ final class SignInRoundTripTests: XCTestCase {
         button("Sign in").tap()
         XCTAssertTrue(loginFormAppears(), "login form not shown again after sign-out")
         login("customer-b")
-        XCTAssertTrue(label(containing: "SyntheticB").waitForExistence(timeout: 90), "customer-b not signed in")
+        expect(label(containing: "SyntheticB"), "customer-b not signed in", timeout: 90)
         XCTAssertFalse(label(containing: "SyntheticA").exists, "customer-a visible to customer-b")
         shot("signed-in-b")
 
@@ -95,10 +104,10 @@ final class SignInRoundTripTests: XCTestCase {
         let cancel = [app, authUI].map { $0.buttons["Cancel"] }.first { $0.exists }
         XCTAssertNotNil(cancel, "no Cancel button on the sign-in sheet")
         cancel?.tap()
-        XCTAssertTrue(button("Sign in").waitForExistence(timeout: 60), "not signed out after cancelled switch")
+        expect(button("Sign in"), "not signed out after cancelled switch", timeout: 60)
         XCTAssertFalse(label(containing: "SyntheticB").exists, "customer-b still visible after cancelled switch")
         relaunch()
-        XCTAssertTrue(button("Sign in").waitForExistence(timeout: 60))
+        expect(button("Sign in"), "sign-in button missing", timeout: 60)
         XCTAssertFalse(label(containing: "SyntheticB").exists)
         shot("cancelled-switch")
     }

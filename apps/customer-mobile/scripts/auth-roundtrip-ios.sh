@@ -22,8 +22,10 @@ xcodebuild test -project MB031NativeChecks.xcodeproj -scheme SignInUITests -dest
 status=${PIPESTATUS[0]}
 set -e
 if [ "$status" -ne 0 ]; then
-  echo "FAIL: iOS sign-in round trip (xcodebuild exit $status)"; tail -60 "$RUNNER_TEMP/mb031-ios-test.log"
-  echo "--- identity log"; tail -30 "$RUNNER_TEMP/keycloak.log"; echo "--- api log"; tail -30 "$RUNNER_TEMP/api.log"
+  echo "FAIL: iOS sign-in round trip (xcodebuild exit $status)"
+  sed -n '/MB031-HIERARCHY-BEGIN/,/MB031-HIERARCHY-END/p' "$RUNNER_TEMP/mb031-ios-test.log" | head -120
+  grep -E "error:|XCTAssert" "$RUNNER_TEMP/mb031-ios-test.log" | head -20
+  echo "--- identity log"; tail -30 "$RUNNER_TEMP/keycloak.log"; echo "--- api log"; grep -vE "DbMigrate|^\s*$" "$RUNNER_TEMP/api.log" | tail -40
   exit 1
 fi
 echo "PASS: iOS system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data"

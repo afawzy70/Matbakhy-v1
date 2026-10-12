@@ -43,6 +43,7 @@ curl -fsS -o /dev/null http://localhost:8180/realms/matbakhy/.well-known/openid-
 APP_ENV=LOCAL SPRING_PROFILES_ACTIVE=dev DATABASE_URL=jdbc:postgresql://localhost:5432/matbakhy DATABASE_USERNAME=matbakhy \
   OIDC_ISSUER=http://localhost:8180/realms/matbakhy OIDC_WEB_CLIENT_SECRET="$WEB_SECRET" WEB_POST_LOGIN_REDIRECT=http://localhost:5173/ \
   OBJECT_STORAGE_ENDPOINT=http://localhost:9090 OBJECT_STORAGE_CLIENT_ENDPOINT=http://localhost:9090 \
+  LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY_OAUTH2_SERVER_RESOURCE=DEBUG \
   nohup java -jar "$JAR" > "$TMP/api.log" 2>&1 &
 for _ in $(seq 1 90); do curl -fs http://localhost:8080/actuator/health | grep -q '"status":"UP"' && break; sleep 2; done
 curl -fs http://localhost:8080/actuator/health | grep -q '"status":"UP"' || { tail -60 "$TMP/api.log"; exit 1; }
