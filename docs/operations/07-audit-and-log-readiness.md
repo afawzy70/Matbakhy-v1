@@ -19,6 +19,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 | Orders (exceptional) | exception cancel; handover override (recent MFA) | `order.exception_cancel`, `order.handover_override` | staff / order | reason code and case; reason ≥ 10 plus evidence | OrderLifecycleIntegrationTest |
 | Configuration | policy, zones, feature flags | `config.change` | staff / config key | reason required; approval reference for a real policy | ConfigurationIntegrationTest |
 | Finance | refunds; settlements; cash verification; own report refused | `refund.*`, `settlement.*`, `cash.verify` | staff / refund, batch, report | reason or evidence depending on action | FinanceOperationsIntegrationTest, CashAndLedgerIntegrationTest |
+| Audit | audit trail read | `audit.read` | staff / looked-up object or actor | ALLOWED, filter in details | StaffAccessIntegrationTest |
 | Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest |
 | Orders (protected data) | staff view disclosing customer contact | `access.order_contact` | staff / order | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support | staff message, case update | `case.message`, `case.update` | staff / case | reason for some transitions | SupportIntegrationTest |
@@ -29,7 +30,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 Not every read should be audited. These are the ones that expose protected data or change sensitive state:
 
 1. **Staff view of an order with customer contact** (`GET /api/v1/ops/orders/{id}` returns name, phone and address): **closed in this session.** Each view that discloses contact now writes `access.order_contact` (actor, order, request ID; no contact data). Test first: `RED-staff-order-contact-audit.log`; assertion in SupportIntegrationTest.
-2. **Audit log reads** (`GET /api/v1/ops/audit`): not audited. Proposal: `audit.read` with the filter used.
+2. **Audit log reads** (`GET /api/v1/ops/audit`): **closed in this session.** Each read writes `audit.read`: the reader, the object or actor looked up (in `object_id`), and the other filters in details. It is written after the query, so a page never lists its own read. Test first: `RED-audit-read-audited.log`; assertion in StaffAccessIntegrationTest.
 3. **Staff case view** (`GET /api/v1/ops/cases/{id}`): not audited. Proposal: as item 1.
 4. **Account deletion request** (customer self-service): only the later erasure job is audited, with no actor. Proposal: record the request with the customer as actor.
 5. **Cash report submission by a cook**: business record only. Probably sufficient (it is business history); listed for the owner's view.
@@ -62,6 +63,8 @@ Not every read should be audited. These are the ones that expose protected data 
 - **Scheduled jobs** without a request get no invented request ID.
 
 ## 4. Data protection in logs
+
+**Audit details redaction limitation (found while testing):** the phone pattern in `Redaction` also matches UUIDs (digit groups joined by hyphens). Identifiers inside audit `details` are therefore masked. This errs on the safe side but loses identifiers, so identifiers belong in `object_id`, which is not redacted. Proposal: exempt values that are well-formed UUIDs from the phone pattern, with a test. Not changed today.
 
 Existing redaction evidence (TC-056, LogRedactionIntegrationTest) with synthetic canaries: name, e-mail, phone, street, recipient, push token, bearer token, one-time and handover codes are absent from captured logs across OTP, address, order, handover, provider failure and an unexpected error. Request and response bodies are not logged. Limitation: this covers the flows exercised, not every possible log statement.
 

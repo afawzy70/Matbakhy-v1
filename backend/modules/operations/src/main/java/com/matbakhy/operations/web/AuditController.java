@@ -1,13 +1,19 @@
 package com.matbakhy.operations.web;
 
+import com.matbakhy.operations.api.AuditLog;
+import com.matbakhy.shared.web.RequestContext;
+import jakarta.servlet.http.HttpServletRequest;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,14 +30,17 @@ class AuditController {
     }
 
     private final JdbcTemplate jdbc;
+    private final AuditLog audit;
 
-    AuditController(JdbcTemplate jdbc) {
+    AuditController(JdbcTemplate jdbc, AuditLog audit) {
         this.jdbc = jdbc;
+        this.audit = audit;
     }
 
     @GetMapping("/api/v1/ops/audit")
     @PreAuthorize("hasAuthority('PERM_audit.read')")
-    AuditPage audit(@RequestParam(required = false) UUID actorId, @RequestParam(required = false) String objectType,
+    AuditPage audit(@AuthenticationPrincipal(expression = "id()") UUID reader, HttpServletRequest request,
+                    @RequestParam(required = false) UUID actorId, @RequestParam(required = false) String objectType,
                     @RequestParam(required = false) String objectId, @RequestParam(required = false) String action,
                     @RequestParam(required = false) String cursor, @RequestParam(defaultValue = "20") int limit) {
         int size = Math.max(1, Math.min(limit, 100));
@@ -58,6 +67,17 @@ class AuditController {
         List<AuditEvent> page = more ? rows.subList(0, size) : rows;
         String next = more ? Base64.getUrlEncoder().withoutPadding().encodeToString(
                 (page.getLast().occurredAt() + "|" + page.getLast().id()).getBytes()) : null;
+        // MB-039: reading the audit trail is itself audited, written after the query so a page never lists its own read. The
+        // object or actor looked up goes in object_id: identifiers inside details would be masked by the phone pattern.
+        Map<String, Object> filter = new LinkedHashMap<>();
+        if (objectType != null) { filter.put("objectType", objectType); }
+        if (action != null) { filter.put("action", action); }
+        filter.put("byActor", actorId != null);
+        filter.put("page", cursor == null ? "first" : "next");
+        String target = objectId != null ? objectId : actorId != null ? actorId.toString() : null;
+        Object requestId = request.getAttribute(RequestContext.REQUEST_ID_ATTRIBUTE);
+        audit.record(new AuditLog.Entry(reader, "audit.read", "audit.read", "audit_event", target, AuditLog.Outcome.ALLOWED, "audit trail read",
+                requestId == null ? null : requestId.toString(), filter));
         return new AuditPage(page, next, more);
     }
 

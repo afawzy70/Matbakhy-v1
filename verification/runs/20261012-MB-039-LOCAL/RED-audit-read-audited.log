@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.identity.StaffAccessIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 16.30 s <<< FAILURE! -- in com.matbakhy.app.identity.StaffAccessIntegrationTest
+com.matbakhy.app.identity.StaffAccessIntegrationTest.audit_is_append_only_and_redacted -- Time elapsed: 0.895 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+Expecting actual:
+  []
+to contain exactly (and in same order):
+  ["880693d6-2180-4347-a06d-c6410fee8a4f|ALLOWED|53101d8a-1235-4ea8-acf6-1fdbaeb4107b"]
+but could not find the following elements:
+  ["880693d6-2180-4347-a06d-c6410fee8a4f|ALLOWED|53101d8a-1235-4ea8-acf6-1fdbaeb4107b"]
+
+	at com.matbakhy.app.identity.StaffAccessIntegrationTest.audit_is_append_only_and_redacted(StaffAccessIntegrationTest.java:223)
+

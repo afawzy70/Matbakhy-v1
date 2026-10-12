@@ -217,6 +217,10 @@ class StaffAccessIntegrationTest {
         MockHttpServletResponse page = call(get("/api/v1/ops/audit?objectId=" + staff), as(adminSubject));
         assertThat(page.getStatus()).isEqualTo(200);
         assertThat(page.getContentAsString()).contains("staff.grant").doesNotContain("1012345678");
+        // MB-039: reading the audit trail is itself audited, with the filter used and without including itself in the page.
+        assertThat(page.getContentAsString()).doesNotContain("\"action\":\"audit.read\"");
+        assertThat(jdbc.queryForList("SELECT actor_id::text || '|' || outcome || '|' || object_id FROM audit_event WHERE action = 'audit.read' AND object_id = ?",
+                String.class, staff.toString())).containsExactly(id(adminSubject) + "|ALLOWED|" + staff);
     }
 
     @Test
