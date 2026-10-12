@@ -2,6 +2,35 @@
 
 The implementation agent wrote this repair record; it is **self-review**, not independent verification. The findings below are **FIXED_PENDING_INDEPENDENT_RETEST**: Codex has not retested them. Nothing is closed by independent QA, and no release gate is approved.
 
+## Recommended retest revision (updated 2026-10-12, 19:20 Asia/Kuwait)
+
+**Retest `cdc592a2492a691de714a3d0bf23b31f25599480`** (full SHA). It supersedes the earlier candidate `c35ad2d`.
+- **CI:** Product CI run 243 (PR) succeeded at this commit.
+- **Local six-check evidence:** recorded in `verification/runs/20261012-MB-032/evidence.json` once it completes (see `docs/status/latest.md`).
+- **Not independently verified:** no Codex result exists yet for this commit or for `c35ad2d`.
+
+**Fixes included in `cdc592a`:**
+
+| Finding | Original reproduction (QA report on `eb1a671`) | Expected | Fix commits |
+|---|---|---|---|
+| MBQA-002 | Meal with two open slots (3 portions each); exhaust S1 (0 left) while S2 keeps 3; select S1; Add to cart | No basket write for the exhausted slot; S2 adds at most 3; a fully sold-out meal is unpurchasable | `e2c6ebc` (web and native) |
+| MBQA-001 | Fresh browser, Arabic browse with bilingual fixtures; click English; inspect cards and the meal request | Requests carry the chosen language, and titles, descriptions and portions switch, in both directions; a stale answer is never shown | `e2c6ebc` (customer web); `a817164` (operations web: kitchen and staff screens had the same root cause) |
+| FG-001 | Add A1/S1 × 2 and open the cart | Per-line quantity and removal, an estimated subtotal separate from the quote, kitchen shown; the four replacement paths keep or replace with exact estimates (240.50 / 80.25 / 240.50 / 95.50) | `f600577` (web); `b68eaaa` (native) |
+| Q1 (related) | Quantity 11–20 selectable while the policy allows 10 | Quantity capped at min(server-published limit, slot portions); a basket line above a lowered limit is explained and gets no quote until reduced | `4eaee3a` (API-001), `cdc592a` (web and native clients) |
+
+**What changed for the retest:**
+- IQA-09's quantity-cap expectation now follows the server's published limit. With the synthetic policy (10), quantity 99 clamps to min(10, slot portions), no longer to min(20, portions).
+- The fixtures need the active commerce policy (the dev profile provides version 1, limit 10).
+
+**Environment and data:**
+- Unchanged from [06-codex-qa-handoff.md](06-codex-qa-handoff.md): isolated compose project, synthetic users from the realm, dev profile policy and zones, your own synthetic catalogue SQL.
+- New endpoint the clients call: `GET /api/v1/configuration/public`.
+
+**Correction to flag in the external QA report (not edited by the implementation agent):**
+- The QA report's "Comparison after independent execution" used the obsolete, authentication-blocked Kane report.
+- The successful Kane execution report is `verification/tool-pilots/kane-cli/2026-10-12-resume-execution.md` at `d0ba642`; see "Reporting correction" below.
+- The QA branch is Codex's to update.
+
 ## Source
 
 | Item | Value |
