@@ -140,14 +140,22 @@ python3 "$HERE/e2e-native/slow_proxy.py" 8081 8080 8 > "$OUT/proxy.log" 2>&1 &
 PROXY=$!
 trap 'kill $PROXY 2>/dev/null || true' EXIT
 sleep 1
+# All API traffic goes through the slow proxy from a fresh app process: the app keeps its connections open, so a
+# redirect made just before "Place order" did not apply to the order request (native runs 27-29: the response arrived,
+# the app confirmed the order and cleared the basket before the kill, as it should).
+adb reverse tcp:8080 tcp:8081 >/dev/null
+launch
+tap 'resource-id="open-cart"' 90
+wait_for 'resource-id="order-form"|resource-id="mode-PICKUP"' 90 >/dev/null || fail "checkout not shown after relaunch"
 tap 'resource-id="mode-PICKUP"'
 tap_scrolled 'resource-id="get-quote"'
 wait_scrolled 'text="Total: [^"]*"' 60 || fail "no quote"
 SHOWN_QUOTE=$(grep -o 'text="Total: [^"]*"' "$UI" | head -1)
 tap_scrolled 'resource-id="accept-terms"'
-adb reverse tcp:8080 tcp:8081 >/dev/null
 tap_scrolled 'resource-id="place-order"'
 sleep 3
+# Precondition of TC-049: the answer must still be outstanding when the app is killed.
+absent 'text="MB-[0-9]+"'
 adb shell am force-stop "$PKG"
 echo "app killed while the response was held back"
 sleep 8
