@@ -29,6 +29,17 @@
       "first_seen": "2026-10-12T04:35:00Z",
       "missing": "No screen reader (NVDA/JAWS/VoiceOver/TalkBack/Orca) is available in the implementation environment, so TC-047's screen-reader requirement cannot be performed; axe scans are not a substitute",
       "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
+    },
+    {
+      "id": "BLK-004",
+      "affects": [
+        "MB-033 physical-device verification (Android and iOS)",
+        "MB-034/MB-035 release builds"
+      ],
+      "owner": "Ahmed Fawzy (physical test devices or a device-farm decision)",
+      "first_seen": "2026-10-12T18:10:00Z",
+      "missing": "No physical Android or iOS device is available to the implementation agent; native evidence comes from GitHub-hosted emulator and simulator runs only",
+      "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
   "next_action": "MB-033 (native lifecycle, push and accessibility) is the next eligible story. Owner-queued audit/log readiness (docs/operations/05-observability-readiness.md) at the next MB-039 checkpoint. Web preview prepared (deploy/web-preview, docs/operations/06-web-preview.md) and rehearsed locally; deploying needs owner inputs (hosting/budget, domain/DNS, tester IPs, GHCR publication) and external testers need AUD-01/LOG-01/OPS-01..03. Codex retest candidate cdc592a (FIXED_PENDING_INDEPENDENT_RETEST). Open: RQ-001/002/003, Q1 value (O04), O05/O06/O07; MB-029 BLOCKED (BLK-003); MB-040 not started.",

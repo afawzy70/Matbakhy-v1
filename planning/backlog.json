@@ -1218,7 +1218,7 @@
       "id": "MB-033",
       "phase": "P07",
       "title": "Implement native lifecycle push and accessibility",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-032",
@@ -1247,7 +1247,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004)."
     },
     {
       "id": "MB-034",
