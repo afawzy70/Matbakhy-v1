@@ -5,7 +5,7 @@ import XCTest
 ///   testA  basket replacement asks first; keep leaves the basket, replace replaces it (TC-148); sign in; place the order
 ///          and terminate the app while the response is held back by a slow proxy (TC-049).
 ///   testB  (API unreachable) reopened, the cart says the order is unconfirmed and that the app is offline.
-///   testC  (API back) "Check and retry" shows the one order with the server's total (TC-049, TC-132).
+///   testC  (API back) reopening shows the one order with the server's total, by itself or after "Check and retry" (TC-049, TC-132).
 final class OrderingTests: XCTestCase {
     let app = XCUIApplication(bundleIdentifier: "com.matbakhy.customer.dev")
     let authUI = XCUIApplication(bundleIdentifier: "com.apple.SafariViewService")
@@ -141,9 +141,13 @@ final class OrderingTests: XCTestCase {
         app.launch()
         expect(element("open-cart"), "cart shortcut missing")
         element("open-cart").tap()
-        expect(element("retry-order"), "retry missing")
-        element("retry-order").tap()
+        // Relaunched online and signed in, the cart asks the server at once with the stored request id and shows the
+        // order (native run 24); "Check and retry" is needed only when that first check cannot finish.
         let number = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "MB-")).firstMatch
+        if !number.waitForExistence(timeout: 30) {
+            expect(element("retry-order"), "neither the recovered order nor a retry was shown")
+            element("retry-order").tap()
+        }
         expect(number, "recovered order not shown")
         print("MB032-ORDER-NUMBER \(number.label)")
         let total = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Total: ")).firstMatch
