@@ -86,6 +86,16 @@ public class ApiExceptionHandler {
         return respond(ErrorCode.UNAUTHENTICATED, List.of(), request);
     }
 
+    /**
+     * The database (or another data resource) is unreachable: a retryable 503 without internal detail, so clients back
+     * off and retry and operators see a dependency outage rather than a code defect (MB-037).
+     */
+    @ExceptionHandler(org.springframework.dao.DataAccessResourceFailureException.class)
+    ResponseEntity<ApiError> dependencyUnavailable(org.springframework.dao.DataAccessResourceFailureException e, HttpServletRequest request) {
+        log.warn("Data resource unavailable ({})", e.getClass().getSimpleName());
+        return respond(ErrorCode.DEPENDENCY_UNAVAILABLE, List.of(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ApiError> unexpected(Exception e, HttpServletRequest request) {
         log.error("Unhandled failure", e);

@@ -7,6 +7,15 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/matbakhy}
     username: ${DATABASE_USERNAME:matbakhy}
     password: ${DATABASE_PASSWORD:}
+    # Bounded waits (MB-037): without a socket timeout a request on a pooled connection blocks forever when the
+    # database stops answering. Long one-off operations (e.g. a large migration) can raise the socket timeout.
+    hikari:
+      connection-timeout: ${DATABASE_CONNECTION_TIMEOUT_MS:5000}
+      validation-timeout: 2000
+      data-source-properties:
+        connectTimeout: 5
+        socketTimeout: ${DATABASE_SOCKET_TIMEOUT_SECONDS:30}
+        tcpKeepAlive: true
   flyway:
     locations: classpath:db/migration
   mvc:
