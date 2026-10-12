@@ -85,13 +85,23 @@ final class SignInRoundTripTests: XCTestCase {
         XCTFail(message)
     }
 
+    /// The app opens on Discover (MB-032); sign-in, greeting, switch and sign-out live on the Account tab.
+    private func openAccount() {
+        let byId = app.buttons["tab-account"]
+        let tab = byId.waitForExistence(timeout: 30) ? byId : app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Account")).firstMatch
+        expect(tab, "Account tab missing", timeout: 30)
+        tab.tap()
+    }
+
     private func relaunch() {
         app.terminate()
         app.launch()
+        openAccount()
     }
 
     func testSignInSignOutAndAccountSwitchLeaveNoPreviousUserSession() {
         app.launch()
+        openAccount()
 
         // 1
         expect(button("Sign in"), "sign-in button missing", timeout: 60)

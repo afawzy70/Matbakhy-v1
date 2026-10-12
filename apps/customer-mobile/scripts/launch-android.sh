@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # MB-031 native launch evidence (CI only): boots an Android emulator, installs the release-variant APK (JS bundle
 # embedded, debug-keystore signed, not a store build), launches it and checks that the app process is alive, that
-# the signed-out home with the sign-in action is on screen and that no fatal exception was logged.
+# the Discover tab is on screen and that no fatal exception was logged.
 set -euo pipefail
 APK="${1:?apk path}"
 PKG=com.matbakhy.customer.dev
@@ -45,5 +45,5 @@ if adb logcat -d | grep -E "FATAL EXCEPTION|ReactNativeJS.*(Error|Exception)" ; 
   echo "FAIL: fatal error after launch"; exit 1
 fi
 [ -n "$PID" ] || { echo "FAIL: app process not running"; exit 1; }
-grep -qE 'text="(Sign in|تسجيل الدخول)"' "$RUNNER_TEMP/ui.xml" || { echo "FAIL: sign-in action not visible"; exit 1; }
-echo "PASS: Android release-variant build launched; signed-out home with sign-in visible; no fatal errors"
+grep -qE '(text|content-desc)="(Discover|اكتشف)' "$RUNNER_TEMP/ui.xml" || { echo "FAIL: Discover tab not visible"; exit 1; }
+echo "PASS: Android release-variant build launched; Discover tab visible; no fatal errors"

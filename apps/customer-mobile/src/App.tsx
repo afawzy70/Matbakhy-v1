@@ -1,26 +1,34 @@
-import { brand, direction, tokens, type Locale } from "@matbakhy/design-tokens";
+import { type Locale } from "@matbakhy/design-tokens";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { DefaultTheme, NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { getLocales } from "expo-localization";
 import { StatusBar } from "expo-status-bar";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
-import { apiGet, SignedOut } from "./api";
-import { signIn as systemSignIn, signOut as systemSignOut, SignInCancelled } from "./auth";
+import { useMemo, useState } from "react";
+import { Text, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { AppProvider, useApp } from "./AppContext";
+import { signIn as systemSignIn, signOut as systemSignOut } from "./auth";
 import { ConfigError, loadConfig, type AppConfig } from "./config";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { strings } from "./i18n";
+import { AccountScreen } from "./screens/Account";
+import { CartScreen } from "./screens/Cart";
+import { DiscoverScreen } from "./screens/Discover";
+import { FavoritesScreen } from "./screens/Favorites";
+import { MealScreen } from "./screens/Meal";
+import type { RootParams, TabParams } from "./screens/navigation";
+import { NotificationsScreen } from "./screens/Notifications";
+import { OrderScreen, OrdersScreen } from "./screens/Orders";
+import { SupportScreen } from "./screens/Support";
 import { Session } from "./session";
+import { colors } from "./ui";
 
 /**
- * MB-031 native shell: environment configuration, Arabic (default) / English with direction, sign-in through the
- * system browser with PKCE, tokens in the OS secure store, account switch and logout that clear private data, and a
- * crash boundary. Product screens arrive in MB-032.
+ * Customer app (MB-031 shell, MB-032 discovery and ordering). Tabs: Discover, Favorites, Orders, Account; stack
+ * screens for meal, cart/checkout, order, notifications and support keep the platform's back behaviour (Android back,
+ * iOS swipe). Arabic is the default when the device is not English.
  */
-const colors = tokens.color.light;
-
-interface Profile {
-  displayName: string | null;
-}
-
 export interface AppDeps {
   config?: AppConfig;
   session?: Session;
@@ -28,8 +36,6 @@ export interface AppDeps {
   signOut?: typeof systemSignOut;
   fetchImpl?: typeof fetch;
 }
-
-type Phase = { kind: "loading" } | { kind: "signedOut"; message?: string } | { kind: "signedIn"; profile: Profile | null } | { kind: "configError" };
 
 function initialLocale(): Locale {
   try {
@@ -39,19 +45,45 @@ function initialLocale(): Locale {
   }
 }
 
-export function App(deps: AppDeps = {}) {
-  const [locale, setLocale] = useState<Locale>(initialLocale);
-  const t = strings[locale];
+const Stack = createNativeStackNavigator<RootParams>();
+const Tab = createBottomTabNavigator<TabParams>();
+const c = DefaultTheme.colors;
+const theme = {
+  ...DefaultTheme,
+  colors: { ...c, primary: colors["primary"] ?? c.primary, background: colors["background"] ?? c.background, card: colors["surface"] ?? c.card, text: colors["foreground"] ?? c.text, border: colors["border"] ?? c.border },
+};
+
+function Tabs() {
+  const { t } = useApp();
   return (
-    <ErrorBoundary t={t}>
-      <Shell deps={deps} locale={locale} onToggleLocale={() => setLocale(locale === "ar" ? "en" : "ar")} />
-    </ErrorBoundary>
+    <Tab.Navigator screenOptions={{ tabBarActiveTintColor: colors["primary"], tabBarIcon: () => null, tabBarIconStyle: { display: "none" } }}>
+      <Tab.Screen name="Discover" component={DiscoverScreen} options={{ title: t.tabs.discover, tabBarButtonTestID: "tab-discover" }} />
+      <Tab.Screen name="Favorites" component={FavoritesScreen} options={{ title: t.tabs.favorites, tabBarButtonTestID: "tab-favorites" }} />
+      <Tab.Screen name="Orders" component={OrdersScreen} options={{ title: t.tabs.orders, tabBarButtonTestID: "tab-orders" }} />
+      <Tab.Screen name="Account" component={AccountScreen} options={{ title: t.tabs.account, tabBarButtonTestID: "tab-account" }} />
+    </Tab.Navigator>
   );
 }
 
-function Shell({ deps, locale, onToggleLocale }: { deps: AppDeps; locale: Locale; onToggleLocale: () => void }) {
-  const t = strings[locale];
-  const rtl = direction(locale) === "rtl";
+function Navigation() {
+  const { t } = useApp();
+  return (
+    <NavigationContainer theme={theme}>
+      <Stack.Navigator screenOptions={{ headerBackTitle: t.back }}>
+        <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+        <Stack.Screen name="Meal" component={MealScreen} options={{ title: "" }} />
+        <Stack.Screen name="Cart" component={CartScreen} options={{ title: t.cart }} />
+        <Stack.Screen name="Order" component={OrderScreen} options={{ title: t.tabs.orders }} />
+        <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: t.notifications }} />
+        <Stack.Screen name="Support" component={SupportScreen} options={{ title: t.support }} />
+      </Stack.Navigator>
+      <StatusBar style="auto" />
+    </NavigationContainer>
+  );
+}
+
+export function App(deps: AppDeps = {}) {
+  const [locale] = useState<Locale>(initialLocale);
   const config = useMemo(() => {
     try {
       return deps.config ?? loadConfig();
@@ -63,142 +95,20 @@ function Shell({ deps, locale, onToggleLocale }: { deps: AppDeps; locale: Locale
     }
   }, [deps.config]);
   const session = useMemo(() => deps.session ?? new Session(), [deps.session]);
-  const doSignIn = deps.signIn ?? systemSignIn;
-  const doSignOut = deps.signOut ?? systemSignOut;
-  const [phase, setPhase] = useState<Phase>(config ? { kind: "loading" } : { kind: "configError" });
-  const [busy, setBusy] = useState(false);
-
-  const loadProfile = useCallback(async () => {
-    if (!config) {
-      return;
-    }
-    try {
-      const cached = session.cache<Profile>("me");
-      const profile = cached ?? (await apiGet<Profile>(config, session, "/api/v1/me", locale, deps.fetchImpl));
-      session.cache("me", profile);
-      setPhase({ kind: "signedIn", profile });
-    } catch (e) {
-      if (e instanceof SignedOut) {
-        setPhase({ kind: "signedOut", message: t.sessionEnded });
-      } else {
-        setPhase({ kind: "signedIn", profile: null });
-      }
-    }
-  }, [config, session, locale, deps.fetchImpl, t.sessionEnded]);
-
-  // The restore effect runs once per session object and calls the latest loadProfile through a ref.
-  const loadProfileRef = useRef(loadProfile);
-  useEffect(() => {
-    loadProfileRef.current = loadProfile;
-  });
-  useEffect(() => {
-    if (!config) {
-      return;
-    }
-    let active = true;
-    session
-      .restore()
-      .then((restored) => {
-        if (!active) {
-          return;
-        }
-        if (restored) {
-          void loadProfileRef.current();
-        } else {
-          setPhase({ kind: "signedOut" });
-        }
-      })
-      .catch(() => active && setPhase({ kind: "signedOut" }));
-    return () => {
-      active = false;
-    };
-  }, [config, session]);
-
-  const startSignIn = async () => {
-    if (!config) {
-      return;
-    }
-    setBusy(true);
-    try {
-      await doSignIn(config, session);
-      await loadProfile();
-    } catch (e) {
-      setPhase({ kind: "signedOut", message: e instanceof SignInCancelled ? undefined : t.signInFailed });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const endSession = async () => {
-    if (!config) {
-      return;
-    }
-    setBusy(true);
-    try {
-      const stored = await session.restore();
-      await doSignOut(config, session, stored?.refreshToken ?? null);
-    } finally {
-      setPhase({ kind: "signedOut" });
-      setBusy(false);
-    }
-  };
-
+  if (!config) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: colors["background"] }}>
+        <Text accessibilityRole="alert">{strings[locale].configError}</Text>
+      </View>
+    );
+  }
   return (
-    <View style={[styles.container, { direction: rtl ? "rtl" : "ltr" }]}>
-      <Text accessibilityRole="header" style={styles.title}>
-        {brand.name[locale]}
-      </Text>
-      <Text style={styles.slogan}>{brand.slogan[locale]}</Text>
-      {phase.kind === "loading" ? <ActivityIndicator accessibilityLabel={t.loading} color={colors["primary"]} /> : null}
-      {phase.kind === "configError" ? <Text accessibilityRole="alert">{t.configError}</Text> : null}
-      {phase.kind === "signedOut" ? (
-        <>
-          {phase.message ? <Text accessibilityRole="alert">{phase.message}</Text> : null}
-          <Button label={t.signIn} disabled={busy} onPress={() => void startSignIn()} />
-        </>
-      ) : null}
-      {phase.kind === "signedIn" ? (
-        <>
-          <Text style={styles.body}>{t.signedInAs(phase.profile?.displayName ?? "")}</Text>
-          <Button label={t.switchAccount} disabled={busy} secondary onPress={() => void endSession().then(startSignIn)} />
-          <Button label={t.signOut} disabled={busy} secondary onPress={() => void endSession()} />
-        </>
-      ) : null}
-      <Button label={t.language} secondary onPress={onToggleLocale} />
-      <StatusBar style="auto" />
-    </View>
+    <ErrorBoundary t={strings[locale]}>
+      <SafeAreaProvider>
+        <AppProvider config={config} session={session} initialLocale={locale} signIn={deps.signIn} signOut={deps.signOut} fetchImpl={deps.fetchImpl}>
+          <Navigation />
+        </AppProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }
-
-function Button({ label, onPress, disabled, secondary }: { label: string; onPress: () => void; disabled?: boolean; secondary?: boolean }) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ disabled: Boolean(disabled) }}
-      disabled={disabled}
-      onPress={onPress}
-      style={[styles.button, secondary ? styles.secondary : null, disabled ? styles.disabled : null]}
-    >
-      <Text style={secondary ? styles.secondaryText : styles.buttonText}>{label}</Text>
-    </Pressable>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center", justifyContent: "center", gap: tokens.space["lg"], padding: tokens.space["lg"], backgroundColor: colors["background"] },
-  title: { fontSize: tokens.font.size["xxl"], fontWeight: "700", color: colors["foreground"] },
-  slogan: { fontSize: tokens.font.size["md"], color: colors["foregroundMuted"], textAlign: "center" },
-  body: { fontSize: tokens.font.size["md"], color: colors["foreground"] },
-  button: {
-    minHeight: tokens.touchTarget.min,
-    minWidth: tokens.touchTarget.min,
-    paddingHorizontal: tokens.space["lg"],
-    justifyContent: "center",
-    borderRadius: tokens.radius["md"],
-    backgroundColor: colors["primary"],
-  },
-  secondary: { backgroundColor: colors["surfaceMuted"], borderWidth: 1, borderColor: colors["border"] },
-  disabled: { opacity: 0.55 },
-  buttonText: { color: colors["onPrimary"], fontWeight: "700" },
-  secondaryText: { color: colors["foreground"] },
-});

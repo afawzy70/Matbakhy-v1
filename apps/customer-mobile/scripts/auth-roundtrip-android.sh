@@ -74,9 +74,13 @@ wait_for() {
 }
 tap() { local pos; pos=$(wait_for "$1" "${2:-60}") || fail "not found: $1"; adb shell input tap $pos; }
 absent() { dump; if [ -n "$(center_of "$1")" ]; then fail "unexpectedly visible: $1"; fi; }
+ACCOUNT_TAB='resource-id="tab-account"|content-desc="Account, tab, 4 of 4"'
+# The app opens on Discover (MB-032); sign-in, greeting, switch and sign-out live on the Account tab.
+account() { tap "$ACCOUNT_TAB" 60; sleep 1; }
 relaunch() {
   adb shell am force-stop "$PKG"
   adb shell am start -W -n "$PKG/.MainActivity" >/dev/null
+  account
 }
 
 # Typing right after the tap can lose the first keystrokes (native run 13 typed "ustomer-a"): wait for focus, check
