@@ -87,10 +87,9 @@ button.danger {
   color: var(--mb-color-on-danger);
 }
 
+/* Link-style buttons keep the 44 px target (MB-029); only their look is a link. */
 button.link {
-  min-block-size: auto;
-  min-inline-size: auto;
-  padding: 0;
+  padding-inline: var(--mb-space-xs);
   background: none;
   color: var(--mb-color-primary);
   text-decoration: underline;
