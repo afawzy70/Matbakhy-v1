@@ -24,7 +24,7 @@ public final class EnvironmentGuard {
     }
 
     static void check(DeploymentEnvironment environment, List<String> activeProfiles, String flywayLocations) {
-        boolean fixtureCapable = environment == DeploymentEnvironment.LOCAL || environment == DeploymentEnvironment.CI;
+        boolean fixtureCapable = environment.synthetic();
         if (fixtureCapable) {
             return;
         }

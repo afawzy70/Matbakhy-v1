@@ -30,4 +30,10 @@ class EnvironmentGuardTest {
                     .doesNotThrowAnyException();
         }
     }
+
+    /** PREVIEW: an access-restricted, synthetic-data web preview (owner direction 2026-10-12); never a release environment. */
+    @Test
+    void preview_allows_the_synthetic_fixtures() {
+        assertThatCode(() -> EnvironmentGuard.check(DeploymentEnvironment.PREVIEW, List.of("dev"), WITH_FIXTURES)).doesNotThrowAnyException();
+    }
 }

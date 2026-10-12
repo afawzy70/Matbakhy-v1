@@ -78,8 +78,7 @@ class SecurityConfiguration {
 
     @Bean
     ClientRegistrationRepository clientRegistrations(IdentityProperties properties, MatbakhyProperties platform) {
-        boolean deployed = platform.environment() == DeploymentEnvironment.STAGING
-                || platform.environment() == DeploymentEnvironment.PRODUCTION;
+        boolean deployed = platform.environment().deployed();
         if (deployed && (properties.webClientSecret() == null || properties.webClientSecret().isBlank())) {
             throw new IllegalStateException("OIDC_WEB_CLIENT_SECRET is required in " + platform.environment());
         }
@@ -121,7 +120,7 @@ class SecurityConfiguration {
         cookie.setSameSite("Lax");
         cookie.setCookiePath("/");
         DeploymentEnvironment env = platform.environment();
-        cookie.setUseSecureCookie(env == DeploymentEnvironment.STAGING || env == DeploymentEnvironment.PRODUCTION);
+        cookie.setUseSecureCookie(env.deployed());
         return cookie;
     }
 

@@ -46,4 +46,26 @@ class ProviderConfigurationTest {
         assertThatThrownBy(() -> config.pushSender(env(DeploymentEnvironment.STAGING), real)).hasMessageContaining("No push notification provider");
         assertThatThrownBy(() -> config.emailSender(env(DeploymentEnvironment.PRODUCTION))).hasMessageContaining("No email notification provider");
     }
+
+    /** PREVIEW keeps synthetic providers (nothing is ever sent) but demands real secrets and real S3-compatible storage. */
+    @Test
+    void preview_uses_synthetic_providers_with_real_secrets_and_storage() {
+        ProviderConfiguration config = new ProviderConfiguration();
+        MatbakhyProperties preview = env(DeploymentEnvironment.PREVIEW);
+        assertThat(config.phoneVerificationSender(preview, phone("a-real-secret-pepper-value-0123456789abcdef")))
+                .isInstanceOf(FakePhoneVerificationSender.class);
+        assertThatThrownBy(() -> config.phoneVerificationSender(preview, phone("local-dev-only-pepper-not-a-secret-000000")))
+                .hasMessageContaining("PHONE_CODE_PEPPER");
+        assertThat(config.malwareScanner(preview)).isInstanceOf(FakeMalwareScanner.class);
+        assertThat(config.emailSender(preview)).isNotNull();
+        NotificationProperties dev = new NotificationProperties("local-dev-only-push-token-hash-key-not-secret",
+                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+        NotificationProperties real = new NotificationProperties("a-real-hash-key-value-0123456789abcdef",
+                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+        assertThat(config.pushSender(preview, real)).isNotNull();
+        assertThatThrownBy(() -> config.pushSender(preview, dev)).hasMessageContaining("PUSH_TOKEN_HASH_KEY");
+        StorageProperties emulator = new StorageProperties(java.net.URI.create("http://storage:9000"), null, "eu-central-1", "local-emulator-only",
+                "local-emulator-only", "private", "public", java.net.URI.create("https://media.example.test"));
+        assertThatThrownBy(() -> config.objectStorage(preview, emulator)).hasMessageContaining("Object storage credentials");
+    }
 }

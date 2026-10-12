@@ -13,7 +13,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Provider adapters (ADR-004). Fakes exist only for LOCAL/CI; deployed environments fail fast without a real provider. */
+/** Provider adapters (ADR-004). Fakes exist only for LOCAL/CI/PREVIEW (synthetic data); staging and production fail fast without a real provider. */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({PhoneVerificationProperties.class, StorageProperties.class})
 class ProviderConfiguration {
@@ -23,7 +23,10 @@ class ProviderConfiguration {
     @Bean
     PhoneVerificationSender phoneVerificationSender(MatbakhyProperties platform, PhoneVerificationProperties phone) {
         DeploymentEnvironment env = platform.environment();
-        if (env == DeploymentEnvironment.LOCAL || env == DeploymentEnvironment.CI) {
+        if (!env.developmentSecrets() && phone.codePepper().startsWith(DEV_PEPPER_PREFIX)) {
+            throw new IllegalStateException("PHONE_CODE_PEPPER must be set to a secret value in " + env);
+        }
+        if (env.synthetic()) {
             return new FakePhoneVerificationSender();
         }
         if (phone.codePepper().startsWith(DEV_PEPPER_PREFIX)) {
@@ -36,7 +39,7 @@ class ProviderConfiguration {
 
     @Bean
     ObjectStorage objectStorage(MatbakhyProperties platform, StorageProperties storage) {
-        boolean local = platform.environment() == DeploymentEnvironment.LOCAL || platform.environment() == DeploymentEnvironment.CI;
+        boolean local = platform.environment().developmentSecrets();
         if (storage.endpoint() == null || storage.endpoint().toString().isBlank()) {
             throw new IllegalStateException("OBJECT_STORAGE_ENDPOINT is required");
         }
@@ -51,7 +54,7 @@ class ProviderConfiguration {
     @Bean
     MalwareScanner malwareScanner(MatbakhyProperties platform) {
         DeploymentEnvironment env = platform.environment();
-        if (env == DeploymentEnvironment.LOCAL || env == DeploymentEnvironment.CI) {
+        if (env.synthetic()) {
             return new FakeMalwareScanner();
         }
         throw new IllegalStateException("No malware scanner is configured for " + env + "; uploads cannot be approved (O07)");
@@ -66,7 +69,7 @@ class ProviderConfiguration {
     @Bean
     PushSender pushSender(MatbakhyProperties platform, NotificationProperties notifications) {
         DeploymentEnvironment env = platform.environment();
-        boolean local = env == DeploymentEnvironment.LOCAL || env == DeploymentEnvironment.CI;
+        boolean local = env.developmentSecrets();
         if (!local && (notifications.tokenHashKey().startsWith(NotificationProperties.DEV_PREFIX)
                 || notifications.tokenEncryptionKey().startsWith(NotificationProperties.DEV_PREFIX))) {
             throw new IllegalStateException("PUSH_TOKEN_HASH_KEY and PUSH_TOKEN_ENCRYPTION_KEY must be set for " + env);
@@ -78,7 +81,7 @@ class ProviderConfiguration {
     /** Deployed environments need real providers (owner decision O07) and real token keys. */
     private static void requireLocal(MatbakhyProperties platform, String channel) {
         DeploymentEnvironment env = platform.environment();
-        if (env != DeploymentEnvironment.LOCAL && env != DeploymentEnvironment.CI) {
+        if (!env.synthetic()) {
             throw new IllegalStateException("No " + channel + " notification provider is configured for " + env + " (O07)");
         }
     }
