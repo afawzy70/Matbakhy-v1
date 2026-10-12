@@ -58,6 +58,7 @@ wait_for() {
 }
 tap() { local pos; pos=$(wait_for "$1" "${2:-60}") || fail "not found: $1"; adb shell input tap $pos; }
 # Scrolls the current screen up until the element is on screen (long forms).
+# Below-the-fold controls (the cart button sits under the meal details; native run 23): scroll up until visible.
 tap_scrolled() {
   local pos
   for _ in 1 2 3 4 5 6; do
@@ -81,23 +82,23 @@ echo "== TC-148: basket replacement asks first"
 launch
 tap 'content-desc="Native Dish One[^"]*"' 90
 tap 'resource-id="slot-0"'
-tap 'resource-id="add-to-cart"'
+tap_scrolled 'resource-id="add-to-cart"'
 wait_for 'text="Added to cart."' 30 >/dev/null || fail "first meal not added"
 adb shell input keyevent 4
 tap 'content-desc="Native Dish Two[^"]*"' 60
 tap 'resource-id="slot-0"'
-tap 'resource-id="add-to-cart"'
+tap_scrolled 'resource-id="add-to-cart"'
 wait_for 'text="Replace your cart\?"' 30 >/dev/null || fail "no replacement prompt"
 shot replace-prompt
 tap 'text="Keep cart"|text="KEEP CART"'
 wait_for 'text="Your cart is unchanged."' 30 >/dev/null || fail "keep did not keep"
-tap 'resource-id="go-to-cart"'
+tap_scrolled 'resource-id="go-to-cart"'
 wait_for 'text="1 × Native Dish One"' 30 >/dev/null || fail "basket changed after keep"
 adb shell input keyevent 4
-tap 'resource-id="add-to-cart"'
+tap_scrolled 'resource-id="add-to-cart"'
 tap 'text="Replace cart"|text="REPLACE CART"' 30
 wait_for 'text="Added to cart."' 30 >/dev/null || fail "replace did not add"
-tap 'resource-id="go-to-cart"'
+tap_scrolled 'resource-id="go-to-cart"'
 wait_for 'text="1 × Native Dish Two"' 30 >/dev/null || fail "basket not replaced"
 absent 'text="1 × Native Dish One"'
 shot cart-replaced
