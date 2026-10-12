@@ -159,7 +159,14 @@ echo "orders in the database after the kill: $COUNT"
 echo "== reopen offline"
 adb reverse --remove tcp:8080 >/dev/null
 launch
-tap 'resource-id="open-cart"' 60
+# Native run 27: after the kill and an offline relaunch, Discover showed no cart shortcut. Before failing, record
+# whether the app still considers the customer signed in (a session end clears the basket) for diagnosis.
+if ! pos=$(wait_for 'resource-id="open-cart"' 60); then
+  echo "diagnostic: no cart shortcut after the offline relaunch; Account tab follows"
+  pos=$(wait_for 'resource-id="tab-account"|content-desc="Account, tab, 4 of 4"' 10) && adb shell input tap $pos && sleep 3
+  fail "cart shortcut missing after the offline relaunch"
+fi
+adb shell input tap $pos
 wait_scrolled 'text="You.re offline. We couldn.t confirm whether your order arrived[^"]*"' 60 || fail "offline uncertainty not stated"
 absent 'resource-id="place-order"'
 absent 'text="MB-[0-9]+"'
