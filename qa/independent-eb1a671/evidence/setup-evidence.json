@@ -1,0 +1,25 @@
+{
+  "applicationSha": "eb1a6717b3304d3a02e6a46d06c77ed5d43ac144",
+  "qaBranch": "qa/independent-browse-basket-eb1a671-20261012",
+  "node": "24.21.0",
+  "pnpm": "10.34.6",
+  "jdk": "Temurin JDK 21.0.12.1+1",
+  "maven": "3.9.11",
+  "jarSha256": "aac7c62618ec08f5840540db89bf6c0cbc7543acfa85de8ad37f41f1a6426809",
+  "backendBuild": "PASS startup build with -DskipTests; no developer test result claimed",
+  "apiStartup": "PASS health UP; Flyway 24 migrations through V22",
+  "browserStartup": "PASS Chromium 154.0.8037.57; title مطبخي; initial lang ar/dir rtl",
+  "mainRunnerExit": 1,
+  "mainRunnerExitMeaning": "explicit failed assertions; see results.json",
+  "productTrackedChanges": [],
+  "setupFailuresResolved": [
+    "sandbox proxy/socket restriction",
+    "read-only default caches/buildx",
+    "JRE21 without compiler",
+    "downloaded JDK CA trust",
+    "mode600 generated jar"
+  ],
+  "nativeMobile": "NOT_RUN; Android platform tools/emulator and Xcode commands unavailable; host Linux",
+  "noPaidService": true,
+  "observedAt": "2026-10-12T11:34:58.237062+00:00"
+}

@@ -1,0 +1,212 @@
+{
+  "applicationSha": "eb1a6717b3304d3a02e6a46d06c77ed5d43ac144",
+  "browser": "Chromium",
+  "results": [
+    {
+      "id": "IQA-01",
+      "startedAt": "2026-10-12T11:18:26.120Z",
+      "checks": [
+        {
+          "name": "Arabic default direction",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "Published card A1",
+          "status": "FAIL",
+          "expected": 1,
+          "actual": 0
+        },
+        {
+          "name": "Published card A2",
+          "status": "FAIL",
+          "expected": 1,
+          "actual": 0
+        },
+        {
+          "name": "Published card B1",
+          "status": "FAIL",
+          "expected": 1,
+          "actual": 0
+        },
+        {
+          "name": "Paused kitchen excluded",
+          "status": "PASS",
+          "expected": "PAUSED1 absent",
+          "actual": [
+            "15 Oct 2026, 14:18وجبة تجريبية B1EGP 80.25مطبخ تجريبي Bوصف مستقل للوجبة B1 بمكونات تجريبية فقط. حصة تجريبيةView details",
+            "وجبة تجريبية A3EGP 80.25مطبخ تجريبي Aوصف مستقل للوجبة A3 بمكونات تجريبية فقط. حصة تجريبيةUnavailable",
+            "15 Oct 2026, 14:18وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطةEGP 95.50مطبخ تجريبي Aوصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. حصة تجريبيةView details",
+            "15 Oct 2026, 14:18وجبة تجريبية A1EGP 120.25مطبخ تجريبي Aوصف مستقل للوجبة A1 بمكونات تجريبية فقط. حصة تجريبيةView details"
+          ]
+        }
+      ],
+      "evidence": [
+        "IQA-01-blocked.png",
+        "IQA-01-blocked.json"
+      ],
+      "status": "BLOCKED",
+      "harnessError": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Search', exact: true })\u001b[22m\n"
+    },
+    {
+      "id": "IQA-02",
+      "startedAt": "2026-10-12T11:18:57.508Z",
+      "checks": [
+        {
+          "name": "description",
+          "status": "FAIL",
+          "expected": "Independent synthetic description for meal A1. ",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "ingredients",
+          "status": "PASS",
+          "expected": "Synthetic rice",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "portion",
+          "status": "PASS",
+          "expected": "Synthetic portion",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "price",
+          "status": "PASS",
+          "expected": "120.25",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "allergens",
+          "status": "PASS",
+          "expected": "Detailed allergy information is not available",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "Only open future offered slots",
+          "status": "PASS",
+          "expected": "A1 and A2 future OPEN slots, each capacity 3",
+          "actual": [
+            {
+              "id": "00000000-0000-0000-0000-00000000019b",
+              "startsAt": "2026-10-15T11:18:24.721226Z",
+              "endsAt": "2026-10-15T13:18:24.721226Z",
+              "timezone": "Africa/Cairo",
+              "cutoffAt": "2026-10-15T09:18:24.721226Z",
+              "availablePortions": 3,
+              "fulfillmentModes": [
+                "PICKUP",
+                "DELIVERY"
+              ]
+            },
+            {
+              "id": "00000000-0000-0000-0000-00000000019c",
+              "startsAt": "2026-10-16T11:18:24.721226Z",
+              "endsAt": "2026-10-16T13:18:24.721226Z",
+              "timezone": "Africa/Cairo",
+              "cutoffAt": "2026-10-16T09:18:24.721226Z",
+              "availablePortions": 3,
+              "fulfillmentModes": [
+                "PICKUP",
+                "DELIVERY"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Operational approval wording",
+          "status": "PASS",
+          "expected": "operational verification, no food safety guarantee",
+          "actual": "Back\nم\nمطبخ تجريبي A\n\nSynthetic independent QA kitchen\n\nThis kitchen is operationally verified by Matbakhy staff; this is not a food-safety certification.\n\nMeals to preorder\nQA Meal A3\nEGP 80.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A3.\n\nSynthetic portion\nUnavailable\n15 Oct 2026, 14:18\nQA Meal A2\nEGP 95.50\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA.\n\nSynthetic portion\nView details\n15 Oct 2026, 14:18\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Private kitchen fields absent",
+          "status": "PASS",
+          "expected": "no private location/contact",
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slug": "qa-kitchen-a",
+            "displayName": "مطبخ تجريبي A",
+            "description": "Synthetic independent QA kitchen",
+            "verificationLabel": "OPERATIONALLY_VERIFIED",
+            "available": true,
+            "pickupEnabled": true,
+            "deliveryZoneIds": [
+              "00000000-0000-4000-8000-00000000a001",
+              "00000000-0000-4000-8000-00000000a002",
+              "00000000-0000-4000-8000-00000000a003"
+            ]
+          }
+        }
+      ],
+      "evidence": [
+        "IQA-02-meal.png",
+        "IQA-02-meal.json",
+        "IQA-02-kitchen.png",
+        "IQA-02-kitchen.json"
+      ],
+      "status": "FAIL"
+    },
+    {
+      "id": "IQA-03",
+      "startedAt": "2026-10-12T11:18:58.605Z",
+      "checks": [
+        {
+          "name": "Own description A1",
+          "status": "FAIL",
+          "expected": "Independent synthetic description for meal A1. ",
+          "actual": "Independent synthetic description for meal A1."
+        },
+        {
+          "name": "Own description A2",
+          "status": "FAIL",
+          "expected": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. ",
+          "actual": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA."
+        },
+        {
+          "name": "Own description B1",
+          "status": "FAIL",
+          "expected": "Independent synthetic description for meal B1. ",
+          "actual": "Independent synthetic description for meal B1."
+        },
+        {
+          "name": "D11 portion filter absent",
+          "status": "PASS",
+          "expected": "no one-person/two-people filters",
+          "actual": [
+            "العربية",
+            "A meal for me or usFor one or two people",
+            "Complete my tableA dish to go with your meal",
+            "Prepare a gatheringFor family get-togethers",
+            "Show results",
+            "Clear filters",
+            "Dishes",
+            "Kitchens",
+            "Search for a meal or kitchen",
+            "Filter results",
+            "All",
+            "Main dishes",
+            "Sides and salads",
+            "Soups",
+            "Baked goods",
+            "Desserts",
+            "Breakfast",
+            "Ready to cook"
+          ]
+        },
+        {
+          "name": "Absent description omitted (contract injection)",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        }
+      ],
+      "evidence": [
+        "IQA-03-null-contract.png",
+        "IQA-03-null-contract.json"
+      ],
+      "status": "FAIL"
+    }
+  ]
+}

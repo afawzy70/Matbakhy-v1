@@ -1,0 +1,1147 @@
+{
+  "applicationSha": "eb1a6717b3304d3a02e6a46d06c77ed5d43ac144",
+  "scope": "INDEPENDENT_REPORT_ONLY_BROWSE_BASKET",
+  "counts": {
+    "PASS": 2,
+    "FAIL": 3,
+    "BLOCKED": 5,
+    "NOT_RUN": 0
+  },
+  "cases": [
+    {
+      "id": "IQA-01",
+      "startedAt": "2026-10-12T11:33:38.262Z",
+      "checks": [
+        {
+          "name": "Arabic default direction",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "English switch localizes API content",
+          "status": "FAIL",
+          "expected": "English titles/descriptions/portions after selecting English",
+          "actual": [
+            "15 Oct 2026, 14:18وجبة تجريبية B1EGP 80.25مطبخ تجريبي Bوصف مستقل للوجبة B1 بمكونات تجريبية فقط. حصة تجريبيةView details",
+            "وجبة تجريبية A3EGP 80.25مطبخ تجريبي Aوصف مستقل للوجبة A3 بمكونات تجريبية فقط. حصة تجريبيةUnavailable",
+            "15 Oct 2026, 14:18وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطةEGP 95.50مطبخ تجريبي Aوصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. حصة تجريبيةView details",
+            "15 Oct 2026, 14:18وجبة تجريبية A1EGP 120.25مطبخ تجريبي Aوصف مستقل للوجبة A1 بمكونات تجريبية فقط. حصة تجريبيةView details"
+          ]
+        },
+        {
+          "name": "Published card A1",
+          "status": "PASS",
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "EGP price A1",
+          "status": "PASS",
+          "expected": "120.25",
+          "actual": "15 Oct 2026, 14:18\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Kitchen A1",
+          "status": "PASS",
+          "expected": "مطبخ تجريبي A",
+          "actual": "15 Oct 2026, 14:18\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Published card A2",
+          "status": "PASS",
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "EGP price A2",
+          "status": "PASS",
+          "expected": "95.50",
+          "actual": "15 Oct 2026, 14:18\nQA Meal A2\nEGP 95.50\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Kitchen A2",
+          "status": "PASS",
+          "expected": "مطبخ تجريبي A",
+          "actual": "15 Oct 2026, 14:18\nQA Meal A2\nEGP 95.50\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Published card B1",
+          "status": "PASS",
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "EGP price B1",
+          "status": "PASS",
+          "expected": "80.25",
+          "actual": "15 Oct 2026, 14:18\nQA Meal B1\nEGP 80.25\nمطبخ تجريبي B\n\nIndependent synthetic description for meal B1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Kitchen B1",
+          "status": "PASS",
+          "expected": "مطبخ تجريبي B",
+          "actual": "15 Oct 2026, 14:18\nQA Meal B1\nEGP 80.25\nمطبخ تجريبي B\n\nIndependent synthetic description for meal B1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Paused kitchen excluded",
+          "status": "PASS",
+          "expected": "PAUSED1 absent",
+          "actual": [
+            "15 Oct 2026, 14:18QA Meal B1EGP 80.25مطبخ تجريبي BIndependent synthetic description for meal B1. Synthetic portionView details",
+            "QA Meal A3EGP 80.25مطبخ تجريبي AIndependent synthetic description for meal A3. Synthetic portionUnavailable",
+            "15 Oct 2026, 14:18QA Meal A2EGP 95.50مطبخ تجريبي AIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Synthetic portionView details",
+            "15 Oct 2026, 14:18QA Meal A1EGP 120.25مطبخ تجريبي AIndependent synthetic description for meal A1. Synthetic portionView details"
+          ]
+        },
+        {
+          "name": "Unique server search result",
+          "status": "PASS",
+          "expected": "only B1",
+          "actual": "15 Oct 2026, 14:18\nQA Meal B1\nEGP 80.25\nمطبخ تجريبي B\n\nIndependent synthetic description for meal B1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Fresh zone/search/reset API queries",
+          "status": "PASS",
+          "expected": "server query contains zoneId and q; reset returns all four active meals",
+          "actual": [
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST&zoneId=00000000-0000-4000-8000-00000000a001",
+            "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST&zoneId=00000000-0000-4000-8000-00000000a001&q=QA%20Meal%20B1"
+          ]
+        }
+      ],
+      "evidence": [
+        "IQA-01-language-switch.png",
+        "IQA-01-language-switch.json",
+        "IQA-01-search.png",
+        "IQA-01-search.json",
+        "IQA-01-browse.png",
+        "IQA-01-browse.json"
+      ],
+      "status": "FAIL",
+      "automatedStatus": "FAIL"
+    },
+    {
+      "id": "IQA-02",
+      "startedAt": "2026-10-12T11:33:41.654Z",
+      "checks": [
+        {
+          "name": "description",
+          "status": "PASS",
+          "expected": "Independent synthetic description for meal A1.",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "ingredients",
+          "status": "PASS",
+          "expected": "Synthetic rice",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "portion",
+          "status": "PASS",
+          "expected": "Synthetic portion",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "price",
+          "status": "PASS",
+          "expected": "120.25",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "allergens",
+          "status": "PASS",
+          "expected": "Detailed allergy information is not available",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nLoading…"
+        },
+        {
+          "name": "Only open future offered slots",
+          "status": "PASS",
+          "expected": "A1 and A2 future OPEN slots, each capacity 3",
+          "actual": [
+            {
+              "id": "00000000-0000-0000-0000-00000000019b",
+              "startsAt": "2026-10-15T11:18:24.721226Z",
+              "endsAt": "2026-10-15T13:18:24.721226Z",
+              "timezone": "Africa/Cairo",
+              "cutoffAt": "2026-10-15T09:18:24.721226Z",
+              "availablePortions": 3,
+              "fulfillmentModes": [
+                "PICKUP",
+                "DELIVERY"
+              ]
+            },
+            {
+              "id": "00000000-0000-0000-0000-00000000019c",
+              "startsAt": "2026-10-16T11:18:24.721226Z",
+              "endsAt": "2026-10-16T13:18:24.721226Z",
+              "timezone": "Africa/Cairo",
+              "cutoffAt": "2026-10-16T09:18:24.721226Z",
+              "availablePortions": 3,
+              "fulfillmentModes": [
+                "PICKUP",
+                "DELIVERY"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Operational approval wording",
+          "status": "PASS",
+          "expected": "operational verification, no food safety guarantee",
+          "actual": "Back\nم\nمطبخ تجريبي A\n\nSynthetic independent QA kitchen\n\nThis kitchen is operationally verified by Matbakhy staff; this is not a food-safety certification.\n\nMeals to preorder\nQA Meal A3\nEGP 80.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A3.\n\nSynthetic portion\nUnavailable\n15 Oct 2026, 14:18\nQA Meal A2\nEGP 95.50\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA.\n\nSynthetic portion\nView details\n15 Oct 2026, 14:18\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Private kitchen fields absent",
+          "status": "PASS",
+          "expected": "no private location/contact",
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slug": "qa-kitchen-a",
+            "displayName": "مطبخ تجريبي A",
+            "description": "Synthetic independent QA kitchen",
+            "verificationLabel": "OPERATIONALLY_VERIFIED",
+            "available": true,
+            "pickupEnabled": true,
+            "deliveryZoneIds": [
+              "00000000-0000-4000-8000-00000000a001",
+              "00000000-0000-4000-8000-00000000a002",
+              "00000000-0000-4000-8000-00000000a003"
+            ]
+          }
+        }
+      ],
+      "evidence": [
+        "IQA-02-meal.png",
+        "IQA-02-meal.json",
+        "IQA-02-kitchen.png",
+        "IQA-02-kitchen.json"
+      ],
+      "status": "PASS",
+      "automatedStatus": "PASS"
+    },
+    {
+      "id": "IQA-03",
+      "startedAt": "2026-10-12T11:33:42.693Z",
+      "checks": [
+        {
+          "name": "Own description A1",
+          "status": "PASS",
+          "expected": "Independent synthetic description for meal A1. ",
+          "actual": "Independent synthetic description for meal A1."
+        },
+        {
+          "name": "Own description A2",
+          "status": "PASS",
+          "expected": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. ",
+          "actual": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA."
+        },
+        {
+          "name": "Own description B1",
+          "status": "PASS",
+          "expected": "Independent synthetic description for meal B1. ",
+          "actual": "Independent synthetic description for meal B1."
+        },
+        {
+          "name": "D11 portion filter absent",
+          "status": "PASS",
+          "expected": "no one-person/two-people filters",
+          "actual": [
+            "العربية",
+            "A meal for me or usFor one or two people",
+            "Complete my tableA dish to go with your meal",
+            "Prepare a gatheringFor family get-togethers",
+            "Show results",
+            "Clear filters",
+            "Dishes",
+            "Kitchens",
+            "Search for a meal or kitchen",
+            "Filter results",
+            "All",
+            "Main dishes",
+            "Sides and salads",
+            "Soups",
+            "Baked goods",
+            "Desserts",
+            "Breakfast",
+            "Ready to cook"
+          ]
+        },
+        {
+          "name": "Absent description omitted (contract injection)",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        }
+      ],
+      "evidence": [
+        "IQA-03-null-contract.png",
+        "IQA-03-null-contract.json"
+      ],
+      "status": "PASS",
+      "automatedStatus": "PASS"
+    },
+    {
+      "id": "IQA-04",
+      "startedAt": "2026-10-12T11:33:44.704Z",
+      "checks": [
+        {
+          "name": "Meal quantity preview arithmetic",
+          "status": "PASS",
+          "expected": "240.50 EGP = 2 × 120.25",
+          "actual": "Add to cart ·\nEGP 240.50"
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "quantity": 2
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible resulting meal and quantity",
+          "status": "PASS",
+          "expected": "2 × QA Meal A1",
+          "actual": "2 × QA Meal A1"
+        },
+        {
+          "name": "Draft persisted after reload",
+          "status": "PASS",
+          "expected": "A1/S1 quantity 2",
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Basket quantity change controls",
+          "status": "FAIL",
+          "expected": "increase/decrease or quantity input",
+          "actual": [
+            "Empty cart"
+          ]
+        },
+        {
+          "name": "Per-line removal control",
+          "status": "FAIL",
+          "expected": "remove individual line",
+          "actual": "2 × QA Meal A1"
+        },
+        {
+          "name": "Estimated basket subtotal",
+          "status": "FAIL",
+          "expected": "estimated subtotal 240.50 EGP",
+          "actual": "Cart\n2 × QA Meal A1\n\n15 Oct 2026, 14:18\n\nEmpty cart\n\nSign in to place your order.\n\nSign in"
+        },
+        {
+          "name": "Empty state",
+          "status": "PASS",
+          "expected": "clear empty state",
+          "actual": "Your cart is empty.\n\nHome"
+        }
+      ],
+      "evidence": [
+        "IQA-04-cart.png",
+        "IQA-04-cart.json"
+      ],
+      "status": "FAIL",
+      "automatedStatus": "FAIL"
+    },
+    {
+      "id": "IQA-05",
+      "startedAt": "2026-10-12T11:33:47.257Z",
+      "checks": [
+        {
+          "name": "No mutation before confirmation",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Cancel preserves complete basket",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "quantity": 2
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible resulting meal and quantity",
+          "status": "PASS",
+          "expected": "2 × QA Meal A1",
+          "actual": "2 × QA Meal A1"
+        }
+      ],
+      "evidence": [
+        "IQA-05-prompt.png",
+        "IQA-05-prompt.json",
+        "IQA-05-result.png",
+        "IQA-05-result.json"
+      ],
+      "status": "BLOCKED",
+      "automatedStatus": "PASS",
+      "reviewNote": "Replacement kitchen/meal/slot/quantity assertions PASS. The initial case also requires the resulting basket total, which cannot be checked because CW05 subtotal is absent (FG-001). Do not promote the core-path PASS to whole-case PASS."
+    },
+    {
+      "id": "IQA-06",
+      "startedAt": "2026-10-12T11:33:49.703Z",
+      "checks": [
+        {
+          "name": "No mutation before confirmation",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012e",
+            "mealId": "00000000-0000-0000-0000-00000000026d",
+            "slotId": "00000000-0000-0000-0000-0000000001a5",
+            "quantity": 1
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012e",
+            "slotId": "00000000-0000-0000-0000-0000000001a5",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-00000000026d",
+                "title": "QA Meal B1",
+                "quantity": 1
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible resulting meal and quantity",
+          "status": "PASS",
+          "expected": "1 × QA Meal B1",
+          "actual": "1 × QA Meal B1"
+        }
+      ],
+      "evidence": [
+        "IQA-06-prompt.png",
+        "IQA-06-prompt.json",
+        "IQA-06-result.png",
+        "IQA-06-result.json"
+      ],
+      "status": "BLOCKED",
+      "automatedStatus": "PASS",
+      "reviewNote": "Replacement kitchen/meal/slot/quantity assertions PASS. The initial case also requires the resulting basket total, which cannot be checked because CW05 subtotal is absent (FG-001). Do not promote the core-path PASS to whole-case PASS."
+    },
+    {
+      "id": "IQA-07",
+      "startedAt": "2026-10-12T11:33:51.143Z",
+      "checks": [
+        {
+          "name": "No mutation before confirmation",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Cancel preserves complete basket",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "quantity": 2
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible resulting meal and quantity",
+          "status": "PASS",
+          "expected": "2 × QA Meal A1",
+          "actual": "2 × QA Meal A1"
+        }
+      ],
+      "evidence": [
+        "IQA-07-prompt.png",
+        "IQA-07-prompt.json",
+        "IQA-07-result.png",
+        "IQA-07-result.json"
+      ],
+      "status": "BLOCKED",
+      "automatedStatus": "PASS",
+      "reviewNote": "Replacement kitchen/meal/slot/quantity assertions PASS. The initial case also requires the resulting basket total, which cannot be checked because CW05 subtotal is absent (FG-001). Do not promote the core-path PASS to whole-case PASS."
+    },
+    {
+      "id": "IQA-08",
+      "startedAt": "2026-10-12T11:33:53.404Z",
+      "checks": [
+        {
+          "name": "No mutation before confirmation",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000264",
+            "slotId": "00000000-0000-0000-0000-00000000019c",
+            "quantity": 1
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "slotId": "00000000-0000-0000-0000-00000000019c",
+            "slotStartsAt": "2026-10-16T11:18:24.721226Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000264",
+                "title": "QA Meal A2",
+                "quantity": 1
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible resulting meal and quantity",
+          "status": "PASS",
+          "expected": "1 × QA Meal A2",
+          "actual": "1 × QA Meal A2"
+        }
+      ],
+      "evidence": [
+        "IQA-08-prompt.png",
+        "IQA-08-prompt.json",
+        "IQA-08-result.png",
+        "IQA-08-result.json"
+      ],
+      "status": "BLOCKED",
+      "automatedStatus": "PASS",
+      "reviewNote": "Replacement kitchen/meal/slot/quantity assertions PASS. The initial case also requires the resulting basket total, which cannot be checked because CW05 subtotal is absent (FG-001). Do not promote the core-path PASS to whole-case PASS."
+    },
+    {
+      "id": "IQA-09",
+      "startedAt": "2026-10-12T11:33:55.283Z",
+      "checks": [
+        {
+          "name": "Sold-out has no selectable slot",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Sold-out add disabled",
+          "status": "PASS",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "Quantity capped by remaining stock",
+          "status": "PASS",
+          "expected": "3",
+          "actual": "3"
+        },
+        {
+          "name": "Increase disabled at cap",
+          "status": "PASS",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "Paused meal not publicly purchasable",
+          "status": "PASS",
+          "expected": 404,
+          "actual": 404
+        },
+        {
+          "name": "Paused kitchen clear unavailable state",
+          "status": "PASS",
+          "expected": "not taking orders",
+          "actual": "Back\nم\nمطبخ تجريبي PAUSED\n\nSynthetic independent QA kitchen\n\nThis kitchen is operationally verified by Matbakhy staff; this is not a food-safety certification.\n\nThis kitchen is not taking orders right now.\n\nMeals to preorder\n\nLoading…"
+        },
+        {
+          "name": "Empty state visible",
+          "status": "PASS",
+          "expected": "no meals, clear/recovery",
+          "actual": "Matbakhy\nHome-cooked meals from kitchens near you\nPreorder\nWhat does your table need?\nChoose by need\nA meal for me or us\nFor one or two people\nComplete my table\nA dish to go with your meal\nPrepare a gathering\nFor family get-togethers\nDishes\nKitchens\nSearch for a meal or kitchen\nSearch for a meal or kitchen\nFilter results\nAll\nMain dishes\nSides and salads\nSoups\nBaked goods\nDesserts\nBreakfast\nReady to cook\nHome-cooked meals to preorder\n\nNo meals match this search.\n\nClear filters"
+        },
+        {
+          "name": "Error offers retry",
+          "status": "PASS",
+          "expected": "visible Retry",
+          "actual": "Matbakhy\nHome-cooked meals from kitchens near you\nPreorder\nWhat does your table need?\nChoose by need\nA meal for me or us\nFor one or two people\nComplete my table\nA dish to go with your meal\nPrepare a gathering\nFor family get-togethers\nDishes\nKitchens\nSearch for a meal or kitchen\nSearch for a meal or kitchen\nFilter results\nAll\nMain dishes\nSides and salads\nSoups\nBaked goods\nDesserts\nBreakfast\nReady to cook\nHome-cooked meals to preorder\n\nSomething went wrong.\n\nRetry"
+        },
+        {
+          "name": "Retry recovers real API",
+          "status": "PASS",
+          "expected": 4,
+          "actual": 4
+        }
+      ],
+      "evidence": [
+        "IQA-09-soldout.png",
+        "IQA-09-soldout.json",
+        "IQA-09-cap.png",
+        "IQA-09-cap.json",
+        "IQA-09-paused.png",
+        "IQA-09-paused.json",
+        "IQA-09-empty.png",
+        "IQA-09-empty.json",
+        "IQA-09-error.png",
+        "IQA-09-error.json",
+        "supplementary.json",
+        "MBQA-002-exhausted-selection.png",
+        "IQA-09-true-soldout.png",
+        "IQA-09-controlled-loading.png"
+      ],
+      "status": "FAIL",
+      "automatedStatus": "PASS",
+      "reviewNote": "Main run PASS covered unoffered capacity=0, quantity cap, closed/past exclusion, paused kitchen, empty and error/retry. Supplementary real API reproduction shows an exhausted selected slot can still be added when another slot has stock (MBQA-002). True all-slots SOLD_OUT and controlled loading verified separately."
+    },
+    {
+      "id": "IQA-10",
+      "startedAt": "2026-10-12T11:33:57.903Z",
+      "checks": [
+        {
+          "name": "Direction ar/1440",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "No page overflow ar/1440/browse",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "No page overflow ar/1440/meal",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "No page overflow ar/1440/kitchen",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "No page overflow ar/1440/basket",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "Direction ar/390",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "No page overflow ar/390/browse",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "No page overflow ar/390/meal",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "No page overflow ar/390/kitchen",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "No page overflow ar/390/basket",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "Direction ar/320",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "No page overflow ar/320/browse",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "No page overflow ar/320/meal",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "No page overflow ar/320/kitchen",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "No page overflow ar/320/basket",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "Direction en/1440",
+          "status": "PASS",
+          "expected": "ltr",
+          "actual": "ltr"
+        },
+        {
+          "name": "No page overflow en/1440/browse",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "No page overflow en/1440/meal",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "No page overflow en/1440/kitchen",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "No page overflow en/1440/basket",
+          "status": "PASS",
+          "expected": 1440,
+          "actual": 1440
+        },
+        {
+          "name": "Direction en/390",
+          "status": "PASS",
+          "expected": "ltr",
+          "actual": "ltr"
+        },
+        {
+          "name": "No page overflow en/390/browse",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "No page overflow en/390/meal",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "No page overflow en/390/kitchen",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "No page overflow en/390/basket",
+          "status": "PASS",
+          "expected": 390,
+          "actual": 390
+        },
+        {
+          "name": "Direction en/320",
+          "status": "PASS",
+          "expected": "ltr",
+          "actual": "ltr"
+        },
+        {
+          "name": "No page overflow en/320/browse",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "No page overflow en/320/meal",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "No page overflow en/320/kitchen",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "No page overflow en/320/basket",
+          "status": "PASS",
+          "expected": 320,
+          "actual": 320
+        },
+        {
+          "name": "Prompt defaults to safe cancel",
+          "status": "PASS",
+          "expected": "Keep my current cart focused",
+          "actual": "Keep my current cart"
+        },
+        {
+          "name": "Prompt keyboard focus contained",
+          "status": "FAIL",
+          "expected": "focus stays in active alertdialog",
+          "actual": "<button type=\"button\" class=\"secondary\">Copy link to share</button>"
+        },
+        {
+          "name": "Escape restores add focus",
+          "status": "PASS",
+          "expected": "Add to cart focused",
+          "actual": "Add to cart · EGP 80.25"
+        },
+        {
+          "name": "200% text no sideways scroll",
+          "status": "PASS",
+          "expected": {
+            "width": 320,
+            "scroll": 320
+          },
+          "actual": {
+            "width": 320,
+            "scroll": 320
+          }
+        }
+      ],
+      "evidence": [
+        "IQA-10-ar-1440-browse.png",
+        "IQA-10-ar-1440-browse.json",
+        "IQA-10-ar-1440-meal.png",
+        "IQA-10-ar-1440-meal.json",
+        "IQA-10-ar-1440-kitchen.png",
+        "IQA-10-ar-1440-kitchen.json",
+        "IQA-10-ar-1440-basket.png",
+        "IQA-10-ar-1440-basket.json",
+        "IQA-10-ar-390-browse.png",
+        "IQA-10-ar-390-browse.json",
+        "IQA-10-ar-390-meal.png",
+        "IQA-10-ar-390-meal.json",
+        "IQA-10-ar-390-kitchen.png",
+        "IQA-10-ar-390-kitchen.json",
+        "IQA-10-ar-390-basket.png",
+        "IQA-10-ar-390-basket.json",
+        "IQA-10-ar-320-browse.png",
+        "IQA-10-ar-320-browse.json",
+        "IQA-10-ar-320-meal.png",
+        "IQA-10-ar-320-meal.json",
+        "IQA-10-ar-320-kitchen.png",
+        "IQA-10-ar-320-kitchen.json",
+        "IQA-10-ar-320-basket.png",
+        "IQA-10-ar-320-basket.json",
+        "IQA-10-en-1440-browse.png",
+        "IQA-10-en-1440-browse.json",
+        "IQA-10-en-1440-meal.png",
+        "IQA-10-en-1440-meal.json",
+        "IQA-10-en-1440-kitchen.png",
+        "IQA-10-en-1440-kitchen.json",
+        "IQA-10-en-1440-basket.png",
+        "IQA-10-en-1440-basket.json",
+        "IQA-10-en-390-browse.png",
+        "IQA-10-en-390-browse.json",
+        "IQA-10-en-390-meal.png",
+        "IQA-10-en-390-meal.json",
+        "IQA-10-en-390-kitchen.png",
+        "IQA-10-en-390-kitchen.json",
+        "IQA-10-en-390-basket.png",
+        "IQA-10-en-390-basket.json",
+        "IQA-10-en-320-browse.png",
+        "IQA-10-en-320-browse.json",
+        "IQA-10-en-320-meal.png",
+        "IQA-10-en-320-meal.json",
+        "IQA-10-en-320-kitchen.png",
+        "IQA-10-en-320-kitchen.json",
+        "IQA-10-en-320-basket.png",
+        "IQA-10-en-320-basket.json",
+        "IQA-10-prompt-focus.png",
+        "IQA-10-prompt-focus.json",
+        "IQA-10-reflow-200.png",
+        "IQA-10-reflow-200.json",
+        "supplementary.json",
+        "IQA-10-text-enlargement.png"
+      ],
+      "status": "BLOCKED",
+      "automatedStatus": "FAIL",
+      "reviewNote": "Layout/direction and prompt entry/Escape/restoration PASS. Supplementary focus-containment assertion FAIL is observable but not a confirmed defect: approved requirements do not specify modal vs inline prompt (RQ-002). Root-font enlargement in the main run did not enlarge px-sized text, so it is not zoom evidence. Supplementary computed font enlargement is verified (20px -> 40px; scrollWidth=320), but native browser zoom/full keyboard/AT review remain NOT_RUN. Scope-limited accessibility acceptance is unresolved."
+    }
+  ],
+  "releaseApproval": false
+}

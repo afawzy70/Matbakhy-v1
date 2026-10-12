@@ -1,0 +1,18 @@
+{
+  "url": "http://localhost:25173/#/checkout",
+  "lang": "ar",
+  "dir": "rtl",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "مطبخي\nالسلة\nEnglish\nتسجيل الدخول\n\nالسلة فارغة.\n\nالرئيسية\nالرئيسية",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "English",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": null
+}

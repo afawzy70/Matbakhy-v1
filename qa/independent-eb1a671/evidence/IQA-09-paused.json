@@ -1,0 +1,18 @@
+{
+  "url": "http://localhost:25173/#/kitchen/qa-kitchen-paused",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy\nCart\nالعربية\nSign in\nBack\nم\nمطبخ تجريبي PAUSED\n\nSynthetic independent QA kitchen\n\nThis kitchen is operationally verified by Matbakhy staff; this is not a food-safety certification.\n\nThis kitchen is not taking orders right now.\n\nMeals to preorder\n\nNo meals match this search.\n\nHome",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "العربية",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": null
+}

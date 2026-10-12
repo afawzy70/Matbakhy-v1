@@ -1,0 +1,9 @@
+{
+  "applicationSha": "eb1a6717b3304d3a02e6a46d06c77ed5d43ac144",
+  "browserVersion": "154.0.8037.57",
+  "web": "http://localhost:25173",
+  "api": "http://localhost:28080",
+  "completedAt": "2026-10-12T11:20:15.807Z",
+  "mode": "REPORT_ONLY",
+  "synthetic": true
+}

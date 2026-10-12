@@ -1,0 +1,1901 @@
+{
+  "applicationSha": "eb1a6717b3304d3a02e6a46d06c77ed5d43ac144",
+  "evidence": [
+    {
+      "id": "MBQA-001-repro-1",
+      "requirement": "BR-046",
+      "expected": "English API content after selecting English",
+      "htmlLang": "en",
+      "htmlDir": "ltr",
+      "titles": [
+        "وجبة تجريبية B1",
+        "وجبة تجريبية A3",
+        "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+        "وجبة تجريبية A1"
+      ],
+      "requests": [
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        },
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        },
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "MBQA-001-repro-2",
+      "requirement": "BR-046",
+      "expected": "English API content after selecting English",
+      "htmlLang": "en",
+      "htmlDir": "ltr",
+      "titles": [
+        "وجبة تجريبية B1",
+        "وجبة تجريبية A3",
+        "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+        "وجبة تجريبية A1"
+      ],
+      "requests": [
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        },
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        },
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "MBQA-001-repro-3",
+      "requirement": "BR-046",
+      "expected": "English API content after selecting English",
+      "htmlLang": "en",
+      "htmlDir": "ltr",
+      "titles": [
+        "وجبة تجريبية B1",
+        "وجبة تجريبية A3",
+        "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+        "وجبة تجريبية A1"
+      ],
+      "requests": [
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        },
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        },
+        {
+          "url": "http://localhost:28080/api/v1/meals?limit=50&sort=NEWEST",
+          "status": 200,
+          "language": "ar",
+          "body": {
+            "items": [
+              {
+                "id": "00000000-0000-0000-0000-00000000026d",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012e",
+                  "slug": "qa-kitchen-b",
+                  "name": "مطبخ تجريبي B",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية B1",
+                "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngB",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a5",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-0000000001a6",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000265",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A3",
+                "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 8025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [],
+                "availability": "UNAVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000264",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+                "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 9550,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              },
+              {
+                "id": "00000000-0000-0000-0000-000000000263",
+                "kitchen": {
+                  "id": "00000000-0000-0000-0000-00000000012d",
+                  "slug": "qa-kitchen-a",
+                  "name": "مطبخ تجريبي A",
+                  "ratingSummary": {
+                    "count": 0,
+                    "averageTenths": null
+                  }
+                },
+                "title": "وجبة تجريبية A1",
+                "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+                "photo": {
+                  "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+                  "alt": "صورة تجريبية"
+                },
+                "portionText": "حصة تجريبية",
+                "price": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "nextSlots": [
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019b",
+                    "startsAt": "2026-10-15T11:18:24.721226Z",
+                    "endsAt": "2026-10-15T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-15T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  },
+                  {
+                    "id": "00000000-0000-0000-0000-00000000019c",
+                    "startsAt": "2026-10-16T11:18:24.721226Z",
+                    "endsAt": "2026-10-16T13:18:24.721226Z",
+                    "timezone": "Africa/Cairo",
+                    "cutoffAt": "2026-10-16T09:18:24.721226Z",
+                    "availablePortions": 3,
+                    "fulfillmentModes": [
+                      "PICKUP",
+                      "DELIVERY"
+                    ]
+                  }
+                ],
+                "availability": "AVAILABLE"
+              }
+            ],
+            "nextCursor": null,
+            "hasMore": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "MBQA-002-exhausted-selection",
+      "requirement": "CW03; BR-013/015",
+      "expected": "Cannot add a selected slot with zero remaining portions",
+      "api": {
+        "id": "00000000-0000-0000-0000-000000000263",
+        "kitchen": {
+          "id": "00000000-0000-0000-0000-00000000012d",
+          "slug": "qa-kitchen-a",
+          "name": "مطبخ تجريبي A",
+          "ratingSummary": {
+            "count": 0,
+            "averageTenths": null
+          }
+        },
+        "title": "QA Meal A1",
+        "photo": {
+          "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+          "alt": "Synthetic solid colour"
+        },
+        "portionText": "Synthetic portion",
+        "price": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "nextSlots": [
+          {
+            "id": "00000000-0000-0000-0000-00000000019b",
+            "startsAt": "2026-10-15T11:18:24.721226Z",
+            "endsAt": "2026-10-15T13:18:24.721226Z",
+            "timezone": "Africa/Cairo",
+            "cutoffAt": "2026-10-15T09:18:24.721226Z",
+            "availablePortions": 0,
+            "fulfillmentModes": [
+              "PICKUP",
+              "DELIVERY"
+            ]
+          },
+          {
+            "id": "00000000-0000-0000-0000-00000000019c",
+            "startsAt": "2026-10-16T11:18:24.721226Z",
+            "endsAt": "2026-10-16T13:18:24.721226Z",
+            "timezone": "Africa/Cairo",
+            "cutoffAt": "2026-10-16T09:18:24.721226Z",
+            "availablePortions": 3,
+            "fulfillmentModes": [
+              "PICKUP",
+              "DELIVERY"
+            ]
+          }
+        ],
+        "availability": "AVAILABLE",
+        "description": "Independent synthetic description for meal A1. ",
+        "ingredients": "Synthetic rice",
+        "allergenCodes": [
+          "UNKNOWN"
+        ],
+        "allergenStatement": "",
+        "photos": [
+          {
+            "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+            "alt": "Synthetic solid colour"
+          }
+        ],
+        "reviewSummary": {
+          "count": 0,
+          "averageTenths": null
+        },
+        "publishedRevision": 1
+      },
+      "addDisabled": false,
+      "quantity": "1",
+      "cart": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "slotId": "00000000-0000-0000-0000-00000000019b",
+        "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+        "modes": [
+          "PICKUP",
+          "DELIVERY"
+        ],
+        "lines": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "title": "QA Meal A1",
+            "quantity": 1
+          }
+        ]
+      }
+    },
+    {
+      "id": "IQA-09-true-soldout",
+      "api": {
+        "id": "00000000-0000-0000-0000-000000000265",
+        "kitchen": {
+          "id": "00000000-0000-0000-0000-00000000012d",
+          "slug": "qa-kitchen-a",
+          "name": "مطبخ تجريبي A",
+          "ratingSummary": {
+            "count": 0,
+            "averageTenths": null
+          }
+        },
+        "title": "QA Meal A3",
+        "photo": {
+          "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+          "alt": "Synthetic solid colour"
+        },
+        "portionText": "Synthetic portion",
+        "price": {
+          "amountMinor": 8025,
+          "currency": "EGP"
+        },
+        "nextSlots": [
+          {
+            "id": "00000000-0000-0000-0000-00000000019b",
+            "startsAt": "2026-10-15T11:18:24.721226Z",
+            "endsAt": "2026-10-15T13:18:24.721226Z",
+            "timezone": "Africa/Cairo",
+            "cutoffAt": "2026-10-15T09:18:24.721226Z",
+            "availablePortions": 0,
+            "fulfillmentModes": [
+              "PICKUP",
+              "DELIVERY"
+            ]
+          },
+          {
+            "id": "00000000-0000-0000-0000-00000000019c",
+            "startsAt": "2026-10-16T11:18:24.721226Z",
+            "endsAt": "2026-10-16T13:18:24.721226Z",
+            "timezone": "Africa/Cairo",
+            "cutoffAt": "2026-10-16T09:18:24.721226Z",
+            "availablePortions": 0,
+            "fulfillmentModes": [
+              "PICKUP",
+              "DELIVERY"
+            ]
+          }
+        ],
+        "availability": "SOLD_OUT",
+        "description": "Independent synthetic description for meal A3. ",
+        "ingredients": "Synthetic rice",
+        "allergenCodes": [
+          "UNKNOWN"
+        ],
+        "allergenStatement": "",
+        "photos": [
+          {
+            "url": "http://localhost:29090/matbakhy-public/iqa.pngA",
+            "alt": "Synthetic solid colour"
+          }
+        ],
+        "reviewSummary": {
+          "count": 0,
+          "averageTenths": null
+        },
+        "publishedRevision": 1
+      },
+      "expected": "all stock exhausted; Add disabled",
+      "addDisabled": true
+    },
+    {
+      "id": "IQA-09-controlled-loading",
+      "expected": "visible loading until response arrives",
+      "loadingVisible": true
+    },
+    {
+      "id": "IQA-10-text-enlargement",
+      "method": "controlled 200% computed text-size injection; not native browser zoom",
+      "before": "20px",
+      "after": "40px",
+      "expected": "all actions fit without page horizontal overflow",
+      "dimensions": {
+        "width": 320,
+        "scrollWidth": 320
+      },
+      "addVisible": true
+    }
+  ]
+}

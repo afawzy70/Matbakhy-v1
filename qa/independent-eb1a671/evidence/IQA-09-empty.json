@@ -1,0 +1,137 @@
+{
+  "url": "http://localhost:25173/#/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy\nCart\nالعربية\nSign in\nMatbakhy\nHome-cooked meals from kitchens near you\nPreorder\nWhat does your table need?\nChoose by need\nA meal for me or us\nFor one or two people\nComplete my table\nA dish to go with your meal\nPrepare a gathering\nFor family get-togethers\nDishes\nKitchens\nSearch for a meal or kitchen\nSearch for a meal or kitchen\nFilter results\nAll\nMain dishes\nSides and salads\nSoups\nBaked goods\nDesserts\nBreakfast\nReady to cook\nHome-cooked meals to preorder\n\nNo meals match this search.\n\nClear filters\nHome",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "العربية",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "A meal for me or usFor one or two people",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Complete my tableA dish to go with your meal",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Prepare a gatheringFor family get-togethers",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Dishes",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Kitchens",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "search",
+      "name": "Search for a meal or kitchen",
+      "value": "NO_MATCH_IQA",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "submit",
+      "name": "Search for a meal or kitchen",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Filter results",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "All",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Main dishes",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Sides and salads",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Soups",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Baked goods",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Desserts",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Breakfast",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Ready to cook",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Clear filters",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": null
+}

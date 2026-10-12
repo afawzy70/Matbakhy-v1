@@ -1,0 +1,40 @@
+{
+  "url": "http://localhost:25173/#/checkout",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 320,
+  "scrollWidth": 320,
+  "text": "Matbakhy\nCart\nالعربية\nSign in\nCart\n2 × QA Meal A1\n\n15 Oct 2026, 14:18\n\nEmpty cart\n\nSign in to place your order.\n\nSign in\nHome",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "العربية",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Empty cart",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": {
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "slotId": "00000000-0000-0000-0000-00000000019b",
+    "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+    "modes": [
+      "PICKUP",
+      "DELIVERY"
+    ],
+    "lines": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "quantity": 2
+      }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "url": "http://localhost:25173/#/kitchen/qa-kitchen-a",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 320,
+  "scrollWidth": 320,
+  "text": "Matbakhy\nCart\nالعربية\nSign in\nBack\nم\nمطبخ تجريبي A\n\nSynthetic independent QA kitchen\n\nThis kitchen is operationally verified by Matbakhy staff; this is not a food-safety certification.\n\nMeals to preorder\nQA Meal A3\nEGP 80.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A3.\n\nSynthetic portion\nUnavailable\n15 Oct 2026, 14:18\nQA Meal A2\nEGP 95.50\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA.\n\nSynthetic portion\nView details\n15 Oct 2026, 14:18\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A1.\n\nSynthetic portion\nView details\nHome",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "العربية",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": {
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "slotId": "00000000-0000-0000-0000-00000000019b",
+    "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+    "modes": [
+      "PICKUP",
+      "DELIVERY"
+    ],
+    "lines": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "quantity": 2
+      }
+    ]
+  }
+}

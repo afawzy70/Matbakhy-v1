@@ -1,0 +1,122 @@
+[
+  {
+    "case": "IQA-01",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "IQA-01",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-01",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-03",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-03",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-04",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-04",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-09",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  },
+  {
+    "case": "IQA-09",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  },
+  {
+    "case": "IQA-09",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-09",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-09",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "IQA-10",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  }
+]

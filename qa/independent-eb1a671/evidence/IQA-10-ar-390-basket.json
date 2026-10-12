@@ -1,0 +1,40 @@
+{
+  "url": "http://localhost:25173/#/checkout",
+  "lang": "ar",
+  "dir": "rtl",
+  "width": 390,
+  "scrollWidth": 390,
+  "text": "مطبخي\nالسلة\nEnglish\nتسجيل الدخول\nالسلة\n2 × QA Meal A1\n\n١٥‏/١٠‏/٢٠٢٦، ٢:١٨ م\n\nإفراغ السلة\n\nسجّل الدخول لإتمام الطلب.\n\nتسجيل الدخول\nالرئيسية",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "English",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "إفراغ السلة",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": {
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "slotId": "00000000-0000-0000-0000-00000000019b",
+    "slotStartsAt": "2026-10-15T11:18:24.721226Z",
+    "modes": [
+      "PICKUP",
+      "DELIVERY"
+    ],
+    "lines": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "quantity": 2
+      }
+    ]
+  }
+}

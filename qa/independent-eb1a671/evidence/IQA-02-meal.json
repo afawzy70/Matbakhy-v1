@@ -1,0 +1,67 @@
+{
+  "url": "http://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy\nCart\nالعربية\nSign in\nBack\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 14:18 · 3 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:25173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nReviews\n\nNo reviews yet.\n\nHome",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "العربية",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "radio",
+      "name": "",
+      "value": "on",
+      "disabled": false
+    },
+    {
+      "tag": "INPUT",
+      "type": "radio",
+      "name": "",
+      "value": "on",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Decrease quantity",
+      "value": "",
+      "disabled": true
+    },
+    {
+      "tag": "INPUT",
+      "type": "number",
+      "name": "Quantity",
+      "value": "1",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Increase quantity",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Add to cart · EGP 120.25",
+      "value": "",
+      "disabled": true
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Copy link to share",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": null
+}

@@ -1,0 +1,25 @@
+{
+  "url": "http://localhost:25173/#/meal/00000000-0000-0000-0000-000000000277",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy\nCart\nالعربية\nSign in\n\nNot found.\n\nRetry\nHome",
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "العربية",
+      "value": "",
+      "disabled": false
+    },
+    {
+      "tag": "BUTTON",
+      "type": "button",
+      "name": "Retry",
+      "value": "",
+      "disabled": false
+    }
+  ],
+  "cart": null
+}
