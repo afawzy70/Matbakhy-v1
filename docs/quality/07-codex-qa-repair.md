@@ -9,7 +9,7 @@ Two immutable revisions are offered. Neither has been retested by Codex; nothing
 | | **A. Original defects fixed: `cdc592a2492a691de714a3d0bf23b31f25599480`** | **B. Newer candidate: `4555f599411da9683453bee209559c8d1f11cded`** (also the cross-role repair candidate, [08](08-codex-qa-repair-cross-role.md)) |
 |---|---|---|
 | Purpose | Retest MBQA-001, MBQA-002, FG-001 and Q1 exactly as repaired | Retest the same, plus everything changed since A |
-| Evidence | Six local checks PASS (`verification/runs/20261012-MB-032/`); Product CI run 243 success; native run 31 success on Android and iOS | Six local checks: `verification/runs/20261012-QA-REPAIR-2-CHECKS/` (running at the time of writing; see `docs/status/latest.md`); native run 35 at this SHA (in progress at the time of writing); native run 34 at `f5d2ba0` (same mobile behaviour except the Q1 refresh) PASS on Android and iOS |
+| Evidence | Six local checks PASS (`verification/runs/20261012-MB-032/`); Product CI run 243 success; native run 31 success on Android and iOS | Six local checks PASS: `verification/runs/20261012-QA-REPAIR-2-CHECKS/`; native run 35 at this SHA (in progress at the time of writing); native run 34 at `f5d2ba0` (same mobile behaviour except the Q1 refresh) PASS on Android and iOS |
 | Customer web and operations web code | As repaired | A plus MBQA-003/004/005, OBS-001 and the Q1 limit refresh ([08](08-codex-qa-repair-cross-role.md)) |
 | Native app | Basket editing, recovery, Q1 limits | A plus: one recovery check at a time ("Check and retry"), order deep links, sign-in prompt on a linked order, refresh on return to the foreground (MB-033) |
 | Native checks | MB-031/MB-032 | A plus quantity limit, lowered limit, delivery checkout and deep links on Android and iOS |

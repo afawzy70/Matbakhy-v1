@@ -9,6 +9,7 @@ Implementation-agent report (self-reported, not an independent review certificat
   - **Q1:** a difference between tested versions (clients wired in `cdc592a`, after `4eaee3a`), plus one genuine gap fixed: the limit was read only once per page load.
   - **RQ-004:** settled by TC-020/TC-042 and the contract (refuse and re-quote); owner confirmation requested ([note](../product/rq-004-stale-quote.md)).
   - **Earlier findings:** MBQA-001/002 and FG-001 were independently retested PASS on web at `4eaee3a`.
+- **Repair candidate checks:** six local checks PASS at `4555f59` (`verification/runs/20261012-QA-REPAIR-2-CHECKS`); native run 35 at `4555f59` in progress at the time of writing.
 - **Earlier Codex candidates:** A `cdc592a` (original findings) and the MB-033 candidate `f5d2ba0` (six local checks PASS) are superseded for retest by `4555f599411da9683453bee209559c8d1f11cded`.
 - Phase/story: P07. **MB-032 DONE** at `cdc592a` (self-review). Next eligible: MB-033.
   - MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.

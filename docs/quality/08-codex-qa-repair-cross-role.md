@@ -10,7 +10,7 @@ Written by the implementation agent. This is **self-review**, not independent ve
 | Evidence commit | `f76664c777132e78e012c24ca50150ab13f59b09` (`report.md`, `repair-handoff.md`, `native-results.md`) |
 | Application tested by QA | `4eaee3a1f53b929b9e7685fd30da689d470d095c` |
 | **Repair candidate** | **`4555f599411da9683453bee209559c8d1f11cded`** on `implementation/mvp` (full SHA; retest this, not the branch head) |
-| Evidence | `verification/runs/20261012-QA-REPAIR-2/` |
+| Evidence | Red logs and browser journeys: `verification/runs/20261012-QA-REPAIR-2/`. Six local checks at the candidate, all PASS (backend verify, clean-clone workspace with contract drift, local stack, browser journeys 5/5 incl. MBQA-003/004, secret scan, guardrails): `verification/runs/20261012-QA-REPAIR-2-CHECKS/evidence.json`. Native run 35 at the candidate: see `docs/status/latest.md` |
 
 The candidate also contains everything committed after `4eaee3a`: Q1 clients, MB-032/MB-033 native work, MB-039 audit changes and the PREVIEW environment. See [07-codex-qa-repair.md](07-codex-qa-repair.md) for that history.
 
