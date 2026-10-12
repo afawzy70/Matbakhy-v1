@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatMoney, formatTime, type Schemas } from "./api";
+import { formatMoney, formatTime, newIdempotencyKey, type Schemas } from "./api";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 const CASE_CATEGORIES = ["LATE", "MISSING_ITEM", "QUALITY", "FOOD_SAFETY", "CASH", "HANDOVER", "OTHER"] as const;
@@ -138,7 +138,9 @@ function Support({ ctx }: { ctx: Ctx }) {
           <ul className="rows">
             {page.items.map((c) => (
               <li key={c.id}>
-                {c.reference} · {c.orderNumber} · {t.caseCategories[c.category]} · {c.state}
+                <a href={`#/support/${c.id}`}>
+                  {c.reference} · {c.orderNumber} · {t.caseCategories[c.category]} · {t.caseStates[c.state] ?? c.state}
+                </a>
               </li>
             ))}
           </ul>
@@ -245,6 +247,99 @@ function Deletion({ ctx, onMeChanged }: { ctx: Ctx; onMeChanged: () => void }) {
       </button>
       {done ? <p role="status">{t.deletionRequested}</p> : null}
       <ErrorLine message={error} />
+    </section>
+  );
+}
+
+/**
+ * MBQA-004: one own support case with its conversation (CW16). The server returns PUBLIC messages only (STAFF_ONLY notes
+ * never reach the customer) and answers 404 for another customer's case; the page shows them oldest first, attributed
+ * to the customer or the support team, and lets the customer reply while the case is not closed.
+ */
+export function SupportCaseDetail({ ctx, id }: { ctx: Ctx; id: string }) {
+  const { t, locale } = ctx;
+  const [state, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/support/cases/{caseId}", { params: { path: { caseId: id } } }), `${id}|${locale}`);
+  const [reply, setReply] = useState("");
+  const [key, setKey] = useState(newIdempotencyKey);
+  const { run, error, busy } = useMutation(ctx, reload);
+  return (
+    <section className="transaction stack" aria-labelledby="case-heading">
+      <p>
+        <a href="#/account">{t.backToAccount}</a>
+      </p>
+      <Status ctx={ctx} state={state} onRetry={reload}>
+        {(c) => {
+          // The server sends PUBLIC messages only; the filter keeps a staff-only note off the screen even if one slipped through.
+          const messages = c.messages.filter((m) => m.visibility === "PUBLIC").sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+          const closed = c.state === "CLOSED";
+          return (
+            <div className="stack">
+              <div className="card">
+                <h2 id="case-heading">
+                  {c.reference} · {t.caseCategories[c.category] ?? c.category}
+                </h2>
+                <p>
+                  <span className="badge">{t.caseStates[c.state] ?? c.state}</span>{" "}
+                  <a href={`#/orders/${c.orderId}`}>{c.orderNumber ?? t.caseOrder}</a>
+                </p>
+                <p>{c.description}</p>
+              </div>
+              <section className="card" aria-labelledby="conversation-heading">
+                <div className="card-head">
+                  <h3 id="conversation-heading">{t.conversation}</h3>
+                  <button type="button" className="secondary" onClick={reload}>
+                    {t.refresh}
+                  </button>
+                </div>
+                {messages.length === 0 ? (
+                  <p>{t.noReplies}</p>
+                ) : (
+                  <ol className="rows" aria-label={t.conversation}>
+                    {messages.map((m) => (
+                      <li key={m.id}>
+                        <p>
+                          <strong>{m.authorRole === "CUSTOMER" ? t.fromYou : t.fromSupport}</strong> ·{" "}
+                          <time dateTime={m.createdAt}>{formatTime(m.createdAt, locale)}</time>
+                        </p>
+                        <p>{m.body}</p>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+              </section>
+              {closed ? (
+                <p className="notice">{t.caseClosedNoReply}</p>
+              ) : (
+                <div className="card form">
+                  <label>
+                    {t.yourReply} <textarea maxLength={4000} value={reply} onChange={(e) => setReply(e.target.value)} />
+                  </label>
+                  <button
+                    type="button"
+                    disabled={busy || reply.trim().length === 0}
+                    onClick={() =>
+                      void run(() =>
+                        ctx.api.POST("/api/v1/support/cases/{caseId}/messages", {
+                          params: { path: { caseId: id }, header: { "Idempotency-Key": key } },
+                          body: { body: reply.trim() },
+                        }),
+                      ).then((ok) => {
+                        if (ok) {
+                          setReply("");
+                          setKey(newIdempotencyKey());
+                        }
+                      })
+                    }
+                  >
+                    {t.sendReply}
+                  </button>
+                  <ErrorLine message={error} />
+                </div>
+              )}
+            </div>
+          );
+        }}
+      </Status>
     </section>
   );
 }

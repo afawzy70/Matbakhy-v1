@@ -29,6 +29,8 @@ export interface AppContextValue {
   reloadProfile: () => Promise<void>;
   /** The active policy's per-line limit from API-001 (Q1 option A); null until known or when unavailable. */
   maxQuantityPerLine: number | null;
+  /** Re-reads the published limit (the cart calls it when it gains focus). */
+  reloadLimits: () => void;
 }
 
 const Ctx = createContext<AppContextValue | null>(null);
@@ -160,21 +162,25 @@ export function AppProvider({
   }, [endSession, startSignIn]);
 
   // Q1 option A: quantity controls follow the server's published limit; without it they fall back to 20 and the slot.
+  // Re-read when the cart gains focus (reloadLimits), so a policy lowered after launch applies before any quote; a failed
+  // re-read keeps the last published limit rather than loosening the controls.
   const [maxQuantityPerLine, setMaxQuantityPerLine] = useState<number | null>(null);
+  const [limitsNonce, setLimitsNonce] = useState(0);
+  const reloadLimits = useCallback(() => setLimitsNonce((n) => n + 1), []);
   useEffect(() => {
     let active = true;
     api
       .GET("/api/v1/configuration/public")
       .then((r) => {
-        if (active) {
-          setMaxQuantityPerLine(r.data?.orderLimits?.maxQuantityPerLine ?? null);
+        if (active && r.data) {
+          setMaxQuantityPerLine(r.data.orderLimits?.maxQuantityPerLine ?? null);
         }
       })
       .catch(() => undefined);
     return () => {
       active = false;
     };
-  }, [api]);
+  }, [api, limitsNonce]);
 
   const value: AppContextValue = {
     config,
@@ -190,6 +196,7 @@ export function AppProvider({
     switchAccount,
     reloadProfile,
     maxQuantityPerLine,
+    reloadLimits,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

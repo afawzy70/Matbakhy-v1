@@ -1,0 +1,3145 @@
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/customer-web
+
+ ❯ src/App.test.tsx (35 tests | 8 failed | 27 skipped) 8134ms
+   ❯ QA repair MBQA-003: sign-out (4)
+     × ends the server session with the CSRF token, clears the basket and profile, and ends the identity provider session 1059ms
+     × is labelled in English after a language switch and reachable by keyboard 1012ms
+     × warns before signing out with an unconfirmed order, then clears its keys only when confirmed 1013ms
+     × keeps the customer signed in, with the basket, when the server cannot be reached 1012ms
+   ❯ QA repair MBQA-004: support case conversation (4)
+     × opens the case from the account and shows public replies oldest first, attributed, with a reply form 1011ms
+     × never renders a staff-only note even if one were present, and says when there are no replies 1008ms
+     × shows another customer's case as not found and offers a retry after an error 1006ms
+     × offers no reply on a closed case 1011ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-003: sign-out > ends the server session with the CSRF token, clears the basket and profile, and ends the identity provider session
+TestingLibraryElementError: Unable to find role="button" and name "تسجيل الخروج"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:964:33
+    962|     const { fetchImpl, calls } = signedIn(() => ({ status: 200, body: …
+    963|     render(<App fetchImpl={fetchImpl} assign={assign} />);
+    964|     const button = await screen.findByRole("button", { name: "تسجيل ال…
+       |                                 ^
+    965|     expect(screen.getByRole("link", { name: "حسابي" })).toBeTruthy();
+    966|     fireEvent.click(button);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-003: sign-out > is labelled in English after a language switch and reachable by keyboard
+TestingLibraryElementError: Unable to find role="button" and name "تسجيل الخروج"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:980:18
+    978|     const { fetchImpl } = signedIn(() => ({ status: 200, body: {} }));
+    979|     render(<App fetchImpl={fetchImpl} assign={vi.fn()} />);
+    980|     await screen.findByRole("button", { name: "تسجيل الخروج" });
+       |                  ^
+    981|     fireEvent.click(screen.getByRole("button", { name: "English" }));
+    982|     const button = screen.getByRole("button", { name: "Sign out" });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-003: sign-out > warns before signing out with an unconfirmed order, then clears its keys only when confirmed
+TestingLibraryElementError: Unable to find role="button" and name "تسجيل الخروج"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:992:34
+    990|     const { fetchImpl, calls } = signedIn(() => ({ status: 200, body: …
+    991|     render(<App fetchImpl={fetchImpl} assign={assign} />);
+    992|     fireEvent.click(await screen.findByRole("button", { name: "تسجيل ا…
+       |                                  ^
+    993|     expect(screen.getByRole("alertdialog")).toBeTruthy();
+    994|     expect(calls.some((c) => c.path === "/api/v1/auth/logout")).toBe(f…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-003: sign-out > keeps the customer signed in, with the basket, when the server cannot be reached
+TestingLibraryElementError: Unable to find role="button" and name "تسجيل الخروج"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"home stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-label[39m=[32m"مطبخي"[39m
+            [33mclass[39m=[32m"brand-strip"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<strong>[39m
+                [0mمطبخي[0m
+              [36m</strong>[39m
+              [36m<span>[39m
+                [0mأكل بيتي من مطابخ قريبة منك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"pill"[39m
+            [36m>[39m
+              [0mحجز مسبق[0m
+            [36m</span>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"intent-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"row between"[39m
+            [36m>[39m
+              [36m<h2[39m
+                [33mid[39m=[32m"intent-heading"[39m
+              [36m>[39m
+                [0mمحتاج إيه لسفرتك؟[0m
+              [36m</h2>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"muted small"[39m
+              [36m>[39m
+                [0mاختر حسب حاجتك[0m
+              [36m</span>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"intents"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mوجبة ليا أو لينا[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلشخص أو فردين[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأكمل سفرتي[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mصنف يكمل أكلك[0m
+                [36m</span>[39m
+              [36m</button>[39m
+              [36m<button[39m
+                [33maria-pressed[39m=[32m"false"[39m
+                [33mclass[39m=[32m"intent"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<strong>[39m
+                  [0mأجهز عزومة[0m
+                [36m</strong>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"small"[39m
+                [36m>[39m
+                  [0mلجمعة ولمة العيلة[0m
+                [36m</span>[39m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"اعرض حسب"[39m
+            [33mclass[39m=[32m"mode-switch"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالأكلات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالمطابخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<form[39m
+            [33mclass[39m=[32m"search-bar"[39m
+            [33mrole[39m=[32m"search"[39m
+          [36m>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"grow"[39m
+            [36m>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"sr-only"[39m
+              [36m>[39m
+                [0mابحث عن طبق أو مطبخ[0m
+              [36m</span>[39m
+              [36m<input[39m
+                [33maria-label[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mmaxlength[39m=[32m"80"[39m
+                [33mplaceholder[39m=[32m"ابحث عن طبق أو مطبخ"[39m
+                [33mtype[39m=[32m"search"[39m
+                [33mvalue[39m=[32m""[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"submit"[39m
+            [36m>[39m
+              [0mابحث عن طبق أو مطبخ[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-controls[39m=[32m"filters"[39m
+              [33maria-expanded[39m=[32m"false"[39m
+              [33mclass[39m=[32m"secondary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mتصفية النتائج[0m
+            [36m</button>[39m
+          [36m</form>[39m
+          [36m<div[39m
+            [33maria-label[39m=[32m"الأصناف"[39m
+            [33mclass[39m=[32m"chips"[39m
+            [33mrole[39m=[32m"group"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"true"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mالكل[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق رئيسية[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mأطباق جانبية وسلطات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mشوربة[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mمخبوزات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحلويات[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mفطار[0m
+            [36m</button>[39m
+            [36m<button[39m
+              [33maria-pressed[39m=[32m"false"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mجاهز للطبخ[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"results-heading"[39m
+            [33mclass[39m=[32m"stack-sm"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"results-heading"[39m
+            [36m>[39m
+              [0mأكلات بيتية متاحة للحجز[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"card pad stack-sm"[39m
+            [36m>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"muted"[39m
+              [36m>[39m
+                [0mلا توجد أطباق متاحة لهذا البحث.[0m
+              [36m</p>[39m
+            [36m</div>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:1008:34
+    1006|     const { fetchImpl } = signedIn(() => "NETWORK_ERROR");
+    1007|     render(<App fetchImpl={fetchImpl} assign={vi.fn()} />);
+    1008|     fireEvent.click(await screen.findByRole("button", { name: "تسجيل ا…
+       |                                  ^
+    1009|     expect(await screen.findByText("تعذّر تسجيل الخروج. حاول مرة أخرى.…
+    1010|     expect(screen.getByRole("button", { name: "تسجيل الخروج" })).toBeT…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-004: support case conversation > opens the case from the account and shows public replies oldest first, attributed, with a reply form
+TestingLibraryElementError: Unable to find role="link" and name `/CS-A12B4EF8/`
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"transaction stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"profile-heading"[39m
+            [33mclass[39m=[32m"card form"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"profile-heading"[39m
+            [36m>[39m
+              [0mالبيانات الشخصية[0m
+            [36m</h2>[39m
+            [36m<label>[39m
+              [0mالاسم[0m
+              [0m [0m
+              [36m<input[39m
+                [33mmaxlength[39m=[32m"120"[39m
+                [33mvalue[39m=[32m"Mona"[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<label>[39m
+              [0mلغة الرسائل المفضلة[0m
+              [0m [0m
+              [36m<select>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"ar"[39m
+                [36m>[39m
+                  [0mالعربية[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"en"[39m
+                [36m>[39m
+                  [0mEnglish[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحفظ[0m
+            [36m</button>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"fav-heading"[39m
+            [33mclass[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"fav-heading"[39m
+            [36m>[39m
+              [0mالمفضلة[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m/>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"inbox-heading"[39m
+            [33mclass[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"inbox-heading"[39m
+            [36m>[39m
+              [0mالإشعارات[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m/>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"support-heading"[39m
+            [33mclass[39m=[32m"card form"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"support-heading"[39m
+            [36m>[39m
+              [0mالدعم[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m>[39m
+              [36m<li>[39m
+                [0mCS-A12B4EF8[0m
+                [0m · [0m
+                [0mMB-2001[0m
+                [0m · [0m
+                [0mالجودة[0m
+                [0m · [0m
+                [0mWAITING_ON_CUSTOMER[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<h3>[39m
+              [0mطلب مساعدة بخصوص طلب[0m
+            [36m</h3>[39m
+            [36m<label>[39m
+              [0mالطلب[0m
+              [0m [0m
+              [36m<select>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<label>[39m
+              [0mنوع المشكلة[0m
+              [0m [0m
+              [36m<select>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"LATE"[39m
+                [36m>[39m
+                  [0mتأخير[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"MISSING_ITEM"[39m
+                [36m>[39m
+                  [0mصنف ناقص[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"QUALITY"[39m
+                [36m>[39m
+                  [0mالجودة[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"FOOD_SAFETY"[39m
+                [36m>[39m
+                  [0mسلامة الغذاء[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"CASH"[39m
+                [36m>[39m
+                  [0mالدفع النقدي[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"HANDOVER"[39m
+                [36m>[39m
+                  [0mالتسليم[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"OTHER"[39m
+                [36m>[39m
+                  [0mأخرى[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<label>[39m
+              [0mاشرح المشكلة[0m
+              [0m [0m
+              [36m<textarea[39m
+                [33mmaxlength[39m=[32m"4000"[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mطلب مساعدة بخصوص طلب[0m
+            [36m</button>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"addr-heading"[39m
+            [33mclass[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"addr-heading"[39m
+            [36m>[39m
+              [0mعناويني[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m/>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"delete-heading"[39m
+            [33mclass[39m=[32m"card form"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"delete-heading"[39m
+            [36m>[39m
+              [0mطلب حذف الحساب[0m
+            [36m</h2>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"check"[39m
+            [36m>[39m
+              [36m<input[39m
+                [33mtype[39m=[32m"checkbox"[39m
+              [36m/>[39m
+              [0m [0m
+              [0mأؤكد طلب حذف حسابي[0m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"danger"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mطلب حذف الحساب[0m
+            [36m</button>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"transaction stack"[39m
+        [36m>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"profile-heading"[39m
+            [33mclass[39m=[32m"card form"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"profile-heading"[39m
+            [36m>[39m
+              [0mالبيانات الشخصية[0m
+            [36m</h2>[39m
+            [36m<label>[39m
+              [0mالاسم[0m
+              [0m [0m
+              [36m<input[39m
+                [33mmaxlength[39m=[32m"120"[39m
+                [33mvalue[39m=[32m"Mona"[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<label>[39m
+              [0mلغة الرسائل المفضلة[0m
+              [0m [0m
+              [36m<select>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"ar"[39m
+                [36m>[39m
+                  [0mالعربية[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"en"[39m
+                [36m>[39m
+                  [0mEnglish[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mحفظ[0m
+            [36m</button>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"fav-heading"[39m
+            [33mclass[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"fav-heading"[39m
+            [36m>[39m
+              [0mالمفضلة[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m/>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"inbox-heading"[39m
+            [33mclass[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"inbox-heading"[39m
+            [36m>[39m
+              [0mالإشعارات[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m/>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"support-heading"[39m
+            [33mclass[39m=[32m"card form"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"support-heading"[39m
+            [36m>[39m
+              [0mالدعم[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m>[39m
+              [36m<li>[39m
+                [0mCS-A12B4EF8[0m
+                [0m · [0m
+                [0mMB-2001[0m
+                [0m · [0m
+                [0mالجودة[0m
+                [0m · [0m
+                [0mWAITING_ON_CUSTOMER[0m
+              [36m</li>[39m
+            [36m</ul>[39m
+            [36m<h3>[39m
+              [0mطلب مساعدة بخصوص طلب[0m
+            [36m</h3>[39m
+            [36m<label>[39m
+              [0mالطلب[0m
+              [0m [0m
+              [36m<select>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m""[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<label>[39m
+              [0mنوع المشكلة[0m
+              [0m [0m
+              [36m<select>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"LATE"[39m
+                [36m>[39m
+                  [0mتأخير[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"MISSING_ITEM"[39m
+                [36m>[39m
+                  [0mصنف ناقص[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"QUALITY"[39m
+                [36m>[39m
+                  [0mالجودة[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"FOOD_SAFETY"[39m
+                [36m>[39m
+                  [0mسلامة الغذاء[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"CASH"[39m
+                [36m>[39m
+                  [0mالدفع النقدي[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"HANDOVER"[39m
+                [36m>[39m
+                  [0mالتسليم[0m
+                [36m</option>[39m
+                [36m<option[39m
+                  [33mvalue[39m=[32m"OTHER"[39m
+                [36m>[39m
+                  [0mأخرى[0m
+                [36m</option>[39m
+              [36m</select>[39m
+            [36m</label>[39m
+            [36m<label>[39m
+              [0mاشرح المشكلة[0m
+              [0m [0m
+              [36m<textarea[39m
+                [33mmaxlength[39m=[32m"4000"[39m
+              [36m/>[39m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mطلب مساعدة بخصوص طلب[0m
+            [36m</button>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"addr-heading"[39m
+            [33mclass[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"addr-heading"[39m
+            [36m>[39m
+              [0mعناويني[0m
+            [36m</h2>[39m
+            [36m<ul[39m
+              [33mclass[39m=[32m"rows"[39m
+            [36m/>[39m
+          [36m</section>[39m
+          [36m<section[39m
+            [33maria-labelledby[39m=[32m"delete-heading"[39m
+            [33mclass[39m=[32m"card form"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mid[39m=[32m"delete-heading"[39m
+            [36m>[39m
+              [0mطلب حذف الحساب[0m
+            [36m</h2>[39m
+            [36m<label[39m
+              [33mclass[39m=[32m"check"[39m
+            [36m>[39m
+              [36m<input[39m
+                [33mtype[39m=[32m"checkbox"[39m
+              [36m/>[39m
+              [0m [0m
+              [0mأؤكد طلب حذف حسابي[0m
+            [36m</label>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"danger"[39m
+              [33mdisabled[39m=[32m""[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mطلب حذف الحساب[0m
+            [36m</button>[39m
+          [36m</section>[39m
+        [36m</div>[39m
+      [36m</main>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33maria-current[39m=[32m"page"[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:1048:34
+    1046|     });
+    1047|     render(<App fetchImpl={fetchImpl} />);
+    1048|     fireEvent.click(await screen.findByRole("link", { name: /CS-A12B4E…
+       |                                  ^
+    1049|     const thread = await screen.findByRole("list", { name: "المحادثة" …
+    1050|     const items = within(thread).getAllByRole("listitem").map((li) => …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-004: support case conversation > never renders a staff-only note even if one were present, and says when there are no replies
+TestingLibraryElementError: Unable to find an element with the text: لا توجد ردود بعد.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m/>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m/>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:1072:25
+    1070|     }));
+    1071|     render(<App fetchImpl={fetchImpl} />);
+    1072|     expect(await screen.findByText("لا توجد ردود بعد.")).toBeTruthy();
+       |                         ^
+    1073|     expect(screen.queryByText("QA PRIVATE NOTE NEVER FOR CUSTOMER")).t…
+    1074|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-004: support case conversation > shows another customer's case as not found and offers a retry after an error
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m/>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m/>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:1081:32
+    1079|     const { fetchImpl } = routes(() => (status === 404 ? { status: 404…
+    1080|     render(<App fetchImpl={fetchImpl} />);
+    1081|     const alert = await screen.findByRole("alert");
+       |                                ^
+    1082|     expect(alert.textContent).not.toContain("CS-A12B4EF8");
+    1083|     status = 200;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-004: support case conversation > offers no reply on a closed case
+TestingLibraryElementError: Unable to find an element with the text: هذه الحالة مغلقة؛ افتح حالة جديدة إذا احتجت مساعدة.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m/>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"app"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"topbar"[39m
+      [36m>[39m
+        [36m<h1>[39m
+          [0mمطبخي[0m
+        [36m</h1>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"topbar-actions"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"button secondary"[39m
+            [33mhref[39m=[32m"#/checkout"[39m
+          [36m>[39m
+            [0mالسلة[0m
+          [36m</a>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"secondary"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mEnglish[0m
+          [36m</button>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"shell"[39m
+      [36m/>[39m
+      [36m<nav[39m
+        [33maria-label[39m=[32m"مطبخي"[39m
+        [33mclass[39m=[32m"bottom-nav"[39m
+      [36m>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/"[39m
+        [36m>[39m
+          [0mالرئيسية[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/orders"[39m
+        [36m>[39m
+          [0mطلباتي[0m
+        [36m</a>[39m
+        [36m<a[39m
+          [33mhref[39m=[32m"#/account"[39m
+        [36m>[39m
+          [0mحسابي[0m
+        [36m</a>[39m
+      [36m</nav>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:1092:25
+    1090|     const { fetchImpl } = routes(() => ({ status: 200, body: supportCa…
+    1091|     render(<App fetchImpl={fetchImpl} />);
+    1092|     expect(await screen.findByText("هذه الحالة مغلقة؛ افتح حالة جديدة …
+       |                         ^
+    1093|     expect(screen.queryByRole("button", { name: "إرسال الرد" })).toBeN…
+    1094|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 27 skipped (35)
+   Start at  18:57:24
+   Duration  9.80s (tests 84%, environment 7%, transform 7%, import 1%)
+

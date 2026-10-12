@@ -5930,7 +5930,9 @@ components:
         Keys: commerce-policy (value = all CommercePolicyVersion fields except version/status/approvedAt; a real policy needs
         approvalReference; synthetic only in LOCAL/CI), zone:{zoneId} (value {active, deliveryFeeMinor}), flag:ordering-enabled
         (value {enabled}). expectedVersion is the current version of that key (0 when none). Applies now; future effectiveAt
-        is 422 SCHEDULED_CHANGES_NOT_SUPPORTED. Only new quotes use the change. Needs config.write and recent MFA.
+        is 422 SCHEDULED_CHANGES_NOT_SUPPORTED. Only new quotes use the change: an existing unplaced quote is not honored at its
+        old values; placing it fails revalidation (409 PRICE_CHANGED, reason POLICY_CHANGED or TOTAL_CHANGED; TC-020/TC-042)
+        and needs a fresh quote. Placed orders keep their snapshots. Needs config.write and recent MFA.
       required: [value, reason, expectedVersion]
       properties:
         value:

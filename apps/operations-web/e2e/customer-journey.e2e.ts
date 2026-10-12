@@ -242,6 +242,65 @@ test("customer orders delivery and pickup in the customer web and follows the co
   expect(replaced, "confirming replaces the basket with the other slot").not.toBe(firstSlot);
   expect(replaced).toBeTruthy();
 
+  // MBQA-004 (independent QA, 4eaee3a): the customer opens a support case and reads the support team's public reply in
+  // the customer web; a staff-only note never reaches the customer; another customer cannot open the case.
+  await page.goto(`${CUSTOMER}/#/account`);
+  await page.getByLabel(c.caseOrder, { exact: true }).selectOption({ label: number });
+  await page.getByLabel(c.caseCategory).selectOption("QUALITY");
+  await page.getByLabel(c.caseDescription).fill("e2e synthetic support case description");
+  await page.getByRole("button", { name: c.openCase }).click();
+  const caseLink = page.getByRole("link", { name: new RegExp(`CS-[0-9A-F]{8} · ${number}`) });
+  await expect(caseLink).toBeVisible();
+  const caseId = sql(`SELECT c.id FROM support_case c JOIN customer_order o ON o.id = c.order_id WHERE o.public_number = '${number}'
+                      ORDER BY c.created_at DESC LIMIT 1`);
+  // Staff messages as test-only SQL with a synthetic staff author (the staff reply UI is covered by the operations tests).
+  sql(`INSERT INTO case_message (id, case_id, author_id, author_role, visibility, body, created_at)
+       SELECT gen_random_uuid(), '${caseId}', u.id, 'STAFF', v.visibility, v.body, now() + v.delay
+       FROM (SELECT id FROM app_user WHERE subject <> '${CUSTOMER_B}' ORDER BY created_at LIMIT 1) u,
+            (VALUES ('STAFF_ONLY', 'E2E PRIVATE NOTE NEVER FOR CUSTOMER', interval '1 second'),
+                    ('PUBLIC', 'E2E PUBLIC REPLY FOR CUSTOMER', interval '2 seconds')) AS v(visibility, body, delay)`);
+  await caseLink.click();
+  await expect(page.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toBeVisible();
+  await expect(page.getByText(c.fromSupport)).toBeVisible();
+  await expect(page.getByText("E2E PRIVATE NOTE NEVER FOR CUSTOMER")).toHaveCount(0);
+  await page.getByLabel(c.yourReply).fill("e2e customer follow-up");
+  await page.getByRole("button", { name: c.sendReply }).click();
+  await expect(page.getByText("e2e customer follow-up")).toBeVisible();
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await overflowing(page), `overflow ${width} support case`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await axe(page, "support-case");
+  const otherContext = await browser.newContext();
+  const other = await otherContext.newPage();
+  await other.goto(`${CUSTOMER}/#/`);
+  await other.getByRole("link", { name: c.signIn }).first().click();
+  await idpLogin(other, "customer-a");
+  await other.goto(`${CUSTOMER}/#/support/${caseId}`);
+  await expect(other.getByRole("alert")).toBeVisible();
+  await expect(other.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toHaveCount(0);
+  expect((await other.request.get(`${API}/api/v1/support/cases/${caseId}`)).status(), "another customer's case is not found").toBe(404);
+  await otherContext.close();
+
+  // MBQA-003 (independent QA, 4eaee3a): a visible, localized sign-out ends the server session, clears this browser's
+  // private state and the identity provider session; reload and back navigation show nothing of the account.
+  await page.goto(`${CUSTOMER}/#/account`);
+  await expect(page.getByRole("button", { name: c.signOut })).toBeVisible();
+  await page.getByRole("button", { name: c.signOut }).click();
+  await expect(page).toHaveURL(/5173\/?(#\/?)?$/);
+  await expect(page.getByRole("link", { name: c.signIn }).first()).toBeVisible();
+  expect((await page.request.get(`${API}/api/v1/me`)).status(), "the server session ended").toBe(401);
+  expect(await page.evaluate(() => window.localStorage.getItem("matbakhy.cart")), "basket cleared").toBeNull();
+  await page.reload();
+  await expect(page.getByRole("link", { name: c.nav.account })).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: c.signOut })).toHaveCount(0);
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByRole("link", { name: c.signIn }).first().click();
+  await expect(page.locator("#username"), "the next sign-in asks for credentials (no silent identity-provider session)").toBeVisible();
+
   await cookContext.close();
   await customerContext.close();
 });

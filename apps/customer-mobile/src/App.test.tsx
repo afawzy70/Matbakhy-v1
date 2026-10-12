@@ -509,4 +509,18 @@ describe("Q1 on native: quantity limits come from the server's active policy", (
     await fireEvent.press(screen.getByTestId("qty-dec-mq"));
     await waitFor(() => expect(screen.queryByText(t.overLineLimit(10))).toBeNull());
   });
+
+  it("re-reads the limit when the cart opens, so a policy lowered after launch applies before any quote", async () => {
+    mockStore.set(
+      "matbakhy.basket.v1",
+      JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "sq", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: "mq", title: "Dish mq", quantity: 8, unitPriceMinor: 12000, maxQuantity: 10 }] }),
+    );
+    let policy = 10;
+    const configured = () => json(200, { orderingAvailable: true, orderLimits: { maxQuantityPerLine: policy, maxLinesPerOrder: 20, policyVersion: 7 } });
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/configuration/public": configured })} />);
+    const cart = await screen.findByTestId("open-cart");
+    policy = 5;
+    await fireEvent.press(cart);
+    expect(await screen.findByText(t.overLineLimit(5))).toBeTruthy();
+  });
 });

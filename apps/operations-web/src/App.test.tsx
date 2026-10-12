@@ -209,6 +209,43 @@ describe("operations-web cook workspace", () => {
     expect(within(card).getByText("+201001234567")).toBeTruthy();
   });
 
+  it("offers only the slot transitions the server allows: no Close for a draft (MBQA-005)", async () => {
+    const slot = (id: string, state: string, hour: number) => ({
+      id, kitchenId: "k1", state, startsAt: `2026-10-14T${hour}:00:00Z`, endsAt: `2026-10-14T${hour + 1}:00:00Z`, cutoffAt: `2026-10-14T${hour - 2}:00:00Z`,
+      leadMinutes: 120, maxPortions: 8, reserved: 0, allocated: 0, consumed: 0, meals: [], version: 2,
+    });
+    let state = "OPEN";
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/meals": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/cook/slots": () => ({
+        status: 200,
+        body: { items: [slot("d", "DRAFT", 10), slot("o", state, 12), slot("p", "PAUSED", 14), slot("c", "CLOSED", 16)], nextCursor: null, hasMore: false },
+      }),
+      // Another device closed the open slot meanwhile: the server refuses and the card follows the server's state.
+      "PATCH /api/v1/cook/slots/o": () => {
+        state = "CLOSED";
+        return { status: 409, body: { code: "STATE_CONFLICT" } };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "المواعيد" }));
+    const cards = await screen.findAllByRole("article");
+    const cardAt = (i: number) => cards[i] as HTMLElement;
+    const actions = (i: number) => within(cardAt(i)).queryAllByRole("button").map((b) => b.textContent);
+    expect(cards).toHaveLength(4);
+    expect(actions(0)).toEqual(["فتح"]);
+    expect(actions(1)).toEqual(["إيقاف مؤقت", "إغلاق"]);
+    expect(actions(2)).toEqual(["فتح", "إغلاق"]);
+    expect(actions(3)).toEqual([]);
+
+    fireEvent.click(within(cardAt(1)).getByRole("button", { name: "إغلاق" }));
+    expect(await screen.findByText("لم يعد هذا الإجراء متاحًا. تم التحديث.")).toBeTruthy();
+    expect(calls.find((c) => c.method === "PATCH")?.body).toEqual({ state: "CLOSED", expectedVersion: 2 });
+    await waitFor(() => expect(within(screen.getAllByRole("article")[1] as HTMLElement).queryAllByRole("button")).toHaveLength(0));
+  });
+
   it("offers resume only for a cook pause and explains a staff pause", async () => {
     const { fetchImpl } = server({
       "GET /api/v1/me": me,

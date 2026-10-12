@@ -1,0 +1,446 @@
+FAIL src/App.test.tsx
+  ● Q1 on native: quantity limits come from the server's active policy › re-reads the limit when the cart opens, so a policy lowered after launch applies before any quote
+
+    Unable to find an element with text: At most 5 per meal can be ordered now. Reduce the quantity to continue.
+
+    [36m<View>[39m
+      [36m<RNSScreenStack>[39m
+        [36m<RNSScreen[39m
+          [33maria-hidden[39m=[32m{true}[39m
+        [36m>[39m
+          [36m<RNSScreenContentWrapper>[39m
+            [36m<View>[39m
+              [36m<RNSScreenNavigationContainer>[39m
+                [36m<RNSScreen[39m
+                  [33mpointerEvents[39m=[32m"box-none"[39m
+                [36m>[39m
+                  [36m<View[39m
+                    [33maria-hidden[39m=[32m{false}[39m
+                  [36m>[39m
+                    [36m<View>[39m
+                      [36m<View[39m
+                        [33mpointerEvents[39m=[32m"box-none"[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mpointerEvents[39m=[32m"box-none"[39m
+                        [36m>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"auto"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"none"[39m
+                          [36m/>[39m
+                          [36m<View[39m
+                            [33mpointerEvents[39m=[32m"box-none"[39m
+                          [36m>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m>[39m
+                              [36m<Text[39m
+                                [33mrole[39m=[32m"heading"[39m
+                              [36m>[39m
+                                [0mDiscover[0m
+                              [36m</Text>[39m
+                            [36m</View>[39m
+                            [36m<View[39m
+                              [33mpointerEvents[39m=[32m"box-none"[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                        [36m</View>[39m
+                      [36m</View>[39m
+                    [36m</View>[39m
+                    [36m<View>[39m
+                      [36m<RCTScrollView[39m
+                        [33mtestID[39m=[32m"discover"[39m
+                      [36m>[39m
+                        [36m<View>[39m
+                          [36m<View[39m
+                            [33maccessibilityLabel[39m=[32m"Cart (8)"[39m
+                            [33maccessibilityRole[39m=[32m"button"[39m
+                            [33maccessibilityState[39m=[32m{
+                              {
+                                "disabled": false,
+                              }
+                            }[39m
+                            [33maccessible[39m=[32m{true}[39m
+                            [33mtestID[39m=[32m"open-cart"[39m
+                          [36m>[39m
+                            [36m<Text>[39m
+                              [0mCart (8)[0m
+                            [36m</Text>[39m
+                          [36m</View>[39m
+                          [36m<View>[39m
+                            [36m<Text>[39m
+                              [0mSearch dishes or kitchens[0m
+                            [36m</Text>[39m
+                            [36m<TextInput[39m
+                              [33maccessibilityLabel[39m=[32m"Search dishes or kitchens"[39m
+                              [33mtestID[39m=[32m"search"[39m
+                              [33mvalue[39m=[32m""[39m
+                            [36m/>[39m
+                          [36m</View>[39m
+                          [36m<View[39m
+                            [33maccessibilityLabel[39m=[32m"Search"[39m
+                            [33maccessibilityRole[39m=[32m"button"[39m
+                            [33maccessibilityState[39m=[32m{
+                              {
+                                "disabled": false,
+                              }
+                            }[39m
+                            [33maccessible[39m=[32m{true}[39m
+                          [36m>[39m
+                            [36m<Text>[39m
+                              [0mSearch[0m
+                            [36m</Text>[39m
+                          [36m</View>[39m
+                          [36m<View>[39m
+                            [36m<View[39m
+                              [33maccessibilityLabel[39m=[32m"Dish m1, Kitchen k1, EGP 120.00"[39m
+                              [33maccessibilityRole[39m=[32m"button"[39m
+                              [33maccessible[39m=[32m{true}[39m
+                              [33mtestID[39m=[32m"meal-m1"[39m
+                            [36m>[39m
+                              [36m<View>[39m
+                                [36m<Text>[39m
+                                  [0mDish m1[0m
+                                [36m</Text>[39m
+                                [36m<Text>[39m
+                                  [0mKitchen k1[0m
+                                [36m</Text>[39m
+                                [36m<Text>[39m
+                                  [0mEGP 120.00[0m
+                                [36m</Text>[39m
+                              [36m</View>[39m
+                            [36m</View>[39m
+                            [36m<View[39m
+                              [33maccessibilityLabel[39m=[32m"Dish m2, Kitchen k2, EGP 120.00"[39m
+                              [33maccessibilityRole[39m=[32m"button"[39m
+                              [33maccessible[39m=[32m{true}[39m
+                              [33mtestID[39m=[32m"meal-m2"[39m
+                            [36m>[39m
+                              [36m<View>[39m
+                                [36m<Text>[39m
+                                  [0mDish m2[0m
+                                [36m</Text>[39m
+                                [36m<Text>[39m
+                                  [0mKitchen k2[0m
+                                [36m</Text>[39m
+                                [36m<Text>[39m
+                                  [0mEGP 120.00[0m
+                                [36m</Text>[39m
+                              [36m</View>[39m
+                            [36m</View>[39m
+                          [36m</View>[39m
+                        [36m</View>[39m
+                      [36m</RCTScrollView>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</RNSScreen>[39m
+              [36m</RNSScreenNavigationContainer>[39m
+              [36m<View[39m
+                [33mpointerEvents[39m=[32m"auto"[39m
+              [36m>[39m
+                [36m<View[39m
+                  [33mpointerEvents[39m=[32m"none"[39m
+                [36m/>[39m
+                [36m<View[39m
+                  [33mrole[39m=[32m"tablist"[39m
+                [36m>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Discover, tab, 1 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": true,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-discover"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View />[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mDiscover[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Favorites, tab, 2 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-favorites"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mFavorites[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Orders, tab, 3 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-orders"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mOrders[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<View>[39m
+                    [36m<View[39m
+                      [33maccessibilityLabel[39m=[32m"Account, tab, 4 of 4"[39m
+                      [33maccessibilityState[39m=[32m{
+                        {
+                          "selected": false,
+                        }
+                      }[39m
+                      [33maccessible[39m=[32m{true}[39m
+                      [33mrole[39m=[32m"button"[39m
+                      [33mtestID[39m=[32m"tab-account"[39m
+                    [36m>[39m
+                      [36m<View[39m
+                        [33mstyle[39m=[32m{
+                          {
+                            "display": "none",
+                          }
+                        }[39m
+                      [36m>[39m
+                        [36m<View[39m
+                          [33mstyle[39m=[32m{
+                            {
+                              "opacity": 0,
+                            }
+                          }[39m
+                        [36m/>[39m
+                        [36m<View />[39m
+                      [36m</View>[39m
+                      [36m<Text>[39m
+                        [0mAccount[0m
+                      [36m</Text>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</View>[39m
+          [36m</RNSScreenContentWrapper>[39m
+          [36m<RNSScreenStackHeaderConfig[39m
+            [33mpointerEvents[39m=[32m"box-none"[39m
+            [33mtitle[39m=[32m"Tabs"[39m
+          [36m/>[39m
+        [36m</RNSScreen>[39m
+        [36m<RNSScreen[39m
+          [33maria-hidden[39m=[32m{false}[39m
+        [36m>[39m
+          [36m<RNSScreenContentWrapper>[39m
+            [36m<RCTScrollView[39m
+              [33mtestID[39m=[32m"cart"[39m
+            [36m>[39m
+              [36m<View>[39m
+                [36m<Text[39m
+                  [33maccessibilityRole[39m=[32m"header"[39m
+                [36m>[39m
+                  [0mCart[0m
+                [36m</Text>[39m
+                [36m<View[39m
+                  [33mtestID[39m=[32m"cart-lines"[39m
+                [36m>[39m
+                  [36m<Text>[39m
+                    [0mKitchen k1[0m
+                  [36m</Text>[39m
+                  [36m<Text>[39m
+                    [0m13 Oct 2026, 13:00[0m
+                  [36m</Text>[39m
+                  [36m<View>[39m
+                    [36m<Text>[39m
+                      [0m8[0m
+                      [0m × [0m
+                      [0mDish mq[0m
+                      [0m · EGP 960.00[0m
+                    [36m</Text>[39m
+                    [36m<View>[39m
+                      [36m<View[39m
+                        [33maccessibilityLabel[39m=[32m"Decrease quantity: Dish mq"[39m
+                        [33maccessibilityRole[39m=[32m"button"[39m
+                        [33maccessibilityState[39m=[32m{
+                          {
+                            "disabled": false,
+                          }
+                        }[39m
+                        [33maccessible[39m=[32m{true}[39m
+                        [33mtestID[39m=[32m"qty-dec-mq"[39m
+                      [36m>[39m
+                        [36m<Text>[39m
+                          [0m−[0m
+                        [36m</Text>[39m
+                      [36m</View>[39m
+                      [36m<View[39m
+                        [33maccessibilityLabel[39m=[32m"Increase quantity: Dish mq"[39m
+                        [33maccessibilityRole[39m=[32m"button"[39m
+                        [33maccessibilityState[39m=[32m{
+                          {
+                            "disabled": false,
+                          }
+                        }[39m
+                        [33maccessible[39m=[32m{true}[39m
+                        [33mtestID[39m=[32m"qty-inc-mq"[39m
+                      [36m>[39m
+                        [36m<Text>[39m
+                          [0m+[0m
+                        [36m</Text>[39m
+                      [36m</View>[39m
+                      [36m<View[39m
+                        [33maccessibilityLabel[39m=[32m"Remove Dish mq"[39m
+                        [33maccessibilityRole[39m=[32m"button"[39m
+                        [33maccessibilityState[39m=[32m{
+                          {
+                            "disabled": false,
+                          }
+                        }[39m
+                        [33maccessible[39m=[32m{true}[39m
+                        [33mtestID[39m=[32m"remove-mq"[39m
+                      [36m>[39m
+                        [36m<Text>[39m
+                          [0mRemove[0m
+                        [36m</Text>[39m
+                      [36m</View>[39m
+                    [36m</View>[39m
+                  [36m</View>[39m
+                  [36m<Text>[39m
+                    [0mEstimated subtotal[0m
+                  [36m</Text>[39m
+                  [36m<Text[39m
+                    [33mtestID[39m=[32m"estimate"[39m
+                  [36m>[39m
+                    [0mEGP 960.00[0m
+                  [36m</Text>[39m
+                  [36m<Text>[39m
+                    [0mThis is an estimate from the prices shown when you added each meal. The final total at the current price appears when you calculate the total.[0m
+                  [36m</Text>[39m
+                  [36m<View[39m
+                    [33maccessibilityLabel[39m=[32m"Empty cart"[39m
+                    [33maccessibilityRole[39m=[32m"button"[39m
+                    [33maccessibilityState[39m=[32m{
+                      {
+                        "disabled": false,
+                      }
+                    }[39m
+                    [33maccessible[39m=[32m{true}[39m
+                  [36m>[39m
+                    [36m<Text>[39m
+                      [0mEmpty cart[0m
+                    [36m</Text>[39m
+                  [36m</View>[39m
+                [36m</View>[39m
+                [36m<View>[39m
+                  [36m<Text>[39m
+                    [0mSign in to see your orders and favorites.[0m
+                  [36m</Text>[39m
+                  [36m<View[39m
+                    [33maccessibilityLabel[39m=[32m"Sign in"[39m
+                    [33maccessibilityRole[39m=[32m"button"[39m
+                    [33maccessibilityState[39m=[32m{
+                      {
+                        "disabled": false,
+                      }
+                    }[39m
+                    [33maccessible[39m=[32m{true}[39m
+                  [36m>[39m
+                    [36m<Text>[39m
+                      [0mSign in[0m
+                    [36m</Text>[39m
+                  [36m</View>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</RCTScrollView>[39m
+          [36m</RNSScreenContentWrapper>[39m
+          [36m<RNSScreenStackHeaderConfig[39m
+            [33mpointerEvents[39m=[32m"box-none"[39m
+            [33mtitle[39m=[32m"Cart"[39m
+          [36m/>[39m
+        [36m</RNSScreen>[39m
+      [36m</RNSScreenStack>[39m
+    [36m</View>[39m
+
+      522 |     policy = 5;
+      523 |     await fireEvent.press(cart);
+    > 524 |     expect(await screen.findByText(t.overLineLimit(5))).toBeTruthy();
+          |                         ^
+      525 |   });
+      526 | });
+      527 |
+
+      at Object.findByText (src/App.test.tsx:524:25)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       1 failed, 38 skipped, 39 total
+Snapshots:   0 total
+Time:        4.18 s
+Ran all test suites with tests matching "re-reads the limit when the cart opens".

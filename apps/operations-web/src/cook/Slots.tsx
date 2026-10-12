@@ -32,11 +32,20 @@ export function Slots({ ctx }: { ctx: Ctx }) {
   );
 }
 
+/**
+ * Actions offered per slot state: the transitions the server allows (DRAFT→OPEN, OPEN→PAUSED/CLOSED, PAUSED→OPEN/CLOSED;
+ * SlotService stays authoritative and refuses anything else). A draft is never closed directly (MBQA-005).
+ */
+const SLOT_ACTIONS: Record<string, ("OPEN" | "PAUSED" | "CLOSED")[]> = {
+  DRAFT: ["OPEN"],
+  OPEN: ["PAUSED", "CLOSED"],
+  PAUSED: ["OPEN", "CLOSED"],
+};
+
 function SlotCard({ ctx, slot, refresh }: { ctx: Ctx; slot: Slot; refresh: () => unknown }) {
   const { t, locale } = ctx;
   const { run, error, busy } = useMutation(ctx, refresh);
-  const next: ("OPEN" | "PAUSED" | "CLOSED")[] =
-    slot.state === "DRAFT" || slot.state === "PAUSED" ? ["OPEN", "CLOSED"] : slot.state === "OPEN" ? ["PAUSED", "CLOSED"] : [];
+  const next = SLOT_ACTIONS[slot.state] ?? [];
   const label = { OPEN: t.open, PAUSED: t.pause, CLOSED: t.close };
   return (
     <article className="card" aria-label={formatTime(slot.startsAt, locale)}>

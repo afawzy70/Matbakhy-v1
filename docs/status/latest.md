@@ -2,13 +2,14 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-12T19:46+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
+- Observed: 2026-10-12T22:10+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- **Codex QA retest candidate:** `cdc592a2492a691de714a3d0bf23b31f25599480` (supersedes `c35ad2d`).
-  - **Contents:** MBQA-001/002, FG-001, the operations-web language fix and Q1 client limits.
-  - **Checks at this SHA:** Product CI success; six-check evidence PASS ([run](../../verification/runs/20261012-MB-032/evidence.json)).
-  - **Independent QA:** findings are FIXED_PENDING_INDEPENDENT_RETEST; no Codex result exists yet ([handoff](../quality/07-codex-qa-repair.md)).
-  - **Still open:** RQ-001/002/003.
+- **Independent QA (Codex, cross-role, tested `4eaee3a`, evidence `f76664c`):**
+  - **Findings:** MBQA-003 (no customer web sign-out), MBQA-004 (support replies unreadable), MBQA-005 (Close offered on a DRAFT slot) and OBS-001 are FIXED_PENDING_INDEPENDENT_RETEST in repair candidate **`<REPAIR_SHA>`** ([repair record](../quality/08-codex-qa-repair-cross-role.md)).
+  - **Q1:** a difference between tested versions (clients wired in `cdc592a`, after `4eaee3a`), plus one genuine gap fixed: the limit was read only once per page load.
+  - **RQ-004:** settled by TC-020/TC-042 and the contract (refuse and re-quote); owner confirmation requested ([note](../product/rq-004-stale-quote.md)).
+  - **Earlier findings:** MBQA-001/002 and FG-001 were independently retested PASS on web at `4eaee3a`.
+- **Earlier Codex candidates:** A `cdc592a` (original findings) and the MB-033 candidate `f5d2ba0` (six local checks PASS) are superseded for retest by `<REPAIR_SHA>`.
 - Phase/story: P07. **MB-032 DONE** at `cdc592a` (self-review). Next eligible: MB-033.
   - MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.
   - MB-039 IN_PROGRESS: the owner's audit/log readiness work package is queued ([05-observability-readiness.md](../operations/05-observability-readiness.md)).
@@ -33,11 +34,12 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-033 Implement native lifecycle push and accessibility | IN_PROGRESS | Deep links (warm/cold), foreground refetch, one recovery check at a time, session-read retry, native delivery and Q1 regression: Android emulator run 33 at `a8132aa` PASS; iOS simulator run 32 at `e3ba61a` PASS (phases D/E), run 34 pending for deep links ([record](../../verification/runs/20261012-MB-033-FOLLOWUP/README.md)). Push (O07), screen readers (BLK-003) and physical devices (BLK-004) not done |
 | MB-032 Implement native discovery and ordering | DONE (self-review) | [run](../../verification/runs/20261012-MB-032/evidence.json) at `cdc592a`: six local checks PASS; native run [38273197484](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484) — Android emulator and iOS simulator: basket keep/replace, kill during submit, offline reopen, one recovered order with one set of side effects, total parity. Delivery checkout not exercised natively |
 | MB-031 Build native shell and authentication | DONE (self-review) | [run](../../verification/runs/20261012-MB-031/evidence.json) at `fd689aa`; native run [38226241501](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501): Android emulator and iOS simulator launch and system-browser PKCE sign-in round trip |
 | MB-037 Prove concurrency retries and recovery | DONE (self-review) | [run](../../verification/runs/20261012-MB-037/evidence.json) at `e512ac4` |
 | MB-029 Verify accessibility RTL and responsive behavior | BLOCKED (BLK-003) | [run](../../verification/runs/20261012-MB-029/evidence.json) at `6a84b26`; TC-047 screen-reader testing NOT_RUN |
-| MB-039 Implement privacy observability and recovery tooling | IN_PROGRESS | Erasure, log redaction, gauges, local backup/restore rehearsal tested; staging restore needs O07; document retention needs O06 |
+| MB-039 Implement privacy observability and recovery tooling | IN_PROGRESS | Erasure, log redaction, gauges, local backup/restore rehearsal tested. Local audit/log readiness [record](../operations/07-audit-and-log-readiness.md): long-path denial audit fixed; staff order-contact views and audit reads audited; correlation and MDC tests. AUD-01/LOG-01/OPS-01..03 NOT_RUN (deployed, MB-040). Staging restore needs O07; retention needs O06 |
 | MB-028 Complete customer account and trust features | DONE (self-review) | [run](../../verification/runs/20261011-MB-028/evidence.json) at `bec5830` (attempt 1 at `fe94d8b` failed the stale traceability matrix); includes API-098 and the web basket-replacement confirmation (TC-147) |
 | MB-027 Complete customer web purchase flow | DONE (self-review); draft visuals until O05 | [run](../../verification/runs/20261011-MB-027/evidence.json) at `0da4477`. CW05 basket editing was incomplete (QA FG-001) until `f600577`; repairs and TC-149/150/151 [run](../../verification/runs/20261012-QA-REPAIR/evidence.json) at `c35ad2d` (pending independent retest) |
 | MB-026 Build operating configuration and staff controls | DONE (self-review) | [run](../../verification/runs/20261011-MB-026/evidence.json) at `c96535b` |

@@ -19,7 +19,7 @@ type Quote = Schemas["QuoteResponse"];
  * While the outcome is unknown the screen says so plainly and never shows the order as placed or failed.
  */
 export function CartScreen({ navigation }: RootProps<"Cart">) {
-  const { api, t, locale, auth, startSignIn, reloadProfile, session } = useApp();
+  const { api, t, locale, auth, startSignIn, reloadProfile, reloadLimits, session } = useApp();
   const [basket, setBasket] = useState<Basket | null | undefined>(undefined);
   const [pending, setPending] = useState<PendingPlacement | null>(null);
   const [outcome, setOutcome] = useState<PlacementOutcome | null>(null);
@@ -57,6 +57,7 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
 
   useFocusEffect(
     useCallback(() => {
+      reloadLimits();
       let active = true;
       void Promise.all([loadBasket(), loadPending()]).then(([b, p]) => {
         if (!active) {
@@ -71,7 +72,7 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
       return () => {
         active = false;
       };
-    }, [auth.kind, recheck]),
+    }, [auth.kind, recheck, reloadLimits]),
   );
 
   if (basket === undefined) {

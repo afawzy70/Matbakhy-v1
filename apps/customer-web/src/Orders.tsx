@@ -73,6 +73,17 @@ export function OrderDetail({ ctx, id }: { ctx: Ctx; id: string }) {
               </li>
             ))}
           </ol>
+          {o.supportCaseIds.length > 0 ? (
+            <nav aria-label={t.supportCases}>
+              <ul className="rows">
+                {o.supportCaseIds.map((caseId) => (
+                  <li key={caseId}>
+                    <a href={`#/support/${caseId}`}>{t.supportCases}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
           {o.allowedActions.includes("CANCEL") ? (
             <button
               type="button"

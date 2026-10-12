@@ -209,13 +209,17 @@ function OrderForm({
       return;
     }
     let active = true;
-    ctx.api.GET("/api/v1/orders/by-request/{clientRequestId}", { params: { path: { clientRequestId: p.clientRequestId } } }).then((r) => {
-      if (active && r.data) {
-        savePending(null);
-        saveCart(null);
-        ctx.go(`/orders/${r.data.id}`);
-      }
-    });
+    ctx.api
+      .GET("/api/v1/orders/by-request/{clientRequestId}", { params: { path: { clientRequestId: p.clientRequestId } } })
+      .then((r) => {
+        if (active && r.data) {
+          savePending(null);
+          saveCart(null);
+          ctx.go(`/orders/${r.data.id}`);
+        }
+      })
+      // OBS-001: unreachable lookup: keep the pending order and its keys; the screen stays "unconfirmed" with the retry.
+      .catch(() => undefined);
     return () => {
       active = false;
     };

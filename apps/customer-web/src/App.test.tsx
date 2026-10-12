@@ -1,6 +1,6 @@
 import { brand } from "@matbakhy/design-tokens";
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { App, title } from "./App";
 import { savePending } from "./cart";
 
@@ -188,6 +188,7 @@ describe("customer web", () => {
       acceptBy: "2026-10-10T09:00:00Z",
       events: [],
       allowedActions: [],
+      supportCaseIds: [],
       cashState: "COLLECTED",
       fulfillmentNote: null,
       dispatchReference: null,
@@ -930,6 +931,33 @@ describe("Q1: quantity limits come from the server's active policy", () => {
     expect(calls.some((c) => c.path === "/api/v1/quotes")).toBe(false);
   });
 
+  it("re-reads the limit when the cart opens, so a policy lowered after the page loaded blocks the quote at once", async () => {
+    window.localStorage.setItem(
+      "matbakhy.cart",
+      JSON.stringify({ kitchenId: "kQ", kitchenName: "Kitchen Q", slotId: "SQ", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: id, title: "QA Meal Q1", quantity: 8, unitPriceMinor: 5000, maxQuantity: 10 }] }),
+    );
+    let policy = 10;
+    const { fetchImpl } = server({
+      "GET /api/v1/configuration/public": () => limits(policy),
+      "GET /api/v1/me": () => ({ status: 200, body: { ...me, locale: "en" } }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/meals": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/zones": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/kitchens": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    });
+    window.location.hash = "#/";
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    await waitFor(() => expect(fetchImpl).toBeDefined());
+    policy = 5;
+    act(() => {
+      window.location.hash = "#/checkout";
+      window.dispatchEvent(new HashChangeEvent("hashchange"));
+    });
+    expect(await screen.findByText("At most 5 per meal can be ordered now. Reduce the quantity to continue.")).toBeTruthy();
+    expect((await screen.findByRole("button", { name: "Calculate total" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
   it("without the published limit, still bounds by the slot's portions and at most 20", async () => {
     const { fetchImpl } = server({
       "GET /api/v1/configuration/public": () => ({ status: 503, body: { code: "SERVICE_UNAVAILABLE" } }),
@@ -940,5 +968,188 @@ describe("Q1: quantity limits come from the server's active policy", () => {
     render(<App fetchImpl={fetchImpl} />);
     fireEvent.click(screen.getByRole("button", { name: "English" }));
     expect(await maxReachable()).toBe(20);
+  });
+});
+
+/** Independent QA MBQA-003 (4eaee3a): the customer web had no sign-out. Run red before the fix. */
+describe("QA repair MBQA-003: sign-out", () => {
+  const signedIn = (logout: Handler) =>
+    server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/meals": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/zones": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/kitchens": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "POST /api/v1/auth/logout": logout,
+    });
+
+  it("ends the server session with the CSRF token, clears the basket and profile, and ends the identity provider session", async () => {
+    document.cookie = "XSRF-TOKEN=csrf-1";
+    cartWithOneMeal();
+    const assign = vi.fn();
+    const { fetchImpl, calls } = signedIn(() => ({ status: 200, body: { idpLogoutUrl: "http://id/logout?client_id=web" } }));
+    render(<App fetchImpl={fetchImpl} assign={assign} />);
+    const button = await screen.findByRole("button", { name: "تسجيل الخروج" });
+    expect(screen.getByRole("link", { name: "حسابي" })).toBeTruthy();
+    fireEvent.click(button);
+    await waitFor(() => expect(assign).toHaveBeenCalledWith("http://id/logout?client_id=web"));
+    const logout = calls.find((c) => c.path === "/api/v1/auth/logout");
+    expect(logout?.method).toBe("POST");
+    expect(logout?.headers.get("X-XSRF-TOKEN")).toBe("csrf-1");
+    expect(window.localStorage.getItem("matbakhy.cart")).toBeNull();
+    expect(screen.queryByRole("link", { name: "حسابي" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "طلباتي" })).toBeNull();
+    expect(screen.getByRole("link", { name: "تسجيل الدخول" })).toBeTruthy();
+  });
+
+  it("is labelled in English after a language switch and reachable by keyboard", async () => {
+    const { fetchImpl } = signedIn(() => ({ status: 200, body: {} }));
+    render(<App fetchImpl={fetchImpl} assign={vi.fn()} />);
+    await screen.findByRole("button", { name: "تسجيل الخروج" });
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const button = screen.getByRole("button", { name: "Sign out" });
+    button.focus();
+    expect(document.activeElement).toBe(button);
+  });
+
+  it("warns before signing out with an unconfirmed order, then clears its keys only when confirmed", async () => {
+    savePending({ clientRequestId: "c1", idempotencyKey: "i1", quoteId: "q1", terms: "t", cancellation: "c" });
+    const assign = vi.fn();
+    const { fetchImpl, calls } = signedIn(() => ({ status: 200, body: {} }));
+    render(<App fetchImpl={fetchImpl} assign={assign} />);
+    fireEvent.click(await screen.findByRole("button", { name: "تسجيل الخروج" }));
+    expect(screen.getByRole("alertdialog")).toBeTruthy();
+    expect(calls.some((c) => c.path === "/api/v1/auth/logout")).toBe(false);
+    fireEvent.click(screen.getByRole("button", { name: "البقاء مسجّلًا" }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(window.localStorage.getItem("matbakhy.pendingPlacement")).not.toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "تسجيل الخروج" }));
+    fireEvent.click(screen.getByRole("button", { name: "تسجيل الخروج على أي حال" }));
+    await waitFor(() => expect(window.localStorage.getItem("matbakhy.pendingPlacement")).toBeNull());
+    expect(await screen.findByRole("link", { name: "تسجيل الدخول" })).toBeTruthy();
+  });
+
+  it("keeps the customer signed in, with the basket, when the server cannot be reached", async () => {
+    cartWithOneMeal();
+    const { fetchImpl } = signedIn(() => "NETWORK_ERROR");
+    render(<App fetchImpl={fetchImpl} assign={vi.fn()} />);
+    fireEvent.click(await screen.findByRole("button", { name: "تسجيل الخروج" }));
+    expect(await screen.findByText("تعذّر تسجيل الخروج. حاول مرة أخرى.")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "تسجيل الخروج" })).toBeTruthy();
+    expect(window.localStorage.getItem("matbakhy.cart")).not.toBeNull();
+  });
+});
+
+/** Independent QA MBQA-004 (4eaee3a): the customer could open a case but not read the support team's public reply. */
+describe("QA repair MBQA-004: support case conversation", () => {
+  const caseId = "22222222-2222-4222-8222-222222222222";
+  const supportCase = (messages: unknown[], state = "WAITING_ON_CUSTOMER") => ({
+    id: caseId, reference: "CS-A12B4EF8", orderId: order.id, orderNumber: order.publicNumber, category: "QUALITY", state,
+    description: "The food arrived cold", resolutionCode: null, createdAt: "2026-10-12T10:00:00Z", updatedAt: "2026-10-12T11:00:00Z",
+    messages, version: 2,
+  });
+  const routes = (detail: Handler, extra: Record<string, Handler> = {}) =>
+    server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/support/cases": () => ({ status: 200, body: { items: [{ ...supportCase([]), messages: [] }], nextCursor: null, hasMore: false } }),
+      [`GET /api/v1/support/cases/${caseId}`]: detail,
+      ...extra,
+    });
+
+  it("opens the case from the account and shows public replies oldest first, attributed, with a reply form", async () => {
+    window.location.hash = "/account";
+    let messages = [
+      { id: "m2", authorRole: "STAFF", visibility: "PUBLIC", body: "QA PUBLIC REPLY FOR CUSTOMER", createdAt: "2026-10-12T11:00:00Z" },
+      { id: "m1", authorRole: "CUSTOMER", visibility: "PUBLIC", body: "Any update?", createdAt: "2026-10-12T10:30:00Z" },
+    ];
+    const { fetchImpl, calls } = routes(() => ({ status: 200, body: supportCase(messages) }), {
+      "GET /api/v1/me/favorites": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/notifications": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/orders": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      [`POST /api/v1/support/cases/${caseId}/messages`]: (_req, body) => {
+        messages = [...messages, { id: "m3", authorRole: "CUSTOMER", visibility: "PUBLIC", body: (body as { body: string }).body, createdAt: "2026-10-12T12:00:00Z" }];
+        return { status: 201, body: messages[2] };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("link", { name: /CS-A12B4EF8/ }));
+    const thread = await screen.findByRole("list", { name: "المحادثة" });
+    const items = within(thread).getAllByRole("listitem").map((li) => li.textContent ?? "");
+    expect(items[0]).toContain("أنت");
+    expect(items[0]).toContain("Any update?");
+    expect(items[1]).toContain("فريق الدعم");
+    expect(items[1]).toContain("QA PUBLIC REPLY FOR CUSTOMER");
+    expect(screen.getByText("بانتظار ردك")).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText("ردّك"), { target: { value: "Thank you" } });
+    fireEvent.click(screen.getByRole("button", { name: "إرسال الرد" }));
+    await waitFor(() => expect(within(screen.getByRole("list", { name: "المحادثة" })).getAllByRole("listitem")).toHaveLength(3));
+    const post = calls.find((c) => c.method === "POST");
+    expect(post?.body).toEqual({ body: "Thank you" });
+    expect(post?.headers.get("Idempotency-Key")).toMatch(/^web-/);
+  });
+
+  it("never renders a staff-only note even if one were present, and says when there are no replies", async () => {
+    window.location.hash = `/support/${caseId}`;
+    const { fetchImpl } = routes(() => ({
+      status: 200,
+      body: supportCase([{ id: "s1", authorRole: "STAFF", visibility: "STAFF_ONLY", body: "QA PRIVATE NOTE NEVER FOR CUSTOMER", createdAt: "2026-10-12T11:00:00Z" }]),
+    }));
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByText("لا توجد ردود بعد.")).toBeTruthy();
+    expect(screen.queryByText("QA PRIVATE NOTE NEVER FOR CUSTOMER")).toBeNull();
+  });
+
+  it("shows another customer's case as not found and offers a retry after an error", async () => {
+    window.location.hash = `/support/${caseId}`;
+    let status = 404;
+    const { fetchImpl } = routes(() => (status === 404 ? { status: 404, body: { code: "NOT_FOUND" } } : { status: 200, body: supportCase([]) }));
+    render(<App fetchImpl={fetchImpl} />);
+    const alert = await screen.findByRole("alert");
+    expect(alert.textContent).not.toContain("CS-A12B4EF8");
+    status = 200;
+    fireEvent.click(within(alert).getByRole("button"));
+    expect(await screen.findByRole("heading", { name: /CS-A12B4EF8/ })).toBeTruthy();
+  });
+
+  it("offers no reply on a closed case", async () => {
+    window.location.hash = `/support/${caseId}`;
+    const { fetchImpl } = routes(() => ({ status: 200, body: supportCase([], "CLOSED") }));
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByText("هذه الحالة مغلقة؛ افتح حالة جديدة إذا احتجت مساعدة.")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "إرسال الرد" })).toBeNull();
+  });
+});
+
+/** Independent QA OBS-001 (4eaee3a): a failed recovery lookup left an unhandled rejection; the pending order must stay. */
+describe("QA repair OBS-001: recovery lookup transport failure", () => {
+  it("keeps the unconfirmed order and its keys, offers the retry, and raises no unhandled error", async () => {
+    cartWithOneMeal();
+    savePending({ clientRequestId: "33333333-3333-4333-8333-333333333333", idempotencyKey: "web-k", quoteId: "q1", terms: "t", cancellation: "c" });
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/orders/by-request/33333333-3333-4333-8333-333333333333": () => "NETWORK_ERROR",
+    });
+    const unhandled: unknown[] = [];
+    const onUnhandled = (e: PromiseRejectionEvent) => {
+      unhandled.push(e.reason);
+      e.preventDefault();
+    };
+    window.addEventListener("unhandledrejection", onUnhandled);
+    const onNode = (reason: unknown) => unhandled.push(reason);
+    process.on("unhandledRejection", onNode);
+    try {
+      window.location.hash = "#/checkout";
+      render(<App fetchImpl={fetchImpl} />);
+      await waitFor(() => expect(calls.some((c) => c.path.startsWith("/api/v1/orders/by-request/"))).toBe(true));
+      await new Promise((r) => setTimeout(r, 50));
+      expect(unhandled).toEqual([]);
+      expect(window.localStorage.getItem("matbakhy.pendingPlacement")).not.toBeNull();
+      expect(window.localStorage.getItem("matbakhy.cart")).not.toBeNull();
+    } finally {
+      window.removeEventListener("unhandledrejection", onUnhandled);
+      process.off("unhandledRejection", onNode);
+    }
   });
 });

@@ -118,6 +118,7 @@ The machine-readable source is [rules.json](../../planning/rules.json). Observab
 ## Configuration
 
 - **BR-042** — Fee/rate/zone/policy changes are versioned and audited; only new quotes use new policy; live unapproved config blocks ordering. Implementation: `MB-026`; verification: `TC-042`.
+  - *Clarification (RQ-004, 2026-10-12, derived from TC-020/TC-042 and the API contract; owner confirmation requested):* an existing unplaced quote is not honored at its old values after a change; placing it is refused with a recoverable reason and the customer must request a fresh quote. Placed orders keep their snapshots. See `docs/product/rq-004-stale-quote.md`.
 
 ## Web
 
