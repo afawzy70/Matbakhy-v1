@@ -5,11 +5,11 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Observed: 2026-10-12T22:10+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
 - **Independent QA (Codex, cross-role, tested `4eaee3a`, evidence `f76664c`):**
-  - **Findings:** MBQA-003 (no customer web sign-out), MBQA-004 (support replies unreadable), MBQA-005 (Close offered on a DRAFT slot) and OBS-001 are FIXED_PENDING_INDEPENDENT_RETEST in repair candidate **`<REPAIR_SHA>`** ([repair record](../quality/08-codex-qa-repair-cross-role.md)).
+  - **Findings:** MBQA-003 (no customer web sign-out), MBQA-004 (support replies unreadable), MBQA-005 (Close offered on a DRAFT slot) and OBS-001 are FIXED_PENDING_INDEPENDENT_RETEST in repair candidate **`4555f599411da9683453bee209559c8d1f11cded`** ([repair record](../quality/08-codex-qa-repair-cross-role.md)).
   - **Q1:** a difference between tested versions (clients wired in `cdc592a`, after `4eaee3a`), plus one genuine gap fixed: the limit was read only once per page load.
   - **RQ-004:** settled by TC-020/TC-042 and the contract (refuse and re-quote); owner confirmation requested ([note](../product/rq-004-stale-quote.md)).
   - **Earlier findings:** MBQA-001/002 and FG-001 were independently retested PASS on web at `4eaee3a`.
-- **Earlier Codex candidates:** A `cdc592a` (original findings) and the MB-033 candidate `f5d2ba0` (six local checks PASS) are superseded for retest by `<REPAIR_SHA>`.
+- **Earlier Codex candidates:** A `cdc592a` (original findings) and the MB-033 candidate `f5d2ba0` (six local checks PASS) are superseded for retest by `4555f599411da9683453bee209559c8d1f11cded`.
 - Phase/story: P07. **MB-032 DONE** at `cdc592a` (self-review). Next eligible: MB-033.
   - MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.
   - MB-039 IN_PROGRESS: the owner's audit/log readiness work package is queued ([05-observability-readiness.md](../operations/05-observability-readiness.md)).

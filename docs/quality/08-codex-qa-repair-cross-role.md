@@ -9,7 +9,7 @@ Written by the implementation agent. This is **self-review**, not independent ve
 | QA branch | `qa/independent-cross-role-4eaee3a-20261012` (read only) |
 | Evidence commit | `f76664c777132e78e012c24ca50150ab13f59b09` (`report.md`, `repair-handoff.md`, `native-results.md`) |
 | Application tested by QA | `4eaee3a1f53b929b9e7685fd30da689d470d095c` |
-| **Repair candidate** | **`<REPAIR_SHA>`** on `implementation/mvp` (full SHA; retest this, not the branch head) |
+| **Repair candidate** | **`4555f599411da9683453bee209559c8d1f11cded`** on `implementation/mvp` (full SHA; retest this, not the branch head) |
 | Evidence | `verification/runs/20261012-QA-REPAIR-2/` |
 
 The candidate also contains everything committed after `4eaee3a`: Q1 clients, MB-032/MB-033 native work, MB-039 audit changes and the PREVIEW environment. See [07-codex-qa-repair.md](07-codex-qa-repair.md) for that history.
@@ -67,7 +67,7 @@ The requirements settle it: TC-020, TC-042 and the API contract all say a stale 
 
 ## Retest instructions
 
-- **Revision:** check out `<REPAIR_SHA>` in a new isolated worktree. Use a new Compose project, new ports and a fresh synthetic seed. The previous campaign's database has terminal states; do not replay against it.
+- **Revision:** check out `4555f599411da9683453bee209559c8d1f11cded` in a new isolated worktree. Use a new Compose project, new ports and a fresh synthetic seed. The previous campaign's database has terminal states; do not replay against it.
 - **Identities (realm `infra/identity/matbakhy-realm.json`, synthetic):** customer-a, customer-b, cook-a, ops-a, and the other synthetic users. Passwords are generated per stack (`DEV_USER_PASSWORD` in `infra/.env`).
 - **Fixtures:**
   - dev profile commerce policy version 1 (limit 10, tax 0, commission 10%);
