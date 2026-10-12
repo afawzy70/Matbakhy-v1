@@ -1,0 +1,165 @@
+# Matbakhy web preview on one VPS (owner direction 2026-10-12): customer web, operations web, API, Keycloak,
+# PostgreSQL and S3-compatible image storage. APP_ENV=PREVIEW: synthetic data and providers that never send anything,
+# real secrets, HTTPS only, access restricted at the proxy. Not MB-040 staging and not a release environment.
+#
+# Images are immutable: our two images are referenced by the commit they were built and tested at (see .env.example);
+# third-party images are pinned by digest. Nothing is built on the server.
+name: matbakhy-preview
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  proxy:
+    # Caddy with both web builds baked in (deploy/web-preview/front.Dockerfile); terminates HTTPS for every host.
+    image: ${FRONT_IMAGE:?set FRONT_IMAGE in .env}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:?set PREVIEW_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
+      ALLOWED_CLIENT_IPS: ${ALLOWED_CLIENT_IPS:?set ALLOWED_CLIENT_IPS}
+    volumes:
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [edge, internal]
+    depends_on:
+      api:
+        condition: service_healthy
+    logging: *logging
+    mem_limit: 256m
+    cpus: 0.5
+
+  postgres:
+    image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: matbakhy
+      POSTGRES_USER: matbakhy
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?set KEYCLOAK_DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/10-keycloak.sh:/docker-entrypoint-initdb.d/10-keycloak.sh:ro
+      - ${BACKUP_DIR:-/srv/matbakhy-backups}:/backups
+      - ../../infra/db/reconcile.sql:/reconcile.sql:ro
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U matbakhy -d matbakhy"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    logging: *logging
+    mem_limit: 1536m
+    cpus: 1.0
+
+  identity:
+    # Production mode (not start-dev): PostgreSQL store, fixed public hostname, TLS terminated by the proxy.
+    image: keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741
+    restart: unless-stopped
+    command: ["start", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KC_HOSTNAME: https://id.${PREVIEW_DOMAIN}
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER:?set KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?set KEYCLOAK_ADMIN_PASSWORD}
+      JAVA_OPTS_KC_HEAP: "-XX:MaxRAMPercentage=70"
+    volumes:
+      # Rendered by deploy.sh from identity/matbakhy-realm.preview.json; holds secrets, so it lives outside Git.
+      - ${GENERATED_DIR:-/srv/matbakhy-preview/generated}/identity:/opt/keycloak/data/import:ro
+    networks: [internal]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+    logging: *logging
+    mem_limit: 1g
+    cpus: 1.0
+
+  storage:
+    # SeaweedFS: S3-compatible object storage on a local volume (meal photos and private documents).
+    image: chrislusf/seaweedfs@sha256:4e61d15fd35994cb1e43e1e553dff106794841fd9a99ade2fc8c8bfce4d7872d
+    restart: unless-stopped
+    command: ["server", "-dir=/data", "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json", "-master.volumeSizeLimitMB=512", "-volume.max=0"]
+    volumes:
+      - storage-data:/data
+      - ${GENERATED_DIR:-/srv/matbakhy-preview/generated}/storage/s3.json:/etc/seaweedfs/s3.json:ro
+    networks: [internal]
+    logging: *logging
+    mem_limit: 512m
+    cpus: 0.5
+
+  api:
+    image: ${API_IMAGE:?set API_IMAGE in .env}
+    restart: unless-stopped
+    environment:
+      APP_ENV: PREVIEW
+      # Synthetic commerce policy and service zones (db/devdata); EnvironmentGuard allows them only in LOCAL/CI/PREVIEW.
+      SPRING_PROFILES_ACTIVE: dev
+      LOGGING_STRUCTURED_FORMAT_CONSOLE: ecs
+      # Behind the proxy: build https://api.<domain> URLs (OIDC redirect) from X-Forwarded-* sent by the internal proxy.
+      SERVER_FORWARD_HEADERS_STRATEGY: native
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
+      DATABASE_URL: jdbc:postgresql://postgres:5432/matbakhy
+      DATABASE_USERNAME: matbakhy
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      OIDC_ISSUER: https://id.${PREVIEW_DOMAIN}/realms/matbakhy
+      OIDC_BACKCHANNEL_ISSUER: http://identity:8080/realms/matbakhy
+      OIDC_WEB_CLIENT_SECRET: ${OIDC_WEB_CLIENT_SECRET:?set OIDC_WEB_CLIENT_SECRET}
+      WEB_ALLOWED_ORIGINS: https://app.${PREVIEW_DOMAIN},https://ops.${PREVIEW_DOMAIN}
+      WEB_POST_LOGIN_REDIRECT: https://app.${PREVIEW_DOMAIN}/
+      STAFF_BOOTSTRAP_SUBJECT: ${STAFF_BOOTSTRAP_SUBJECT:-}
+      PHONE_CODE_PEPPER: ${PHONE_CODE_PEPPER:?set PHONE_CODE_PEPPER}
+      HANDOVER_HASH_KEY: ${HANDOVER_HASH_KEY:?set HANDOVER_HASH_KEY}
+      HANDOVER_ENCRYPTION_KEY: ${HANDOVER_ENCRYPTION_KEY:?set HANDOVER_ENCRYPTION_KEY}
+      PUSH_TOKEN_HASH_KEY: ${PUSH_TOKEN_HASH_KEY:?set PUSH_TOKEN_HASH_KEY}
+      PUSH_TOKEN_ENCRYPTION_KEY: ${PUSH_TOKEN_ENCRYPTION_KEY:?set PUSH_TOKEN_ENCRYPTION_KEY}
+      OBJECT_STORAGE_ENDPOINT: http://storage:8333
+      OBJECT_STORAGE_CLIENT_ENDPOINT: https://media.${PREVIEW_DOMAIN}
+      OBJECT_STORAGE_PUBLIC_BASE_URL: https://media.${PREVIEW_DOMAIN}/matbakhy-public
+      OBJECT_STORAGE_ACCESS_KEY: ${STORAGE_ACCESS_KEY:?set STORAGE_ACCESS_KEY}
+      OBJECT_STORAGE_SECRET_KEY: ${STORAGE_SECRET_KEY:?set STORAGE_SECRET_KEY}
+    networks: [internal]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      identity:
+        condition: service_healthy
+      storage:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+    logging: *logging
+    mem_limit: 2g
+    cpus: 1.5
+
+networks:
+  edge: {}
+  # No route to the internet for the database, identity provider, storage and API; only the proxy is published.
+  internal:
+    internal: true
+
+volumes:
+  postgres-data:
+  storage-data:
+  caddy-data:
+  caddy-config:

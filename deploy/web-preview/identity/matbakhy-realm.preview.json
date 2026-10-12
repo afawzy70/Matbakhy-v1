@@ -1,0 +1,117 @@
+{
+  "realm": "matbakhy",
+  "displayName": "Matbakhy (local development)",
+  "enabled": true,
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "verifyEmail": true,
+  "bruteForceProtected": true,
+  "internationalizationEnabled": true,
+  "supportedLocales": [
+    "ar",
+    "en"
+  ],
+  "defaultLocale": "ar",
+  "accessTokenLifespan": 300,
+  "attributes": {
+    "matbakhy.note": "Local reference realm template. scripts/dev.sh fills the placeholders from infra/.env into infra/.generated (ignored by Git)."
+  },
+  "clients": [
+    {
+      "clientId": "matbakhy-web",
+      "name": "Matbakhy web (server-side OIDC client)",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "${OIDC_WEB_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "https://api.${PREVIEW_DOMAIN}/login/oauth2/code/keycloak"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://app.${PREVIEW_DOMAIN}/*##https://ops.${PREVIEW_DOMAIN}/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "matbakhy-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "id": "7d3f0a52-1c0e-4b8e-9a3e-000000000c01",
+      "username": "preview-customer-1",
+      "email": "preview-customer-1@preview.matbakhy.invalid",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Preview Customer 1",
+      "lastName": "Synthetic",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PREVIEW_USER_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "7d3f0a52-1c0e-4b8e-9a3e-000000000c02",
+      "username": "preview-customer-2",
+      "email": "preview-customer-2@preview.matbakhy.invalid",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Preview Customer 2",
+      "lastName": "Synthetic",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PREVIEW_USER_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "7d3f0a52-1c0e-4b8e-9a3e-0000000000a1",
+      "username": "preview-cook-1",
+      "email": "preview-cook-1@preview.matbakhy.invalid",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Preview Cook 1",
+      "lastName": "Synthetic",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PREVIEW_USER_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "id": "7d3f0a52-1c0e-4b8e-9a3e-0000000000f1",
+      "username": "preview-ops-1",
+      "email": "preview-ops-1@preview.matbakhy.invalid",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Preview Ops 1",
+      "lastName": "Synthetic",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PREVIEW_USER_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

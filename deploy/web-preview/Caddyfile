@@ -1,0 +1,57 @@
+# Reverse proxy for the Matbakhy web preview. Every host is HTTPS (automatic certificates) and answers only the
+# allow-listed client addresses: a network allow-list keeps sign-in redirects and API calls working, unlike a
+# password prompt in front of the identity provider. Access logs are off; container logs are size-bounded.
+{
+	email {$ACME_EMAIL}
+}
+
+(restricted) {
+	@outsider not remote_ip {$ALLOWED_CLIENT_IPS}
+	respond @outsider "Not available" 403
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+}
+
+(spa) {
+	import restricted
+	header X-Frame-Options DENY
+	encode zstd gzip
+	try_files {path} /index.html
+	file_server
+}
+
+app.{$PREVIEW_DOMAIN} {
+	root * /srv/customer-web
+	import spa
+}
+
+ops.{$PREVIEW_DOMAIN} {
+	root * /srv/operations-web
+	import spa
+}
+
+api.{$PREVIEW_DOMAIN} {
+	import restricted
+	# Only the API and the OIDC login endpoints are exposed; actuator stays internal.
+	@public path /api/* /oauth2/* /login/oauth2/* /logout
+	reverse_proxy @public api:8080
+	respond 404
+}
+
+id.{$PREVIEW_DOMAIN} {
+	import restricted
+	# Keycloak's admin console is not published; administer it through an SSH tunnel (see docs/operations/05-web-preview.md).
+	@admin path /admin /admin/*
+	respond @admin 404
+	reverse_proxy identity:8080
+}
+
+media.{$PREVIEW_DOMAIN} {
+	import restricted
+	reverse_proxy storage:8333
+}

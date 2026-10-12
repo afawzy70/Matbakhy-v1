@@ -1,0 +1,11 @@
+**/node_modules
+**/dist
+**/target
+**/.generated
+apps/customer-mobile/android
+apps/customer-mobile/ios
+backend
+verification
+infra/.env
+deploy/web-preview/.env
+.git

@@ -1,0 +1,13 @@
+{
+  "identities": [
+    {
+      "name": "matbakhy-api",
+      "credentials": [{ "accessKey": "${STORAGE_ACCESS_KEY}", "secretKey": "${STORAGE_SECRET_KEY}" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    },
+    {
+      "name": "anonymous",
+      "actions": ["Read:matbakhy-public"]
+    }
+  ]
+}

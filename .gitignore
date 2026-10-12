@@ -33,3 +33,7 @@ apps/customer-mobile/ios/
 infra/.generated/
 docs/design/approved/homepage-review.png
 apps/customer-mobile/e2e-ios/*.xcodeproj/
+
+# Web preview secrets and generated configuration (deploy/web-preview)
+deploy/web-preview/.env
+deploy/web-preview/generated/

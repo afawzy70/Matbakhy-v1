@@ -1,0 +1,50 @@
+name: Web preview images (manual; not run without owner approval)
+# Builds the two images for deploy/web-preview at the dispatched commit and pushes them to GHCR, tagged with the
+# full commit SHA. The deployment then references them by digest (printed in the job summary). Nothing is deployed
+# here. Dispatch only for a commit whose Product CI passed; the job refuses otherwise.
+on:
+  workflow_dispatch:
+    inputs:
+      preview_domain:
+        description: "Preview domain (app./ops./api./id./media. are derived from it)"
+        required: true
+permissions:
+  contents: read
+  packages: write
+  actions: read
+jobs:
+  images:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    env:
+      PREVIEW_DOMAIN: ${{ inputs.preview_domain }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Require a green Product CI run for this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ok=$(gh api "repos/${{ github.repository }}/actions/workflows/ci.yml/runs?head_sha=${{ github.sha }}&status=success" --jq '.total_count')
+          [ "${ok:-0}" -ge 1 ] || { echo "Product CI has not passed for ${{ github.sha }}"; exit 1; }
+      - name: Validate the domain input
+        run: echo "$PREVIEW_DOMAIN" | grep -Eq '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$'
+      - name: Build the API jar (tests ran in Product CI for this commit)
+        working-directory: backend
+        run: |
+          export JAVA_HOME="$JAVA_HOME_21_X64" PATH="$JAVA_HOME_21_X64/bin:$PATH"
+          ./mvnw -B -ntp -DskipTests package
+      - name: Build and push images tagged with the commit
+        run: |
+          owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          api="ghcr.io/$owner/matbakhy-api:${{ github.sha }}"
+          front="ghcr.io/$owner/matbakhy-preview-front:${{ github.sha }}"
+          echo "${{ github.token }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker build -t "$api" --label "org.opencontainers.image.revision=${{ github.sha }}" backend
+          docker build -t "$front" --label "org.opencontainers.image.revision=${{ github.sha }}" \
+            --build-arg PREVIEW_DOMAIN="$PREVIEW_DOMAIN" -f deploy/web-preview/front.Dockerfile .
+          docker push "$api" && docker push "$front"
+          {
+            echo "RELEASE_COMMIT=${{ github.sha }}"
+            echo "API_IMAGE=$(docker image inspect --format '{{index .RepoDigests 0}}' "$api")"
+            echo "FRONT_IMAGE=$(docker image inspect --format '{{index .RepoDigests 0}}' "$front")"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
