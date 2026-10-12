@@ -1059,7 +1059,7 @@
       "id": "MB-029",
       "phase": "P06",
       "title": "Verify accessibility RTL and responsive behavior",
-      "status": "IN_PROGRESS",
+      "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
         "MB-022",
@@ -1093,9 +1093,11 @@
         "TC-047",
         "TC-129"
       ],
-      "evidence": [],
+      "evidence": [
+        "verification/runs/20261012-MB-029/evidence.json"
+      ],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": "Not DONE. Evidence at 6a84b26 (self-review): TC-046 and TC-129 PASS; TC-047 BLOCKED on screen-reader testing (BLK-003). Keyboard, focus and layout parts verified in the browser."
     },
     {
       "id": "MB-030",

@@ -4,7 +4,7 @@
   "status": "IN_PROGRESS",
   "current_phase": "P06",
   "current_story": "MB-029",
-  "last_tested_commit": "bad288fd8367efc7475153ad8ad2204d711ba85d",
+  "last_tested_commit": "6a84b26bdab9b1c9dbe3b74022450132e89ae62c",
   "last_completed_story": "MB-028",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
@@ -18,6 +18,17 @@
       "first_seen": "2026-10-11T08:59:00Z",
       "missing": "No PowerShell runtime available to test Windows bootstrap scripts (GitHub release downloads denied)",
       "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
+    },
+    {
+      "id": "BLK-003",
+      "affects": [
+        "MB-029 / TC-047 (screen readers)",
+        "MB-030 (depends on MB-029)"
+      ],
+      "owner": "Ahmed Fawzy (assistive-technology tester or explicit deferral decision)",
+      "first_seen": "2026-10-12T04:35:00Z",
+      "missing": "No screen reader (NVDA/JAWS/VoiceOver/TalkBack/Orca) is available in the implementation environment, so TC-047's screen-reader requirement cannot be performed; axe scans are not a substitute",
+      "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
     }
   ],
   "next_action": "Awaiting the 2026-10-12 window (12:00-00:00 Asia/Kuwait). Then, in order: (1) apply D11 - remove the intent tiles' sort-only contextual panel and any one-person/two-people control; (2) apply D12 - add optional description to the discovery MealSummary from the existing published description, render when present; (3) MB-029 remaining checks (keyboard journeys, dialog focus in the browser, operations web at 360/390/768/1440 RTL/LTR, long table values) and evidence for TC-046/TC-047/TC-129, screen-reader testing reported separately (NOT_RUN unless actually performed); (4) approved light design for cart, checkout, order status and account with screenshots and the derived desktop layout for owner review (dark palette stays unapproved, not default); (5) re-run customer and kitchen journeys on the candidate revision and record CI; (6) external-QA handoff and staging-readiness assessment (no deployment or purchase); (7) MB-030 only after MB-029 is DONE. O05 stays open.",

@@ -866,8 +866,10 @@
       "given": "Long Arabic cook/meal names and high totals",
       "when": "Pages render at 360/390/768/1440 widths",
       "then": "No overlap/clipped totals/hidden checkout actions; directional order is correct",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-029/evidence.json"
+      ]
     },
     {
       "id": "TC-047",
@@ -882,8 +884,9 @@
       "given": "User uses keyboard/screen reader and enlarged text",
       "when": "They place an order and operate backoffice forms",
       "then": "Complete without pointer-only controls or ambiguous error/status feedback",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "BLOCKED",
+      "evidence": [],
+      "blocked_note": "2026-10-12: keyboard-only journeys, visible focus, labels and dialog focus restoration pass in the browser (verification/runs/20261012-MB-029/evidence.json), but screen-reader testing was not performed: no screen reader is available in the implementation environment (BLK-003). Not claimed as PASS."
     },
     {
       "id": "TC-048",
@@ -1708,8 +1711,10 @@
       "given": "All dependencies are DONE with current evidence; the named artifacts exist on the candidate source commit",
       "when": "Audit Arabic/English strings; keyboard/screen reader/focus/contrast; table alignment and long values; browser history and mobile widths",
       "then": "Critical journeys pass RTL/LTR at 360/390/768/1440 widths with no lost actions or clipped totals",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261012-MB-029/evidence.json"
+      ]
     },
     {
       "id": "TC-130",

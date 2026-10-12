@@ -1,0 +1,95 @@
+{
+  "run_id": "20261012-MB-029",
+  "story_id": "MB-029",
+  "phase": "P06",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack: cook, customer purchase, customer layout matrix, keyboard-only journeys, operations layout matrix (Playwright, Chromium, axe-core)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-046",
+      "observed": "Customer home, kitchen and meal pages at 320/360/390/420/768/1440 px in Arabic RTL and English LTR, plus cart/checkout with quote, order status, order list and account at 320/390/768/1440 px, and every cook and staff operations section (cook-a: 6, ops-a: 4) at 360/390/768/1440 px in both directions: no page-level horizontal overflow (offending elements are named when it fails), every visible button/link/input/select at least 44 px, tables either fit or scroll inside their own container, html dir matches the language. Long values: a 117-character meal title with an unbroken 60-character token wraps in operations lists and cards. Defects found and fixed before this run: undersized link buttons, checkboxes and inputs; form fields and fieldsets that could not shrink; unbroken words; a content-box card overflowing at 320 px; desktop navigation and total-divider layout."
+    },
+    {
+      "id": "TC-129",
+      "observed": "Critical journeys pass at the required widths in both directions on PostgreSQL, Keycloak, the S3 emulator and the API: purchase (delivery with lost-response retry, pickup), cook fulfilment and handover, reviews, favorites, moderation, basket replacement, and the layout matrices above (360/390/768/1440 included) with no lost actions or clipped totals; axe-core WCAG 2.2 A/AA rules report no serious or critical finding on the customer pages (390 and 1440 px, both languages) and on every operations section (390 and 1440 px, both languages). Automated rules are not a full audit."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-MB-029/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "TC-046 and TC-129 observed in the browser on the real stack; the checks were shown to fail on real defects and on a deliberate mutation (focus outlines removed).",
+      "TC-047 is NOT claimed: keyboard-only journeys, visible focus and dialog focus restoration pass, but screen-reader testing was not performed (no screen reader in this environment), so TC-047 is BLOCKED and MB-029 is not DONE."
+    ]
+  },
+  "open_defects": []
+}
