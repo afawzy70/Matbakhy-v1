@@ -17,7 +17,11 @@ yes | timeout 900 sdkmanager --install "emulator" "platform-tools" "$IMAGE" >"$R
 set -o pipefail
 tail -3 "$RUNNER_TEMP/sdkmanager.log"
 [ -d "$ANDROID_HOME/system-images/android-${API_LEVEL}/google_apis/x86_64" ] || { echo "system image not installed"; tail -30 "$RUNNER_TEMP/sdkmanager.log"; exit 1; }
-echo no | avdmanager create avd -n mb031 -k "$IMAGE" --force >/dev/null
+# avdmanager and the emulator must agree on the AVD directory (second CI run: "Unknown AVD name"); pin it.
+export ANDROID_AVD_HOME="$RUNNER_TEMP/avd"
+mkdir -p "$ANDROID_AVD_HOME"
+echo no | avdmanager create avd -n mb031 -k "$IMAGE" --force
+emulator -list-avds | grep -qx mb031 || { echo "AVD mb031 not created"; ls -la "$ANDROID_AVD_HOME"; exit 1; }
 emulator -avd mb031 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect >"$RUNNER_TEMP/emulator.log" 2>&1 &
 timeout 300 adb wait-for-device || { echo "emulator did not appear"; tail -50 "$RUNNER_TEMP/emulator.log"; exit 1; }
 for _ in $(seq 1 120); do
