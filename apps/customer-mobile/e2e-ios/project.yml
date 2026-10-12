@@ -1,0 +1,40 @@
+# MB-031 iOS sign-in round trip (CI only). XcodeGen generates a tiny host app plus a UI-test bundle; the test drives
+# the separately installed customer app by bundle identifier, so the app's own native project is not modified.
+name: MB031NativeChecks
+options:
+  deploymentTarget:
+    iOS: "16.0"
+settings:
+  base:
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    GENERATE_INFOPLIST_FILE: YES
+    SWIFT_VERSION: "5.0"
+targets:
+  HostApp:
+    type: application
+    platform: iOS
+    sources: [HostApp]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.matbakhy.checks.host
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+  SignInUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: HostApp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.matbakhy.checks.uitests
+        TEST_TARGET_NAME: HostApp
+schemes:
+  SignInUITests:
+    build:
+      targets:
+        HostApp: all
+        SignInUITests: [test]
+    test:
+      targets: [SignInUITests]

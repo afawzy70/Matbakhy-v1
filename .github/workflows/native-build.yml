@@ -124,3 +124,7 @@ jobs:
       - name: MB-031 launch on iOS Simulator
         working-directory: apps/customer-mobile
         run: scripts/launch-ios.sh "$(find ios/build-release/Build/Products -maxdepth 2 -name '*.app' | head -1)"
+      - name: Start identity provider and API natively for the sign-in round trip (no Docker on macOS runners; synthetic users)
+        run: apps/customer-mobile/scripts/native-stack-macos.sh
+      - name: MB-031 native sign-in round trip on iOS (XCUITest; system browser, PKCE, secure storage, sign-out, account switch)
+        run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
