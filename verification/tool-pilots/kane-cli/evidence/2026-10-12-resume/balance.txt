@@ -1,0 +1,4 @@
+Skill update available: not installed → 0.1.2 — run `kane-cli install skill`
+
+Error: Credit balance request failed: 401 {"error":"authentication failed"}
+BLOCKED: credit balance not verifiable; no case run
