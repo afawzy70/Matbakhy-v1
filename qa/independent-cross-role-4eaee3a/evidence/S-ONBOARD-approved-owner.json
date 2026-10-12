@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nHome\nOrders\nMeals\nSlots\nStatement\nSettings\nQA Applicant Kitchen\n\nActive\n\nActive orders\n0 Waiting for acceptance\n0 Accepted\n0 Preparing\n0 Ready\n0 Out for delivery\nWaiting for acceptance\n\nNo orders.\n\nUpcoming slots\nAPI: http://localhost:38080",
+  "cart": null,
+  "pending": false
+}

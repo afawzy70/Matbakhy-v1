@@ -45,5 +45,10 @@ for k in ['DEV_USER_PASSWORD','OIDC_WEB_CLIENT_SECRET','API_PORT']:text=text.rep
     environment:
       WEB_ALLOWED_ORIGINS: http://localhost:35173,http://localhost:35174
       WEB_POST_LOGIN_REDIRECT: http://localhost:35173/
+      NO_PROXY: localhost,127.0.0.1,object-storage,identity,postgres,mail
+      no_proxy: localhost,127.0.0.1,object-storage,identity,postgres,mail
+      JAVA_TOOL_OPTIONS: "-Dhttp.nonProxyHosts=localhost|127.*|object-storage|identity|postgres|mail"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -Y off -qO- http://127.0.0.1:8080/actuator/health | grep -q UP"]
 ''')
 print('Isolated QA realm/settings generated; secret values remain outside git.')

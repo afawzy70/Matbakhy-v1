@@ -1,0 +1,118 @@
+{
+  "order": {
+    "id": "9a29b97b-ae92-471e-a448-759997fdd767",
+    "publicNumber": "MB-100009",
+    "version": 5,
+    "state": "COMPLETED",
+    "fulfillmentMode": "DELIVERY",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "allergenStatement": "UNKNOWN",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 12025,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3000,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 15025,
+      "currency": "EGP"
+    },
+    "slot": {
+      "id": "00000000-0000-0000-0000-00000000019f",
+      "startsAt": "2026-10-18T15:59:42.580575Z",
+      "endsAt": "2026-10-18T17:59:42.580575Z",
+      "timezone": "Africa/Cairo",
+      "cutoffAt": "2026-10-18T13:59:42.580575Z",
+      "availablePortions": 45,
+      "fulfillmentModes": [
+        "DELIVERY"
+      ]
+    },
+    "acceptBy": "2026-10-12T17:13:00.503789Z",
+    "events": [
+      {
+        "sequence": 1,
+        "fromState": null,
+        "toState": "PENDING_ACCEPTANCE",
+        "occurredAt": "2026-10-12T16:58:00.520457Z",
+        "actorType": "CUSTOMER",
+        "reasonCode": null
+      },
+      {
+        "sequence": 2,
+        "fromState": "PENDING_ACCEPTANCE",
+        "toState": "ACCEPTED",
+        "occurredAt": "2026-10-12T16:58:01.626270Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 3,
+        "fromState": "ACCEPTED",
+        "toState": "PREPARING",
+        "occurredAt": "2026-10-12T16:58:01.978007Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 4,
+        "fromState": "PREPARING",
+        "toState": "READY",
+        "occurredAt": "2026-10-12T16:58:02.138466Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 5,
+        "fromState": "READY",
+        "toState": "OUT_FOR_DELIVERY",
+        "occurredAt": "2026-10-12T17:01:01.007097Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 6,
+        "fromState": "OUT_FOR_DELIVERY",
+        "toState": "COMPLETED",
+        "occurredAt": "2026-10-12T17:01:01.211197Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      }
+    ],
+    "allowedActions": [],
+    "cashState": "DUE",
+    "fulfillmentNote": null,
+    "dispatchReference": "QA-DELIVERY-REFERENCE",
+    "contact": null
+  },
+  "database": {
+    "id": "9a29b97b-ae92-471e-a448-759997fdd767",
+    "subtotal_minor": 12025,
+    "delivery_fee_minor": 3000,
+    "tax_minor": 0,
+    "total_minor": 15025,
+    "commission_minor": 1203,
+    "commission_bps_snapshot": 1000,
+    "state": "COMPLETED"
+  }
+}

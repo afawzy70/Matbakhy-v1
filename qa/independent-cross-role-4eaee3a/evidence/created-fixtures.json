@@ -1,0 +1,73 @@
+{
+  "createdMeal": {
+    "id": "3c4fa46e-2db4-4cd8-9e62-b76f2a6730c6",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "status": "DRAFT",
+    "content": {
+      "titleAr": "وجبة QA منشأة",
+      "titleEn": "QA Created Dish",
+      "descriptionAr": "وصف وجبة اختبار مستقلة بمكونات تجريبية فقط",
+      "descriptionEn": null,
+      "portionAr": "حصة اختبار",
+      "portionEn": null,
+      "ingredientsAr": "أرز ومكونات اختبار",
+      "ingredientsEn": null,
+      "allergenDeclaration": "NONE_DECLARED",
+      "allergenCodes": [],
+      "allergenNote": null,
+      "priceMinor": 10125,
+      "currency": "EGP",
+      "photos": [
+        {
+          "mediaId": "e0e4bbe2-0578-4569-915b-eb854c68e7eb",
+          "altAr": null,
+          "altEn": null
+        }
+      ],
+      "category": null
+    },
+    "revision": 1,
+    "publishedAt": null,
+    "archivedAt": null,
+    "updatedAt": "2026-10-12T16:37:11.436361Z",
+    "version": 0,
+    "moderationState": "VISIBLE",
+    "moderationReason": null
+  },
+  "connectedSlot": {
+    "id": "d51ea2ec-9c6b-44da-b112-5f86fd3d5477",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "localDate": "2026-10-20",
+    "startsAt": "2026-10-20T10:00:00Z",
+    "endsAt": "2026-10-20T12:00:00Z",
+    "timezone": "Africa/Cairo",
+    "leadMinutes": 120,
+    "cutoffAt": "2026-10-20T08:00:00Z",
+    "maxPortions": 8,
+    "reserved": 0,
+    "allocated": 0,
+    "consumed": 0,
+    "availablePortions": 8,
+    "state": "DRAFT",
+    "orderable": false,
+    "meals": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "capacity": 3,
+        "reserved": 0,
+        "allocated": 0,
+        "consumed": 0,
+        "available": 3
+      },
+      {
+        "mealId": "00000000-0000-0000-0000-000000000264",
+        "capacity": 3,
+        "reserved": 0,
+        "allocated": 0,
+        "consumed": 0,
+        "available": 3
+      }
+    ],
+    "version": 0
+  }
+}

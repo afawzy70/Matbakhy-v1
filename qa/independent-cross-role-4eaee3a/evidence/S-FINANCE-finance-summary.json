@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nFinance\nKitchen id\nShow\nStatement 2026-10-01 – 2026-10-12\n\nThe cash you collect is yours; only the commission is owed to the platform. Includes refunds, commission reversals and settlements.\n\nCash verified\nEGP 240.50\nCommission owed to the platform\nEGP 36.08\nCommission reversed (refunds)\nEGP 0.00\nCommission settled\nEGP 0.00\nCommission still owed to the platform\nEGP 36.08\nMB-100005 · EGP 240.50 · Verified\nCase reference\nReason\nRequest full refund\nMB-100009 · EGP 150.25 · Cash due\nRefunds\nEGP 240.50 · Rejected\nSettlements\nUnsettled entries\n COMMISSION · EGP 12.03\nCreate settlement batch\n2026-10-01 – 2026-10-12 · EGP 24.05 · Draft\nReview\nCancel\nAPI: http://localhost:38080",
+  "cart": null,
+  "pending": false
+}

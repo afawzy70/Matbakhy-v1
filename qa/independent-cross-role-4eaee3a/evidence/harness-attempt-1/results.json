@@ -1,0 +1,212 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "results": [
+    {
+      "id": "C-AUTH",
+      "actor": "Customer web",
+      "requirement": "MB-009/027; BR-006/007",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:02.802Z",
+      "checks": [
+        {
+          "name": "Real login maps correct synthetic identity",
+          "status": "PASS",
+          "expected": "00000000-0000-0000-0000-0000000002bd",
+          "actual": "00000000-0000-0000-0000-0000000002bd"
+        },
+        {
+          "name": "Session restored after reload",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('button', { name: 'Sign out', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.be.visible\" with timeout 5000ms\n  - waiting for getByRole('button', { name: 'Sign out', exact: true })\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toBeVisible() failed\n\nLocator: getByRole('button', { name: 'Sign out', exact: true })\nExpected: visible\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.be.visible\" with timeout 5000ms\n  - waiting for getByRole('button', { name: 'Sign out', exact: true })\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:10.355Z"
+    },
+    {
+      "id": "C-BROWSE",
+      "actor": "Customer web",
+      "requirement": "MB-016/027; BR-011/016/017/046; D11/D12; MBQA-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:10.359Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "locator.click: Timeout 9000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'العربية', exact: true })\u001b[22m\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "locator.click: Timeout 9000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'العربية', exact: true })\u001b[22m\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:19.616Z"
+    },
+    {
+      "id": "C-BASKET",
+      "actor": "Customer web",
+      "requirement": "CW05/BR-018/019; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:19.619Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:24.645Z"
+    },
+    {
+      "id": "C-REPLACE-K-CANCEL",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:24.648Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    6 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    6 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:29.718Z"
+    },
+    {
+      "id": "C-REPLACE-K-CONFIRM",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:29.720Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:34.780Z"
+    },
+    {
+      "id": "C-REPLACE-S-CANCEL",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:34.790Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:39.846Z"
+    },
+    {
+      "id": "C-REPLACE-S-CONFIRM",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:39.850Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:45.008Z"
+    },
+    {
+      "id": "C-STOCK",
+      "actor": "Customer web + cook API",
+      "requirement": "CW03; BR-013/015/017; MBQA-002",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:45.012Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:52.508Z"
+    },
+    {
+      "id": "C-Q1",
+      "actor": "Customer web + API",
+      "requirement": "BR-019; CW03; configured policy/Q1",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:52.512Z",
+      "checks": [
+        {
+          "name": "Public API publishes actual configured max",
+          "status": "PASS",
+          "expected": {
+            "maxQuantityPerLine": 10
+          },
+          "actual": {
+            "orderingAvailable": true,
+            "orderLimits": {
+              "maxQuantityPerLine": 10,
+              "maxLinesPerOrder": 20,
+              "policyVersion": 1
+            }
+          }
+        },
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    6 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    6 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:11:57.605Z"
+    },
+    {
+      "id": "C-QUOTE",
+      "actor": "Customer web",
+      "requirement": "MB-017/027; BR-019/020/021",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:11:57.609Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n"
+        }
+      ],
+      "evidence": [],
+      "exception": "expect(locator).toHaveText(expected) failed\n\nLocator: locator('#meal-title')\nExpected: \"QA Meal A1\"\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for locator('#meal-title')\n    7 × locator resolved to <h2 id=\"meal-title\">وجبة تجريبية A1</h2>\n      - unexpected value \"وجبة تجريبية A1\"\n",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-12T16:12:02.689Z"
+    }
+  ]
+}

@@ -23,9 +23,13 @@ wait_node(){ local until=$((SECONDS+45)) pos; while [ "$SECONDS" -lt "$until" ];
 tap(){ local pos; pos=$(wait_node "$1") || { echo "IQA FAIL: control unavailable: $1"; exit 1; }; adb shell input tap $pos; }
 scroll_tap(){ local pos; for _ in 1 2 3 4 5 6 7 8; do dump; pos=$(position "$1"); if [ -n "$pos" ]; then adb shell input tap $pos; return; fi; adb shell input swipe 250 800 250 250 350; sleep 1; done; echo "IQA FAIL: below-fold control unavailable"; exit 1; }
 check_total(){ wait_node 'resource-id="estimate"' >/dev/null; dump; grep -q '240\.00' "$UI" || { echo 'IQA FAIL: expected 2 x 120.00 = 240.00 EGP'; exit 1; }; }
-adb shell input keyevent 4
+# This is a new basket journey, after the recovery script left a navigation stack whose
+# Discover request began offline. Start a real foreground process with connectivity restored;
+# keep the session/storage and business data. This is not an authentication or state bypass.
+adb shell am force-stop "$PKG"
+adb shell am start -W -n "$PKG/.MainActivity" >/dev/null
 tap 'resource-id="tab-discover"|content-desc="Discover, tab'
-tap 'resource-id="meal-'"$MID"'"|content-desc="Native Dish One'
+scroll_tap 'resource-id="meal-'"$MID"'"|content-desc="Native Dish One'
 tap 'resource-id="slot-0"'
 scroll_tap 'resource-id="add-to-cart"'
 scroll_tap 'resource-id="go-to-cart"'

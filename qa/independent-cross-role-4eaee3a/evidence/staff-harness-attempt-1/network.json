@@ -1,0 +1,3793 @@
+[
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002bf",
+      "displayName": "QA cook-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002bf",
+      "displayName": "QA cook-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "fabaa7a7-b17d-4336-9ecf-e0e5ce6aa117",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:31.661075005Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "2aad1ec7-1d0b-4445-b6c5-6ef6c8963301",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "9660512e-34ae-4d04-b6e1-c7cd0a88272c",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "83c1b0bc-5381-4128-a72f-c0d042deb449",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "f06f3e92-eab9-486b-be43-cd5bbcf45e19",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "a323bb7b-b496-46f4-a14b-5e0b0d19d477",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "e31dff28-8df4-4930-bf7f-78938a985fcb",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "08367172-2896-436e-baaa-718464fc3e5e",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:31.708607274Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "f6abcbf3-8054-4a06-a29b-5935307bb426",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "84c88376-4b07-4314-bec9-83b0847caf13",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "bbeb433f-76f1-45af-9652-bf1eb0bac470",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "d9066f52-fdf3-4377-8397-7773883c7eb7",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "7ccacebe-d28d-452d-8460-742bb499e431",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "2758dfdc-c982-4054-928b-ea4bd541dfe5",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "serverTime": "2026-10-12T16:23:31.836143766Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "serverTime": "2026-10-12T16:23:31.847049129Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "15c62a68-ced3-4067-acf1-f36f64240e3f",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "f1ab9b25-a020-4d54-b72e-85707adde20d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "6d528748-8bd1-4fb0-a51a-b67a938becdc",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "0398dfaa-5c7e-41a0-86ae-3f78114703d8",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:34.497117466Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012e",
+        "publicSlug": "qa-kitchen-b",
+        "displayName": "مطبخ تجريبي B",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a5",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a6",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a7",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a9",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "58e942a9-6a0b-46c6-aa2a-4317c43d83a9",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "c86f0ae0-cd0b-47fc-8522-122dd1da82b4",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "f5e9e4b0-ce7e-439c-b516-399378746429",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:34.601104281Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012e",
+        "publicSlug": "qa-kitchen-b",
+        "displayName": "مطبخ تجريبي B",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a5",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a6",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a7",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a9",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:34.626808357Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012e",
+        "publicSlug": "qa-kitchen-b",
+        "displayName": "مطبخ تجريبي B",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a5",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a6",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a7",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a9",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:34.658085528Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012e",
+        "publicSlug": "qa-kitchen-b",
+        "displayName": "مطبخ تجريبي B",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a5",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a6",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a7",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a9",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "serverTime": "2026-10-12T16:23:34.757483842Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012e",
+        "publicSlug": "qa-kitchen-b",
+        "displayName": "مطبخ تجريبي B",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a5",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a6",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a7",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-0000000001a9",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c4",
+      "displayName": "QA support-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c4",
+      "displayName": "QA support-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "510afeec-fab1-494c-979c-6b62c8fd7d7e",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "07a7bcf8-67f3-41ef-af34-82caec7a6791",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "0c482f97-9181-4c5d-a867-b8a1ee371155",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "c9fbc432-8fee-435c-ba78-1d313eb75d65",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "e8eb8020-309d-4593-82c0-ca9e1271d10f",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "ea0257ba-bbec-4985-aca4-c7ca4c6ed36c",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "3a22a39c-785d-417e-a3df-1cac9be4e89e",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "88915ca1-f093-433e-a7e1-76fb83ebc51c",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "39285163-1798-4db1-90c9-5675ca3921f8",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "fdf12a80-0cdb-4edb-a189-98d95038a57d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "633b6279-5b79-40d6-a575-a6824ab57121",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "36a3c6d5-2d38-461f-95f8-3c413c93b2d9",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "815bacb7-fdc8-4e5f-b12c-0d89636a09ac",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "a3f95c8c-1841-45ac-9965-1589dee240b7",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=50&state=ACTIVE",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "support-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=50&state=ACTIVE",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c5",
+      "displayName": "QA finance-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c5",
+      "displayName": "QA finance-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "76d39386-e9ed-4a42-9260-a56fd13325fd",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "6958c3b7-db46-42bc-8e08-adf7825d072a",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "3457dac2-4a66-453a-b836-4d4a3ef99c7e",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 404,
+    "language": "ar",
+    "body": {
+      "code": "NOT_FOUND",
+      "messageKey": "error.not_found",
+      "fieldErrors": [],
+      "requestId": "8cf25c05-40a6-476c-b071-f129b2d899a8",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "d59d7d41-78fc-4d3a-af7a-dd0e60aa5974",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "06d2d36c-657f-4020-abe4-8f0af18b5f94",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "28c14d25-2034-4a45-9659-aba4ee9c9ed4",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "26d6a7bb-e498-4237-8b80-dd56feeb4da3",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "5022659f-070c-42da-8899-12e2c4e5be82",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "7bed23f0-b300-47ae-b89a-10fa99f8153a",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "16b7e01d-6f32-4525-a0ec-e9379dcd4dab",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "d9724726-38da-4652-971c-bbcf5036ac7b",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "e87dc3fb-aaf7-41ca-b507-c2ac40f66ab4",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 404,
+    "language": "ar",
+    "body": {
+      "code": "NOT_FOUND",
+      "messageKey": "error.not_found",
+      "fieldErrors": [],
+      "requestId": "f7269a80-cf33-4d46-a281-9813dde648e0",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "e88e2a47-478f-453a-a153-3f5b0d55e797",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "finance-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "aeb3171d-c982-46a6-8862-db2c63027de3",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c3",
+      "displayName": "QA ops-review",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c3",
+      "displayName": "QA ops-review",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "108a0e9b-299a-461a-b614-e75d47143980",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "d40bfd58-fadd-4ad4-9477-d7e7c911e02c",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-0000-0000-000000000277",
+          "kitchenId": "00000000-0000-0000-0000-00000000012f",
+          "kitchenName": "مطبخ تجريبي PAUSED",
+          "status": "PUBLISHED",
+          "moderationState": "VISIBLE",
+          "moderationReason": null,
+          "titleAr": "وجبة تجريبية PAUSED1",
+          "titleEn": "QA Meal PAUSED1",
+          "priceMinor": 8025,
+          "updatedAt": "2026-10-12T15:59:42.580575Z",
+          "version": 0
+        }
+      ],
+      "nextCursor": "MjAyNi0xMC0xMlQxNTo1OTo0Mi41ODA1NzVafDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDI3Nw",
+      "hasMore": true
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-0000-0000-0000000000c9",
+          "state": "APPROVED",
+          "publicName": null,
+          "currentRevision": 0,
+          "submittedAt": null,
+          "updatedAt": "2026-10-12T15:59:42.580575Z",
+          "version": 0
+        }
+      ],
+      "nextCursor": "MjAyNi0xMC0xMlQxNTo1OTo0Mi41ODA1NzVafDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBjOQ",
+      "hasMore": true
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "1927b1f2-92a4-4aae-9d80-4e0771f0ee00",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "ab0f1101-428c-4082-bdf6-13ded54ceaf8",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "a368250e-3ae3-41b4-a583-9c527b0d6263",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "id": "c97fbb55-2bc5-4bd3-af28-270ec5737d62",
+          "publicNumber": "MB-100003",
+          "state": "CANCELLED",
+          "fulfillmentMode": "PICKUP",
+          "kitchenId": "00000000-0000-0000-0000-00000000012d",
+          "total": {
+            "amountMinor": 36075,
+            "currency": "EGP"
+          },
+          "acceptBy": "2026-10-12T16:31:33.627424Z",
+          "createdAt": "2026-10-12T16:16:33.661656Z",
+          "cashState": "NOT_DUE",
+          "exceptions": [],
+          "version": 1
+        }
+      ],
+      "nextCursor": "MjAyNi0xMC0xMlQxNjoxNjozMy42NjE2NTZafGM5N2ZiYjU1LTJiYzUtNGJkMy1hZjI4LTI3MGVjNTczN2Q2Mg",
+      "hasMore": true
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "c6126bb5-a906-4632-84af-b875575c069a",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "36b06c00-8b90-48f3-8f3f-cc40b49090b3",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-0000-0000-0000000000c9",
+          "state": "APPROVED",
+          "publicName": null,
+          "currentRevision": 0,
+          "submittedAt": null,
+          "updatedAt": "2026-10-12T15:59:42.580575Z",
+          "version": 0
+        }
+      ],
+      "nextCursor": "MjAyNi0xMC0xMlQxNTo1OTo0Mi41ODA1NzVafDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBjOQ",
+      "hasMore": true
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "eea33bd9-a60d-48d6-8150-2b1a9ac7bea6",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "id": "00000000-0000-0000-0000-000000000277",
+          "kitchenId": "00000000-0000-0000-0000-00000000012f",
+          "kitchenName": "مطبخ تجريبي PAUSED",
+          "status": "PUBLISHED",
+          "moderationState": "VISIBLE",
+          "moderationReason": null,
+          "titleAr": "وجبة تجريبية PAUSED1",
+          "titleEn": "QA Meal PAUSED1",
+          "priceMinor": 8025,
+          "updatedAt": "2026-10-12T15:59:42.580575Z",
+          "version": 0
+        }
+      ],
+      "nextCursor": "MjAyNi0xMC0xMlQxNTo1OTo0Mi41ODA1NzVafDAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDI3Nw",
+      "hasMore": true
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "256a2904-c399-4c12-b34b-2de69122ea18",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "c911f3ca-297e-48c9-985d-eeb72b17924d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "id": "c97fbb55-2bc5-4bd3-af28-270ec5737d62",
+          "publicNumber": "MB-100003",
+          "state": "CANCELLED",
+          "fulfillmentMode": "PICKUP",
+          "kitchenId": "00000000-0000-0000-0000-00000000012d",
+          "total": {
+            "amountMinor": 36075,
+            "currency": "EGP"
+          },
+          "acceptBy": "2026-10-12T16:31:33.627424Z",
+          "createdAt": "2026-10-12T16:16:33.661656Z",
+          "cashState": "NOT_DUE",
+          "exceptions": [],
+          "version": 1
+        }
+      ],
+      "nextCursor": "MjAyNi0xMC0xMlQxNjoxNjozMy42NjE2NTZafGM5N2ZiYjU1LTJiYzUtNGJkMy1hZjI4LTI3MGVjNTczN2Q2Mg",
+      "hasMore": true
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?state=SUBMITTED&limit=50",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-review",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?state=SUBMITTED&limit=50",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c2",
+      "displayName": "QA ops-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002c2",
+      "displayName": "QA ops-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "367d97a4-e3ec-4e87-ab4f-13d4e7f8a268",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "41a33617-7e1d-4b0b-88d9-c4b39ade547d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "cce76e87-5837-4e91-8e50-fc4b48203e28",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "fa6aa243-03bb-4ebb-9710-2583e7935dce",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "f07450fd-d08e-4edd-95a3-e5f47218e431",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "71755610-b0a5-495a-9045-ac8f46d95a48",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "commercePolicy": {
+        "version": 1,
+        "label": "SYNTHETIC development policy (not for live use)",
+        "synthetic": true,
+        "status": "ACTIVE",
+        "taxRateBps": 0,
+        "commissionRateBps": 1000,
+        "maxItemQuantity": 10,
+        "quoteTtlSeconds": 300,
+        "acceptanceWindowMinutes": 15,
+        "minAcceptanceMinutes": 5,
+        "cancellationPolicyVersion": "synthetic-cancel-v1",
+        "termsVersion": "synthetic-terms-v1",
+        "approvedAt": null
+      },
+      "policyHistory": [
+        {
+          "version": 1,
+          "label": "SYNTHETIC development policy (not for live use)",
+          "synthetic": true,
+          "status": "ACTIVE",
+          "taxRateBps": 0,
+          "commissionRateBps": 1000,
+          "maxItemQuantity": 10,
+          "quoteTtlSeconds": 300,
+          "acceptanceWindowMinutes": 15,
+          "minAcceptanceMinutes": 5,
+          "cancellationPolicyVersion": "synthetic-cancel-v1",
+          "termsVersion": "synthetic-terms-v1",
+          "approvedAt": null
+        }
+      ],
+      "zones": [
+        {
+          "id": "00000000-0000-4000-8000-00000000a001",
+          "code": "test-zone-a",
+          "nameAr": "منطقة تجريبية أ",
+          "nameEn": "Test zone A",
+          "active": true,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a002",
+          "code": "test-zone-b",
+          "nameAr": "منطقة تجريبية ب",
+          "nameEn": "Test zone B",
+          "active": true,
+          "deliveryFeeMinor": 4500,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a003",
+          "code": "test-zone-off",
+          "nameAr": "منطقة تجريبية متوقفة",
+          "nameEn": "Test zone (inactive)",
+          "active": false,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        }
+      ],
+      "flags": [
+        {
+          "key": "ordering-enabled",
+          "enabled": true,
+          "version": 0
+        }
+      ],
+      "changes": []
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c2",
+          "displayName": "QA ops-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "audit.read",
+              "grantId": "9a8a3a9c-1f32-4c54-b7e0-e8a536b3db28"
+            },
+            {
+              "permission": "config.read",
+              "grantId": "bd8f50c2-21d5-486a-81b3-9af1c483e7c7"
+            },
+            {
+              "permission": "config.write",
+              "grantId": "dc8c3bc8-adf4-4513-9063-268e8c07f510"
+            },
+            {
+              "permission": "staff.grant",
+              "grantId": "219b657b-f612-4259-8054-587780702416"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c3",
+          "displayName": "QA ops-review",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "content.moderate",
+              "grantId": "5fd7d8d9-65cc-4001-be45-cf7073f6c274"
+            },
+            {
+              "permission": "cook.review",
+              "grantId": "1fd8496b-079d-467f-bd4c-8758cd1559d3"
+            },
+            {
+              "permission": "order.exception_cancel",
+              "grantId": "a9cc791f-41de-4a57-b8ed-35b81980f69b"
+            },
+            {
+              "permission": "order.handover_override",
+              "grantId": "6858f584-9788-49e5-9304-1c000830421e"
+            },
+            {
+              "permission": "order.ops",
+              "grantId": "f5e4b6c8-3f5f-43bd-aa4a-42278caed246"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c4",
+          "displayName": "QA support-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "support.case",
+              "grantId": "7bb46581-2826-4da5-b021-b54168028db3"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c5",
+          "displayName": "QA finance-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "finance.read",
+              "grantId": "098bd930-9137-44bc-a42f-4548b85107ed"
+            },
+            {
+              "permission": "finance.refund_approve",
+              "grantId": "7fd87690-7e2e-47e2-a54c-999df608af83"
+            },
+            {
+              "permission": "finance.settlement",
+              "grantId": "a29b5cff-7673-4156-883e-99ca48c0360c"
+            },
+            {
+              "permission": "finance.verify",
+              "grantId": "575178f4-e18f-41ee-aae2-d4107a64dbbb"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c6",
+          "displayName": "QA finance-b",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "finance.read",
+              "grantId": "d9972bbd-88d0-4fda-a6b8-d2163d7e0941"
+            },
+            {
+              "permission": "finance.refund_approve",
+              "grantId": "a676c7ea-1121-46f2-aa4d-183f5cd61097"
+            },
+            {
+              "permission": "finance.settlement",
+              "grantId": "a3254c09-711f-4674-930e-b7a6ed2f12b3"
+            },
+            {
+              "permission": "finance.verify",
+              "grantId": "02462449-efbe-4e54-bf4a-5fe2789be48c"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c7",
+          "displayName": "QA config-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "config.read",
+              "grantId": "8ca88d26-af8c-4a5e-a65a-116dc7e8f7a4"
+            },
+            {
+              "permission": "config.write",
+              "grantId": "b24e7412-a8a7-4c67-ad3e-b5fa0a764a48"
+            },
+            {
+              "permission": "integration.ops",
+              "grantId": "913af1b3-24fb-45e0-96bb-7ed635d65e76"
+            }
+          ]
+        }
+      ],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "0358c223-0348-4a00-8288-f42ba4e4187a",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "5e8658c6-17c6-459d-884a-e7c9bb51d7e5",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "3115c7f6-f0ab-4512-834d-a00b305ae053",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "6b268e49-771a-47a5-9472-8b63720a9c57",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "d81a75cb-7bf8-4aec-bf58-3d92253b7e1d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "ebfb638a-a92a-45d5-b557-89e87776d04d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "commercePolicy": {
+        "version": 1,
+        "label": "SYNTHETIC development policy (not for live use)",
+        "synthetic": true,
+        "status": "ACTIVE",
+        "taxRateBps": 0,
+        "commissionRateBps": 1000,
+        "maxItemQuantity": 10,
+        "quoteTtlSeconds": 300,
+        "acceptanceWindowMinutes": 15,
+        "minAcceptanceMinutes": 5,
+        "cancellationPolicyVersion": "synthetic-cancel-v1",
+        "termsVersion": "synthetic-terms-v1",
+        "approvedAt": null
+      },
+      "policyHistory": [
+        {
+          "version": 1,
+          "label": "SYNTHETIC development policy (not for live use)",
+          "synthetic": true,
+          "status": "ACTIVE",
+          "taxRateBps": 0,
+          "commissionRateBps": 1000,
+          "maxItemQuantity": 10,
+          "quoteTtlSeconds": 300,
+          "acceptanceWindowMinutes": 15,
+          "minAcceptanceMinutes": 5,
+          "cancellationPolicyVersion": "synthetic-cancel-v1",
+          "termsVersion": "synthetic-terms-v1",
+          "approvedAt": null
+        }
+      ],
+      "zones": [
+        {
+          "id": "00000000-0000-4000-8000-00000000a001",
+          "code": "test-zone-a",
+          "nameAr": "منطقة تجريبية أ",
+          "nameEn": "Test zone A",
+          "active": true,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a002",
+          "code": "test-zone-b",
+          "nameAr": "منطقة تجريبية ب",
+          "nameEn": "Test zone B",
+          "active": true,
+          "deliveryFeeMinor": 4500,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a003",
+          "code": "test-zone-off",
+          "nameAr": "منطقة تجريبية متوقفة",
+          "nameEn": "Test zone (inactive)",
+          "active": false,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        }
+      ],
+      "flags": [
+        {
+          "key": "ordering-enabled",
+          "enabled": true,
+          "version": 0
+        }
+      ],
+      "changes": []
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "items": [
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c2",
+          "displayName": "QA ops-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "audit.read",
+              "grantId": "9a8a3a9c-1f32-4c54-b7e0-e8a536b3db28"
+            },
+            {
+              "permission": "config.read",
+              "grantId": "bd8f50c2-21d5-486a-81b3-9af1c483e7c7"
+            },
+            {
+              "permission": "config.write",
+              "grantId": "dc8c3bc8-adf4-4513-9063-268e8c07f510"
+            },
+            {
+              "permission": "staff.grant",
+              "grantId": "219b657b-f612-4259-8054-587780702416"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c3",
+          "displayName": "QA ops-review",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "content.moderate",
+              "grantId": "5fd7d8d9-65cc-4001-be45-cf7073f6c274"
+            },
+            {
+              "permission": "cook.review",
+              "grantId": "1fd8496b-079d-467f-bd4c-8758cd1559d3"
+            },
+            {
+              "permission": "order.exception_cancel",
+              "grantId": "a9cc791f-41de-4a57-b8ed-35b81980f69b"
+            },
+            {
+              "permission": "order.handover_override",
+              "grantId": "6858f584-9788-49e5-9304-1c000830421e"
+            },
+            {
+              "permission": "order.ops",
+              "grantId": "f5e4b6c8-3f5f-43bd-aa4a-42278caed246"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c4",
+          "displayName": "QA support-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "support.case",
+              "grantId": "7bb46581-2826-4da5-b021-b54168028db3"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c5",
+          "displayName": "QA finance-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "finance.read",
+              "grantId": "098bd930-9137-44bc-a42f-4548b85107ed"
+            },
+            {
+              "permission": "finance.refund_approve",
+              "grantId": "7fd87690-7e2e-47e2-a54c-999df608af83"
+            },
+            {
+              "permission": "finance.settlement",
+              "grantId": "a29b5cff-7673-4156-883e-99ca48c0360c"
+            },
+            {
+              "permission": "finance.verify",
+              "grantId": "575178f4-e18f-41ee-aae2-d4107a64dbbb"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c6",
+          "displayName": "QA finance-b",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "finance.read",
+              "grantId": "d9972bbd-88d0-4fda-a6b8-d2163d7e0941"
+            },
+            {
+              "permission": "finance.refund_approve",
+              "grantId": "a676c7ea-1121-46f2-aa4d-183f5cd61097"
+            },
+            {
+              "permission": "finance.settlement",
+              "grantId": "a3254c09-711f-4674-930e-b7a6ed2f12b3"
+            },
+            {
+              "permission": "finance.verify",
+              "grantId": "02462449-efbe-4e54-bf4a-5fe2789be48c"
+            }
+          ]
+        },
+        {
+          "userId": "00000000-0000-0000-0000-0000000002c7",
+          "displayName": "QA config-a",
+          "status": "ACTIVE",
+          "grants": [
+            {
+              "permission": "config.read",
+              "grantId": "8ca88d26-af8c-4a5e-a65a-116dc7e8f7a4"
+            },
+            {
+              "permission": "config.write",
+              "grantId": "b24e7412-a8a7-4c67-ad3e-b5fa0a764a48"
+            },
+            {
+              "permission": "integration.ops",
+              "grantId": "913af1b3-24fb-45e0-96bb-7ed635d65e76"
+            }
+          ]
+        }
+      ],
+      "nextCursor": null,
+      "hasMore": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "commercePolicy": {
+        "version": 1,
+        "label": "SYNTHETIC development policy (not for live use)",
+        "synthetic": true,
+        "status": "ACTIVE",
+        "taxRateBps": 0,
+        "commissionRateBps": 1000,
+        "maxItemQuantity": 10,
+        "quoteTtlSeconds": 300,
+        "acceptanceWindowMinutes": 15,
+        "minAcceptanceMinutes": 5,
+        "cancellationPolicyVersion": "synthetic-cancel-v1",
+        "termsVersion": "synthetic-terms-v1",
+        "approvedAt": null
+      },
+      "policyHistory": [
+        {
+          "version": 1,
+          "label": "SYNTHETIC development policy (not for live use)",
+          "synthetic": true,
+          "status": "ACTIVE",
+          "taxRateBps": 0,
+          "commissionRateBps": 1000,
+          "maxItemQuantity": 10,
+          "quoteTtlSeconds": 300,
+          "acceptanceWindowMinutes": 15,
+          "minAcceptanceMinutes": 5,
+          "cancellationPolicyVersion": "synthetic-cancel-v1",
+          "termsVersion": "synthetic-terms-v1",
+          "approvedAt": null
+        }
+      ],
+      "zones": [
+        {
+          "id": "00000000-0000-4000-8000-00000000a001",
+          "code": "test-zone-a",
+          "nameAr": "منطقة تجريبية أ",
+          "nameEn": "Test zone A",
+          "active": true,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a002",
+          "code": "test-zone-b",
+          "nameAr": "منطقة تجريبية ب",
+          "nameEn": "Test zone B",
+          "active": true,
+          "deliveryFeeMinor": 4500,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a003",
+          "code": "test-zone-off",
+          "nameAr": "منطقة تجريبية متوقفة",
+          "nameEn": "Test zone (inactive)",
+          "active": false,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        }
+      ],
+      "flags": [
+        {
+          "key": "ordering-enabled",
+          "enabled": true,
+          "version": 0
+        }
+      ],
+      "changes": []
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "commercePolicy": {
+        "version": 1,
+        "label": "SYNTHETIC development policy (not for live use)",
+        "synthetic": true,
+        "status": "ACTIVE",
+        "taxRateBps": 0,
+        "commissionRateBps": 1000,
+        "maxItemQuantity": 10,
+        "quoteTtlSeconds": 300,
+        "acceptanceWindowMinutes": 15,
+        "minAcceptanceMinutes": 5,
+        "cancellationPolicyVersion": "synthetic-cancel-v1",
+        "termsVersion": "synthetic-terms-v1",
+        "approvedAt": null
+      },
+      "policyHistory": [
+        {
+          "version": 1,
+          "label": "SYNTHETIC development policy (not for live use)",
+          "synthetic": true,
+          "status": "ACTIVE",
+          "taxRateBps": 0,
+          "commissionRateBps": 1000,
+          "maxItemQuantity": 10,
+          "quoteTtlSeconds": 300,
+          "acceptanceWindowMinutes": 15,
+          "minAcceptanceMinutes": 5,
+          "cancellationPolicyVersion": "synthetic-cancel-v1",
+          "termsVersion": "synthetic-terms-v1",
+          "approvedAt": null
+        }
+      ],
+      "zones": [
+        {
+          "id": "00000000-0000-4000-8000-00000000a001",
+          "code": "test-zone-a",
+          "nameAr": "منطقة تجريبية أ",
+          "nameEn": "Test zone A",
+          "active": true,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a002",
+          "code": "test-zone-b",
+          "nameAr": "منطقة تجريبية ب",
+          "nameEn": "Test zone B",
+          "active": true,
+          "deliveryFeeMinor": 4500,
+          "version": 0
+        },
+        {
+          "id": "00000000-0000-4000-8000-00000000a003",
+          "code": "test-zone-off",
+          "nameAr": "منطقة تجريبية متوقفة",
+          "nameEn": "Test zone (inactive)",
+          "active": false,
+          "deliveryFeeMinor": 3000,
+          "version": 0
+        }
+      ],
+      "flags": [
+        {
+          "key": "ordering-enabled",
+          "enabled": true,
+          "version": 0
+        }
+      ],
+      "changes": []
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-b",
+    "method": "GET",
+    "path": "/api/v1/cook/meals/00000000-0000-0000-0000-00000000026d",
+    "status": 405,
+    "body": {
+      "code": "METHOD_NOT_ALLOWED",
+      "messageKey": "error.method_not_allowed",
+      "fieldErrors": [],
+      "requestId": "614cecad-63fd-42be-bf6f-23b21041b017",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/meals/00000000-0000-0000-0000-00000000026d",
+    "status": 405,
+    "body": {
+      "code": "METHOD_NOT_ALLOWED",
+      "messageKey": "error.method_not_allowed",
+      "fieldErrors": [],
+      "requestId": "8b153c20-282b-4d7e-ad83-46974317acf4",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "POST",
+    "path": "/api/v1/cook/meals/00000000-0000-0000-0000-00000000026d/publication",
+    "status": 422,
+    "body": {
+      "code": "VALIDATION_FAILED",
+      "messageKey": "error.validation_failed",
+      "fieldErrors": [
+        {
+          "field": "expectedVersion",
+          "code": "NotNull"
+        }
+      ],
+      "requestId": "fcb8639c-f0ab-4ab1-ac28-4b068c6514f1",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "ops-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks",
+    "status": 403,
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "c0c94597-bf0a-497d-a335-0bfe131b76fa",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002bf",
+      "displayName": "QA cook-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "id": "00000000-0000-0000-0000-0000000002bf",
+      "displayName": "QA cook-a",
+      "locale": "ar",
+      "emailVerified": true,
+      "phoneVerified": "[REDACTED]",
+      "version": 0,
+      "capabilities": [
+        "BROWSE",
+        "ORDER"
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "2e36ff75-4605-4cf1-a572-41139bd4dba2",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "454f56ec-7cea-4340-9e13-69fb229327d8",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "2b7c2c40-882b-412d-a582-2d3566ae46ec",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "542c1398-a0f0-44cf-b08e-e3e433d4090d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "22551e30-da9f-444e-bd62-d0ea570ad63a",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:41.060087770Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "5aa72c9e-7e08-4c3e-893e-d4d05974784c",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/finance/statements?kitchenId=00000000-0000-0000-0000-000000000000",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "fb3cc65a-9568-4c0b-bc9b-ba231b0c6163",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/catalogue?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "2023aa17-dd96-4e3a-908b-708718b83390",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cooks?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "a53edb5e-620a-49f4-bfb8-da2ac616c9df",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/orders?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "42cccced-571a-45a0-b15e-5469419912c4",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "0fb80b0b-7e15-4dac-a59b-bc67634ddb8b",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/cases?limit=1",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "03ae7452-48e2-459b-8a06-881cb247b3b0",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/configuration",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "864aefb2-27d7-49ca-a6fe-32d8d21e39f7",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/ops/staff",
+    "status": 403,
+    "language": "ar",
+    "body": {
+      "code": "FORBIDDEN",
+      "messageKey": "error.forbidden",
+      "fieldErrors": [],
+      "requestId": "9e29db82-904e-42a7-9c6f-741480f212c0",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "ar",
+    "body": {
+      "serverTime": "2026-10-12T16:23:41.280600112Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "body": {
+      "serverTime": "2026-10-12T16:23:41.300187989Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "serverTime": "2026-10-12T16:23:41.328962716Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/cook/dashboard",
+    "status": 200,
+    "language": "en",
+    "body": {
+      "serverTime": "2026-10-12T16:23:41.354743817Z",
+      "kitchen": {
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "publicSlug": "qa-kitchen-a",
+        "displayName": "مطبخ تجريبي A",
+        "description": "Synthetic independent QA kitchen",
+        "operatingState": "ACTIVE",
+        "pausedBy": null,
+        "pickupEnabled": true,
+        "zones": [
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a003",
+            "nameAr": "منطقة تجريبية متوقفة",
+            "nameEn": "Test zone (inactive)",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a001",
+            "nameAr": "منطقة تجريبية أ",
+            "nameEn": "Test zone A",
+            "deliveryEnabled": true
+          },
+          {
+            "zoneId": "00000000-0000-4000-8000-00000000a002",
+            "nameAr": "منطقة تجريبية ب",
+            "nameEn": "Test zone B",
+            "deliveryEnabled": true
+          }
+        ],
+        "version": 0
+      },
+      "activeCounts": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      },
+      "pendingAcceptance": [],
+      "upcomingSlots": [
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019b",
+          "startsAt": "2026-10-15T15:59:42.580575Z",
+          "endsAt": "2026-10-15T17:59:42.580575Z",
+          "cutoffAt": "2026-10-15T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019c",
+          "startsAt": "2026-10-16T15:59:42.580575Z",
+          "endsAt": "2026-10-16T17:59:42.580575Z",
+          "cutoffAt": "2026-10-16T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019d",
+          "startsAt": "2026-10-17T15:59:42.580575Z",
+          "endsAt": "2026-10-17T17:59:42.580575Z",
+          "cutoffAt": "2026-10-17T13:59:42.580575Z",
+          "state": "CLOSED",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        },
+        {
+          "slotId": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-18T15:59:42.580575Z",
+          "endsAt": "2026-10-18T17:59:42.580575Z",
+          "cutoffAt": "2026-10-18T13:59:42.580575Z",
+          "state": "OPEN",
+          "maxPortions": 50,
+          "reserved": 0,
+          "allocated": 0,
+          "consumed": 0
+        }
+      ]
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "status": 401,
+    "body": {
+      "code": "UNAUTHENTICATED",
+      "messageKey": "error.unauthenticated",
+      "fieldErrors": [],
+      "requestId": "aeb352e2-6a4d-4e29-8c19-c82cacbf645d",
+      "retryable": false
+    }
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "method": "POST",
+    "path": "/api/v1/auth/logout",
+    "status": 200,
+    "language": "en"
+  }
+]

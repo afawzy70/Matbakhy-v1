@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nHome\nOrders\nMeals\nSlots\nStatement\nSettings\nNew meal (draft)\nArabic name\nEnglish name\nPublic description\nPortion\nIngredients\nPrice (EGP)\nAllergens\nNone declared\nUnknown\nMeal photo\nCreate\nMy meals\nQA Meal A1\nPublished\n\nEGP 120.25\n\nPause\nArchive\nQA Meal A2\nPublished\n\nEGP 95.50\n\nPause\nArchive\nQA Meal A3\nPublished\n\nEGP 80.25\n\nPause\nArchive\nQA Created Dish\nDraft\n\nEGP 101.25\n\nPublish\nArchive\nAPI: http://localhost:38080",
+  "cart": null,
+  "pending": false
+}

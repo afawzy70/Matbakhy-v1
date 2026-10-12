@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nHome\nOrders\nMeals\nSlots\nStatement\nSettings\nNew slot\nDate\nStart\nEnd\nMaximum portions\nOrder lead time (minutes)\nPortions per meal\nوجبة تجريبية A1\nوجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة\nوجبة تجريبية A3\nCreate\nMy slots\n15 Oct 2026, 18:59 – 15 Oct 2026, 20:59\nOpen\n\n0 of 50 portions\n\nPause\nClose\n16 Oct 2026, 18:59 – 16 Oct 2026, 20:59\nOpen\n\n0 of 50 portions\n\nPause\nClose\n17 Oct 2026, 18:59 – 17 Oct 2026, 20:59\nClosed\n\n0 of 50 portions\n\n18 Oct 2026, 18:59 – 18 Oct 2026, 20:59\nOpen\n\n0 of 50 portions\n\nPause\nClose\n19 Oct 2026, 13:00 – 19 Oct 2026, 15:00\nDraft\n\n0 of 8 portions\n\nOpen\nClose\n\nThis action is no longer available. Refreshed.\n\n20 Oct 2026, 13:00 – 20 Oct 2026, 15:00\nOpen\n\n2 of 8 portions\n\nPause\nClose\nAPI: http://localhost:38080",
+  "cart": null,
+  "pending": false
+}

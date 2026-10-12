@@ -1,0 +1,170 @@
+{
+  "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+  "statement": {
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "from": "2026-10-01",
+    "to": "2026-10-12",
+    "direction": "COOK_PAYS_PLATFORM",
+    "includes": [
+      "COMPLETED_ORDERS",
+      "CASH_POSITION",
+      "COMMISSION",
+      "REFUNDS",
+      "SETTLEMENTS"
+    ],
+    "summary": {
+      "completedOrders": 2,
+      "ordersTotal": {
+        "amountMinor": 39075,
+        "currency": "EGP"
+      },
+      "cashReported": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "cashVerified": {
+        "amountMinor": 24050,
+        "currency": "EGP"
+      },
+      "cashOutstanding": {
+        "amountMinor": 15025,
+        "currency": "EGP"
+      },
+      "commissionPosted": {
+        "amountMinor": 3608,
+        "currency": "EGP"
+      },
+      "commissionPending": 0,
+      "commissionReversed": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "commissionSettled": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "commissionOutstanding": {
+        "amountMinor": 3608,
+        "currency": "EGP"
+      }
+    },
+    "items": [
+      {
+        "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+        "publicNumber": "MB-100005",
+        "completedAt": "2026-10-12T16:37:27.485800Z",
+        "orderTotal": {
+          "amountMinor": 24050,
+          "currency": "EGP"
+        },
+        "cashState": "VERIFIED",
+        "commission": {
+          "amountMinor": 2405,
+          "currency": "EGP"
+        },
+        "commissionState": "POSTED"
+      },
+      {
+        "orderId": "9a29b97b-ae92-471e-a448-759997fdd767",
+        "publicNumber": "MB-100009",
+        "completedAt": "2026-10-12T17:01:01.211197Z",
+        "orderTotal": {
+          "amountMinor": 15025,
+          "currency": "EGP"
+        },
+        "cashState": "DUE",
+        "commission": {
+          "amountMinor": 1203,
+          "currency": "EGP"
+        },
+        "commissionState": "POSTED"
+      }
+    ],
+    "refunds": [],
+    "settlements": [],
+    "unsettledEntries": [
+      {
+        "ledgerGroupId": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+        "kind": "COMMISSION",
+        "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+        "amount": {
+          "amountMinor": 2405,
+          "currency": "EGP"
+        }
+      },
+      {
+        "ledgerGroupId": "7f03228b-9260-4222-9822-4446d075ae1c",
+        "kind": "COMMISSION",
+        "orderId": "9a29b97b-ae92-471e-a448-759997fdd767",
+        "amount": {
+          "amountMinor": 1203,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "nextCursor": null,
+    "hasMore": false
+  },
+  "refund": {
+    "id": "06ed8b55-c627-4ef3-87cf-06c3fa6182bc",
+    "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "caseReference": "CS-A12B4EF8",
+    "amount": {
+      "amountMinor": 24050,
+      "currency": "EGP"
+    },
+    "state": "REJECTED",
+    "reason": "Synthetic full refund request; no money moved",
+    "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+    "approvedBy": "00000000-0000-0000-0000-0000000002c6",
+    "paidBy": null,
+    "paymentReference": null,
+    "verifiedBy": null,
+    "decisionReason": "Synthetic cleanup: no actual refund paid",
+    "createdAt": "2026-10-12T17:04:42.813303Z",
+    "updatedAt": "2026-10-12T17:04:42.918179Z",
+    "version": 2
+  },
+  "settlement": {
+    "id": "d44c87e3-d3b2-4050-bead-2d4b43a61b8e",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "periodFrom": "2026-10-01",
+    "periodTo": "2026-10-12",
+    "state": "REVIEWED",
+    "total": {
+      "amountMinor": 2405,
+      "currency": "EGP"
+    },
+    "direction": "COOK_PAYS_PLATFORM",
+    "lines": [
+      {
+        "ledgerGroupId": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+        "kind": "COMMISSION",
+        "orderId": "620ab03d-db91-443f-8e32-d36cbd939e36",
+        "amount": {
+          "amountMinor": 2405,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "createdBy": "00000000-0000-0000-0000-0000000002c5",
+    "reviewedBy": "00000000-0000-0000-0000-0000000002c6",
+    "paymentReference": null,
+    "paymentRecordedBy": null,
+    "reconciledBy": null,
+    "createdAt": "2026-10-12T17:04:43.482052Z",
+    "updatedAt": "2026-10-12T17:04:43.539066Z",
+    "version": 1
+  },
+  "ledger": [
+    {
+      "group_id": "7f03228b-9260-4222-9822-4446d075ae1c",
+      "balance": 0
+    },
+    {
+      "group_id": "c8451550-5e7c-45b6-beba-8858f7c13d05",
+      "balance": 0
+    }
+  ]
+}

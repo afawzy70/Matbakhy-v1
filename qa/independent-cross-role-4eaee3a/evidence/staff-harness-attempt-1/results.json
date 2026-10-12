@@ -1,0 +1,1303 @@
+{
+  "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+  "results": [
+    {
+      "id": "C-AUTH",
+      "actor": "Customer web",
+      "requirement": "MB-009/027; BR-006/007",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:04.554Z",
+      "checks": [
+        {
+          "name": "Real login maps correct synthetic identity",
+          "status": "PASS",
+          "expected": "00000000-0000-0000-0000-0000000002bd",
+          "actual": "00000000-0000-0000-0000-0000000002bd"
+        },
+        {
+          "name": "Session restored after reload",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Delivered customer account exposes sign-out action",
+          "status": "FAIL",
+          "expected": "reachable Sign out control (CW11)",
+          "actual": [
+            "العربية",
+            "Save",
+            "Get help with an order",
+            "Request account deletion"
+          ]
+        },
+        {
+          "name": "Logout revokes application session",
+          "status": "PASS",
+          "expected": 401,
+          "actual": 401
+        },
+        {
+          "name": "Distinct real customer identities",
+          "status": "PASS",
+          "expected": "00000000-0000-0000-0000-0000000002be",
+          "actual": "00000000-0000-0000-0000-0000000002be"
+        },
+        {
+          "name": "Customer denied /api/v1/cook/dashboard",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        },
+        {
+          "name": "Customer denied /api/v1/ops/orders",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        },
+        {
+          "name": "Customer denied /api/v1/ops/cases",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        },
+        {
+          "name": "Customer denied /api/v1/ops/configuration",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        }
+      ],
+      "evidence": [
+        "C-AUTH-account.png",
+        "C-AUTH-account.json"
+      ],
+      "findings": [
+        "MBQA-003"
+      ],
+      "observations": [
+        {
+          "name": "API-only logout workaround, not UI journey PASS",
+          "status": 200
+        }
+      ],
+      "status": "FAIL",
+      "finishedAt": "2026-10-12T16:16:19.273Z"
+    },
+    {
+      "id": "C-BROWSE",
+      "actor": "Customer web",
+      "requirement": "MB-016/027; BR-011/016/017/046; D11/D12; MBQA-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:19.277Z",
+      "checks": [
+        {
+          "name": "Current request language //ar",
+          "status": "PASS",
+          "expected": "ar",
+          "actual": "ar"
+        },
+        {
+          "name": "Document direction //ar",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "Translated meal content //ar",
+          "status": "PASS",
+          "expected": "وجبة تجريبية A1",
+          "actual": "مطبخي\nأكل بيتي من مطابخ قريبة منك\nحجز مسبق\nمحتاج إيه لسفرتك؟\nاختر حسب حاجتك\nوجبة ليا أو لينا\nلشخص أو فردين\nأكمل سفرتي\nصنف يكمل أكلك\nأجهز عزومة\nلجمعة ولمة العيلة\nالأكلات\nالمطابخ\nابحث عن طبق أو مطبخ\nابحث عن طبق أو مطبخ\nتصفية النتائج\nالكل\nأطباق رئيسية\nأطباق جانبية وسلطات\nشوربة\nمخبوزات\nحلويات\nفطار\nجاهز للطبخ\nأكلات بيتية متاحة للحجز\n١٥‏/١٠‏/٢٠٢٦، ٦:٥٩ م\nوجبة تجريبية B1\n‏٨٠٫٢٥ ج.م.‏\nمطبخ تجريبي B\n\nوصف مستقل للوجبة B1 بمكونات تجريبية فقط.\n\nحصة تجريبية\nعرض التفاصيل\nوجبة تجريبية A3\n‏٨٠٫٢٥ ج.م.‏\nمطبخ تجريبي A\n\nوصف مستقل للوجبة A3 بمكونات تجريبية فقط.\n\nحصة تجريبية\nغير متاح\n١٥‏/١٠‏/٢٠٢٦، ٦:٥٩ م\nوجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة\n‏٩٥٫٥٠ ج.م.‏\nمطبخ تجريبي A\n\nوصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار.\n\nحصة تجريبية\nعرض التفاصيل\n١٥‏/١٠‏/٢٠٢٦، ٦:٥٩ م\nوجبة تجريبية A1\n‏١٢٠٫٢٥ ج.م.‏\nمطبخ تجريبي A\n\nوصف مستقل للوجبة A1 بمكونات تجريبية فقط.\n\nحصة تجريبية\nعرض التفاصيل"
+        },
+        {
+          "name": "Current request language //en",
+          "status": "PASS",
+          "expected": "en",
+          "actual": "en"
+        },
+        {
+          "name": "Document direction //en",
+          "status": "PASS",
+          "expected": "ltr",
+          "actual": "ltr"
+        },
+        {
+          "name": "Translated meal content //en",
+          "status": "PASS",
+          "expected": "QA Meal A1",
+          "actual": "Matbakhy\nHome-cooked meals from kitchens near you\nPreorder\nWhat does your table need?\nChoose by need\nA meal for me or us\nFor one or two people\nComplete my table\nA dish to go with your meal\nPrepare a gathering\nFor family get-togethers\nDishes\nKitchens\nSearch for a meal or kitchen\nSearch for a meal or kitchen\nFilter results\nAll\nMain dishes\nSides and salads\nSoups\nBaked goods\nDesserts\nBreakfast\nReady to cook\nHome-cooked meals to preorder\n15 Oct 2026, 18:59\nQA Meal B1\nEGP 80.25\nمطبخ تجريبي B\n\nIndependent synthetic description for meal B1.\n\nSynthetic portion\nView details\nQA Meal A3\nEGP 80.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A3.\n\nSynthetic portion\nUnavailable\n15 Oct 2026, 18:59\nQA Meal A2\nEGP 95.50\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA.\n\nSynthetic portion\nView details\n15 Oct 2026, 18:59\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\n\nIndependent synthetic description for meal A1.\n\nSynthetic portion\nView details"
+        },
+        {
+          "name": "Current request language /meal/00000000-0000-0000-0000-000000000263/ar",
+          "status": "PASS",
+          "expected": "ar",
+          "actual": "ar"
+        },
+        {
+          "name": "Document direction /meal/00000000-0000-0000-0000-000000000263/ar",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "Translated meal content /meal/00000000-0000-0000-0000-000000000263/ar",
+          "status": "PASS",
+          "expected": "وجبة تجريبية A1",
+          "actual": "رجوع\nوجبة تجريبية A1\n‏١٢٠٫٢٥ ج.م.‏\nمطبخ تجريبي A\nحصة تجريبية\nعن الطبق\n\nوصف مستقل للوجبة A1 بمكونات تجريبية فقط.\n\nالمكونات ومعلومات الحساسية\n\nأرز تجريبي\n\nمعلومات الحساسية التفصيلية مش متوفرة للطبق ده. لو عندك حساسية، متطلبوش من غير ما تتأكد.\n\nمواعيد التحضير\n١٥‏/١٠‏/٢٠٢٦، ٦:٥٩ م · متبقٍ ٣ · استلام من المطبخ / توصيل\n١٦‏/١٠‏/٢٠٢٦، ٦:٥٩ م · متبقٍ ٣ · استلام من المطبخ / توصيل\n١٨‏/١٠‏/٢٠٢٦، ٦:٥٩ م · متبقٍ ٢٥ · استلام من المطبخ / توصيل\n−\n+\nأضف إلى السلة ·\n‏١٢٠٫٢٥ ج.م.‏\n\nالإجمالي النهائي بيتحسب في السلة من السعر الحالي.\n\nhttp://localhost:35173/#/meal/00000000-0000-0000-0000-000000000263\nانسخ الرابط للمشاركة\n\nالتقييمات\n\nجارٍ التحميل…"
+        },
+        {
+          "name": "Current request language /meal/00000000-0000-0000-0000-000000000263/en",
+          "status": "PASS",
+          "expected": "en",
+          "actual": "en"
+        },
+        {
+          "name": "Document direction /meal/00000000-0000-0000-0000-000000000263/en",
+          "status": "PASS",
+          "expected": "ltr",
+          "actual": "ltr"
+        },
+        {
+          "name": "Translated meal content /meal/00000000-0000-0000-0000-000000000263/en",
+          "status": "PASS",
+          "expected": "QA Meal A1",
+          "actual": "Back\nQA Meal A1\nEGP 120.25\nمطبخ تجريبي A\nSynthetic portion\nAbout this dish\n\nIndependent synthetic description for meal A1.\n\nIngredients and allergy information\n\nSynthetic rice\n\nDetailed allergy information is not available for this dish. If you have an allergy, do not order without checking.\n\nCooking slots\n15 Oct 2026, 18:59 · 3 left · Pickup from the kitchen / Delivery\n16 Oct 2026, 18:59 · 3 left · Pickup from the kitchen / Delivery\n18 Oct 2026, 18:59 · 25 left · Pickup from the kitchen / Delivery\n−\n+\nAdd to cart ·\nEGP 120.25\n\nThe final total is calculated in the cart at the current price.\n\nhttp://localhost:35173/#/meal/00000000-0000-0000-0000-000000000263\nCopy link to share\n\nAdd to favorites\nReviews\n\nNo reviews yet."
+        },
+        {
+          "name": "Current request language /kitchen/qa-kitchen-a/ar",
+          "status": "PASS",
+          "expected": "ar",
+          "actual": "ar"
+        },
+        {
+          "name": "Document direction /kitchen/qa-kitchen-a/ar",
+          "status": "PASS",
+          "expected": "rtl",
+          "actual": "rtl"
+        },
+        {
+          "name": "Current request language /kitchen/qa-kitchen-a/en",
+          "status": "PASS",
+          "expected": "en",
+          "actual": "en"
+        },
+        {
+          "name": "Document direction /kitchen/qa-kitchen-a/en",
+          "status": "PASS",
+          "expected": "ltr",
+          "actual": "ltr"
+        },
+        {
+          "name": "Server unique search",
+          "status": "PASS",
+          "expected": "B1 only",
+          "actual": "15 Oct 2026, 18:59\nQA Meal B1\nEGP 80.25\nمطبخ تجريبي B\n\nIndependent synthetic description for meal B1.\n\nSynthetic portion\nView details"
+        }
+      ],
+      "evidence": [
+        "C-BROWSE-home-ar.png",
+        "C-BROWSE-home-ar.json",
+        "C-BROWSE-home-en.png",
+        "C-BROWSE-home-en.json",
+        "C-BROWSE-meal-ar.png",
+        "C-BROWSE-meal-ar.json",
+        "C-BROWSE-meal-en.png",
+        "C-BROWSE-meal-en.json",
+        "C-BROWSE-kitchen-ar.png",
+        "C-BROWSE-kitchen-ar.json",
+        "C-BROWSE-kitchen-en.png",
+        "C-BROWSE-kitchen-en.json",
+        "C-BROWSE-search.png",
+        "C-BROWSE-search.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:23.871Z"
+    },
+    {
+      "id": "C-BASKET",
+      "actor": "Customer web",
+      "requirement": "CW05/BR-018/019; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:23.874Z",
+      "checks": [
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 33600,
+            "currency": "EGP"
+          },
+          "actual": "EGP 336.00"
+        },
+        {
+          "name": "Kitchen identity visible",
+          "status": "PASS",
+          "expected": "مطبخ تجريبي A",
+          "actual": "Cart\n\nKitchen: مطبخ تجريبي A\n\n15 Oct 2026, 18:59\n\nQA Meal A1\n−\n2\n+\nEGP 240.50\nRemove\nQA Meal A2\n−\n1\n+\nEGP 95.50\nRemove\nEstimated subtotal\nEGP 336.00\n\nThis is an estimate from the prices shown when you added each meal. The final total at the current price appears when you choose \"Calculate total\".\n\nEmpty cart\nCheckout\nDelivery\nPickup from the kitchen\n\nLoading…\n\nCalculate total"
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 43150,
+            "currency": "EGP"
+          },
+          "actual": "EGP 431.50"
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 31125,
+            "currency": "EGP"
+          },
+          "actual": "EGP 311.25"
+        },
+        {
+          "name": "Basket persists exact lines across reload",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 1,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              },
+              {
+                "mealId": "00000000-0000-0000-0000-000000000264",
+                "title": "QA Meal A2",
+                "quantity": 2,
+                "unitPriceMinor": 9550,
+                "maxQuantity": 3
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 1,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              },
+              {
+                "mealId": "00000000-0000-0000-0000-000000000264",
+                "title": "QA Meal A2",
+                "quantity": 2,
+                "unitPriceMinor": 9550,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Language switch preserves basket identity/state",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 1,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              },
+              {
+                "mealId": "00000000-0000-0000-0000-000000000264",
+                "title": "QA Meal A2",
+                "quantity": 2,
+                "unitPriceMinor": 9550,
+                "maxQuantity": 3
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 1,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              },
+              {
+                "mealId": "00000000-0000-0000-0000-000000000264",
+                "title": "QA Meal A2",
+                "quantity": 2,
+                "unitPriceMinor": 9550,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 19100,
+            "currency": "EGP"
+          },
+          "actual": "EGP 191.00"
+        },
+        {
+          "name": "Last-line removal clears storage",
+          "status": "PASS",
+          "expected": null,
+          "actual": null
+        }
+      ],
+      "evidence": [
+        "C-BASKET-edited.png",
+        "C-BASKET-edited.json",
+        "C-BASKET-empty.png",
+        "C-BASKET-empty.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:26.701Z"
+    },
+    {
+      "id": "C-REPLACE-K-CANCEL",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:26.731Z",
+      "checks": [
+        {
+          "name": "No mutation before consent",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "quantity": 2
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 24050,
+            "currency": "EGP"
+          },
+          "actual": "EGP 240.50"
+        }
+      ],
+      "evidence": [
+        "C-REPLACE-K-CANCEL-prompt.png",
+        "C-REPLACE-K-CANCEL-prompt.json",
+        "C-REPLACE-K-CANCEL-result.png",
+        "C-REPLACE-K-CANCEL-result.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:28.190Z"
+    },
+    {
+      "id": "C-REPLACE-K-CONFIRM",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:28.193Z",
+      "checks": [
+        {
+          "name": "No mutation before consent",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012e",
+            "mealId": "00000000-0000-0000-0000-00000000026d",
+            "slotId": "00000000-0000-0000-0000-0000000001a5",
+            "quantity": 1
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012e",
+            "kitchenName": "مطبخ تجريبي B",
+            "slotId": "00000000-0000-0000-0000-0000000001a5",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-00000000026d",
+                "title": "QA Meal B1",
+                "quantity": 1,
+                "unitPriceMinor": 8025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 8025,
+            "currency": "EGP"
+          },
+          "actual": "EGP 80.25"
+        }
+      ],
+      "evidence": [
+        "C-REPLACE-K-CONFIRM-prompt.png",
+        "C-REPLACE-K-CONFIRM-prompt.json",
+        "C-REPLACE-K-CONFIRM-result.png",
+        "C-REPLACE-K-CONFIRM-result.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:29.575Z"
+    },
+    {
+      "id": "C-REPLACE-S-CANCEL",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:29.579Z",
+      "checks": [
+        {
+          "name": "No mutation before consent",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "quantity": 2
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 24050,
+            "currency": "EGP"
+          },
+          "actual": "EGP 240.50"
+        }
+      ],
+      "evidence": [
+        "C-REPLACE-S-CANCEL-prompt.png",
+        "C-REPLACE-S-CANCEL-prompt.json",
+        "C-REPLACE-S-CANCEL-result.png",
+        "C-REPLACE-S-CANCEL-result.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:31.478Z"
+    },
+    {
+      "id": "C-REPLACE-S-CONFIRM",
+      "actor": "Customer web",
+      "requirement": "BR-018/TC-147; FG-001",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:31.483Z",
+      "checks": [
+        {
+          "name": "No mutation before consent",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019b",
+            "slotStartsAt": "2026-10-15T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000263",
+                "title": "QA Meal A1",
+                "quantity": 2,
+                "unitPriceMinor": 12025,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Exact resulting kitchen/meal/slot/quantity",
+          "status": "PASS",
+          "expected": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "mealId": "00000000-0000-0000-0000-000000000264",
+            "slotId": "00000000-0000-0000-0000-00000000019c",
+            "quantity": 1
+          },
+          "actual": {
+            "kitchenId": "00000000-0000-0000-0000-00000000012d",
+            "kitchenName": "مطبخ تجريبي A",
+            "slotId": "00000000-0000-0000-0000-00000000019c",
+            "slotStartsAt": "2026-10-16T15:59:42.580575Z",
+            "modes": [
+              "PICKUP",
+              "DELIVERY"
+            ],
+            "lines": [
+              {
+                "mealId": "00000000-0000-0000-0000-000000000264",
+                "title": "QA Meal A2",
+                "quantity": 1,
+                "unitPriceMinor": 9550,
+                "maxQuantity": 3
+              }
+            ]
+          }
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 9550,
+            "currency": "EGP"
+          },
+          "actual": "EGP 95.50"
+        }
+      ],
+      "evidence": [
+        "C-REPLACE-S-CONFIRM-prompt.png",
+        "C-REPLACE-S-CONFIRM-prompt.json",
+        "C-REPLACE-S-CONFIRM-result.png",
+        "C-REPLACE-S-CONFIRM-result.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:33.167Z"
+    },
+    {
+      "id": "C-STOCK",
+      "actor": "Customer web + cook API",
+      "requirement": "CW03; BR-013/015/017; MBQA-002",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:33.185Z",
+      "checks": [
+        {
+          "name": "Mixed-stock fixture created through real reservation",
+          "status": "PASS",
+          "expected": "S1 zero while S2 has 3",
+          "actual": {
+            "id": "00000000-0000-0000-0000-000000000263",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 0,
+                "averageTenths": null
+              }
+            },
+            "title": "QA Meal A1",
+            "photo": {
+              "url": "http://localhost:39090/matbakhy-public/iqa.pngA",
+              "alt": "Synthetic solid colour"
+            },
+            "portionText": "Synthetic portion",
+            "price": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-15T15:59:42.580575Z",
+                "endsAt": "2026-10-15T17:59:42.580575Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-15T13:59:42.580575Z",
+                "availablePortions": 0,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-16T15:59:42.580575Z",
+                "endsAt": "2026-10-16T17:59:42.580575Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T13:59:42.580575Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-18T15:59:42.580575Z",
+                "endsAt": "2026-10-18T17:59:42.580575Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-18T13:59:42.580575Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE",
+            "description": "Independent synthetic description for meal A1. ",
+            "ingredients": "Synthetic rice",
+            "allergenCodes": [
+              "UNKNOWN"
+            ],
+            "allergenStatement": "",
+            "photos": [
+              {
+                "url": "http://localhost:39090/matbakhy-public/iqa.pngA",
+                "alt": "Synthetic solid colour"
+              }
+            ],
+            "reviewSummary": {
+              "count": 0,
+              "averageTenths": null
+            },
+            "publishedRevision": 1
+          }
+        },
+        {
+          "name": "Exhausted selected slot Add disabled",
+          "status": "PASS",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "No basket written for exhausted selection",
+          "status": "PASS",
+          "expected": null,
+          "actual": null
+        },
+        {
+          "name": "Synthetic reservation released through legal cancellation",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Positive quantity cap obeys slot stock",
+          "status": "PASS",
+          "expected": "3",
+          "actual": "3"
+        }
+      ],
+      "evidence": [
+        "C-STOCK-exhausted.png",
+        "C-STOCK-exhausted.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:35.537Z"
+    },
+    {
+      "id": "C-Q1",
+      "actor": "Customer web + API",
+      "requirement": "BR-019; CW03; configured policy/Q1",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:35.547Z",
+      "checks": [
+        {
+          "name": "Public API publishes actual configured max",
+          "status": "PASS",
+          "expected": {
+            "maxQuantityPerLine": 10
+          },
+          "actual": {
+            "orderingAvailable": true,
+            "orderLimits": {
+              "maxQuantityPerLine": 10,
+              "maxLinesPerOrder": 20,
+              "policyVersion": 1
+            }
+          }
+        },
+        {
+          "name": "Server rejects above active policy maximum",
+          "status": "PASS",
+          "expected": {
+            "status": 422,
+            "code": "VALIDATION_FAILED",
+            "max": 10
+          },
+          "actual": {
+            "status": 422,
+            "data": {
+              "code": "VALIDATION_FAILED",
+              "messageKey": "error.validation_failed",
+              "fieldErrors": [
+                {
+                  "field": "items.quantity",
+                  "code": "RANGE_1_TO_10"
+                }
+              ],
+              "requestId": "bb5c4a5b-d421-46e8-8ac5-c5d90bf6fe65",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Actual policy maximum can be quoted",
+          "status": "PASS",
+          "expected": {
+            "status": 201,
+            "totalMinor": 120250
+          },
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "ea00f9f9-fe11-4a72-87e2-a84389da9561",
+              "expiresAt": "2026-10-12T16:21:36.667347356Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000263",
+                  "mealRevision": 1,
+                  "title": "QA Meal A1",
+                  "quantity": 10,
+                  "unitPrice": {
+                    "amountMinor": 12025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 120250,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 120250,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 120250,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-12T16:31:36.667347356Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        }
+      ],
+      "evidence": [
+        "C-Q1-policy-boundary.png",
+        "C-Q1-policy-boundary.json"
+      ],
+      "observations": [
+        {
+          "name": "Known Q1 UI/server inconsistency",
+          "actualDraftQuantity": 11,
+          "configuredServerLimit": 10,
+          "classification": "PARTIAL client integration, not a repaired cap or new regression"
+        }
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:36.683Z"
+    },
+    {
+      "id": "C-QUOTE",
+      "actor": "Customer web",
+      "requirement": "MB-017/027; BR-019/020/021",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:16:36.718Z",
+      "checks": [
+        {
+          "name": "Pickup total/subtotal/fee/tax match active policy",
+          "status": "PASS",
+          "expected": {
+            "status": 201,
+            "subtotalMinor": 24050,
+            "deliveryFeeMinor": 0,
+            "taxMinor": 0,
+            "totalMinor": 24050
+          },
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "0dbdbafe-ce98-4a8f-b5bc-54c01f29fd6f",
+              "expiresAt": "2026-10-12T16:21:37.856206764Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000263",
+                  "mealRevision": 1,
+                  "title": "QA Meal A1",
+                  "quantity": 2,
+                  "unitPrice": {
+                    "amountMinor": 12025,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 24050,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 24050,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-12T16:31:37.856206764Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Placement unavailable before terms accepted",
+          "status": "PASS",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "Visible estimated subtotal matches integer arithmetic",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 36075,
+            "currency": "EGP"
+          },
+          "actual": "EGP 360.75"
+        },
+        {
+          "name": "Basket edit discards previous quote/placement control",
+          "status": "PASS",
+          "expected": "no Place order until fresh quote",
+          "actual": 0
+        },
+        {
+          "name": "Client forged total rejected",
+          "status": "PASS",
+          "expected": {
+            "status": 400
+          },
+          "actual": {
+            "status": 400,
+            "data": {
+              "code": "MALFORMED_REQUEST",
+              "messageKey": "error.malformed_request",
+              "fieldErrors": [],
+              "requestId": "a830a8ae-f26a-40b7-b92d-4ad7aa2c2bcf",
+              "retryable": false
+            }
+          }
+        }
+      ],
+      "evidence": [
+        "C-QUOTE-edit-invalidates.png",
+        "C-QUOTE-edit-invalidates.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-12T16:16:38.189Z"
+    },
+    {
+      "id": "S-AUTH",
+      "actor": "Cook/ops/support/finance/admin web",
+      "requirement": "MB-011/022/026; BR-006/007",
+      "applicationSha": "4eaee3a1f53b929b9e7685fd30da689d470d095c",
+      "startedAt": "2026-10-12T16:23:29.567Z",
+      "checks": [
+        {
+          "name": "Exact role-specific navigation cook-a",
+          "status": "PASS",
+          "expected": [
+            "Home",
+            "Orders",
+            "Meals",
+            "Slots",
+            "Statement",
+            "Settings"
+          ],
+          "actual": [
+            "Home",
+            "Orders",
+            "Meals",
+            "Slots",
+            "Statement",
+            "Settings"
+          ]
+        },
+        {
+          "name": "Exact role-specific navigation cook-b",
+          "status": "PASS",
+          "expected": [
+            "Home",
+            "Orders",
+            "Meals",
+            "Slots",
+            "Statement",
+            "Settings"
+          ],
+          "actual": [
+            "Home",
+            "Orders",
+            "Meals",
+            "Slots",
+            "Statement",
+            "Settings"
+          ]
+        },
+        {
+          "name": "Exact role-specific navigation support-a",
+          "status": "PASS",
+          "expected": [
+            "Support"
+          ],
+          "actual": [
+            "Support"
+          ]
+        },
+        {
+          "name": "Exact role-specific navigation finance-a",
+          "status": "PASS",
+          "expected": [
+            "Finance"
+          ],
+          "actual": [
+            "Finance"
+          ]
+        },
+        {
+          "name": "Exact role-specific navigation ops-review",
+          "status": "PASS",
+          "expected": [
+            "Cook applications",
+            "Catalogue moderation",
+            "Order monitoring"
+          ],
+          "actual": [
+            "Cook applications",
+            "Catalogue moderation",
+            "Order monitoring"
+          ]
+        },
+        {
+          "name": "Exact role-specific navigation ops-a",
+          "status": "FAIL",
+          "expected": [
+            "Configuration",
+            "Staff permissions"
+          ],
+          "actual": [
+            "Operating configuration",
+            "Staff permissions"
+          ]
+        },
+        {
+          "name": "Cook cannot read another kitchen protected meal",
+          "status": "FAIL",
+          "expected": 404,
+          "actual": {
+            "status": 405,
+            "data": {
+              "code": "METHOD_NOT_ALLOWED",
+              "messageKey": "error.method_not_allowed",
+              "fieldErrors": [],
+              "requestId": "8b153c20-282b-4d7e-ad83-46974317acf4",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Cook cannot mutate another kitchen meal",
+          "status": "FAIL",
+          "expected": 404,
+          "actual": {
+            "status": 422,
+            "data": {
+              "code": "VALIDATION_FAILED",
+              "messageKey": "error.validation_failed",
+              "fieldErrors": [
+                {
+                  "field": "expectedVersion",
+                  "code": "NotNull"
+                }
+              ],
+              "requestId": "fcb8639c-f0ab-4ab1-ac28-4b068c6514f1",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Admin is not an implicit domain superuser",
+          "status": "PASS",
+          "expected": 403,
+          "actual": {
+            "status": 403,
+            "data": {
+              "code": "FORBIDDEN",
+              "messageKey": "error.forbidden",
+              "fieldErrors": [],
+              "requestId": "c0c94597-bf0a-497d-a335-0bfe131b76fa",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Cook session restores",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Staff web logout revokes session",
+          "status": "PASS",
+          "expected": 401,
+          "actual": 401
+        }
+      ],
+      "evidence": [
+        "S-AUTH-cook-a.png",
+        "S-AUTH-cook-a.json",
+        "S-AUTH-cook-b.png",
+        "S-AUTH-cook-b.json",
+        "S-AUTH-support-a.png",
+        "S-AUTH-support-a.json",
+        "S-AUTH-finance-a.png",
+        "S-AUTH-finance-a.json",
+        "S-AUTH-ops-review.png",
+        "S-AUTH-ops-review.json",
+        "S-AUTH-ops-a.png",
+        "S-AUTH-ops-a.json"
+      ],
+      "status": "FAIL",
+      "finishedAt": "2026-10-12T16:23:41.545Z"
+    }
+  ]
+}

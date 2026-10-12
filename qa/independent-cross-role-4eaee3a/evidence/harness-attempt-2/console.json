@@ -1,0 +1,8 @@
+[
+  {
+    "case": "C-Q1",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 422 ()"
+  }
+]

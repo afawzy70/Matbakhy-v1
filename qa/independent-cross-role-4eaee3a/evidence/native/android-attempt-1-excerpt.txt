@@ -1,0 +1,15 @@
+Android debug APK (Gradle)	Gradle assembleDebug	2026-10-12T15:57:59.2985774Z Welcome to Gradle 9.3.1!
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T16:10:14.0502938Z sdkVersion:'24'
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T16:10:14.0503307Z targetSdkVersion:'36'
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T16:10:14.0826166Z openjdk version "17.0.20.1" 2026-08-18
+Android debug APK (Gradle)	Record artifact identity	2026-10-12T16:10:14.8084135Z Gradle 9.3.1
+Android debug APK (Gradle)	MB-031 launch on Android emulator	2026-10-12T16:25:09.3756090Z PASS: Android release-variant build launched; Discover tab visible; no fatal errors
+Android debug APK (Gradle)	MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)	2026-10-12T16:26:08.3485222Z ok: signed in as customer-a; session restored after restart
+Android debug APK (Gradle)	MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)	2026-10-12T16:26:22.0265533Z ok: after sign-out and restart the app is signed out and shows nothing of customer-a
+Android debug APK (Gradle)	MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)	2026-10-12T16:26:48.0283415Z ok: login form shown again; signed in as customer-b; nothing of customer-a visible
+Android debug APK (Gradle)	MB-031 native sign-in round trip on Android (system browser, PKCE, secure storage, sign-out, account switch)	2026-10-12T16:27:08.1869261Z PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T16:28:54.7417065Z app killed while the response was held back
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T16:29:02.8670345Z orders in the database after the kill: 1
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T16:29:12.9700902Z ok: offline and unconfirmed, nothing claimed
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T16:29:24.6267908Z order MB-100001; database (number|total_minor): MB-100001|9000; app shows text="Total: EGP 90.00"; quote showed text="Total: EGP 90.00"
+Android debug APK (Gradle)	MB-032 native ordering on Android (basket replacement, app killed during submit, offline reopen, recovery without duplicate)	2026-10-12T16:29:24.7889120Z PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total

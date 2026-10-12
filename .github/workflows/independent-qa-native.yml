@@ -94,6 +94,8 @@ jobs:
         run: docker compose --env-file infra/.env -f infra/compose.yaml logs --tail 60 api identity || true
 
   ios:
+    # A bounded Android harness retry does not rerun or replace the independent iOS assessment.
+    if: ${{ !contains(github.event.head_commit.message, '[android-only]') }}
     name: iOS simulator build (Xcode, unsigned)
     runs-on: macos-26
     timeout-minutes: 90

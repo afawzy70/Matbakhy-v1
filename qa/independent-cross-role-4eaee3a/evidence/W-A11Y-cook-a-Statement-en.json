@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 320,
+  "scrollWidth": 320,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nHome\nOrders\nMeals\nSlots\nStatement\nSettings\nFrom\nTo\nShow\nStatement 2026-10-01 – 2026-10-12\n\nThe cash you collect is yours; only the commission is owed to the platform. Includes refunds, commission reversals and settlements.\n\nCompleted orders\n1\nOrder value\nEGP 240.50\nCash not reported\nEGP 240.50\nCash reported\nEGP 0.00\nCash verified\nEGP 0.00\nCommission owed to the platform\nEGP 24.05\nCommission not posted yet\n0\nCommission reversed (refunds)\nEGP 0.00\nCommission settled\nEGP 0.00\nCommission still owed to the platform\nEGP 24.05\n#\tDate\tTotal\tReport cash collected\tCommission\nMB-100005\t12 Oct 2026, 19:37\tEGP 240.50\tCash due\tEGP 24.05\nAPI: http://localhost:38080",
+  "cart": null,
+  "pending": false
+}
