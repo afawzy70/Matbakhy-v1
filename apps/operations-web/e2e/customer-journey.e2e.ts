@@ -71,6 +71,8 @@ async function addToCart(page: Page) {
 }
 
 test("customer orders delivery and pickup in the customer web and follows the cook's actions", async ({ browser }) => {
+  // The journey also covers the support thread and sign-out (MBQA-003/004) since the independent QA repairs.
+  test.setTimeout(360_000);
   expect(sql(`SELECT count(*) FROM meal WHERE title_ar = 'كشري تجريبي' AND status = 'PUBLISHED' AND moderation_state = 'VISIBLE'`),
     "cook workflow ran first").toBe("1");
   const customerContext = await browser.newContext();
@@ -245,7 +247,8 @@ test("customer orders delivery and pickup in the customer web and follows the co
   // MBQA-004 (independent QA, 4eaee3a): the customer opens a support case and reads the support team's public reply in
   // the customer web; a staff-only note never reaches the customer; another customer cannot open the case.
   await page.goto(`${CUSTOMER}/#/account`);
-  await page.getByLabel(c.caseOrder, { exact: true }).selectOption({ label: number });
+  // The order select is identified by its option (its label's text also contains the options).
+  await page.locator(`select:has(option:text-is("${number}"))`).selectOption({ label: number });
   await page.getByLabel(c.caseCategory).selectOption("QUALITY");
   await page.getByLabel(c.caseDescription).fill("e2e synthetic support case description");
   await page.getByRole("button", { name: c.openCase }).click();
