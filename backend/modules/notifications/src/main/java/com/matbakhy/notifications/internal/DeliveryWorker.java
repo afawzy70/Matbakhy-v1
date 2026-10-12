@@ -130,13 +130,25 @@ public class DeliveryWorker {
         String requestId = jdbc.queryForList("""
                 SELECT e.request_id FROM notification_delivery d JOIN notification n ON n.id = d.notification_id
                 JOIN outbox_event e ON e.id = n.source_event_id WHERE d.id = ?""", String.class, id).stream().findFirst().orElse(null);
-        try (var traced = MDC.putCloseable(RequestContext.REQUEST_ID_MDC_KEY, requestId)) {
+        String previous = MDC.get(RequestContext.REQUEST_ID_MDC_KEY);
+        setRequestId(requestId);
+        try {
             LOG.warn("notification delivery {} failed on attempt {}: {} (now {})", id, attempts, error, status);
+        } finally {
+            setRequestId(previous);
         }
     }
 
     /** Stored and logged provider errors are plain codes; free text (which may echo a recipient or token) is replaced. */
     private static String safeError(String error) {
         return error == null ? null : SAFE_ERROR.matcher(error).matches() ? error : "PROVIDER_ERROR";
+    }
+
+    private static void setRequestId(String requestId) {
+        if (requestId == null) {
+            MDC.remove(RequestContext.REQUEST_ID_MDC_KEY);
+        } else {
+            MDC.put(RequestContext.REQUEST_ID_MDC_KEY, requestId);
+        }
     }
 }

@@ -133,8 +133,12 @@ public class OutboxDispatcher {
         boolean dead = attempts >= props.maxAttempts();
         Instant next = clock.instant().plus(backoff(attempts));
         String error = failure.getClass().getSimpleName();
-        try (var traced = MDC.putCloseable(RequestContext.REQUEST_ID_MDC_KEY, requestId)) {
+        String previous = MDC.get(RequestContext.REQUEST_ID_MDC_KEY);
+        setRequestId(requestId);
+        try {
             LOG.warn("outbox event {} dispatch failed on attempt {}: {}{}", id, attempts, error, dead ? " (moved to FAILED)" : "");
+        } finally {
+            setRequestId(previous);
         }
         tx.executeWithoutResult(s -> jdbc.update("""
                 UPDATE outbox_event SET attempts = ?, status = ?, available_at = ?, last_error = ?, lease_owner = NULL, leased_until = NULL,
@@ -144,5 +148,13 @@ public class OutboxDispatcher {
 
     Duration backoff(int attempts) {
         return props.initialBackoff().multipliedBy(1L << Math.min(attempts - 1, 10));
+    }
+
+    private static void setRequestId(String requestId) {
+        if (requestId == null) {
+            MDC.remove(RequestContext.REQUEST_ID_MDC_KEY);
+        } else {
+            MDC.put(RequestContext.REQUEST_ID_MDC_KEY, requestId);
+        }
     }
 }
