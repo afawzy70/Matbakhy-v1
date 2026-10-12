@@ -27,6 +27,8 @@ export interface AppContextValue {
   endSession: () => Promise<void>;
   switchAccount: () => Promise<void>;
   reloadProfile: () => Promise<void>;
+  /** The active policy's per-line limit from API-001 (Q1 option A); null until known or when unavailable. */
+  maxQuantityPerLine: number | null;
 }
 
 const Ctx = createContext<AppContextValue | null>(null);
@@ -157,6 +159,23 @@ export function AppProvider({
     await startSignIn();
   }, [endSession, startSignIn]);
 
+  // Q1 option A: quantity controls follow the server's published limit; without it they fall back to 20 and the slot.
+  const [maxQuantityPerLine, setMaxQuantityPerLine] = useState<number | null>(null);
+  useEffect(() => {
+    let active = true;
+    api
+      .GET("/api/v1/configuration/public")
+      .then((r) => {
+        if (active) {
+          setMaxQuantityPerLine(r.data?.orderLimits?.maxQuantityPerLine ?? null);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [api]);
+
   const value: AppContextValue = {
     config,
     session,
@@ -170,6 +189,7 @@ export function AppProvider({
     endSession,
     switchAccount,
     reloadProfile,
+    maxQuantityPerLine,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

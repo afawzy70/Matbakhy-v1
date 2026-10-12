@@ -844,3 +844,101 @@ describe("QA repair FG-001: the basket can be edited and shows an estimate (CW05
     expect((within(cart).getByRole("button", { name: "Remove QA Meal A1" }) as HTMLButtonElement).disabled).toBe(true);
   });
 });
+
+/**
+ * Q1 option A: the quantity controls follow the server's published per-line limit (API-001), not a hard-coded 20.
+ * The limit value is the active commerce policy's; the server still refuses anything above it at quote time.
+ */
+describe("Q1: quantity limits come from the server's active policy", () => {
+  const id = "c1c1c1c1-0000-4000-8000-0000000000c1";
+  const limits = (maxQuantityPerLine: number) => ({ status: 200, body: { orderingAvailable: true, orderLimits: { maxQuantityPerLine, maxLinesPerOrder: 20, policyVersion: 7 } } });
+  const meal = (availablePortions: number) => ({
+    id,
+    title: "QA Meal Q1",
+    kitchen: { id: "kQ", slug: "kitchen-q", name: "Kitchen Q" },
+    portionText: "1 plate",
+    price: egp(5000),
+    description: "",
+    ingredients: "",
+    allergenCodes: ["NONE_DECLARED"],
+    allergenStatement: null,
+    photo: null,
+    nextSlots: [{ id: "SQ", startsAt: "2026-10-13T10:00:00Z", availablePortions, fulfillmentModes: ["PICKUP"] }],
+    availability: "AVAILABLE",
+  });
+  const reviews = { status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } };
+
+  async function maxReachable() {
+    fireEvent.click(await screen.findByRole("radio"));
+    const plus = screen.getByRole("button", { name: "Increase quantity" }) as HTMLButtonElement;
+    for (let i = 0; i < 30 && !plus.disabled; i++) {
+      fireEvent.click(plus);
+    }
+    return Number((screen.getByRole("spinbutton", { name: "Quantity" }) as HTMLInputElement).value);
+  }
+
+  it("caps the meal quantity at the policy limit when the slot has more portions, and at the portions when fewer", async () => {
+    const { fetchImpl } = server({
+      "GET /api/v1/configuration/public": () => limits(10),
+      [`GET /api/v1/meals/${id}`]: () => ({ status: 200, body: meal(15) }),
+      "GET /api/v1/kitchens/kQ/reviews": () => reviews,
+    });
+    window.location.hash = `#/meal/${id}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    await waitFor(async () => expect(await maxReachable()).toBe(10));
+    fireEvent.change(screen.getByRole("spinbutton", { name: "Quantity" }), { target: { value: "11" } });
+    expect((screen.getByRole("spinbutton", { name: "Quantity" }) as HTMLInputElement).value).toBe("10");
+    fireEvent.click(screen.getByRole("button", { name: /^Add to cart/ }));
+    expect(await screen.findByText("Added to cart.")).toBeTruthy();
+    const line = JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").lines[0];
+    expect([line.quantity, line.maxQuantity]).toEqual([10, 10]);
+    cleanup();
+
+    const fewer = server({
+      "GET /api/v1/configuration/public": () => limits(10),
+      [`GET /api/v1/meals/${id}`]: () => ({ status: 200, body: meal(3) }),
+      "GET /api/v1/kitchens/kQ/reviews": () => reviews,
+    });
+    window.location.hash = `#/meal/${id}`;
+    render(<App fetchImpl={fewer.fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await maxReachable()).toBe(3);
+  });
+
+  it("explains a basket line above a lowered limit and offers no quote until it is reduced", async () => {
+    window.localStorage.setItem(
+      "matbakhy.cart",
+      JSON.stringify({ kitchenId: "kQ", kitchenName: "Kitchen Q", slotId: "SQ", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: id, title: "QA Meal Q1", quantity: 12, unitPriceMinor: 5000, maxQuantity: 20 }] }),
+    );
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/configuration/public": () => limits(10),
+      "GET /api/v1/me": () => ({ status: 200, body: { ...me, locale: "en" } }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    });
+    window.location.hash = "#/checkout";
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByText("At most 10 per meal can be ordered now. Reduce the quantity to continue.")).toBeTruthy();
+    expect((await screen.findByRole("button", { name: "Calculate total" }) as HTMLButtonElement).disabled).toBe(true);
+    const minus = screen.getByRole("button", { name: "Decrease quantity: QA Meal Q1" });
+    fireEvent.click(minus);
+    fireEvent.click(minus);
+    await waitFor(() => expect(screen.queryByText(/At most 10 per meal/)).toBeNull());
+    expect((screen.getByRole("button", { name: "Calculate total" }) as HTMLButtonElement).disabled).toBe(false);
+    expect((screen.getByRole("button", { name: "Increase quantity: QA Meal Q1" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(calls.some((c) => c.path === "/api/v1/quotes")).toBe(false);
+  });
+
+  it("without the published limit, still bounds by the slot's portions and at most 20", async () => {
+    const { fetchImpl } = server({
+      "GET /api/v1/configuration/public": () => ({ status: 503, body: { code: "SERVICE_UNAVAILABLE" } }),
+      [`GET /api/v1/meals/${id}`]: () => ({ status: 200, body: meal(40) }),
+      "GET /api/v1/kitchens/kQ/reviews": () => reviews,
+    });
+    window.location.hash = `#/meal/${id}`;
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await maxReachable()).toBe(20);
+  });
+});

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { errorCode, formatMoney, formatTime, loginUrl, newIdempotencyKey, type Schemas } from "./api";
-import { estimateMinor, LINE_MAX, loadCart, loadPending, saveCart, savePending, type CartLine, type PendingPlacement } from "./cart";
+import { estimateMinor, lineLimit, loadCart, loadPending, saveCart, savePending, type CartLine, type PendingPlacement } from "./cart";
 import { errorText } from "./i18n";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
@@ -12,6 +12,7 @@ export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; on
   const [cart, setCart] = useState(loadCart);
   // While an order from this basket may exist, the basket cannot change (CW05: no surprise changes to a sent order).
   const [locked, setLocked] = useState(() => loadPending() !== null);
+  const limit = lineLimit(ctx.maxQuantityPerLine);
   if (!cart || cart.lines.length === 0) {
     return (
       <div className="transaction">
@@ -42,6 +43,7 @@ export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; on
               ctx={ctx}
               line={l}
               locked={locked}
+              limit={limit}
               onChange={(next) => {
                 const lines = cart.lines.flatMap((x) => (x.mealId !== l.mealId ? [x] : next ? [next] : []));
                 const updated = lines.length > 0 ? { ...cart, lines } : null;
@@ -81,7 +83,13 @@ export function Checkout({ ctx, me, onMeChanged }: { ctx: Ctx; me: Me | null; on
         <PhoneVerification ctx={ctx} onVerified={onMeChanged} />
       ) : (
         // Any edit changes the key, so a quote for the previous basket can never be accepted for the new one.
-        <OrderForm key={cart.lines.map((l) => `${l.mealId}:${l.quantity}`).join("|")} ctx={ctx} cart={cart} onPending={setLocked} />
+        <OrderForm
+          key={cart.lines.map((l) => `${l.mealId}:${l.quantity}`).join("|")}
+          ctx={ctx}
+          cart={cart}
+          onPending={setLocked}
+          overLimit={cart.lines.some((l) => l.quantity > limit)}
+        />
       )}
     </div>
   );
@@ -93,9 +101,9 @@ function estimateText(cart: NonNullable<ReturnType<typeof loadCart>>, locale: st
 }
 
 /** One basket line: quantity within 1..maxQuantity (at most 20), removal, and the line estimate when known. */
-function CartLineRow({ ctx, line, locked, onChange }: { ctx: Ctx; line: CartLine; locked: boolean; onChange: (next: CartLine | null) => void }) {
+function CartLineRow({ ctx, line, locked, limit, onChange }: { ctx: Ctx; line: CartLine; locked: boolean; limit: number; onChange: (next: CartLine | null) => void }) {
   const { t, locale } = ctx;
-  const max = Math.min(LINE_MAX, line.maxQuantity ?? LINE_MAX);
+  const max = Math.min(limit, line.maxQuantity ?? limit);
   return (
     <li className="cart-line">
       <span className="cart-line-title">{line.title}</span>
@@ -112,6 +120,11 @@ function CartLineRow({ ctx, line, locked, onChange }: { ctx: Ctx; line: CartLine
       <button type="button" className="secondary" aria-label={t.removeLine(line.title)} disabled={locked} onClick={() => onChange(null)}>
         {t.remove}
       </button>
+      {line.quantity > limit ? (
+        <p role="alert" className="notice cart-line-notice">
+          {t.overLineLimit(limit)}
+        </p>
+      ) : null}
     </li>
   );
 }
@@ -166,7 +179,18 @@ function PhoneVerification({ ctx, onVerified }: { ctx: Ctx; onVerified: () => vo
   );
 }
 
-function OrderForm({ ctx, cart, onPending }: { ctx: Ctx; cart: NonNullable<ReturnType<typeof loadCart>>; onPending: (pending: boolean) => void }) {
+function OrderForm({
+  ctx,
+  cart,
+  onPending,
+  overLimit,
+}: {
+  ctx: Ctx;
+  cart: NonNullable<ReturnType<typeof loadCart>>;
+  onPending: (pending: boolean) => void;
+  /** A line is above the server's current per-line limit: no quote until the customer reduces it (Q1). */
+  overLimit: boolean;
+}) {
   const { t, locale } = ctx;
   const [mode, setMode] = useState<"DELIVERY" | "PICKUP">(cart.modes.includes("DELIVERY") ? "DELIVERY" : "PICKUP");
   const [addressId, setAddressId] = useState<string | null>(null);
@@ -283,7 +307,7 @@ function OrderForm({ ctx, cart, onPending }: { ctx: Ctx; cart: NonNullable<Retur
       <button
         type="button"
         className="cta"
-        disabled={quoting.busy || (mode === "DELIVERY" && !addressId)}
+        disabled={overLimit || quoting.busy || (mode === "DELIVERY" && !addressId)}
         onClick={() =>
           void quoting.run(async () => {
             const r = await ctx.api.POST("/api/v1/quotes", {

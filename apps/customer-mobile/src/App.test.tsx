@@ -331,3 +331,36 @@ describe("the unconfirmed order stays reachable after a restart (TC-049, MB-032)
     warn.mockRestore();
   });
 });
+
+/** Q1 option A on native: quantity controls follow the server's published per-line limit (API-001). */
+describe("Q1 on native: quantity limits come from the server's active policy", () => {
+  const limits = () => json(200, { orderingAvailable: true, orderLimits: { maxQuantityPerLine: 10, maxLinesPerOrder: 20, policyVersion: 7 } });
+  const many = { ...meal("mq", "k1"), nextSlots: [{ ...slot("sq"), availablePortions: 15 }] };
+
+  it("caps the meal quantity at the policy limit although the slot has more portions", async () => {
+    const routes = { "GET /api/v1/configuration/public": limits, "GET /api/v1/meals": () => json(200, { items: [many], nextCursor: null, hasMore: false }), "GET /api/v1/meals/mq": () => json(200, many) };
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api(routes)} />);
+    await fireEvent.press(await screen.findByTestId("meal-mq"));
+    await fireEvent.press(await screen.findByTestId("slot-0", {}, { timeout: 5000 }));
+    for (let i = 0; i < 20; i++) {
+      await fireEvent.press(screen.getByLabelText(t.increase));
+    }
+    await fireEvent.press(screen.getByTestId("add-to-cart"));
+    expect(await screen.findByText(t.added)).toBeTruthy();
+    expect(JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}").lines[0]).toEqual(expect.objectContaining({ quantity: 10, maxQuantity: 10 }));
+  });
+
+  it("explains a basket line above a lowered limit, and lets the customer reduce it", async () => {
+    mockStore.set(
+      "matbakhy.basket.v1",
+      JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "sq", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: "mq", title: "Dish mq", quantity: 12, unitPriceMinor: 12000, maxQuantity: 20 }] }),
+    );
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/configuration/public": limits })} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+    expect(await screen.findByText(t.overLineLimit(10))).toBeTruthy();
+    expect(screen.getByTestId("qty-inc-mq").props.accessibilityState.disabled).toBe(true);
+    await fireEvent.press(screen.getByTestId("qty-dec-mq"));
+    await fireEvent.press(screen.getByTestId("qty-dec-mq"));
+    await waitFor(() => expect(screen.queryByText(t.overLineLimit(10))).toBeNull());
+  });
+});

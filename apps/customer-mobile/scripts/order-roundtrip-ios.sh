@@ -77,6 +77,11 @@ sleep 1
 phase testC_BackOnlineRecoversTheOneOrder
 COUNT=$(customer_orders)
 [ "$COUNT" = "1" ] || { echo "FAIL: duplicate order: $COUNT"; exit 1; }
+# No duplicated business side effect either: one stock allocation, one portion reserved on the meal and cook slots,
+# one cash obligation, one ORDER_PLACED outbox event and one order event.
+SIDE=$(psql_q -v phone=+201005550002 < "$HERE/e2e-native/side-effects.sql")
+echo "side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): $SIDE"
+[ "$SIDE" = "1|1|1|1|1|1|1" ] || { echo "FAIL: duplicated or missing side effect: $SIDE"; exit 1; }
 NUMBER=$(grep -o 'MB032-ORDER-NUMBER [^ ]*' "$RUNNER_TEMP/mb032-testC_BackOnlineRecoversTheOneOrder.log" | head -1 | cut -d' ' -f2)
 SHOWN=$(grep -o 'MB032-ORDER-TOTAL .*' "$RUNNER_TEMP/mb032-testC_BackOnlineRecoversTheOneOrder.log" | head -1)
 DB=$(psql_q -c "SELECT total_minor FROM customer_order WHERE public_number = '$NUMBER'")

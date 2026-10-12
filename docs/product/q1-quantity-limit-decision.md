@@ -1,6 +1,17 @@
 # Q1: maximum quantity per order line — decision note (proposal, not approved)
 
-Status: **OPEN, owner decision needed.** This note recommends an approach. It does not change the commerce policy, the contract or any behaviour. Nothing here is owner approval.
+Status (updated 2026-10-12, owner continuation directive): **client behaviour resolved by option A; the limit value itself remains an owner decision (O04).**
+
+- **Direction.** The owner directed that the backend's configured policy is the enforcement authority, and that clients obtain and respect it rather than hard-code a conflicting limit "where consistent with existing approved requirements". The screen specification already requires matching client and server limits, and API-001 was already in the approved contract. Option A was therefore implemented without changing any business value.
+- **Implemented:**
+  - **Backend (`4eaee3a`):** `GET /api/v1/configuration/public` publishes `orderLimits {maxQuantityPerLine, maxLinesPerOrder, policyVersion}` from the active policy, and `orderingAvailable`.
+  - **Clients:** web and native cap the quantity at min(published limit, slot portions).
+  - **Over-limit baskets:** a line above a lowered limit shows "At most N per meal can be ordered now" and gets no quote until it is reduced.
+  - **Fallback:** without the published limit, clients fall back to min(20, slot portions), and the quote still refuses anything above the policy.
+  - **Tests:** written first and run red (`verification/runs/20261012-Q1/`).
+- **Still the owner's decision:** the real `max_item_quantity` under O04. Synthetic local/CI policies keep 10, and nothing here approves a value.
+
+The original analysis follows.
 
 ## The conflict
 

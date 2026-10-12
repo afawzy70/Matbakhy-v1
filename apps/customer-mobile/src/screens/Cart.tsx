@@ -2,7 +2,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../AppContext";
-import { estimateMinor, LINE_MAX, loadBasket, loadPending, saveBasket, savePending, type Basket, type BasketLine, type PendingPlacement } from "../basket";
+import { estimateMinor, lineLimit, loadBasket, loadPending, saveBasket, savePending, type Basket, type BasketLine, type PendingPlacement } from "../basket";
 import { errorText } from "../i18n";
 import { errorCode, formatMoney, formatTime, newKey, type Schemas } from "../mobileApi";
 import { place, recover, type PlacementOutcome } from "../placement";
@@ -161,10 +161,11 @@ function estimateText(basket: Basket, locale: "ar" | "en", unavailable: string):
   return amount === null ? unavailable : formatMoney(amount, locale);
 }
 
-/** One basket line: "quantity × title", quantity within 1..maxQuantity (at most 20), and removal. */
+/** One basket line: "quantity × title", quantity within 1 and the per-line limit, removal, and a notice when above it. */
 function BasketLineRow({ line, locked, onChange }: { line: BasketLine; locked: boolean; onChange: (next: BasketLine | null) => void }) {
-  const { t, locale } = useApp();
-  const max = Math.min(LINE_MAX, line.maxQuantity ?? LINE_MAX);
+  const { t, locale, maxQuantityPerLine } = useApp();
+  const limit = lineLimit(maxQuantityPerLine);
+  const max = Math.min(limit, line.maxQuantity ?? limit);
   return (
     <View style={{ gap: 6 }}>
       <Body locale={locale}>
@@ -176,6 +177,7 @@ function BasketLineRow({ line, locked, onChange }: { line: BasketLine; locked: b
         <Button testID={`qty-inc-${line.mealId}`} label="+" accessibilityLabel={t.increaseOf(line.title)} variant="secondary" disabled={locked || line.quantity >= max} onPress={() => onChange({ ...line, quantity: line.quantity + 1 })} />
         <Button testID={`remove-${line.mealId}`} label={t.remove} accessibilityLabel={t.removeLine(line.title)} variant="secondary" disabled={locked} onPress={() => onChange(null)} />
       </View>
+      {line.quantity > limit ? <Notice locale={locale}>{t.overLineLimit(limit)}</Notice> : null}
     </View>
   );
 }
@@ -232,7 +234,9 @@ function PhoneVerification({ onVerified }: { onVerified: () => void }) {
 }
 
 function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending: (p: PendingPlacement) => void; onOutcome: (o: PlacementOutcome) => void }) {
-  const { api, t, locale } = useApp();
+  const { api, t, locale, maxQuantityPerLine } = useApp();
+  // A line above the server's current per-line limit gets no quote until the customer reduces it (Q1).
+  const overLimit = basket.lines.some((l) => l.quantity > lineLimit(maxQuantityPerLine));
   const [mode, setMode] = useState<"DELIVERY" | "PICKUP">(basket.modes.includes("DELIVERY") ? "DELIVERY" : "PICKUP");
   const [addressId, setAddressId] = useState<string | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -328,7 +332,12 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
           )}
         </StatusView>
       ) : null}
-      <Button testID="get-quote" label={t.getQuote} disabled={busy || (mode === "DELIVERY" && !selectedAddress)} onPress={() => void getQuote()} />
+      <Button
+        testID="get-quote"
+        label={t.getQuote}
+        disabled={overLimit || busy || (mode === "DELIVERY" && !selectedAddress)}
+        onPress={() => void getQuote()}
+      />
       {quote ? (
         <View testID="quote" style={{ gap: 6 }}>
           <Body locale={locale}>

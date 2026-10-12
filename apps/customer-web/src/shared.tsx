@@ -10,6 +10,8 @@ export interface Ctx {
   onSignedOut: () => void;
   /** Navigate within the app (hash routes). */
   go: (route: string) => void;
+  /** The active policy's per-line limit from API-001 (Q1 option A); null until known or when unavailable. */
+  maxQuantityPerLine: number | null;
 }
 
 export type Loaded<T> = { status: "loading" } | { status: "error"; code: string } | { status: "ok"; data: T };

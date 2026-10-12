@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Alert, View } from "react-native";
 import { useApp } from "../AppContext";
-import { decideAdd, loadBasket, loadPending, saveBasket, type Basket } from "../basket";
+import { decideAdd, lineLimit, loadBasket, loadPending, saveBasket, type Basket } from "../basket";
 import { formatMoney, formatTime } from "../mobileApi";
 import { Body, Button, Card, Choice, Notice, Screen, StatusView, Title } from "../ui";
 import { useServer } from "../useServer";
 import type { RootProps } from "./navigation";
 
-function maxQuantity(slot: { availablePortions: number } | null): number {
-  return slot ? Math.max(1, Math.min(20, slot.availablePortions)) : 20;
+/** Bounded by the chosen slot's remaining portions and the server's per-line limit (both server values). */
+function maxQuantity(slot: { availablePortions: number } | null, limit: number): number {
+  return slot ? Math.max(1, Math.min(limit, slot.availablePortions)) : limit;
 }
 
 /**
@@ -16,7 +17,8 @@ function maxQuantity(slot: { availablePortions: number } | null): number {
  * (BR-018, TC-148): "Keep cart" (or dismissing) leaves it unchanged; "Replace cart" replaces it.
  */
 export function MealScreen({ route, navigation }: RootProps<"Meal">) {
-  const { api, t, locale, auth } = useApp();
+  const { api, t, locale, auth, maxQuantityPerLine } = useApp();
+  const limit = lineLimit(maxQuantityPerLine);
   const { mealId } = route.params;
   const [meal, reload] = useServer(() => api.GET("/api/v1/meals/{mealId}", { params: { path: { mealId } } }), `${mealId}|${locale}`);
   const [slotId, setSlotId] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
           const slot = m.nextSlots.find((s) => s.id === slotId) ?? null;
           // CW03 / BR-013: the selected slot itself must have the portions; the meal being AVAILABLE through another slot is not enough.
           const slotExhausted = slot !== null && slot.availablePortions < 1;
-          const purchasable = slot !== null && m.availability === "AVAILABLE" && !slotExhausted && quantity <= slot.availablePortions;
+          const purchasable = slot !== null && m.availability === "AVAILABLE" && !slotExhausted && quantity <= slot.availablePortions && quantity <= limit;
           return (
             <View style={{ gap: 12 }}>
               <Title locale={locale}>{m.title}</Title>
@@ -101,7 +103,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                   label={`${formatTime(s.startsAt, locale)} · ${t.portionsLeft(s.availablePortions)} · ${s.fulfillmentModes.map((f) => t.mode[f] ?? f).join(" / ")}`}
                   onPress={() => {
                     setSlotId(s.id);
-                    setQuantity((q) => Math.min(q, maxQuantity(s)));
+                    setQuantity((q) => Math.min(q, maxQuantity(s, limit)));
                   }}
                 />
               ))}
@@ -110,7 +112,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                 <Body locale={locale} strong>
                   {quantity}
                 </Body>
-                <Button label="+" accessibilityLabel={t.increase} variant="secondary" disabled={quantity >= maxQuantity(slot)} onPress={() => setQuantity(quantity + 1)} />
+                <Button label="+" accessibilityLabel={t.increase} variant="secondary" disabled={quantity >= maxQuantity(slot, limit)} onPress={() => setQuantity(quantity + 1)} />
               </View>
               <Button
                 testID="add-to-cart"
@@ -120,7 +122,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                   if (slot && purchasable) {
                     void add(
                       { kitchenId: m.kitchen.id, kitchenName: m.kitchen.name, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes },
-                      { mealId: m.id, title: m.title, quantity, unitPriceMinor: m.price.amountMinor, maxQuantity: maxQuantity(slot) },
+                      { mealId: m.id, title: m.title, quantity, unitPriceMinor: m.price.amountMinor, maxQuantity: maxQuantity(slot, limit) },
                     );
                   }
                 }}

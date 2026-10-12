@@ -189,6 +189,11 @@ NUMBER=$(grep -o 'text="MB-[^"]*"' "$UI" | head -1 | sed 's/text="\(.*\)"/\1/')
 shot recovered-order
 COUNT=$(psql_q -c "SELECT count(*) FROM customer_order o JOIN app_user u ON u.id = o.customer_id WHERE u.phone_e164 = '+201005550001'")
 [ "$COUNT" = "1" ] || fail "duplicate order: $COUNT orders"
+# No duplicated business side effect either: one stock allocation, one portion reserved on the meal and cook slots,
+# one cash obligation, one ORDER_PLACED outbox event and one order event.
+SIDE=$(psql_q -v phone=+201005550001 < "$HERE/e2e-native/side-effects.sql")
+echo "side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): $SIDE"
+[ "$SIDE" = "1|1|1|1|1|1|1" ] || { echo "FAIL: duplicated or missing side effect: $SIDE"; exit 1; }
 DB=$(psql_q -c "SELECT public_number || '|' || total_minor FROM customer_order WHERE public_number = '$NUMBER'")
 wait_for 'text="Total: [^"]*"' 10 >/dev/null || true
 SHOWN_TOTAL=$(grep -o 'text="Total: [^"]*"' "$UI" | head -1)

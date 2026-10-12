@@ -15,8 +15,13 @@ export interface CartLine {
   maxQuantity?: number;
 }
 
-/** Order line maximum, matching the meal page. Open question Q1: the active policy limit may be lower. */
+/** Fallback line maximum when the server's published limit (API-001) is not available; the quote still enforces the policy. */
 export const LINE_MAX = 20;
+
+/** The per-line maximum: the server's published policy limit when known, otherwise LINE_MAX. */
+export function lineLimit(published: number | null): number {
+  return published ?? LINE_MAX;
+}
 
 export interface Cart {
   kitchenId: string;

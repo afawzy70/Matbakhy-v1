@@ -1,15 +1,16 @@
 import { useRef, useState } from "react";
 import { formatMoney, formatTime } from "./api";
-import { loadCart, loadPending, saveCart, type Cart } from "./cart";
+import { lineLimit, loadCart, loadPending, saveCart, type Cart } from "./cart";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
-/** Quantity is bounded by the chosen slot's remaining portions (server value) and the order line maximum of 20. */
-function maxQuantity(slot: { availablePortions: number } | null): number {
-  return slot ? Math.max(1, Math.min(20, slot.availablePortions)) : 20;
+/** Quantity is bounded by the chosen slot's remaining portions and the server's per-line limit (both server values). */
+function maxQuantity(slot: { availablePortions: number } | null, limit: number): number {
+  return slot ? Math.max(1, Math.min(limit, slot.availablePortions)) : limit;
 }
 
 export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: boolean }) {
   const { t, locale } = ctx;
+  const limit = lineLimit(ctx.maxQuantityPerLine);
   const [meal, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/meals/{mealId}", { params: { path: { mealId: id } } }), `${id}|${locale}`);
   const [slotId, setSlotId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -28,7 +29,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
         const slot = m.nextSlots.find((s) => s.id === slotId) ?? null;
         // CW03 / BR-013: the selected slot itself must have the portions; the meal being AVAILABLE through another slot is not enough.
         const slotExhausted = slot !== null && slot.availablePortions < 1;
-        const purchasable = slot !== null && m.availability === "AVAILABLE" && !slotExhausted && quantity <= slot.availablePortions;
+        const purchasable = slot !== null && m.availability === "AVAILABLE" && !slotExhausted && quantity <= slot.availablePortions && quantity <= limit;
         return (
           <article className="meal-detail stack" aria-labelledby="meal-title">
             <a href="#/">{t.back}</a>
@@ -72,7 +73,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                     checked={slotId === s.id}
                     onChange={() => {
                       setSlotId(s.id);
-                      setQuantity((q) => Math.min(q, Math.max(1, Math.min(20, s.availablePortions))));
+                      setQuantity((q) => Math.min(q, maxQuantity(s, limit)));
                     }}
                   />
                   <span>
@@ -90,11 +91,11 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                   type="number"
                   aria-label={t.quantity}
                   min={1}
-                  max={maxQuantity(slot)}
+                  max={maxQuantity(slot, limit)}
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, Math.min(maxQuantity(slot), Number(e.target.value) || 1)))}
+                  onChange={(e) => setQuantity(Math.max(1, Math.min(maxQuantity(slot, limit), Number(e.target.value) || 1)))}
                 />
-                <button type="button" className="secondary" aria-label={t.increase} disabled={quantity >= maxQuantity(slot)} onClick={() => setQuantity(quantity + 1)}>
+                <button type="button" className="secondary" aria-label={t.increase} disabled={quantity >= maxQuantity(slot, limit)} onClick={() => setQuantity(quantity + 1)}>
                   +
                 </button>
               </div>
@@ -108,7 +109,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                 }
                 const cart = loadCart();
                 const next: Cart = { kitchenId: m.kitchen.id, kitchenName: m.kitchen.name, slotId: slot.id, slotStartsAt: slot.startsAt, modes: slot.fulfillmentModes, lines: [] };
-                const line = { mealId: m.id, title: m.title, quantity, unitPriceMinor: m.price.amountMinor, maxQuantity: maxQuantity(slot) };
+                const line = { mealId: m.id, title: m.title, quantity, unitPriceMinor: m.price.amountMinor, maxQuantity: maxQuantity(slot, limit) };
                 if (cart && cart.lines.length > 0 && (cart.kitchenId !== m.kitchen.id || cart.slotId !== slot.id)) {
                   if (loadPending()) {
                     // An order may already exist for the current basket; it is resolved at checkout before any change.

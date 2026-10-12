@@ -24,6 +24,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
   const [route, setRoute] = useState(currentRoute);
   const [me, setMe] = useState<Schemas["CustomerProfile"] | null>(null);
   const [meVersion, setMeVersion] = useState(0);
+  const [maxQuantityPerLine, setMaxQuantityPerLine] = useState<number | null>(null);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
   const api = useMemo(() => createApi(fetchImpl), [fetchImpl]);
 
@@ -64,10 +65,27 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
     };
   }, [api, meVersion]);
 
+  // Q1 option A: quantity controls follow the server's published limit; without it they fall back to 20 and the slot.
+  useEffect(() => {
+    let active = true;
+    api
+      .GET("/api/v1/configuration/public")
+      .then((r) => {
+        if (active) {
+          setMaxQuantityPerLine(r.data?.orderLimits?.maxQuantityPerLine ?? null);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [api]);
+
   const ctx: Ctx = {
     api,
     t,
     locale,
+    maxQuantityPerLine,
     onSignedOut: () => setMe(null),
     go: (to: string) => {
       window.location.hash = to;
