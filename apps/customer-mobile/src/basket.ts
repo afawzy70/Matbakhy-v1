@@ -41,8 +41,22 @@ const BASKET = "matbakhy.basket.v1";
 const PENDING = "matbakhy.pendingPlacement.v1";
 const OPTIONS: SecureStore.SecureStoreOptions = { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DEVICE_ONLY };
 
+/**
+ * One retry for a failed secure-storage read: a single failure must not make a basket or an unconfirmed order vanish
+ * from the screen (native runs 27/28, Android cold start). The warning names the key and error type only.
+ */
+async function getWithRetry(key: string): Promise<string | null> {
+  try {
+    return await SecureStore.getItemAsync(key, OPTIONS);
+  } catch (e) {
+    console.warn(`secure storage read failed for ${key} (${e instanceof Error ? e.name : typeof e}); retrying`);
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    return SecureStore.getItemAsync(key, OPTIONS);
+  }
+}
+
 async function read<T>(key: string): Promise<T | null> {
-  const raw = await SecureStore.getItemAsync(key, OPTIONS);
+  const raw = await getWithRetry(key);
   if (raw === null) {
     return null;
   }

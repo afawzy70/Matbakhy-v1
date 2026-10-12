@@ -1,0 +1,671 @@
+# Red phase: unconfirmed order reachable after restart (native runs 27/28, Android), unchanged product code (HEAD 1cc826e6141ae0ed8a0db61e98e1fdb1982aca34, tests uncommitted)
+FAIL src/App.test.tsx
+  ● the unconfirmed order stays reachable after a restart (TC-049, MB-032) › shows the cart shortcut when an order is pending even if the basket cannot be found
+
+    Unable to find an element with testID: open-cart
+
+    <View>
+      <RNSScreenStack>
+        <RNSScreen
+          aria-hidden={false}
+        >
+          <RNSScreenContentWrapper>
+            <View>
+              <RNSScreenNavigationContainer>
+                <RNSScreen
+                  pointerEvents="box-none"
+                >
+                  <View
+                    aria-hidden={false}
+                  >
+                    <View>
+                      <View
+                        pointerEvents="box-none"
+                      >
+                        <View
+                          pointerEvents="box-none"
+                        >
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="auto"
+                            />
+                          </View>
+                          <View
+                            pointerEvents="none"
+                          />
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="box-none"
+                            />
+                            <View
+                              pointerEvents="box-none"
+                            >
+                              <Text
+                                role="heading"
+                              >
+                                Discover
+                              </Text>
+                            </View>
+                            <View
+                              pointerEvents="box-none"
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <RCTScrollView
+                        testID="discover"
+                      >
+                        <View>
+                          <View>
+                            <Text>
+                              Search dishes or kitchens
+                            </Text>
+                            <TextInput
+                              accessibilityLabel="Search dishes or kitchens"
+                              testID="search"
+                              value=""
+                            />
+                          </View>
+                          <View
+                            accessibilityLabel="Search"
+                            accessibilityRole="button"
+                            accessibilityState={
+                              {
+                                "disabled": false,
+                              }
+                            }
+                            accessible={true}
+                          >
+                            <Text>
+                              Search
+                            </Text>
+                          </View>
+                          <View
+                            accessibilityRole="alert"
+                            testID="offline"
+                          >
+                            <Text>
+                              You're offline. What you see is not current cooking status or stock.
+                            </Text>
+                            <View
+                              accessibilityLabel="Retry"
+                              accessibilityRole="button"
+                              accessibilityState={
+                                {
+                                  "disabled": false,
+                                }
+                              }
+                              accessible={true}
+                            >
+                              <Text>
+                                Retry
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </RCTScrollView>
+                    </View>
+                  </View>
+                </RNSScreen>
+              </RNSScreenNavigationContainer>
+              <View
+                pointerEvents="auto"
+              >
+                <View
+                  pointerEvents="none"
+                />
+                <View
+                  role="tablist"
+                >
+                  <View>
+                    <View
+                      accessibilityLabel="Discover, tab, 1 of 4"
+                      accessibilityState={
+                        {
+                          "selected": true,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-discover"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View />
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                      </View>
+                      <Text>
+                        Discover
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Favorites, tab, 2 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-favorites"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Favorites
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Orders, tab, 3 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-orders"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Orders
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Account, tab, 4 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-account"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Account
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </RNSScreenContentWrapper>
+          <RNSScreenStackHeaderConfig
+            pointerEvents="box-none"
+            title="Tabs"
+          />
+        </RNSScreen>
+      </RNSScreenStack>
+    </View>
+
+      314 |     mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify(pending));
+      315 |     await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
+    > 316 |     expect(await screen.findByTestId("open-cart")).toBeTruthy();
+          |                         ^
+      317 |   });
+      318 |
+      319 |   it("retries a failed secure-storage read once instead of hiding the basket", async () => {
+
+      at Object.findByTestId (src/App.test.tsx:316:25)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● the unconfirmed order stays reachable after a restart (TC-049, MB-032) › retries a failed secure-storage read once instead of hiding the basket
+
+    keystore not ready
+
+      323 |     const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+      324 |     SecureStore.getItemAsync.mockImplementationOnce(async () => {
+    > 325 |       throw new Error("keystore not ready");
+          |             ^
+      326 |     });
+      327 |     await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
+      328 |     await fireEvent.press(await screen.findByTestId("open-cart"));
+
+      at Object.<anonymous> (src/App.test.tsx:325:13)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at ../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at Object.<anonymous> (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+      at getItemAsync (src/basket.ts:45:33)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at ../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7
+      at ../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12
+      at apply (src/basket.ts:44:20)
+      at read (src/basket.ts:65:33)
+      at src/screens/Discover.tsx:20:22
+      at effect (../../node_modules/.pnpm/@react-navigation+core@7.23.0_react@19.2.3/node_modules/@react-navigation/core/src/useFocusEffect.tsx:37:23)
+      at callback (../../node_modules/.pnpm/@react-navigation+core@7.23.0_react@19.2.3/node_modules/@react-navigation/core/src/useFocusEffect.tsx:76:17)
+      at Object.react_stack_bottom_frame (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:17681:20)
+      at runWithFiberInDEV (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:2508:13)
+      at commitHookEffectListMount (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:10861:29)
+      at commitHookPassiveMountEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:10948:11)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13327:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13351:15)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13380:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+      at reconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13319:11)
+      at recursivelyTraverseReconnectPassiveEffects (../../node_modules/.pnpm/react-reconciler@0.33.0_react@19.2.3/node_modules/react-reconciler/cjs/react-reconciler.development.js:13279:9)
+
+  ● the unconfirmed order stays reachable after a restart (TC-049, MB-032) › retries a failed secure-storage read once instead of hiding the basket
+
+    Unable to find an element with testID: open-cart
+
+    <View>
+      <RNSScreenStack>
+        <RNSScreen
+          aria-hidden={false}
+        >
+          <RNSScreenContentWrapper>
+            <View>
+              <RNSScreenNavigationContainer>
+                <RNSScreen
+                  pointerEvents="box-none"
+                >
+                  <View
+                    aria-hidden={false}
+                  >
+                    <View>
+                      <View
+                        pointerEvents="box-none"
+                      >
+                        <View
+                          pointerEvents="box-none"
+                        >
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="auto"
+                            />
+                          </View>
+                          <View
+                            pointerEvents="none"
+                          />
+                          <View
+                            pointerEvents="box-none"
+                          >
+                            <View
+                              pointerEvents="box-none"
+                            />
+                            <View
+                              pointerEvents="box-none"
+                            >
+                              <Text
+                                role="heading"
+                              >
+                                Discover
+                              </Text>
+                            </View>
+                            <View
+                              pointerEvents="box-none"
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <RCTScrollView
+                        testID="discover"
+                      >
+                        <View>
+                          <View>
+                            <Text>
+                              Search dishes or kitchens
+                            </Text>
+                            <TextInput
+                              accessibilityLabel="Search dishes or kitchens"
+                              testID="search"
+                              value=""
+                            />
+                          </View>
+                          <View
+                            accessibilityLabel="Search"
+                            accessibilityRole="button"
+                            accessibilityState={
+                              {
+                                "disabled": false,
+                              }
+                            }
+                            accessible={true}
+                          >
+                            <Text>
+                              Search
+                            </Text>
+                          </View>
+                          <View
+                            accessibilityRole="alert"
+                            testID="offline"
+                          >
+                            <Text>
+                              You're offline. What you see is not current cooking status or stock.
+                            </Text>
+                            <View
+                              accessibilityLabel="Retry"
+                              accessibilityRole="button"
+                              accessibilityState={
+                                {
+                                  "disabled": false,
+                                }
+                              }
+                              accessible={true}
+                            >
+                              <Text>
+                                Retry
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </RCTScrollView>
+                    </View>
+                  </View>
+                </RNSScreen>
+              </RNSScreenNavigationContainer>
+              <View
+                pointerEvents="auto"
+              >
+                <View
+                  pointerEvents="none"
+                />
+                <View
+                  role="tablist"
+                >
+                  <View>
+                    <View
+                      accessibilityLabel="Discover, tab, 1 of 4"
+                      accessibilityState={
+                        {
+                          "selected": true,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-discover"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View />
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                      </View>
+                      <Text>
+                        Discover
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Favorites, tab, 2 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-favorites"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Favorites
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Orders, tab, 3 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-orders"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Orders
+                      </Text>
+                    </View>
+                  </View>
+                  <View>
+                    <View
+                      accessibilityLabel="Account, tab, 4 of 4"
+                      accessibilityState={
+                        {
+                          "selected": false,
+                        }
+                      }
+                      accessible={true}
+                      role="button"
+                      testID="tab-account"
+                    >
+                      <View
+                        style={
+                          {
+                            "display": "none",
+                          }
+                        }
+                      >
+                        <View
+                          style={
+                            {
+                              "opacity": 0,
+                            }
+                          }
+                        />
+                        <View />
+                      </View>
+                      <Text>
+                        Account
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </RNSScreenContentWrapper>
+          <RNSScreenStackHeaderConfig
+            pointerEvents="box-none"
+            title="Tabs"
+          />
+        </RNSScreen>
+      </RNSScreenStack>
+    </View>
+
+      326 |     });
+      327 |     await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
+    > 328 |     await fireEvent.press(await screen.findByTestId("open-cart"));
+          |                                        ^
+      329 |     expect(await screen.findByText(/1 × Dish m1/)).toBeTruthy();
+      330 |     expect(warn).toHaveBeenCalled();
+      331 |     warn.mockRestore();
+
+      at Object.findByTestId (src/App.test.tsx:328:40)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       2 failed, 28 skipped, 30 total
+Snapshots:   0 total
+Time:        4.039 s, estimated 7 s
+Ran all test suites with tests matching "stays reachable".

@@ -299,3 +299,35 @@ describe("native basket editing (CW05, MB-032; parity with QA finding FG-001)", 
     expect(screen.getByTestId("remove-m1").props.accessibilityState.disabled).toBe(true);
   });
 });
+
+/**
+ * MB-032 native run 27/28 (Android): after the app was killed during submit and reopened offline, Discover showed no
+ * cart shortcut although the customer was still signed in, so the unconfirmed order could not be reached (TC-049).
+ */
+describe("the unconfirmed order stays reachable after a restart (TC-049, MB-032)", () => {
+  const pending = { clientRequestId: "c1", idempotencyKey: "i1", quoteId: "q1", terms: "t1", cancellation: "c1" };
+  const offline = jest.fn(async () => {
+    throw new TypeError("Network request failed");
+  }) as unknown as typeof fetch;
+
+  it("shows the cart shortcut when an order is pending even if the basket cannot be found", async () => {
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify(pending));
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
+    expect(await screen.findByTestId("open-cart")).toBeTruthy();
+  });
+
+  it("retries a failed secure-storage read once instead of hiding the basket", async () => {
+    const SecureStore = jest.requireMock<{ getItemAsync: jest.Mock }>("expo-secure-store");
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"], lines: [{ mealId: "m1", title: "Dish m1", quantity: 1 }] }));
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify(pending));
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+    SecureStore.getItemAsync.mockImplementationOnce(async () => {
+      throw new Error("keystore not ready");
+    });
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={offline} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+    expect(await screen.findByText(/1 × Dish m1/)).toBeTruthy();
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
