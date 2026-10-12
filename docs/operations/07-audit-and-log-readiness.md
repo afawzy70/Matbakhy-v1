@@ -22,6 +22,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 | Audit | audit trail read | `audit.read` | staff / looked-up object or actor | ALLOWED, filter in details | StaffAccessIntegrationTest |
 | Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest |
 | Orders (protected data) | staff view disclosing customer contact | `access.order_contact` | staff / order | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
+| Support (protected data) | staff view of a case | `access.support_case` | staff / case | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support | staff message, case update | `case.message`, `case.update` | staff / case | reason for some transitions | SupportIntegrationTest |
 | Privacy | account erasure (job); legal hold | `account.erasure` | system / account | counts only, no personal data | AccountErasureIntegrationTest |
 
@@ -31,7 +32,7 @@ Not every read should be audited. These are the ones that expose protected data 
 
 1. **Staff view of an order with customer contact** (`GET /api/v1/ops/orders/{id}` returns name, phone and address): **closed in this session.** Each view that discloses contact now writes `access.order_contact` (actor, order, request ID; no contact data). Test first: `RED-staff-order-contact-audit.log`; assertion in SupportIntegrationTest.
 2. **Audit log reads** (`GET /api/v1/ops/audit`): **closed in this session.** Each read writes `audit.read`: the reader, the object or actor looked up (in `object_id`), and the other filters in details. It is written after the query, so a page never lists its own read. Test first: `RED-audit-read-audited.log`; assertion in StaffAccessIntegrationTest.
-3. **Staff case view** (`GET /api/v1/ops/cases/{id}`): not audited. Proposal: as item 1.
+3. **Staff case view** (`GET /api/v1/ops/cases/{id}`): **closed in this session.** Each view writes `access.support_case` (actor, case, request ID; no case content). Test first: `RED-staff-case-view-audit.log`; assertion in SupportIntegrationTest.
 4. **Account deletion request** (customer self-service): only the later erasure job is audited, with no actor. Proposal: record the request with the customer as actor.
 5. **Cash report submission by a cook**: business record only. Probably sufficient (it is business history); listed for the owner's view.
 6. **Request IDs missing** on `case.message` (hard-coded null). System jobs (`staff.bootstrap`, `media.rejected`, `account.erasure`) have none by design.

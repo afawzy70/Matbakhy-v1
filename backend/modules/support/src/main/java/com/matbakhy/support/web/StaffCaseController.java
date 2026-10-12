@@ -53,8 +53,9 @@ class StaffCaseController {
     }
 
     @GetMapping("/api/v1/ops/cases/{caseId}")
-    StaffCase get(@PathVariable UUID caseId) {
-        return support.staffCase(caseId, true);
+    StaffCase get(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID caseId, HttpServletRequest request) {
+        Object requestId = request.getAttribute(RequestContext.REQUEST_ID_ATTRIBUTE);
+        return support.viewStaffCase(actor.id(), caseId, requestId == null ? null : requestId.toString());
     }
 
     @PostMapping("/api/v1/ops/cases/{caseId}/messages")

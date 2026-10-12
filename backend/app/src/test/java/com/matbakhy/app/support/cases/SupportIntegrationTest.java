@@ -243,6 +243,9 @@ class SupportIntegrationTest {
 
         String caseId = request.get("id").asString();
         JsonNode staffCase = ok(call(get("/api/v1/ops/cases/" + caseId), agentSubject), 200);
+        // MB-039: a staff view of a case (customer description and conversation) leaves one audit row.
+        assertThat(jdbc.queryForList("SELECT action || '|' || outcome FROM audit_event WHERE object_type = 'support_case' AND object_id = ? AND action LIKE 'access.%'",
+                String.class, caseId)).containsExactly("access.support_case|ALLOWED");
         assertThat(staffCase.get("severity").asString()).isEqualTo("HIGH");
         assertThat(staffCase.get("cancellationReason").asString()).isEqualTo("CHANGED_MIND");
         assertThat(call(patch("/api/v1/ops/cases/" + caseId).content("{\"state\":\"RESOLVED\",\"resolutionCode\":\"ORDER_CANCELLED\",\"reason\":\"cancelled\","

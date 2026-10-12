@@ -198,6 +198,14 @@ public class SupportService implements OrderCases {
         return new CasePage<>(page, next, more);
     }
 
+    /** A staff view of one case (customer description and conversation) is audited; the row holds no case content (MB-039). */
+    public StaffCase viewStaffCase(UUID staffId, UUID caseId, String requestId) {
+        StaffCase c = staffCase(caseId, true);
+        audit.record(new Entry(staffId, "access.support_case", "support.case", "support_case", caseId.toString(), Outcome.ALLOWED,
+                "staff view of a support case", requestId, Map.of()));
+        return c;
+    }
+
     public StaffCase staffCase(UUID caseId, boolean withMessages) {
         Row r = row(caseId).orElseThrow(SupportService::notFound);
         Instant now = clock.instant();
