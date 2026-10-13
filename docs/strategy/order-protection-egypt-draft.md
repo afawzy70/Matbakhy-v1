@@ -62,3 +62,11 @@ What constitutes high exposure? COD cap? cook opt-in? minimum notice for cancell
 
 ## Product governance
 No automatic implementation, production rollout, financial policy activation, or new MVP commitments. Owners may later approve scoped stories and an external legal/financial provider integration design. Reference issues #3 and #4 (AI concierge must also comply with payment gating and explicit consent).
+
+## Owner direction — 2026-10-13 (pilot payments)
+- Prioritize customer acquisition and familiar existing Egyptian payment instruments: InstaPay, regulated mobile wallets, transfers, and eligible COD. Do NOT invent a proprietary wallet, escrow, payment method or require heavy provider integration for initial pilot.
+- Exploratory MVP option: customer transfers deposit directly to the cook's permitted business/merchant account or wallet. Platform displays approved recipient details, amount and terms and logs a manual cook-reported receipt acknowledgement, explicitly NOT independent bank verification.
+- Financial flow is customer -> cook, not through Matbakhy. Cook confirmation and order acceptance are separate actions. Orders requiring deposits cannot start preparation before cook verifies receipt in actual account. Pending and disputed transfers route to human support and no duplicate payment demand.
+- Do NOT claim that lack of custody makes Matbakhy legally exempt. Platform roles (marketplace intermediary/contracting party/agent), advertising, consumer rights, data duties, provider terms, kitchen licensing, merchant-account permissible use and dispute practices require Egyptian counsel review before live launch.
+- No blanket 'platform has no legal responsibility' promise. Customer-facing language must truthfully distinguish who sells, who is paid, who refunds, what platform support does, and cannot waive mandatory statutory rights.
+- Revisit automated payment verification, payment gateway, settlement and guarantees after pilot conversion, cook loss, disputes, and provider/legal feasibility measurements. This paragraph records owner's commercial preference, not legal approval or changed MVP story acceptance.
