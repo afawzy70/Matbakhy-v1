@@ -35,7 +35,22 @@ curl -fsS http://localhost:9099/pending | python3 -c 'import json,sys; d=json.lo
 adb shell am force-stop""")
 # Append checks with the harness's bounded scrolling/dump helpers, using actual native controls.
 s+='''
+IQA_G_STATUS=0
+set +e
+(
+set -e
 echo "== IQA same-session lower limit, edit/remove and lifecycle"
+launch
+tap 'resource-id="tab-account"' 90
+if wait_for 'content-desc="Sign out"|text="Sign out"' 10 >/dev/null; then tap 'content-desc="Sign out"|text="Sign out"'; fi
+tap 'content-desc="Sign in"|text="Sign in"' 60
+pos=$(wait_for 'resource-id="username"|hint="Username or email"|text="Username or email"' 90) || fail "real G sign-in username unavailable"
+adb shell input tap $pos; adb shell input text "$CUSTOMER"
+pos=$(wait_for 'resource-id="password"|hint="Password"|text="Password"' 30) || fail "real G password field unavailable"
+adb shell input tap $pos; adb shell input text "$USER_PASSWORD"
+tap 'resource-id="kc-login"|text="Sign In"'
+wait_for 'text="Hello [^\"]*SyntheticA"' 90 >/dev/null || fail "fresh G identity not established"
+echo "IQA-G-FRESH-AUTH established without policy change"
 launch
 tap 'content-desc="Native Dish One[^\"]*"' 90
 tap 'resource-id="slot-0"'
@@ -94,11 +109,11 @@ wait_scrolled 'content-desc="Remove from favorites"|text="Remove from favorites"
 adb shell input keyevent 4
 tap 'resource-id="tab-favorites"'
 wait_for 'content-desc="Native Dish One[^\"]*"|text="Native Dish One"' 30 >/dev/null || fail "favorite list missing One"
-tap 'content-desc="Native Dish One[^\"]*"|text="Native Dish One"'
 tap_scrolled 'content-desc="Remove from favorites"|text="Remove from favorites"'
-wait_scrolled 'content-desc="Add to favorites"|text="Add to favorites"' 30 || fail "favorite removal not server-confirmed"
-adb shell input keyevent 4
-wait_for 'text="No favorite dishes yet."' 30 >/dev/null || fail "favorite remained after removal"
+wait_for 'text="No favorite dishes yet."' 30 >/dev/null || fail "favorite remained after actual list removal"
+launch
+tap 'resource-id="tab-favorites"'
+wait_for 'text="No favorite dishes yet."' 30 >/dev/null || fail "favorite removal did not persist after cold reopen"
 echo "IQA-FAVORITES verified add/list/remove"
 launch
 tap 'resource-id="tab-account"'
@@ -113,6 +128,9 @@ echo "IQA-LOCALE verified AR and EN account switching"
 '''
 s+=r'''
 
+)
+IQA_G_STATUS=$?
+set -e
 echo "== IQA independent native customer trust prerequisites"
 launch
 tap 'resource-id="tab-account"' 90
@@ -150,6 +168,7 @@ tap_scrolled 'content-desc="Support"|text="Support"'
 wait_for 'text="CS-DA877001[^\"]*"' 30 >/dev/null || fail "support fixture not listed"
 tap 'text="CS-DA877001[^\"]*"'
 wait_for 'text="QA PUBLIC NATIVE REPLY"' 10 >/dev/null || fail "MBQA-004 public reply unreachable"
+[ "$IQA_G_STATUS" -eq 0 ] || exit "$IQA_G_STATUS"
 '''
 p.write_text(s)
 p=Path('apps/customer-mobile/e2e-ios/UITests/OrderingTests.swift');s=p.read_text();s=s.replace('Thread.sleep(forTimeInterval: 3)\n        app.terminate()', '''Thread.sleep(forTimeInterval: 1)
