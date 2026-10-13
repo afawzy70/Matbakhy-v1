@@ -143,6 +143,10 @@ class ActivityInsightsIntegrationTest {
         ok(activity("vb-" + UUID.randomUUID(), browser, event("MEAL_VIEW", meal) + "," + event("MEAL_VIEW", otherMeal)), 202);
         // A declared crawler is accepted (no signal) and not counted.
         ok(activity("bot-" + UUID.randomUUID(), "Mozilla/5.0 (compatible; Googlebot/2.1)", event("MEAL_VIEW", meal)), 202);
+        // A signed-out phone sends no cookie and no CSRF token (MB-054 on native): still accepted and counted.
+        assertThat(mvc.perform(post("/api/v1/activity").header("User-Agent", "okhttp/4.12.0").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"visitorId\":\"app-" + UUID.randomUUID() + "\",\"events\":[" + event("MEAL_VIEW", meal) + "]}"))
+                .andReturn().getResponse().getStatus()).isEqualTo(202);
         // Unknown subjects are ignored without saying so; a malformed request is refused.
         ok(activity(visitorA, browser, event("MEAL_VIEW", UUID.randomUUID())), 202);
         assertThat(activity(visitorA, browser, "{\"kind\":\"PURCHASE\",\"subjectId\":\"" + meal + "\"}").getStatus()).isIn(400, 422);
@@ -150,7 +154,7 @@ class ActivityInsightsIntegrationTest {
 
         JsonNode report = insights(cookSubject, "Cook");
         JsonNode a = report.get("activity");
-        assertThat(a.get("mealViews").asInt()).isEqualTo(2);
+        assertThat(a.get("mealViews").asInt()).as("two browsers and one phone").isEqualTo(3);
         assertThat(a.get("mealImpressions").asInt()).isEqualTo(1);
         assertThat(a.get("kitchenViews").asInt()).isEqualTo(1);
         assertThat(a.get("addToCart").asInt()).isEqualTo(1);
@@ -159,7 +163,7 @@ class ActivityInsightsIntegrationTest {
         assertThat(other.get("activity").get("mealViews").asInt()).as("per kitchen").isEqualTo(1);
 
         // Stored: a keyed per-day hash, never the visitor id, an address or an account.
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM activity_daily WHERE kitchen_id = ?", Integer.class, kitchen)).isEqualTo(5);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM activity_daily WHERE kitchen_id = ?", Integer.class, kitchen)).isEqualTo(6);
         assertThat(jdbc.queryForObject("SELECT count(DISTINCT length(visitor_hash)) || '|' || min(length(visitor_hash)) FROM activity_daily",
                 String.class)).isEqualTo("1|32");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM activity_daily WHERE position(convert_to(?, 'UTF8') IN visitor_hash) > 0",

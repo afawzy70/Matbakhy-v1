@@ -5,6 +5,7 @@ import { decideAdd, lineLimit, loadBasket, loadPending, saveBasket, type Basket 
 import { formatMoney, formatTime } from "../mobileApi";
 import { Body, Button, Card, Choice, Notice, Screen, StatusView, Title } from "../ui";
 import { useServer } from "../useServer";
+import { track, useTrack } from "../activity";
 import type { RootProps } from "./navigation";
 
 /** Bounded by the chosen slot's remaining portions and the server's per-line limit (both server values). */
@@ -21,6 +22,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
   const limit = lineLimit(maxQuantityPerLine);
   const { mealId } = route.params;
   const [meal, reload] = useServer(() => api.GET("/api/v1/meals/{mealId}", { params: { path: { mealId } } }), `${mealId}|${locale}`);
+  useTrack(api, "MEAL_VIEW", meal.status === "ok" ? [mealId] : []);
   const [slotId, setSlotId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
@@ -32,6 +34,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
     if (outcome.kind === "added") {
       await saveBasket(outcome.basket);
       setMessage(t.added);
+      track(api, "ADD_TO_CART", line.mealId);
       return;
     }
     if (outcome.kind === "placementPending") {
@@ -48,7 +51,10 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
           text: t.replaceBasket,
           style: "destructive",
           onPress: () => {
-            void saveBasket(outcome.replacement).then(() => setMessage(t.added));
+            void saveBasket(outcome.replacement).then(() => {
+              setMessage(t.added);
+              track(api, "ADD_TO_CART", line.mealId);
+            });
           },
         },
       ],

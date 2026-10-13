@@ -170,7 +170,9 @@ class SecurityConfiguration {
     SecurityFilterChain webChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors,
                                  IdentityProperties properties, ClientRegistrationRepository registrations) throws Exception {
         http.cors(cors -> { })
-                .csrf(csrf -> csrf.spa())
+                // MB-054: the activity endpoint acts for nobody and ignores identity, so a signed-out phone (no cookie, no CSRF token)
+                // can send it; every other browser request keeps CSRF protection.
+                .csrf(csrf -> csrf.spa().ignoringRequestMatchers(ACTIVITY))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/error").permitAll()
                         .requestMatchers(SecurityConfiguration::managementScrape).permitAll()

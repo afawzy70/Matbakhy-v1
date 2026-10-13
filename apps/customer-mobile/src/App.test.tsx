@@ -842,3 +842,35 @@ describe("MB-053 on native: direct deposit checkout and payment status", () => {
     }
   });
 });
+
+/** MB-054 (D17, TC-164) on native: browsing activity goes in one batch with a per-process visitor id, without signing in. */
+describe("MB-054 on native: organic activity", () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it("sends the impressions, the meal view and the add to cart, and never blocks the screen on a failure", async () => {
+    // Start on Discover regardless of a link another test opened.
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue(null);
+    const sent: { visitorId: string; events: { kind: string; subjectId: string }[] }[] = [];
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const key = `${input.method} ${new URL(input.url).pathname}`;
+      if (key === "GET /api/v1/meals") return json(200, { items: [meal("m1", "k1"), meal("m2", "k2")], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/meals/m1") return json(200, meal("m1", "k1"));
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "POST /api/v1/activity") {
+        sent.push((await input.json()) as (typeof sent)[number]);
+        return json(503, { code: "SERVICE_UNAVAILABLE" });
+      }
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("meal-m1"));
+    await fireEvent.press(await screen.findByTestId("slot-0", {}, { timeout: 5000 }));
+    await fireEvent.press(screen.getByTestId("add-to-cart"));
+    expect(await screen.findByText(t.added)).toBeTruthy();
+    await waitFor(() => expect(sent.flatMap((b) => b.events.map((e) => `${e.kind}:${e.subjectId}`))).toEqual(
+      expect.arrayContaining(["MEAL_IMPRESSION:m1", "MEAL_IMPRESSION:m2", "MEAL_VIEW:m1", "ADD_TO_CART:m1"])), { timeout: 4000 });
+    expect(new Set(sent.map((b) => b.visitorId)).size).toBe(1);
+    expect(sent[0]?.visitorId).toMatch(/^app-[0-9a-f-]{36}$/);
+    expect([...mockStore.keys()].some((k) => k.includes("visitor"))).toBe(false);
+  });
+});

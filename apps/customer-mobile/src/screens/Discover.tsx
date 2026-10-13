@@ -6,6 +6,7 @@ import { loadBasket, loadPending } from "../basket";
 import { formatMoney } from "../mobileApi";
 import { Body, Button, Card, Field, Screen, StatusView, colors } from "../ui";
 import { useServer } from "../useServer";
+import { useTrack } from "../activity";
 import type { TabProps } from "./navigation";
 
 /** Native home: search and published, orderable meals from the server (the client never filters, prices or ranks). */
@@ -16,6 +17,7 @@ export function DiscoverScreen({ navigation }: TabProps<"Discover">) {
   const [basketCount, setBasketCount] = useState(0);
   const [orderPending, setOrderPending] = useState(false);
   const [meals, reload] = useServer(() => api.GET("/api/v1/meals", { params: { query: { limit: 50, sort: "NEWEST", ...(query ? { q: query } : {}) } } }), `${query}|${locale}`);
+  useTrack(api, "MEAL_IMPRESSION", meals.status === "ok" ? meals.data.items.map((m) => m.id) : []);
   useFocusEffect(
     useCallback(() => {
       let active = true;
