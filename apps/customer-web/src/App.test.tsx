@@ -31,6 +31,7 @@ function server(routes: Record<string, Handler>) {
 }
 
 const egp = (amountMinor: number) => ({ amountMinor, currency: "EGP" });
+const cod = (total: number) => ({ method: "COD", depositBps: 0, deposit: egp(0), remainder: egp(total), recipient: null });
 const me = { id: "u1", displayName: "Mona", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: ["BROWSE", "ORDER"] };
 const order = { id: "11111111-1111-4111-8111-111111111111", publicNumber: "MB-2001" };
 
@@ -77,7 +78,7 @@ describe("customer web", () => {
       "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
       "POST /api/v1/quotes": () => ({
         status: 201,
-        body: { quoteId: "q1", expiresAt: "2026-10-11T10:05:00Z", kitchenId: "k1", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0), total: egp(24000), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-11T10:15:00Z", warnings: ["SYNTHETIC_POLICY"] },
+        body: { quoteId: "q1", expiresAt: "2026-10-11T10:05:00Z", kitchenId: "k1", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0), total: egp(24000), payment: cod(24000), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-11T10:15:00Z", warnings: ["SYNTHETIC_POLICY"] },
       }),
       "POST /api/v1/orders": () => (++attempts === 1 ? "NETWORK_ERROR" : { status: 201, body: order }),
     });
@@ -816,7 +817,7 @@ describe("QA repair FG-001: the basket can be edited and shows an estimate (CW05
         quotes.push(body);
         return {
           status: 201,
-          body: { quoteId: `q${quotes.length}`, expiresAt: "2026-10-13T09:05:00Z", kitchenId: "kA", items: [], subtotal: egp(12025), deliveryFee: egp(0), tax: egp(1684), total: egp(13709), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T09:15:00Z", warnings: [] },
+          body: { quoteId: `q${quotes.length}`, expiresAt: "2026-10-13T09:05:00Z", kitchenId: "kA", items: [], subtotal: egp(12025), deliveryFee: egp(0), tax: egp(1684), total: egp(13709), payment: cod(13709), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T09:15:00Z", warnings: [] },
         };
       },
     });
@@ -1172,7 +1173,7 @@ describe("D13: changed prices need informed reconfirmation", () => {
     const subtotal = items.reduce((s, i) => s + i.lineTotal.amountMinor, 0);
     return {
       quoteId: `q${version}`, expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items, subtotal: egp(subtotal), deliveryFee: egp(fee), tax: egp(0),
-      total: egp(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
+      total: egp(subtotal + fee), payment: cod(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
     };
   };
   function setup(modes: string[] = ["PICKUP"]) {
@@ -1287,5 +1288,89 @@ describe("D13: changed prices need informed reconfirmation", () => {
     fireEvent.click(screen.getByRole("button", { name: "زيادة الكمية: Dish m2" }));
     await waitFor(() => expect(screen.queryByTestId("price-change")).toBeNull());
     expect(screen.queryByRole("button", { name: "تأكيد الطلب" })).toBeNull();
+  });
+});
+
+/**
+ * MB-053 (D16, TC-163): the customer chooses cash on receipt or a deposit paid straight to the kitchen's approved account,
+ * sees the deposit, remainder, recipient and deadline from the server quote, and can only say the deposit was sent.
+ */
+describe("MB-053: direct deposit checkout and honest payment status", () => {
+  const recipient = { method: "INSTAPAY", identifier: "kitchen@instapay", name: "Kitchen K1" };
+  function setup(codEligible = true) {
+    window.localStorage.setItem("matbakhy.cart", JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "s1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"],
+      lines: [{ mealId: "m1", title: "Dish m1", quantity: 2, unitPriceMinor: 12000, maxQuantity: 5 }] }));
+    window.location.hash = "#/checkout";
+    return server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/zones": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "POST /api/v1/quotes": (_req, body) => {
+        const method = (body as { paymentMethod: string }).paymentMethod;
+        if (method === "COD" && !codEligible) {
+          return { status: 422, body: { code: "VALIDATION_FAILED", fieldErrors: [{ field: "paymentMethod", code: "COD_NOT_ELIGIBLE" }] } };
+        }
+        const payment = method === "DEPOSIT" ? { method, depositBps: 5000, deposit: egp(12000), remainder: egp(12000), recipient } : cod(24000);
+        return { status: 201, body: { quoteId: "q1", expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0),
+          total: egp(24000), payment, cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [] } };
+      },
+    });
+  }
+  const en = (minor: number) => new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+
+  it("quotes a deposit with the amount, remainder, kitchen recipient and the direct-payment note", async () => {
+    const { fetchImpl, calls } = setup();
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio", { name: "Deposit sent straight to the kitchen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Calculate total" }));
+    const terms = await screen.findByTestId("deposit-terms");
+    expect(terms.textContent).toContain(`Deposit now: ${en(12000)}`);
+    expect(terms.textContent).toContain(`Rest on receipt: ${en(12000)}`);
+    expect(terms.textContent).toContain("InstaPay: kitchen@instapay · Kitchen K1");
+    expect(terms.textContent).toContain("the platform never receives or holds the money");
+    expect(calls.find((c) => c.path === "/api/v1/quotes")?.body).toMatchObject({ paymentMethod: "DEPOSIT" });
+  });
+
+  it("explains when cash on receipt is not eligible, and a different method needs a fresh quote", async () => {
+    const { fetchImpl } = setup(false);
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Calculate total" }));
+    expect(await screen.findByText("Cash on receipt is not available for this total at this kitchen. Choose the deposit.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("radio", { name: "Deposit sent straight to the kitchen" }));
+    expect(screen.queryByText(/Cash on receipt is not available/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Calculate total" }));
+    expect(await screen.findByTestId("deposit-terms")).toBeTruthy();
+  });
+
+  it("lets the customer say the deposit was sent, then shows that the kitchen still has to confirm", async () => {
+    window.location.hash = `#/orders/${order.id}`;
+    let state = "WAITING_FOR_DEPOSIT";
+    const view = () => ({
+      ...order, version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0), total: egp(24000),
+      slot: { id: "s1", startsAt: "2026-10-13T10:00:00Z" }, acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], supportCaseIds: [], cashState: "NOT_DUE",
+      fulfillmentNote: null, dispatchReference: null, contact: null, handoverCode: null,
+      payment: { method: "DEPOSIT", state, deposit: egp(12000), remainder: egp(12000), recipient, depositExpiresAt: "2026-10-13T09:00:00Z", version: state === "WAITING_FOR_DEPOSIT" ? 0 : 1 },
+    });
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      [`GET /api/v1/orders/${order.id}`]: () => ({ status: 200, body: view() }),
+      [`POST /api/v1/orders/${order.id}/payment/transfer-report`]: () => {
+        state = "CUSTOMER_TRANSFER_REPORTED";
+        return { status: 200, body: view().payment };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const status = await screen.findByTestId("payment-status");
+    expect(status.textContent).toContain("Waiting for your deposit");
+    fireEvent.change(within(status).getByRole("textbox", { name: "Transfer reference (optional)" }), { target: { value: " IP-123 " } });
+    fireEvent.click(within(status).getByRole("button", { name: "I sent the deposit" }));
+    await waitFor(() => expect(screen.getByTestId("payment-status").textContent).toContain("You reported the transfer; waiting for the kitchen to confirm"));
+    expect(screen.getByTestId("payment-status").textContent).toContain("Preparation starts only after the kitchen confirms");
+    expect(screen.queryByRole("button", { name: "I sent the deposit" })).toBeNull();
+    expect(calls.find((c) => c.path.endsWith("/payment/transfer-report"))?.body).toEqual({ reference: "IP-123" });
+    expect(screen.getByTestId("payment-status").textContent).not.toMatch(/bank (verified|confirmed)/i);
   });
 });

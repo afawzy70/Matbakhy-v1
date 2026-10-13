@@ -8,7 +8,7 @@ type Method = Schemas["PaymentRecipient"]["method"];
 const METHODS: Method[] = ["INSTAPAY", "MOBILE_WALLET", "BANK_TRANSFER"];
 
 /**
- * MB-052 (D16): the kitchen's payment terms. Customers pay a deposit directly to the kitchen's own account; Matbakhy
+ * MB-052 (D16): the kitchen's payment terms. Customers pay a deposit directly to the kitchen's own account; the platform
  * never holds the money. A new or changed account is offered to customers only after staff approve it.
  */
 export function PaymentSettings({ ctx }: { ctx: Ctx }) {

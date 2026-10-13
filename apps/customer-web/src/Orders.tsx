@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatMoney, formatTime, newIdempotencyKey } from "./api";
+import { PaymentStatus } from "./Payment";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 export function OrderList({ ctx }: { ctx: Ctx }) {
@@ -55,6 +56,7 @@ export function OrderDetail({ ctx, id }: { ctx: Ctx; id: string }) {
           <p>
             {t.total}: <strong>{formatMoney(o.total.amountMinor, locale)}</strong> · {formatTime(o.slot.startsAt, locale)}
           </p>
+          <PaymentStatus ctx={ctx} orderId={o.id} payment={o.payment} refresh={reload} />
           {o.handoverCode ? (
             <p className="notice handover">
               {t.handoverCode}: <strong dir="ltr">{o.handoverCode}</strong>
