@@ -241,15 +241,24 @@ fieldset {
   color: var(--mb-color-danger);
 }
 
+/* QA repair MBQA-006: on a narrow screen the label column shrinks and wraps its words; the value column keeps at least
+   one whole amount (currency and digits are joined by a no-break space), instead of a 10 px column of digits. */
 .summary {
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: minmax(0, max-content) 1fr;
   gap: var(--mb-space-xs) var(--mb-space-lg);
   font-variant-numeric: tabular-nums;
 }
 
 .summary dd {
   margin: 0;
+}
+
+/* Amounts and order numbers are never broken inside a token (body allows breaking anywhere for long words); a table
+   that no longer fits scrolls inside its focusable region, keeping each value under its header. */
+.summary dd,
+td {
+  overflow-wrap: normal;
 }
 
 .table-wrap {

@@ -129,6 +129,9 @@ test("keyboard-only customer and cook journeys with visible focus and focus rest
   await tabTo(cook, (e) => e.tag === "BUTTON" && e.text === t.tabs.statement, "statement tab");
   await cook.keyboard.press("Enter");
   await expect(cook.getByRole("button", { name: t.tabs.statement })).toHaveAttribute("aria-current", "page");
-  await expect(cook.getByText(t.statementNote)).toBeVisible();
+  // MB-050 (D10): the launch policy has no platform commission, so the statement says so instead of the commission note.
+  await expect(cook.getByText(t.statementNoteNoCommission)).toBeVisible();
+  await expect(cook.getByText(t.noCommission)).toBeVisible();
+  await expect(cook.getByText(t.statementNote)).toHaveCount(0);
   await cookContext.close();
 });

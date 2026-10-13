@@ -222,7 +222,10 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await cook.getByRole("button", { name: t.tabs.statement }).click();
   await expect(cook.getByRole("cell", { name: pickup.number })).toBeVisible();
   await expect(cook.getByRole("cell", { name: delivery.number })).toBeVisible();
-  await expect(cook.getByText(t.statementNote)).toBeVisible();
+  // MB-050 (D10): the launch policy has no platform commission, so the statement says so instead of the commission note.
+  await expect(cook.getByText(t.statementNoteNoCommission)).toBeVisible();
+  await expect(cook.getByText(t.noCommission)).toBeVisible();
+  await expect(cook.getByText(t.statementNote)).toHaveCount(0);
   await axe(cook, "cook statement");
 
   // ---- pause stops new sales; resume restores them ----

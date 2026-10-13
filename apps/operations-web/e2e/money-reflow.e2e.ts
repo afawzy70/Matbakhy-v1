@@ -23,7 +23,7 @@ async function idpLogin(page: Page, user: string) {
 /** Each formatted amount (EGP + no-break space + digits, or Arabic digits + no-break space + ج.م.) and the lines it spans. */
 async function moneyTokens(page: Page): Promise<{ text: string; lines: number }[]> {
   return page.evaluate(() => {
-    const re = /EGP [\d,]+\.\d{2}|[٠-٩٬]+٫[٠-٩]{2} ج\.م\./g;
+    const re = /EGP\u00a0[\d,]+\.\d{2}|[٠-٩٬]+٫[٠-٩]{2}\u00a0ج\.م\./g;
     const out: { text: string; lines: number }[] = [];
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {

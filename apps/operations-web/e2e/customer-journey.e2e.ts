@@ -102,7 +102,8 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.getByLabel(c.phone).last().fill("+201005556667");
   await page.getByLabel(c.zone).last().selectOption({ label: "منطقة تجريبية أ" });
   await page.getByRole("button", { name: c.saveAddress }).click();
-  await page.getByRole("radio").first().check();
+  // The saved address, not the first radio on the page: the MB-053 payment choice is a radio group too.
+  await page.getByRole("group", { name: c.address }).getByRole("radio").first().check();
   await page.getByRole("button", { name: c.getQuote }).click();
   await expect(page.getByText(c.total, { exact: true })).toBeVisible();
   await shot(page, "checkout-quote");
