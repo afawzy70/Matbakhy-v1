@@ -27,3 +27,9 @@ OWNER_FEEDBACK:
 ```text
 Record the unavailable device/runner/account/provider as a specific BLOCKED check with required setup, owner and dependent stories. Do not invent credentials, disable certificate/security checks, spend money or fake platform verification. Complete all unaffected implementation, tests, documentation and reviewable artifacts, then give the exact remaining setup and resume command/action.
 ```
+
+## Incorporate 2026-10-13 owner decisions without restarting execution
+
+```text
+Continue MATBAKHY_MVP from the existing working branch and verified checkpoint. Safely fetch/reconcile the latest main branch without discarding uncommitted work. Read docs/delivery/07-owner-decisions-implementation-sequence.md, docs/strategy/mvp-direct-deposit-payment.md, docs/strategy/free-core-sponsored-discovery.md and docs/product/01-context-and-decisions.md. Preserve current in-flight work; record a requirements-to-stories-to-tests change matrix and align machine-readable decision/backlog/scenario entries at the next safe boundary. MVP: 0% platform commission and no platform service fee or ads; eligible COD plus manual direct-to-kitchen deposit, kitchen-reported acknowledgement, separate kitchen acceptance, immutable quote, dispute/refund paths; privacy-safe organic growth metrics. No billing/paid boosts, AI Concierge implementation or automated payment custody/gateway. Continue dependency-ordered stories, verify and checkpoint each. Block only live monetary features pending required Egyptian legal/provider/food licensing review. Do not mark not-run tests PASS. Report concise Egyptian Arabic progress to owner.
+```
