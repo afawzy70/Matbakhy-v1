@@ -13,6 +13,7 @@ import com.matbakhy.app.security.TestLogins;
 import com.matbakhy.app.support.IntegrationTest;
 import com.matbakhy.app.support.TestCommerce;
 import com.matbakhy.app.support.TestKitchens;
+import com.matbakhy.finance.internal.LedgerService;
 import com.matbakhy.identity.internal.AccountErasureService;
 import java.time.Clock;
 import java.util.Map;
@@ -48,6 +49,7 @@ class AccountErasureIntegrationTest {
     @Autowired JsonMapper json;
     @Autowired Clock clock;
     @Autowired AccountErasureService erasure;
+    @Autowired LedgerService ledger;
 
     TestCommerce fx;
     String customerSubject;
@@ -213,6 +215,44 @@ class AccountErasureIntegrationTest {
         assertThatThrownBy(() -> jdbc.update("UPDATE payment_event SET reference = NULL WHERE order_id = ? AND actor_type = 'COOK'", order))
                 .as("only a customer's reference may be erased").hasMessageContaining("append-only");
         assertThatThrownBy(() -> jdbc.update("DELETE FROM payment_event WHERE order_id = ?", order)).hasMessageContaining("append-only");
+    }
+
+    private void cookAction(UUID order, String action, String extra) throws Exception {
+        long v = jdbc.queryForObject("SELECT version FROM customer_order WHERE id = ?", Long.class, order);
+        ok(call(post("/api/v1/cook/orders/" + order + "/" + action).header("Idempotency-Key", "era-" + UUID.randomUUID())
+                .content("{\"expectedVersion\":" + v + extra + "}"), as(cookSubject)), 200);
+    }
+
+    /** TC-055 "balanced finance remains": a completed order's ledger (synthetic 10% commission fixture) is untouched by erasure. */
+    @Test
+    void erasure_keeps_the_ledger_of_a_completed_order_balanced_and_unchanged() throws Exception {
+        AccountAuthentication me = as(customerSubject);
+        UUID order = placeOrder(me);
+        cookAction(order, "accept", "");
+        cookAction(order, "prepare", "");
+        cookAction(order, "ready", "");
+        cookAction(order, "dispatch", ",\"deliveryReference\":\"Synthetic rider\"");
+        cookAction(order, "handover", ",\"code\":\"" + ok(call(get("/api/v1/orders/" + order), me), 200).get("handoverCode").asString() + "\"");
+        UUID completed = jdbc.queryForObject("SELECT id FROM order_event WHERE order_id = ? AND to_state = 'COMPLETED'", UUID.class, order);
+        ledger.postCommission(completed, order);
+        String ledgerSql = """
+                SELECT string_agg(e.account || ':' || e.direction || ':' || e.amount_minor, ',' ORDER BY e.account, e.direction)
+                FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id WHERE g.order_id = ?""";
+        String before = jdbc.queryForObject(ledgerSql, String.class, order);
+        assertThat(before).as("a commission group was posted").isNotNull();
+
+        ok(call(post("/api/v1/me/deletion-requests").content("{\"confirm\":true,\"policyVersion\":\"retention-policy-draft\"}"), me), 200);
+        jdbc.update("UPDATE deletion_request SET requested_at = now() - interval '15 days' WHERE user_id = ?", customer);
+        assertThat(erasure.eraseDue().erased()).isEqualTo(1);
+
+        assertThat(jdbc.queryForObject(ledgerSql, String.class, order)).as("ledger entries unchanged").isEqualTo(before);
+        assertThat(jdbc.queryForObject("""
+                SELECT count(*) FROM ledger_group g WHERE g.order_id = ? AND
+                  (SELECT coalesce(sum(CASE WHEN e.direction = 'DEBIT' THEN e.amount_minor ELSE -e.amount_minor END), 0)
+                   FROM ledger_entry e WHERE e.group_id = g.id) <> 0""", Integer.class, order)).as("every group still balances").isZero();
+        assertThat(jdbc.queryForObject("SELECT state || '|' || total_minor FROM customer_order WHERE id = ?", String.class, order))
+                .startsWith("COMPLETED|");
+        assertThat(jdbc.queryForObject("SELECT contact_snapshot::text FROM customer_order WHERE id = ?", String.class, order)).isEqualTo("{\"erased\": true}");
     }
 
     @Test
