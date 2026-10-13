@@ -1893,7 +1893,7 @@
       "id": "MB-053",
       "phase": "P07",
       "title": "Deposit checkout and payment status on web, Android and iOS (D16)",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-051",

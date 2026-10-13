@@ -2,8 +2,8 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-13 ~13:30 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
-- Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge. GitHub reports the PR as conflicting with `main`. It is not merged or rebased (draft; owner decision).
+- Observed: 2026-10-13 ~14:50 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
+- Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge. The owner's `main` commits of 11:05–11:59 were merged into the branch at `39856f6` (no rebase, no force-push), which cleared the conflict. The PR is not merged (draft).
 - **New QA candidate E (immutable): `bc305c642442f1bdeaf0f1c92f30bc9976dcddc5`** ([handoff](../quality/09-qa-candidate-e-pricing-history.md)).
   - Scope: D13 informed price reconfirmation, D14 kitchen price history, the MB-031 token-refresh fix, and MB-039 local controls.
   - Six local checks PASS ([evidence](../../verification/runs/20261013-CANDIDATE-E/evidence.json)).
@@ -12,7 +12,7 @@ Implementation-agent report (self-reported, not an independent review certificat
     - The workflow concluded failure in the new MB-033 dynamic-text phase (harness, plus an iOS overflow; fixed after the candidate).
   - Failed attempts, kept as records: C at `31025fc` (secret-scan false positive) and D at `cc52fa4` (brand guard; native sign-in).
 - **Previous candidate `4555f599411da9683453bee209559c8d1f11cded`** stays valid for its scope. MBQA-003/004/005 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST. No newer independent QA report.
-- **Owner decisions today:** D13 (changed prices need informed reconfirmation; RQ-004 decided), D14 (kitchen price history, MB-048), D15 (execution window).
+- **Owner decisions today:** D13 (changed prices need informed reconfirmation; RQ-004 decided), D14 (kitchen price history, MB-048), D15 (execution window). From the owner's `main` commits: D10 updated (zero commission, no customer platform fee, no paid ads), D16 (MVP payment = eligible cash on receipt plus a deposit sent directly to the kitchen, kitchen-reported, never "bank verified"; live money blocked by legal/provider gates), D17 (staged sequence, [change matrix](../delivery/08-change-matrix-2026-10-13.md)).
 - **Stories:**
   - **MB-048 DONE** (TC-153) and **MB-049 DONE** (TC-154 web/Android/iOS, TC-155, TC-156), self-review at candidate E.
   - **MB-031** stays DONE. A defect was found today (no token refresh: sign-out about 5 minutes after sign-in, and the basket cleared). Fixed red first; confirmed natively in run 39.
@@ -24,6 +24,11 @@ Implementation-agent report (self-reported, not an independent review certificat
     - local log, metrics and alert stack rehearsed;
     - runbook rehearsal ([07](../operations/07-audit-and-log-readiness.md)).
     - AUD-01/LOG-01/OPS-01..03 deployed: NOT_RUN (MB-040).
+  - **MB-050 DONE** (TC-157): launch policy 0% commission; server and database refuse non-zero outside synthetic fixtures; screens show no platform commission.
+  - **MB-051 DONE** (TC-158/159/160): deposit terms in quotes, immutable payment snapshot, payment state separate from the order, no preparation before the kitchen reports receipt.
+  - **MB-052** (TC-161/162): staff-approved recipients (recent MFA), not-received and wrong-amount reports, disputes in the finance queue, refund obligation and refund report; cook and finance screens. Evidence run at `49a55f1` in progress. Follow-ups: automatic support case and customer notification for disputes and refund obligations.
+  - **MB-053 IN_PROGRESS** (TC-163): web and native deposit choice, terms and honest status with component tests (mutation-checked); native deposit phase (Android and iOS) written, waiting for its CI run.
+  - MB-054 (P08) not started. Live money: not approved (D16 gates).
   - MB-029 BLOCKED (BLK-003); MB-030 waits on MB-029.
 - **Secret scan:** the worktree history-scan correction from the morning stands. Fail-on-zero is kept. Narrow fingerprint exceptions: 20 QA-branch nonces plus 1 runbook command, each reviewed.
 - **Q1:** the commercial limit is O04; 10 is the synthetic policy only.
@@ -41,6 +46,10 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-053 Deposit checkout and honest status on web, Android and iOS (D16) | IN_PROGRESS | Web `6d5d2d0`, native `6611e69`, native deposit phase `49a55f1`; component tests PASS; native run pending |
+| MB-052 Kitchen acknowledgement, disputes and refunds (D16) | IN_PROGRESS → evidence run at `49a55f1` | PaymentReconciliationIntegrationTest 3/3; ops-web MB-052 tests |
+| MB-051 Deposit quote, snapshot and payment states (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-051/evidence.json) at `61d8dd5` |
+| MB-050 Zero commission at launch (D10) | DONE (self-review) | [run](../../verification/runs/20261013-MB-050/evidence.json) |
 | MB-049 Informed reconfirmation of changed prices (D13) | DONE (self-review) | [run](../../verification/runs/20261013-MB-049/evidence.json) at `bc305c6`: TC-154 web, Android emulator, iOS simulator; TC-155/156 on PostgreSQL |
 | MB-048 Kitchen meal price history (D14) | DONE (self-review) | [run](../../verification/runs/20261013-MB-048/evidence.json) at `bc305c6`: TC-153 |
 | MB-033 Implement native lifecycle push and accessibility | IN_PROGRESS | Deep links (warm/cold), foreground refetch, one recovery check at a time, session-read retry, native delivery and Q1 regression: Android emulator run 33 at `a8132aa` PASS; iOS simulator run 32 at `e3ba61a` PASS (phases D/E), run 34 at `f5d2ba0` PASS on both platforms incl. deep links ([record](../../verification/runs/20261012-MB-033-FOLLOWUP/README.md)). Push (O07), screen readers (BLK-003) and physical devices (BLK-004) not done. 2026-10-13: native largest-text phases and notification permission added; verification in progress (run 40) |
