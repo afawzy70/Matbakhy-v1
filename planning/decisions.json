@@ -230,6 +230,36 @@
       "required_before": "P06",
       "approval_reference": "Owner session prompt received 2026-10-12 06:21 Asia/Kuwait (MVP decisions 1 and 2)",
       "build_with_default": false
+    },
+    {
+      "id": "D13",
+      "topic": "Price changes before an order is placed (RQ-004)",
+      "status": "ACCEPTED",
+      "value": "A displayed price or unexpired quote does not guarantee the old price. The server revalidates at placement; a stale quote is refused (409 PRICE_CHANGED), consumes no stock and creates no order or obligation. The client obtains a fresh server quote, shows the previous and new affected prices and totals with accurate attribution (kitchen meal price vs delivery fee, tax or policy), and requires an explicit customer acceptance before placing; never a silent charge or silent resubmission. After an order is committed, its item prices, fees, total and policy snapshots are immutable. Concurrent price update and placement are serialized; a committed order with a lost response is recovered at its original price.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
+    },
+    {
+      "id": "D14",
+      "topic": "Kitchen meal price history",
+      "status": "ACCEPTED",
+      "value": "Approved increment: a simple price-history view in the kitchen meal management showing the active price and previous actual price changes with Africa/Cairo date/time and EGP formatting, derived from immutable meal revisions; out of scope: scheduled or bulk pricing, promotions, analytics, editing or deleting history, rollback.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
+    },
+    {
+      "id": "D15",
+      "topic": "Daily execution window",
+      "status": "ACCEPTED",
+      "value": "The work window opens with the owner's first start/continue prompt of the day and ends at the next 00:00 Asia/Kuwait; later prompts do not extend it; informational questions do not open a window; not a rolling 24-hour session.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P00",
+      "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
     }
   ]
 }

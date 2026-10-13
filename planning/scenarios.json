@@ -2106,6 +2106,73 @@
       "evidence": [
         "verification/runs/20261012-MB-032/evidence.json"
       ]
+    },
+    {
+      "id": "TC-153",
+      "title": "Kitchen price history shows the active price and actual previous changes (D14)",
+      "rule_ids": [
+        "BR-012"
+      ],
+      "story_id": "MB-048",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "medium",
+      "given": "A published meal whose price was changed twice and whose description was edited once without a price change",
+      "when": "The owning cook opens its price history; another cook requests the same history",
+      "then": "The active price equals the current meal price; two previous prices are listed newest first with Africa/Cairo times; the description-only edit adds no entry; the other cook gets not found",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-154",
+      "title": "Changed prices need informed customer reconfirmation before placement (D13)",
+      "rule_ids": [
+        "BR-019",
+        "BR-020"
+      ],
+      "story_id": "MB-049",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "A customer holds an unexpired quote and the kitchen raises or lowers a meal price, or the delivery fee changes",
+      "when": "The customer presses Place order",
+      "then": "No order is created; the customer sees the kitchen's (or the fee's) previous and new price and the new total; placing requires explicit acceptance of the fresh server quote; editing or leaving remains possible; web, Android and iOS",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-155",
+      "title": "Concurrent price update and placement are serialized (D13)",
+      "rule_ids": [
+        "BR-019",
+        "BR-020"
+      ],
+      "story_id": "MB-049",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "high",
+      "given": "A price update and an order placement for the same meal run concurrently",
+      "when": "Either commits first",
+      "then": "Update first: placement refused with PRICE_CHANGED, no stock or order; placement first: order committed at its validated price and the update applies afterwards",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-156",
+      "title": "Committed orders keep their prices; lost responses recover at the original price (D13)",
+      "rule_ids": [
+        "BR-012",
+        "BR-020"
+      ],
+      "story_id": "MB-049",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "high",
+      "given": "An order committed but its response was lost, then the meal price changed",
+      "when": "The customer recovers the order and later orders are priced",
+      "then": "The same single order is returned at its original item prices, total and commission; no second order; its financial records are unchanged",
+      "status": "NOT_RUN",
+      "evidence": []
     }
   ]
 }

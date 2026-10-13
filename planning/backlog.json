@@ -1709,6 +1709,74 @@
       "evidence": [],
       "review_status": "NOT_RUN",
       "completion_note": null
+    },
+    {
+      "id": "MB-048",
+      "phase": "P07",
+      "title": "Show kitchen meal price history (D14)",
+      "status": "IN_PROGRESS",
+      "priority": "P1",
+      "depends_on": [
+        "MB-014",
+        "MB-022"
+      ],
+      "implementation_steps": [
+        "Owner-scoped price-history read derived from immutable meal revisions (no new store)",
+        "Kitchen meal management: active price label and previous changes with Africa/Cairo time and EGP",
+        "Explain that new prices affect only orders not yet placed"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web",
+        "contracts"
+      ],
+      "acceptance": [
+        "The active price is labelled and equals the authoritative current meal price; previous actual price changes are listed newest first with their saved time (Africa/Cairo, EGP); edits that did not change the price add no entry; no fabricated dates or prices",
+        "Another kitchen's meal history is not found; no staff notes or personal data are exposed; history cannot be edited or deleted (out of scope: scheduled or bulk pricing, promotions, analytics, rollback)"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-153"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": "Approved increment: Owner decision D13/D14 (session prompt 2026-10-13 09:47 Asia/Kuwait)"
+    },
+    {
+      "id": "MB-049",
+      "phase": "P07",
+      "title": "Informed reconfirmation of changed prices before placement (D13, RQ-004)",
+      "status": "IN_PROGRESS",
+      "priority": "P0",
+      "depends_on": [
+        "MB-017",
+        "MB-018",
+        "MB-027",
+        "MB-032"
+      ],
+      "implementation_steps": [
+        "Serialize concurrent price/fee/policy updates and placement (share locks during revalidation)",
+        "Web and native: on PRICE_CHANGED re-quote, show previous and new affected prices and totals with accurate attribution, require explicit acceptance before placing",
+        "Recover a committed order with a lost response at its original price"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/customer-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "A stale quote is refused at placement with a recoverable reason, consumes no stock and creates no order or obligation; the customer sees the previous and new affected prices and total attributed to the kitchen only for meal prices, and must explicitly accept the fresh quote before placing; editing the basket or leaving stays possible; a refresh failure or second change requires review again",
+        "Concurrent update and placement are serialized (update first: re-quote required; placement first: order kept at its committed price); a committed order with a lost response is recovered at its original price without a second order; committed orders and their financial calculations never change after later price changes; verified on web, Android emulator and iOS simulator"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-154",
+        "TC-155",
+        "TC-156"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": "Owner decision: Owner decision D13/D14 (session prompt 2026-10-13 09:47 Asia/Kuwait)"
     }
   ]
 }

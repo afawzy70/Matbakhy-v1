@@ -1,6 +1,6 @@
 # RQ-004: an unexpired quote after a fee or policy change
 
-Raised by independent QA (`qa/independent-cross-role-4eaee3a-20261012`, evidence `f76664c`, case S-CONFIG-QUOTES, BLOCKED on the oracle). Recorded 2026-10-12 by the implementation agent. This is analysis, not an owner decision.
+Raised by independent QA (`qa/independent-cross-role-4eaee3a-20261012`, evidence `f76664c`, case S-CONFIG-QUOTES, BLOCKED on the oracle). Recorded 2026-10-12 by the implementation agent. **Decided by the owner on 2026-10-13 (decision D13, session prompt 09:47 Asia/Kuwait)**; the analysis below is kept as history.
 
 ## Observed behavior (QA, at `4eaee3a`; unchanged at the current candidate)
 
@@ -34,12 +34,12 @@ No pricing rule changed.
 - **What the customer sees:** the old quote, with its old total, stays on screen until they press Place order; it can therefore show a total the server will no longer accept. At placement the server revalidates and refuses it (409 `PRICE_CHANGED`, reason `TOTAL_CHANGED` or `POLICY_CHANGED`); no order is created and placed orders keep their snapshots. The web and native clients then remove the quote, show "The price changed. Calculate the total again." and require a new quote and a fresh terms acceptance; the new total is never accepted silently. *(Corrected 2026-10-13: an earlier version said the screen never presents a total the server would not accept, which was wrong. Client-level tests of this path do not exist yet; server tests do: QuoteIntegrationTest, OrderPlacementIntegrationTest.)*
 - **The cost:** one extra step when a change lands during the 5-minute quote window.
 
-## Owner question (confirmation only; work continues)
+## Owner decision D13 (2026-10-13) — replaces the open question
 
-> Confirm that when a fee, rate or zone changes, a customer's unplaced quote (still within its 5 minutes) must be refused and recalculated, rather than honored at the old price.
+The owner confirmed refusal and re-quotation, and added the customer experience:
+- before an order is created, a displayed price or unexpired quote does not guarantee the old price; the server revalidates at placement;
+- the customer is told what changed (the kitchen, only when a kitchen-managed meal price changed; otherwise the delivery fee, tax or policy component that actually changed), sees the previous and new affected prices and the new total from a fresh server quote, and must explicitly accept it before placing;
+- no silent charge, no silent resubmission, and the original Place order click is never acceptance of an unseen price; the basket and fulfilment details stay, and the customer can edit or leave;
+- after an order is committed its snapshots never change; concurrent updates and placements are serialized; a committed order with a lost response is recovered at its original price.
 
-**Status (2026-10-13):** owner confirmation **not given**. Current behavior is unchanged and follows the documented requirements.
-
-**Recommendation:** confirm. It matches TC-020, TC-042 and the contract, and it never charges a total the current policy does not support.
-
-**The alternative:** honor unexpired quotes at their snapshot. That would need a rule change (BR-020/BR-042), new tests, and a decision on who absorbs the difference.
+Implementation and verification: backlog MB-049, scenarios TC-154–TC-156. No confirmation request remains open.
