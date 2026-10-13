@@ -21,6 +21,8 @@ try:
   apk=Path('apps/customer-mobile/android/app/build/outputs/apk/release/app-release.apk')
   record['artifact']={'file':str(apk),'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()}
   record['device']={'kind':'emulator','os':subprocess.check_output(['adb','shell','getprop','ro.build.version.release'],text=True).strip(),'sdk':subprocess.check_output(['adb','shell','getprop','ro.build.version.sdk'],text=True).strip()}
+  shots=list((Path(os.environ['RUNNER_TEMP'])/'mb032-android').glob('*iqa-arabic-account.png'))
+  if shots:shutil.copy(shots[0],out/'android-arabic-account.png')
  else:
   app=next(Path('apps/customer-mobile/ios/build-release/Build/Products').glob('*/*.app'))
   info=plistlib.loads((app/'Info.plist').read_bytes());exe=app/info['CFBundleExecutable']
@@ -52,6 +54,9 @@ try:
  r=subprocess.run(prefix+['-tA','-v','ON_ERROR_STOP=1','-c',sql],capture_output=True,text=True,timeout=30)
  if r.returncode:raise RuntimeError('Database correlation command unavailable')
  data=json.loads(r.stdout.strip());record['database']=data
+ proof_sql="SELECT json_build_object('ownCases',(SELECT coalesce(json_agg(json_build_object('reference',c.reference,'orderId',c.order_id,'state',c.state,'category',c.category)),'[]'::json) FROM support_case c JOIN app_user u ON u.id=c.customer_id WHERE u.display_name LIKE '%SyntheticA%'),'publicFixtureMessages',(SELECT count(*) FROM case_message m JOIN support_case c ON c.id=m.case_id WHERE c.reference='CS-DA877001' AND m.visibility='PUBLIC'),'cancelledDeliveryAllocations',(SELECT count(*) FROM stock_allocation a JOIN customer_order o ON o.id=a.order_id JOIN app_user u ON u.id=o.customer_id WHERE u.display_name LIKE '%SyntheticA%' AND o.fulfillment_mode='DELIVERY' AND o.state='CANCELLED' AND a.state='RELEASED'),'cancelledDeliveryEvents',(SELECT count(*) FROM order_event e JOIN customer_order o ON o.id=e.order_id JOIN app_user u ON u.id=o.customer_id WHERE u.display_name LIKE '%SyntheticA%' AND o.fulfillment_mode='DELIVERY' AND e.to_state='CANCELLED'))"
+ proof=subprocess.check_output(prefix+['-tA','-v','ON_ERROR_STOP=1','-c',proof_sql],text=True,timeout=30)
+ record['trustInvariants']=json.loads(proof.strip())
  orders=data['orders']
  pickup=[o for o in orders if o['slotId']=='00000000-0000-4000-8000-00000000a052']
  delivery=[o for o in orders if o['slotId']=='00000000-0000-4000-8000-00000000a051']

@@ -110,7 +110,36 @@ echo "IQA-LOCALE verified AR and EN account switching"
 '''
 s+=r'''
 
-echo "== IQA native support public reply"
+echo "== IQA independent native customer trust prerequisites"
+launch
+tap 'resource-id="tab-account"' 90
+# Establish a genuinely fresh same-customer session, retaining the configured300s access policy.
+if wait_for 'content-desc="Sign out"|text="Sign out"' 10 >/dev/null; then tap 'content-desc="Sign out"|text="Sign out"'; fi
+tap 'content-desc="Sign in"|text="Sign in"' 60
+pos=$(wait_for 'resource-id="username"|hint="Username or email"|text="Username or email"' 90) || fail "real sign-in username unavailable"
+adb shell input tap $pos; adb shell input text "$CUSTOMER"
+pos=$(wait_for 'resource-id="password"|hint="Password"|text="Password"' 30) || fail "real password field unavailable"
+adb shell input tap $pos; adb shell input text "$USER_PASSWORD"
+tap 'resource-id="kc-login"|text="Sign In"'
+wait_for 'text="Signed in as[^\"]*"' 90 >/dev/null || fail "active same-customer session not established"
+echo "IQA-SUPPORT-FRESH-AUTH established without policy change"
+adb shell am start -W -a android.intent.action.VIEW -d "matbakhy-dev://orders/$DID" "$PKG" >/dev/null
+wait_for "text=\\"$DNUMBER\\"" 60 >/dev/null || fail "own delivery order missing"
+tap_scrolled 'content-desc="Cancel order"|text="Cancel order"'
+wait_scrolled 'text="Cancelled"' 60 || fail "customer cancellation not visible"
+absent 'content-desc="Cancel order"|text="Cancel order"'
+echo "IQA-CUSTOMER-CANCEL verified $DNUMBER"
+launch
+tap 'resource-id="tab-account"' 90
+tap_scrolled 'content-desc="Support"|text="Support"'
+tap_scrolled "content-desc=\\"Order: $DNUMBER\\"|text=\\"Order: $DNUMBER\\""
+tap_scrolled 'content-desc="Describe the problem"'
+adb shell input text 'Independent%snative%ssynthetic%ssupport%screation'
+wait_for 'text="Independent native synthetic support creation"' 30 >/dev/null || fail "intended description not entered"
+adb shell input keyevent 4
+tap_scrolled 'content-desc="Send"|text="Send"'
+wait_scrolled 'text="Case sent:[^\"]*"' 60 || fail "native support creation not acknowledged"
+echo "IQA-SUPPORT-CREATE verified real UI receipt"
 curl -fsS http://localhost:9099/seed-case >/dev/null
 launch
 tap 'resource-id="tab-account"' 90
