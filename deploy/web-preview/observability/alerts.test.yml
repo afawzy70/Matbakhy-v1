@@ -49,7 +49,7 @@ tests:
         exp_alerts: []
       - eval_time: 26h
         alertname: BackupStale
-        exp_alerts: [{exp_labels: {severity: incident, job: node}, exp_annotations: {summary: "No successful database backup in 24 hours"}}]
+        exp_alerts: [{exp_labels: {severity: incident, job: node}, exp_annotations: {summary: "No verified database backup in 24 hours"}}]
   - interval: 1m
     input_series:
       - series: 'up{job="node"}'
@@ -58,7 +58,7 @@ tests:
       # No backup has ever been recorded: the metric is absent, which is also stale.
       - eval_time: 6m
         alertname: BackupStale
-        exp_alerts: [{exp_labels: {severity: incident}, exp_annotations: {summary: "No successful database backup in 24 hours"}}]
+        exp_alerts: [{exp_labels: {severity: incident}, exp_annotations: {summary: "No verified database backup in 24 hours"}}]
   - interval: 1m
     input_series:
       - series: 'node_filesystem_avail_bytes{job="node",mountpoint="/",fstype="ext4"}'

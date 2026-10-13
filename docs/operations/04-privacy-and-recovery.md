@@ -48,6 +48,7 @@ Status on 2026-10-12: implemented and tested locally on PostgreSQL. The retentio
 | Backup | `PGHOST=… PGUSER=… PGDATABASE=… scripts/db-backup.sh <dir outside any Git checkout>` |
 | Restore and reconcile | `RESTORE_CONFIRM_TARGET=<new_db> scripts/db-restore.sh <file.dump> <new_db>` |
 | Reconcile only | `psql -X -At -F ' ' -f infra/db/reconcile.sql <db>` (every count must be 0) |
+| Web preview | `deploy/web-preview/deploy.sh backup` takes the dump, restores it into an empty scratch database (`matbakhy_restore_check`), reconciles it and drops the scratch database. Only then does it record the backup time that the BackupStale alert watches ("No verified database backup in 24 hours"). A failed restore leaves no record and fails the command (guarded by `scripts/test_preview_backup.py`) |
 
 **Backup output.** `db-backup.sh` writes three files:
 - a custom-format dump

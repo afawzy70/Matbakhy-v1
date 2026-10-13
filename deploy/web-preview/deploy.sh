@@ -5,7 +5,7 @@
 #   ./deploy.sh up             verify pinned images and secrets, back up the database, pull, start, wait for health
 #   ./deploy.sh seed           load the synthetic catalogue and verify the synthetic customers' phones
 #   ./deploy.sh smoke          HTTPS smoke test from the server
-#   ./deploy.sh backup         PostgreSQL dump (checksum + manifest) and an image-storage archive
+#   ./deploy.sh backup         PostgreSQL dump (checksum + manifest), verified by a restore into a scratch database, and an image-storage archive
 #   ./deploy.sh restore-db F   restore a dump into an empty database and reconcile it (scripts/db-restore.sh)
 # Nothing here builds images, creates cloud resources or changes DNS.
 set -eu
@@ -91,13 +91,26 @@ seed() {
 backup_db() {
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   compose exec -T -e PGDATABASE=matbakhy -e PGUSER=matbakhy postgres sh -s "/backups/db-$stamp" < ../../scripts/db-backup.sh
+  verify_backup "/backups/db-$stamp"
   backup_metric
 }
 
-# Only after a successful dump (set -e): the time of the last good backup, for the BackupStale alert (MB-039).
+# BR-057 / TC-057: a backup counts only after it has been restored into an empty scratch database and reconciled
+# (scripts/db-restore.sh). With set -e a failed restore stops here, so the metric below is never written for it.
+verify_backup() {
+  dump=$(compose exec -T postgres sh -c "ls $1/*.dump" | tail -1 | tr -d '\r')
+  [ -n "$dump" ] || die "no dump in $1"
+  compose exec -T postgres dropdb -U matbakhy --if-exists matbakhy_restore_check
+  compose exec -T -e PGUSER=matbakhy -e RESTORE_CONFIRM_TARGET=matbakhy_restore_check postgres \
+    sh -s "$dump" matbakhy_restore_check /reconcile.sql < ../../scripts/db-restore.sh
+  compose exec -T postgres dropdb -U matbakhy matbakhy_restore_check
+  echo "backup verified: $dump restored and reconciled"
+}
+
+# Only after a verified backup (set -e): the time of the last good backup, for the BackupStale alert (MB-039).
 backup_metric() {
   mkdir -p "$BACKUP_DIR/metrics"
-  printf '# HELP matbakhy_backup_last_success_timestamp_seconds Last successful database backup (deploy.sh).\n# TYPE matbakhy_backup_last_success_timestamp_seconds gauge\nmatbakhy_backup_last_success_timestamp_seconds %s\n' \
+  printf '# HELP matbakhy_backup_last_success_timestamp_seconds Last database backup restored and reconciled (deploy.sh).\n# TYPE matbakhy_backup_last_success_timestamp_seconds gauge\nmatbakhy_backup_last_success_timestamp_seconds %s\n' \
     "$(date -u +%s)" > "$BACKUP_DIR/metrics/matbakhy_backup.prom.tmp"
   mv "$BACKUP_DIR/metrics/matbakhy_backup.prom.tmp" "$BACKUP_DIR/metrics/matbakhy_backup.prom"
 }
