@@ -2198,8 +2198,10 @@
       "given": "The launch configuration and a completed cash order",
       "when": "Staff try to set a non-zero commission; the order is quoted, placed, completed, posted and shown in statements and screens",
       "then": "The change is refused; every quote, order snapshot, ledger entry and statement carries zero commission and no service fee; customer, cook and ops screens on web, Android and iOS show no platform fee",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-050/evidence.json"
+      ]
     },
     {
       "id": "TC-158",

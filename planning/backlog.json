@@ -1788,7 +1788,7 @@
       "id": "MB-050",
       "phase": "P07",
       "title": "Zero platform commission and fees at launch (D10)",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-020",
@@ -1814,9 +1814,11 @@
       "scenario_ids": [
         "TC-157"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261013-MB-050/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D10 at 07d7236 (self-review): server refuses non-zero commission; V23 database check for live policies; development policy 0%; launch order carries 0 commission from quote to ledger and statement; cook statement, ops finance and configuration say there is no platform commission; customer apps never show commission or a service fee. TC-157 PASS. Dormant commission arithmetic covered only by synthetic fixtures."
     },
     {
       "id": "MB-051",
