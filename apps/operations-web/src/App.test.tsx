@@ -377,6 +377,70 @@ describe("operations-web cook workspace", () => {
     expect(screen.getByRole("cell", { name: "MB-1002" })).toBeTruthy();
   });
 
+  it("MB-052 (D16): the cook sees the deposit and reports receipt or a problem; it is never called a bank confirmation", async () => {
+    const pay = (state: string, version = 1) => ({
+      method: "DEPOSIT", state, deposit: egp(13500), remainder: egp(13500), version, depositExpiresAt: "2026-10-11T10:25:00Z",
+      recipient: { method: "INSTAPAY", identifier: "kitchen@instapay", name: "Synthetic Kitchen" },
+    });
+    const current = { ...order("ACCEPTED", ["PREPARE", "CANCEL"], 2), payment: pay("CUSTOMER_TRANSFER_REPORTED") };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/orders": (req) => ({
+        status: 200,
+        body: { items: new URL(req.url).searchParams.get("state") === "ACCEPTED" ? [current] : [], nextCursor: null, hasMore: false },
+      }),
+      "POST /api/v1/cook/orders/o1/payment/receipt": () => ({ status: 200, body: pay("KITCHEN_RECEIPT_REPORTED", 2) }),
+      "POST /api/v1/cook/orders/o1/payment/problem": () => ({ status: 200, body: pay("DISPUTED", 2) }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الطلبات" }));
+    const card = await screen.findByRole("article", { name: "MB-1001" });
+    expect(within(card).getByText("العميل أبلغ بالتحويل")).toBeTruthy();
+    expect(within(card).getByText("kitchen@instapay")).toBeTruthy();
+    expect(within(card).getByText(/ليس تأكيدًا من البنك/)).toBeTruthy();
+    fireEvent.click(within(card).getByRole("button", { name: /وصلني العربون/ }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment/receipt"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment/receipt"))?.body).toEqual({ expectedVersion: 1, amountMinor: 13500 });
+    fireEvent.click(within(card).getByRole("button", { name: "لم يصلني" }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment/problem"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment/problem"))?.body).toEqual({ expectedVersion: 1, kind: "NOT_RECEIVED" });
+    expect(card.textContent).not.toMatch(/verified|مؤكد من البنك/i);
+  });
+
+  it("MB-052 (D16): finance staff approve an account and decide an ended order's deposit, with no way to mark money received", async () => {
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/finance/statements": () => ({ status: 404, body: { code: "NOT_FOUND" } }),
+      "GET /api/v1/ops/payment-recipients": () => ({
+        status: 200,
+        body: { items: [{ kitchenId: "k9", kitchenName: "مطبخ تجريبي", recipient: { method: "INSTAPAY", identifier: "k9@instapay", name: "Synthetic" }, version: 3 }] },
+      }),
+      "GET /api/v1/ops/payments": () => ({
+        status: 200,
+        body: { items: [{ orderId: "o7", publicNumber: "MB-1007", kitchenId: "k9", orderState: "REJECTED", state: "DISPUTED", deposit: egp(13500), lastReason: "NOT_RECEIVED", updatedAt: SERVER_NOW, version: 4 }] },
+      }),
+      "POST /api/v1/ops/kitchens/k9/payment-recipient/approval": () => ({ status: 200, body: {} }),
+      "POST /api/v1/ops/orders/o7/payment/decision": () => ({ status: 200, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByText("k9@instapay")).toBeTruthy();
+    const reasons = await screen.findAllByLabelText("السبب");
+    fireEvent.change(reasons[0] as HTMLElement, { target: { value: "name matches the approved cook" } });
+    fireEvent.click(screen.getByRole("button", { name: "موافقة على الحساب" }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment-recipient/approval"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment-recipient/approval"))?.body).toEqual({ expectedVersion: 3, reason: "name matches the approved cook" });
+
+    expect(await screen.findByText(/MB-1007/)).toBeTruthy();
+    const outcome = screen.getByLabelText("القرار") as HTMLSelectElement;
+    expect([...outcome.options].map((o) => o.value)).toEqual(["REFUND_OWED", "CLOSED_NO_FUNDS"]);
+    fireEvent.change(screen.getAllByLabelText("السبب")[1] as HTMLElement, { target: { value: "kitchen rejected after the transfer" } });
+    fireEvent.click(screen.getByRole("button", { name: "تسجيل القرار" }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment/decision"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment/decision"))?.body).toEqual({ expectedVersion: 4, outcome: "REFUND_OWED", reason: "kitchen rejected after the transfer" });
+  });
+
   it("gives a reviewer the application queue and asks for MFA step-up when a decision needs it", async () => {
     const review = {
       id: "a1",

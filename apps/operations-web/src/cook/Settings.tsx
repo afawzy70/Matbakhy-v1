@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Schemas } from "../api";
+import { PaymentSettings } from "./Payments";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 type Settings = Schemas["CookSettings"];
@@ -70,6 +71,7 @@ function SettingsForm({ ctx, settings, refresh }: { ctx: Ctx; settings: Settings
         </button>
         <ErrorLine message={error} />
       </form>
+      <PaymentSettings ctx={ctx} />
     </div>
   );
 }

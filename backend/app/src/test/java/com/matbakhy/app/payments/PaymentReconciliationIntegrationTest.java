@@ -143,6 +143,9 @@ class PaymentReconciliationIntegrationTest {
         assertThat(profile.get("recipientStatus").asString()).isEqualTo("NONE");
         assertThat(quote("DEPOSIT").getContentAsString()).contains("DEPOSIT_NOT_OFFERED");
 
+        assertThat(ok(call(get("/api/v1/ops/payment-recipients"), logins.login(financeSubject, "Finance")), 200).get("items").toString())
+                .contains(kitchen.toString(), "synthetic.kitchen@instapay");
+        assertThat(call(get("/api/v1/ops/payment-recipients"), as(cookSubject)).getStatus()).isEqualTo(403);
         assertThat(approve(as(cookSubject)).getStatus()).as("the cook cannot approve").isEqualTo(403);
         assertThat(approve(logins.login(financeSubject, "Finance")).getStatus()).as("recent MFA required").isEqualTo(403);
         JsonNode approved = ok(approve(logins.loginWithMfa(financeSubject, "Finance")), 200);
@@ -150,6 +153,8 @@ class PaymentReconciliationIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'payment.recipient_approve' AND object_id = ?",
                 Integer.class, kitchen.toString())).isEqualTo(1);
         ok(quote("DEPOSIT"), 201);
+        assertThat(ok(call(get("/api/v1/ops/payment-recipients"), logins.login(financeSubject, "Finance")), 200).get("items").toString())
+                .doesNotContain(kitchen.toString());
 
         JsonNode changed = setProfile("another.account@instapay");
         assertThat(changed.get("recipientStatus").asString()).as("a new recipient needs a new approval").isEqualTo("NONE");

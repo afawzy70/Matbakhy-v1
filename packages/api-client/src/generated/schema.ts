@@ -628,6 +628,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ops/payment-recipients": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-109: kitchen payment recipients waiting for approval (D16)
+         * @description At most 100. Approve with API-104 after checking the recipient against the approved cook.
+         */
+        get: operations["getOpsPaymentRecipients"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orders/{orderId}/cancellation-requests": {
         parameters: {
             query?: never;
@@ -2968,6 +2988,15 @@ export interface components {
             expectedVersion: number;
             reference: string;
         };
+        PendingRecipients: {
+            items: {
+                /** Format: uuid */
+                kitchenId: string;
+                kitchenName: string;
+                recipient: components["schemas"]["PaymentRecipient"];
+                version: number;
+            }[];
+        };
         /** @description No status, role, customerId or price override is accepted. */
         PlaceOrderRequest: {
             /** Format: uuid */
@@ -4686,6 +4715,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PaymentView"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getOpsPaymentRecipients: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PendingRecipients"];
                 };
             };
             "4XX": components["responses"]["Error"];

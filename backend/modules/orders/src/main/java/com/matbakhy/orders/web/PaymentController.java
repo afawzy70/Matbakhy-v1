@@ -116,4 +116,13 @@ class PaymentController {
     PaymentView refund(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID orderId, @Valid @RequestBody RefundBody body) {
         return payments.reportRefund(actor.id(), orderId, body.expectedVersion(), body.reference());
     }
+
+    record Pending(List<PaymentService.PendingRecipient> items) {
+    }
+
+    @GetMapping("/api/v1/ops/payment-recipients")
+    @PreAuthorize("hasAuthority('PERM_finance.verify')")
+    Pending pending() {
+        return new Pending(payments.pendingRecipients());
+    }
 }

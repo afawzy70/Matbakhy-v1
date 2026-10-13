@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatMoney, formatTime, newIdempotencyKey, type Schemas } from "../api";
+import { OrderPayment } from "./Payments";
 import { egpToMinor, ErrorLine, minutesLeft, Status, useMutation, useServer, type Ctx } from "./shared";
 
 type Order = Schemas["CookOrderView"];
@@ -131,6 +132,7 @@ function OrderCard({ ctx, order, refresh }: { ctx: Ctx; order: Order; refresh: (
         </p>
       ) : null}
       {order.state === "COMPLETED" ? <p className="muted">{t.cash[order.cashState] ?? order.cashState}</p> : null}
+      <OrderPayment ctx={ctx} order={order} refresh={refresh} />
 
       <div className="actions">
         {order.allowedActions.map((action) => (

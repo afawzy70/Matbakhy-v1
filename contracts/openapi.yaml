@@ -1247,6 +1247,30 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PaymentRefundReport"
+  /api/v1/ops/payment-recipients:
+    get:
+      operationId: getOpsPaymentRecipients
+      tags:
+        - ops
+      summary: "API-109: kitchen payment recipients waiting for approval (D16)"
+      description: At most 100. Approve with API-104 after checking the recipient against the approved cook.
+      x-matbakhy-id: API-109
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PendingRecipients"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
   /api/v1/orders/{orderId}/cancellation-requests:
     post:
       operationId: postOrdersCancellationRequests
@@ -6237,6 +6261,26 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+    PendingRecipients:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [kitchenId, kitchenName, recipient, version]
+            properties:
+              kitchenId: *a1
+              kitchenName:
+                type: string
+              recipient:
+                $ref: "#/components/schemas/PaymentRecipient"
+              version:
+                type: integer
+                minimum: 0
     PlaceOrderRequest:
       type: object
       additionalProperties: false

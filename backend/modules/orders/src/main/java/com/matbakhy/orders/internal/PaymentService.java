@@ -144,6 +144,21 @@ public class PaymentService {
         return profileView(kitchen);
     }
 
+    public record PendingRecipient(UUID kitchenId, String kitchenName, Recipient recipient, long version) {
+    }
+
+    /** Kitchens whose recipient waits for approval (finance.verify), oldest first. */
+    public List<PendingRecipient> pendingRecipients() {
+        return jdbc.query("""
+                SELECT kitchen_id, recipient_method, recipient_identifier, recipient_name, version FROM kitchen_payment_profile
+                WHERE recipient_status = 'NONE' AND recipient_identifier IS NOT NULL ORDER BY kitchen_id LIMIT 100""",
+                (rs, n) -> {
+                    UUID k = rs.getObject(1, UUID.class);
+                    String name = kitchens.fulfillmentContact(k).map(KitchenDirectory.FulfillmentContact::displayName).orElse("");
+                    return new PendingRecipient(k, name, new Recipient(rs.getString(2), rs.getString(3), rs.getString(4)), rs.getLong(5));
+                });
+    }
+
     /** Staff (finance.verify, recent MFA) approve the recipient after checking it against the approved cook. Audited. */
     @Transactional
     public ProfileView approveRecipient(UUID staffId, UUID kitchenId, long expectedVersion, String reason) {

@@ -974,6 +974,15 @@
       "response_type": "PaymentView",
       "contract": "Kitchen reports the refund it sent with the transfer reference (D16)",
       "implemented": true
+    },
+    {
+      "id": "API-109",
+      "method": "GET",
+      "path": "/api/v1/ops/payment-recipients",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PendingRecipients",
+      "contract": "Kitchen payment recipients waiting for staff approval (D16)",
+      "implemented": true
     }
   ]
 }

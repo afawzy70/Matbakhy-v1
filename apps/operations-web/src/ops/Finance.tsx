@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { formatMoney, hasCommission, newIdempotencyKey, type Schemas } from "../api";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "../cook/shared";
+import { PaymentsOps } from "./Payments";
 
 type Statement = Schemas["StatementPage"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,6 +28,7 @@ export function Finance({ ctx }: { ctx: Ctx }) {
         <button type="submit">{t.show}</button>
       </form>
       {kitchenId ? <KitchenFinance key={kitchenId} ctx={ctx} kitchenId={kitchenId} /> : null}
+      <PaymentsOps ctx={ctx} />
     </div>
   );
 }
