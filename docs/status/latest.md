@@ -2,7 +2,7 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-13 ~18:10 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
+- Observed: 2026-10-13 ~18:25 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge. The owner's `main` commits of 11:05–11:59 were merged into the branch at `39856f6` (no rebase, no force-push), which cleared the conflict. The PR is not merged (draft).
 - **New QA candidate E (immutable): `bc305c642442f1bdeaf0f1c92f30bc9976dcddc5`** ([handoff](../quality/09-qa-candidate-e-pricing-history.md)).
   - Scope: D13 informed price reconfirmation, D14 kitchen price history, the MB-031 token-refresh fix, and MB-039 local controls.
@@ -20,7 +20,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 - **Stories:**
   - **MB-048 DONE** (TC-153) and **MB-049 DONE** (TC-154 web/Android/iOS, TC-155, TC-156), self-review at candidate E.
   - **MB-031** stays DONE. A defect was found today (no token refresh: sign-out about 5 minutes after sign-in, and the basket cleared). Fixed red first; confirmed natively in run 39.
-  - **MB-033 IN_PROGRESS.** Native largest-text phases (English and Arabic) and notification permission (asked only on request; refusal safe; development builds only while O07 is open) are implemented. A large-text overflow fix is being verified in native run 40. Open: visual review of the screenshots, push (O07), screen readers (BLK-003), physical devices (BLK-004).
+  - **MB-033 IN_PROGRESS.** Largest text in English and Arabic passed on Android (runs 43/46/47) and iOS (run 40). TC-050 (push permission optional) PASS on both platforms ([evidence](../../verification/runs/20261013-TC-050/evidence.json)). Open: visual review of the large-text screenshots, push routing (O07), screen readers (BLK-003), physical devices (BLK-004), iOS reruns (BLK-005).
   - **MB-039 IN_PROGRESS** (local, self-review):
     - runtime DB role;
     - audit-write failure handling;
@@ -86,7 +86,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-009 Integrate identity and sessions | DONE (self-review) | [run](../../verification/runs/20261011-MB-009/evidence.json) at `44d5a55`; attempt 1 at `2edf3ef` failed the secret scan (repaired) |
 | MB-008 Local stack and CI commands | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-008/evidence.json) |
 
-31 of 46 stories DONE (MB-029 BLOCKED; MB-039 IN_PROGRESS) (a count, not a measure of effort or readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
+37 of 53 stories DONE (MB-029 BLOCKED; MB-033, MB-039 and MB-053 IN_PROGRESS; 12 TODO, all behind MB-029/MB-033 or later gates); scenarios 99 PASS, 28 NOT_RUN, 1 BLOCKED (a count, not a measure of effort or readiness; self-review, not release readiness). MB-005–MB-008 were closed only after native evidence existed and their checks were re-run at the same commit.
 
 ## Surfaces
 
