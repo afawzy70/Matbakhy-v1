@@ -345,9 +345,10 @@ MEAL='resource-id="meal-00000000-0000-4000-8000-00000000a0b1"'
 dynamic_text_pass() {
   local lang="$1" notif="$2" support="$3"
   tap 'resource-id="tab-discover"'
-  wait_for "$MEAL" 90 >/dev/null || fail "[$lang] Discover: meal not listed at large text"
+  # At the largest size only one meal card may fit; scroll to the expected one (native run 40, Arabic).
+  wait_scrolled "$MEAL" 90 || fail "[$lang] Discover: meal not listed at large text"
   shot "dt-$lang-discover"
-  tap "$MEAL"
+  tap_scrolled "$MEAL"
   tap 'resource-id="slot-0"'
   wait_scrolled 'resource-id="add-to-cart"' 30 || fail "[$lang] Meal: add to cart not reachable at large text"
   shot "dt-$lang-meal"
