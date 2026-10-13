@@ -22,4 +22,5 @@ phase 8 node qa/regression-d877a15/support-final.cjs
 phase 9 node qa/regression-d877a15/security-final.cjs
 phase 10 node qa/regression-d877a15/pricing.cjs
 phase 11 node qa/regression-d877a15/audit.cjs
+phase 12 node qa/regression-d877a15/additional.cjs
 python3 qa/regression-d877a15/validate-run.py

@@ -372,3 +372,34 @@ Automation: MANUAL / planned automation.
 
 Review: SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
 
+
+## C-FILTER — Server budget/sort and empty-state recovery
+
+Purpose: Server budget/sort and empty-state recovery. References: TC-016/017/046; D11/D12. Role customer-a/b and cook for setup; Chromiumweb/API/DB; en/ar; priorityP1.
+
+Preconditions: Baseline four published A/B meals in isolated seed.
+
+1. Open Filters,enter maximum100EGP,Show results.
+2. Sort PRICE_ASC; clear; search unique QA-NO-MATCH-877; use Clear to recover.
+
+Expected: Budget sends10000minor; results A2/A3/B1 only, sorted8025,8025,9550; empty shows actionable clear; clearing restoresfour.
+
+Invariants: server queries, no client-only filtering or hidden portion filter. Cleanup/reset: Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.
+
+Automation: qa/regression-d877a15/additional.cjs. Review SELF_REVIEWED. Questions: O04 synthetic policies not approved commercial values.
+
+## C-CONCURRENCY — Concurrent last portion and payload idempotency
+
+Purpose: Concurrent last portion and payload idempotency. References: TC-022/024/025; MB-037. Role customer-a/b and cook for setup; Chromiumweb/API/DB; en/ar; priorityP1.
+
+Preconditions: Fresh own A2slot max1/mealcap1 opened via authenticatedcook; customer-a/b distinct.
+
+1. Both customers quote the finalportion; verify0reservation.
+2. Hold test-only stock row; start both real placements; observe2lock waits; release.
+3. Verify one201,one409STOCK_CHANGED; replay winner; change payload withsame key; legallycancel.
+
+Expected: Exactlyoneorder andone meal/kitchen reservation; replay sameorder; payloadcollision409; cleanup releasesonce.
+
+Invariants: transactional all-or-nothing, oneevent/cash/allocation, no oversell. Cleanup/reset: Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.
+
+Automation: qa/regression-d877a15/additional.cjs. Review SELF_REVIEWED. Questions: O04 synthetic policies not approved commercial values.

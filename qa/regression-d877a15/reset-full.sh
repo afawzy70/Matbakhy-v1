@@ -23,4 +23,5 @@ PY
 python3 qa/regression-d877a15/setup.py
 docker compose --env-file /workspace/qa-tools/regression-d877a15/stack/.env -f infra/compose.yaml -f /workspace/qa-tools/regression-d877a15/stack/override.yaml up -d --wait --wait-timeout 300 > "/workspace/qa-tools/regression-stack-$IQA_ATTEMPT.log" 2>&1
 python3 qa/regression-d877a15/seed.py
+node qa/regression-d877a15/browser-ready.cjs
 bash qa/regression-d877a15/run-full.sh
