@@ -723,7 +723,10 @@ describe("MB-033 notification permission (provider-independent; push delivery is
     expect(stateOf({ status: "granted", granted: true, canAskAgain: true })).toBe("granted");
     expect(stateOf({ status: "undetermined", granted: false, canAskAgain: true })).toBe("undetermined");
     expect(stateOf({ status: "undetermined", granted: false, canAskAgain: false })).toBe("denied");
-    expect(stateOf({ status: "denied", granted: false, canAskAgain: true })).toBe("denied");
+    // Android 13+ before the first request: "denied" but askable.
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: true })).toBe("undetermined");
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: true }, true)).toBe("denied");
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: false })).toBe("denied");
   });
 });
 

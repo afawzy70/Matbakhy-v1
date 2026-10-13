@@ -15,30 +15,32 @@ export interface NotificationPermissions {
 
 type Status = { status: string; granted: boolean; canAskAgain: boolean };
 
-export function stateOf(s: Status): PermissionState {
+export function stateOf(s: Status, answered = false): PermissionState {
   if (s.granted || s.status === "granted") {
     return "granted";
   }
-  // Android after two refusals and iOS after one: the system will not ask again, so this is a refusal.
-  if (s.status === "denied" || !s.canAskAgain) {
+  // The system will not show its dialog again (iOS after one refusal, Android after two), or the customer has just
+  // answered it with a refusal: this is a refusal.
+  if (!s.canAskAgain || (answered && s.status === "denied")) {
     return "denied";
   }
+  // Android 13+ reports a never-asked permission as "denied" with canAskAgain: it can still be asked.
   return "undetermined";
 }
 
 /** The device implementation (expo-notifications permissions only; no token is requested or registered). */
 export function systemNotificationPermissions(): NotificationPermissions {
   const load = () => import("expo-notifications");
-  const safely = async (read: () => Promise<Status>): Promise<PermissionState> => {
+  const safely = async (read: () => Promise<Status>, answered = false): Promise<PermissionState> => {
     try {
-      return stateOf(await read());
+      return stateOf(await read(), answered);
     } catch {
       return "unavailable";
     }
   };
   return {
     get: () => safely(async () => (await load()).getPermissionsAsync()),
-    request: () => safely(async () => (await load()).requestPermissionsAsync({ ios: { allowAlert: true, allowBadge: false, allowSound: true } })),
+    request: () => safely(async () => (await load()).requestPermissionsAsync({ ios: { allowAlert: true, allowBadge: false, allowSound: true } }), true),
     openSettings: () => Linking.openSettings(),
   };
 }

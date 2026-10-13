@@ -26,13 +26,13 @@ export function AccountScreen({ navigation }: TabProps<"Account">) {
         <>
           <Body locale={locale}>{t.signedInAs(auth.profile?.displayName ?? "")}</Body>
           <Button label={t.notifications} variant="secondary" onPress={() => navigation.navigate("Notifications")} />
-          <PhoneAlerts />
           <Button label={t.support} variant="secondary" onPress={() => navigation.navigate("Support", {})} />
           <Button label={t.switchAccount} disabled={busy} variant="secondary" onPress={() => void switchAccount()} />
           <Button label={t.signOut} disabled={busy} variant="secondary" onPress={() => void endSession()} />
         </>
       ) : null}
       <Button label={t.language} variant="secondary" onPress={toggleLocale} />
+      {auth.kind === "signedIn" ? <PhoneAlerts /> : null}
     </Screen>
   );
 }

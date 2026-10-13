@@ -52,6 +52,19 @@ final class SignInRoundTripTests: XCTestCase {
         dismissKeyboard()
         guard let secret = field(secure: true, timeout: 10) else { return XCTFail("password field missing") }
         type(password + "\n", into: secret)
+        dismissSavePassword()
+    }
+
+    /// iOS may offer "Save Password?" after the provider's form is submitted; while it is up the redirect waits and the
+    /// authorization code can expire (native run 38). Dismiss it when it appears.
+    private func dismissSavePassword() {
+        for root in [app, authUI, XCUIApplication(bundleIdentifier: "com.apple.springboard")] {
+            let notNow = root.buttons["Not Now"].firstMatch
+            if notNow.waitForExistence(timeout: 4) {
+                notNow.tap()
+                return
+            }
+        }
     }
 
     /// With the software keyboard up, its form-assistant bar can cover the password field (native run 18): tap the page

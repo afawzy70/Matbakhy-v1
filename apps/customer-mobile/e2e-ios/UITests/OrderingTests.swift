@@ -100,6 +100,19 @@ final class OrderingTests: XCTestCase {
         secret.tap()
         Thread.sleep(forTimeInterval: 1.5)
         secret.typeText(password + "\n")
+        dismissSavePassword()
+    }
+
+    /// iOS may offer "Save Password?" after the provider's form is submitted; while it is up the redirect waits and the
+    /// authorization code can expire (native run 38). Dismiss it when it appears.
+    private func dismissSavePassword() {
+        for root in [app, authUI, XCUIApplication(bundleIdentifier: "com.apple.springboard")] {
+            let notNow = root.buttons["Not Now"].firstMatch
+            if notNow.waitForExistence(timeout: 4) {
+                notNow.tap()
+                return
+            }
+        }
     }
 
     func testA_ReplacementPromptAndSubmitThenKill() {
