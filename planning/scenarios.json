@@ -2139,8 +2139,10 @@
       "given": "A customer holds an unexpired quote and the kitchen raises or lowers a meal price, or the delivery fee changes",
       "when": "The customer presses Place order",
       "then": "No order is created; the customer sees the kitchen's (or the fee's) previous and new price and the new total; placing requires explicit acceptance of the fresh server quote; editing or leaving remains possible; web, Android and iOS",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-049/evidence.json"
+      ]
     },
     {
       "id": "TC-155",
@@ -2158,7 +2160,8 @@
       "then": "Update first: placement refused with PRICE_CHANGED, no stock or order; placement first: order committed at its validated price and the update applies afterwards",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+        "verification/runs/20261013-CANDIDATE-E/evidence.json",
+        "verification/runs/20261013-MB-049/evidence.json"
       ]
     },
     {
@@ -2177,7 +2180,8 @@
       "then": "The same single order is returned at its original item prices, total and commission; no second order; its financial records are unchanged",
       "status": "PASS",
       "evidence": [
-        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+        "verification/runs/20261013-CANDIDATE-E/evidence.json",
+        "verification/runs/20261013-MB-049/evidence.json"
       ]
     }
   ]

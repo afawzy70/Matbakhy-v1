@@ -1749,7 +1749,7 @@
       "id": "MB-049",
       "phase": "P07",
       "title": "Informed reconfirmation of changed prices before placement (D13, RQ-004)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-017",
@@ -1778,10 +1778,11 @@
         "TC-156"
       ],
       "evidence": [
+        "verification/runs/20261013-MB-049/evidence.json",
         "verification/runs/20261013-CANDIDATE-E/evidence.json"
       ],
-      "review_status": "NOT_RUN",
-      "completion_note": "D13 at bc305c6 (self-review): TC-155 and TC-156 PASS (candidate E backend verify); TC-154 web component tests and the real-stack browser journey PASS; Android emulator PASS (native runs 36, 37); iOS simulator phase H pending native run 39 (runs 36/37 blocked by the MB-031 token-refresh defect, fixed in c4b1598)."
+      "review_status": "PASS",
+      "completion_note": "D13 at bc305c6 = QA candidate E (self-review): TC-155/156 PASS (backend verify, real PostgreSQL); TC-154 PASS on web (component tests red first; real-stack browser journey in BROWSER-E2E), Android emulator and iOS simulator (native run 39 phase H: notice with old/new prices and totals, no order at the stale price, placed only after explicit acceptance, stored 13000|13000|1). The run 39 workflow failed later, in the MB-033 dynamic-text phase (not D13). Independent retest pending."
     }
   ]
 }

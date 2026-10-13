@@ -1,0 +1,13 @@
+
+> @matbakhy/customer-web@0.1.0 test /home/user/Matbakhy-v1-candE/apps/customer-web
+> vitest run
+
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1-candE/apps/customer-web
+
+
+ Test Files  1 passed (1)
+      Tests  41 passed (41)
+   Start at  10:07:04
+   Duration  6.88s (tests 76%, environment 11%, transform 11%, import 2%)
+

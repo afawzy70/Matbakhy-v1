@@ -34,14 +34,27 @@ Implementation-agent handoff. Every result below is self-review by the implement
 | Browser on the real stack | The cook changes a price in the price-history UI; the customer's placement is refused; the Arabic notice is shown, with no order, no overflow at 320 and 390 px and no axe violation; the order is placed at the new price after acceptance | PASS | BROWSER-E2E in the candidate run |
 | Cook web (component) | Price-history section, labels, Cairo times, change action | PASS | WORKSPACE-CLEAN-CHECKOUT |
 | Android emulator (API 35) | Native run 36 at `f5c8f50`. Quote at EGP 120.00, the price changed to 130.00 in the database, then Place. Notice "The kitchen updated the price of … EGP 120.00 to EGP 130.00." with the old and new totals. No order was created at the stale price, and Place stayed disabled until acceptance. The order was then stored as 13000\|13000\|1 | PASS | `ANDROID-NATIVE-f5c8f50.log` |
-| iOS simulator | Native runs 36 and 37: phases A–G PASS. Phase H (D13) could not run: the session expired (MB-031 defect above). Run 39 at the candidate, with the fix | see "Native results" below | `IOS-NATIVE-f5c8f50-FAIL.log`, `NATIVE-e5cfb41.log` |
+| iOS simulator | Runs 36 and 37: phase H blocked by the session-expiry defect. Run 39 at the candidate: phase H PASS | PASS | `NATIVE-bc305c6.log` |
 | Same-session lowered limit (Q1, MB-033) | Android: the same process (PID checked), limit 10 → 5 while running; reopening the cart flags the line. iOS phase G: the same running app, the cart flags the line | PASS on both (run 36) | `ANDROID-NATIVE-f5c8f50.log`, `IOS-NATIVE-f5c8f50-FAIL.log` (phase G passed; H failed) |
 
 Not covered by the implementation agent: physical devices (BLK-004), screen readers (BLK-003), and a cross-device race between a real cook and a real customer. Native price changes are applied by SQL (`e2e-native/price-change.sql`, which mirrors the server's own update), not through the cook UI.
 
 ## Native results
 
-<!-- filled from native run at e5cfb41 -->
+Native run 39 ([38375863664](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38375863664)) at the candidate:
+
+| Phase | Android emulator (API 35) | iOS simulator |
+|---|---|---|
+| Sign-in round trip (MB-031) | PASS | PASS |
+| MB-032 regression; delivery; quantity limit; deep links | PASS | PASS (phases A–F) |
+| Same-session lowered limit | PASS: same process, limit 10 → 5, the line is flagged | PASS (phase G) |
+| D13 price change (MB-049) | PASS: no order at the stale price; notice with old and new prices and totals; placed after acceptance; stored 13000\|13000\|1 | PASS (phase H) after a relaunch about 10 minutes after sign-in. The session stayed alive, which confirms the token-refresh fix natively |
+| Largest text size (MB-033) | **FAIL**: harness (Place order needs a quote first) | **FAIL**: harness, plus a real overflow: the Pickup choice ran past the screen edge |
+| Notification refusal (MB-033) | NOT_RUN (after the failure) | NOT_RUN |
+
+The workflow conclusion is therefore **failure**. Every D13, D14, regression and session check passed before the failing MB-033 phase. MB-033 is not part of this candidate's scope and stays IN_PROGRESS; its fixes come after the candidate.
+
+Evidence: `verification/runs/20261013-PRICE-CHANGE/NATIVE-bc305c6.log` and `verification/runs/20261013-MB-049/`.
 
 ## Fixtures
 
