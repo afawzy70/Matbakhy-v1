@@ -2,6 +2,7 @@
 import json
 import os
 import platform
+import hashlib,plistlib,shutil
 import subprocess
 from pathlib import Path
 
@@ -14,7 +15,39 @@ if surface=='android':prefix=['docker','compose','--env-file','infra/.env','-f',
 else:
  pg=subprocess.check_output(['brew','--prefix','postgresql@16'],text=True).strip()
  prefix=[str(Path(pg)/'bin/psql'),'-h','localhost','-U','matbakhy','-d','matbakhy']
-sql="""SELECT json_build_object('orders',(SELECT coalesce(json_agg(json_build_object('id',o.id,'publicNumber',o.public_number,'customerId',o.customer_id,'state',o.state,'totalMinor',o.total_minor,'slotId',o.slot_id)), '[]'::json) FROM customer_order o JOIN app_user u ON u.id=o.customer_id WHERE u.display_name LIKE '%SyntheticA%'), 'slotCounters',(SELECT coalesce(json_agg(json_build_object('id',s.id,'reserved',s.reserved,'allocated',s.allocated,'consumed',s.consumed)), '[]'::json) FROM cook_slot s WHERE s.id='00000000-0000-4000-8000-00000000a052'), 'mealCounters',(SELECT coalesce(json_agg(json_build_object('id',m.id,'reserved',m.reserved,'allocated',m.allocated,'consumed',m.consumed)), '[]'::json) FROM meal_slot m WHERE m.id='00000000-0000-4000-8000-00000000a062'));"""
+# Metadata is observational only; no build/UI PASS from inspection.
+try:
+ if surface=='android':
+  apk=Path('apps/customer-mobile/android/app/build/outputs/apk/release/app-release.apk')
+  record['artifact']={'file':str(apk),'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()}
+  record['device']={'kind':'emulator','os':subprocess.check_output(['adb','shell','getprop','ro.build.version.release'],text=True).strip(),'sdk':subprocess.check_output(['adb','shell','getprop','ro.build.version.sdk'],text=True).strip()}
+ else:
+  app=next(Path('apps/customer-mobile/ios/build-release/Build/Products').glob('*/*.app'))
+  info=plistlib.loads((app/'Info.plist').read_bytes());exe=app/info['CFBundleExecutable']
+  record['artifact']={'bundleId':info['CFBundleIdentifier'],'version':info['CFBundleShortVersionString'],'sha256':hashlib.sha256(exe.read_bytes()).hexdigest(),'signing':'ad-hoc simulator; no team/store certificate'}
+  devices=json.loads(subprocess.check_output(['xcrun','simctl','list','devices','booted','-j'],text=True))
+  record['device']=[{'kind':'simulator','runtime':runtime,'name':v['name']} for runtime,vs in devices['devices'].items() for v in vs if v['state']=='Booted']
+  result=Path(os.environ['RUNNER_TEMP'])/'mb032-testG_IndependentSameSessionPolicyEditAndRecovery.xcresult'
+  exported=Path(os.environ['RUNNER_TEMP'])/'iqa-account-attachments'
+  if result.exists():
+   r=subprocess.run(['xcrun','xcresulttool','export','attachments','--path',str(result),'--output-path',str(exported)],capture_output=True,text=True,timeout=30)
+   if r.returncode==0:
+    manifests=list(exported.rglob('manifest.json'))
+    def walk(v):
+     if isinstance(v,dict):
+      if any(isinstance(x,str) and 'iqa-arabic-account' in x for x in v.values()):
+       for x in v.values():
+        if isinstance(x,str) and x.endswith('.png'):
+         paths=list(exported.rglob(Path(x).name))
+         if len(paths)==1:shutil.copy(paths[0],out/'ios-arabic-account.png')
+      for x in v.values():walk(x)
+     elif isinstance(v,list):
+      for x in v:walk(x)
+    for m in manifests:walk(json.loads(m.read_text()))
+   record['accountScreenshotPreserved']=(out/'ios-arabic-account.png').exists()
+except Exception:
+ record['metadataGap']='artifact/device or selected safe attachment unavailable; not an execution PASS'
+sql="""SELECT json_build_object('orders',(SELECT coalesce(json_agg(json_build_object('id',o.id,'publicNumber',o.public_number,'customerId',o.customer_id,'state',o.state,'totalMinor',o.total_minor,'slotId',o.slot_id,'kitchenId',o.kitchen_id,'items',(SELECT json_agg(json_build_object('mealId',i.meal_id,'quantity',i.quantity,'unitPriceMinor',i.unit_price_minor)) FROM order_item i WHERE i.order_id=o.id))), '[]'::json) FROM customer_order o JOIN app_user u ON u.id=o.customer_id WHERE u.display_name LIKE '%SyntheticA%'), 'slotCounters',(SELECT coalesce(json_agg(json_build_object('id',s.id,'reserved',s.reserved,'allocated',s.allocated,'consumed',s.consumed)), '[]'::json) FROM cook_slot s WHERE s.id='00000000-0000-4000-8000-00000000a052'), 'mealCounters',(SELECT coalesce(json_agg(json_build_object('id',m.id,'reserved',m.reserved,'allocated',m.allocated,'consumed',m.consumed)), '[]'::json) FROM meal_slot m WHERE m.id='00000000-0000-4000-8000-00000000a062'));"""
 try:
  r=subprocess.run(prefix+['-tA','-v','ON_ERROR_STOP=1','-c',sql],capture_output=True,text=True,timeout=30)
  if r.returncode:raise RuntimeError('Database correlation command unavailable')
