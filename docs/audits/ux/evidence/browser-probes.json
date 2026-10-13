@@ -1,0 +1,132 @@
+{
+  "mode": "Real React UI with synthetic intercepted API, not end-to-end",
+  "source": "cc52fa4224e3163677a1215dc8f63ede2a9dbe4c",
+  "checks": [
+    {
+      "id": "filter-back",
+      "before": {
+        "value": "تجريبي",
+        "url": "http://localhost:5173/#/"
+      },
+      "after": {
+        "value": "",
+        "url": "http://localhost:5173/#/"
+      },
+      "requests": [
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST&q=%D8%AA%D8%AC%D8%B1%D9%8A%D8%A8%D9%8A",
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST",
+        "?limit=50&sort=NEWEST&q=audit"
+      ]
+    },
+    {
+      "id": "pagination",
+      "fixtureHasMore": true,
+      "fixtureNextCursor": "audit-next-page",
+      "cursorRequested": false,
+      "buttons": [
+        "English",
+        "وجبة ليا أو لينالشخص أو فردين",
+        "أكمل سفرتيصنف يكمل أكلك",
+        "أجهز عزومةلجمعة ولمة العيلة",
+        "الأكلات",
+        "المطابخ",
+        "ابحث عن طبق أو مطبخ",
+        "تصفية النتائج",
+        "الكل",
+        "أطباق رئيسية",
+        "أطباق جانبية وسلطات",
+        "شوربة",
+        "مخبوزات",
+        "حلويات",
+        "فطار",
+        "جاهز للطبخ"
+      ]
+    },
+    {
+      "id": "arabic-numerals",
+      "text": "Your area\nChoose an area\nمنطقة تدقيق\nSort results\nNewest\nLowest price\nHighest price\nMaximum price (EGP)\n\nEnter the price in numbers, e.g. 150 or 150.50\n\nShow results",
+      "submitDisabled": true
+    },
+    {
+      "id": "unknown-route",
+      "mainText": ""
+    },
+    {
+      "id": "keyboard-search",
+      "reached": true,
+      "stops": [
+        {
+          "tag": "BUTTON",
+          "role": "button",
+          "text": "A meal for me or usFor one or two p",
+          "outline": "solid",
+          "width": "3px"
+        },
+        {
+          "tag": "BUTTON",
+          "role": "button",
+          "text": "Complete my tableA dish to go with ",
+          "outline": "solid",
+          "width": "3px"
+        },
+        {
+          "tag": "BUTTON",
+          "role": "button",
+          "text": "Prepare a gatheringFor family get-t",
+          "outline": "solid",
+          "width": "3px"
+        },
+        {
+          "tag": "BUTTON",
+          "role": "button",
+          "text": "Dishes",
+          "outline": "solid",
+          "width": "3px"
+        },
+        {
+          "tag": "BUTTON",
+          "role": "button",
+          "text": "Kitchens",
+          "outline": "solid",
+          "width": "3px"
+        },
+        {
+          "tag": "INPUT",
+          "role": "search",
+          "text": "",
+          "outline": "solid",
+          "width": "3px"
+        }
+      ]
+    },
+    {
+      "id": "onboarding",
+      "text": "لا يوجد مطبخ معتمد لهذا الحساب بعد.\n\nلم تبدأ طلب الانضمام بعد.",
+      "mainInteractiveCount": 0
+    }
+  ],
+  "screens": [
+    {
+      "screen": "home",
+      "width": 390,
+      "locale": "ar",
+      "overflow": false,
+      "axe": []
+    },
+    {
+      "screen": "home",
+      "width": 1440,
+      "locale": "ar",
+      "overflow": false,
+      "axe": []
+    }
+  ],
+  "console": [],
+  "browser": "141.0.7390.37"
+}

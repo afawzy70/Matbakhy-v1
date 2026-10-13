@@ -1,0 +1,31 @@
+// Audit-only browser reproduction: real unmodified UI, synthetic intercepted API; no backend claim.
+const {createRequire}=require('node:module');
+const req=createRequire(process.cwd()+'/apps/operations-web/package.json');
+const {chromium}=req('@playwright/test'); const AxeBuilder=req('@axe-core/playwright').default;
+const fs=require('node:fs'); const path=require('node:path');
+const out=path.join(process.cwd(),'docs/audits/ux/evidence');
+const results={mode:'Real React UI with synthetic intercepted API, not end-to-end',source:'cc52fa4224e3163677a1215dc8f63ede2a9dbe4c',checks:[],screens:[],console:[]};
+const mid='22222222-2222-4222-8222-222222222222';
+const meal={id:mid,title:'طبق تدقيق تجريبي',kitchen:{id:'33333333-3333-4333-8333-333333333333',slug:'audit-kitchen',name:'مطبخ تدقيق تجريبي'},portionText:'طبق واحد',price:{amountMinor:12000,currency:'EGP'},description:'وصف تجريبي للمراجعة',ingredients:'مكونات تجريبية',allergenCodes:['UNKNOWN'],allergenStatement:'معلومات تجريبية',photo:null,nextSlots:[],availability:'AVAILABLE'};
+const pageData={items:[meal],nextCursor:'audit-next-page',hasMore:true};
+(async()=>{const browser=await chromium.launch({headless:true}); results.browser=browser.version();
+const context=await browser.newContext({viewport:{width:390,height:844}});const page=await context.newPage();let mealRequests=[];
+page.on('pageerror',e=>results.console.push(e.message));
+await page.route('**/api/v1/**',async route=>{const u=new URL(route.request().url()); let status=200,body;
+if(u.pathname==='/api/v1/me') {status=401;body={code:'UNAUTHENTICATED'};}
+else if(u.pathname==='/api/v1/configuration/public')body={orderLimits:{maxQuantityPerLine:10}};
+else if(u.pathname==='/api/v1/zones')body={items:[{id:'z1',name:'منطقة تدقيق',code:'test-zone'}],nextCursor:null,hasMore:false};
+else if(u.pathname==='/api/v1/meals'){mealRequests.push(u.search);body=pageData;}
+else if(u.pathname==='/api/v1/meals/'+mid)body=meal;
+else body={items:[],summary:{averageTenths:null,count:0},nextCursor:null,hasMore:false};
+await route.fulfill({status,json:body});});
+await page.goto('http://localhost:5173/#/');await page.getByRole('link',{name:meal.title,exact:true}).waitFor();
+for(const width of [390,1440]){await page.setViewportSize({width,height:900});await page.screenshot({path:path.join(out,`home-ar-${width}.png`),fullPage:true});const axe=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa','wcag22aa']).analyze();results.screens.push({screen:'home',width,locale:'ar',overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),axe:axe.violations.map(v=>({id:v.id,impact:v.impact,targets:v.nodes.map(n=>n.target)}))});}
+const search=page.getByRole('searchbox');await search.fill('تجريبي');await page.getByRole('search').getByRole('button',{name:'ابحث عن طبق أو مطبخ',exact:true}).click();await page.waitForTimeout(200);const before={value:await search.inputValue(),url:page.url()};await page.getByRole('link',{name:meal.title,exact:true}).click();await page.getByRole('heading',{name:meal.title,exact:true,level:2}).waitFor();await page.screenshot({path:path.join(out,'meal-ar-1440.png'),fullPage:true});await page.locator('main a[href="#/"]').first().click();await page.getByRole('searchbox').waitFor();results.checks.push({id:'filter-back',before,after:{value:await page.getByRole('searchbox').inputValue(),url:page.url()},requests:mealRequests});
+results.checks.push({id:'pagination',fixtureHasMore:true,fixtureNextCursor:'audit-next-page',cursorRequested:mealRequests.some(x=>x.includes('cursor=')),buttons:await page.getByRole('button').allTextContents()});
+await page.getByRole('button',{name:'English',exact:true}).click();await page.getByRole('button',{name:'Filter results',exact:true}).click();await page.getByLabel('Maximum price (EGP)').fill('١٢٠').catch(async()=>{await page.locator('#filters input[inputmode=decimal]').fill('١٢٠');});await page.screenshot({path:path.join(out,'arabic-digits-rejected.png'),fullPage:true});results.checks.push({id:'arabic-numerals',text:await page.locator('#filters').innerText(),submitDisabled:await page.locator('#filters button[type=submit]').isDisabled()});
+await page.goto('http://localhost:5173/#/missing-audit-route');results.checks.push({id:'unknown-route',mainText:await page.locator('main').innerText()});await page.screenshot({path:path.join(out,'unknown-route.png'),fullPage:true});
+// Keyboard-only search entry, no pointer input for this sequence.
+await page.goto('http://localhost:5173/#/');await page.getByRole('searchbox').waitFor();await page.evaluate(()=>document.activeElement.blur());let reached=false,stops=[];for(let i=0;i<35;i++){await page.keyboard.press('Tab');const e=await page.evaluate(()=>{const a=document.activeElement,s=getComputedStyle(a);return{tag:a.tagName,role:a.getAttribute('type'),text:(a.textContent||'').slice(0,35),outline:s.outlineStyle,width:s.outlineWidth};});stops.push(e);if(e.role==='search'){reached=true;await page.keyboard.type('audit');await page.keyboard.press('Enter');break;}}results.checks.push({id:'keyboard-search',reached,stops});
+const opsContext=await browser.newContext({viewport:{width:390,height:844}});const ops=await opsContext.newPage();await ops.route('**/api/v1/**',async route=>{const p=new URL(route.request().url()).pathname;await route.fulfill({status:p==='/api/v1/me'?200:p==='/api/v1/cook/application'?404:403,json:p==='/api/v1/me'?{id:'audit-user',displayName:'Synthetic cook',emailVerified:true,phoneVerified:true,capabilities:[]}:{code:'FORBIDDEN'}});});await ops.goto('http://localhost:5174/');await ops.getByRole('heading',{level:2}).waitFor();await ops.screenshot({path:path.join(out,'cook-onboarding-no-action.png'),fullPage:true});results.checks.push({id:'onboarding',text:await ops.locator('main').innerText(),mainInteractiveCount:await ops.locator('main input,main button,main a').count()});
+fs.writeFileSync(path.join(out,'browser-probes.json'),JSON.stringify(results,null,2)+'\n');await browser.close();console.log(JSON.stringify({checks:results.checks.map(x=>x.id),screens:results.screens,console:results.console}));})().catch(e=>{console.error(e);console.error(JSON.stringify(results));process.exit(1)});

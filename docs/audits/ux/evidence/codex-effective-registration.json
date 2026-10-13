@@ -1,0 +1,26 @@
+{
+  "checkedAt": "2026-10-13T09:34:05.749815+00:00",
+  "mechanism": "Codex app-server initialize + config/read(includeLayers=true), --strict-config; no model invocation",
+  "hosted_activation": "Explicit developer_instructions passed via collaboration.spawn_agent; both agents acknowledged full body and independently produced reports. Hosted tool has no custom-role selector.",
+  "userAgent": "matbakhy_ux_audit/0.159.2 (Debian 13.0.0; x86_64) dumb (matbakhy_ux_audit; 1.0)",
+  "effective_agents": {
+    "enabled": true,
+    "max_concurrent_threads_per_session": null,
+    "max_depth": null,
+    "default_subagent_model": null,
+    "default_subagent_reasoning_effort": null,
+    "job_max_runtime_seconds": null,
+    "interrupt_message": null,
+    "design-ux-architect": {
+      "description": "Matbakhy independent ux-architect audit; preserves Agency Agents identity",
+      "config_file": "/run/codex-environment/codex-home/roles/ux-architect.role.toml",
+      "nickname_candidates": null
+    },
+    "design-ux-researcher": {
+      "description": "Matbakhy independent ux-researcher audit; preserves Agency Agents identity",
+      "config_file": "/run/codex-environment/codex-home/roles/ux-researcher.role.toml",
+      "nickname_candidates": null
+    }
+  },
+  "configuration_layer_count": 2
+}

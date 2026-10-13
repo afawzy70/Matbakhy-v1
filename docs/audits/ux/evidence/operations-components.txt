@@ -1,0 +1,13 @@
+
+> @matbakhy/operations-web@0.1.0 test /workspace/Matbakhy-v1/apps/operations-web
+> vitest run
+
+
+ RUN  v5.0.3 /workspace/Matbakhy-v1/apps/operations-web
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  09:16:30
+   Duration  1.85s (tests 54%, environment 27%, transform 12%, import 6%)
+

@@ -1,0 +1,349 @@
+{
+  "source": "cc52fa4224e3163677a1215dc8f63ede2a9dbe4c",
+  "mode": "Synthetic intercepted API, current real React/CSS, cook statement only",
+  "historicalAlias": "MBQA-006",
+  "records": [
+    {
+      "width": 320,
+      "locale": "ar",
+      "amounts": [
+        {
+          "text": "2",
+          "width": 41,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 41,
+          "digitLines": 2
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 41,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 41,
+          "digitLines": 2
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 41,
+          "digitLines": 2
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 41,
+          "digitLines": 1
+        },
+        {
+          "text": "0",
+          "width": 41,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 41,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 41,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 41,
+          "digitLines": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "locale": "ar",
+      "amounts": [
+        {
+          "text": "2",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "0",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 111,
+          "digitLines": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "locale": "ar",
+      "amounts": [
+        {
+          "text": "2",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "0",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        },
+        {
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "width": 873,
+          "digitLines": 1
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "width": 320,
+      "locale": "en",
+      "amounts": [
+        {
+          "text": "2",
+          "width": 10,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 10,
+          "digitLines": 5
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 10,
+          "digitLines": 3
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 10,
+          "digitLines": 5
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 10,
+          "digitLines": 5
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 10,
+          "digitLines": 3
+        },
+        {
+          "text": "0",
+          "width": 10,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 10,
+          "digitLines": 3
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 10,
+          "digitLines": 3
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 10,
+          "digitLines": 3
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "locale": "en",
+      "amounts": [
+        {
+          "text": "2",
+          "width": 50,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "0",
+          "width": 50,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 50,
+          "digitLines": 2
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 50,
+          "digitLines": 2
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "locale": "en",
+      "amounts": [
+        {
+          "text": "2",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 390.75",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "0",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 812,
+          "digitLines": 1
+        },
+        {
+          "text": "EGP 0.00",
+          "width": 812,
+          "digitLines": 1
+        }
+      ],
+      "overflow": false
+    }
+  ]
+}

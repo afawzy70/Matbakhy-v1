@@ -1,9 +1,10 @@
+Coordinator rerun 2026-10-13; diagnostic pass demonstrates bypass, not repair acceptance.
 
- RUN  v5.0.3 /workspace/matbakhy-ux-architect-active
+ RUN  v5.0.3 /workspace/Matbakhy-v1
 
 
  Test Files  1 passed (1)
       Tests  1 passed (1)
-   Start at  09:24:25
-   Duration  1.07s (environment 44%, tests 31%, transform 16%, import 9%)
+   Start at  09:44:17
+   Duration  1.45s (environment 47%, tests 26%, transform 17%, import 9%)
 

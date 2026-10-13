@@ -1,0 +1,48 @@
+2026-10-13 final report validation; application source cc52fa4224e3163677a1215dc8f63ede2a9dbe4c
+Commands: python3 scripts/validate_blueprint.py; python3 -m unittest discover -s scripts -p 'test_*.py' -v
+Exit code: 0
+PASS: blueprint structure only; product remains unverified
+test_doctor_names_each_missing_prerequisite_and_starts_nothing (test_dev_bootstrap.DevBootstrapGuards.test_doctor_names_each_missing_prerequisite_and_starts_nothing) ... ok
+test_env_file_without_local_marker_is_refused (test_dev_bootstrap.DevBootstrapGuards.test_env_file_without_local_marker_is_refused) ... ok
+test_smoke_fails_clearly_when_stack_is_not_running (test_dev_bootstrap.DevBootstrapGuards.test_smoke_fails_clearly_when_stack_is_not_running) ... ok
+test_unknown_command_prints_usage (test_dev_bootstrap.DevBootstrapGuards.test_unknown_command_prints_usage) ... ok
+test_up_runs_doctor_first (test_dev_bootstrap.DevBootstrapGuards.test_up_runs_doctor_first) ... ok
+test_broken_document_link_is_rejected (test_guardrails.BlueprintGuards.test_broken_document_link_is_rejected) ... ok
+test_command_only_report_cannot_be_product_evidence (test_guardrails.BlueprintGuards.test_command_only_report_cannot_be_product_evidence) ... ok
+test_dependency_cycle_is_rejected (test_guardrails.BlueprintGuards.test_dependency_cycle_is_rejected) ... ok
+test_done_without_evidence_cannot_pass (test_guardrails.BlueprintGuards.test_done_without_evidence_cannot_pass) ... ok
+test_duplicate_endpoint_is_rejected (test_guardrails.BlueprintGuards.test_duplicate_endpoint_is_rejected) ... ok
+test_initial_phase_cannot_be_promoted (test_guardrails.BlueprintGuards.test_initial_phase_cannot_be_promoted) ... ok
+test_rule_losing_coverage_is_rejected (test_guardrails.BlueprintGuards.test_rule_losing_coverage_is_rejected) ... ok
+test_scenario_pass_without_evidence_is_rejected (test_guardrails.BlueprintGuards.test_scenario_pass_without_evidence_is_rejected) ... ok
+test_valid_initial_blueprint (test_guardrails.BlueprintGuards.test_valid_initial_blueprint) ... ok
+test_empty_or_blocked_required_set_cannot_pass (test_guardrails.RunnerGuards.test_empty_or_blocked_required_set_cannot_pass) ... ok
+test_failing_command_cannot_pass (test_guardrails.RunnerGuards.test_failing_command_cannot_pass) ... ok
+test_missing_executable_is_blocked (test_guardrails.RunnerGuards.test_missing_executable_is_blocked) ... ok
+test_real_zero_exit_records_log (test_guardrails.RunnerGuards.test_real_zero_exit_records_log) ... ok
+test_timeout_is_failure (test_guardrails.RunnerGuards.test_timeout_is_failure) ... ok
+test_unconfigured_is_blocked (test_guardrails.RunnerGuards.test_unconfigured_is_blocked) ... ok
+test_a_modified_tracked_run_file_on_the_first_line_is_allowed (test_record_evidence.DirtyOutsideRunsTest.test_a_modified_tracked_run_file_on_the_first_line_is_allowed) ... ok
+test_changes_outside_the_run_directory_are_reported (test_record_evidence.DirtyOutsideRunsTest.test_changes_outside_the_run_directory_are_reported) ... ok
+test_current_repository_passes (test_scope.ScopeGuards.test_current_repository_passes) ... ok
+test_decision_missing_from_register_is_rejected (test_scope.ScopeGuards.test_decision_missing_from_register_is_rejected) ... ok
+test_fabricated_acceptance_is_rejected (test_scope.ScopeGuards.test_fabricated_acceptance_is_rejected) ... ok
+test_later_phase_dependency_is_rejected (test_scope.ScopeGuards.test_later_phase_dependency_is_rejected) ... ok
+test_lost_client_target_is_rejected (test_scope.ScopeGuards.test_lost_client_target_is_rejected) ... ok
+test_merged_native_verification_is_rejected (test_scope.ScopeGuards.test_merged_native_verification_is_rejected) ... ok
+test_open_decision_with_value_is_rejected (test_scope.ScopeGuards.test_open_decision_with_value_is_rejected) ... ok
+test_planned_path_that_exists_is_rejected (test_scope.ScopeGuards.test_planned_path_that_exists_is_rejected) ... ok
+test_present_path_that_is_missing_is_rejected (test_scope.ScopeGuards.test_present_path_that_is_missing_is_rejected) ... ok
+test_removed_deferred_extension_is_rejected (test_scope.ScopeGuards.test_removed_deferred_extension_is_rejected) ... ok
+test_stale_matrix_is_rejected (test_scope.ScopeGuards.test_stale_matrix_is_rejected) ... ok
+test_unlisted_top_level_path_is_rejected (test_scope.ScopeGuards.test_unlisted_top_level_path_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 34 tests in 3.345s
+
+OK
+
+PASS: Markdown destinations, suggested source paths, 21 unique stable IDs, required backlog fields, priority/confidence totals, agent TOML syntax and tracked audit-only scope.
+Final specialist consistency reviews: researcher and architect found no material blockers; wording clarifications applied.
+
+PASS: bash scripts/check_secrets.sh; 277 fetched history commits and committable working tree scanned; no leaks found. See secret-scan.txt.
