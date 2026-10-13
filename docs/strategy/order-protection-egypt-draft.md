@@ -1,6 +1,6 @@
 # Matbakhy Order Protection — Egypt policy discovery v0.1
 Date: 2026-10-13
-Status: DRAFT / FUTURE INITIATIVE / NOT ACTIVE. Owner and qualified Egyptian legal/food-compliance/payment review required before launch. This is a design hypothesis, not legal advice, provider approval, or permission to retain consumer money.
+Status: BROADER PROTECTION STRATEGY DRAFT. Manual direct-to-cook deposit is now OWNER-APPROVED MVP SCOPE (see docs/strategy/mvp-direct-deposit-payment.md). Remaining automated payment/guarantee initiatives stay FUTURE / NOT ACTIVE. Owner and qualified Egyptian legal/food-compliance/payment review required before launch. This is a design hypothesis, not legal advice, provider approval, or permission to retain consumer money.
 
 ## Core promise
 Protect approved home cooks from preparing costly non-collectible orders. Avoid making unsupported promises of guaranteed payment. Give customers clear, proportionate rules and genuine recourse. Never ask a cook to start high-exposure preparation before the platform can show VERIFIED_REQUIRED_PAYMENT (if applicable) and ACCEPTED.
@@ -8,13 +8,13 @@ Protect approved home cooks from preparing costly non-collectible orders. Avoid 
 ## Proposed customer-facing policy
 1. Show exact product price, taxes/fees, delivery/pickup, cancellation deadline, required upfront amount, responsible seller/collector, refund and contact terms **before** final confirmation. Preserve immutable versioned policy and order-price snapshot.
 2. For standard low-exposure orders, permit cash on delivery/pickup only if the cook/zone/operations policy allows it. Verify contact phone before order. Define cook acceptance deadline; pending is not confirmed.
-3. For high-exposure orders (large quantity, advance ingredients, personalized menu, events), require a prepayment/deposit through a licensed/contracted payment provider before acceptance or prep. No manual screenshot proof. Deposit size is based on exposure & agreement, not a universal 30%/50% rule.
+3. For high-exposure orders (large quantity, advance ingredients, personalized menu, events), require an eligible prepayment/deposit before acceptance or prep. The approved MVP direction is direct customer-to-cook payment using existing Egyptian rails, manually acknowledged by the kitchen after checking its account; provider integration is deferred. A screenshot alone is never proof of payment. Actual recipient account usage requires provider/legal clearance. Deposit size is based on exposure & agreement, not a universal 30%/50% rule.
 4. Customers can cancel before a clearly disclosed preparation cutoff without a discretionary penalty, subject to reviewed legal policy. After cutoff, any eligible fee/retention is capped by the published policy and legally recoverable/actual documented exposure; never retain amounts automatically if supplier is at fault.
 5. If cook rejects, cannot fulfill, changes essential terms, arrives late in breach, or food is unsafe/wrong: preserve customer statutory remedies, investigate and refund as legally required; never use 'no refunds for food' blanket text.
 6. If customer misses agreed handover: record timestamps, customer-visible contact attempts, arrival/ready evidence, reasonable waiting window, handover code; staff review before closing a dispute. Never mark as delivered just because driver/cook says so.
 7. No public blacklist, discriminatory proxy scoring or permanent punishment after one disputed no-show. A documented repeated pattern can trigger payment-first eligibility with notice and appeal. Limit data and retention.
-8. No off-platform transfer to cook personal wallet as 'platform protected'; show verified provider payment receipt and use controlled ledger/reconciliation.
-9. Cook sees a clear badge: 'Payment verified / Preparation approved / COD allowed / Payment pending'; money collected, due, refundable and owed to cook remain separate financial states.
+8. Manual direct transfers to an approved, legally eligible kitchen merchant/business recipient are an MVP option. Do not advertise them as independently bank-verified or platform-guaranteed; keep kitchen-reported receipt separate from actual provider verification and maintain auditable reconciliation.
+9. Cook sees accurate status labels: 'Kitchen reported deposit received / Preparation approved / COD allowed / Payment pending'; money collected, due, refundable and owed to cook remain separate financial states.
 10. Support an auditable neutral dispute process: customer and cook upload relevant proof, human reviews, records reason, appeal, final outcome; restrict private phone/address visibility.
 
 ## Proposed risk tiers — operational tests, NOT current thresholds
@@ -24,8 +24,8 @@ Tier C: bespoke catering / large events: signed digital quote & staged prepaymen
 Payment-first rules may also apply after substantiated repeated collection failures; no arbitrary or secret fees. Thresholds/amounts and timing to be tuned in an Egyptian field pilot, approved by owner and counsel.
 
 ## Exact lifecycle & separation of responsibility
-QUOTE_CREATED -> CUSTOMER_REVIEWED_TERMS -> (PAYMENT_REQUIRED -> PAYMENT_VERIFIED) -> COOK_ACCEPTED -> PREPARING -> READY -> HANDED_OVER_VERIFIED -> COMPLETED -> RECONCILED.
-Offer decline/expiry/cancel/refund/dispute branches. The system must not infer payment from checkout return redirect or chat. Verify provider callback signature, amount, currency, idempotency, order ID; query provider for ambiguous states; never double-charge on retry. Capacity reservation and expiry must be concurrency safe. Preserve original amount after order acceptance. Changes require explicit re-quote before placement.
+QUOTE_CREATED -> CUSTOMER_REVIEWED_TERMS -> (PAYMENT_REQUIRED -> CUSTOMER_REPORTS_TRANSFER -> KITCHEN_REPORTS_FUNDS_RECEIVED) -> COOK_ACCEPTED -> PREPARING -> READY -> HANDED_OVER_VERIFIED -> COMPLETED -> RECONCILED.
+Offer decline/expiry/cancel/refund/dispute branches. The system must not infer payment from screenshot, customer assertion, checkout redirect or chat. In MVP, use authenticated kitchen acknowledgement rather than an automated provider-verified callback. Provider signature verification and automated reconciliation are future extensions. Capacity reservation and expiry must be concurrency safe. Preserve original amount after order acceptance. Changes require explicit re-quote before placement.
 Separate order-state, payment-state, cooking-state, handover-state and settlement-state. Refunds/retentions are recorded with reason and approval; cook compensation is never implied by merely receiving a customer deposit.
 
 ## Egypt operational/legal gates — verify before production
@@ -61,7 +61,7 @@ What constitutes high exposure? COD cap? cook opt-in? minimum notice for cancell
 - Official Paymob API collections: https://github.com/PaymobAccept/API-Postman-Collections
 
 ## Product governance
-No automatic implementation, production rollout, financial policy activation, or new MVP commitments. Owners may later approve scoped stories and an external legal/financial provider integration design. Reference issues #3 and #4 (AI concierge must also comply with payment gating and explicit consent).
+The owner explicitly added *manual direct-to-kitchen deposit* to MVP scope on 2026-10-13. All other protection initiatives remain future-only. No unconditional production rollout or live financial activation. Owners may later approve scoped stories and an external legal/financial provider integration design. Reference issues #3 and #4 (AI concierge must also comply with payment gating and explicit consent).
 
 ## Owner direction — 2026-10-13 (pilot payments)
 - Prioritize customer acquisition and familiar existing Egyptian payment instruments: InstaPay, regulated mobile wallets, transfers, and eligible COD. Do NOT invent a proprietary wallet, escrow, payment method or require heavy provider integration for initial pilot.
