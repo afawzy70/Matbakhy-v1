@@ -4,7 +4,7 @@
   "status": "IN_PROGRESS",
   "current_phase": "P07",
   "current_story": "MB-039",
-  "last_tested_commit": "c056e4a3444d89251e55ff8b843928b15592e37a",
+  "last_tested_commit": "1850f7b8ba8e19315753b0776ee3c0be5d21035b",
   "last_completed_story": "MB-053",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
@@ -43,7 +43,7 @@
     }
   ],
   "next_action": "Window until 2026-10-14 00:00 Kuwait. MB-053 DONE (native run 48 PASS on Android and iOS). MB-039 local: TC-055 and TC-056 PASS, erasure defect fixed (V27), preview backups count only after a restore check. Remaining MB-039: TC-057 staging restore and deployed AUD-01/LOG-01/OPS-01..03 (MB-040, needs authorization). MB-033: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots.",
-  "updated_at": "2026-10-13T16:05:44Z",
+  "updated_at": "2026-10-13T16:29:17Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
