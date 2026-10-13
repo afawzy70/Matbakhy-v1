@@ -43,7 +43,7 @@ Business history is the order's timeline (`order_event`, append-only). Diagnosti
 | Recent lines missing in Grafana | Alert LogPipelineDown; `docker compose ps alloy loki`. Restart the collector: `docker compose up -d alloy`. It resumes from its saved position; lines older than Docker's cap (10 MB × 3 per container) are lost |
 | Logs not JSON | `LOGGING_STRUCTURED_FORMAT_CONSOLE=ecs` on the api service |
 | `service.version` is `unknown` | `RELEASE_COMMIT` not set in `.env` |
-| ApiDown | `docker compose ps api`, health on the management port: `docker compose exec api wget -qO- localhost:8081/actuator/health` |
+| ApiDown | `docker compose ps api`; health on the management port (8081): `docker compose exec api wget -qO- http://127.0.0.1:8081/actuator/health` |
 | DatabaseUnavailable | `docker compose ps postgres`; `docker compose logs --tail 50 postgres`. Data alerts (OutboxFailed and similar) may show "resolved" while the data is missing; recheck them after recovery |
 | BackupStale | Run `./deploy.sh backup`; it records the time of the last good backup for the alert |
 | DiskPressure | `df -h`; `docker system df`; prune unused images. Do not delete volumes (database, logs, metrics) without the owner |

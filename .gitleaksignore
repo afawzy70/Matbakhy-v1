@@ -24,3 +24,7 @@
 8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:3569
 8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:3660
 8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:3832
+# 2026-10-13: a runbook command (an exec into the api service fetching the management health URL; commit a8b206e)
+# matched generic-api-key ("api" followed by a host:port path). No credential; the line was reworded in the next
+# commit so the working tree no longer matches. Reviewed by the implementation agent; this one historical finding only.
+a8b206e608464952064b127d0bed5993b8c70799:docs/operations/08-troubleshooting-runbook.md:generic-api-key:46
