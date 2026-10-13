@@ -149,6 +149,15 @@ extra=r'''    private func fixture(_ path: String) {
 
     func testG_IndependentSameSessionPolicyEditAndRecovery() {
         app.launch()
+        element("tab-account").tap()
+        let oldSession = app.buttons["Sign out"]
+        if oldSession.waitForExistence(timeout: 10) { oldSession.tap() }
+        let freshSignIn = app.buttons["Sign in"]
+        expect(freshSignIn, "independent active-session prerequisite unavailable")
+        freshSignIn.tap()
+        login("customer-a")
+        expect(text("Signed in as"), "real Gsession not established")
+        print("IQA-G-FRESH-AUTH established without changing300s policy")
         element("tab-discover").tap()
         let meal = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Native Dish One")).firstMatch
         expect(meal, "One not listed")
@@ -243,10 +252,49 @@ extra=r'''    private func fixture(_ path: String) {
         expect(text("Signed in as"), "real fresh customer session not established")
         print("IQA-SUPPORT-FRESH-AUTH established")
         fixture("seed-case")
+        // Completed native cancellation journey on the actual previously placed delivery order.
+        guard #available(iOS 16.4, *), let id = ProcessInfo.processInfo.environment["MB033_ORDER_ID"], let number = ProcessInfo.processInfo.environment["MB033_ORDER_NUMBER"] else { return XCTFail("real delivered-order prerequisite absent") }
+        app.open(URL(string: "matbakhy-dev://orders/\(id)")!)
+        expect(text(number), "own delivery order missing")
+        let cancel = app.buttons["Cancel order"]
+        expect(cancel, "pending cancellation unavailable")
+        var scrolls = 0
+        while !cancel.isHittable && scrolls < 6 { app.swipeUp(); scrolls += 1 }
+        XCTAssertTrue(cancel.isHittable)
+        cancel.tap()
+        expect(text("Cancelled"), "real customer cancellation not visible")
+        XCTAssertFalse(app.buttons["Cancel order"].exists)
+        print("IQA-CUSTOMER-CANCEL verified \(number)")
+        app.terminate()
+        app.launch()
+        element("tab-account").tap()
         let support = app.buttons["Support"]
         expect(support, "Support unavailable")
         support.tap()
-        expect(text("CS-DA877001"), "synthetic public-reply case not in list")
+        let orderChoice = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Order: " + number)).firstMatch
+        expect(orderChoice, "own order choice missing")
+        while !orderChoice.isHittable { app.swipeUp(); break }
+        orderChoice.tap()
+        let description = app.textViews["Describe the problem"]
+        expect(description, "support description editor missing")
+        description.tap()
+        description.typeText("Independent synthetic native support creation after cancellation.")
+        let quality = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", "Quality")).firstMatch
+        expect(quality, "case category choice missing")
+        quality.tap()
+        let send = app.buttons["Send"]
+        expect(send, "support submit missing")
+        scrolls = 0
+        while !send.isHittable && scrolls < 6 { app.swipeUp(); scrolls += 1 }
+        XCTAssertTrue(send.isHittable)
+        send.tap()
+        expect(text("Case sent:"), "real support creation not acknowledged")
+        print("IQA-SUPPORT-CREATE verified real UI receipt")
+        let publicCase = text("CS-DA877001")
+        expect(publicCase, "synthetic public-reply case not in list")
+        scrolls = 0
+        while !publicCase.isHittable && scrolls < 6 { app.swipeDown(); scrolls += 1 }
+        XCTAssertTrue(publicCase.isHittable)
         text("CS-DA877001").tap()
         expect(text("QA PUBLIC NATIVE REPLY"), "MBQA-004: customer cannot reach public reply", timeout: 10)
         XCTAssertFalse(text("QA PRIVATE NATIVE NOTE").exists)

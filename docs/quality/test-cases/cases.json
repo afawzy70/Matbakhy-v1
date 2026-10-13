@@ -1373,5 +1373,51 @@
     "automation": "qa/regression-d877a15/permission-revocation.cjs (TARGETED extension; next fresh full)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
+  },
+  {
+    "id": "N-CANCEL",
+    "title": "Native pending cancellation and immutable history",
+    "purpose": "Native pending cancellation and immutable history",
+    "requirementReferences": "TC-028/029; MB-019/032",
+    "group": "native",
+    "roles": "customer Android/iOS separately",
+    "platforms": "Android,iOS",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README",
+    "steps": [
+      "Sign in as real customer-a with fresh unchanged-policy session.",
+      "Open actual earlier delivery order by own deep link; scroll to Cancel order and cancel.",
+      "Verify same public number and Cancelled state; cancellation control absent; compare DB allocation/capacity/events/immutable amounts."
+    ],
+    "expected": "Owning pending order CANCELLED; one release/event, no duplicate effect; original63000 total unchanged; other recovered order unaffected.",
+    "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
+    "cleanup": "Synthetic cancellation is terminal and allowed; subsequent full regression starts with fresh native fixture. No production or real messages.",
+    "automation": "qa/regression-d877a15/native/instrument.py; independent iOS Hsegment; Android variation requires separately executed control",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
+  },
+  {
+    "id": "N-SUPPORT-CREATE",
+    "title": "Native owned support-case creation and keyboard",
+    "purpose": "Native owned support-case creation and keyboard",
+    "requirementReferences": "TC-041; MB-024/032",
+    "group": "native",
+    "roles": "customer Android/iOS separately",
+    "platforms": "Android,iOS",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README",
+    "steps": [
+      "Open Account→Support; select exact own earlier order.",
+      "Type a synthetic explanation in real multiline field; dismiss keyboard through real category control; scroll to Send.",
+      "Submit and verify case receipt plus persisted own order/customer/category, then refresh own case list."
+    ],
+    "expected": "Real UI/API creates one valid owned case; text input/keyboard/scrolling permit submission; no foreign-order data.",
+    "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
+    "cleanup": "Synthetic cancellation is terminal and allowed; subsequent full regression starts with fresh native fixture. No production or real messages.",
+    "automation": "qa/regression-d877a15/native/instrument.py; independent iOS Hsegment; Android variation requires separately executed control",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   }
 ]

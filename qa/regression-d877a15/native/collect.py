@@ -55,6 +55,8 @@ try:
  orders=data['orders']
  pickup=[o for o in orders if o['slotId']=='00000000-0000-4000-8000-00000000a052']
  delivery=[o for o in orders if o['slotId']=='00000000-0000-4000-8000-00000000a051']
+ if delivery:
+  record['deliveryFinalState']=delivery[0]['state']
  record['checks'].append({'name':'Exactly one recovered pickup and one later delivery order','expected':[1,1], 'actual':[len(pickup),len(delivery)],'status':'PASS' if len(pickup)==len(delivery)==1 and len(orders)==2 else 'FAIL'})
  record['checks'].append({'name':'Stored pickup and delivery totals','expected':[9000,63000], 'actual':[o['totalMinor'] for o in pickup+delivery],'status':'PASS' if [o['totalMinor'] for o in pickup+delivery]==[9000,63000] else 'FAIL'})
 except Exception as e:

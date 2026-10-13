@@ -220,3 +220,35 @@ Expected: Own public reply reachable/readable; private marker absent; customer c
 Invariants: no responsive-web/unit substitution; fresh OS/app/DB per campaign platform. Cleanup: Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.
 
 Automation: qa/regression-d877a15/native/instrument.py; fixture-control.py; generated native UI harness. Review SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
+
+## N-CANCEL — Native pending cancellation and immutable history
+
+Purpose: Native pending cancellation and immutable history. References: TC-028/029; MB-019/032. Customer-a; native-ios; en/ar; priorityP1.
+
+Preconditions: Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README.
+
+1. Sign in as real customer-a with fresh unchanged-policy session.
+2. Open actual earlier delivery order by own deep link; scroll to Cancel order and cancel.
+3. Verify same public number and Cancelled state; cancellation control absent; compare DB allocation/capacity/events/immutable amounts.
+
+Expected: Owning pending order CANCELLED; one release/event, no duplicate effect; original63000 total unchanged; other recovered order unaffected.
+
+Invariants: no responsive-web/unit substitution; fresh OS/app/DB per campaign platform. Cleanup: Synthetic cancellation is terminal and allowed; subsequent full regression starts with fresh native fixture. No production or real messages.
+
+Automation: qa/regression-d877a15/native/instrument.py; independent iOS Hsegment; Android variation requires separately executed control. Review SELF_REVIEWED. Questions: no native coverage inferred from other platforms.
+
+## N-SUPPORT-CREATE — Native owned support-case creation and keyboard
+
+Purpose: Native owned support-case creation and keyboard. References: TC-041; MB-024/032. Customer-a; native-ios; en/ar; priorityP1.
+
+Preconditions: Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README.
+
+1. Open Account→Support; select exact own earlier order.
+2. Type a synthetic explanation in real multiline field; dismiss keyboard through real category control; scroll to Send.
+3. Submit and verify case receipt plus persisted own order/customer/category, then refresh own case list.
+
+Expected: Real UI/API creates one valid owned case; text input/keyboard/scrolling permit submission; no foreign-order data.
+
+Invariants: no responsive-web/unit substitution; fresh OS/app/DB per campaign platform. Cleanup: Synthetic cancellation is terminal and allowed; subsequent full regression starts with fresh native fixture. No production or real messages.
+
+Automation: qa/regression-d877a15/native/instrument.py; independent iOS Hsegment; Android variation requires separately executed control. Review SELF_REVIEWED. Questions: no native coverage inferred from other platforms.
