@@ -2183,6 +2183,137 @@
         "verification/runs/20261013-CANDIDATE-E/evidence.json",
         "verification/runs/20261013-MB-049/evidence.json"
       ]
+    },
+    {
+      "id": "TC-157",
+      "title": "No commission or platform fee anywhere at launch (D10)",
+      "rule_ids": [
+        "BR-033",
+        "BR-019"
+      ],
+      "story_id": "MB-050",
+      "phase": "P07",
+      "level": "system",
+      "severity": "critical",
+      "given": "The launch configuration and a completed cash order",
+      "when": "Staff try to set a non-zero commission; the order is quoted, placed, completed, posted and shown in statements and screens",
+      "then": "The change is refused; every quote, order snapshot, ledger entry and statement carries zero commission and no service fee; customer, cook and ops screens on web, Android and iOS show no platform fee",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-158",
+      "title": "Deposit-required quote and immutable snapshot (D16)",
+      "rule_ids": [
+        "BR-019",
+        "BR-022"
+      ],
+      "story_id": "MB-051",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "high",
+      "given": "A kitchen requiring a deposit with an approved recipient",
+      "when": "The customer quotes and places an order",
+      "then": "The quote and order hold deposit due, remainder, method, recipient identifier, expiry and terms in integer EGP; later recipient or rate changes do not alter the placed order",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-159",
+      "title": "Customer transfer report is not payment; no preparation before kitchen receipt and acceptance (D16)",
+      "rule_ids": [
+        "BR-026"
+      ],
+      "story_id": "MB-051",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "critical",
+      "given": "A deposit-required order WAITING_FOR_DEPOSIT",
+      "when": "The customer reports a transfer (twice, concurrently) and the kitchen tries to start preparation",
+      "then": "One report is recorded; the order cannot be accepted into preparation until the kitchen reports receipt and separately accepts; nothing is labelled bank verified",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-160",
+      "title": "Deposit expiry after a reported transfer reconciles instead of closing silently (D16)",
+      "rule_ids": [
+        "BR-027",
+        "BR-029"
+      ],
+      "story_id": "MB-051",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "high",
+      "given": "A reported transfer and an approaching deposit expiry",
+      "when": "The expiry passes, or the kitchen reports receipt just before it",
+      "then": "The order moves to reconciliation rather than silently expiring; capacity is released only once; no double payment request",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-161",
+      "title": "Kitchen reports not received or a mismatched amount (D16)",
+      "rule_ids": [
+        "BR-026"
+      ],
+      "story_id": "MB-052",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "high",
+      "given": "A transfer reported by the customer",
+      "when": "The kitchen reports not received or a different amount",
+      "then": "Processing pauses, the customer is told, a dispute reaches ops with an audited timeline; staff cannot mark funds received without the kitchen's report; other kitchens see nothing",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-162",
+      "title": "Kitchen cannot fulfil after reported receipt: refund obligation (D16)",
+      "rule_ids": [
+        "BR-035"
+      ],
+      "story_id": "MB-052",
+      "phase": "P07",
+      "level": "integration",
+      "severity": "high",
+      "given": "A deposit the kitchen reported as received",
+      "when": "The kitchen rejects or cannot fulfil the order",
+      "then": "A refund obligation owned by the kitchen is recorded and visible to the customer and ops; a support case exists; no automatic legal waiver",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-163",
+      "title": "Deposit checkout and honest payment status on web, Android and iOS (D16)",
+      "rule_ids": [
+        "BR-019"
+      ],
+      "story_id": "MB-053",
+      "phase": "P07",
+      "level": "system",
+      "severity": "high",
+      "given": "A deposit-required kitchen",
+      "when": "A customer checks out and reports a transfer on each client in Arabic and English",
+      "then": "Recipient, amount, expiry and terms are shown before placing; the transfer report is idempotent; statuses are honest (no bank-verified or protected claims); native emulator/simulator evidence",
+      "status": "NOT_RUN",
+      "evidence": []
+    },
+    {
+      "id": "TC-164",
+      "title": "Organic activity metrics are deduplicated, private and never claim profit (D17)",
+      "rule_ids": [
+        "BR-019"
+      ],
+      "story_id": "MB-054",
+      "phase": "P08",
+      "level": "integration",
+      "severity": "medium",
+      "given": "Repeated page refreshes, a bot-like burst and two kitchens",
+      "when": "Activity is recorded and the cook report is generated",
+      "then": "Counts are deduplicated and per kitchen; no personal targeting data; gross sales, refunds and known net amounts are distinct; no profit claim; no sponsored result exists",
+      "status": "NOT_RUN",
+      "evidence": []
     }
   ]
 }

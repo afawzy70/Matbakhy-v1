@@ -1783,6 +1783,167 @@
       ],
       "review_status": "PASS",
       "completion_note": "D13 at bc305c6 = QA candidate E (self-review): TC-155/156 PASS (backend verify, real PostgreSQL); TC-154 PASS on web (component tests red first; real-stack browser journey in BROWSER-E2E), Android emulator and iOS simulator (native run 39 phase H: notice with old/new prices and totals, no order at the stale price, placed only after explicit acceptance, stored 13000|13000|1). The run 39 workflow failed later, in the MB-033 dynamic-text phase (not D13). Independent retest pending."
+    },
+    {
+      "id": "MB-050",
+      "phase": "P07",
+      "title": "Zero platform commission and fees at launch (D10)",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-020",
+        "MB-025",
+        "MB-026",
+        "MB-027"
+      ],
+      "implementation_steps": [
+        "Server and database refuse a non-zero commission rate for live policies; the development policy is 0%",
+        "Ledger, statements and finance views carry zero commission without hiding non-zero amounts",
+        "Customer, cook and ops screens show no platform commission or service fee; regression tests updated"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/customer-web",
+        "apps/operations-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "No commission or platform/service fee is calculated, stored as non-zero, posted to the ledger or shown in customer web, Android, iOS, cook or ops screens at launch; a non-zero commission configuration is refused by the server; the dormant capability stays testable only in synthetic test fixtures"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-157"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-051",
+      "phase": "P07",
+      "title": "Deposit-required checkout and separated payment state (D16)",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-017",
+        "MB-018",
+        "MB-019",
+        "MB-020",
+        "MB-050"
+      ],
+      "implementation_steps": [
+        "Quote and immutable order snapshot: deposit due, remainder, method, approved kitchen recipient identifier, expiry, terms",
+        "Payment state machine separate from order and fulfilment states: WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, EXPIRED/RECONCILE_PENDING",
+        "No preparation before kitchen-reported receipt and separate acceptance; race-safe expiry and capacity"
+      ],
+      "artifacts": [
+        "backend",
+        "contracts"
+      ],
+      "acceptance": [
+        "Eligible COD and deposit-required orders have correct integer EGP amounts, recipient and remainder in an immutable snapshot; a customer's transfer report never counts as payment; preparation is impossible before kitchen-reported receipt and acceptance; nothing is labelled bank verified; expiry after a reported transfer reconciles instead of silently closing; development/test fixtures only, live money blocked"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-158",
+        "TC-159",
+        "TC-160"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-052",
+      "phase": "P07",
+      "title": "Kitchen receipt acknowledgement, mismatches, disputes and refunds (D16)",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-051",
+        "MB-022",
+        "MB-024",
+        "MB-025"
+      ],
+      "implementation_steps": [
+        "Cook acknowledges receipt or reports not received/mismatch with identity, time, amount, optional reference and reason (audited)",
+        "Ops dispute and reconciliation queue; refund obligations with clear owner; no fabricated confirmation"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Kitchen-reported receipt, not-received and mismatched-amount paths are audited and object-scoped; disputes pause processing and reach ops; a kitchen that cannot fulfil after reported receipt records a refund obligation; staff cannot mark funds received without the kitchen's report; cross-kitchen payment data is not visible"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-161",
+        "TC-162"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-053",
+      "phase": "P07",
+      "title": "Deposit checkout and payment status on web, Android and iOS (D16)",
+      "status": "TODO",
+      "priority": "P0",
+      "depends_on": [
+        "MB-051",
+        "MB-027",
+        "MB-032"
+      ],
+      "implementation_steps": [
+        "Shared contract: recipient, amount, expiry and terms; 'I transferred' with optional reference; status and next steps",
+        "Arabic RTL and English LTR parity; native verification"
+      ],
+      "artifacts": [
+        "apps/customer-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "Customers see the approved recipient, amount, expiry and refund/cancellation terms before placing, can report a transfer once (idempotent), and always see an honest payment status (reported by you, reported by the kitchen, disputed) on web, Android and iOS; no 'bank verified' or 'protected' claims"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-163"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
+    },
+    {
+      "id": "MB-054",
+      "phase": "P08",
+      "title": "Privacy-safe organic activity and kitchen performance metrics (D17)",
+      "status": "TODO",
+      "priority": "P1",
+      "depends_on": [
+        "MB-016",
+        "MB-022",
+        "MB-050"
+      ],
+      "implementation_steps": [
+        "Deduplicated, consent/privacy-compliant events: impressions, views, add-to-cart, quotes, orders, fulfilment, cancellations, repeat orders, capacity, GMV",
+        "Free cook report: gross sales, refunds, known net amounts, definitions and windows; no profit claims"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Activity counts are deduplicated and robust to refresh/bot inflation, scoped per kitchen, contain no personal targeting data, distinguish gross sales from net amounts and never claim profit; no sponsored ranking, campaign or billing exists"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-164"
+      ],
+      "evidence": [],
+      "review_status": "NOT_RUN",
+      "completion_note": null
     }
   ]
 }
