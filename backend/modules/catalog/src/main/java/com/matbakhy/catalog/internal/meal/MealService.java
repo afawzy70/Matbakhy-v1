@@ -75,6 +75,13 @@ public class MealService {
                            Instant archivedAt, Instant updatedAt, long version, String moderationState, String moderationReason) {
     }
 
+    /** API-099 (D14): the active price and the price changes of an own meal, newest first. */
+    public record PriceHistory(UUID mealId, Money activePrice, List<PriceChange> changes) {
+    }
+
+    public record PriceChange(Money price, Instant changedAt, int revision) {
+    }
+
     /** API-071 row: what moderators need, no private kitchen data. */
     public record OpsMeal(UUID id, UUID kitchenId, String kitchenName, String status, String moderationState, String moderationReason,
                           String titleAr, String titleEn, Long priceMinor, Instant updatedAt, long version) {
@@ -168,6 +175,34 @@ public class MealService {
         }
         writeContent(mealId, content, row.revision() + 1);
         return cookMeal(mealId);
+    }
+
+    /**
+     * D14 price history, derived from the immutable revisions: an entry for the first priced revision and for every later
+     * revision whose price differs from the previous entry; other edits add nothing. The active price is the meal's current
+     * price (the authoritative record). Owner-scoped: another kitchen's meal is not found.
+     */
+    @Transactional(readOnly = true)
+    public PriceHistory priceHistory(UUID actorId, UUID mealId) {
+        Seller seller = requireSeller(actorId);
+        Long active = jdbc.query("SELECT price_minor FROM meal WHERE id = ? AND kitchen_id = ?", rs -> rs.next() ? (Long) rs.getObject(1) : null,
+                mealId, seller.kitchenId());
+        if (active == null && jdbc.queryForObject("SELECT count(*) FROM meal WHERE id = ? AND kitchen_id = ?", Integer.class, mealId,
+                seller.kitchenId()) == 0) {
+            throw new ApiException(ErrorCode.NOT_FOUND, "meal not found");
+        }
+        List<PriceChange> changes = new ArrayList<>();
+        Long previous = null;
+        for (Map<String, Object> r : jdbc.queryForList(
+                "SELECT revision, price_minor, created_at FROM meal_revision WHERE meal_id = ? AND price_minor IS NOT NULL ORDER BY revision", mealId)) {
+            long price = ((Number) r.get("price_minor")).longValue();
+            if (previous == null || previous != price) {
+                changes.add(new PriceChange(new Money(price, "EGP"), ((java.sql.Timestamp) r.get("created_at")).toInstant(), (Integer) r.get("revision")));
+                previous = price;
+            }
+        }
+        java.util.Collections.reverse(changes);
+        return new PriceHistory(mealId, active == null ? null : new Money(active, "EGP"), changes);
     }
 
     @Transactional

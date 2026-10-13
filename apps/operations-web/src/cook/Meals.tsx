@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatMoney, type Schemas } from "../api";
+import { formatMoney, formatTime, type Schemas } from "../api";
 import { egpToMinor, ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 type Meal = Schemas["CookMeal"];
@@ -66,8 +66,90 @@ function MealCard({ ctx, meal, refresh }: { ctx: Ctx; meal: Meal; refresh: () =>
           </button>
         ))}
       </div>
+      <PriceHistory ctx={ctx} meal={meal} refresh={refresh} />
       <ErrorLine message={error} />
     </article>
+  );
+}
+
+/**
+ * D14 (MB-048): the active price (the meal's current price) and its previous actual changes with Africa/Cairo times,
+ * read from API-099; a simple price change through the existing meal edit (new prices apply to orders not yet placed).
+ */
+function PriceHistory({ ctx, meal, refresh }: { ctx: Ctx; meal: Meal; refresh: () => unknown }) {
+  const { t, locale } = ctx;
+  const [open, setOpen] = useState(false);
+  const [price, setPrice] = useState("");
+  const priceMinor = egpToMinor(price);
+  const [history, reload] = useServer<Schemas["MealPriceHistory"]>(
+    ctx,
+    () => (open ? ctx.api.GET("/api/v1/cook/meals/{mealId}/price-history", { params: { path: { mealId: meal.id } } }) : Promise.resolve({ response: new Response(null, { status: 204 }) })),
+    `${open}|${meal.version}`,
+  );
+  const { run, error, busy } = useMutation(ctx, () => {
+    refresh();
+    reload();
+  });
+  const sectionId = `price-history-${meal.id}`;
+  return (
+    <div className="stack">
+      <button type="button" className="secondary" aria-expanded={open} aria-controls={sectionId} onClick={() => setOpen(!open)}>
+        {t.priceHistory}
+      </button>
+      {open ? (
+        <section id={sectionId} aria-label={t.priceHistory} className="stack">
+          <Status ctx={ctx} state={history} onRetry={reload}>
+            {(h) => {
+              const [current, ...previous] = h.changes;
+              return (
+                <>
+                  <p>
+                    <strong>{t.activePrice}:</strong> {h.activePrice ? formatMoney(h.activePrice.amountMinor, locale) : "—"}
+                    {current ? ` · ${t.since} ${formatTime(current.changedAt, locale)}` : ""}
+                  </p>
+                  <h4>{t.previousPrices}</h4>
+                  {previous.length === 0 ? (
+                    <p>{t.noPreviousPrices}</p>
+                  ) : (
+                    <ol className="rows" aria-label={t.previousPrices}>
+                      {previous.map((c) => (
+                        <li key={c.revision}>
+                          {formatMoney(c.price.amountMinor, locale)} · <time dateTime={c.changedAt}>{formatTime(c.changedAt, locale)}</time>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                </>
+              );
+            }}
+          </Status>
+          <p className="hint">{t.priceChangeNote}</p>
+          {meal.status !== "ARCHIVED" ? (
+            <div className="form">
+              <label>
+                {t.newPrice}{" "}
+                <input inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} aria-invalid={price !== "" && priceMinor === null} />
+              </label>
+              <button
+                type="button"
+                disabled={busy || priceMinor === null || priceMinor <= 0 || priceMinor === meal.content.priceMinor}
+                onClick={() =>
+                  void run(() =>
+                    ctx.api.PATCH("/api/v1/cook/meals/{mealId}", {
+                      params: { path: { mealId: meal.id } },
+                      body: { expectedVersion: meal.version, priceMinor: priceMinor ?? 0 },
+                    }),
+                  ).then((ok) => ok && setPrice(""))
+                }
+              >
+                {t.changePrice}
+              </button>
+              <ErrorLine message={error} />
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+    </div>
   );
 }
 

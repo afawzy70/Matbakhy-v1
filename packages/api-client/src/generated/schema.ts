@@ -840,6 +840,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cook/meals/{mealId}/price-history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-099: own meal's active price and previous actual price changes (D14)
+         * @description Derived from the immutable meal revisions; revisions that did not change the price add no entry. Another kitchen's meal is 404. New prices apply only to orders not yet placed; placed orders keep their agreed prices.
+         */
+        get: operations["getCookMealsPriceHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cook/slots": {
         parameters: {
             query?: never;
@@ -1903,6 +1923,20 @@ export interface components {
             items: components["schemas"]["AuditEvent"][];
             nextCursor: string | null;
             hasMore: boolean;
+        };
+        /** @description The active price (the meal's current price) and its price changes, newest first. Times are UTC instants; clients show them in Africa/Cairo. */
+        MealPriceHistory: {
+            /** Format: uuid */
+            mealId: string;
+            activePrice: components["schemas"]["Money"];
+            changes: components["schemas"]["MealPriceChange"][];
+        };
+        /** @description A saved revision whose price differs from the previous revision's (the first priced revision is the initial price). */
+        MealPriceChange: {
+            price: components["schemas"]["Money"];
+            /** Format: date-time */
+            changedAt: string;
+            revision: number;
         };
         /** @description Messages are append-only. Customers only ever receive PUBLIC ones. */
         CaseMessage: {
@@ -4723,6 +4757,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CookMeal"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getCookMealsPriceHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                mealId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MealPriceHistory"];
                 };
             };
             "4XX": components["responses"]["Error"];

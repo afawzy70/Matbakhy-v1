@@ -884,6 +884,15 @@
       "response_type": "ReviewQueue",
       "contract": "moderation queue; reported visible or hidden reviews, bounded",
       "implemented": true
+    },
+    {
+      "id": "API-099",
+      "method": "GET",
+      "path": "/api/v1/cook/meals/{mealId}/price-history",
+      "permission": "COOK_OWNER",
+      "response_type": "MealPriceHistory",
+      "contract": "Own meal's active price and previous actual price changes from immutable revisions (D14); another kitchen's meal is 404",
+      "implemented": true
     }
   ]
 }

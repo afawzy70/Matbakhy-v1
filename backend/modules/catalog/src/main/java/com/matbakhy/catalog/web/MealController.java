@@ -86,6 +86,11 @@ class MealController {
         return meals.create(actor.id(), body.input());
     }
 
+    @GetMapping("/api/v1/cook/meals/{mealId}/price-history")
+    MealService.PriceHistory priceHistory(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID mealId) {
+        return meals.priceHistory(actor.id(), mealId);
+    }
+
     @PatchMapping("/api/v1/cook/meals/{mealId}")
     CookMeal update(@AuthenticationPrincipal CurrentAccount actor, @PathVariable UUID mealId, @Valid @RequestBody MealBody body) {
         return meals.update(actor.id(), mealId, body.expectedVersion(), body.input());

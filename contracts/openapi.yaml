@@ -1640,6 +1640,36 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PostCookMealsPublicationRequest"
+  /api/v1/cook/meals/{mealId}/price-history:
+    get:
+      operationId: getCookMealsPriceHistory
+      tags:
+        - cook
+      summary: "API-099: own meal's active price and previous actual price changes (D14)"
+      description: Derived from the immutable meal revisions; revisions that did not change the price add no entry. Another kitchen's meal is
+        404. New prices apply only to orders not yet placed; placed orders keep their agreed prices.
+      x-matbakhy-id: API-099
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: mealId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MealPriceHistory"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
   /api/v1/cook/slots:
     get:
       operationId: getCookSlots
@@ -3786,6 +3816,35 @@ components:
             - "null"
         hasMore:
           type: boolean
+    MealPriceHistory:
+      type: object
+      additionalProperties: false
+      description: The active price (the meal's current price) and its price changes, newest first. Times are UTC instants; clients show them in Africa/Cairo.
+      required: [mealId, activePrice, changes]
+      properties:
+        mealId:
+          type: string
+          format: uuid
+        activePrice:
+          $ref: "#/components/schemas/Money"
+        changes:
+          type: array
+          items:
+            $ref: "#/components/schemas/MealPriceChange"
+    MealPriceChange:
+      type: object
+      additionalProperties: false
+      description: A saved revision whose price differs from the previous revision's (the first priced revision is the initial price).
+      required: [price, changedAt, revision]
+      properties:
+        price:
+          $ref: "#/components/schemas/Money"
+        changedAt:
+          type: string
+          format: date-time
+        revision:
+          type: integer
+          minimum: 1
     CaseMessage:
       type: object
       additionalProperties: false

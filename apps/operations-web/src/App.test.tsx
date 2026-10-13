@@ -246,6 +246,60 @@ describe("operations-web cook workspace", () => {
     await waitFor(() => expect(within(screen.getAllByRole("article")[1] as HTMLElement).queryAllByRole("button")).toHaveLength(0));
   });
 
+  it("shows a meal's active price and previous changes in Cairo time and changes the price with the meal version (MB-048)", async () => {
+    let price = 11500;
+    let version = 7;
+    const meal = () => ({
+      id: "m1", kitchenId: "k1", status: "PUBLISHED", revision: 4, publishedAt: "2026-10-01T08:00:00Z", archivedAt: null, updatedAt: "2026-10-03T08:00:00Z",
+      version, moderationState: "VISIBLE", moderationReason: null,
+      content: { titleAr: "كشري", titleEn: "Koshari", priceMinor: price, currency: "EGP", allergenCodes: [], photos: [] },
+    });
+    const history = () => ({
+      mealId: "m1",
+      activePrice: egp(price),
+      changes: [
+        ...(price !== 11500 ? [{ price: egp(price), changedAt: "2026-10-13T09:00:00Z", revision: 5 }] : []),
+        { price: egp(11500), changedAt: "2026-10-03T08:00:00Z", revision: 4 },
+        { price: egp(13000), changedAt: "2026-10-02T08:00:00Z", revision: 3 },
+        { price: egp(12000), changedAt: "2026-10-01T08:00:00Z", revision: 1 },
+      ],
+    });
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/meals": () => ({ status: 200, body: { items: [meal()], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/cook/meals/m1/price-history": () => ({ status: 200, body: history() }),
+      "PATCH /api/v1/cook/meals/m1": (_req, body) => {
+        price = (body as { priceMinor: number }).priceMinor;
+        version += 1;
+        return { status: 200, body: meal() };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأطباق" }));
+    const card = await screen.findByRole("article", { name: "كشري" });
+    const toggle = within(card).getByRole("button", { name: "سجل الأسعار" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle);
+    const section = await within(card).findByRole("region", { name: "سجل الأسعار" });
+    expect(await within(section).findByText(/السعر الحالي/)).toBeTruthy();
+    const egpAr = (minor: number) => new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+    expect(within(section).getByText(/السعر الحالي/).parentElement?.textContent).toContain(egpAr(11500));
+    const previous = within(within(section).getByRole("list", { name: "الأسعار السابقة" })).getAllByRole("listitem").map((li) => li.textContent ?? "");
+    expect(previous).toHaveLength(2);
+    expect(previous[0]).toContain(egpAr(13000));
+    expect(previous[1]).toContain(egpAr(12000));
+    const cairo = new Intl.DateTimeFormat("ar-EG", { timeZone: "Africa/Cairo", dateStyle: "medium", timeStyle: "short" }).format(new Date("2026-10-02T08:00:00Z"));
+    expect(previous[0]).toContain(cairo);
+    expect(within(section).getByText("السعر الجديد يسري على الطلبات التي لم تُرسل بعد؛ الطلبات القائمة تحتفظ بالأسعار المتفق عليها.")).toBeTruthy();
+
+    fireEvent.change(within(section).getByLabelText(/السعر الجديد/), { target: { value: "125.50" } });
+    fireEvent.click(within(section).getByRole("button", { name: "تغيير السعر" }));
+    await waitFor(() => expect(calls.find((c) => c.method === "PATCH")?.body).toEqual({ expectedVersion: 7, priceMinor: 12550 }));
+    await waitFor(() => expect(within(section).getByText(/السعر الحالي/).parentElement?.textContent).toContain(egpAr(12550)));
+    expect(within(within(section).getByRole("list", { name: "الأسعار السابقة" })).getAllByRole("listitem")).toHaveLength(3);
+  });
+
   it("offers resume only for a cook pause and explains a staff pause", async () => {
     const { fetchImpl } = server({
       "GET /api/v1/me": me,
