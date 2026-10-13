@@ -10,4 +10,4 @@ From repository root after installing existing pinned dependencies:
 
 The old quote q0 is refused with PRICE_CHANGED; q1's old/new notice appears. Without clicking Accept new total, Calculate total clears the notice; ordinary terms acceptance enables placement and POST q1 succeeds. The probe asserts that path. Browser/backend/native verification is a separate check. After a fix this diagnostic probe should fail; implement the inverse acceptance regression in the relevant normal test suites, then archive this original evidence unchanged.
 
-Files: [probe](consent.probe.test.tsx), [portable audit config](consent-vitest.config.mjs), [actual command output](consent-component-reproducer.log). Earlier scratch attempts failed on audit-directory module resolution; the config uses relative existing dependency paths and changes no production configuration.
+Files: [probe](consent.probe.test.tsx), [portable audit config](consent-vitest.config.mjs), [actual command output](consent-component-reproducer.txt). Earlier scratch attempts failed on audit-directory module resolution; the config uses relative existing dependency paths and changes no production configuration.
