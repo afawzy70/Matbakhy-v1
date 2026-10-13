@@ -1,0 +1,65 @@
+# MB-039 (OPS-02): proposed alerts from docs/operations/01-environments.md. Thresholds are PROVISIONAL and are tuned
+# with pilot data; invariant alerts (ledger, audit) are never weakened. Instrumentation (the gauges) is not an alert;
+# these rules are. Delivery goes only to the local test sink until the owner approves a real destination.
+groups:
+  - name: matbakhy
+    rules:
+      - alert: ApiDown
+        expr: up{job="api"} == 0
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "API metrics endpoint unreachable", runbook: "docs/operations/08-troubleshooting-runbook.md#4-missing-or-suspicious-telemetry"}
+      - alert: DatabaseUnavailable
+        # The gauges read the database when sampled and report NaN when it cannot be read.
+        expr: matbakhy_outbox_failed_events != matbakhy_outbox_failed_events
+        for: 1m
+        labels: {severity: critical}
+        annotations: {summary: "API cannot read the database"}
+      - alert: LedgerUnbalanced
+        expr: matbakhy_ledger_unbalanced_groups > 0
+        labels: {severity: critical}
+        annotations: {summary: "Ledger groups whose debits differ from credits; stop and escalate, do not edit ledger rows"}
+      - alert: AuditWriteFailed
+        expr: increase(matbakhy_audit_write_failures_events_total[10m]) > 0
+        labels: {severity: critical}
+        annotations: {summary: "A denial was refused without its audit row (audit store failing)"}
+      - alert: OutboxStale
+        expr: matbakhy_outbox_oldest_pending_age_seconds > 300
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "Oldest pending outbox event older than 5 minutes"}
+      - alert: OutboxFailed
+        expr: matbakhy_outbox_failed_events > 0
+        labels: {severity: ops}
+        annotations: {summary: "Outbox events exhausted their retries", runbook: "docs/operations/08-troubleshooting-runbook.md#3-inspect-and-retry-dead-letters"}
+      - alert: NotificationsDeadLettered
+        expr: increase(matbakhy_notifications_dead_deliveries[30m]) > 0
+        labels: {severity: ops}
+        annotations: {summary: "Channel deliveries moved to the dead letter"}
+      - alert: AcceptanceExpiryLagging
+        expr: matbakhy_orders_acceptance_overdue_orders > 0
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: "Orders past their acceptance deadline are not being expired"}
+      - alert: OrderPlacementFailures
+        expr: |
+          sum(rate(http_server_requests_seconds_count{uri="/api/v1/orders",method="POST",status=~"5.."}[10m]))
+            / sum(rate(http_server_requests_seconds_count{uri="/api/v1/orders",method="POST"}[10m])) > 0.01
+        for: 10m
+        labels: {severity: investigate}
+        annotations: {summary: "More than 1% of order placements fail with a server error over 10 minutes"}
+      - alert: BackupStale
+        expr: (time() - matbakhy_backup_last_success_timestamp_seconds) > 86400 or absent(matbakhy_backup_last_success_timestamp_seconds)
+        for: 5m
+        labels: {severity: incident}
+        annotations: {summary: "No successful database backup in 24 hours"}
+      - alert: DiskPressure
+        expr: node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} < 0.15
+        for: 5m
+        labels: {severity: warning}
+        annotations: {summary: "Less than 15% disk free on the host"}
+      - alert: LogPipelineDown
+        expr: up{job=~"loki|alloy"} == 0
+        for: 2m
+        labels: {severity: warning}
+        annotations: {summary: "Log collector or log store unreachable; container logs are kept up to Docker's cap and shipped on recovery"}

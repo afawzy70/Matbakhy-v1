@@ -26,6 +26,7 @@ init_secrets() {
   sed -e "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(hex)|" \
       -e "s|^KEYCLOAK_DB_PASSWORD=.*|KEYCLOAK_DB_PASSWORD=$(hex)|" \
       -e "s|^APP_DB_PASSWORD=.*|APP_DB_PASSWORD=$(hex)|" \
+      -e "s|^GRAFANA_ADMIN_PASSWORD=.*|GRAFANA_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^KEYCLOAK_ADMIN_PASSWORD=.*|KEYCLOAK_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^OIDC_WEB_CLIENT_SECRET=.*|OIDC_WEB_CLIENT_SECRET=$(hex)|" \
       -e "s|^PREVIEW_USER_PASSWORD=.*|PREVIEW_USER_PASSWORD=$(openssl rand -hex 10)|" \
@@ -89,6 +90,15 @@ seed() {
 backup_db() {
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
   compose exec -T -e PGDATABASE=matbakhy -e PGUSER=matbakhy postgres sh -s "/backups/db-$stamp" < ../../scripts/db-backup.sh
+  backup_metric
+}
+
+# Only after a successful dump (set -e): the time of the last good backup, for the BackupStale alert (MB-039).
+backup_metric() {
+  mkdir -p "$BACKUP_DIR/metrics"
+  printf '# HELP matbakhy_backup_last_success_timestamp_seconds Last successful database backup (deploy.sh).\n# TYPE matbakhy_backup_last_success_timestamp_seconds gauge\nmatbakhy_backup_last_success_timestamp_seconds %s\n' \
+    "$(date -u +%s)" > "$BACKUP_DIR/metrics/matbakhy_backup.prom.tmp"
+  mv "$BACKUP_DIR/metrics/matbakhy_backup.prom.tmp" "$BACKUP_DIR/metrics/matbakhy_backup.prom"
 }
 
 backup() {

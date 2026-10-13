@@ -1,0 +1,18 @@
+# Native run 36 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38360947299), source f5c8f50,
+# job 115174748178 "Android debug APK (Gradle)": success. Excerpt of the ordering step (timestamps UTC).
+07:41:02 order MB-100001; database (number|total_minor): MB-100001|9000; app shows text="Total: EGP 90.00"
+07:41:25 ok: the control stopped at 10 of 15 available portions and is disabled there
+07:41:52 ok: the saved basket was flagged, no quote was requested, and reducing to 5 cleared it
+07:42:16 delivery order MB-100002 (mode|fee|total|address snapshot|kitchen|state): DELIVERY|3000|63000|true|...a0d1|PENDING_ACCEPTANCE
+07:42:27 ok: the order link opens order MB-100002 warm and cold
+07:42:27 == MB-033 Q1 same session: the limit lowered while the app keeps running applies when the cart is opened again
+07:43:00 screenshot 11-same-session-limit: 44409aecbd6b0d8a
+07:43:07 ok: same process (8471): limit 10 -> 5 while running; reopening the cart flagged the line
+07:43:07 == MB-049 (D13): the kitchen raises a price after the quote; the customer sees it and must accept the new total
+07:43:31 screenshot 12-price-change-notice: cdf3ebb0911609b6
+07:43:46 repriced order MB-100003 (total|unit|quantity): 13000|13000|1
+07:43:47 screenshot 13-repriced-order: 9787ba376bc97808
+07:43:47 ok: refused at the stale price with no order; notice with old and new prices; placed only after acceptance at 130.00
+07:43:47 PASS: Android ... limit lowered in the same session; kitchen price change reconfirmed
+# The script fails unless: the place attempt at the stale price creates no order; the notice text names the meal with
+# EGP 120.00 and EGP 130.00; the place button is disabled before acceptance; the stored order is 13000|13000|1.

@@ -1,0 +1,42 @@
+// MB-039 (OPS-01): ships every container's json-file log to Loki. Reads the files read-only (no Docker socket).
+// The read position is kept in Alloy's data volume, so after a collector outage it resumes where it stopped, as long
+// as Docker has not yet rotated the lines away (10 MB x 3 per container).
+local.file_match "containers" {
+  path_targets = [{"__path__" = "/var/lib/docker/containers/*/*-json.log"}]
+}
+
+loki.source.file "containers" {
+  targets    = local.file_match.containers.targets
+  forward_to = [loki.process.containers.receiver]
+}
+
+loki.process "containers" {
+  // Docker's json-file wrapper: the line, the stream, the time and attrs.tag (compose logging option tag="{{.Name}}").
+  stage.json {
+    expressions = {output = "log", stream = "stream", time = "time", container = "attrs.tag"}
+  }
+  stage.labels {
+    values = {container = "", stream = ""}
+  }
+  stage.timestamp {
+    source = "time"
+    format = "RFC3339Nano"
+  }
+  stage.output {
+    source = "output"
+  }
+  // ECS JSON from the API (nested "log": {"level": ...}): the level becomes a label; the request ID stays in the line (search with a line filter).
+  stage.json {
+    expressions = {level = "log.level"}
+  }
+  stage.labels {
+    values = {level = ""}
+  }
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

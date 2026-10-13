@@ -298,6 +298,16 @@ final class OrderingTests: XCTestCase {
         app.launch()
         expect(element("open-cart"), "cart shortcut missing", timeout: 90)
         element("open-cart").tap()
+        // Native run 36: this relaunch, about ten minutes after phase A's sign-in, showed the cart signed out. That is
+        // recorded as an open observation (session restore after relaunch), not hidden: the marker below says so, and
+        // the phase signs in again so the price-change check itself runs.
+        if !element("mode-PICKUP").waitForExistence(timeout: 10) && app.buttons["Sign in"].firstMatch.exists {
+            print("MB049-SIGNED-OUT-AT-START")
+            shot("signed-out-before-price-change")
+            app.buttons["Sign in"].firstMatch.tap()
+            login("customer-a")
+            expect(element("mode-PICKUP"), "checkout not shown after sign-in", timeout: 90)
+        }
         tapScrolled("mode-PICKUP")
         tapScrolled("get-quote")
         let total = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Total: ")).firstMatch

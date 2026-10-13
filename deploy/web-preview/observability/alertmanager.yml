@@ -1,0 +1,13 @@
+# MB-039 (OPS-02): every alert goes to the local test sink. Real recipients need the owner's authorization (O07);
+# until then there is no real routing and that gap is explicit.
+route:
+  receiver: test-sink
+  group_by: [alertname]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+receivers:
+  - name: test-sink
+    webhook_configs:
+      - url: http://alert-sink:8080/alerts
+        send_resolved: true

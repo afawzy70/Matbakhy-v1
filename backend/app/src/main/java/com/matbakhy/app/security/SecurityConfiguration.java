@@ -170,6 +170,7 @@ class SecurityConfiguration {
                 .csrf(csrf -> csrf.spa())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/error").permitAll()
+                        .requestMatchers(SecurityConfiguration::managementScrape).permitAll()
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
@@ -188,6 +189,19 @@ class SecurityConfiguration {
                 .addFilterBefore(WebReturnTo.capture(properties.allowedOrigins()),
                         org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
+    }
+
+    /**
+     * MB-039: the Prometheus scrape is open only on a separate management port (management.server.port), served by the
+     * management child context, which no proxy forwards. On the API port the endpoint is neither exposed nor permitted.
+     */
+    static boolean managementScrape(jakarta.servlet.http.HttpServletRequest request) {
+        if (!"/actuator/prometheus".equals(request.getRequestURI())) {
+            return false;
+        }
+        var context = org.springframework.web.context.support.WebApplicationContextUtils.findWebApplicationContext(request.getServletContext());
+        return context instanceof org.springframework.boot.web.server.context.WebServerApplicationContext server
+                && org.springframework.boot.web.server.context.WebServerApplicationContext.hasServerNamespace(server, "management");
     }
 
     /**
