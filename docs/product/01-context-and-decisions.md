@@ -34,7 +34,7 @@ The recurring recovered product concept is a marketplace connecting home cooks a
 | D02 Web | React + TypeScript, separate customer and operations apps | Shared contract/client packages; role-specific UI |
 | D03 Mobile | React Native + Expo, source controlled here | CLI-based AI workflow; share contracts/types, not all UI; Flutter remains an owner-selectable alternative before P01 toolchain lock |
 | D04 Ordering | Transactional marketplace; one cook + one dated slot per order | Clear capacity/pricing/cancellation semantics |
-| D05 Payments | Cash on delivery or cash at pickup; manual recorded refunds/reconciliation | Avoid choosing an uncontracted provider; no stored card data |
+| D05 Payments | **Owner-updated 2026-10-13:** COD/pickup where eligible, plus manual direct customer-to-cook deposit via established Egyptian payment rails (InstaPay/mobile wallets/bank transfers), with cook-reported receipt confirmation | No Matbakhy custody or custom wallet; implementation & live activation gated by permissible merchant accounts, Egyptian legal/consumer/privacy review and truthful receipts/refund workflow. See [MVP direct-payment decision](../strategy/mvp-direct-deposit-payment.md) |
 | D06 Fulfillment | Cook-arranged delivery to configured zones, or customer pickup | No driver app, live driver map or courier API required |
 | D07 Social | Favorites and shareable public links; feed/comments/follows deferred | Validate ordering first; preserve social proposal as an extension |
 | D08 Identity | OIDC provider (local Keycloak reference), email sign-in; verified phone at first checkout | Avoid custom password/token infrastructure; mobile PKCE; production IdP/SMS selection is a launch dependency |
@@ -50,7 +50,7 @@ Machine-readable status, owners and deadlines are in [decisions.json](../../plan
 | ID | Owner input needed | Latest gate / allowed work meanwhile |
 |---|---|---|
 | O01 | Launch city, exact service zones and pickup policy | Before live serviceability config; synthetic zones can be built now |
-| O02 | Confirm cash-first vs online prepayment at launch | Before checkout release scope freeze; cash core and provider interfaces can proceed |
+| O02 | **Commercial direction confirmed:** COD where eligible + direct-to-cook manual deposit via familiar methods. **Open:** permitted merchant recipient, disclosure/refund/confirmation process and legal approval | Before checkout release scope freeze; implementable flow can be planned/tested with fakes; no real collections before approval |
 | O03 | Who delivers, collects cash, pays delivery costs and carries failed-delivery cost | Before live fulfillment; baseline cook-delivery can be tested with fixtures |
 | O04 | Commission, refund/cancellation rules, taxes, invoices, settlement cycle | Before financial release; use clearly labelled synthetic policies |
 | O05 | Brand name clearance, logo, typography, approved screen direction | Before final branded UI; create reviewable prototype, continue backend |
@@ -61,3 +61,7 @@ Machine-readable status, owners and deadlines are in [decisions.json](../../plan
 | O10 | Confirm whether social feed/follows/comments are launch-critical | P00 scope review; default deferred, never describe as previously rejected |
 
 Resolve decisions by recording actual owner text/reference, date, status, affected requirements, migration/contract implications and approval scope. Do not put personal transcripts or private credentials in this public repository. A missing answer blocks only dependent work.
+
+## Owner decision — 2026-10-13: familiar payment rails in MVP
+
+The owner approves adding a **manual direct-to-cook deposit option** (InstaPay and eligible Egyptian mobile wallets/bank transfers) alongside eligible cash on delivery/pickup to the MVP functional scope. This replaces cash-only as the exclusive checkout path; it does **not** assert production legal or payment-provider clearance. No proprietary wallet, platform custody, escrow or automated gateway required for the initial controlled pilot. The cook must independently see and acknowledge incoming funds; Matbakhy records the cook's statement rather than claiming bank verification. Preparation for deposit-required orders is blocked pending acknowledgement and cook acceptance. Disputes, no-show/cancellation, refunds and complete price snapshots must remain auditable. No unilateral rewrite of already placed orders. For details and explicit release gates see [MVP direct-payment decision](../strategy/mvp-direct-deposit-payment.md). AI Concierge remains future-only (issue #4); advanced guarantee/insurance and automated payment reconciliation remain future-only (issue #3).
