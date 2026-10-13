@@ -380,7 +380,7 @@ Purpose: Server budget/sort and empty-state recovery. References: TC-016/017/046
 Preconditions: Baseline four published A/B meals in isolated seed.
 
 1. Open Filters,enter maximum100EGP,Show results.
-2. Sort PRICE_ASC; clear; search unique QA-NO-MATCH-877; use Clear to recover.
+2. Sort PRICE_ASC; reset maximum price to empty and sort NEWEST through the filter form; search unique QA-NO-MATCH-877; use the empty-state Clear to recover.
 
 Expected: Budget sends10000minor; results A2/A3/B1 only, sorted8025,8025,9550; empty shows actionable clear; clearing restoresfour.
 

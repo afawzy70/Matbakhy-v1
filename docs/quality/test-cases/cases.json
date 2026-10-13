@@ -1271,14 +1271,14 @@
     "preconditions": "Baseline four published A/B meals in isolated seed",
     "steps": [
       "Open Filters,enter maximum100EGP,Show results.",
-      "Sort PRICE_ASC; clear; search unique QA-NO-MATCH-877; use Clear to recover."
+      "Sort PRICE_ASC; reset maximum price to empty and sort NEWEST through the filter form; search unique QA-NO-MATCH-877; use the empty-state Clear action to recover."
     ],
     "expected": "Budget sends10000minor; results A2/A3/B1 only, sorted8025,8025,9550; empty shows actionable clear; clearing restoresfour.",
     "invariants": "server queries, no client-only filtering or hidden portion filter",
     "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
     "automation": "qa/regression-d877a15/additional.cjs",
     "reviewStatus": "SELF_REVIEWED",
-    "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
+    "questions": "TC-016/BR-016 define server filter/sort and changing filters, not a global one-click Clear for non-empty results. Initial control assumption corrected with preserved run history; owner may review this convenience as a UX recommendation."
   },
   {
     "id": "C-CONCURRENCY",

@@ -36,9 +36,20 @@ wait_scrolled 'resource-id="get-quote"' 30 || fail "quote missing"
 grep -qE 'resource-id="get-quote"[^>]*enabled="false"|enabled="false"[^>]*resource-id="get-quote"' "$UI" || fail "invalid quote enabled"
 wait_scrolled_up 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 || fail "decrease below fold"
 pos=$(center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"')
-for _ in $(seq 6); do adb shell input tap $pos; done
+for quantity in 9 8 7 6 5 4; do
+  wait_scrolled_up 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 || fail "decrease missing during edit"
+  pos=$(center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"')
+  adb shell input tap $pos
+  wait_for "text=\"$quantity × Native Dish One[^\"]*\"" 30 >/dev/null || fail "one decrement did not reach $quantity"
+done
 wait_for 'text="4 × Native Dish One[^\"]*"' 30 >/dev/null || fail "quantity not four"
-wait_scrolled 'text="Estimated subtotal: EGP.480.00"' 30 || fail "estimated subtotal not 480"
+wait_scrolled 'resource-id="estimate"' 30 || fail "estimate control missing"
+python3 - "$UI" <<'P'
+import re,sys
+nodes=re.findall(r'<node [^>]*>',open(sys.argv[1]).read())
+node=next(n for n in nodes if 'resource-id="estimate"' in n)
+assert re.search(r'text="EGP.480\.00"',node), 'visible estimate must be 480.00'
+P
 wait_scrolled_up 'resource-id="remove-00000000-0000-4000-8000-00000000a0b1"' 30 || fail "remove missing"
 tap 'resource-id="remove-00000000-0000-4000-8000-00000000a0b1"'
 wait_for 'text="Your cart is empty."' 30 >/dev/null || fail "empty state missing"

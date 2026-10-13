@@ -47,19 +47,14 @@ jobs:
       - name: Generate native Android project (Expo prebuild)
         working-directory: apps/customer-mobile
         run: pnpm exec expo prebuild --platform android --no-install --clean
-      - name: Gradle assembleDebug
-        working-directory: apps/customer-mobile/android
-        run: ./gradlew --no-daemon assembleDebug
-      - name: Record artifact identity
-        working-directory: apps/customer-mobile/android
-        run: |
-          APK=app/build/outputs/apk/debug/app-debug.apk
-          ls -l "$APK" && sha256sum "$APK"
-          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/aapt dump badging "$APK" | grep -E "^package:|sdkVersion|targetSdkVersion"
-          java -version 2>&1 | head -1; ./gradlew --version | grep -E "Gradle|Kotlin|JVM"
       - name: Gradle assembleRelease (JS bundle embedded; debug-keystore signed; not a store build)
         working-directory: apps/customer-mobile/android
         run: ./gradlew --no-daemon assembleRelease && sha256sum app/build/outputs/apk/release/app-release.apk
+      - name: Record release APK identity
+        run: |
+          sha256sum apps/customer-mobile/android/app/build/outputs/apk/release/app-release.apk
+          java -version 2>&1 | head -1
+          "$ANDROID_HOME"/build-tools/$(ls "$ANDROID_HOME"/build-tools | sort -V | tail -1)/aapt dump badging apps/customer-mobile/android/app/build/outputs/apk/release/app-release.apk | grep -E "^package:|sdkVersion|targetSdkVersion"
       - name: Start the local stack for the sign-in round trip (PostgreSQL, Keycloak, API; synthetic users, random local passwords)
         run: |
           export JAVA_HOME="$JAVA_HOME_21_X64" PATH="$JAVA_HOME_21_X64/bin:$PATH"
