@@ -55,7 +55,7 @@ Shared adjacency: the sign-out button replaces "Sign in" in the header when sign
   | Initial entry capped at min(10, portions) | Component tests | Component tests; Android emulator run 33 and iOS simulator run 32: cap 10 of 15 |
   | Quantity editing in the basket capped | Component tests | Component tests |
   | Restored basket above a lowered limit flagged, no quote, recovers after reduction | Component tests | Component tests; Android run 33 and iOS run 32 (limit lowered to 5 in the synthetic CI policy) |
-  | Policy lowered after the basket was created, page still open | New component test | New component test (emulator/simulator: next native run) |
+  | Policy lowered after the basket was created, page still open | Component test | Component test only. Native runs 32–35 lower the limit and then **relaunch** the app, so they exercise the restored-basket path, not the mid-session refresh; that refresh has no emulator/simulator execution yet |
   | Reduced availability on a restored basket | Server refuses (`INSUFFICIENT_PORTIONS`, shown as an error; quote not created) | Same |
   | Direct API above the limit | `QuoteIntegrationTest`: 11 under 10 → 422 | Same server |
 
@@ -106,3 +106,26 @@ Android basket editing: our script `order-roundtrip-android.sh` scrolls relative
 - **Independent coverage:** iOS authentication, ordering and recovery; Android basket editing and lifecycle; native mixed-stock and same-kitchen slot variants.
 - **Not available:** screen reader (BLK-003; MB-029/TC-047 blocked); positive SMS verification (fake sender; a simulated provider is not real delivery); physical devices (BLK-004).
 - **Owner questions:** RQ-001/002/003; RQ-004 confirmation; O04 limit value; O06/O07/O09.
+
+## Corrections and changes after the candidate (2026-10-13)
+
+- **Secret scan at the candidate:**
+  - The repair-candidate local SECRET-SCAN (`20261012-QA-REPAIR-2-CHECKS`) ran from a git worktree and scanned 0 commits of history while printing PASS. Its working-tree scan is valid.
+  - Product CI's Gitleaks job was failing for an unrelated reason: synthetic idempotency keys in the QA branch were flagged.
+  - Both are fixed in `ed2ac56`, and a full-history scan (which covers `4555f59`) found no secret in `implementation/mvp`. See [the record](../../verification/runs/20261013-SECRET-SCAN-FIX/README.md).
+  - The candidate's code is unchanged and it remains the retest target.
+- **RQ-004 wording:** the earlier sentence that the screen "never presents a total the server would not accept" was wrong.
+  - An old quote stays on screen until the customer presses Place order. Only then does the server revalidate and refuse it (409 `PRICE_CHANGED`).
+  - The clients then remove the quote, show "The price changed. Calculate the total again." and require a new quote and a fresh terms acceptance. No new total is accepted silently.
+  - See the corrected [rq-004-stale-quote.md](../product/rq-004-stale-quote.md). Client tests for that path are listed as the next MB-033/RQ-004 task.
+- **Product changes after the candidate.** These are not part of the retest; they are backend MB-039 changes, each tested red first with focused integration tests (`verification/runs/20261012-MB-039-LOCAL/`):
+
+  | Commit | Change |
+  |---|---|
+  | `885824b` | Staff support-case views audited (`access.support_case`) |
+  | `3d88aaa` | Staff support messages audited with the request ID |
+  | `00b5189` | Audit-detail redaction keeps whole-value UUIDs |
+  | `1e8ca5d`, `0d0621d` | ECS log lines carry `service.name`, `service.environment` and `service.version` |
+  | `b01453e` | Draft troubleshooting runbook (documentation) |
+
+  The full six-check set has not been re-run after `4555f59`. A newer retest candidate will be published explicitly if one is needed.

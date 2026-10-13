@@ -42,8 +42,8 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Independent QA repair candidate 4555f599411da9683453bee209559c8d1f11cded published (MBQA-003/004/005, OBS-001, Q1 limit refresh; FIXED_PENDING_INDEPENDENT_RETEST; docs/quality/08-codex-qa-repair-cross-role.md): six local checks PASS, native run 35 PASS on Android emulator and iOS simulator. Next: MB-033 (dynamic text sizing checks, notification permission/denial handling design pending O07 push provider), MB-039 remaining local items (runtime database role proposal, log store/metrics/alerts plan for MB-040). Owner: RQ-004 confirmation, RQ-001/002/003, O04, O05, O06, O07, O09; preview access method. MB-029 BLOCKED (BLK-003); physical devices BLK-004.",
-  "updated_at": "2026-10-12T19:51:38Z",
+  "next_action": "Inside the 12:00-00:00 Kuwait window: (1) RQ-004 client tests for stale-quote refusal (web, native); (2) MB-033 dynamic text sizing and notification-permission states with emulator/simulator execution; (3) MB-039 runtime DB role separation, audit-write failure behavior, local log store/metrics/alert sink and runbook rehearsal. Independent retest candidate 4555f599411da9683453bee209559c8d1f11cded unchanged (MBQA-003/004/005, OBS-001 FIXED_PENDING_INDEPENDENT_RETEST). 2026-10-13 preflight: secret-scan guardrail fixed (ed2ac56); four worktree evidence runs annotated. Blocking decisions: O07 push/staging providers, preview hosting and access method, O06 retention; BLK-003, BLK-004.",
+  "updated_at": "2026-10-13T06:04:35Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

@@ -31,12 +31,14 @@ No pricing rule changed.
 
 ## Customer impact
 
-- **What the customer sees:** the old total until they press Place order. They then get "The price changed. Calculate the total again." and the quote is removed, so the screen never presents a total the server would not accept at placement.
+- **What the customer sees:** the old quote, with its old total, stays on screen until they press Place order; it can therefore show a total the server will no longer accept. At placement the server revalidates and refuses it (409 `PRICE_CHANGED`, reason `TOTAL_CHANGED` or `POLICY_CHANGED`); no order is created and placed orders keep their snapshots. The web and native clients then remove the quote, show "The price changed. Calculate the total again." and require a new quote and a fresh terms acceptance; the new total is never accepted silently. *(Corrected 2026-10-13: an earlier version said the screen never presents a total the server would not accept, which was wrong. Client-level tests of this path do not exist yet; server tests do: QuoteIntegrationTest, OrderPlacementIntegrationTest.)*
 - **The cost:** one extra step when a change lands during the 5-minute quote window.
 
 ## Owner question (confirmation only; work continues)
 
 > Confirm that when a fee, rate or zone changes, a customer's unplaced quote (still within its 5 minutes) must be refused and recalculated, rather than honored at the old price.
+
+**Status (2026-10-13):** owner confirmation **not given**. Current behavior is unchanged and follows the documented requirements.
 
 **Recommendation:** confirm. It matches TC-020, TC-042 and the contract, and it never charges a total the current policy does not support.
 

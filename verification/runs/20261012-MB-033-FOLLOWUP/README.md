@@ -63,4 +63,10 @@ Review findings:
 | 34 ([38291984205](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38291984205)) | `f5d2ba0` | **PASS** (job 114953998714; same phases as run 33) | **PASS:** all phases A–F: regression, cap 10, lowered limit (one quote after correction), delivery MB-100002 DELIVERY/3000/63000, deep link warm and cold. [log](IOS-NATIVE-f5d2ba0.log) |
 
 **Result:** at `f5d2ba0` both platforms pass the native delivery, quantity-limit and deep-link checks on emulator/simulator. Six local checks also PASS at `f5d2ba0` (`verification/runs/20261012-CANDIDATE-B2`). Physical devices: not run (BLK-004).
+| 35 ([38296110431](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38296110431)) | `4555f59` | Workflow success (job conclusions read via the API; step logs not excerpted) | Workflow success (same) |
+
+**Current result (2026-10-13):**
+- The latest step-level evidence for each phase is run 34 at `f5d2ba0`, with excerpts for both platforms.
+- Run 35 at `4555f59` adds the mobile mid-session limit refresh. Its job conclusions are success, but no native phase lowers the limit while the cart stays open, so that refresh is covered by component tests only.
+- Physical devices: NOT_RUN (BLK-004). Screen readers: NOT_RUN (BLK-003).
 

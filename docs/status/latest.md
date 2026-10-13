@@ -137,14 +137,18 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-**Next story:** MB-033 (native lifecycle, push and accessibility). The owner's audit and log readiness package follows at the next MB-039 checkpoint.
+**Next tasks (inside the 12:00–00:00 Kuwait window):**
+1. RQ-004 client tests: a stale quote refused at placement removes the old quote, shows the price-changed message and needs a new quote and fresh terms acceptance (web and native).
+2. MB-033 dynamic text sizing on Android and iOS (Arabic RTL, English LTR): discovery, basket, checkout, orders, support, notifications; then notification-permission states without a provider.
+3. MB-039 local controls: runtime database role separation with mutation rejection under the runtime role; audit-write failure behavior; resource-bounded searchable logs and restricted metrics with a local alert sink; runbook rehearsal against a deliberately failed synthetic event.
 
-**Owner decisions and inputs still needed:**
-- **Web preview:** hosting provider, plan and budget; domain and DNS; the tester access method (private network recommended, because mobile and Wi-Fi addresses change; IP allow-list otherwise); approval to publish the two preview images to GHCR. See [06-web-preview.md](../operations/06-web-preview.md); prices are unverified.
-- **Policy and launch decisions:**
-  - O04: the real per-line quantity limit and commerce policy;
-  - O05: visual approval;
-  - O06: retention;
-  - O07: providers and staging.
-- **Requirement questions:** RQ-001, RQ-002, RQ-003.
-- **Screen-reader testing:** BLK-003.
+**Decisions that block the next work** (everything else continues without them):
+
+| Decision | Recommendation | Impact while open | Continues without it |
+|---|---|---|---|
+| O07 push provider (and staging providers) | Choose a provider only after the preview; keep fakes until then | No device-token registration, push routing or real notification checks (MB-033 push criteria stay BLOCKED) | Permission states and denial handling in the app; in-app notifications |
+| Preview hosting, domain and tester access method | Hetzner-class VPS (prices unverified) with a private-network (WireGuard) access because mobile and Wi-Fi IPs change | No deployed AUD-01/LOG-01/OPS-01..03; external testers blocked; MB-040 not started | All local readiness work and rehearsals |
+| O06 log retention and audit archival | Short operational log retention for the preview; audit kept append-only until an archival policy is approved | Retention can be configured only as a proposal | Local log store with size caps; audit controls |
+| Screen-reader tester (BLK-003) and physical devices (BLK-004) | One tester with TalkBack and VoiceOver on two physical devices | MB-029, MB-033 accessibility and device criteria cannot close | Automated checks and emulator/simulator runs (not substitutes) |
+
+Not blocking current work but still open: RQ-004 confirmation (current behavior continues), O04 commercial limit (synthetic 10 in development), O05 visual approval, RQ-001/002/003, O09.
