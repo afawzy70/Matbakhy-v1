@@ -1,0 +1,56 @@
+{
+  "run_id": "20261013-TC-050",
+  "story_id": "MB-033",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "NATIVE-COMPONENT",
+      "name": "Customer mobile component tests (notification permission state, refusal copy, inbox)",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/customer-mobile test"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    }
+  ],
+  "manual_checks": [
+    {
+      "id": "ANDROID-NATIVE-REFUSAL",
+      "name": "Android emulator (API 35): the app does not ask on launch; Allow opens the system dialog; Don't allow leaves the app usable with a Settings path and the in-app notifications; POST_NOTIFICATIONS granted=false",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38392564050 (job: Android debug APK (Gradle)) at ae9fdbf; also runs 38402170785 and 38407586755",
+      "log_path": "verification/runs/20261013-TC-050/ANDROID-NATIVE.log"
+    },
+    {
+      "id": "IOS-NATIVE-REFUSAL",
+      "name": "iOS simulator (phase J): not asked on launch; Allow shows the system prompt; Don't Allow explained with a Settings path; in-app notifications still available",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "Native run 40 at 9c0db34 (no change to notificationPermission.ts, Account.tsx or Notifications.tsx since)",
+      "log_path": "verification/runs/20261013-TC-050/IOS-NATIVE.log"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-050",
+      "observed": "Push permission is optional on both platforms: neither app asks on launch; the request appears only after the customer taps Allow alerts; after Don't allow the app explains that every update stays in Notifications, offers Settings, keeps the in-app inbox usable and requests no device token (development builds only while O07 is open). Android: system permission granted=false checked by dumpsys. iOS: springboard prompt and refusal checked by XCUITest."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "TC-050 only. Self-review, not independent review. MB-033 stays IN_PROGRESS: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots, and iOS reruns blocked by BLK-005."
+    ]
+  },
+  "open_defects": []
+}
