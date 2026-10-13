@@ -1,0 +1,94 @@
+{
+  "run_id": "20261013-CANDIDATE-H",
+  "story_id": "MB-039",
+  "phase": "P08",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-055",
+      "observed": "AccountErasureIntegrationTest on PostgreSQL (BACKEND-VERIFY): erasure under the fixture policy, including a customer with a support reply and a deposit transfer reference (V27), ledger unchanged and balanced; runtime role cannot delete, truncate or disable the append-only triggers."
+    },
+    {
+      "id": "TC-056",
+      "observed": "LogRedactionIntegrationTest (BACKEND-VERIFY): no tokens, OTPs, contact, address, document content, deposit recipient, transfer reference or activity visitor id in ECS logs or metric names and tags."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Local regression checks for QA candidate H. Since candidate G (c056e4a): V27 lets account erasure clear a customer's support replies and deposit transfer references on append-only history (erasure previously failed for customers with a support reply); preview backups count only after a restore check (BR-057); extended TC-055/TC-056 tests; iOS UI-test harness resolution of BLK-005 (native run 48: Android and iOS every phase PASS incl. the MB-053 deposit journey).",
+      "Self-review, not independent review. MBQA-003/004/005/006 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST."
+    ]
+  },
+  "open_defects": []
+}
