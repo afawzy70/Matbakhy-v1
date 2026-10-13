@@ -103,18 +103,27 @@ final class OrderingTests: XCTestCase {
         secret.tap()
         Thread.sleep(forTimeInterval: 1.5)
         secret.typeText(password + "\n")
-        dismissSavePassword()
+        dismissSavePassword(until: element("mode-PICKUP"))
     }
 
     /// iOS may offer "Save Password?" after the provider's form is submitted; while it is up the redirect waits and the
     /// authorization code can expire (native run 38). Dismiss it when it appears.
-    private func dismissSavePassword() {
-        for root in [app, authUI, XCUIApplication(bundleIdentifier: "com.apple.springboard")] {
-            let notNow = root.buttons["Not Now"].firstMatch
-            if notNow.waitForExistence(timeout: 4) {
-                notNow.tap()
-                return
+    /// Run 43: the prompt appeared after a sequential 3 × 4 s look had ended, so all three places are now checked
+    /// together, every half second, for up to 30 s; the wait ends early once the app shows the signed-in account.
+    private func dismissSavePassword(until done: XCUIElement? = nil) {
+        let roots = [app, authUI, XCUIApplication(bundleIdentifier: "com.apple.springboard")]
+        let deadline = Date().addingTimeInterval(30)
+        while Date() < deadline {
+            for root in roots {
+                let notNow = root.buttons["Not Now"].firstMatch
+                if notNow.exists && notNow.isHittable {
+                    notNow.tap()
+                    print("MB031-SAVE-PASSWORD-DISMISSED")
+                    return
+                }
             }
+            if let done, done.exists { return }
+            Thread.sleep(forTimeInterval: 0.5)
         }
     }
 
