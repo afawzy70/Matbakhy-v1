@@ -22,11 +22,15 @@ export function createMobileApi(config: AppConfig, session: Session, context: Re
   // objects. Returning them fails its `instanceof Response` check when the platform fetch (React Native/Expo) yields a
   // Response class other than the global one, which turned every API answer into an error on iOS (native run 21).
   client.use({
-    onRequest({ request }) {
+    async onRequest({ request }) {
       request.headers.set("Accept-Language", context.locale);
-      const token = session.accessToken;
+      const hadSession = session.accessToken !== null;
+      // Refreshes an expired access token first (native run 36); a refused refresh ends the session here.
+      const token = await session.freshAccessToken();
       if (token) {
         request.headers.set("Authorization", `Bearer ${token}`);
+      } else if (hadSession) {
+        context.onSignedOut();
       }
     },
     async onResponse({ request, response }) {

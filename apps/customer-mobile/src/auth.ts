@@ -2,7 +2,7 @@ import * as AuthSession from "expo-auth-session";
 import * as WebBrowser from "expo-web-browser";
 import type { AppConfig } from "./config";
 import { checkRedirect } from "./redirect";
-import type { Session } from "./session";
+import { RefreshRejected, type Session, type Tokens } from "./session";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -53,5 +53,22 @@ export async function signOut(config: AppConfig, session: Session, refreshToken:
     }
   } finally {
     await session.signOut();
+  }
+}
+
+/**
+ * Exchanges the refresh token at the provider (public client, no secret). An OAuth error response (for example
+ * invalid_grant after the session expired or was revoked) ends the session; a transport failure does not.
+ */
+export async function refresh(config: AppConfig, refreshToken: string): Promise<Tokens> {
+  const discovery = await AuthSession.fetchDiscoveryAsync(config.issuer);
+  try {
+    const tokens = await AuthSession.refreshAsync({ clientId: config.clientId, refreshToken }, discovery);
+    return { accessToken: tokens.accessToken, refreshToken: tokens.refreshToken ?? null, idToken: tokens.idToken ?? null, ...(tokens.expiresIn ? { expiresIn: tokens.expiresIn } : {}) };
+  } catch (e) {
+    if (e instanceof AuthSession.TokenError) {
+      throw new RefreshRejected(e.code);
+    }
+    throw e;
   }
 }

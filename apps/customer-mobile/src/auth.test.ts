@@ -1,7 +1,7 @@
 import * as SecureStore from "expo-secure-store";
 import { ConfigError, loadConfig } from "./config";
 import { AuthRedirectError, checkRedirect } from "./redirect";
-import { Session } from "./session";
+import { RefreshRejected, Session } from "./session";
 import { fakeJwt } from "./testing";
 import { loadSession, saveSession, subjectOf } from "./tokenStore";
 
@@ -105,5 +105,51 @@ describe("environment configuration", () => {
     expect(loadConfig({}, { environment: "development" }, "matbakhy-dev").redirectUri).toBe(REDIRECT);
     expect(() => loadConfig({ EXPO_PUBLIC_ENVIRONMENT: "staging", EXPO_PUBLIC_API_URL: "http://api" }, {}, "x")).toThrow(ConfigError);
     expect(loadConfig({ EXPO_PUBLIC_ENVIRONMENT: "staging", EXPO_PUBLIC_API_URL: "https://api", EXPO_PUBLIC_OIDC_ISSUER: "https://id" }, {}, "x").issuer).toBe("https://id");
+  });
+});
+
+describe("token refresh keeps the customer signed in past the access-token lifetime (native run 36 finding)", () => {
+  const fresh = (sub: string, n: number) => ({ accessToken: fakeJwt(sub) + `.${n}`, refreshToken: `r${n}`, idToken: fakeJwt(sub), expiresIn: 300 });
+
+  it("returns the current token while it is valid and refreshes once, for concurrent callers, when it has expired", async () => {
+    const session = new Session();
+    await session.signedIn({ ...fresh("customer-a", 1), expiresIn: 300 }, 0);
+    const refresher = jest.fn(async () => fresh("customer-a", 2));
+    session.useRefresher(refresher);
+    expect(await session.freshAccessToken(1_000)).toBe(fakeJwt("customer-a") + ".1");
+    expect(refresher).not.toHaveBeenCalled();
+    const [a, b] = await Promise.all([session.freshAccessToken(301_000), session.freshAccessToken(301_000)]);
+    expect(a).toBe(fakeJwt("customer-a") + ".2");
+    expect(b).toBe(a);
+    expect(refresher).toHaveBeenCalledTimes(1);
+    expect(refresher).toHaveBeenCalledWith("r1");
+    expect(JSON.parse(mockStore.get("matbakhy.session.v1") ?? "{}").refreshToken).toBe("r2");
+  });
+
+  it("ends the session when the provider refuses the refresh token", async () => {
+    const session = new Session();
+    await session.signedIn(fresh("customer-a", 1), 0);
+    session.cache("me", { name: "A" });
+    session.useRefresher(async () => {
+      throw new RefreshRejected("invalid_grant");
+    });
+    expect(await session.freshAccessToken(400_000)).toBeNull();
+    expect(session.accessToken).toBeNull();
+    expect(session.cachedKeys).toEqual([]);
+    expect(mockStore.size).toBe(0);
+  });
+
+  it("keeps the session when the provider cannot be reached, and refuses tokens for another subject", async () => {
+    const session = new Session();
+    await session.signedIn(fresh("customer-a", 1), 0);
+    session.useRefresher(async () => {
+      throw new TypeError("Network request failed");
+    });
+    expect(await session.freshAccessToken(400_000)).toBe(fakeJwt("customer-a") + ".1");
+    expect(session.subject).toBe("customer-a");
+
+    session.useRefresher(async () => fresh("customer-b", 3));
+    expect(await session.freshAccessToken(400_000)).toBeNull();
+    expect(session.accessToken).toBeNull();
   });
 });

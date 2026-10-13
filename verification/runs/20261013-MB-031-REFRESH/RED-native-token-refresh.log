@@ -1,0 +1,70 @@
+FAIL src/auth.test.ts
+  authorization redirect (TC-131: invalid redirect rejected)
+    ✓ accepts only our exact redirect with the expected state and a code (12 ms)
+  secure token storage (TC-048, TC-131: invalid token state rejected)
+    ✓ stores the session only in the secure mockStore, device-only (2 ms)
+    ✓ deletes corrupt, incomplete or expired-unrefreshable sessions and reports signed out (4 ms)
+    ✓ reads the subject from a token without trusting anything else (1 ms)
+  account switch and logout clear private data (TC-048)
+    ✓ drops A's cached data when B signs in, and everything on sign-out (3 ms)
+    ✓ rejects a token without a subject and stays signed out (1 ms)
+  environment configuration
+    ✓ uses development defaults and refuses plain HTTP outside development (2 ms)
+  token refresh keeps the customer signed in past the access-token lifetime (native run 36 finding)
+    ✕ returns the current token while it is valid and refreshes once, for concurrent callers, when it has expired (1 ms)
+    ✕ ends the session when the provider refuses the refresh token
+    ✕ keeps the session when the provider cannot be reached, and refuses tokens for another subject
+
+  ● token refresh keeps the customer signed in past the access-token lifetime (native run 36 finding) › returns the current token while it is valid and refreshes once, for concurrent callers, when it has expired
+
+    TypeError: session.useRefresher is not a function
+
+      116 |     await session.signedIn({ ...fresh("customer-a", 1), expiresIn: 300 }, 0);
+      117 |     const refresher = jest.fn(async () => fresh("customer-a", 2));
+    > 118 |     session.useRefresher(refresher);
+          |             ^
+      119 |     expect(await session.freshAccessToken(1_000)).toBe(fakeJwt("customer-a") + ".1");
+      120 |     expect(refresher).not.toHaveBeenCalled();
+      121 |     const [a, b] = await Promise.all([session.freshAccessToken(301_000), session.freshAccessToken(301_000)]);
+
+      at Object.useRefresher (src/auth.test.ts:118:13)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● token refresh keeps the customer signed in past the access-token lifetime (native run 36 finding) › ends the session when the provider refuses the refresh token
+
+    TypeError: session.useRefresher is not a function
+
+      131 |     await session.signedIn(fresh("customer-a", 1), 0);
+      132 |     session.cache("me", { name: "A" });
+    > 133 |     session.useRefresher(async () => {
+          |             ^
+      134 |       throw new RefreshRejected("invalid_grant");
+      135 |     });
+      136 |     expect(await session.freshAccessToken(400_000)).toBeNull();
+
+      at Object.useRefresher (src/auth.test.ts:133:13)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● token refresh keeps the customer signed in past the access-token lifetime (native run 36 finding) › keeps the session when the provider cannot be reached, and refuses tokens for another subject
+
+    TypeError: session.useRefresher is not a function
+
+      143 |     const session = new Session();
+      144 |     await session.signedIn(fresh("customer-a", 1), 0);
+    > 145 |     session.useRefresher(async () => {
+          |             ^
+      146 |       throw new TypeError("Network request failed");
+      147 |     });
+      148 |     expect(await session.freshAccessToken(400_000)).toBe(fakeJwt("customer-a") + ".1");
+
+      at Object.useRefresher (src/auth.test.ts:145:13)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       3 failed, 7 passed, 10 total
+Snapshots:   0 total
+Time:        0.658 s, estimated 1 s
+Ran all test suites matching /src\/auth.test.ts/i.
