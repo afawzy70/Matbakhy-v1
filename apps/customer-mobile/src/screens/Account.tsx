@@ -66,7 +66,7 @@ function PhoneAlerts() {
     : state === "granted"
       ? t.alertsGranted
       : state === "denied"
-        ? t.alertsDenied
+        ? t.alertsDenied(brand.name[locale])
         : state === "unavailable"
           ? t.alertsUnavailable
           : state === "undetermined"

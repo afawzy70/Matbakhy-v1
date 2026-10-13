@@ -686,7 +686,7 @@ describe("MB-033 notification permission (provider-independent; push delivery is
     await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
     await openAccount();
     await fireEvent.press(await screen.findByTestId("allow-alerts"));
-    expect(await screen.findByText(t.alertsDenied)).toBeTruthy();
+    expect(await screen.findByText(t.alertsDenied(brand.name.en))).toBeTruthy();
     expect(screen.queryByTestId("allow-alerts")).toBeNull();
     await fireEvent.press(screen.getByTestId("open-alert-settings"));
     expect(permissions.openSettings).toHaveBeenCalledTimes(1);
@@ -698,7 +698,7 @@ describe("MB-033 notification permission (provider-independent; push delivery is
     const permissions = fake("denied", "denied");
     await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
     await openAccount();
-    expect(await screen.findByText(t.alertsDenied)).toBeTruthy();
+    expect(await screen.findByText(t.alertsDenied(brand.name.en))).toBeTruthy();
     expect(screen.queryByTestId("allow-alerts")).toBeNull();
     expect(permissions.request).not.toHaveBeenCalled();
   });
