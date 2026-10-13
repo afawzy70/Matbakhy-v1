@@ -1,3 +1,4 @@
+import { priceChanges } from "@matbakhy/api-client";
 import { useEffect, useState } from "react";
 import { errorCode, formatMoney, formatTime, loginUrl, newIdempotencyKey, type Schemas } from "./api";
 import { estimateMinor, lineLimit, loadCart, loadPending, saveCart, savePending, type CartLine, type PendingPlacement } from "./cart";
@@ -199,6 +200,9 @@ function OrderForm({
   const [pending, setPending] = useState<PendingPlacement | null>(loadPending);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // D13: a price that changed before placement is shown and must be accepted explicitly before the new quote is placed.
+  const [change, setChange] = useState<{ previous: Quote | null; next: Quote } | null>(null);
+  const [changeAccepted, setChangeAccepted] = useState(false);
   const [addresses, reloadAddresses] = useServer(ctx, () => ctx.api.GET("/api/v1/me/addresses"));
   const quoting = useMutation(ctx, () => undefined);
 
@@ -225,6 +229,34 @@ function OrderForm({
     };
   }, [ctx]);
 
+  function quoteRequest() {
+    return {
+      items: cart.lines.map((l) => ({ mealId: l.mealId, quantity: l.quantity })),
+      slotId: cart.slotId,
+      fulfillmentMode: mode,
+      ...(mode === "DELIVERY" && addressId ? { addressId } : {}),
+    };
+  }
+
+  /** After a refused stale quote: a fresh server quote for the same basket, shown against the one the customer saw. */
+  async function requote(previous: Quote | null) {
+    setChangeAccepted(false);
+    setAccepted(false);
+    try {
+      const r = await ctx.api.POST("/api/v1/quotes", { body: quoteRequest() });
+      if (r.data) {
+        setQuote(r.data);
+        setChange({ previous, next: r.data });
+        return;
+      }
+    } catch {
+      // Unreachable: fall through; the basket stays and "Calculate total" can be pressed again.
+    }
+    setQuote(null);
+    setChange(null);
+    setError(t.requoteFailed);
+  }
+
   async function place(p: PendingPlacement) {
     setPlacing(true);
     setError(null);
@@ -247,8 +279,15 @@ function OrderForm({
       savePending(null);
       setPending(null);
       onPending(false);
+      const code = errorCode(r.error);
+      if (code === "PRICE_CHANGED") {
+        // Nothing was ordered: re-quote and let the customer review and accept the new prices (never resubmit silently).
+        await requote(quote);
+        return;
+      }
       setQuote(null);
-      setError(errorText(t, errorCode(r.error)));
+      setChange(null);
+      setError(errorText(t, code));
     } catch {
       setError(t.pendingRetry);
     } finally {
@@ -278,6 +317,7 @@ function OrderForm({
               onClick={() => {
                 setMode(m);
                 setQuote(null);
+                setChange(null);
               }}
             >
               {t.mode[m]}
@@ -298,6 +338,7 @@ function OrderForm({
                     onChange={() => {
                       setAddressId(a.id);
                       setQuote(null);
+                      setChange(null);
                     }}
                   />{" "}
                   {a.label} · {a.street} {a.building}
@@ -314,15 +355,10 @@ function OrderForm({
         disabled={overLimit || quoting.busy || (mode === "DELIVERY" && !addressId)}
         onClick={() =>
           void quoting.run(async () => {
-            const r = await ctx.api.POST("/api/v1/quotes", {
-              body: {
-                items: cart.lines.map((l) => ({ mealId: l.mealId, quantity: l.quantity })),
-                slotId: cart.slotId,
-                fulfillmentMode: mode,
-                ...(mode === "DELIVERY" && addressId ? { addressId } : {}),
-              },
-            });
+            const r = await ctx.api.POST("/api/v1/quotes", { body: quoteRequest() });
             setQuote(r.data ?? null);
+            setChange(null);
+            setError(null);
             return r;
           })
         }
@@ -330,6 +366,7 @@ function OrderForm({
         {t.getQuote}
       </button>
       <ErrorLine message={quoting.error} />
+      {change ? <PriceChangeNotice ctx={ctx} change={change} accepted={changeAccepted} onAccept={() => setChangeAccepted(true)} /> : null}
       {quote ? (
         <div className="stack">
           <dl className="summary">
@@ -352,7 +389,7 @@ function OrderForm({
           <button
             type="button"
             className="cta"
-            disabled={!accepted || placing || pending !== null}
+            disabled={!accepted || placing || pending !== null || (change !== null && !changeAccepted)}
             onClick={() => {
               // Keys are fixed and stored before the request so a retry can never create a second order.
               const p: PendingPlacement = {
@@ -374,6 +411,40 @@ function OrderForm({
       ) : null}
       <ErrorLine message={error} />
     </section>
+  );
+}
+
+/**
+ * D13: what changed since the customer's last total, attributed accurately: the kitchen for meal prices, otherwise the
+ * delivery fee or tax; the previous and new total; and an explicit acceptance before the new quote can be placed.
+ */
+function PriceChangeNotice({ ctx, change, accepted, onAccept }: { ctx: Ctx; change: { previous: Quote | null; next: Quote }; accepted: boolean; onAccept: () => void }) {
+  const { t, locale } = ctx;
+  const money = (minor: number) => formatMoney(minor, locale);
+  const d = change.previous ? priceChanges(change.previous, change.next) : null;
+  return (
+    <div role="alert" className="notice" aria-labelledby="price-change-title" data-testid="price-change">
+      <h3 id="price-change-title">{t.priceChangeTitle}</h3>
+      {d?.meals.map((m) => (
+        <p key={m.mealId}>{t.kitchenChangedPrice(m.title, money(m.previousMinor), money(m.nextMinor))}</p>
+      ))}
+      {d?.deliveryFee ? <p>{t.deliveryFeeChanged(money(d.deliveryFee.previousMinor), money(d.deliveryFee.nextMinor))}</p> : null}
+      {d?.tax ? <p>{t.taxChanged(money(d.tax.previousMinor), money(d.tax.nextMinor))}</p> : null}
+      {d?.unexplained ? <p>{t.orderDetailsChanged}</p> : null}
+      <p>
+        <strong>{d ? t.newTotalReview(money(d.total.previousMinor), money(d.total.nextMinor)) : t.newTotalOnly(money(change.next.total.amountMinor))}</strong>
+      </p>
+      <p>
+        {t.editOrLeave} <a href="#/">{t.backToBrowsing}</a>
+      </p>
+      {accepted ? (
+        <p role="status">{t.newTotalAccepted}</p>
+      ) : (
+        <button type="button" onClick={onAccept}>
+          {t.acceptNewTotal}
+        </button>
+      )}
+    </div>
   );
 }
 

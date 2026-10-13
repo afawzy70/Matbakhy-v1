@@ -4,6 +4,7 @@ import type { components, operations, paths } from "./generated/schema";
 export type { components, operations, paths };
 export type ApiError = components["schemas"]["ApiError"];
 export { MalformedMoneyError, parseMoney, type Money } from "./money";
+export { priceChanges, type MealPriceDelta, type PriceChanges, type PriceDelta } from "./priceChanges";
 
 /**
  * Typed client for the Matbakhy API. Paths, parameters and bodies are checked against
