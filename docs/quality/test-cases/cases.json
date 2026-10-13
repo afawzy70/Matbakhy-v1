@@ -1181,7 +1181,7 @@
     "platforms": "Chromium web + real API/DB",
     "locales": "en,ar; baseline en unless explicitly parameterized",
     "priority": "P1",
-    "preconditions": "real localAPI/Postgres; generatedprivate canaries; fresh isolated known seed described in README",
+    "preconditions": "Fresh pending A2×1/A5 order with non-null disclosed contact, fresh OPEN owncase; actual staff grants; private generated canaries",
     "steps": [
       "Trigger denied foreign reads,supportviews/messages andordercontactview with unique requestIds.",
       "Read authorizedaudit; inspect local logs for canary values."
@@ -1189,7 +1189,7 @@
     "expected": "Auditread audited; targetedstaffreads/messages correlated; no credential/contact/address/OTPcanaries in logs or auditdetail.",
     "invariants": "scopeexplicit; blocked tools never pass",
     "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": "MANUAL / planned automation",
+    "automation": "qa/regression-d877a15/audit.cjs",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1229,7 +1229,7 @@
       "Sign inA; openOne and Add to favorites.",
       "Open Favorites,selectOne,remove; inspect list and stored favorite."
     ],
-    "expected": "A favorite persists in actual list and removal removes own row; B cannot read A favorites.",
+    "expected": "Own favorite persists in actual native list and removal removes own row. Foreign-account authorization is a separate API/access case; no native B-account favorite-cache claim.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
     "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
     "automation": "qa/regression-d877a15/native/instrument.py; fixture-control.py; generated native UI harness",
