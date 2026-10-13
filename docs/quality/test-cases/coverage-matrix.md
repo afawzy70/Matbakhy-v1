@@ -1,0 +1,24 @@
+# Requirements and journey eligibility — pinned d877a15
+
+Application: `d877a1576cd942200fe0a53b5a19fee76b996025`, pushed remote HEAD resolved 2026-10-13. Selected newest coherent incremental candidate: old repairs4555f59 plus local audit/log additions, nonzero secret scan, D13 server locking1c49473 and D14 kitchen price-history UI/API. MB-048/049 remain IN_PROGRESS; code inspection confirms history and server segment are executable. Status/latest predates these increments and still names4555f59; it is historical delivery context, not evidence for the newer code. Product CI38359983464 was in progress at selection, not assumed passing. Never follow later branch updates.
+
+| Actors / surface | Tasks and delivered implementation | Dependencies/data | Eligibility and cases |
+|---|---|---|---|
+| Customer web | MB-009/010/016..019/024/027/028: real OIDC, discovery, basket, address, quote/place, orders, favorites/reviews, case thread repair | Real API/Keycloak/Postgres, baselineA/B, verified contact prerequisite | READY C-* and S-SUPPORT; verification phone positive separately BLOCKED |
+| Kitchen web | MB-014/015/019/020/022: actual Meals/Slots/Orders/Statement/Settings; D14 PriceHistory in Meals + owner-scopedAPI-099 | cook-a/b, synthetic media and open capacities | READY S-AUTH/CATALOG/SLOTS/DRAFT-CLOSE/INVALID/SETTINGS,X-FULFILL; P-HISTORY PARTIAL delivered increment pending story closure |
+| Reviewer operations web | MB-012/023: CookApplications/Catalogue/Orders | real freshOTP, cook.review/content.moderate/order.ops grants | READY S-ONBOARD (submission API to actual reviewer UI; no applicant editing UI claim),S-MODERATE,C-AFTER-ACCEPT |
+| Support web | MB-024: case detail, public/private messages, assignment/states | support.case grant, exact customer order/case | READY S-SUPPORT/S-SUPPORT-RESOLVE |
+| Finance web | MB-020/025: statements, reports, refunds, settlements | two actors, verified synthetic cash, fictional external references | READY S-FINANCE*; bank/payment-provider settlement explicitly excluded |
+| Admin/config web | MB-011/026: granular grants, versions, audit read | freshOTP, staff.grant/config/audit permissions | READY S-CONFIG/SECURITY-REVOKED/P-FEE-STALE |
+| Customer Android native | MB-031/032 completed; MB-033 delivery/Q1/deep links implemented | own free authorized GitHub emulator runner, native seed, real services | READY core authentication/discovery/basket/pickup/recovery/delivery; PARTIAL MB-033; N-* logged separately from web |
+| Customer iOS native | Same code, distinct Swift native tests | own macOS simulator runner/native services | READY same delivered core; tooling failure becomes BLOCKED, never inherited Android PASS |
+| Staff Android/iOS | No staff-native application or journeys exist | None | NOT READY / excluded; responsive operations web is not native |
+| Repricing customer experience | MB-049/TC-154 D13 newly approved; Checkout/Cart still generic PRICE_CHANGED handling, no old/new component comparison | Implemented client reconfirmation increment missing | NOT READY implementation gap: P-PRECOMMIT/P-REFRESH-FAIL; do not call a regression against pre-D13 candidate |
+| Pricing atomicity / history integrity | MB-049 server1c49473, MB-048d877a15 code present | locked real DB transactions and authorized updates | PARTIAL eligible server segment P-SERIALIZE/P-FEE-STALE; P-LOST-PRICE independent transport recovery invariant |
+| Accessibility | MB-029/TC-046/047 | Chromium/axe/keyboard; no local screen reader | PARTIAL W-A11Y; M-SCREENREADER BLOCKED; dependent gate stays open |
+| Native scaling/push/physical devices | MB-033 remainder not implemented; MB-034/035 future signing/device evidence | actual OS/device/provider prerequisites | N-OPTIONAL NOT READY; physical/provider checks BLOCKED, no paid service |
+| Deployment/operations/performance | MB-038/040..046 future; MB-039 local audit/log segment exists | local logs/audit available; no authorized deployment | M-LOG-AUDIT READY, M-DEPLOYED NOT READY; load/pilot/store release excluded |
+
+Coverage denominator: 54 stable definitions, including9 native definitions parameterized separately per OS, 4 replacement cases and explicit gaps. Execution denominator uses concrete platform/locale/viewport rows, not scenario registry's old PASS statuses. Delivered feature mapping is the table above; execution report lists unexecuted eligible subchecks explicitly. Provider SMS/push, screen readers, physical devices and external staging are not substituted by component/API results.
+
+Existing independent findings and successful Kane report were read only after deriving original campaign cases. The prior Kane comparison correction is preserved: successful pilot atd0ba6424 scoped desktopArabic, different-kitchen keep/replace and same-kitchen slot keep only; it does not prove displayed basket totals or native coverage. No Kane invocation/credits in this campaign.
