@@ -53,6 +53,6 @@ Claude has eight bounded implementation batches, with objectives, scope, accepta
 - [Limitations and evidence](UX-AUDIT-LIMITATIONS.md)
 - [Claude implementation handoff](CLAUDE-UX-IMPLEMENTATION-HANDOFF.md)
 
-The dedicated audit branch is intended to target `implementation/mvp` in a draft PR so its review contains audit documentation only. The existing implementation PR #1 is a separate deliverable. Final publication commit/PR are reported by the coordinator; a push does not establish CI success.
+Published as draft [audit PR #6](https://github.com/afawzy70/Matbakhy-v1/pull/6), targeting `implementation/mvp`; its diff contains only `docs/audits/ux/`. The existing implementation PR #1 is separate. No merge performed; a push does not establish CI success.
 
 Publication-time fetch observed newer implementation head `d35cc133f7d163801a263c8b40c80edd4823f289`; audit results remain pinned to cc52fa4. See the limitations report for the inspected change boundary.
