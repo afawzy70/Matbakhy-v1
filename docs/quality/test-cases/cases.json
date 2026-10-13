@@ -1325,5 +1325,29 @@
     "automation": "qa/regression-d877a15/layout.cjs (TARGETED discovery; integrate in next fresh FULL REGRESSION)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "No owner approval inferred. This tests functional readability under BR-046, not branding preferences; screen reader remains separate BLOCKED check."
+  },
+  {
+    "id": "C-PERMANENT-REPLAY",
+    "title": "Permanent request identity after quote expiry and cache miss",
+    "purpose": "Verify stable clientRequestId resolves an existing order with a fresh idempotency key, independent of cached original response",
+    "requirementReferences": "BR-023/024; TC-023; MB-018/037",
+    "group": "cross-cutting",
+    "roles": "actors named in preconditions",
+    "platforms": "Chromium web + real API/DB",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P0",
+    "preconditions": "Owning customer-a; genuinely committed earlier synthetic order from lost-response flow; real quote expires_at < database now(); fresh unused idempotency key; order already legally cancelled in cleanup",
+    "steps": [
+      "Read original quoteId/clientRequestId/accepted policy versions and immutable amounts for the own synthetic order from read-only DB metadata.",
+      "Confirm the original quote is genuinely expired; record order/stock/cash/event counts.",
+      "POST the original placement body with same clientRequestId and a NEW idempotency key through real authenticated API; repeat.",
+      "Compare exact returned order ID/amounts and unchanged counts/reservation state."
+    ],
+    "expected": "201 returns the SAME existing order and immutable prices/fees/total despite expired quote/current versions; no new order, reservation, cash obligation or placement event; cancellation is not undone.",
+    "invariants": "one permanent customer+clientRequestId; cache miss does not cause revalidation/new placement; no duplicated effects",
+    "cleanup": "Read-only baseline plus bounded idempotency response rows in own QA DB; no order recreated or cancellation repeated.",
+    "automation": "qa/regression-d877a15/permanent-replay.cjs (TARGETED extension; include next fresh full)",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   }
 ]

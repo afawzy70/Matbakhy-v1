@@ -251,3 +251,20 @@ Expected: Amounts remain readable as intact numeric tokens, with currency groupe
 Invariants: UI formatting preserves authoritative EGP minor-unit amounts; read-only actions never alter finance/order data. Cleanup: Restore1440/en; close only own browser contexts; do not mutate order/cash/ledger.
 
 Automation: qa/regression-d877a15/layout.cjs (TARGETED discovery; integrate in next fresh FULL REGRESSION). Review SELF_REVIEWED. Questions: No owner approval inferred. This tests functional readability under BR-046, not branding preferences; screen reader remains separate BLOCKED check.
+
+## C-PERMANENT-REPLAY — Permanent request identity after quote expiry and cache miss
+
+Purpose: Verify stable clientRequestId resolves an existing order with a fresh idempotency key, independent of cached original response. References: BR-023/024; TC-023; MB-018/037. Customer-a; authenticatedweb/API; en; priorityP0. Native client execution not substituted.
+
+Preconditions: Owning customer-a; genuinely committed earlier synthetic order from lost-response flow; real quote expires_at < database now(); fresh unused idempotency key; order already legally cancelled in cleanup.
+
+1. Read original quoteId/clientRequestId/accepted policy versions and immutable amounts for the own synthetic order from read-only DB metadata.
+2. Confirm the original quote is genuinely expired; record order/stock/cash/event counts.
+3. POST the original placement body with same clientRequestId and a NEW idempotency key through real authenticated API; repeat.
+4. Compare exact returned order ID/amounts and unchanged counts/reservation state.
+
+Expected: 201 returns the SAME existing order and immutable prices/fees/total despite expired quote/current versions; no new order, reservation, cash obligation or placement event; cancellation is not undone.
+
+Invariants: one permanent customer+clientRequestId; cache miss does not cause revalidation/new placement; no duplicated effects. Cleanup: Read-only baseline plus bounded idempotency response rows in own QA DB; no order recreated or cancellation repeated.
+
+Automation: qa/regression-d877a15/permanent-replay.cjs (TARGETED extension; include next fresh full). Review SELF_REVIEWED. Questions: commercial values synthetic; no owner approval claim.
