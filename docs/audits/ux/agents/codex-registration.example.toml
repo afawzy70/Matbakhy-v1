@@ -8,4 +8,3 @@ config_file = "roles/ux-researcher.role.toml"
 [agents.design-ux-architect]
 description = "Matbakhy independent ux-architect audit; preserves Agency Agents identity"
 config_file = "roles/ux-architect.role.toml"
-

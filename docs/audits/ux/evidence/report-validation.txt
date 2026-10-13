@@ -46,3 +46,5 @@ PASS: Markdown destinations, suggested source paths, 21 unique stable IDs, requi
 Final specialist consistency reviews: researcher and architect found no material blockers; wording clarifications applied.
 
 PASS: bash scripts/check_secrets.sh; 277 fetched history commits and committable working tree scanned; no leaks found. See secret-scan.txt.
+
+Whitespace check: four upstream architect Markdown trailing-space lines intentionally retained to preserve original bytes. Audit-authored files pass diff --check; source archive excluded from that whitespace-only check.

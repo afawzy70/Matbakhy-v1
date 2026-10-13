@@ -16,4 +16,3 @@ The Agency -- Installing agents
   +------------------------------------------------+
 
   Run ./scripts/convert.sh to regenerate after adding or editing agents.
-
