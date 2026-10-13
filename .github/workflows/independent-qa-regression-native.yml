@@ -119,24 +119,6 @@ jobs:
       - name: Generate native iOS project (Expo prebuild) and install pods
         working-directory: apps/customer-mobile
         run: pnpm exec expo prebuild --platform ios --clean
-      - name: xcodebuild for iOS Simulator (no code signing)
-        working-directory: apps/customer-mobile/ios
-        run: |
-          set +e
-          xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Debug \
-            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > "$RUNNER_TEMP/xcodebuild.log" 2>&1
-          status=$?
-          grep -nE "error:|\*\* BUILD" "$RUNNER_TEMP/xcodebuild.log" | head -60
-          tail -20 "$RUNNER_TEMP/xcodebuild.log"
-          exit $status
-      - name: Record artifact identity
-        working-directory: apps/customer-mobile/ios
-        run: |
-          APP=$(find build/Build/Products -maxdepth 2 -name '*.app' | head -1)
-          echo "$APP" && /usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Info.plist"
-          /usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP/Info.plist"
-          shasum -a 256 "$APP/$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Info.plist")"
       - name: xcodebuild Release for iOS Simulator (JS bundle embedded; ad-hoc signed so the simulator keychain works; no team or certificate)
         working-directory: apps/customer-mobile/ios
         run: |
@@ -153,12 +135,12 @@ jobs:
         run: scripts/launch-ios.sh "$(find ios/build-release/Build/Products -maxdepth 2 -name '*.app' | head -1)"
       - name: Start identity provider and API natively for the sign-in round trip (no Docker on macOS runners; synthetic users)
         run: apps/customer-mobile/scripts/native-stack-macos.sh
-      - name: MB-031 native sign-in round trip on iOS (XCUITest; system browser, PKCE, secure storage, sign-out, account switch)
-        run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
       - name: Independent pending preconditions and fixture control (test harness only)
         run: |
           python3 iqa-controls/qa/regression-d877a15/native/instrument.py
           nohup python3 iqa-controls/qa/regression-d877a15/native/fixture-control.py > "$RUNNER_TEMP/iqa-fixture.log" 2>&1 &
+      - name: MB-031 native sign-in round trip on iOS (XCUITest; system browser, PKCE, secure storage, sign-out, account switch)
+        run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
       - name: MB-032 native ordering on iOS (basket replacement, app terminated during submit, offline reopen, recovery without duplicate)
         run: apps/customer-mobile/scripts/order-roundtrip-ios.sh
       - name: Independent native outcome and reservation correlation

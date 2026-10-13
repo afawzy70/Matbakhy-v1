@@ -218,5 +218,7 @@ extra=r'''    private func fixture(_ path: String) {
 s=s.rsplit('}',1)[0]+extra+'}\n'
 p.write_text(s)
 p=Path('apps/customer-mobile/scripts/order-roundtrip-ios.sh')
-s=p.read_text();s+='\nphase testG_IndependentSameSessionPolicyEditAndRecovery\nphase testH_IndependentCustomerSupportReply\n'
+s=p.read_text().replace('Test Case|error:|MB03[23]-', 'Test Case|error:|MB03[23]-|IQA-')
+s=s.replace('    exit 1\n  fi\n}', '    exit 1\n  fi\n  grep -q \"Test Case.*$name.*passed\" \"$RUNNER_TEMP/mb032-$name.log\" || { echo \"FAIL: zero successful executions for $name\"; exit 1; }\n}')
+s+='\nphase testG_IndependentSameSessionPolicyEditAndRecovery\nphase testH_IndependentCustomerSupportReply\n'
 p.write_text(s)
