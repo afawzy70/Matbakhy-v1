@@ -8,7 +8,7 @@ import { useMemo, useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AppProvider, useApp } from "./AppContext";
-import { signIn as systemSignIn, signOut as systemSignOut } from "./auth";
+import { refresh as systemRefresh, signIn as systemSignIn, signOut as systemSignOut } from "./auth";
 import { ConfigError, loadConfig, type AppConfig } from "./config";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { strings } from "./i18n";
@@ -24,6 +24,7 @@ import { OrderScreen, OrdersScreen } from "./screens/Orders";
 import { SupportScreen } from "./screens/Support";
 import { Session } from "./session";
 import { colors } from "./ui";
+import type { NotificationPermissions } from "./notificationPermission";
 
 /**
  * Customer app (MB-031 shell, MB-032 discovery and ordering). Tabs: Discover, Favorites, Orders, Account; stack
@@ -36,6 +37,8 @@ export interface AppDeps {
   signIn?: typeof systemSignIn;
   signOut?: typeof systemSignOut;
   fetchImpl?: typeof fetch;
+  permissions?: NotificationPermissions;
+  refresh?: typeof systemRefresh;
 }
 
 function initialLocale(): Locale {
@@ -107,7 +110,7 @@ export function App(deps: AppDeps = {}) {
   return (
     <ErrorBoundary t={strings[locale]}>
       <SafeAreaProvider>
-        <AppProvider config={config} session={session} initialLocale={locale} signIn={deps.signIn} signOut={deps.signOut} fetchImpl={deps.fetchImpl}>
+        <AppProvider config={config} session={session} initialLocale={locale} signIn={deps.signIn} signOut={deps.signOut} fetchImpl={deps.fetchImpl} {...(deps.permissions ? { permissions: deps.permissions } : {})} {...(deps.refresh ? { refresh: deps.refresh } : {})}>
           <Navigation />
         </AppProvider>
       </SafeAreaProvider>

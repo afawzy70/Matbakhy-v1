@@ -11,6 +11,11 @@ export interface AppConfig {
   issuer: string;
   clientId: string;
   redirectUri: string;
+  /**
+   * MB-033: offer to ask for the phone's notification permission. Push delivery is not decided (O07), so only
+   * development builds ask; other builds say that updates appear in Notifications inside the app.
+   */
+  notificationPrompt?: boolean;
 }
 
 export class ConfigError extends Error {}
@@ -30,6 +35,7 @@ export function loadConfig(
     issuer: env.EXPO_PUBLIC_OIDC_ISSUER ?? "http://localhost:8180/realms/matbakhy",
     clientId: env.EXPO_PUBLIC_OIDC_CLIENT_ID ?? "matbakhy-mobile",
     redirectUri: `${scheme}://auth/callback`,
+    notificationPrompt: (env.EXPO_PUBLIC_NOTIFICATION_PROMPT ?? String(extra.notificationPrompt ?? environment === "development")) === "true",
   };
   // Only local development may use plain HTTP; deployed builds must talk to TLS endpoints.
   if (environment !== "development") {

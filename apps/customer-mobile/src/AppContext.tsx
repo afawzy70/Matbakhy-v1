@@ -1,11 +1,14 @@
 import type { Locale } from "@matbakhy/design-tokens";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { signIn as systemSignIn, signOut as systemSignOut, SignInCancelled } from "./auth";
+import { refresh as systemRefresh, signIn as systemSignIn, signOut as systemSignOut, SignInCancelled } from "./auth";
 import { clearShopping } from "./basket";
 import type { AppConfig } from "./config";
 import { strings, type Strings } from "./i18n";
 import { createMobileApi, type MobileApi, type Schemas } from "./mobileApi";
 import type { Session } from "./session";
+import { type NotificationPermissions, systemNotificationPermissions } from "./notificationPermission";
+
+const devicePermissions = systemNotificationPermissions();
 
 export type Profile = Schemas["CustomerProfile"];
 
@@ -31,6 +34,8 @@ export interface AppContextValue {
   maxQuantityPerLine: number | null;
   /** Re-reads the published limit (the cart calls it when it gains focus). */
   reloadLimits: () => void;
+  /** The phone's notification permission (MB-033), provider-independent. */
+  permissions: NotificationPermissions;
 }
 
 const Ctx = createContext<AppContextValue | null>(null);
@@ -55,6 +60,8 @@ export function AppProvider({
   signIn = systemSignIn,
   signOut = systemSignOut,
   fetchImpl,
+  permissions = devicePermissions,
+  refresh = systemRefresh,
   children,
 }: {
   config: AppConfig;
@@ -63,6 +70,8 @@ export function AppProvider({
   signIn?: typeof systemSignIn;
   signOut?: typeof systemSignOut;
   fetchImpl?: typeof fetch;
+  permissions?: NotificationPermissions;
+  refresh?: typeof systemRefresh;
   children: ReactNode;
 }) {
   const [locale, setLocale] = useState<Locale>(initialLocale);
@@ -70,9 +79,9 @@ export function AppProvider({
   const [busy, setBusy] = useState(false);
   const t = strings[locale];
   // A new client per language: requests carry the current Accept-Language; a 401 ends the session everywhere.
-  const api = useMemo(
-    () =>
-      createMobileApi(
+  const api = useMemo(() => {
+    session.useRefresher((refreshToken) => refresh(config, refreshToken));
+    return createMobileApi(
         config,
         session,
         {
@@ -83,9 +92,8 @@ export function AppProvider({
           },
         },
         fetchImpl,
-      ),
-    [config, session, fetchImpl, locale],
-  );
+      );
+  }, [config, session, fetchImpl, locale, refresh]);
 
   const reloadProfile = useCallback(async () => {
     try {
@@ -197,6 +205,7 @@ export function AppProvider({
     reloadProfile,
     maxQuantityPerLine,
     reloadLimits,
+    permissions,
   };
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

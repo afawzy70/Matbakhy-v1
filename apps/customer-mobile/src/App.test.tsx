@@ -649,3 +649,110 @@ describe("D13 on native: changed prices need informed reconfirmation", () => {
     }
   });
 });
+
+describe("MB-033 notification permission (provider-independent; push delivery is O07)", () => {
+  const promptConfig: AppConfig = { ...config, notificationPrompt: true };
+  const routes = () =>
+    api({
+      ...discover,
+      "GET /api/v1/me": () => json(200, profile),
+      "GET /api/v1/notifications": () => json(200, { items: [{ id: "n1", type: "ORDER_STATE", params: { state: "ACCEPTED", orderNumber: "MB-000901" }, orderId: null, createdAt: "2026-10-13T09:00:00Z", readAt: null }], nextCursor: null, hasMore: false }),
+    });
+  async function signedIn() {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    return session;
+  }
+  const fake = (initial: string, afterRequest: string) => ({
+    get: jest.fn(async () => initial as never),
+    request: jest.fn(async () => afterRequest as never),
+    openSettings: jest.fn(async () => undefined),
+  });
+
+  it("never asks on launch; asks only when the customer presses Allow", async () => {
+    const permissions = fake("undetermined", "granted");
+    await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
+    await openAccount();
+    expect(await screen.findByText(t.alertsAsk)).toBeTruthy();
+    expect(permissions.request).not.toHaveBeenCalled();
+    await fireEvent.press(screen.getByTestId("allow-alerts"));
+    expect(await screen.findByText(t.alertsGranted)).toBeTruthy();
+    expect(permissions.request).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId("allow-alerts")).toBeNull();
+  });
+
+  it("a refusal is safe: it explains, offers Settings and the in-app notifications still work", async () => {
+    const permissions = fake("undetermined", "denied");
+    await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
+    await openAccount();
+    await fireEvent.press(await screen.findByTestId("allow-alerts"));
+    expect(await screen.findByText(t.alertsDenied)).toBeTruthy();
+    expect(screen.queryByTestId("allow-alerts")).toBeNull();
+    await fireEvent.press(screen.getByTestId("open-alert-settings"));
+    expect(permissions.openSettings).toHaveBeenCalledTimes(1);
+    await fireEvent.press(screen.getByRole("button", { name: t.notifications }));
+    expect(await screen.findByText(/MB-000901/)).toBeTruthy();
+  });
+
+  it("an earlier refusal shows the Settings path without the system prompt", async () => {
+    const permissions = fake("denied", "denied");
+    await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
+    await openAccount();
+    expect(await screen.findByText(t.alertsDenied)).toBeTruthy();
+    expect(screen.queryByTestId("allow-alerts")).toBeNull();
+    expect(permissions.request).not.toHaveBeenCalled();
+  });
+
+  it("states what it cannot check, and builds without the prompt never touch the permission", async () => {
+    const unavailable = fake("unavailable", "unavailable");
+    const first = await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={unavailable} />);
+    await openAccount();
+    expect(await screen.findByText(t.alertsUnavailable)).toBeTruthy();
+    first.unmount();
+
+    const untouched = fake("undetermined", "granted");
+    await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={untouched} />);
+    await openAccount();
+    expect(await screen.findByText(t.alertsInApp)).toBeTruthy();
+    expect(untouched.get).not.toHaveBeenCalled();
+    expect(untouched.request).not.toHaveBeenCalled();
+  });
+
+  it("maps the system statuses: a refusal the system will not ask again counts as denied", () => {
+    const { stateOf } = jest.requireActual<typeof import("./notificationPermission")>("./notificationPermission");
+    expect(stateOf({ status: "granted", granted: true, canAskAgain: true })).toBe("granted");
+    expect(stateOf({ status: "undetermined", granted: false, canAskAgain: true })).toBe("undetermined");
+    expect(stateOf({ status: "undetermined", granted: false, canAskAgain: false })).toBe("denied");
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: true })).toBe("denied");
+  });
+});
+
+describe("an expired access token is refreshed instead of signing the customer out (native run 36)", () => {
+  it("refreshes before the first request and stays signed in with the new token", async () => {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a") + ".old", idToken: fakeJwt("customer-a"), refreshToken: "r1", expiresIn: 0 });
+    const refresh = jest.fn(async () => ({ accessToken: fakeJwt("customer-a") + ".new", refreshToken: "r2", idToken: fakeJwt("customer-a"), expiresIn: 300 }));
+    const fetchImpl = api({ ...discover, "GET /api/v1/me": () => json(200, profile) });
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} refresh={refresh} />);
+    await openAccount();
+    expect(await screen.findByText(t.signedInAs("Mona"))).toBeTruthy();
+    const me = (fetchImpl as jest.Mock).mock.calls.map((c) => c[0] as Request).find((r) => r.url.endsWith("/api/v1/me"));
+    expect(me?.headers.get("Authorization")).toBe(`Bearer ${fakeJwt("customer-a")}.new`);
+    expect(refresh).toHaveBeenCalledWith(config, "r1");
+  });
+
+  it("ends the session cleanly when the provider refuses the refresh token", async () => {
+    const { RefreshRejected } = jest.requireActual<typeof import("./session")>("./session");
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r1", expiresIn: 0 });
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    const refresh = jest.fn(async () => {
+      throw new RefreshRejected("invalid_grant");
+    });
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(401, {}) })} refresh={refresh} />);
+    await openAccount();
+    expect(await screen.findByRole("button", { name: t.signIn })).toBeTruthy();
+    await waitFor(() => expect(mockStore.size).toBe(0));
+    expect(session.accessToken).toBeNull();
+  });
+});
