@@ -336,5 +336,81 @@ echo "repriced order $PNUMBER (total|unit|quantity): $PROW"
 shot repriced-order
 echo "ok: refused at the stale price with no order; notice with old and new prices; placed only after acceptance at 130.00"
 
+echo "== MB-033 dynamic text: largest system font size, English then Arabic, every customer area"
+# Android's largest font-size setting is 2.0 on API 34+ (1.3 on older images); the app keeps React Native's default
+# font scaling (no fixed heights, no line limits). Each area must still show its content and reach its main action;
+# the screenshots (CI artifact) are for visual review of wrapping and RTL. Overflow is not measured automatically:
+# uiautomator reports bounds clipped to the window.
+MEAL='resource-id="meal-00000000-0000-4000-8000-00000000a0b1"'
+dynamic_text_pass() {
+  local lang="$1" notif="$2" support="$3"
+  tap 'resource-id="tab-discover"'
+  wait_for "$MEAL" 90 >/dev/null || fail "[$lang] Discover: meal not listed at large text"
+  shot "dt-$lang-discover"
+  tap "$MEAL"
+  tap 'resource-id="slot-0"'
+  wait_scrolled 'resource-id="add-to-cart"' 30 || fail "[$lang] Meal: add to cart not reachable at large text"
+  shot "dt-$lang-meal"
+  tap_scrolled 'resource-id="add-to-cart"'
+  tap_scrolled 'resource-id="go-to-cart"'
+  wait_for 'resource-id="cart-lines"' 30 >/dev/null || fail "[$lang] Cart: basket lines missing"
+  shot "dt-$lang-cart"
+  wait_scrolled 'resource-id="get-quote"' 30 || fail "[$lang] Checkout: calculate total not reachable at large text"
+  wait_scrolled 'resource-id="place-order"' 30 || fail "[$lang] Checkout: place order not reachable at large text"
+  shot "dt-$lang-checkout"
+  adb shell input keyevent 4
+  adb shell input keyevent 4
+  tap 'resource-id="tab-orders"'
+  wait_for "resource-id=\"order-$PNUMBER\"" 30 >/dev/null || fail "[$lang] Orders: $PNUMBER not listed"
+  shot "dt-$lang-orders"
+  tap "resource-id=\"order-$PNUMBER\""
+  wait_for 'resource-id="order-items"' 30 >/dev/null || fail "[$lang] Order: items missing"
+  shot "dt-$lang-order"
+  adb shell input keyevent 4
+  tap 'resource-id="tab-account"'
+  tap_scrolled "text=\"$notif\""
+  wait_for 'resource-id="notifications"' 30 >/dev/null || fail "[$lang] Notifications screen missing"
+  shot "dt-$lang-notifications"
+  adb shell input keyevent 4
+  tap_scrolled "text=\"$support\""
+  wait_for 'resource-id="support"' 30 >/dev/null || fail "[$lang] Support screen missing"
+  shot "dt-$lang-support"
+  adb shell input keyevent 4
+  echo "ok: [$lang] discover, meal, cart, checkout actions, orders, order, notifications and support at font scale $SCALE"
+}
+SCALE=2.0
+[ "$(adb shell getprop ro.build.version.sdk | tr -d '\r')" -ge 34 ] || SCALE=1.3
+adb shell settings put system font_scale "$SCALE"
+launch
+dynamic_text_pass en "Notifications" "Support"
+# Switch the app to Arabic from Account (the button names the other language). The choice is not persisted, so the
+# Arabic pass continues in the same process.
+tap 'resource-id="tab-account"'
+tap_scrolled 'text="العربية"'
+wait_for 'text="الإشعارات"' 30 >/dev/null || fail "Arabic not applied"
+dynamic_text_pass ar "الإشعارات" "الدعم"
+tap 'resource-id="tab-account"'
+tap_scrolled 'text="English"'
+adb shell settings put system font_scale 1.0
+echo "ok: dynamic text pass complete in English and Arabic"
+
+echo "== MB-033 notification permission: asked only when the customer chooses; a refusal is safe"
+launch
+tap 'resource-id="tab-account"'
+wait_scrolled 'resource-id="phone-alerts-undetermined"' 30 || fail "permission not shown as not yet asked (the app must not ask on launch)"
+absent 'resource-id="com.android.permissioncontroller:id/permission_deny_button"'
+tap_scrolled 'resource-id="allow-alerts"'
+tap 'resource-id="com.android.permissioncontroller:id/permission_deny_button"' 30
+wait_scrolled 'resource-id="phone-alerts-denied"' 30 || fail "refusal not explained"
+wait_scrolled 'resource-id="open-alert-settings"' 10 || fail "no path to Settings after a refusal"
+absent 'resource-id="allow-alerts"'
+shot alerts-denied
+[ "$(adb shell dumpsys package "$PKG" | grep -o 'android.permission.POST_NOTIFICATIONS: granted=[a-z]*' | head -1)" = "android.permission.POST_NOTIFICATIONS: granted=false" ] || fail "system permission not refused"
+tap_scrolled 'text="Notifications"'
+wait_for 'resource-id="notifications"' 30 >/dev/null || fail "in-app notifications unavailable after the refusal"
+shot notifications-after-refusal
+adb shell input keyevent 4
+echo "ok: not asked on launch; Allow opened the system dialog; Don't allow left the app usable with the Settings path and in-app notifications"
+
 if adb logcat -d | grep -E "FATAL EXCEPTION"; then fail "fatal exception"; fi
-echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed"
+echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest font size in English and Arabic; notification refusal safe"

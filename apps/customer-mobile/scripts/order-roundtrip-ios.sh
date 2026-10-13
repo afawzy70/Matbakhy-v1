@@ -160,4 +160,14 @@ AFTER=$(psql_q -c "SELECT count(*) FROM customer_order WHERE kitchen_id = '00000
 echo "repriced order $PNUMBER (total|unit|quantity): $PROW; kitchen-one orders before phase H: $BEFORE, after: $AFTER"
 [ "$PROW" = "13000|13000|1" ] || { echo "FAIL: repriced order not stored at the accepted price: $PROW"; exit 1; }
 [ "$AFTER" = "$((BEFORE + 1))" ] || { echo "FAIL: expected exactly one new order (none at the stale price)"; exit 1; }
-echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed"
+echo "== phase I (MB-033): largest accessibility text size, English then Arabic, every customer area"
+export TEST_RUNNER_MB033_DT_ORDER="$PNUMBER"
+xcrun simctl ui "$UDID" content_size accessibility-extra-extra-extra-large
+phase testI_DynamicTextEnglishAndArabic
+xcrun simctl ui "$UDID" content_size large
+mkdir -p "$RUNNER_TEMP/mb033-ios-screens"
+xcrun xcresulttool export attachments --path "$RUNNER_TEMP/mb032-testI_DynamicTextEnglishAndArabic.xcresult" \
+  --output-path "$RUNNER_TEMP/mb033-ios-screens" >/dev/null 2>&1 || echo "screenshots not exported; the xcresult bundle keeps them"
+echo "== phase J (MB-033): notification permission asked only on request; Don't Allow is safe"
+phase testJ_NotificationRefusalIsSafe
+echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest accessibility text size in English and Arabic; notification refusal safe"

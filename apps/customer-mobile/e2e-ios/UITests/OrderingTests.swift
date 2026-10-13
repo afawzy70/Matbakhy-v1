@@ -13,6 +13,10 @@ import XCTest
 ///   testF  the order link (matbakhy-dev://orders/<id>) opens that order while the app runs (warm) and after termination (cold).
 ///   testG  same session: with 6 in the basket the script lowers the limit to 5 while the app keeps running (the test waits on
 ///          the public configuration); reopening the cart flags the line.
+///   testI  MB-033 dynamic text (the script sets the largest accessibility text size first): every customer area in English,
+///          then in Arabic, shows its content and reaches its main action; screenshots are kept for visual review.
+///   testJ  MB-033 notification permission: not asked on launch; Allow shows the system prompt; Don't Allow leaves the
+///          app usable with a Settings path and the in-app notifications.
 ///   testH  D13: after a quote the script raises Native Dish One to 130.00 (the test waits on the public meal); placing shows
 ///          the kitchen's change and the old and new totals; the new quote is placed only after explicit acceptance.
 final class OrderingTests: XCTestCase {
@@ -298,16 +302,15 @@ final class OrderingTests: XCTestCase {
         app.launch()
         expect(element("open-cart"), "cart shortcut missing", timeout: 90)
         element("open-cart").tap()
-        // Native run 36: this relaunch, about ten minutes after phase A's sign-in, showed the cart signed out. That is
-        // recorded as an open observation (session restore after relaunch), not hidden: the marker below says so, and
-        // the phase signs in again so the price-change check itself runs.
-        if !element("mode-PICKUP").waitForExistence(timeout: 10) && app.buttons["Sign in"].firstMatch.exists {
-            print("MB049-SIGNED-OUT-AT-START")
+        // Native run 36: this relaunch, about ten minutes after phase A's sign-in, showed the cart signed out because
+        // the app never refreshed its 5-minute access token. Fixed in MB-031 (token refresh); the relaunch must now
+        // still be signed in, which makes this phase the native check of the refresh.
+        if !element("mode-PICKUP").waitForExistence(timeout: 20) && app.buttons["Sign in"].firstMatch.exists {
             shot("signed-out-before-price-change")
-            app.buttons["Sign in"].firstMatch.tap()
-            login("customer-a")
-            expect(element("mode-PICKUP"), "checkout not shown after sign-in", timeout: 90)
+            XCTFail("signed out after relaunch: the expired access token was not refreshed")
+            return
         }
+        print("MB049-STILL-SIGNED-IN")
         tapScrolled("mode-PICKUP")
         tapScrolled("get-quote")
         let total = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Total: ")).firstMatch
@@ -334,5 +337,103 @@ final class OrderingTests: XCTestCase {
         expect(number, "repriced order not confirmed")
         print("MB049-ORDER-NUMBER \(number.label)")
         shot("repriced-order")
+    }
+
+    /// Scrolls until a button with this label is hittable, then taps it (buttons without an identifier).
+    private func tapLabel(_ label: String) {
+        let target = app.buttons[label].firstMatch
+        expect(target, "\(label) missing")
+        var tries = 0
+        while !target.isHittable && tries < 8 {
+            app.swipeUp()
+            tries += 1
+        }
+        target.tap()
+    }
+
+    /// Scrolls until the element is hittable (reachable on screen) without tapping it.
+    private func reach(_ id: String, _ message: String) {
+        let target = element(id)
+        expect(target, message)
+        var tries = 0
+        while !target.isHittable && tries < 10 {
+            app.swipeUp()
+            tries += 1
+        }
+        XCTAssertTrue(target.isHittable, message)
+    }
+
+    private func dynamicTextPass(_ lang: String, order number: String, notifications: String, support: String) {
+        element("tab-discover").tap()
+        let meal = element("meal-00000000-0000-4000-8000-00000000a0b1")
+        expect(meal, "[\(lang)] Discover: meal not listed at large text", timeout: 90)
+        shot("dt-\(lang)-discover")
+        meal.tap()
+        expect(element("slot-0"), "[\(lang)] Meal: no slot")
+        element("slot-0").tap()
+        reach("add-to-cart", "[\(lang)] Meal: add to cart not reachable at large text")
+        shot("dt-\(lang)-meal")
+        tapScrolled("add-to-cart")
+        tapScrolled("go-to-cart")
+        expect(element("cart-lines"), "[\(lang)] Cart: basket lines missing")
+        shot("dt-\(lang)-cart")
+        reach("get-quote", "[\(lang)] Checkout: calculate total not reachable at large text")
+        reach("place-order", "[\(lang)] Checkout: place order not reachable at large text")
+        shot("dt-\(lang)-checkout")
+        app.navigationBars.buttons.firstMatch.tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        element("tab-orders").tap()
+        let order = element("order-\(number)")
+        expect(order, "[\(lang)] Orders: \(number) not listed")
+        shot("dt-\(lang)-orders")
+        order.tap()
+        expect(element("order-items"), "[\(lang)] Order: items missing")
+        shot("dt-\(lang)-order")
+        app.navigationBars.buttons.firstMatch.tap()
+        element("tab-account").tap()
+        tapLabel(notifications)
+        expect(element("notifications"), "[\(lang)] Notifications screen missing")
+        shot("dt-\(lang)-notifications")
+        app.navigationBars.buttons.firstMatch.tap()
+        tapLabel(support)
+        expect(element("support"), "[\(lang)] Support screen missing")
+        shot("dt-\(lang)-support")
+        app.navigationBars.buttons.firstMatch.tap()
+        print("MB033-DYNAMIC-TEXT-OK \(lang)")
+    }
+
+    func testI_DynamicTextEnglishAndArabic() {
+        guard let number = ProcessInfo.processInfo.environment["MB033_DT_ORDER"], !number.isEmpty else {
+            return XCTFail("order number not passed by the script")
+        }
+        app.launch()
+        dynamicTextPass("en", order: number, notifications: "Notifications", support: "Support")
+        // The language button names the other language; the choice is not persisted, so Arabic continues in this process.
+        element("tab-account").tap()
+        tapLabel("العربية")
+        dynamicTextPass("ar", order: number, notifications: "الإشعارات", support: "الدعم")
+    }
+
+    func testJ_NotificationRefusalIsSafe() {
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        app.launch()
+        element("tab-account").tap()
+        let undetermined = element("phone-alerts-undetermined")
+        expect(undetermined, "permission not shown as not yet asked (the app must not ask on launch)")
+        XCTAssertFalse(springboard.alerts.firstMatch.exists, "a system prompt appeared without the customer asking")
+        tapScrolled("allow-alerts")
+        let prompt = springboard.alerts.firstMatch
+        expect(prompt, "no system notification prompt", timeout: 20)
+        let deny = prompt.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Don")).firstMatch
+        XCTAssertTrue(deny.waitForExistence(timeout: 10), "no Don't Allow button")
+        deny.tap()
+        expect(element("phone-alerts-denied"), "refusal not explained")
+        expect(element("open-alert-settings"), "no path to Settings after a refusal", timeout: 10)
+        XCTAssertFalse(element("allow-alerts").exists, "still offering the system prompt after a refusal")
+        print("MB033-ALERTS-DENIED-SAFE")
+        shot("alerts-denied")
+        tapLabel("Notifications")
+        expect(element("notifications"), "in-app notifications unavailable after the refusal")
+        shot("notifications-after-refusal")
     }
 }

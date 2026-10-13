@@ -75,6 +75,15 @@ jobs:
       - name: Stack logs on failure
         if: failure()
         run: docker compose --env-file infra/.env -f infra/compose.yaml logs --tail 60 api identity || true
+      # MB-033 visual review of dynamic text and RTL (synthetic data only); kept 7 days.
+      - name: Android screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2, resolved 2026-10-13
+        with:
+          name: android-screenshots
+          path: ${{ runner.temp }}/mb032-android/*.png
+          retention-days: 7
+          if-no-files-found: warn
 
   ios:
     name: iOS simulator build (Xcode, unsigned)
@@ -133,3 +142,13 @@ jobs:
         run: apps/customer-mobile/scripts/auth-roundtrip-ios.sh
       - name: MB-032 native ordering on iOS (basket replacement, app terminated during submit, offline reopen, recovery without duplicate)
         run: apps/customer-mobile/scripts/order-roundtrip-ios.sh
+      - name: iOS screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2, resolved 2026-10-13
+        with:
+          name: ios-screenshots
+          path: |
+            ${{ runner.temp }}/mb033-ios-screens
+            ${{ runner.temp }}/mb032-testI_DynamicTextEnglishAndArabic.xcresult
+          retention-days: 7
+          if-no-files-found: warn
