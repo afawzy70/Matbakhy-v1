@@ -1,0 +1,78 @@
+{
+  "run_id": "20261013-MB-053",
+  "story_id": "MB-053",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "BACKEND-DEPOSIT",
+      "name": "Deposit payment and reconciliation integration tests on PostgreSQL",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp -pl app -am test -Dtest=DepositPaymentIntegrationTest,PaymentReconciliationIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WEB-COMPONENT",
+      "name": "Customer web component tests (deposit choice, terms, status, transfer report)",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/customer-web test"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    },
+    {
+      "id": "NATIVE-COMPONENT",
+      "name": "Customer mobile component tests (deposit choice, terms, status, transfer report)",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/customer-mobile test"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    }
+  ],
+  "manual_checks": [
+    {
+      "id": "ANDROID-NATIVE-DEPOSIT",
+      "name": "Android emulator (API 35): cash refused above the kitchen's limit with an explanation; deposit, recipient and direct-payment note in the quote; order stored DEPOSIT/WAITING_FOR_DEPOSIT at half the total; the transfer report shown as the customer's report and stored CUSTOMER_TRANSFER_REPORTED",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38421819591 (job: Android debug APK (Gradle)) at f05e3d6; also runs 43, 46, 47",
+      "log_path": "verification/runs/20261013-MB-053/ANDROID-NATIVE.log"
+    },
+    {
+      "id": "IOS-NATIVE-DEPOSIT",
+      "name": "iOS simulator (phase K): same journey; deposit EGP 65.00 shown; order MB-100004 stored DEPOSIT/CUSTOMER_TRANSFER_REPORTED at half the total; the report cannot be sent again",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38421819591 (job: iOS simulator build) at f05e3d6, all phases A-K",
+      "log_path": "verification/runs/20261013-MB-053/IOS-NATIVE.log"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-163",
+      "observed": "Customer web (component tests and browser workflows at candidates F/G), Android emulator and iOS simulator (native run 48 at f05e3d6): the customer chooses cash on receipt or a deposit paid directly to the kitchen; cash above the kitchen's limit is refused with an explanation; the quote shows the deposit, the remainder, the approved recipient, the deadline and that the platform never holds the money; the placed order snapshots these terms (DEPOSIT, half the total); 'I sent the deposit' moves the payment to CUSTOMER_TRANSFER_REPORTED once, is shown as the customer's own report with the kitchen still to confirm, and is not offered again; no screen claims a bank confirmation or protection."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "MB-053 self-review, not independent review. Synthetic data only; live money blocked by D16 gates. Native evidence is from emulator/simulator (BLK-004 physical devices open)."
+    ]
+  },
+  "open_defects": []
+}
