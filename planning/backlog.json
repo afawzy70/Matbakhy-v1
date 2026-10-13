@@ -1247,7 +1247,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004). 2026-10-13: native dynamic-text phases (Android font scale 2.0, iOS accessibility XXXL; English and Arabic; discover, meal, cart, checkout, orders, order, notifications, support; screenshots as CI artifacts) and provider-independent notification permission (asked only on request; refusal safe; development builds only while O07 is open) added; native refusal phases on both platforms. Visual review of the screenshots by a person is still needed. Push delivery (O07), screen readers (BLK-003) and physical devices (BLK-004) remain open; not DONE. 2026-10-13 evening: TC-050 observed on both platforms (iOS run 40 phase J at 9c0db34, verification/runs/20261013-MB-033-NATIVE/NATIVE-dfec36a.log; Android runs 43/46/47, verification/runs/20261013-NATIVE-43/) recorded as evidence run verification/runs/20261013-TC-050 at 60b833d: TC-050 PASS. Android every phase PASS in runs 43, 46, 47. iOS reruns after run 40 blocked by the simulator Save Password prompt in the sign-in harness (BLK-005). Still open: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots; not DONE."
+      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004). 2026-10-13: native dynamic-text phases (Android font scale 2.0, iOS accessibility XXXL; English and Arabic; discover, meal, cart, checkout, orders, order, notifications, support; screenshots as CI artifacts) and provider-independent notification permission (asked only on request; refusal safe; development builds only while O07 is open) added; native refusal phases on both platforms. Visual review of the screenshots by a person is still needed. Push delivery (O07), screen readers (BLK-003) and physical devices (BLK-004) remain open; not DONE. 2026-10-13 evening: TC-050 observed on both platforms (iOS run 40 phase J at 9c0db34, verification/runs/20261013-MB-033-NATIVE/NATIVE-dfec36a.log; Android runs 43/46/47, verification/runs/20261013-NATIVE-43/) recorded as evidence run verification/runs/20261013-TC-050 at 60b833d: TC-050 PASS. Android every phase PASS in runs 43, 46, 47. iOS reruns after run 40 blocked by the simulator Save Password prompt in the sign-in harness (BLK-005). Still open: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots; not DONE. Native run 48 at f05e3d6: iOS every phase A-K PASS (BLK-005 resolved), Android every phase PASS."
     },
     {
       "id": "MB-034",
@@ -1895,7 +1895,7 @@
       "id": "MB-053",
       "phase": "P07",
       "title": "Deposit checkout and payment status on web, Android and iOS (D16)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-051",
@@ -1917,9 +1917,11 @@
       "scenario_ids": [
         "TC-163"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": "2026-10-13 (not DONE): web 6d5d2d0 and native 6611e69 deposit choice, terms and honest status with component tests (mutation-checked); browser workflows pass at candidates F and G. Native deposit phase 49a55f1: Android PASS in runs 43, 46 and 47 (order stored DEPOSIT/WAITING_FOR_DEPOSIT at half the total; transfer report stored CUSTOMER_TRANSFER_REPORTED; shown as the customer's report). iOS deposit phase NOT_RUN: blocked by BLK-005 (sign-in harness). TC-163 stays NOT_RUN until iOS runs."
+      "evidence": [
+        "verification/runs/20261013-MB-053/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D16 customer deposit checkout and honest status on web (6d5d2d0), Android and iOS (6611e69, native phase 49a55f1). TC-163 PASS (evidence at 6b7741f): component tests on web and native, deposit integration tests, native run 48 at f05e3d6 with the full deposit journey on the Android emulator and the iOS simulator (iOS after BLK-005 was resolved with an XCTest interruption monitor; sign-in real). Self-review; synthetic data; live money blocked (D16)."
     },
     {
       "id": "MB-054",

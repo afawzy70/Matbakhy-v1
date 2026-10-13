@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P07",
-  "current_story": "MB-053",
+  "current_story": "MB-039",
   "last_tested_commit": "c056e4a3444d89251e55ff8b843928b15592e37a",
-  "last_completed_story": "MB-054",
+  "last_completed_story": "MB-053",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -40,6 +40,17 @@
       "first_seen": "2026-10-12T18:10:00Z",
       "missing": "No physical Android or iOS device is available to the implementation agent; native evidence comes from GitHub-hosted emulator and simulator runs only",
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
+    }
+  ],
+  "next_action": "Window until 2026-10-14 00:00 Kuwait. MB-053 DONE (native run 48 PASS on Android and iOS). MB-039 local: TC-055 and TC-056 PASS, erasure defect fixed (V27), preview backups count only after a restore check. Remaining MB-039: TC-057 staging restore and deployed AUD-01/LOG-01/OPS-01..03 (MB-040, needs authorization). MB-033: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots.",
+  "updated_at": "2026-10-13T16:05:44Z",
+  "heartbeat": null,
+  "runtime_note": "No continuously running supervisor is installed or active.",
+  "resolved_blockers": [
+    {
+      "id": "BLK-001",
+      "resolved": "2026-10-11T09:28:00Z",
+      "resolution": "Native Android Gradle and iOS Xcode simulator compilation evidence produced on GitHub-hosted runners for this public repository (run 38128068345). Device/emulator/simulator verification remains required in P07 (MB-034/MB-035)."
     },
     {
       "id": "BLK-005",
@@ -50,18 +61,9 @@
       "owner": "Implementation agent (next window)",
       "first_seen": "2026-10-13T12:06:00Z",
       "missing": "On the GitHub macOS simulator the iOS 'Save Password?' prompt interferes with the XCUITest sign-in harness; three materially different harness fixes (5efc139, 1db23f0, 7ce20da) each got further (both accounts now sign in) but the test still fails (last: UI query timeout). The app's sign-in works (API log). Android is unaffected.",
-      "next_action": "Next window: disable simulator password AutoFill before tests, or use addUIInterruptionMonitor, or set autocomplete=off on the local test realm's login form (test-only). See verification/runs/20261013-NATIVE-43/RUNS-44-47.md"
-    }
-  ],
-  "next_action": "Window 2026-10-13 09:47:28 to 2026-10-14 00:00 Kuwait (D15). QA candidate G at c056e4a (six local checks PASS). Next window: resolve BLK-005 (iOS sign-in harness and Save Password prompt) and run the iOS deposit phase to close MB-053/TC-163; then MB-033 items not blocked by O07/BLK-003/BLK-004.",
-  "updated_at": "2026-10-13T14:58:07Z",
-  "heartbeat": null,
-  "runtime_note": "No continuously running supervisor is installed or active.",
-  "resolved_blockers": [
-    {
-      "id": "BLK-001",
-      "resolved": "2026-10-11T09:28:00Z",
-      "resolution": "Native Android Gradle and iOS Xcode simulator compilation evidence produced on GitHub-hosted runners for this public repository (run 38128068345). Device/emulator/simulator verification remains required in P07 (MB-034/MB-035)."
+      "next_action": "Next window: disable simulator password AutoFill before tests, or use addUIInterruptionMonitor, or set autocomplete=off on the local test realm's login form (test-only). See verification/runs/20261013-NATIVE-43/RUNS-44-47.md",
+      "resolved_at": "2026-10-13T16:05:44Z",
+      "resolution": "f05e3d6: XCTest UI interruption monitor taps \"Not Now\"; only the app hierarchy is polled; native run 48 (38421819591) iOS every phase A-K PASS. Sign-in real, nothing bypassed."
     }
   ],
   "work_window": {

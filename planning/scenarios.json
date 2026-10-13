@@ -2314,8 +2314,10 @@
       "given": "A deposit-required kitchen",
       "when": "A customer checks out and reports a transfer on each client in Arabic and English",
       "then": "Recipient, amount, expiry and terms are shown before placing; the transfer report is idempotent; statuses are honest (no bank-verified or protected claims); native emulator/simulator evidence",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-053/evidence.json"
+      ]
     },
     {
       "id": "TC-164",
