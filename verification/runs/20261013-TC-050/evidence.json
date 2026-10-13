@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-033",
+  "phase": "P07",
+  "source_commit": "60b833dc09fd7e1b409f9f7aaa9d51e9d0a86a6b",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-13T14:59:11.728949+00:00",
+  "finished_at": "2026-10-13T14:59:25.470177+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "NATIVE-COMPONENT",
+      "name": "Customer mobile component tests (notification permission state, refusal copy, inbox)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/customer-mobile test"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-TC-050/NATIVE-COMPONENT.log"
+    },
+    {
+      "id": "ANDROID-NATIVE-REFUSAL",
+      "name": "Android emulator (API 35): the app does not ask on launch; Allow opens the system dialog; Don't allow leaves the app usable with a Settings path and the in-app notifications; POST_NOTIFICATIONS granted=false",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38392564050 (job: Android debug APK (Gradle)) at ae9fdbf; also runs 38402170785 and 38407586755",
+      "log_path": "verification/runs/20261013-TC-050/ANDROID-NATIVE.log"
+    },
+    {
+      "id": "IOS-NATIVE-REFUSAL",
+      "name": "iOS simulator (phase J): not asked on launch; Allow shows the system prompt; Don't Allow explained with a Settings path; in-app notifications still available",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "Native run 40 at 9c0db34 (no change to notificationPermission.ts, Account.tsx or Notifications.tsx since)",
+      "log_path": "verification/runs/20261013-TC-050/IOS-NATIVE.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-050",
+      "status": "PASS",
+      "observed": "Push permission is optional on both platforms: neither app asks on launch; the request appears only after the customer taps Allow alerts; after Don't allow the app explains that every update stays in Notifications, offers Settings, keeps the in-app inbox usable and requests no device token (development builds only while O07 is open). Android: system permission granted=false checked by dumpsys. iOS: springboard prompt and refusal checked by XCUITest."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261013-TC-050/NATIVE-COMPONENT.log",
+    "verification/runs/20261013-TC-050/ANDROID-NATIVE.log",
+    "verification/runs/20261013-TC-050/IOS-NATIVE.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "TC-050 only. Self-review, not independent review. MB-033 stays IN_PROGRESS: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots, and iOS reruns blocked by BLK-005."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

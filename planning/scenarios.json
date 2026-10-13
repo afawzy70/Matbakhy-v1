@@ -937,8 +937,10 @@
       "given": "Push denied or old-account notification opened cold",
       "when": "App launches",
       "then": "Ordering still works; correct authorized route or safe sign-in/denial, never data leak",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-TC-050/evidence.json"
+      ]
     },
     {
       "id": "TC-051",
