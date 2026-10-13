@@ -151,6 +151,12 @@
       "state": "PRESENT",
       "owner_story": "MB-040",
       "purpose": "Deployment packages; web-preview is an early, access-restricted synthetic-data preview (owner direction 2026-10-12), not MB-040 staging"
+    },
+    {
+      "path": "qa",
+      "state": "PRESENT",
+      "owner_story": "MB-030",
+      "purpose": "Independent QA controls only; no product code or story completion claims"
     }
   ]
 }

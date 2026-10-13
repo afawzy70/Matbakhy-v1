@@ -190,3 +190,33 @@ Automation: .github/workflows/independent-qa-regression-native.yml, apps/custome
 
 Review: SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
 
+
+## N-FAVORITES — Native favorite ownership and list
+
+Purpose: Native favorite ownership and list. References: TC-040; MB-028/032. Role customer; platform native-android; locales en/ar; P1.
+
+Preconditions: Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README; support message SQL is test data, not a staff workflow PASS.
+
+1. Sign inA; openOne and Add to favorites.
+2. Open Favorites,selectOne,remove; inspect list and stored favorite.
+
+Expected: A favorite persists in actual list and removal removes own row; B cannot read A favorites.
+
+Invariants: no responsive-web/unit substitution; fresh OS/app/DB per campaign platform. Cleanup: Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.
+
+Automation: qa/regression-d877a15/native/instrument.py; fixture-control.py; generated native UI harness. Review SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
+
+## N-SUPPORT — Native public support reply reachability
+
+Purpose: Native public support reply reachability. References: TC-041; MB-024/028/032; MBQA-004. Role customer; platform native-android; locales en/ar; P1.
+
+Preconditions: Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README; support message SQL is test data, not a staff workflow PASS.
+
+1. Seed exact own native order case CS-DA877001 with PUBLIC marker and STAFF_ONLY marker as prerequisite only.
+2. Open Account→Support,locatecase and try opening thread; inspect rendered public marker and reply control.
+
+Expected: Own public reply reachable/readable; private marker absent; customer can reply while OPEN.
+
+Invariants: no responsive-web/unit substitution; fresh OS/app/DB per campaign platform. Cleanup: Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.
+
+Automation: qa/regression-d877a15/native/instrument.py; fixture-control.py; generated native UI harness. Review SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
