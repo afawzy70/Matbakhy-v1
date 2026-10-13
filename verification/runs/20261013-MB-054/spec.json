@@ -1,0 +1,69 @@
+{
+  "run_id": "20261013-MB-054",
+  "story_id": "MB-054",
+  "phase": "P08",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (ActivityInsightsIntegrationTest and regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "CONTRACT-CHECK",
+      "name": "Contract lint and generated-client drift",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm run contract:check"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "WORKSPACE-TESTS",
+      "name": "Workspace component tests (customer web activity, cook insights)",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm -r test"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real local stack (cook Insights tab in the layout and axe sweep)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-164",
+      "observed": "ActivityInsightsIntegrationTest on PostgreSQL (red first: 3 of 4 failed): ten refreshes by one visitor count one impression, one meal view, one kitchen view and one add-to-cart; a second visitor adds one view; a declared crawler and unknown subjects are not counted (202 either way); malformed kinds and visitor ids are refused; two kitchens are counted separately; the table stores only day, kind, subject, kitchen and a 32-byte keyed hash, never the visitor id. The cook report for two completed orders, one cancelled order and a paid refund of 2500 shows quotes 3, placed 3, completed 2, cancelled 1, repeat customers 1, portions 20 offered and 2 taken, gross 20000, refunds 2500, known net 17500, definitions including NET_IS_NOT_PROFIT, and no profit, margin, sponsor, customer or phone field; the other kitchen's report shows 0. A customer gets 403, an anonymous caller 401, a kitchenId parameter cannot select another kitchen, and a window over 366 days is refused. Discovery has no sponsored, promoted or advert data."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "MB-054 at a89151f. Self-review, not independent review.",
+      "Limits: a bot that rotates visitor ids on every request is bounded only by the request size (50 events), not by the per-visitor cap; edge rate limiting is a preview/deployment control. Native apps do not send activity yet (web only). Search/filter context is not recorded. Retention of activity rows is decided under O06 (no deletion job yet). Deposit refunds reported by kitchens (order_payment REFUNDED) are not in the refunds figure, which counts paid or verified refunds from the finance workflow.",
+      "No sponsored ranking, campaign, billing or profit figure exists (Stage 3-4 not started; owner go required)."
+    ]
+  },
+  "open_defects": []
+}
