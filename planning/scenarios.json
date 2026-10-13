@@ -2272,8 +2272,10 @@
       "given": "A transfer reported by the customer",
       "when": "The kitchen reports not received or a different amount",
       "then": "Processing pauses, the customer is told, a dispute reaches ops with an audited timeline; staff cannot mark funds received without the kitchen's report; other kitchens see nothing",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-052/evidence.json"
+      ]
     },
     {
       "id": "TC-162",
@@ -2288,8 +2290,10 @@
       "given": "A deposit the kitchen reported as received",
       "when": "The kitchen rejects or cannot fulfil the order",
       "then": "A refund obligation owned by the kitchen is recorded and visible to the customer and ops; a support case exists; no automatic legal waiver",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-052/evidence.json"
+      ]
     },
     {
       "id": "TC-163",

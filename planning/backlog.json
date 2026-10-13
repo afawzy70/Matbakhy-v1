@@ -1861,7 +1861,7 @@
       "id": "MB-052",
       "phase": "P07",
       "title": "Kitchen receipt acknowledgement, mismatches, disputes and refunds (D16)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-051",
@@ -1885,9 +1885,11 @@
         "TC-161",
         "TC-162"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": "Server part (self-review): payment profile (API-102/103), recipient approval with recent MFA (API-104), problem reports (API-105), ops queue (API-106), staff decisions without any 'received' outcome (API-107), kitchen refund report (API-108); PaymentReconciliationIntegrationTest 3/3 (written before the code but not executed red). Cook and ops screens not done; no automatic support case or customer notification yet."
+      "evidence": [
+        "verification/runs/20261013-MB-052/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D16 kitchen acknowledgement at 49a55f1 (self-review): staff-approved recipients (finance.verify with recent MFA, audited; a changed recipient needs re-approval), kitchen not-received and wrong-amount reports to DISPUTED, finance queue, refund obligation (REFUND_OWED, audited, ended orders only) and kitchen refund report (REFUNDED), no staff path to mark money received; cook and finance screens (API-103..109). TC-161/162 PASS. Follow-ups: automatic support case and customer notification for DISPUTED/REFUND_OWED. Synthetic data only; live money blocked."
     },
     {
       "id": "MB-053",
