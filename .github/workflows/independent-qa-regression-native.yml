@@ -4,7 +4,7 @@ name: Independent QA native execution (product pinned d877a15)
 on:
   push:
     branches: [qa/full-regression-d877a15-20261013]
-    paths: [.github/workflows/independent-qa-native.yml, qa/regression-d877a15/native/**]
+    paths: [.github/workflows/independent-qa-regression-native.yml, qa/regression-d877a15/native/**]
   workflow_dispatch:
 permissions:
   contents: read
