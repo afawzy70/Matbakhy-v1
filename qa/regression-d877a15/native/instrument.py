@@ -1,7 +1,26 @@
 """Add observations/assertions to native test harness only, after the pinned product binary is built."""
 from pathlib import Path
 # Make the response-holding proxy observable without retaining bodies or credentials.
-p=Path('apps/customer-mobile/e2e-native/slow_proxy.py');s=p.read_text().replace('import sys','import sys\nimport json,os,time\nfrom pathlib import Path')
+p=Path('apps/customer-mobile/e2e-native/slow_proxy.py');s=p.read_text().replace('import sys','import sys\nimport json,os,time,base64,re\nfrom pathlib import Path')
+# Record only method/path/status and JWT time metadata, never credentials or response bodies.
+s=s.replace('while data := await reader.read(65536):', '''while data := await reader.read(65536):
+            try:
+                line=data.split(b"\\r\\n",1)[0].decode("latin1")
+                obs={"at":time.time()}
+                request=re.match(r"^(GET|POST|PATCH|DELETE) (/api/v1/[^ ?]*)",line)
+                response=re.match(r"^HTTP/1[.]1 ([0-9]{3})",line)
+                if request:
+                    obs.update(method=request[1],path=request[2])
+                    auth=re.search(rb"(?i)authorization: bearer ([^\\r\\n ]+)",data)
+                    obs["bearerPresent"]=bool(auth)
+                    if auth:
+                        part=auth[1].split(b".")[1];payload=json.loads(base64.urlsafe_b64decode(part+b"="*((4-len(part)%4)%4)))
+                        obs.update(exp=payload.get("exp"),iat=payload.get("iat"),expired=payload.get("exp",0)<=time.time())
+                elif response:obs.update(status=int(response[1]))
+                if request or response:
+                    folder=Path("iqa-native-evidence");folder.mkdir(exist_ok=True)
+                    with (folder/"transport.jsonl").open("a") as file:file.write(json.dumps(obs)+"\\n")
+            except Exception:pass''')
 s=s.replace('if delay:\n                await asyncio.sleep(delay)', '''if delay:
                 is_order_response = b'"publicNumber"' in data and b'"PENDING_ACCEPTANCE"' in data
                 if is_order_response:
@@ -212,9 +231,18 @@ extra=r'''    private func fixture(_ path: String) {
     }
 
     func testH_IndependentCustomerSupportReply() {
-        fixture("seed-case")
         app.launch()
         element("tab-account").tap()
+        // Independent support case: establish a fresh REAL customer session, without changing the300s policy.
+        let signOut = app.buttons["Sign out"]
+        if signOut.waitForExistence(timeout: 10) { signOut.tap() }
+        let signIn = app.buttons["Sign in"]
+        expect(signIn, "fresh support authentication unavailable")
+        signIn.tap()
+        login("customer-a")
+        expect(text("Signed in as"), "real fresh customer session not established")
+        print("IQA-SUPPORT-FRESH-AUTH established")
+        fixture("seed-case")
         let support = app.buttons["Support"]
         expect(support, "Support unavailable")
         support.tap()
@@ -229,5 +257,7 @@ p.write_text(s)
 p=Path('apps/customer-mobile/scripts/order-roundtrip-ios.sh')
 s=p.read_text().replace('Test Case|error:|MB03[23]-', 'Test Case|error:|MB03[23]-|IQA-')
 s=s.replace('    exit 1\n  fi\n}', '    exit 1\n  fi\n  grep -q \"Test Case.*$name.*passed\" \"$RUNNER_TEMP/mb032-$name.log\" || { echo \"FAIL: zero successful executions for $name\"; exit 1; }\n}')
-s+='\nphase testG_IndependentSameSessionPolicyEditAndRecovery\nphase testH_IndependentCustomerSupportReply\n'
+# Return allows the independent Gcase to execute even when H finds the known public-thread product defect.
+s=s.replace('    exit 1\n  fi\n', '    return 1\n  fi\n').replace('zero successful executions for $name\"; exit 1;', 'zero successful executions for $name\"; return 1;')
+s+='\nIQA_EXTRA_FAILURE=0\nphase testH_IndependentCustomerSupportReply || IQA_EXTRA_FAILURE=1\nphase testG_IndependentSameSessionPolicyEditAndRecovery || IQA_EXTRA_FAILURE=1\nexit $IQA_EXTRA_FAILURE\n'
 p.write_text(s)
