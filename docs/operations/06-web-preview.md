@@ -40,6 +40,7 @@ This is intended, and it is unchanged.
 | `identity/matbakhy-realm.preview.json` | Realm template |
 | `storage/s3.json.template` | Storage identities and access |
 | `postgres/10-keycloak.sh` | Creates the Keycloak database on first start |
+| `observability/` | Log collection (Alloy → Loki), metrics and alert rules (Prometheus, `promtool` tests), Alertmanager to a local test sink, Grafana data sources (MB-039) |
 | `postgres/20-runtime-role.sh` | Creates the API's least-privilege runtime role `matbakhy_app` on first start (MB-039) |
 | `seed-preview.sql` | Synthetic catalogue and accounts |
 | `smoke.sh` | Read-only HTTPS smoke test |
@@ -84,7 +85,7 @@ Results are in `verification/runs/20261012-STAGING-PREP/rehearsal.log`:
 The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Builds and heavy tests stay in CI.
 
 - **Observation only, not capacity evidence:** in the local rehearsal, idle memory was about 1 GiB in total (API 277 MiB, Keycloak 557 MiB, PostgreSQL 84 MiB, SeaweedFS 69 MiB). Idle figures say nothing about peaks under use; load is not measured (MB-038).
-- **Container limits** (in `compose.yaml`; they add up to about 5.3 GiB, leaving room for the OS, backups and page cache):
+- **Container limits** (in `compose.yaml`; they add up to about 6.9 GiB with the observability services. That leaves only about 1 GiB of the 8 GB target for the OS, backups and page cache: the limits are ceilings, and idle use in the local rehearsal was about 1.2 GiB for all eleven services, but the owner may prefer more memory (O07)):
 
 | Service | Memory | CPU | Logs (json-file) |
 |---|---|---|---|
@@ -93,6 +94,7 @@ The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Builds and 
 | PostgreSQL | 1.5 GiB | — | 10 MB × 3 |
 | Storage | 512 MiB | — | 10 MB × 3 |
 | Proxy | 256 MiB | — | 10 MB × 3 |
+| Observability (Loki 384, Alloy 256, Prometheus 512, Alertmanager 128, Grafana 256, node-exporter 64, sink 64) | about 1.6 GiB | about 2 | 10 MB × 3 each |
 
 - 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside.
 

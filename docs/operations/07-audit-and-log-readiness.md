@@ -69,19 +69,24 @@ Not every read should be audited. These are the ones that expose protected data 
 
 Existing redaction evidence (TC-056, LogRedactionIntegrationTest) with synthetic canaries: name, e-mail, phone, street, recipient, push token, bearer token, one-time and handover codes are absent from captured logs across OTP, address, order, handover, provider failure and an unexpected error. Request and response bodies are not logged. Limitation: this covers the flows exercised, not every possible log statement.
 
-## 5–7. Log access, metrics and alerts, runbook
+## 5–7. Log access, metrics and alerts, runbook (local rehearsal 2026-10-13)
 
-Not done locally in this session:
-- **Log access and lifecycle:** proposal is Docker json-file rotation (already capped at 10 MB × 3 per container in the preview package) plus a small searchable store on the same host (for example Loki with a disk cap), operator access only through the private network. Needs a test of retention across restart/redeploy and of disk pressure. Retention periods are O06; none is invented here.
-- **Metrics and alerts:** operational gauges exist (OperationalMetricsIntegrationTest); actuator is not exposed through the preview proxy. Collection, dashboards and alert delivery to a test sink are NOT_RUN.
-- **Runbook:** draft at [08-troubleshooting-runbook.md](08-troubleshooting-runbook.md) (order failure by request/order ID, audit trail, dead letters, missing telemetry, configuration/retention/restore dependencies); not yet exercised on a deployment.
+Evidence: `verification/runs/20261013-MB-039-LOCAL/OBSERVABILITY-REHEARSAL.md` (local Docker, not the preview host).
+
+- **Log collection and access (OPS-01, local):** Grafana Alloy reads every container's json-file log read-only (no Docker socket) and ships it to a single-node Loki on the internal network. Operators search through Grafana, published only on the host loopback (127.0.0.1:3000, SSH tunnel, admin password from `.env`; anonymous access off). Search by request ID, retention across an API redeploy and a Loki restart, and recovery after a collector outage (no loss, no duplicates) all PASS locally.
+- **Lifecycle:** Docker keeps 10 MB × 3 per container; Loki deletes by age (rehearsal value 168 h); Prometheus keeps 15 days or 2 GB, whichever comes first. **The periods are rehearsal values, not decisions (O06).** Loki has no size cap; a full-disk drill is NOT_RUN.
+- **Metrics (OPS-02, local):** the API publishes health and Prometheus metrics only on a separate management port (8081) that the proxy never forwards; the API port refuses them (ManagementPortIntegrationTest). Prometheus scrapes the API, the host (disk, memory, backup age via node-exporter's textfile) and the pipeline itself.
+- **Alerts:** the proposed thresholds from [01-environments.md](01-environments.md) are rules in `observability/alerts.yml` with `promtool` unit tests. All are **provisional**. Alertmanager sends every alert to a local test sink; there is no real recipient (O07). Exercised end to end: failing outbox, stale backup (fires, then resolves after `deploy.sh` backup), API down, database down, disk pressure (real, on the rehearsal host).
+- **Defect found in the rehearsal and fixed:** during a database outage each gauge waited for a connection, the scrape timed out and only ApiDown fired. Gauges now read with a 1.5 s budget and a 10 s back-off (red first: 57 s → under 4 s), and DatabaseUnavailable fires.
+- **Open tuning:** data alerts such as OutboxFailed show "resolved" while their data is missing during an outage; proposal in the evidence file.
+- **Runbook:** [08-troubleshooting-runbook.md](08-troubleshooting-runbook.md) now uses these tools. Not yet rehearsed against a deliberately failed synthetic event on the preview (OPS-03).
 
 ## Preview checks
 
 | Check | Status |
 |---|---|
 | AUD-01 | NOT_RUN (deployed). Local: coverage matrix and reliability above, including the runtime-role check |
-| LOG-01 | NOT_RUN (deployed). Local: correlation and MDC checks PASS |
-| OPS-01 | NOT_RUN |
-| OPS-02 | NOT_RUN |
-| OPS-03 | NOT_RUN |
+| LOG-01 | NOT_RUN (deployed). Local: correlation and MDC checks PASS; JSON lines searchable by request ID in the local log store |
+| OPS-01 | NOT_RUN (deployed). Local rehearsal: search, redeploy/restart retention, collector outage PASS; full-disk drill NOT_RUN; retention periods O06 |
+| OPS-02 | NOT_RUN (deployed). Local rehearsal: restricted scrape, alerts to the local test sink PASS; real routing NOT_RUN (O07) |
+| OPS-03 | NOT_RUN. Runbook updated for the local tools; not rehearsed on the preview |

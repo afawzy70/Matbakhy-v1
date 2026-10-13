@@ -11,7 +11,7 @@ The customer or staff member usually has one of these:
 
 | Starting point | Step |
 |---|---|
-| Request ID | Search the API logs for it: `docker compose logs api \| grep '"requestId":"<id>"'`. Each JSON line has `service.environment`, `service.version` (release commit), `log.logger` and `message`. Failure logs from the outbox dispatcher and the notification worker carry the request ID stored with the event, so the order request and its later delivery failures share it. |
+| Request ID | Search the log store: open Grafana through an SSH tunnel (`ssh -L 3000:127.0.0.1:3000 <host>`, then http://localhost:3000, user `ops-admin`), Explore → Loki, query `{container=~".*api.*"} \|= "<id>"`. Logs survive API redeploys there. Fallback for the last 30 MB only: `docker compose logs api \| grep '"requestId":"<id>"'`. Each JSON line has `service.environment`, `service.version` (release commit), `log.logger` and `message`. Failure logs from the outbox dispatcher and the notification worker carry the request ID stored with the event, so the order request and its later delivery failures share it. |
 | Order number | Operations web → Orders (`GET /api/v1/ops/orders`, `order.ops`). The order detail shows state, exceptions and case IDs. Viewing customer contact writes an `access.order_contact` audit row. |
 | Client request ID (customer's unconfirmed order) | The customer's app looks it up itself (`GET /api/v1/orders/by-request/{id}`; another customer gets 404). Staff can confirm it with a read-only query of `customer_order.client_request_id`. |
 
@@ -39,21 +39,27 @@ Business history is the order's timeline (`order_event`, append-only). Diagnosti
 
 | Symptom | Check |
 |---|---|
-| No logs for a request ID | The request reached the API (`docker compose logs proxy`); its `X-Request-Id` was well-formed (malformed IDs are replaced, so use the ID from the response) |
+| No logs for a request ID | The request reached the API (proxy logs in Grafana: `{container=~".*proxy.*"}`); its `X-Request-Id` was well-formed (malformed IDs are replaced, so use the ID from the response) |
+| Recent lines missing in Grafana | Alert LogPipelineDown; `docker compose ps alloy loki`. Restart the collector: `docker compose up -d alloy`. It resumes from its saved position; lines older than Docker's cap (10 MB × 3 per container) are lost |
 | Logs not JSON | `LOGGING_STRUCTURED_FORMAT_CONSOLE=ecs` on the api service |
 | `service.version` is `unknown` | `RELEASE_COMMIT` not set in `.env` |
-| Logs missing after a restart | Docker json-file keeps 3 × 10 MB per container and is removed with the container. A searchable store with retention is not set up yet (OPS-01 open) |
-| Gauges look stale | Actuator is not exposed through the proxy. Read it inside the host network (`docker compose exec api wget -qO- localhost:8080/actuator/metrics/<name>`, when the metrics endpoint is enabled). Collection and alerts are OPS-02, not yet set up |
+| ApiDown | `docker compose ps api`, health on the management port: `docker compose exec api wget -qO- localhost:8081/actuator/health` |
+| DatabaseUnavailable | `docker compose ps postgres`; `docker compose logs --tail 50 postgres`. Data alerts (OutboxFailed and similar) may show "resolved" while the data is missing; recheck them after recovery |
+| BackupStale | Run `./deploy.sh backup`; it records the time of the last good backup for the alert |
+| DiskPressure | `df -h`; `docker system df`; prune unused images. Do not delete volumes (database, logs, metrics) without the owner |
+| AuditWriteFailed | The audit store is failing: denials are still refused, but critical changes fail. Check the database; escalate |
 | Ledger alarm | `matbakhy.ledger.unbalanced.groups > 0`: stop and escalate; do not edit ledger rows |
+
+Alerts go only to the local test sink (`docker compose logs alert-sink`) until the owner approves a real recipient (O07).
 
 ## 5. Configuration, access, retention, storage and restore
 
 - **Configuration:** `deploy/web-preview/.env` (mode 600, never committed): `RELEASE_COMMIT`, image digests, domain, access list.
 - **Operator access:** SSH key to the host. The private network (recommended in [06](06-web-preview.md)) is not set up.
-- **Retention:** log retention and audit archival periods are owner decisions (O06). None is configured beyond Docker's 30 MB per container cap.
+- **Retention:** log retention and audit archival periods are owner decisions (O06). Rehearsal values in `.env`: `LOG_RETENTION=168h` (Loki), `METRICS_RETENTION=15d` (Prometheus, also capped at 2 GB); Docker keeps 30 MB per container.
 - **Storage budget:** see "Sizing" in [06](06-web-preview.md). Backups live in `deploy/web-preview/backups` until copied off the host.
-- **Restore dependency:** `./deploy.sh restore-db <dump>` restores into an empty database and runs the reconciliation query. Audit rows restore with the database. Logs are not part of the backup.
+- **Restore dependency:** `./deploy.sh restore-db <dump>` restores into an empty database and runs the reconciliation query. Audit rows restore with the database. Logs and metrics are not part of the backup.
 
 ## Not covered yet (owner or MB-040)
 
-Searchable log store and its access control; metric collection, dashboards and alert routing to a test sink; disk-pressure and collector-outage drills; deployed rehearsal of this runbook.
+Rehearsal of this runbook on the preview against a deliberately failed synthetic event (OPS-03); a full-disk drill; real alert routing (O07); retention periods (O06); dashboards beyond Grafana's Explore view.
