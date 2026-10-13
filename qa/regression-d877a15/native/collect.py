@@ -18,6 +18,9 @@ else:
 # Metadata is observational only; no build/UI PASS from inspection.
 try:
  if surface=='android':
+  shots=list((Path(os.environ['RUNNER_TEMP'])/'mb032-android').glob('*iqa-arabic-account.png'))
+  if shots:shutil.copy(shots[0],out/'android-arabic-account.png')
+  record['accountScreenshotPreserved']=(out/'android-arabic-account.png').exists()
   apk=Path('apps/customer-mobile/android/app/build/outputs/apk/release/app-release.apk')
   record['artifact']={'file':str(apk),'sha256':hashlib.sha256(apk.read_bytes()).hexdigest()}
   record['device']={'kind':'emulator','os':subprocess.check_output(['adb','shell','getprop','ro.build.version.release'],text=True).strip(),'sdk':subprocess.check_output(['adb','shell','getprop','ro.build.version.sdk'],text=True).strip()}

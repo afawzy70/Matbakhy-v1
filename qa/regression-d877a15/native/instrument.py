@@ -96,6 +96,9 @@ tap 'resource-id="tab-favorites"'
 wait_for 'content-desc="Native Dish One[^\"]*"|text="Native Dish One"' 30 >/dev/null || fail "favorite list missing One"
 tap 'content-desc="Native Dish One[^\"]*"|text="Native Dish One"'
 tap_scrolled 'content-desc="Remove from favorites"|text="Remove from favorites"'
+wait_scrolled 'content-desc="Add to favorites"|text="Add to favorites"' 30 || fail "favorite removal not server-confirmed"
+adb shell input keyevent 4
+wait_for 'text="No favorite dishes yet."' 30 >/dev/null || fail "favorite remained after removal"
 echo "IQA-FAVORITES verified add/list/remove"
 launch
 tap 'resource-id="tab-account"'
@@ -121,7 +124,7 @@ adb shell input tap $pos; adb shell input text "$CUSTOMER"
 pos=$(wait_for 'resource-id="password"|hint="Password"|text="Password"' 30) || fail "real password field unavailable"
 adb shell input tap $pos; adb shell input text "$USER_PASSWORD"
 tap 'resource-id="kc-login"|text="Sign In"'
-wait_for 'text="Signed in as[^\"]*"' 90 >/dev/null || fail "active same-customer session not established"
+wait_for 'text="Hello [^\"]*SyntheticA"' 90 >/dev/null || fail "active same-customer session not established"
 echo "IQA-SUPPORT-FRESH-AUTH established without policy change"
 adb shell am start -W -a android.intent.action.VIEW -d "matbakhy-dev://orders/$DID" "$PKG" >/dev/null
 wait_for "text=\\"$DNUMBER\\"" 60 >/dev/null || fail "own delivery order missing"
@@ -185,7 +188,7 @@ extra=r'''    private func fixture(_ path: String) {
         expect(freshSignIn, "independent active-session prerequisite unavailable")
         freshSignIn.tap()
         login("customer-a")
-        expect(text("Signed in as"), "real Gsession not established")
+        expect(text("SyntheticA"), "real Gsession not established")
         print("IQA-G-FRESH-AUTH established without changing300s policy")
         element("tab-discover").tap()
         let meal = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Native Dish One")).firstMatch
@@ -219,10 +222,14 @@ extra=r'''    private func fixture(_ path: String) {
         fixture("restore")
         app.navigationBars.buttons.firstMatch.tap()
         addFirstSlot(of: "Native Dish One")
+        expect(text("Added to cart."), "one-portion lifecycle prerequisite not committed to basket")
         app.navigationBars.buttons.firstMatch.tap()
+        element("open-cart").tap()
+        expect(element("cart"), "intended basket screen not opened before background")
+        expect(text("1 × Native Dish One"), "actual one-portion basket absent before background")
         XCUIDevice.shared.press(.home)
         app.activate()
-        element("open-cart").tap()
+        expect(element("cart"), "background resumed another screen; do not infer lost data")
         expect(text("1 × Native Dish One"), "background lost basket")
         app.terminate()
         app.launch()
@@ -278,7 +285,7 @@ extra=r'''    private func fixture(_ path: String) {
         expect(signIn, "fresh support authentication unavailable")
         signIn.tap()
         login("customer-a")
-        expect(text("Signed in as"), "real fresh customer session not established")
+        expect(text("SyntheticA"), "real fresh customer session not established")
         print("IQA-SUPPORT-FRESH-AUTH established")
         fixture("seed-case")
         // Completed native cancellation journey on the actual previously placed delivery order.
