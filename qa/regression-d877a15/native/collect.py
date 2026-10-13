@@ -32,7 +32,7 @@ try:
   record['artifact']={'bundleId':info['CFBundleIdentifier'],'version':info['CFBundleShortVersionString'],'sha256':hashlib.sha256(exe.read_bytes()).hexdigest(),'signing':'ad-hoc simulator; no team/store certificate'}
   devices=json.loads(subprocess.check_output(['xcrun','simctl','list','devices','booted','-j'],text=True))
   record['device']=[{'kind':'simulator','runtime':runtime,'name':v['name']} for runtime,vs in devices['devices'].items() for v in vs if v['state']=='Booted']
-  result=Path(os.environ['RUNNER_TEMP'])/'mb032-testG_IndependentSameSessionPolicyEditAndRecovery.xcresult'
+  result=Path(os.environ['RUNNER_TEMP'])/'mb032-testI_IndependentLocaleLayout.xcresult'
   exported=Path(os.environ['RUNNER_TEMP'])/'iqa-account-attachments'
   if result.exists():
    r=subprocess.run(['xcrun','xcresulttool','export','attachments','--path',str(result),'--output-path',str(exported)],capture_output=True,text=True,timeout=30)
@@ -40,16 +40,18 @@ try:
     manifests=list(exported.rglob('manifest.json'))
     def walk(v):
      if isinstance(v,dict):
-      if any(isinstance(x,str) and 'iqa-arabic-account' in x for x in v.values()):
+      if any(isinstance(x,str) and ('iqa-arabic-account' in x or 'iqa-english-account' in x) for x in v.values()):
        for x in v.values():
-        if isinstance(x,str) and x.endswith('.png'):
+        if isinstance(x,str) and Path(x).suffix.lower() in ['.png','.jpg','.jpeg']:
          paths=list(exported.rglob(Path(x).name))
-         if len(paths)==1:shutil.copy(paths[0],out/'ios-arabic-account.png')
+         if len(paths)==1:
+          name='ios-arabic-account' if any(isinstance(y,str) and 'iqa-arabic-account' in y for y in v.values()) else 'ios-english-account'
+          shutil.copy(paths[0],out/(name+Path(x).suffix))
       for x in v.values():walk(x)
      elif isinstance(v,list):
       for x in v:walk(x)
     for m in manifests:walk(json.loads(m.read_text()))
-   record['accountScreenshotPreserved']=(out/'ios-arabic-account.png').exists()
+   record['accountScreenshotPreserved']=bool(list(out.glob('ios-*account.*')))
 except Exception:
  record['metadataGap']='artifact/device or selected safe attachment unavailable; not an execution PASS'
 sql="""SELECT json_build_object('orders',(SELECT coalesce(json_agg(json_build_object('id',o.id,'publicNumber',o.public_number,'customerId',o.customer_id,'state',o.state,'totalMinor',o.total_minor,'slotId',o.slot_id,'kitchenId',o.kitchen_id,'items',(SELECT json_agg(json_build_object('mealId',i.meal_id,'quantity',i.quantity,'unitPriceMinor',i.unit_price_minor)) FROM order_item i WHERE i.order_id=o.id))), '[]'::json) FROM customer_order o JOIN app_user u ON u.id=o.customer_id WHERE u.display_name LIKE '%SyntheticA%'), 'slotCounters',(SELECT coalesce(json_agg(json_build_object('id',s.id,'reserved',s.reserved,'allocated',s.allocated,'consumed',s.consumed)), '[]'::json) FROM cook_slot s WHERE s.id='00000000-0000-4000-8000-00000000a052'), 'mealCounters',(SELECT coalesce(json_agg(json_build_object('id',m.id,'reserved',m.reserved,'allocated',m.allocated,'consumed',m.consumed)), '[]'::json) FROM meal_slot m WHERE m.id='00000000-0000-4000-8000-00000000a062'));"""
@@ -69,6 +71,18 @@ try:
  record['checks'].append({'name':'Stored pickup and delivery totals','expected':[9000,63000], 'actual':[o['totalMinor'] for o in pickup+delivery],'status':'PASS' if [o['totalMinor'] for o in pickup+delivery]==[9000,63000] else 'FAIL'})
 except Exception as e:
  record['checks'].append({'name':'Native order database correlation','status':'BLOCKED','reason':str(e)[:300]})
+for candidate in [Path('apps/customer-mobile/e2e-ios/iqa-native-evidence/transport.jsonl'),out/'transport.jsonl']:
+ if candidate.exists():
+  observations=[]
+  for line in candidate.read_text().splitlines():
+   row=json.loads(line);allowed={'at','method','path','status','bearerPresent','exp','iat','expired'}
+   assert set(row)<=allowed
+   if 'path' in row:assert row['path'].startswith('/api/v1/') and '?' not in row['path']
+   observations.append(row)
+  assert observations,'zero transport observations; not a logging PASS'
+  (out/'transport.jsonl').write_text(''.join(json.dumps(row)+'\n' for row in observations))
+  record['transportScope']='response-holding proxy phases only; no claim of later direct API traffic'
+  break
 (out/'correlation.json').write_text(json.dumps(record,indent=2)+'\n')
 print(json.dumps({'platform':surface,'applicationSha':sha,'checks':record['checks']}))
 if any(c['status']!='PASS' for c in record['checks']):raise SystemExit(1)

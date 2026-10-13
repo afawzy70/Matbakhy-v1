@@ -159,7 +159,7 @@ adb shell input text 'Independent%snative%ssynthetic%ssupport%screation'
 wait_for 'text="Independent native synthetic support creation"' 30 >/dev/null || fail "intended description not entered"
 adb shell input keyevent 4
 tap_scrolled 'content-desc="Send"|text="Send"'
-wait_scrolled 'text="Case sent:[^\"]*"' 60 || fail "native support creation not acknowledged"
+wait_scrolled 'text="Case CS-[^\"]* opened."' 60 || fail "native support creation not acknowledged"
 echo "IQA-SUPPORT-CREATE verified real UI receipt"
 curl -fsS http://localhost:9099/seed-case >/dev/null
 launch
@@ -294,6 +294,20 @@ extra=r'''    private func fixture(_ path: String) {
 
     }
 
+    func testI_IndependentLocaleLayout() {
+        app.launch()
+        element("tab-account").tap()
+        if app.buttons["English"].exists { app.buttons["English"].tap() }
+        expect(app.buttons["العربية"], "English language state/control absent")
+        shot("iqa-english-account")
+        app.buttons["العربية"].tap()
+        expect(app.buttons["English"], "Arabic language state/control absent")
+        shot("iqa-arabic-account")
+        app.buttons["English"].tap()
+        expect(app.buttons["العربية"], "English state not restored")
+        print("IQA-LOCALE verified independent EN/AR switching; pixel layout requires separate inspection")
+    }
+
     func testH_IndependentCustomerSupportReply() {
         app.launch()
         element("tab-account").tap()
@@ -343,7 +357,7 @@ extra=r'''    private func fixture(_ path: String) {
         while !send.isHittable && scrolls < 6 { app.swipeUp(); scrolls += 1 }
         XCTAssertTrue(send.isHittable)
         send.tap()
-        expect(text("Case sent:"), "real support creation not acknowledged")
+        expect(text("Case CS-"), "actual case reference receipt not acknowledged")
         print("IQA-SUPPORT-CREATE verified real UI receipt")
         let publicCase = text("CS-DA877001")
         expect(publicCase, "synthetic public-reply case not in list")
@@ -362,5 +376,5 @@ s=p.read_text().replace('Test Case|error:|MB03[23]-', 'Test Case|error:|MB03[23]
 s=s.replace('    exit 1\n  fi\n}', '    exit 1\n  fi\n  grep -q \"Test Case.*$name.*passed\" \"$RUNNER_TEMP/mb032-$name.log\" || { echo \"FAIL: zero successful executions for $name\"; exit 1; }\n}')
 # Return allows the independent Gcase to execute even when H finds the known public-thread product defect.
 s=s.replace('    exit 1\n  fi\n', '    return 1\n  fi\n').replace('zero successful executions for $name\"; exit 1;', 'zero successful executions for $name\"; return 1;')
-s+='\nIQA_EXTRA_FAILURE=0\nphase testH_IndependentCustomerSupportReply || IQA_EXTRA_FAILURE=1\nphase testG_IndependentSameSessionPolicyEditAndRecovery || IQA_EXTRA_FAILURE=1\nexit $IQA_EXTRA_FAILURE\n'
+s+='\nIQA_EXTRA_FAILURE=0\nphase testH_IndependentCustomerSupportReply || IQA_EXTRA_FAILURE=1\nphase testG_IndependentSameSessionPolicyEditAndRecovery || IQA_EXTRA_FAILURE=1\nphase testI_IndependentLocaleLayout || IQA_EXTRA_FAILURE=1\nexit $IQA_EXTRA_FAILURE\n'
 p.write_text(s)
