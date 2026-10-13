@@ -414,3 +414,69 @@ Cleanup/reset: Use independent browser state/cart reset without erasing pending 
 Automation/manual reference: qa/regression-d877a15/additional.cjs.
 
 Review: SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
+
+## C-PROFILE — Edit profile preferences and remove an owned address
+
+Purpose: Edit profile preferences and remove an owned address.
+
+References: BR-001/005; TC-005/128; API-010/016. Roles: customer. Platforms: Chromium web + real API/DB. Locales: en,ar; baseline en unless explicitly parameterized. Priority: P1.
+
+Preconditions/fixtures: Fresh campaign customer-a/b and own real delivery address; executed connected completed order and worker-created inbox. Run before deletion; C-DELETION-INTAKE must be last. Generated identities only..
+
+1. Open Account asA; edit Name and preferred message language ar; Save, observe actual PATCH200 and higher version. Reload and verify saved inputs.
+2. Submit stale expectedVersion; expect409/latest preserved. B attempts A address deletion404. A removes existing address via UI; expect204 and absent from own list.
+3. Restore profile through authorized PATCH; compare immutable historical order totals.
+
+Expected: Saved own versioned name/message preference survives refresh; B unaffected, stale updates409; only owner removes address and prior order stays immutable.
+
+Persisted/API invariants: Own profile/version and notification ownership; order snapshots unchanged; dedup_key unique; one RECEIVED deletion request for B, ACTIVE A. No legal-retention/purge PASS inferred.
+
+Cleanup/reset: Restore profile and authorized mealprice in finally. Own-address removal and B deletion are intentional final synthetic state; create fresh volumes for next full campaign.
+
+Automation/manual reference: qa/regression-d877a15/account-segments.cjs; IQA_ACCOUNT_FULL=1 appends all outcomes; default TARGETED.
+
+Review: SELF_REVIEWED. Questions: O06 retention/legal documents/purge timing remains unresolved; only delivered confirmed intake tested.
+
+## C-INBOX-SHARE-REORDER — Read real inbox and reorder at current price; share public link
+
+Purpose: Read real inbox and reorder at current price; share public link.
+
+References: TC-012/037/038/128; API-031/032. Roles: customer. Platforms: Chromium web + real API/DB. Locales: en,ar; baseline en unless explicitly parameterized. Priority: P1.
+
+Preconditions/fixtures: Fresh campaign customer-a/b and own real delivery address; executed connected completed order and worker-created inbox. Run before deletion; C-DELETION-INTAKE must be last. Generated identities only..
+
+1. Require a real worker-created unread notification; click its Mark read on Account. API-032200 with persistedreadAt; repeat200, B attempts same notification404, DB dedup unique.
+2. Owning cook legally raises A1 price500minor; open completed pickup order and click Order again at today's price. Verify current public meal and exact current price, unchanged old order total.
+3. Click Copy link to share; independently verify the displayed selectable link contains only public meal ID. Clipboard provider success is not required; legally restore price.
+
+Expected: Owned read state persists; no foreign mutation/duplicate logical notification; reorder uses changed current offering and history keeps agreed snapshots; sharing contains no private order/secret.
+
+Persisted/API invariants: Own profile/version and notification ownership; order snapshots unchanged; dedup_key unique; one RECEIVED deletion request for B, ACTIVE A. No legal-retention/purge PASS inferred.
+
+Cleanup/reset: Restore profile and authorized mealprice in finally. Own-address removal and B deletion are intentional final synthetic state; create fresh volumes for next full campaign.
+
+Automation/manual reference: qa/regression-d877a15/account-segments.cjs; IQA_ACCOUNT_FULL=1 appends all outcomes; default TARGETED.
+
+Review: SELF_REVIEWED. Questions: O06 retention/legal documents/purge timing remains unresolved; only delivered confirmed intake tested.
+
+## C-DELETION-INTAKE — Confirmed deletion request disables syntheticB
+
+Purpose: Confirmed deletion request disables syntheticB.
+
+References: BR-001; TC-128; API-017; O06 boundary. Roles: customer. Platforms: Chromium web + real API/DB. Locales: en,ar; baseline en unless explicitly parameterized. Priority: P1.
+
+Preconditions/fixtures: Fresh campaign customer-a/b and own real delivery address; executed connected completed order and worker-created inbox. Run before deletion; C-DELETION-INTAKE must be last. Generated identities only..
+
+1. Run last, after all B-dependent cases. Open B Account: Request deletion disabled before explicit checkbox confirmation.
+2. Confirm and press actual UI action; observe POST200 RECEIVED and DB one received request/statusDELETION_REQUESTED.
+3. Attempt B private quote:403. Check A remains ACTIVE. Do not exercise14-day purge or claim owner-approved legal retention.
+
+Expected: Confirmed intake is once and disables onlyB/private operations; no live data involved. Purge/retention remains separate unresolved O06.
+
+Persisted/API invariants: Own profile/version and notification ownership; order snapshots unchanged; dedup_key unique; one RECEIVED deletion request for B, ACTIVE A. No legal-retention/purge PASS inferred.
+
+Cleanup/reset: Restore profile and authorized mealprice in finally. Own-address removal and B deletion are intentional final synthetic state; create fresh volumes for next full campaign.
+
+Automation/manual reference: qa/regression-d877a15/account-segments.cjs; IQA_ACCOUNT_FULL=1 appends all outcomes; default TARGETED.
+
+Review: SELF_REVIEWED. Questions: O06 retention/legal documents/purge timing remains unresolved; only delivered confirmed intake tested.

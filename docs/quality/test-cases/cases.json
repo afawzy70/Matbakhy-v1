@@ -1423,5 +1423,74 @@
     "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
+  },
+  {
+    "id": "C-PROFILE",
+    "title": "Edit profile preferences and remove an owned address",
+    "purpose": "Edit profile preferences and remove an owned address",
+    "requirementReferences": "BR-001/005; TC-005/128; API-010/016",
+    "group": "customer-web",
+    "roles": "customer",
+    "platforms": "Chromium web + real API/DB",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Fresh campaign customer-a/b and own real delivery address; executed connected completed order and worker-created inbox. Run before deletion; C-DELETION-INTAKE must be last. Generated identities only.",
+    "steps": [
+      "Open Account asA; edit Name and preferred message language ar; Save, observe actual PATCH200 and higher version. Reload and verify saved inputs.",
+      "Submit stale expectedVersion; expect409/latest preserved. B attempts A address deletion404. A removes existing address via UI; expect204 and absent from own list.",
+      "Restore profile through authorized PATCH; compare immutable historical order totals."
+    ],
+    "expected": "Saved own versioned name/message preference survives refresh; B unaffected, stale updates409; only owner removes address and prior order stays immutable.",
+    "invariants": "Own profile/version and notification ownership; order snapshots unchanged; dedup_key unique; one RECEIVED deletion request for B, ACTIVE A. No legal-retention/purge PASS inferred.",
+    "cleanup": "Restore profile and authorized mealprice in finally. Own-address removal and B deletion are intentional final synthetic state; create fresh volumes for next full campaign.",
+    "automation": "qa/regression-d877a15/account-segments.cjs; IQA_ACCOUNT_FULL=1 appends all outcomes; default TARGETED",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "O06 retention/legal documents/purge timing remains unresolved; only delivered confirmed intake tested."
+  },
+  {
+    "id": "C-INBOX-SHARE-REORDER",
+    "title": "Read real inbox and reorder at current price; share public link",
+    "purpose": "Read real inbox and reorder at current price; share public link",
+    "requirementReferences": "TC-012/037/038/128; API-031/032",
+    "group": "customer-web",
+    "roles": "customer",
+    "platforms": "Chromium web + real API/DB",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Fresh campaign customer-a/b and own real delivery address; executed connected completed order and worker-created inbox. Run before deletion; C-DELETION-INTAKE must be last. Generated identities only.",
+    "steps": [
+      "Require a real worker-created unread notification; click its Mark read on Account. API-032200 with persistedreadAt; repeat200, B attempts same notification404, DB dedup unique.",
+      "Owning cook legally raises A1 price500minor; open completed pickup order and click Order again at today's price. Verify current public meal and exact current price, unchanged old order total.",
+      "Click Copy link to share; independently verify the displayed selectable link contains only public meal ID. Clipboard provider success is not required; legally restore price."
+    ],
+    "expected": "Owned read state persists; no foreign mutation/duplicate logical notification; reorder uses changed current offering and history keeps agreed snapshots; sharing contains no private order/secret.",
+    "invariants": "Own profile/version and notification ownership; order snapshots unchanged; dedup_key unique; one RECEIVED deletion request for B, ACTIVE A. No legal-retention/purge PASS inferred.",
+    "cleanup": "Restore profile and authorized mealprice in finally. Own-address removal and B deletion are intentional final synthetic state; create fresh volumes for next full campaign.",
+    "automation": "qa/regression-d877a15/account-segments.cjs; IQA_ACCOUNT_FULL=1 appends all outcomes; default TARGETED",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "O06 retention/legal documents/purge timing remains unresolved; only delivered confirmed intake tested."
+  },
+  {
+    "id": "C-DELETION-INTAKE",
+    "title": "Confirmed deletion request disables syntheticB",
+    "purpose": "Confirmed deletion request disables syntheticB",
+    "requirementReferences": "BR-001; TC-128; API-017; O06 boundary",
+    "group": "customer-web",
+    "roles": "customer",
+    "platforms": "Chromium web + real API/DB",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Fresh campaign customer-a/b and own real delivery address; executed connected completed order and worker-created inbox. Run before deletion; C-DELETION-INTAKE must be last. Generated identities only.",
+    "steps": [
+      "Run last, after all B-dependent cases. Open B Account: Request deletion disabled before explicit checkbox confirmation.",
+      "Confirm and press actual UI action; observe POST200 RECEIVED and DB one received request/statusDELETION_REQUESTED.",
+      "Attempt B private quote:403. Check A remains ACTIVE. Do not exercise14-day purge or claim owner-approved legal retention."
+    ],
+    "expected": "Confirmed intake is once and disables onlyB/private operations; no live data involved. Purge/retention remains separate unresolved O06.",
+    "invariants": "Own profile/version and notification ownership; order snapshots unchanged; dedup_key unique; one RECEIVED deletion request for B, ACTIVE A. No legal-retention/purge PASS inferred.",
+    "cleanup": "Restore profile and authorized mealprice in finally. Own-address removal and B deletion are intentional final synthetic state; create fresh volumes for next full campaign.",
+    "automation": "qa/regression-d877a15/account-segments.cjs; IQA_ACCOUNT_FULL=1 appends all outcomes; default TARGETED",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "O06 retention/legal documents/purge timing remains unresolved; only delivered confirmed intake tested."
   }
 ]
