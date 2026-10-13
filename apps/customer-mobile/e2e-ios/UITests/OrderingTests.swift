@@ -17,6 +17,9 @@ import XCTest
 ///          then in Arabic, shows its content and reaches its main action; screenshots are kept for visual review.
 ///   testJ  MB-033 notification permission: not asked on launch; Allow shows the system prompt; Don't Allow leaves the
 ///          app usable with a Settings path and the in-app notifications.
+///   testK  MB-053: the script gives the kitchen a 50% deposit to an approved synthetic recipient and caps cash at 1 EGP;
+///          cash is refused with an explanation, the deposit quote shows amount, recipient and the direct-payment note,
+///          and after "I sent the deposit" the order says the kitchen still has to confirm.
 ///   testH  D13: after a quote the script raises Native Dish One to 130.00 (the test waits on the public meal); placing shows
 ///          the kitchen's change and the old and new totals; the new quote is placed only after explicit acceptance.
 final class OrderingTests: XCTestCase {
@@ -456,5 +459,43 @@ final class OrderingTests: XCTestCase {
         tapLabel("Notifications")
         expect(element("notifications"), "in-app notifications unavailable after the refusal")
         shot("notifications-after-refusal")
+    }
+
+    func testK_DepositCheckoutAndTransferReport() {
+        app.launch()
+        element("tab-discover").tap()
+        let meal = element("meal-00000000-0000-4000-8000-00000000a0b1")
+        expect(meal, "meal not listed", timeout: 90)
+        meal.tap()
+        expect(element("slot-0"), "no slot")
+        element("slot-0").tap()
+        tapScrolled("add-to-cart")
+        tapScrolled("go-to-cart")
+        tapScrolled("mode-PICKUP")
+        tapScrolled("get-quote")
+        expect(text("Cash on receipt is not available for this total"), "COD_NOT_ELIGIBLE not explained")
+        tapScrolled("pay-DEPOSIT")
+        tapScrolled("get-quote")
+        expect(element("deposit-terms"), "no deposit terms in the quote")
+        expect(text("Deposit now: "), "deposit amount not shown")
+        expect(text("synthetic-kitchen@instapay"), "approved recipient not shown")
+        expect(text("the platform never receives or holds the money"), "direct-payment note not shown")
+        print("MB053-TERMS \(text("Deposit now: ").label)")
+        shot("deposit-terms")
+        tapScrolled("accept-terms")
+        tapScrolled("place-order")
+        let number = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "MB-")).firstMatch
+        expect(number, "deposit order not confirmed")
+        print("MB053-ORDER-NUMBER \(number.label)")
+        expect(text("Payment: Waiting for your deposit"), "payment state not shown on the order")
+        tapScrolled("transfer-reference")
+        // Return ends editing (single-line field), so the keyboard does not cover the button.
+        element("transfer-reference").typeText("IP123\n")
+        tapScrolled("report-transfer")
+        expect(text("Payment: You reported the transfer; waiting for the kitchen to confirm"), "reported transfer not shown honestly")
+        expect(text("Preparation starts only after the kitchen confirms"), "no explanation that the kitchen must confirm", timeout: 10)
+        XCTAssertFalse(element("report-transfer").exists, "the report can be sent again")
+        print("MB053-REPORTED")
+        shot("deposit-reported")
     }
 }

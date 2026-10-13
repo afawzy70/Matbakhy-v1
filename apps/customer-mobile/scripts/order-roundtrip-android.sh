@@ -415,5 +415,47 @@ shot notifications-after-refusal
 adb shell input keyevent 4
 echo "ok: not asked on launch; Allow opened the system dialog; Don't allow left the app usable with the Settings path and in-app notifications"
 
+echo "== MB-053 deposit: cash refused above the kitchen's limit; deposit terms shown; the customer reports the transfer"
+KITCHEN=00000000-0000-4000-8000-00000000a0d1
+psql_q -v kitchen=$KITCHEN < "$HERE/e2e-native/deposit-profile.sql" >/dev/null
+trap 'kill $PROXY 2>/dev/null || true; psql_q -c "DELETE FROM kitchen_payment_profile WHERE kitchen_id = '"'$KITCHEN'"'" >/dev/null || true' EXIT
+launch
+tap 'resource-id="tab-discover"'
+tap_scrolled "$MEAL"
+tap_scrolled 'resource-id="slot-0"'
+tap_scrolled 'resource-id="add-to-cart"'
+tap_scrolled 'resource-id="go-to-cart"'
+tap_scrolled 'resource-id="mode-PICKUP"'
+tap_scrolled 'resource-id="get-quote"'
+wait_scrolled 'text="Cash on receipt is not available for this total at this kitchen. Choose the deposit\."' 60 || fail "COD_NOT_ELIGIBLE not explained"
+tap_scrolled 'resource-id="pay-DEPOSIT"'
+tap_scrolled 'resource-id="get-quote"'
+wait_scrolled 'resource-id="deposit-terms"' 60 || fail "no deposit terms in the quote"
+wait_scrolled 'text="Deposit now: EGP[^"]*"' 20 || fail "deposit amount not shown"
+wait_scrolled 'text="[^"]*synthetic-kitchen@instapay[^"]*Synthetic Kitchen"' 20 || fail "approved recipient not shown"
+wait_scrolled 'text="[^"]*the platform never receives or holds the money[^"]*"' 20 || fail "direct-payment note not shown"
+shot deposit-terms
+tap_scrolled 'resource-id="accept-terms"'
+tap_scrolled 'resource-id="place-order"'
+wait_for 'text="MB-[^"]*"' 60 >/dev/null || fail "deposit order not confirmed"
+QNUMBER=$(grep -o 'text="MB-[^"]*"' "$UI" | head -1 | sed 's/text="\(.*\)"/\1/')
+QROW=$(psql_q -c "SELECT p.method || '|' || p.state || '|' || (p.deposit_minor * 2 - o.total_minor BETWEEN 0 AND 1) || '|' || p.recipient_identifier FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE o.public_number = '$QNUMBER'")
+echo "deposit order $QNUMBER (method|state|half|recipient): $QROW"
+[ "$QROW" = "DEPOSIT|WAITING_FOR_DEPOSIT|true|synthetic-kitchen@instapay" ] || fail "deposit order not stored with the quoted terms: $QROW"
+wait_scrolled 'text="Payment: Waiting for your deposit"' 30 || fail "payment state not shown on the order"
+tap_scrolled 'resource-id="transfer-reference"'
+sleep 1
+adb shell input text "IP123"
+# Close the keyboard only if it is open, so Back never leaves the order screen.
+if adb shell dumpsys input_method | grep -q "mInputShown=true"; then adb shell input keyevent 4; sleep 1; fi
+tap_scrolled 'resource-id="report-transfer"'
+wait_scrolled_up 'text="Payment: You reported the transfer; waiting for the kitchen to confirm"' 30 || fail "reported transfer not shown honestly"
+wait_scrolled 'text="Preparation starts only after the kitchen confirms[^"]*"' 20 || fail "no explanation that the kitchen must confirm"
+absent 'resource-id="report-transfer"'
+shot deposit-reported
+[ "$(psql_q -c "SELECT p.state FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE o.public_number = '$QNUMBER'")" = "CUSTOMER_TRANSFER_REPORTED" ] || fail "transfer report not stored"
+psql_q -c "DELETE FROM kitchen_payment_profile WHERE kitchen_id = '$KITCHEN'" >/dev/null
+echo "ok: cash refused above the limit; deposit, recipient and direct-payment note shown; order $QNUMBER waits for the deposit; the customer's report is shown as theirs, not as payment"
+
 if adb logcat -d | grep -E "FATAL EXCEPTION"; then fail "fatal exception"; fi
-echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest font size in English and Arabic; notification refusal safe"
+echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest font size in English and Arabic; notification refusal safe; deposit checkout and transfer report shown honestly"

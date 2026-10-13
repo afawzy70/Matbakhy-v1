@@ -23,7 +23,7 @@ phase() {
   set +e
   xcodebuild test-without-building -project MB031NativeChecks.xcodeproj -scheme SignInUITests -destination "id=$UDID" \
     -only-testing:"SignInUITests/OrderingTests/$name" -resultBundlePath "$RUNNER_TEMP/mb032-$name.xcresult" 2>&1 \
-    | tee "$RUNNER_TEMP/mb032-$name.log" | grep -E "Test Case|error:|MB03[23]-" 
+    | tee "$RUNNER_TEMP/mb032-$name.log" | grep -E "Test Case|error:|MB0[3-5][0-9]-" 
   status=${PIPESTATUS[0]}
   set -e
   if [ "$status" -ne 0 ]; then
@@ -170,4 +170,15 @@ xcrun xcresulttool export attachments --path "$RUNNER_TEMP/mb032-testI_DynamicTe
   --output-path "$RUNNER_TEMP/mb033-ios-screens" >/dev/null 2>&1 || echo "screenshots not exported; the xcresult bundle keeps them"
 echo "== phase J (MB-033): notification permission asked only on request; Don't Allow is safe"
 phase testJ_NotificationRefusalIsSafe
-echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest accessibility text size in English and Arabic; notification refusal safe"
+echo "== phase K (MB-053): cash refused above the kitchen's limit; deposit terms; the customer reports the transfer"
+KITCHEN=00000000-0000-4000-8000-00000000a0d1
+psql_q -v kitchen=$KITCHEN < "$HERE/e2e-native/deposit-profile.sql" >/dev/null
+trap 'kill $PROXY $API 2>/dev/null || true; psql_q -c "DELETE FROM kitchen_payment_profile WHERE kitchen_id = '"'$KITCHEN'"'" >/dev/null || true' EXIT
+phase testK_DepositCheckoutAndTransferReport
+LOG_K="$RUNNER_TEMP/mb032-testK_DepositCheckoutAndTransferReport.log"
+QNUMBER=$(grep -o 'MB053-ORDER-NUMBER [^ ]*' "$LOG_K" | head -1 | cut -d' ' -f2)
+QROW=$(psql_q -c "SELECT p.method || '|' || p.state || '|' || (p.deposit_minor * 2 - o.total_minor BETWEEN 0 AND 1) || '|' || p.recipient_identifier FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE o.public_number = '$QNUMBER'")
+echo "deposit order $QNUMBER (method|state|half|recipient): $QROW"
+[ "$QROW" = "DEPOSIT|CUSTOMER_TRANSFER_REPORTED|true|synthetic-kitchen@instapay" ] || { echo "FAIL: deposit order or transfer report not stored: $QROW"; exit 1; }
+psql_q -c "DELETE FROM kitchen_payment_profile WHERE kitchen_id = '$KITCHEN'" >/dev/null
+echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest accessibility text size in English and Arabic; notification refusal safe; deposit checkout and transfer report shown honestly"
