@@ -1,0 +1,14 @@
+# Native run 37 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38366031566), source e5cfb41.
+Android job 115191264039: success (same phases as run 36, including MB-049 D13 and the same-session limit).
+iOS job 115191263933: failure in phase H; phases A-G passed again:
+08:33:53 MB032-ORDER-NUMBER MB-100001, side effects 1|1|1|1|1|1|1
+08:34:46 MB033-QUANTITY-STOPPED-AT 10
+08:35:46 MB033-OVER-LIMIT-BLOCKED; delivery MB-100002 DELIVERY|3000|63000
+08:36:35 MB033-DEEP-LINK-OK MB-100002
+08:37:40 MB033-G-READY / MB033-SAME-SESSION-LIMIT-OK (phase G passed)
+08:41:26 testH failed "mode-PICKUP missing": the relaunched app showed "Your cart is empty." (phase A sign-in was
+         about 10 minutes earlier).
+Root cause (confirmed in code, fixed in c4b1598): the app never refreshed its 5-minute access token. The first request
+after expiry got 401, which ends the session and clears the basket. In run 36 the same relaunch showed the basket still
+present with "Sign in"; in run 37 the session end had already cleared it. Android's D13 phase ran within 5 minutes of
+sign-in, so it was not affected. Not a D13 defect; iOS D13 evidence comes from the next run with the fix.
