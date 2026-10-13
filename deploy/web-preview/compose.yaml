@@ -43,9 +43,11 @@ services:
       POSTGRES_USER: matbakhy
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
       KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?set KEYCLOAK_DB_PASSWORD}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./postgres/10-keycloak.sh:/docker-entrypoint-initdb.d/10-keycloak.sh:ro
+      - ./postgres/20-runtime-role.sh:/docker-entrypoint-initdb.d/20-runtime-role.sh:ro
       - ${BACKUP_DIR:-/srv/matbakhy-backups}:/backups
       - ../../infra/db/reconcile.sql:/reconcile.sql:ro
     networks: [internal]
@@ -119,8 +121,13 @@ services:
       SERVER_FORWARD_HEADERS_STRATEGY: native
       JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
       DATABASE_URL: jdbc:postgresql://postgres:5432/matbakhy
-      DATABASE_USERNAME: matbakhy
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD}
+      # MB-039: the API runs as a least-privilege role; Flyway migrates as the owner and grants the
+      # runtime role in its afterMigrate callback (backend db/migration/afterMigrate.sql).
+      DATABASE_USERNAME: matbakhy_app
+      DATABASE_PASSWORD: ${APP_DB_PASSWORD}
+      DATABASE_RUNTIME_ROLE: matbakhy_app
+      SPRING_FLYWAY_USER: matbakhy
+      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD}
       OIDC_ISSUER: https://id.${PREVIEW_DOMAIN}/realms/matbakhy
       OIDC_BACKCHANNEL_ISSUER: http://identity:8080/realms/matbakhy
       OIDC_WEB_CLIENT_SECRET: ${OIDC_WEB_CLIENT_SECRET:?set OIDC_WEB_CLIENT_SECRET}

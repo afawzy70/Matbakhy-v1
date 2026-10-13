@@ -49,7 +49,7 @@ Not every read should be audited. These are the ones that expose protected data 
 | Business-success row rolls back with its transaction | PASS (new test: a row written in a rolled-back transaction does not survive) |
 | Denial rows survive the rejected request | PASS indirectly: services that write DENIED then fail use `noRollbackFor` and the DENIED counts are asserted (existing tests) |
 | Denial on a long path | **Defect found and fixed:** the 120-character action limit made the insert fail, so a long path produced an error instead of a recorded 403. Red log: `RED-audit-long-path-denial.log` |
-| Mutation rejection **as the runtime database role** | **NOT_RUN / gap.** Tests and the preview package use one database user that owns the tables. Triggers stop ordinary UPDATE/DELETE/TRUNCATE, but the owner can disable or drop them. Proposal for MB-040: a separate migration (owner) role and a runtime role with only the grants it needs, then rerun the rejection tests as the runtime role. |
+| Mutation rejection **as the runtime database role** | **PASS locally (2026-10-13).** Flyway migrates as the owner; the callback `afterMigrate.sql` grants the runtime role only what it needs. RuntimeRoleIntegrationTest connects as that role: ordinary writes succeed; 12 forbidden statements fail with 42501 (UPDATE/DELETE/TRUNCATE audit, DISABLE/DROP TRIGGER, `session_replication_role`, ledger UPDATE, order item DELETE, meal revision UPDATE, order DELETE, Flyway history UPDATE, CREATE TABLE). The preview package now uses this split (`matbakhy_app`); a rehearsal with the real init script and API jar started healthy as the runtime role and refused the same kinds of statement (`PREVIEW-RUNTIME-ROLE-REHEARSAL.txt`). **Deployed: NOT_RUN** (MB-040). |
 | Audit-write failure on a critical operation | Behaviour today: the audit insert is in the business transaction, so a failed audit write rolls the operation back (no phantom success, no unaudited change). A failed **denial** audit write (outside a transaction) surfaces as an error response rather than a 403; the request is still refused. Not separately fault-injected. |
 
 ## 3. Application logs
@@ -80,7 +80,7 @@ Not done locally in this session:
 
 | Check | Status |
 |---|---|
-| AUD-01 | NOT_RUN (deployed). Local: coverage matrix and reliability above; runtime-role check is a gap |
+| AUD-01 | NOT_RUN (deployed). Local: coverage matrix and reliability above, including the runtime-role check |
 | LOG-01 | NOT_RUN (deployed). Local: correlation and MDC checks PASS |
 | OPS-01 | NOT_RUN |
 | OPS-02 | NOT_RUN |

@@ -23,7 +23,7 @@ Business history is the order's timeline (`order_event`, append-only). Diagnosti
 - Each read of the trail is itself audited (`audit.read`).
 - Rows hold the actor, action, outcome, reason and request ID. Details are redacted.
 - Rows cannot be updated, deleted or truncated (database triggers).
-- **Caveat:** the database owner role can disable the triggers. A separate runtime role is a proposal for MB-040 ([07](07-audit-and-log-readiness.md)).
+- The API connects as `matbakhy_app`, which cannot change or disable the triggers. The owner role `matbakhy` (migrations, backups, operator shell) still can: use it only for those tasks ([07](07-audit-and-log-readiness.md)).
 
 ## 3. Inspect and retry dead letters
 
