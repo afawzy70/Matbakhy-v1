@@ -1,0 +1,346 @@
+ok: docker CLI
+ok: docker daemon
+ok: docker compose v2
+ok: JDK 21
+ok: Node.js 24.21.0
+ok: pnpm (corepack)
+ok: curl
+ok: openssl
+-- building API jar
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=40955 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+-- starting stack (project matbakhy-e2e-20684)
+ Image matbakhy-e2e-20684-api Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 522B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 501B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 86B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 ...
+
+#6 [1/4] FROM docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+#6 resolve docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555 0.1s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 48.85MB 0.5s done
+#5 DONE 0.5s
+
+#7 [2/4] RUN addgroup -S matbakhy && adduser -S -G matbakhy matbakhy
+#7 CACHED
+
+#8 [3/4] WORKDIR /app
+#8 CACHED
+
+#9 [4/4] COPY app/target/matbakhy-app-0.1.0-SNAPSHOT.jar /app/matbakhy-api.jar
+#9 DONE 0.3s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 2.3s done
+#10 exporting manifest sha256:1c8cb02a4c49d3b6e14a5c924f3904ac8751b223755a19a709bab9873146c919 done
+#10 exporting config sha256:05fd6fd28b1ff6d1d655d58fca937a5b6634844de21a463830e3a09aea8905cc done
+#10 exporting attestation manifest sha256:148dbdcc32a817e556801fe3751550df0ad33edca132d0dbe795c537686e9ddc done
+#10 exporting manifest list sha256:b5291e6870eebbcdc4a015da1e151726f99dd40b8b4bc759e3f3a91b8bb807e4 done
+#10 naming to docker.io/library/matbakhy-e2e-20684-api:latest done
+#10 unpacking to docker.io/library/matbakhy-e2e-20684-api:latest
+#10 unpacking to docker.io/library/matbakhy-e2e-20684-api:latest 1.0s done
+#10 DONE 3.4s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s
+ Image matbakhy-e2e-20684-api Built 
+ Network matbakhy-e2e-20684_default Creating 
+ Volume matbakhy-e2e-20684_postgres-data Creating 
+ Volume matbakhy-e2e-20684_postgres-data Creating 
+ Network matbakhy-e2e-20684_default Creating 
+ Volume matbakhy-e2e-20684_postgres-data Created 
+ Volume matbakhy-e2e-20684_postgres-data Created 
+ Network matbakhy-e2e-20684_default Created 
+ Network matbakhy-e2e-20684_default Created 
+ Container matbakhy-e2e-20684-postgres-1 Creating 
+ Container matbakhy-e2e-20684-mail-1 Creating 
+ Container matbakhy-e2e-20684-object-storage-1 Creating 
+ Container matbakhy-e2e-20684-identity-1 Creating 
+ Container matbakhy-e2e-20684-mail-1 Created 
+ Container matbakhy-e2e-20684-identity-1 Created 
+ Container matbakhy-e2e-20684-object-storage-1 Created 
+ Container matbakhy-e2e-20684-postgres-1 Created 
+ Container matbakhy-e2e-20684-api-1 Creating 
+ Container matbakhy-e2e-20684-api-1 Created 
+ Container matbakhy-e2e-20684-postgres-1 Starting 
+ Container matbakhy-e2e-20684-object-storage-1 Starting 
+ Container matbakhy-e2e-20684-identity-1 Starting 
+ Container matbakhy-e2e-20684-mail-1 Starting 
+ Container matbakhy-e2e-20684-postgres-1 Started 
+ Container matbakhy-e2e-20684-object-storage-1 Started 
+ Container matbakhy-e2e-20684-identity-1 Started 
+ Container matbakhy-e2e-20684-postgres-1 Waiting 
+ Container matbakhy-e2e-20684-identity-1 Waiting 
+ Container matbakhy-e2e-20684-mail-1 Started 
+ Container matbakhy-e2e-20684-postgres-1 Healthy 
+ Container matbakhy-e2e-20684-identity-1 Healthy 
+ Container matbakhy-e2e-20684-api-1 Starting 
+ Container matbakhy-e2e-20684-api-1 Started 
+ Container matbakhy-e2e-20684-api-1 Waiting 
+ Container matbakhy-e2e-20684-postgres-1 Waiting 
+ Container matbakhy-e2e-20684-identity-1 Waiting 
+ Container matbakhy-e2e-20684-object-storage-1 Waiting 
+ Container matbakhy-e2e-20684-mail-1 Waiting 
+ Container matbakhy-e2e-20684-postgres-1 Healthy 
+ Container matbakhy-e2e-20684-identity-1 Healthy 
+ Container matbakhy-e2e-20684-mail-1 Healthy 
+ Container matbakhy-e2e-20684-object-storage-1 Healthy 
+ Container matbakhy-e2e-20684-api-1 Healthy 
+NAME                                  IMAGE                                                                                              COMMAND                  SERVICE          CREATED              STATUS                        PORTS
+matbakhy-e2e-20684-api-1              matbakhy-e2e-20684-api                                                                             "java -XX:MaxRAMPerc…"   api              About a minute ago   Up 22 seconds (healthy)       127.0.0.1:18080->8080/tcp
+matbakhy-e2e-20684-identity-1         keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741   "/opt/keycloak/bin/k…"   identity         About a minute ago   Up About a minute (healthy)   8443/tcp, 9000/tcp, 127.0.0.1:18180->8080/tcp
+matbakhy-e2e-20684-mail-1             axllent/mailpit:v1.31.5@sha256:94f6b70c1436defae6799d9ac7ff0eeff9540465b842026d5cdb018f1c0234ea    "/mailpit"               mail             About a minute ago   Up About a minute (healthy)   1110/tcp, 127.0.0.1:11025->1025/tcp, 127.0.0.1:18025->8025/tcp
+matbakhy-e2e-20684-object-storage-1   adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92         "/cnb/process/web"       object-storage   About a minute ago   Up About a minute             127.0.0.1:19090->9090/tcp
+matbakhy-e2e-20684-postgres-1         postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea      "docker-entrypoint.s…"   postgres         About a minute ago   Up About a minute (healthy)   127.0.0.1:15432->5432/tcp
+-- starting operations web on http://localhost:5174
+-- starting customer web on http://localhost:5173
+-- running browser workflows
+
+Running 6 tests using 1 worker
+
+  ✘  1 e2e/cook-workspace.e2e.ts:67:1 › cook fulfils pickup and delivery orders through the real API (29.4s)
+  ✘  2 e2e/customer-journey.e2e.ts:87:1 › customer orders delivery and pickup in the customer web and follows the cook's actions (6.0m)
+  ✓  3 e2e/customer-journey.e2e.ts:555:1 › customer screens keep the approved layout across widths and both directions (26.4s)
+  ✘  4 e2e/keyboard.e2e.ts:48:1 › keyboard-only customer and cook journeys with visible focus and focus restoration (6.4s)
+  ✘  5 e2e/money-reflow.e2e.ts:113:1 › MBQA-006: money amounts stay intact on the cook statement and the finance view (12 variations) (2.6s)
+Internal error: step id not found: fixture@871
+  ✘  6 e2e/operations-layout.e2e.ts:87:1 › operations sections keep layout and accessibility across widths and both directions (33.4s)
+
+
+  1) e2e/cook-workspace.e2e.ts:67:1 › cook fulfils pickup and delivery orders through the real API ─
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText('النقد الذي تحصّله لك؛ المستحق للمنصة هو العمولة فقط. يشمل الكشف الاستردادات وعكس العمولة والتسويات.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByText('النقد الذي تحصّله لك؛ المستحق للمنصة هو العمولة فقط. يشمل الكشف الاستردادات وعكس العمولة والتسويات.')
+
+
+      223 |   await expect(cook.getByRole("cell", { name: pickup.number })).toBeVisible();
+      224 |   await expect(cook.getByRole("cell", { name: delivery.number })).toBeVisible();
+    > 225 |   await expect(cook.getByText(t.statementNote)).toBeVisible();
+          |                                                 ^
+      226 |   await axe(cook, "cook statement");
+      227 |
+      228 |   // ---- pause stops new sales; resume restores them ----
+        at /home/user/Matbakhy-v1/apps/operations-web/e2e/cook-workspace.e2e.ts:225:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/cook-workspace.e2e.ts-cook-528e9-orders-through-the-real-API/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/cook-workspace.e2e.ts-cook-528e9-orders-through-the-real-API/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/claude-0/e2e-red/cook-workspace.e2e.ts-cook-528e9-orders-through-the-real-API/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/cook-workspace.e2e.ts-cook-528e9-orders-through-the-real-API/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../../../../tmp/claude-0/e2e-red/cook-workspace.e2e.ts-cook-528e9-orders-through-the-real-API/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) e2e/customer-journey.e2e.ts:87:1 › customer orders delivery and pickup in the customer web and follows the cook's actions 
+
+    Test timeout of 360000ms exceeded.
+
+    Error: locator.click: Test ended.
+    Call log:
+      - waiting for getByRole('button', { name: 'احسب الإجمالي' })
+        - locator resolved to <button disabled class="cta" type="button">احسب الإجمالي</button>
+      - attempting click action
+        - waiting for element to be visible, enabled and stable
+        - element is not stable
+      - retrying click action
+        - waiting for element to be visible, enabled and stable
+        - element is not enabled
+      - retrying click action
+        - waiting 20ms
+        2 × waiting for element to be visible, enabled and stable
+          - element is not enabled
+        - retrying click action
+          - waiting 100ms
+        689 × waiting for element to be visible, enabled and stable
+            - element is not enabled
+          - retrying click action
+            - waiting 500ms
+
+
+      104 |   await page.getByRole("button", { name: c.saveAddress }).click();
+      105 |   await page.getByRole("radio").first().check();
+    > 106 |   await page.getByRole("button", { name: c.getQuote }).click();
+          |                                                        ^
+      107 |   await expect(page.getByText(c.total, { exact: true })).toBeVisible();
+      108 |   await shot(page, "checkout-quote");
+      109 |   await page.getByLabel(c.terms).check();
+        at /home/user/Matbakhy-v1/apps/operations-web/e2e/customer-journey.e2e.ts:106:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/customer-journey.e2e.ts-cu-b8d4f--follows-the-cook-s-actions/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/claude-0/e2e-red/customer-journey.e2e.ts-cu-b8d4f--follows-the-cook-s-actions/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/customer-journey.e2e.ts-cu-b8d4f--follows-the-cook-s-actions/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../../../../tmp/claude-0/e2e-red/customer-journey.e2e.ts-cu-b8d4f--follows-the-cook-s-actions/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) e2e/keyboard.e2e.ts:48:1 › keyboard-only customer and cook journeys with visible focus and focus restoration 
+
+    Error: expect(locator).toBeChecked() failed
+
+    Locator: getByRole('radio').nth(1)
+    Expected: checked
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeChecked" with timeout 5000ms
+      - waiting for getByRole('radio').nth(1)
+
+
+      68 |   await page.getByRole("radio").first().focus();
+      69 |   await page.keyboard.press("ArrowDown");
+    > 70 |   await expect(page.getByRole("radio").nth(1)).toBeChecked();
+         |                                                ^
+      71 |   await tabTo(page, (e) => e.tag === "BUTTON" && e.text.startsWith(c.addToCart), "add to cart");
+      72 |   await page.keyboard.press("Enter");
+      73 |   const prompt = page.getByRole("alertdialog", { name: c.replaceTitle });
+        at /home/user/Matbakhy-v1/apps/operations-web/e2e/keyboard.e2e.ts:70:48
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/keyboard.e2e.ts-keyboard-o-8fd56-focus-and-focus-restoration/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/claude-0/e2e-red/keyboard.e2e.ts-keyboard-o-8fd56-focus-and-focus-restoration/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/keyboard.e2e.ts-keyboard-o-8fd56-focus-and-focus-restoration/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../../../../tmp/claude-0/e2e-red/keyboard.e2e.ts-keyboard-o-8fd56-focus-and-focus-restoration/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) e2e/money-reflow.e2e.ts:113:1 › MBQA-006: money amounts stay intact on the cook statement and the finance view (12 variations) 
+
+    Error: cook ar 320: amounts split across lines
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 10
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "lines": 2,
+    +     "text": "٢٤٠٫٠٠ ج.م.",
+    +   },
+    +   Object {
+    +     "lines": 2,
+    +     "text": "٢٧٠٫٠٠ ج.م.",
+    +   },
+    + ]
+
+      45 |   const tokens = await moneyTokens(page);
+      46 |   expect(tokens.length, `${where}: amounts shown`).toBeGreaterThan(2);
+    > 47 |   expect(tokens.filter((t) => t.lines !== 1), `${where}: amounts split across lines`).toEqual([]);
+         |                                                                                       ^
+      48 |   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), `${where}: page scrolls sideways`).toBe(true);
+      49 |   const wrap = page.locator(".table-wrap");
+      50 |   if ((await wrap.count()) > 0) {
+        at checkVariation (/home/user/Matbakhy-v1/apps/operations-web/e2e/money-reflow.e2e.ts:47:87)
+        at variations (/home/user/Matbakhy-v1/apps/operations-web/e2e/money-reflow.e2e.ts:83:7)
+        at /home/user/Matbakhy-v1/apps/operations-web/e2e/money-reflow.e2e.ts:100:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/money-reflow.e2e.ts-MBQA-0-56810-finance-view-12-variations-/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/claude-0/e2e-red/money-reflow.e2e.ts-MBQA-0-56810-finance-view-12-variations-/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/money-reflow.e2e.ts-MBQA-0-56810-finance-view-12-variations-/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../../../../tmp/claude-0/e2e-red/money-reflow.e2e.ts-MBQA-0-56810-finance-view-12-variations-/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) e2e/operations-layout.e2e.ts:87:1 › operations sections keep layout and accessibility across widths and both directions 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('navigation', { name: 'مساحة الطاهي' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByRole('navigation', { name: 'مساحة الطاهي' })
+
+
+      86 |     await page.getByRole("link", { name: strings.ar.signIn }).click();
+      87 |     await idpLogin(page, user);
+    > 88 |     await expect(page.getByRole("navigation", { name: strings.ar.section })).toBeVisible();
+         |                                                                              ^
+      89 |     await everySection(page, user);
+      90 |     await context.close();
+      91 |   }
+        at /home/user/Matbakhy-v1/apps/operations-web/e2e/operations-layout.e2e.ts:88:78
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/operations-layout.e2e.ts-o-a7009--widths-and-both-directions/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/operations-layout.e2e.ts-o-a7009--widths-and-both-directions/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../../../../tmp/claude-0/e2e-red/operations-layout.e2e.ts-o-a7009--widths-and-both-directions/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    ../../../../../tmp/claude-0/e2e-red/operations-layout.e2e.ts-o-a7009--widths-and-both-directions/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace ../../../../../tmp/claude-0/e2e-red/operations-layout.e2e.ts-o-a7009--widths-and-both-directions/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5 failed
+    e2e/cook-workspace.e2e.ts:67:1 › cook fulfils pickup and delivery orders through the real API ──
+    e2e/customer-journey.e2e.ts:87:1 › customer orders delivery and pickup in the customer web and follows the cook's actions 
+    e2e/keyboard.e2e.ts:48:1 › keyboard-only customer and cook journeys with visible focus and focus restoration 
+    e2e/money-reflow.e2e.ts:113:1 › MBQA-006: money amounts stay intact on the cook statement and the finance view (12 variations) 
+    e2e/operations-layout.e2e.ts:87:1 › operations sections keep layout and accessibility across widths and both directions 
+  1 passed (8.0m)
