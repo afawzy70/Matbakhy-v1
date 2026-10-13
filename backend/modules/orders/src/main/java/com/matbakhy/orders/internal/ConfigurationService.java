@@ -151,7 +151,9 @@ public class ConfigurationService {
         recorded.put("label", text("label", str(v, "label"), 3, 120));
         recorded.put("synthetic", isSynthetic);
         recorded.put("taxRateBps", integer(v, "taxRateBps", 0, 10_000));
-        recorded.put("commissionRateBps", integer(v, "commissionRateBps", 0, 10_000));
+        // Owner decision D10 (2026-10-13): no Matbakhy commission at launch. The rate stays in the policy as inactive
+        // capability; only 0 is accepted (a database check also refuses a non-zero rate for a live policy).
+        recorded.put("commissionRateBps", integer(v, "commissionRateBps", 0, 0));
         recorded.put("maxItemQuantity", integer(v, "maxItemQuantity", 1, 99));
         recorded.put("quoteTtlSeconds", integer(v, "quoteTtlSeconds", 60, 3600));
         recorded.put("acceptanceWindowMinutes", integer(v, "acceptanceWindowMinutes", 1, 1440));

@@ -67,3 +67,16 @@ export function formatTime(iso: string, locale: string): string {
     timeStyle: "short",
   }).format(new Date(iso));
 }
+
+/**
+ * Owner decision D10 (2026-10-13): no platform commission at launch. Commission rows are shown only when a statement
+ * actually carries a commission (the dormant capability); otherwise the screen says there is none.
+ */
+export function hasCommission(statement: {
+  summary: { commissionPosted: { amountMinor: number }; commissionReversed: { amountMinor: number }; commissionSettled: { amountMinor: number }; commissionOutstanding: { amountMinor: number } };
+  items: { commission?: { amountMinor: number } | null }[];
+}): boolean {
+  const s = statement.summary;
+  return [s.commissionPosted, s.commissionReversed, s.commissionSettled, s.commissionOutstanding].some((m) => m.amountMinor !== 0)
+    || statement.items.some((l) => (l.commission?.amountMinor ?? 0) !== 0);
+}

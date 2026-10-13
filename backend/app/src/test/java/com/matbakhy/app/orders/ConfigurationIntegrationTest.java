@@ -128,7 +128,7 @@ class ConfigurationIntegrationTest {
 
     private static String policy(boolean synthetic, int taxBps) {
         return """
-                {"label":"Pilot policy","synthetic":%s,"taxRateBps":%d,"commissionRateBps":1000,"maxItemQuantity":20,"quoteTtlSeconds":300,
+                {"label":"Pilot policy","synthetic":%s,"taxRateBps":%d,"commissionRateBps":0,"maxItemQuantity":20,"quoteTtlSeconds":300,
                  "acceptanceWindowMinutes":15,"minAcceptanceMinutes":5,"cancellationPolicyVersion":"cancel-v2","termsVersion":"terms-v2"}"""
                 .formatted(synthetic, taxBps);
     }

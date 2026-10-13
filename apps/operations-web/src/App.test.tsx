@@ -351,6 +351,32 @@ describe("operations-web cook workspace", () => {
     expect(screen.getByRole("cell", { name: "MB-1001" })).toBeTruthy();
   });
 
+  it("MB-050 (D10): with no commission the cook statement says so and shows no commission rows or column", async () => {
+    const zero = egp(0);
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/statements": () => ({
+        status: 200,
+        body: {
+          from: "2026-10-01", to: "2026-10-13", includes: ["COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION"], kitchenId: "k1",
+          direction: "COOK_PAYS_PLATFORM", refunds: [], settlements: [], unsettledEntries: [],
+          summary: { completedOrders: 1, ordersTotal: egp(27000), cashReported: zero, cashVerified: zero, cashOutstanding: egp(27000),
+            commissionPosted: zero, commissionPending: 0, commissionReversed: zero, commissionSettled: zero, commissionOutstanding: zero },
+          items: [{ orderId: "o1", publicNumber: "MB-1002", completedAt: "2026-10-13T09:00:00Z", orderTotal: egp(27000), cashState: "DUE", commission: zero, commissionState: "POSTED" }],
+          nextCursor: null, hasMore: false,
+        },
+      }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الكشف" }));
+    expect(await screen.findByText("لا توجد عمولة للمنصة: كل مبلغ الطلب لك.")).toBeTruthy();
+    expect(screen.queryByText(/عمولة/, { selector: "dt" })).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: "العمولة" })).toBeNull();
+    expect(screen.queryByText(/المستحق للمنصة هو العمولة فقط/)).toBeNull();
+    expect(screen.getByRole("cell", { name: "MB-1002" })).toBeTruthy();
+  });
+
   it("gives a reviewer the application queue and asks for MFA step-up when a decision needs it", async () => {
     const review = {
       id: "a1",

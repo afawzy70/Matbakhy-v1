@@ -159,7 +159,7 @@ class BackupRestoreIntegrationTest {
         assertThat(backup.getExitCode()).as(backup.getStdout() + backup.getStderr()).isZero();
         String dump = psqlLess(sh(source, "ls /backups/*.dump").getStdout().strip());
         assertThat(sh(source, "cat " + dump.replace(".dump", ".manifest")).getStdout())
-                .contains("schema_version=22", "rows.customer_order=3", "rows.ledger_group=1", "rows.ledger_entry=2");
+                .contains("schema_version=23", "rows.customer_order=3", "rows.ledger_group=1", "rows.ledger_entry=2");
 
         // Written after the backup: lost on restore. That window is the RPO of a backup-only recovery.
         psql(source, "UPDATE meal_slot SET capacity = capacity + 1");

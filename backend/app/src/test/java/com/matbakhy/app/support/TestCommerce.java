@@ -23,14 +23,27 @@ public final class TestCommerce {
         this.clock = clock;
     }
 
+    /**
+     * A synthetic test policy with a 10% commission: exercises the dormant commission capability only. The launch
+     * configuration has no commission (D10); use {@link #activateLaunchPolicy(int)} for launch behaviour.
+     */
     public int activatePolicy(int taxBps) {
+        return activatePolicy(taxBps, 1000);
+    }
+
+    /** The launch commercial terms (D10): no commission. */
+    public int activateLaunchPolicy(int taxBps) {
+        return activatePolicy(taxBps, 0);
+    }
+
+    private int activatePolicy(int taxBps, int commissionBps) {
         jdbc.update("UPDATE commerce_policy SET status = 'RETIRED' WHERE status = 'ACTIVE'");
         Integer next = jdbc.queryForObject("SELECT coalesce(max(version), 0) + 1 FROM commerce_policy", Integer.class);
         jdbc.update("""
                 INSERT INTO commerce_policy (version, label, synthetic, status, tax_rate_bps, commission_rate_bps, max_item_quantity,
                                              quote_ttl_seconds, acceptance_window_minutes, min_acceptance_minutes, cancellation_policy_version,
                                              terms_version)
-                VALUES (?, 'SYNTHETIC test policy', true, 'ACTIVE', ?, 1000, 10, 300, 15, 5, ?, ?)""", next, taxBps, CANCELLATION, TERMS);
+                VALUES (?, 'SYNTHETIC test policy', true, 'ACTIVE', ?, ?, 10, 300, 15, 5, ?, ?)""", next, taxBps, commissionBps, CANCELLATION, TERMS);
         return next;
     }
 
