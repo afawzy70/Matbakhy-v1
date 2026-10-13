@@ -1302,5 +1302,28 @@
     "automation": "qa/regression-d877a15/additional.cjs",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
+  },
+  {
+    "id": "W-MONEY-REFLOW",
+    "title": "Financial amounts remain readable at narrow widths",
+    "purpose": "Detect split numeric tokens missed by axe, semantic table checks and document overflow assertions",
+    "requirementReferences": "BR-046/TC-046; MB-022/025/029",
+    "group": "cross-cutting",
+    "roles": "cook-a, finance-a",
+    "platforms": "Chromium web + real API/DB",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Own kitchen A with two completed synthetic orders and real commission/cash summary; statements rendered by authorized roles; all contacts masked in evidence",
+    "steps": [
+      "Open Cook Statement; open Finance summary for kitchen A as finance-a.",
+      "For each role inspect320,390,1440 widths in EN and AR; compare displayed amounts with actual statement/DB values.",
+      "Measure DOM ranges for whole decimal/grouped number tokens and visually inspect summary/table screenshots; inspect header/cell mapping and overflow."
+    ],
+    "expected": "Amounts remain readable as intact numeric tokens, with currency grouped intelligibly; no single-glyph monetary columns or broken order-number digits; ordinary line breaks between whole words allowed; desktop baseline also measured.",
+    "invariants": "UI formatting preserves authoritative EGP minor-unit amounts; read-only actions never alter finance/order data",
+    "cleanup": "Restore1440/en; close only own browser contexts; do not mutate order/cash/ledger.",
+    "automation": "qa/regression-d877a15/layout.cjs (TARGETED discovery; integrate in next fresh FULL REGRESSION)",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "No owner approval inferred. This tests functional readability under BR-046, not branding preferences; screen reader remains separate BLOCKED check."
   }
 ]

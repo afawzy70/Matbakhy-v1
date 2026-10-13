@@ -235,3 +235,19 @@ Automation: MANUAL / planned automation.
 
 Review: SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
 
+
+## W-MONEY-REFLOW — Financial amounts remain readable at narrow widths
+
+Purpose: Detect split numeric tokens missed by axe, semantic table checks and document overflow assertions. References: BR-046/TC-046; MB-022/025/029. Roles cook-a, finance-a; Chromiumweb; en/ar; widths320/390/1440; priorityP1.
+
+Preconditions: Own kitchen A with two completed synthetic orders and real commission/cash summary; statements rendered by authorized roles; all contacts masked in evidence.
+
+1. Open Cook Statement; open Finance summary for kitchen A as finance-a.
+2. For each role inspect320,390,1440 widths in EN and AR; compare displayed amounts with actual statement/DB values.
+3. Measure DOM ranges for whole decimal/grouped number tokens and visually inspect summary/table screenshots; inspect header/cell mapping and overflow.
+
+Expected: Amounts remain readable as intact numeric tokens, with currency grouped intelligibly; no single-glyph monetary columns or broken order-number digits; ordinary line breaks between whole words allowed; desktop baseline also measured.
+
+Invariants: UI formatting preserves authoritative EGP minor-unit amounts; read-only actions never alter finance/order data. Cleanup: Restore1440/en; close only own browser contexts; do not mutate order/cash/ledger.
+
+Automation: qa/regression-d877a15/layout.cjs (TARGETED discovery; integrate in next fresh FULL REGRESSION). Review SELF_REVIEWED. Questions: No owner approval inferred. This tests functional readability under BR-046, not branding preferences; screen reader remains separate BLOCKED check.
