@@ -27,6 +27,7 @@ const config: AppConfig = { environment: "development", apiBaseUrl: "http://api"
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
 const money = (amountMinor: number) => ({ amountMinor, currency: "EGP" });
+const cod = (total: number) => ({ method: "COD", depositBps: 0, deposit: money(0), remainder: money(total), recipient: null });
 const slot = (id: string) => ({ id, startsAt: "2026-10-13T10:00:00Z", endsAt: "2026-10-13T11:00:00Z", timezone: "Africa/Cairo", cutoffAt: "2026-10-13T08:00:00Z", availablePortions: 5, fulfillmentModes: ["DELIVERY", "PICKUP"] });
 const meal = (id: string, kitchenId: string) => ({
   id,
@@ -542,7 +543,7 @@ describe("D13 on native: changed prices need informed reconfirmation", () => {
     const subtotal = items.reduce((s, i) => s + i.lineTotal.amountMinor, 0);
     return {
       quoteId: `q${version}`, expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items, subtotal: money(subtotal), deliveryFee: money(fee), tax: money(0),
-      total: money(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
+      total: money(subtotal + fee), payment: cod(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
     };
   };
   const placed = {
@@ -757,5 +758,87 @@ describe("an expired access token is refreshed instead of signing the customer o
     expect(await screen.findByRole("button", { name: t.signIn })).toBeTruthy();
     await waitFor(() => expect(mockStore.size).toBe(0));
     expect(session.accessToken).toBeNull();
+  });
+});
+
+/** MB-053 (D16, TC-163) on native: the same deposit choice, terms and honest status as the web. */
+describe("MB-053 on native: direct deposit checkout and payment status", () => {
+  const recipient = { method: "INSTAPAY", identifier: "kitchen@instapay", name: "Kitchen K1" };
+  const en = (minor: number) => new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+  async function signedIn() {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    return session;
+  }
+
+  it("quotes a deposit with the recipient and the direct-payment note, and explains when cash is not eligible", async () => {
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "slot-k1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"],
+      lines: [{ mealId: "m1", title: "Dish m1", quantity: 2, unitPriceMinor: 12000, maxQuantity: 5 }] }));
+    const quoteBodies: { paymentMethod?: string }[] = [];
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const key = `${input.method} ${new URL(input.url).pathname}`;
+      if (key === "GET /api/v1/me") return json(200, profile);
+      if (key === "GET /api/v1/meals") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "GET /api/v1/me/addresses") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "POST /api/v1/quotes") {
+        const body = (await input.json()) as { paymentMethod?: string };
+        quoteBodies.push(body);
+        if (body.paymentMethod === "COD") return json(422, { code: "VALIDATION_FAILED", fieldErrors: [{ field: "paymentMethod", code: "COD_NOT_ELIGIBLE" }] });
+        return json(201, { quoteId: "q1", expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items: [], subtotal: money(24000), deliveryFee: money(0), tax: money(0), total: money(24000),
+          payment: { method: "DEPOSIT", depositBps: 5000, deposit: money(12000), remainder: money(12000), recipient },
+          cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [] });
+      }
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+    await fireEvent.press(await screen.findByTestId("get-quote"));
+    expect(await screen.findByText(t.errors.COD_NOT_ELIGIBLE ?? "missing")).toBeTruthy();
+    await fireEvent.press(screen.getByTestId("pay-DEPOSIT"));
+    expect(screen.queryByText(t.errors.COD_NOT_ELIGIBLE ?? "missing")).toBeNull();
+    await fireEvent.press(screen.getByTestId("get-quote"));
+    await screen.findByTestId("deposit-terms");
+    expect(screen.getByText(`Deposit now: ${en(12000)}`)).toBeTruthy();
+    expect(screen.getByText(`Rest on receipt: ${en(12000)}`)).toBeTruthy();
+    expect(screen.getByText(/kitchen@instapay/)).toBeTruthy();
+    expect(screen.getByText(t.pay.directNote)).toBeTruthy();
+    expect(quoteBodies.map((b) => b.paymentMethod)).toEqual(["COD", "DEPOSIT"]);
+  });
+
+  it("lets the customer say the deposit was sent, then shows that the kitchen still has to confirm", async () => {
+    let state = "WAITING_FOR_DEPOSIT";
+    let reported: unknown = null;
+    const view = () => ({
+      id: "o9", publicNumber: "MB-000902", version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP", items: [], subtotal: money(24000), deliveryFee: money(0), tax: money(0),
+      total: money(24000), slot: slot("slot-k1"), acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], cashState: "NOT_DUE", supportCaseIds: [], handoverCode: null, contact: null,
+      payment: { method: "DEPOSIT", state, deposit: money(12000), remainder: money(12000), recipient, depositExpiresAt: "2026-10-13T09:00:00Z", version: 0 },
+    });
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const key = `${input.method} ${new URL(input.url).pathname}`;
+      if (key === "GET /api/v1/me") return json(200, profile);
+      if (key === "GET /api/v1/meals") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "GET /api/v1/orders/o9") return json(200, view());
+      if (key === "POST /api/v1/orders/o9/payment/transfer-report") {
+        reported = await input.json();
+        state = "CUSTOMER_TRANSFER_REPORTED";
+        return json(200, view().payment);
+      }
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    try {
+      await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+      expect(await screen.findByText(`${t.pay.title}: ${t.pay.states.WAITING_FOR_DEPOSIT}`)).toBeTruthy();
+      await fireEvent.changeText(screen.getByTestId("transfer-reference"), " IP-123 ");
+      await fireEvent.press(screen.getByTestId("report-transfer"));
+      expect(await screen.findByText(`${t.pay.title}: ${t.pay.states.CUSTOMER_TRANSFER_REPORTED}`)).toBeTruthy();
+      expect(screen.getByText(t.pay.explain.CUSTOMER_TRANSFER_REPORTED ?? "missing")).toBeTruthy();
+      expect(screen.queryByTestId("report-transfer")).toBeNull();
+      expect(reported).toEqual({ reference: "IP-123" });
+    } finally {
+      jest.restoreAllMocks();
+    }
   });
 });

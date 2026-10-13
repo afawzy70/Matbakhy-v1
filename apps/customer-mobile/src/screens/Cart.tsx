@@ -9,6 +9,7 @@ import { errorCode, formatMoney, formatTime, newKey, type Schemas } from "../mob
 import { place, recover, type PlacementOutcome } from "../placement";
 import { Body, Button, Card, Choice, ErrorLine, Field, Notice, Screen, StatusView, Title } from "../ui";
 import { useServer } from "../useServer";
+import { PaymentTerms } from "./Payment";
 import type { RootProps } from "./navigation";
 
 type Quote = Schemas["QuoteResponse"];
@@ -261,6 +262,7 @@ function OrderForm({
   const overLimit = basket.lines.some((l) => l.quantity > lineLimit(maxQuantityPerLine));
   const [mode, setMode] = useState<"DELIVERY" | "PICKUP">(basket.modes.includes("DELIVERY") ? "DELIVERY" : "PICKUP");
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [payMethod, setPayMethod] = useState<"COD" | "DEPOSIT">("COD");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -278,6 +280,7 @@ function OrderForm({
       slotId: basket.slotId,
       fulfillmentMode: mode,
       ...(mode === "DELIVERY" && selectedAddress ? { addressId: selectedAddress } : {}),
+      paymentMethod: payMethod,
     };
   }
 
@@ -308,7 +311,10 @@ function OrderForm({
     try {
       const r = await api.POST("/api/v1/quotes", { body: quoteRequest() });
       setQuote(r.data ?? null);
-      setError(r.data ? null : errorCode(r.error));
+      // MB-053: the server names the payment method it refused in the field errors.
+      const fields = JSON.stringify((r.error as { fieldErrors?: unknown } | undefined)?.fieldErrors ?? []);
+      const payment = ["COD_NOT_ELIGIBLE", "DEPOSIT_NOT_OFFERED"].find((c) => fields.includes(c));
+      setError(r.data ? null : (payment ?? errorCode(r.error)));
     } catch {
       setError("NETWORK");
     } finally {
@@ -390,6 +396,25 @@ function OrderForm({
           )}
         </StatusView>
       ) : null}
+      <View style={{ gap: 8 }}>
+        <Body locale={locale} strong>
+          {t.pay.choose}
+        </Body>
+        {(["COD", "DEPOSIT"] as const).map((m) => (
+          <Choice
+            key={m}
+            testID={`pay-${m}`}
+            label={m === "COD" ? t.pay.cod : t.pay.deposit}
+            selected={payMethod === m}
+            onPress={() => {
+              setPayMethod(m);
+              setQuote(null);
+              setChange(null);
+              setError(null);
+            }}
+          />
+        ))}
+      </View>
       <Button
         testID="get-quote"
         label={t.getQuote}
@@ -411,9 +436,7 @@ function OrderForm({
           <Body locale={locale} strong>
             {t.total}: {formatMoney(quote.total.amountMinor, locale)}
           </Body>
-          <Body locale={locale} muted>
-            {t.cashOnDelivery}
-          </Body>
+          <PaymentTerms terms={quote.payment} deadline={quote.acceptanceDeadlinePreview} />
           {quote.warnings.includes("SYNTHETIC_POLICY") ? <Notice locale={locale}>{t.syntheticPolicy}</Notice> : null}
           <Choice testID="accept-terms" label={t.terms} selected={accepted} onPress={() => setAccepted(!accepted)} />
           <Button

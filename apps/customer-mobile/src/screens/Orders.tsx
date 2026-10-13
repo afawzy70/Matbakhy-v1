@@ -6,6 +6,7 @@ import { errorCode, formatMoney, formatTime, newKey } from "../mobileApi";
 import { Body, Button, Card, Choice, ErrorLine, Field, Notice, Screen, StatusView, Title } from "../ui";
 import { useServer } from "../useServer";
 import type { RootProps, TabProps } from "./navigation";
+import { PaymentStatus } from "./Payment";
 
 /** The customer's own orders, from the server; states and totals are the server's (same as on the web). */
 export function OrdersScreen({ navigation }: TabProps<"Orders">) {
@@ -137,6 +138,7 @@ function SignedInOrder({ route, navigation }: RootProps<"Order">) {
                 {formatTime(o.slot.startsAt, locale)} · {t.mode[o.fulfillmentMode] ?? o.fulfillmentMode}
               </Body>
             </Card>
+            <PaymentStatus orderId={o.id} payment={o.payment} onChanged={reload} />
             {o.handoverCode ? (
               <Notice locale={locale} testID="handover-code">
                 {t.handoverCode}: {o.handoverCode}
