@@ -1349,5 +1349,29 @@
     "automation": "qa/regression-d877a15/permanent-replay.cjs (TARGETED extension; include next fresh full)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
+  },
+  {
+    "id": "S-PERMISSION-UI",
+    "title": "Live support permission revocation, UI and backend agreement",
+    "purpose": "Verify previously allowed staff read/write disappears per request and on UI refresh without logging the user out",
+    "requirementReferences": "TC-007,043",
+    "group": "backoffice",
+    "roles": "permission-scoped staff/customer",
+    "platforms": "Chromium web + real API/DB",
+    "locales": "en,ar; baseline en unless explicitly parameterized",
+    "priority": "P1",
+    "preconditions": "Active support-a with exactly support.case grant; ops-a real freshOTP/staff.grant; existing own QAcase; different browser sessions; no parallel auth diagnostic",
+    "steps": [
+      "Show support navigation and identify actual active support.case grant.",
+      "Administrator revokes that grant through real API; same staff session must still /me200.",
+      "Attempt case read/message write; refresh operations UI.",
+      "Verify403/no business mutation and no Support tab; restore grant through authorized API and confirm UI/API access returns."
+    ],
+    "expected": "Authenticated staff loses previously permitted actions immediately403; refreshing hides revoked navigation; denied write changes nothing; restoration201 returns access200 without auth bypass.",
+    "invariants": "server rereads actual grants; same authenticated identity; case messages/version unchanged after denial; recoverable administrator preserved.",
+    "cleanup": "Restore only the revoked synthetic support grant in finally through real admin API; no user/session deletion.",
+    "automation": "qa/regression-d877a15/permission-revocation.cjs (TARGETED extension; next fresh full)",
+    "reviewStatus": "SELF_REVIEWED",
+    "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   }
 ]

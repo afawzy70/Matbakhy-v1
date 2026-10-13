@@ -196,3 +196,20 @@ Automation: MANUAL / planned automation.
 
 Review: SELF_REVIEWED. Questions: Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred.
 
+
+## S-PERMISSION-UI — Live support permission revocation, UI and backend agreement
+
+Purpose: Verify previously allowed staff read/write disappears per request and on UI refresh without logging the user out. References: TC-007,043. Admin/support; Chromiumweb/API; en; priorityP0.
+
+Preconditions: Active support-a with exactly support.case grant; ops-a real freshOTP/staff.grant; existing own QAcase; different browser sessions; no parallel auth diagnostic.
+
+1. Show support navigation and identify actual active support.case grant.
+2. Administrator revokes that grant through real API; same staff session must still /me200.
+3. Attempt case read/message write; refresh operations UI.
+4. Verify403/no business mutation and no Support tab; restore grant through authorized API and confirm UI/API access returns.
+
+Expected: Authenticated staff loses previously permitted actions immediately403; refreshing hides revoked navigation; denied write changes nothing; restoration201 returns access200 without auth bypass.
+
+Invariants: server rereads actual grants; same authenticated identity; case messages/version unchanged after denial; recoverable administrator preserved.. Cleanup: Restore only the revoked synthetic support grant in finally through real admin API; no user/session deletion.
+
+Automation: qa/regression-d877a15/permission-revocation.cjs (TARGETED extension; next fresh full). Review SELF_REVIEWED. Questions: no new access policy or owner approval inferred.
