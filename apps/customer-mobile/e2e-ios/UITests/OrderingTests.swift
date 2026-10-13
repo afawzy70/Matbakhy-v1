@@ -11,6 +11,10 @@ import XCTest
 ///   testE  the saved basket is flagged and cannot be quoted; reducing to 5 restores the quote; a delivery order to the
 ///          saved address shows the zone fee and the server's total.
 ///   testF  the order link (matbakhy-dev://orders/<id>) opens that order while the app runs (warm) and after termination (cold).
+///   testG  same session: with 6 in the basket the script lowers the limit to 5 while the app keeps running (the test waits on
+///          the public configuration); reopening the cart flags the line.
+///   testH  D13: after a quote the script raises Native Dish One to 130.00 (the test waits on the public meal); placing shows
+///          the kitchen's change and the old and new totals; the new quote is placed only after explicit acceptance.
 final class OrderingTests: XCTestCase {
     let app = XCUIApplication(bundleIdentifier: "com.matbakhy.customer.dev")
     let authUI = XCUIApplication(bundleIdentifier: "com.apple.SafariViewService")
@@ -240,5 +244,85 @@ final class OrderingTests: XCTestCase {
         expect(app.staticTexts[number], "cold deep link did not open \(number)", timeout: 90)
         print("MB033-DEEP-LINK-OK \(number)")
         shot("deep-link-cold")
+    }
+
+    /// Waits (polling the local API the app uses) until `condition` holds for the JSON at `path`; the script makes the change.
+    private func waitForServer(_ path: String, timeout: TimeInterval = 120, _ condition: @escaping ([String: Any]) -> Bool) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            let done = XCTestExpectation(description: path)
+            var ok = false
+            URLSession.shared.dataTask(with: URL(string: "http://localhost:8080\(path)")!) { data, _, _ in
+                if let data, let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    ok = condition(object)
+                }
+                done.fulfill()
+            }.resume()
+            _ = XCTWaiter.wait(for: [done], timeout: 10)
+            if ok { return true }
+            Thread.sleep(forTimeInterval: 2)
+        }
+        return false
+    }
+
+    func testG_LimitLoweredInTheSameSession() {
+        app.launch()
+        let meal = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Native Dish One")).firstMatch
+        expect(meal, "Native Dish One not listed", timeout: 90)
+        meal.tap()
+        expect(element("slot-0"), "no slot")
+        element("slot-0").tap()
+        let increase = app.buttons["Increase"]
+        for _ in 0..<5 { increase.tap() }
+        expect(app.staticTexts["6"], "quantity 6 not reached", timeout: 10)
+        tapScrolled("add-to-cart")
+        expect(text("Added to cart."), "six portions not added")
+        tapScrolled("go-to-cart")
+        expect(text("6 × Native Dish One"), "basket line 6 not shown")
+        XCTAssertFalse(text("per meal can be ordered now").exists)
+        print("MB033-G-READY")
+        XCTAssertTrue(waitForServer("/api/v1/configuration/public") { ($0["orderLimits"] as? [String: Any])?["maxQuantityPerLine"] as? Int == 5 },
+                      "the script did not lower the limit")
+        XCTAssertEqual(app.state, .runningForeground, "the app must still be the same running session")
+        app.navigationBars.buttons.firstMatch.tap()
+        tapScrolled("go-to-cart")
+        expect(text("At most 5 per meal can be ordered now"), "lowered limit not applied in the same session")
+        print("MB033-SAME-SESSION-LIMIT-OK")
+        shot("same-session-limit")
+        let decrease = element("qty-dec-00000000-0000-4000-8000-00000000a0b1")
+        for _ in 0..<5 { decrease.tap() }
+        expect(text("1 × Native Dish One"), "basket line not reduced to 1", timeout: 10)
+    }
+
+    func testH_KitchenPriceChangeNeedsReconfirmation() {
+        app.launch()
+        expect(element("open-cart"), "cart shortcut missing", timeout: 90)
+        element("open-cart").tap()
+        tapScrolled("mode-PICKUP")
+        tapScrolled("get-quote")
+        let total = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Total: ")).firstMatch
+        expect(total, "no quote")
+        XCTAssertTrue(total.label.contains("120.00"), "quote not at the old price: \(total.label)")
+        tapScrolled("accept-terms")
+        print("MB049-H-READY")
+        XCTAssertTrue(waitForServer("/api/v1/meals/00000000-0000-4000-8000-00000000a0b1") { ($0["price"] as? [String: Any])?["amountMinor"] as? Int == 13000 },
+                      "the script did not change the price")
+        tapScrolled("place-order")
+        let kitchen = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "The kitchen updated the price of")).firstMatch
+        expect(kitchen, "kitchen price change not explained")
+        XCTAssertTrue(kitchen.label.contains("Native Dish One") && kitchen.label.contains("120.00") && kitchen.label.contains("130.00"), kitchen.label)
+        print("MB049-NOTICE \(kitchen.label)")
+        let totals = element("price-change-total")
+        expect(totals, "old and new total not shown")
+        print("MB049-TOTALS \(totals.label)")
+        shot("price-change-notice")
+        XCTAssertFalse(element("place-order").isEnabled, "placing possible before accepting the new total")
+        tapScrolled("accept-new-total")
+        tapScrolled("accept-terms")
+        tapScrolled("place-order")
+        let number = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "MB-")).firstMatch
+        expect(number, "repriced order not confirmed")
+        print("MB049-ORDER-NUMBER \(number.label)")
+        shot("repriced-order")
     }
 }

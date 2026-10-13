@@ -524,3 +524,128 @@ describe("Q1 on native: quantity limits come from the server's active policy", (
     expect(await screen.findByText(t.overLineLimit(5))).toBeTruthy();
   });
 });
+
+/**
+ * Owner decision D13 (RQ-004) on native: a refused stale quote (409 PRICE_CHANGED) is re-quoted, the change is shown with
+ * accurate attribution and the previous and new totals, and the new quote can be placed only after explicit acceptance.
+ */
+describe("D13 on native: changed prices need informed reconfirmation", () => {
+  const prices: Record<string, number> = {};
+  let fee = 0;
+  let version = 0;
+  let quoteFails = false;
+  const quoteBody = () => {
+    const items = [
+      { mealId: "m1", mealRevision: version + 1, title: "Dish m1", quantity: 2, unitPrice: money(prices.m1 ?? 0), lineTotal: money(2 * (prices.m1 ?? 0)) },
+      { mealId: "m2", mealRevision: version + 1, title: "Dish m2", quantity: 1, unitPrice: money(prices.m2 ?? 0), lineTotal: money(prices.m2 ?? 0) },
+    ];
+    const subtotal = items.reduce((s, i) => s + i.lineTotal.amountMinor, 0);
+    return {
+      quoteId: `q${version}`, expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items, subtotal: money(subtotal), deliveryFee: money(fee), tax: money(0),
+      total: money(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
+    };
+  };
+  const placed = {
+    id: "o9", publicNumber: "MB-000901", version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP",
+    items: [], subtotal: money(0), deliveryFee: money(0), tax: money(0), total: money(0), slot: slot("slot-k1"),
+    acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], cashState: "DUE", supportCaseIds: [], handoverCode: null, contact: null,
+  };
+  async function setup(modes: string[]) {
+    prices.m1 = 12000;
+    prices.m2 = 8000;
+    fee = modes.includes("DELIVERY") ? 3000 : 0;
+    version = 0;
+    quoteFails = false;
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "slot-k1", slotStartsAt: "2026-10-13T10:00:00Z", modes,
+      lines: [{ mealId: "m1", title: "Dish m1", quantity: 2, unitPriceMinor: 12000, maxQuantity: 5 }, { mealId: "m2", title: "Dish m2", quantity: 1, unitPriceMinor: 8000, maxQuantity: 5 }] }));
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    const orderPosts: { quoteId: string; clientRequestId: string }[] = [];
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const path = new URL(input.url).pathname;
+      const key = `${input.method} ${path}`;
+      if (key === "GET /api/v1/me") return json(200, profile);
+      if (key === "GET /api/v1/meals") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "GET /api/v1/me/addresses") return json(200, { items: [{ id: "a1", label: "Home", street: "Street", building: "1", zoneId: "z1", version: 0 }], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/zones") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "POST /api/v1/quotes") return quoteFails ? json(503, { code: "SERVICE_UNAVAILABLE" }) : json(201, quoteBody());
+      if (key === "POST /api/v1/orders") {
+        const body = (await input.json()) as { quoteId: string; clientRequestId: string };
+        orderPosts.push(body);
+        return body.quoteId === `q${version}` ? json(201, placed) : json(409, { code: "PRICE_CHANGED", fieldErrors: [{ field: "quoteId", code: "MEAL_CHANGED" }] });
+      }
+      if (key === "GET /api/v1/orders/o9") return json(200, placed);
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+    return orderPosts;
+  }
+  const changePrices = (next: Record<string, number>, nextFee = fee) => {
+    Object.assign(prices, next);
+    fee = nextFee;
+    version += 1;
+  };
+  const en = (minor: number) => new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+  const disabled = (id: string) => screen.getByTestId(id).props.accessibilityState?.disabled === true;
+
+  it("shows the kitchen's increase and decrease and the old and new totals, and places only after explicit acceptance", async () => {
+    const posts = await setup(["PICKUP"]);
+    await fireEvent.press(await screen.findByTestId("get-quote"));
+    await fireEvent.press(await screen.findByTestId("accept-terms"));
+    changePrices({ m1: 13000, m2: 7500 });
+    await fireEvent.press(screen.getByTestId("place-order"));
+    expect(await screen.findByText(`The kitchen updated the price of “Dish m1” from ${en(12000)} to ${en(13000)}.`)).toBeTruthy();
+    expect(screen.getByText(`The kitchen updated the price of “Dish m2” from ${en(8000)} to ${en(7500)}.`)).toBeTruthy();
+    expect(screen.getByTestId("price-change-total").props.children).toBe(`The total was ${en(32000)} and is now ${en(33500)}. Review the new total before confirming your order.`);
+    expect(screen.queryByText("The price changed. Calculate the total again.")).toBeNull();
+    expect(posts).toHaveLength(1);
+    await fireEvent.press(screen.getByTestId("accept-terms"));
+    expect(disabled("place-order")).toBe(true);
+    await fireEvent.press(screen.getByTestId("accept-new-total"));
+    expect(disabled("place-order")).toBe(false);
+    await fireEvent.press(screen.getByTestId("place-order"));
+    expect(await screen.findByText("MB-000901")).toBeTruthy();
+    expect(posts.map((p) => p.quoteId)).toEqual(["q0", "q1"]);
+    expect(posts[0]?.clientRequestId).not.toBe(posts[1]?.clientRequestId);
+  });
+
+  it("attributes a delivery-fee-only change to the fee, and asks again after a refresh failure and a second change", async () => {
+    const posts = await setup(["DELIVERY"]);
+    await fireEvent.press(await screen.findByTestId("get-quote"));
+    await fireEvent.press(await screen.findByTestId("accept-terms"));
+    changePrices({}, 3125);
+    await fireEvent.press(screen.getByTestId("place-order"));
+    expect(await screen.findByText(`The delivery fee changed from ${en(3000)} to ${en(3125)}.`)).toBeTruthy();
+    expect(screen.queryByText(/The kitchen updated/)).toBeNull();
+
+    await fireEvent.press(screen.getByTestId("accept-terms"));
+    await fireEvent.press(screen.getByTestId("accept-new-total"));
+    changePrices({ m1: 14000 });
+    quoteFails = true;
+    await fireEvent.press(screen.getByTestId("place-order"));
+    expect(await screen.findByText("We couldn't calculate the new total. Calculate the total again.")).toBeTruthy();
+    expect(screen.queryByTestId("place-order")).toBeNull();
+    expect(mockStore.has("matbakhy.basket.v1")).toBe(true);
+    expect(posts).toHaveLength(2);
+  });
+
+  it("explains the change in Arabic", async () => {
+    const localization = jest.requireMock<{ getLocales: () => { languageCode: string }[] }>("expo-localization");
+    const original = localization.getLocales;
+    localization.getLocales = () => [{ languageCode: "ar" }];
+    try {
+      await setup(["PICKUP"]);
+      await fireEvent.press(await screen.findByTestId("get-quote"));
+      await fireEvent.press(await screen.findByTestId("accept-terms"));
+      changePrices({ m1: 13000 });
+      await fireEvent.press(screen.getByTestId("place-order"));
+      const ar = (minor: number) => new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+      expect(await screen.findByText(`المطبخ حدّث سعر «Dish m1» من ${ar(12000)} إلى ${ar(13000)}.`)).toBeTruthy();
+      expect(screen.getByTestId("accept-new-total")).toBeTruthy();
+    } finally {
+      localization.getLocales = original;
+    }
+  });
+});

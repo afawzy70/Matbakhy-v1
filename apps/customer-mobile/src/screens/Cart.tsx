@@ -1,3 +1,4 @@
+import { priceChanges } from "@matbakhy/api-client";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useRef, useState } from "react";
 import { View } from "react-native";
@@ -136,7 +137,8 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
           <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck()} />
         </View>
       ) : null}
-      {outcome?.kind === "rejected" ? <ErrorLine t={t} code={outcome.code} /> : null}
+      {/* A refused stale price is explained by the order form's price-change notice instead (D13). */}
+      {outcome?.kind === "rejected" && outcome.code !== "PRICE_CHANGED" ? <ErrorLine t={t} code={outcome.code} /> : null}
       {auth.kind !== "signedIn" ? (
         <Card>
           <Body locale={locale}>{t.signInRequired}</Body>
@@ -151,10 +153,12 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
             void reloadProfile();
           }}
         />
-      ) : pending ? null : (
-        // Any edit changes the key, so a quote for the previous basket can never be accepted for the new one.
+      ) : (
+        // Any edit changes the key, so a quote for the previous basket can never be accepted for the new one. While an
+        // order is pending the form stays mounted but hidden, so a refused stale price can be shown afterwards (D13).
         <OrderForm
           key={basket.lines.map((l) => `${l.mealId}:${l.quantity}`).join("|")}
+          hidden={pending !== null}
           basket={basket}
           onPending={(p) => setPending(p)}
           onOutcome={settleOutcome}
@@ -241,7 +245,17 @@ function PhoneVerification({ onVerified }: { onVerified: () => void }) {
   );
 }
 
-function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending: (p: PendingPlacement) => void; onOutcome: (o: PlacementOutcome) => void }) {
+function OrderForm({
+  basket,
+  hidden,
+  onPending,
+  onOutcome,
+}: {
+  basket: Basket;
+  hidden: boolean;
+  onPending: (p: PendingPlacement) => void;
+  onOutcome: (o: PlacementOutcome) => void;
+}) {
   const { api, t, locale, maxQuantityPerLine } = useApp();
   // A line above the server's current per-line limit gets no quote until the customer reduces it (Q1).
   const overLimit = basket.lines.some((l) => l.quantity > lineLimit(maxQuantityPerLine));
@@ -251,22 +265,48 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // D13: a price that changed before placement is shown and must be accepted explicitly before the new quote is placed.
+  const [change, setChange] = useState<{ previous: Quote | null; next: Quote } | null>(null);
+  const [changeAccepted, setChangeAccepted] = useState(false);
   const [addresses, reloadAddresses] = useServer(() => api.GET("/api/v1/me/addresses"), "addresses");
   // The first saved address is preselected until the customer picks another.
   const selectedAddress = addressId ?? (addresses.status === "ok" ? (addresses.data.items[0]?.id ?? null) : null);
 
+  function quoteRequest() {
+    return {
+      items: basket.lines.map((l) => ({ mealId: l.mealId, quantity: l.quantity })),
+      slotId: basket.slotId,
+      fulfillmentMode: mode,
+      ...(mode === "DELIVERY" && selectedAddress ? { addressId: selectedAddress } : {}),
+    };
+  }
+
+  /** After a refused stale quote: a fresh server quote for the same basket, shown against the one the customer saw. */
+  async function requote(previous: Quote) {
+    setChangeAccepted(false);
+    setAccepted(false);
+    try {
+      const r = await api.POST("/api/v1/quotes", { body: quoteRequest() });
+      if (r.data) {
+        setQuote(r.data);
+        setChange({ previous, next: r.data });
+        return true;
+      }
+    } catch {
+      // Unreachable: the basket stays and "Calculate total" can be pressed again.
+    }
+    setQuote(null);
+    setChange(null);
+    setError("REQUOTE_FAILED");
+    return false;
+  }
+
   async function getQuote() {
     setBusy(true);
     setError(null);
+    setChange(null);
     try {
-      const r = await api.POST("/api/v1/quotes", {
-        body: {
-          items: basket.lines.map((l) => ({ mealId: l.mealId, quantity: l.quantity })),
-          slotId: basket.slotId,
-          fulfillmentMode: mode,
-          ...(mode === "DELIVERY" && selectedAddress ? { addressId: selectedAddress } : {}),
-        },
-      });
+      const r = await api.POST("/api/v1/quotes", { body: quoteRequest() });
       setQuote(r.data ?? null);
       setError(r.data ? null : errorCode(r.error));
     } catch {
@@ -290,15 +330,22 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
     setBusy(true);
     try {
       const o = await place(api, p);
-      if (o.kind === "rejected") {
-        setQuote(null);
-      }
       onOutcome(o);
+      if (o.kind === "rejected" && o.code === "PRICE_CHANGED") {
+        // Nothing was ordered: re-quote and let the customer review and accept the new prices (never resubmit silently).
+        await requote(q);
+      } else if (o.kind === "rejected") {
+        setQuote(null);
+        setChange(null);
+      }
     } finally {
       setBusy(false);
     }
   }
 
+  if (hidden) {
+    return null;
+  }
   return (
     <Card testID="order-form">
       <View style={{ flexDirection: "row", gap: 8 }}>
@@ -313,6 +360,7 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
               onPress={() => {
                 setMode(m);
                 setQuote(null);
+                setChange(null);
               }}
             />
           ))}
@@ -332,6 +380,7 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
                   onPress={() => {
                     setAddressId(a.id);
                     setQuote(null);
+                    setChange(null);
                   }}
                 />
               ))}
@@ -346,6 +395,7 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
         disabled={overLimit || busy || (mode === "DELIVERY" && !selectedAddress)}
         onPress={() => void getQuote()}
       />
+      {change ? <PriceChangeNotice change={change} accepted={changeAccepted} onAccept={() => setChangeAccepted(true)} /> : null}
       {quote ? (
         <View testID="quote" style={{ gap: 6 }}>
           <Body locale={locale}>
@@ -365,11 +415,50 @@ function OrderForm({ basket, onPending, onOutcome }: { basket: Basket; onPending
           </Body>
           {quote.warnings.includes("SYNTHETIC_POLICY") ? <Notice locale={locale}>{t.syntheticPolicy}</Notice> : null}
           <Choice testID="accept-terms" label={t.terms} selected={accepted} onPress={() => setAccepted(!accepted)} />
-          <Button testID="place-order" label={busy ? t.placing : t.placeOrder} disabled={!accepted || busy} onPress={() => void submit(quote)} />
+          <Button
+            testID="place-order"
+            label={busy ? t.placing : t.placeOrder}
+            disabled={!accepted || busy || (change !== null && !changeAccepted)}
+            onPress={() => void submit(quote)}
+          />
         </View>
       ) : null}
-      {error ? <Body locale={locale}>{errorText(t, error)}</Body> : null}
+      {error ? <Body locale={locale}>{error === "REQUOTE_FAILED" ? t.requoteFailed : errorText(t, error)}</Body> : null}
     </Card>
+  );
+}
+
+/**
+ * D13: what changed since the customer's last total, attributed accurately: the kitchen for meal prices, otherwise the
+ * delivery fee or tax; the previous and new total; and an explicit acceptance before the new quote can be placed.
+ */
+function PriceChangeNotice({ change, accepted, onAccept }: { change: { previous: Quote | null; next: Quote }; accepted: boolean; onAccept: () => void }) {
+  const { t, locale } = useApp();
+  const money = (minor: number) => formatMoney(minor, locale);
+  const d = change.previous ? priceChanges(change.previous, change.next) : null;
+  return (
+    <View accessibilityRole="alert" testID="price-change" style={{ gap: 6 }}>
+      <Notice locale={locale}>{t.priceChangeTitle}</Notice>
+      {d?.meals.map((m) => (
+        <Body key={m.mealId} locale={locale}>
+          {t.kitchenChangedPrice(m.title, money(m.previousMinor), money(m.nextMinor))}
+        </Body>
+      ))}
+      {d?.deliveryFee ? <Body locale={locale}>{t.deliveryFeeChanged(money(d.deliveryFee.previousMinor), money(d.deliveryFee.nextMinor))}</Body> : null}
+      {d?.tax ? <Body locale={locale}>{t.taxChanged(money(d.tax.previousMinor), money(d.tax.nextMinor))}</Body> : null}
+      {d?.unexplained ? <Body locale={locale}>{t.orderDetailsChanged}</Body> : null}
+      <Body locale={locale} strong testID="price-change-total">
+        {d ? t.newTotalReview(money(d.total.previousMinor), money(d.total.nextMinor)) : t.newTotalOnly(money(change.next.total.amountMinor))}
+      </Body>
+      <Body locale={locale} muted>
+        {t.editOrLeave}
+      </Body>
+      {accepted ? (
+        <Body locale={locale}>{t.newTotalAccepted}</Body>
+      ) : (
+        <Button testID="accept-new-total" label={t.acceptNewTotal} onPress={onAccept} />
+      )}
+    </View>
   );
 }
 

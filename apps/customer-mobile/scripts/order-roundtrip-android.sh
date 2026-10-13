@@ -286,5 +286,55 @@ wait_for "text=\"$DNUMBER\"" 90 >/dev/null || fail "cold deep link did not open 
 shot deep-link-cold
 echo "ok: the order link opens order $DNUMBER warm and cold"
 
+echo "== MB-033 Q1 same session: the limit lowered while the app keeps running applies when the cart is opened again"
+launch
+APP_PID=$(adb shell pidof "$PKG" | tr -d '\r')
+tap 'content-desc="Native Dish One[^"]*"' 90
+tap 'resource-id="slot-0"'
+pos=$(wait_for 'content-desc="Increase"' 30) || fail "no increase control"
+for _ in $(seq 5); do adb shell input tap $pos; sleep 0.4; done
+wait_for 'text="6"' 20 >/dev/null || fail "quantity 6 not reached"
+tap_scrolled 'resource-id="add-to-cart"'
+wait_for 'text="Added to cart."' 30 >/dev/null || fail "six portions not added"
+tap_scrolled 'resource-id="go-to-cart"'
+wait_for 'text="6 × Native Dish One[^"]*"' 30 >/dev/null || fail "basket line 6 not shown"
+absent 'text="At most [0-9]+ per meal[^"]*"'
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 5 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+adb shell input keyevent 4
+tap_scrolled 'resource-id="go-to-cart"'
+wait_scrolled_up 'text="At most 5 per meal can be ordered now. Reduce the quantity to continue."' 60 || fail "lowered limit not applied in the same session"
+[ "$(adb shell pidof "$PKG" | tr -d '\r')" = "$APP_PID" ] || fail "the app process changed; not the same session"
+shot same-session-limit
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+pos=$(wait_scrolled_up 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 && center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"') || fail "no decrease control"
+for _ in $(seq 5); do adb shell input tap $pos; sleep 0.5; done
+wait_for 'text="1 × Native Dish One[^"]*"' 20 >/dev/null || fail "basket line not reduced to 1"
+echo "ok: same process ($APP_PID): limit 10 -> 5 while running; reopening the cart flagged the line"
+
+echo "== MB-049 (D13): the kitchen raises a price after the quote; the customer sees it and must accept the new total"
+tap_scrolled 'resource-id="mode-PICKUP"'
+tap_scrolled 'resource-id="get-quote"'
+wait_scrolled 'text="Total: EGP.120\.00"' 60 || fail "no quote at the old price"
+tap_scrolled 'resource-id="accept-terms"'
+BEFORE=$(psql_q -c "SELECT count(*) FROM customer_order WHERE kitchen_id = '00000000-0000-4000-8000-00000000a0d1'")
+psql_q -v meal=00000000-0000-4000-8000-00000000a0b1 -v price=13000 < "$HERE/e2e-native/price-change.sql" >/dev/null
+tap_scrolled 'resource-id="place-order"'
+wait_scrolled 'text="The kitchen updated the price of[^"]*Native Dish One[^"]*EGP.120\.00 to EGP.130\.00\."' 60 || fail "kitchen price change not explained"
+wait_scrolled 'text="The total was EGP.120\.00 and is now EGP.130\.00\.[^"]*"' 20 || fail "old and new total not shown"
+shot price-change-notice
+[ "$(psql_q -c "SELECT count(*) FROM customer_order WHERE kitchen_id = '00000000-0000-4000-8000-00000000a0d1'")" = "$BEFORE" ] || fail "an order was created at the stale price"
+wait_scrolled 'resource-id="place-order"' 20 || fail "no place button"
+grep -qE 'resource-id="place-order"[^>]*enabled="false"|enabled="false"[^>]*resource-id="place-order"' "$UI" || fail "placing possible before accepting the new total"
+tap_scrolled 'resource-id="accept-new-total"'
+tap_scrolled 'resource-id="accept-terms"'
+tap_scrolled 'resource-id="place-order"'
+wait_for 'text="MB-[^"]*"' 60 >/dev/null || fail "repriced order not confirmed"
+PNUMBER=$(grep -o 'text="MB-[^"]*"' "$UI" | head -1 | sed 's/text="\(.*\)"/\1/')
+PROW=$(psql_q -c "SELECT o.total_minor || '|' || i.unit_price_minor || '|' || i.quantity FROM customer_order o JOIN order_item i ON i.order_id = o.id WHERE o.public_number = '$PNUMBER'")
+echo "repriced order $PNUMBER (total|unit|quantity): $PROW"
+[ "$PROW" = "13000|13000|1" ] || fail "repriced order not stored at the accepted price: $PROW"
+shot repriced-order
+echo "ok: refused at the stale price with no order; notice with old and new prices; placed only after acceptance at 130.00"
+
 if adb logcat -d | grep -E "FATAL EXCEPTION"; then fail "fatal exception"; fi
-echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold"
+echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed"

@@ -123,4 +123,41 @@ echo "== phase F (MB-033): the order link opens the order warm and cold"
 export TEST_RUNNER_MB033_ORDER_ID="$(psql_q -c "SELECT id FROM customer_order WHERE public_number = '$DNUMBER'")"
 export TEST_RUNNER_MB033_ORDER_NUMBER="$DNUMBER"
 phase testF_OrderDeepLinkWarmAndCold
-echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold"
+
+# A phase whose test prints a READY marker and then waits on the API while this script applies a change.
+phase_with_change() {
+  local name="$1" marker="$2" change="$3" log="$RUNNER_TEMP/mb032-$1.log" status
+  : > "$log"
+  set +e
+  ( xcodebuild test-without-building -project MB031NativeChecks.xcodeproj -scheme SignInUITests -destination "id=$UDID" \
+      -only-testing:"SignInUITests/OrderingTests/$name" -resultBundlePath "$RUNNER_TEMP/mb032-$name.xcresult" > "$log" 2>&1 ) &
+  local pid=$!
+  for _ in $(seq 1 240); do grep -q "$marker" "$log" && break; kill -0 $pid 2>/dev/null || break; sleep 1; done
+  grep -q "$marker" "$log" && eval "$change"
+  wait $pid; status=$?
+  set -e
+  grep -E "Test Case|error:|MB03[23]-|MB049-" "$log" || true
+  if [ "$status" -ne 0 ]; then
+    echo "FAIL: $name (xcodebuild exit $status)"
+    sed -n '/MB031-HIERARCHY-BEGIN/,/MB031-HIERARCHY-END/p' "$log" | head -120
+    exit 1
+  fi
+}
+
+echo "== phase G (MB-033 Q1): the limit is lowered while the app keeps running"
+phase_with_change testG_LimitLoweredInTheSameSession MB033-G-READY \
+  "psql_q -c \"UPDATE commerce_policy SET max_item_quantity = 5 WHERE status = 'ACTIVE' AND synthetic\" >/dev/null"
+psql_q -c "UPDATE commerce_policy SET max_item_quantity = 10 WHERE status = 'ACTIVE' AND synthetic" >/dev/null
+
+echo "== phase H (MB-049, D13): the kitchen raises a price after the quote; reconfirmation required"
+BEFORE=$(psql_q -c "SELECT count(*) FROM customer_order WHERE kitchen_id = '00000000-0000-4000-8000-00000000a0d1'")
+phase_with_change testH_KitchenPriceChangeNeedsReconfirmation MB049-H-READY \
+  "psql_q -v meal=00000000-0000-4000-8000-00000000a0b1 -v price=13000 < \"$HERE/e2e-native/price-change.sql\" >/dev/null"
+LOG_H="$RUNNER_TEMP/mb032-testH_KitchenPriceChangeNeedsReconfirmation.log"
+PNUMBER=$(grep -o 'MB049-ORDER-NUMBER [^ ]*' "$LOG_H" | head -1 | cut -d' ' -f2)
+PROW=$(psql_q -c "SELECT o.total_minor || '|' || i.unit_price_minor || '|' || i.quantity FROM customer_order o JOIN order_item i ON i.order_id = o.id WHERE o.public_number = '$PNUMBER'")
+AFTER=$(psql_q -c "SELECT count(*) FROM customer_order WHERE kitchen_id = '00000000-0000-4000-8000-00000000a0d1'")
+echo "repriced order $PNUMBER (total|unit|quantity): $PROW; kitchen-one orders before phase H: $BEFORE, after: $AFTER"
+[ "$PROW" = "13000|13000|1" ] || { echo "FAIL: repriced order not stored at the accepted price: $PROW"; exit 1; }
+[ "$AFTER" = "$((BEFORE + 1))" ] || { echo "FAIL: expected exactly one new order (none at the stale price)"; exit 1; }
+echo "PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed"
