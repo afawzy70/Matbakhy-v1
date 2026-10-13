@@ -7,7 +7,7 @@ async function login(browser,role,origin='http://localhost:36173'){
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();page.setDefaultTimeout(12000);
  await page.goto(origin);await page.getByRole('link',{name:/^(Sign in|تسجيل الدخول)$/}).first().click();
  await expect(page.locator('#username')).toBeVisible();await page.locator('#username').fill(role);await page.locator('#password').fill(secret.password);await page.locator('#kc-login').click();
- if(secret.otp[role]){await expect(page.locator('#otp')).toBeVisible();await page.locator('#otp').fill(totp(secret.otp[role]));await page.locator('#kc-login').click();}
+ if(secret.otp[role]){await expect(page.locator('#otp')).toBeVisible();const counterPath='/workspace/qa-tools/regression-d877a15/otp-counters.json';const used=fs.existsSync(counterPath)?JSON.parse(fs.readFileSync(counterPath)):{};let tick=Math.floor(Date.now()/30000);let remaining=30000-Date.now()%30000;if(used[role]===tick||remaining<6000){await new Promise(r=>setTimeout(r,remaining+150));tick=Math.floor(Date.now()/30000);}await page.locator('#otp').fill(totp(secret.otp[role]));used[role]=tick;fs.writeFileSync(counterPath,JSON.stringify(used));await page.locator('#kc-login').click();}
  await page.waitForURL(u=>u.origin===origin,{timeout:20000,waitUntil:'domcontentloaded'});
  const response=await context.request.get('http://localhost:39080/api/v1/me');const profile=await response.json();expect(response.status()).toBe(200);
  await context.storageState({path:'/workspace/qa-tools/regression-d877a15/'+role+'-state.json'});
