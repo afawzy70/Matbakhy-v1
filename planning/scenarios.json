@@ -1019,8 +1019,10 @@
       "given": "Synthetic user with orders and private uploads requests deletion",
       "when": "Retention workflow executes under fixture policy",
       "then": "PII removed/anonymized as specified, balanced finance remains, audit documents actions",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-TC-055/evidence.json"
+      ]
     },
     {
       "id": "TC-056",
