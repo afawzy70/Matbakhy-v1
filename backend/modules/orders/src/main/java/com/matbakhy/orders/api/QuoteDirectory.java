@@ -17,7 +17,8 @@ public interface QuoteDirectory {
     record ValidQuote(UUID quoteId, UUID customerId, UUID kitchenId, UUID slotId, String fulfillmentMode, UUID addressId,
                       Long addressVersion, UUID zoneId, int policyVersion, long subtotalMinor, long deliveryFeeMinor, long taxMinor,
                       long totalMinor, Instant acceptByPreview, Instant expiresAt, List<QuotedItem> items, Instant acceptBy,
-                      int commissionRateBps, String cancellationPolicyVersion, String termsVersion) {
+                      int commissionRateBps, String cancellationPolicyVersion, String termsVersion, String paymentMethod, long depositMinor,
+                      String recipientMethod, String recipientIdentifier, String recipientName) {
     }
 
     ValidQuote requireValid(UUID customerId, UUID quoteId);

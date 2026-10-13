@@ -953,6 +953,76 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/orders/{orderId}/payment/transfer-report:
+    post:
+      operationId: postOrdersPaymentTransferReport
+      tags:
+        - orders
+      summary: "API-100: the customer reports a sent deposit (D16); idempotent; not payment"
+      description: Moves WAITING_FOR_DEPOSIT to CUSTOMER_TRANSFER_REPORTED once; repeated or concurrent reports change nothing more. Another customer's order is 404; a COD order is 409.
+      x-matbakhy-id: API-100
+      x-permission: ORDER_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentTransferReport"
+  /api/v1/cook/orders/{orderId}/payment/receipt:
+    post:
+      operationId: postCookOrdersPaymentReceipt
+      tags:
+        - cook
+      summary: "API-101: the kitchen reports the deposit arrived in its own account (D16); not a bank confirmation"
+      description: Requires the current payment version and the exact deposit amount. Preparation of a deposit order is refused until this report exists. Another kitchen's order is 404.
+      x-matbakhy-id: API-101
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentReceiptReport"
   /api/v1/orders/{orderId}/cancellation-requests:
     post:
       operationId: postOrdersCancellationRequests
@@ -4505,6 +4575,11 @@ components:
           oneOf:
             - $ref: "#/components/schemas/CustomerFulfillmentContact"
             - type: "null"
+        payment:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentView"
+            - type: "null"
+          description: Payment terms and state (D16), kept apart from the order state; null for orders placed before payment records existed.
     CustomerFulfillmentContact:
       type: object
       additionalProperties: false
@@ -5481,6 +5556,11 @@ components:
           oneOf:
             - $ref: "#/components/schemas/KitchenFulfillmentContact"
             - type: "null"
+        payment:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentView"
+            - type: "null"
+          description: Payment terms and state (D16), kept apart from the order state; null for orders placed before payment records existed.
       description: Monetary amounts are immutable snapshots from placement.
     OutboxStatus:
       type: object
@@ -5708,6 +5788,96 @@ components:
           format: uri
         alt:
           type: string
+    PaymentMethod:
+      type: string
+      enum: [COD, DEPOSIT]
+      description: COD where the kitchen allows it for the total; DEPOSIT paid by the customer directly to the kitchen's approved recipient (D16). Matbakhy never holds the money.
+    PaymentRecipient:
+      type: object
+      additionalProperties: false
+      required: [method, identifier, name]
+      properties:
+        method:
+          type: string
+          enum: [INSTAPAY, MOBILE_WALLET, BANK_TRANSFER]
+        identifier:
+          type: string
+          description: The kitchen's approved, intentionally public payment identifier
+        name:
+          type: string
+    QuotePaymentTerms:
+      type: object
+      additionalProperties: false
+      required: [method, depositBps, deposit, remainder, recipient]
+      properties:
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+        depositBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        deposit:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        remainder:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+    PaymentState:
+      type: string
+      enum: [NOT_REQUIRED, WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, RECONCILE_PENDING, EXPIRED]
+      description: CUSTOMER_TRANSFER_REPORTED is the customer's statement, not payment. KITCHEN_RECEIPT_REPORTED is the kitchen's statement after checking its own account, not a bank confirmation.
+    PaymentView:
+      type: object
+      additionalProperties: false
+      required: [method, state, deposit, remainder, recipient, depositExpiresAt, version]
+      properties:
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+        state:
+          $ref: "#/components/schemas/PaymentState"
+        deposit:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        remainder:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+        depositExpiresAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
+    PaymentTransferReport:
+      type: object
+      additionalProperties: false
+      properties:
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: Optional transfer reference from the customer's app; never a card or account secret
+    PaymentReceiptReport:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, amountMinor]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        amountMinor:
+          type: integer
+          minimum: 1
+          description: Must equal the deposit; a different amount or "not received" is reported through the mismatch path (MB-052)
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
     PlaceOrderRequest:
       type: object
       additionalProperties: false
@@ -6557,7 +6727,9 @@ components:
           type: string
           format: uuid
           description: Required when fulfillmentMode is DELIVERY
-      description: No client price, tax, fee or commission fields are accepted.
+        paymentMethod:
+          $ref: "#/components/schemas/PaymentMethod"
+      description: No client price, tax, fee or commission fields are accepted. paymentMethod defaults to COD (D16).
     QuoteResponse:
       type: object
       additionalProperties: false
@@ -6573,6 +6745,7 @@ components:
         - cancellationPolicyVersion
         - acceptanceDeadlinePreview
         - warnings
+        - payment
       properties:
         quoteId: *a1
         expiresAt:
@@ -6604,6 +6777,8 @@ components:
           type: array
           items:
             type: string
+        payment:
+          $ref: "#/components/schemas/QuotePaymentTerms"
     RatingSummary:
       type: object
       additionalProperties: false

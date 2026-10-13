@@ -18,11 +18,11 @@ BEGIN
     EXECUTE format('REVOKE INSERT, UPDATE, DELETE ON TABLE flyway_schema_history FROM %I', runtime);
     -- Fully append-only (unconditional triggers): no UPDATE or DELETE privilege at all.
     FOREACH t IN ARRAY ARRAY['audit_event', 'case_message', 'config_change', 'ledger_entry', 'ledger_group', 'meal_revision',
-                             'order_event', 'order_item'] LOOP
+                             'order_event', 'order_item', 'payment_event'] LOOP
         EXECUTE format('REVOKE UPDATE, DELETE ON TABLE %I FROM %I', t, runtime);
     END LOOP;
     -- Guarded tables (some updates are legitimate, deletion never is).
-    FOREACH t IN ARRAY ARRAY['customer_order', 'cook_application_revision', 'settlement_line'] LOOP
+    FOREACH t IN ARRAY ARRAY['customer_order', 'cook_application_revision', 'settlement_line', 'order_payment'] LOOP
         EXECUTE format('REVOKE DELETE ON TABLE %I FROM %I', t, runtime);
     END LOOP;
 END $$;

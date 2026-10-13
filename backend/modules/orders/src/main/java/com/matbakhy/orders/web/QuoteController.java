@@ -4,6 +4,7 @@ import com.matbakhy.identity.api.CurrentAccount;
 import com.matbakhy.orders.internal.QuoteService;
 import com.matbakhy.orders.internal.QuoteService.ItemRequest;
 import com.matbakhy.orders.internal.QuoteService.Mode;
+import com.matbakhy.orders.internal.PaymentService;
 import com.matbakhy.orders.internal.QuoteService.QuoteRequest;
 import com.matbakhy.orders.internal.QuoteService.QuoteResponse;
 import com.matbakhy.shared.web.Languages;
@@ -35,7 +36,7 @@ class QuoteController {
     }
 
     record Body(@NotNull @Size(min = 1, max = 20) List<@NotNull @Valid Item> items, @NotNull UUID slotId, @NotNull Mode fulfillmentMode,
-                UUID addressId) {
+                UUID addressId, PaymentService.Method paymentMethod) {
     }
 
     @PostMapping("/api/v1/quotes")
@@ -44,6 +45,6 @@ class QuoteController {
                         @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String acceptLanguage) {
         boolean english = Languages.prefersEnglish(acceptLanguage);
         return quotes.create(actor.id(), new QuoteRequest(body.items().stream().map(i -> new ItemRequest(i.mealId(), i.quantity())).toList(),
-                body.slotId(), body.fulfillmentMode(), body.addressId()), english);
+                body.slotId(), body.fulfillmentMode(), body.addressId(), body.paymentMethod()), english);
     }
 }

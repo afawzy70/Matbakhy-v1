@@ -58,11 +58,13 @@ public class OrderLifecycleService {
     private final IdempotentCommands idempotency;
     private final AuditLog audit;
     private final JsonMapper json;
+    private final PaymentService payments;
     private final Clock clock;
 
     OrderLifecycleService(JdbcTemplate jdbc, SlotInventory inventory, KitchenDirectory kitchens, HandoverCodes codes, HandoverProperties handover,
-                          IdempotentCommands idempotency, AuditLog audit, JsonMapper json, Clock clock) {
+                          IdempotentCommands idempotency, AuditLog audit, JsonMapper json, PaymentService payments, Clock clock) {
         this.jdbc = jdbc;
+        this.payments = payments;
         this.inventory = inventory;
         this.kitchens = kitchens;
         this.codes = codes;
@@ -137,6 +139,7 @@ public class OrderLifecycleService {
                 case "prepare" -> {
                     require(o, "ACCEPTED");
                     fulfillable(kitchen);
+                    payments.requireReadyForPreparation(o.id());
                     move(o, Stage.ALLOCATED, Stage.CONSUMED, "ALLOCATED", "CONSUMED");
                     transition(o, "PREPARING", "COOK", cookId, null);
                 }
@@ -363,6 +366,9 @@ public class OrderLifecycleService {
                 UUID.randomUUID(), o.id(), "ORDER_" + to, json.writeValueAsString(Map.of("orderId", o.id().toString(), "state", to)),
                 Timestamp.from(now), Timestamp.from(now), org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY));
         log.info("order {} {} -> {} by {}", o.id(), o.state(), to, actorType);
+        if (terminal && !"COMPLETED".equals(to)) {
+            payments.orderClosed(o.id(), actorType, actorId, reasonCode);
+        }
     }
 
     private void issueChallenge(Order o) {

@@ -69,7 +69,7 @@ public class OrderService {
     public record OrderView(UUID id, String publicNumber, long version, String state, String fulfillmentMode, List<OrderLine> items,
                             Money subtotal, Money deliveryFee, Money tax, Money total, SlotView slot, Instant acceptBy,
                             List<OrderEvent> events, List<String> allowedActions, String cashState, List<UUID> supportCaseIds,
-                            String handoverCode, KitchenContact contact) {
+                            String handoverCode, KitchenContact contact, PaymentService.PaymentView payment) {
     }
 
     /** Kitchen contact for the order owner after acceptance; the pickup location only for pickup orders. */
@@ -83,7 +83,7 @@ public class OrderService {
     public record CookOrderView(UUID id, String publicNumber, long version, String state, String fulfillmentMode, List<OrderLine> items,
                                 Money subtotal, Money deliveryFee, Money tax, Money total, SlotView slot, Instant acceptBy,
                                 List<OrderEvent> events, List<String> allowedActions, String cashState, String fulfillmentNote,
-                                String dispatchReference, CustomerContact contact) {
+                                String dispatchReference, CustomerContact contact, PaymentService.PaymentView payment) {
     }
 
     public record CookOrderPage(List<CookOrderView> items, String nextCursor, boolean hasMore) {
@@ -106,11 +106,12 @@ public class OrderService {
     private final KitchenDirectory kitchens;
     private final OrderCases cases;
     private final HandoverCodes codes;
+    private final PaymentService payments;
     private final Clock clock;
 
     OrderService(JdbcTemplate jdbc, QuoteDirectory quotes, SlotInventory inventory, MealCatalog meals, AddressDirectory addresses,
                  CheckoutContactPolicy contact, IdempotentCommands idempotency, JsonMapper json, KitchenDirectory kitchens,
-                 HandoverCodes codes, OrderCases cases, Clock clock) {
+                 HandoverCodes codes, OrderCases cases, PaymentService payments, Clock clock) {
         this.jdbc = jdbc;
         this.quotes = quotes;
         this.inventory = inventory;
@@ -122,6 +123,7 @@ public class OrderService {
         this.kitchens = kitchens;
         this.codes = codes;
         this.cases = cases;
+        this.payments = payments;
         this.clock = clock;
     }
 
@@ -198,8 +200,12 @@ public class OrderService {
                 VALUES (?, 'order', ?, 'ORDER_PLACED', ?::jsonb, ?, ?, ?)""",
                 UUID.randomUUID(), orderId, json.writeValueAsString(Map.of("orderId", orderId.toString(), "kitchenId", q.kitchenId().toString())),
                 Timestamp.from(now), Timestamp.from(now), org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY));
+        // MB-051: the payment terms are snapshotted with the order; cash due at hand-over is what the deposit does not cover.
+        payments.createFor(orderId, customerId, q.paymentMethod(), q.totalMinor(), q.depositMinor(),
+                q.recipientIdentifier() == null ? null : new PaymentService.Recipient(q.recipientMethod(), q.recipientIdentifier(), q.recipientName()),
+                q.acceptBy(), now);
         jdbc.update("INSERT INTO cash_obligation (id, order_id, amount_minor, state, created_at) VALUES (?, ?, ?, 'DUE', ?)",
-                UUID.randomUUID(), orderId, q.totalMinor(), Timestamp.from(now));
+                UUID.randomUUID(), orderId, q.totalMinor() - q.depositMinor(), Timestamp.from(now));
         log.info("order {} recorded in its placement transaction", orderId);
         return orderId;
     }
@@ -318,7 +324,8 @@ public class OrderService {
         return new OrderView(orderId, (String) o.get("public_number"), (Long) o.get("version"), state, mode, lines,
                 egp((Long) o.get("subtotal_minor")), egp((Long) o.get("delivery_fee_minor")), egp((Long) o.get("tax_minor")),
                 egp((Long) o.get("total_minor")), slot, ((Timestamp) o.get("accept_by")).toInstant(), eventsAfter(orderId, 0, 1000), actions,
-                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), cases.caseIds(orderId), handoverCode(orderId, state), kitchenContact);
+                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), cases.caseIds(orderId), handoverCode(orderId, state), kitchenContact,
+                payments.view(orderId).orElse(null));
     }
 
     static final Set<String> CONTACT_STATES = Set.of("ACCEPTED", "PREPARING", "READY", "OUT_FOR_DELIVERY");
@@ -341,7 +348,7 @@ public class OrderService {
         }
         OrderView v = view(customer, orderId, false);
         return new OrderView(v.id(), v.publicNumber(), v.version(), v.state(), v.fulfillmentMode(), v.items(), v.subtotal(), v.deliveryFee(), v.tax(),
-                v.total(), v.slot(), v.acceptBy(), v.events(), List.of(), v.cashState(), v.supportCaseIds(), null, null);
+                v.total(), v.slot(), v.acceptBy(), v.events(), List.of(), v.cashState(), v.supportCaseIds(), null, null, v.payment());
     }
 
     // ---- cook reads ----
@@ -407,7 +414,7 @@ public class OrderService {
         boolean showNote = CONTACT_STATES.contains(v.state()) || "PENDING_ACCEPTANCE".equals(v.state());
         return new CookOrderView(v.id(), v.publicNumber(), v.version(), v.state(), v.fulfillmentMode(), v.items(), v.subtotal(), v.deliveryFee(),
                 v.tax(), v.total(), v.slot(), v.acceptBy(), v.events(), cookActions(v.state(), v.fulfillmentMode()), v.cashState(),
-                showNote ? (String) o.get("fulfillment_note") : null, (String) o.get("dispatch_reference"), contact);
+                showNote ? (String) o.get("fulfillment_note") : null, (String) o.get("dispatch_reference"), contact, v.payment());
     }
 
     private static List<String> cookActions(String state, String mode) {

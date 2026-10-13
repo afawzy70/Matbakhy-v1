@@ -893,6 +893,24 @@
       "response_type": "MealPriceHistory",
       "contract": "Own meal's active price and previous actual price changes from immutable revisions (D14); another kitchen's meal is 404",
       "implemented": true
+    },
+    {
+      "id": "API-100",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/payment/transfer-report",
+      "permission": "ORDER_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Customer reports a sent deposit (D16); idempotent; a report is not payment",
+      "implemented": true
+    },
+    {
+      "id": "API-101",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/receipt",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports the deposit arrived in its own account (D16); exact amount and current version; not a bank confirmation",
+      "implemented": true
     }
   ]
 }

@@ -464,6 +464,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orders/{orderId}/payment/transfer-report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-100: the customer reports a sent deposit (D16); idempotent; not payment
+         * @description Moves WAITING_FOR_DEPOSIT to CUSTOMER_TRANSFER_REPORTED once; repeated or concurrent reports change nothing more. Another customer's order is 404; a COD order is 409.
+         */
+        post: operations["postOrdersPaymentTransferReport"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cook/orders/{orderId}/payment/receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-101: the kitchen reports the deposit arrived in its own account (D16); not a bank confirmation
+         * @description Requires the current payment version and the exact deposit amount. Preparation of a deposit order is refused until this report exists. Another kitchen's order is 404.
+         */
+        post: operations["postCookOrdersPaymentReceipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orders/{orderId}/cancellation-requests": {
         parameters: {
             query?: never;
@@ -2210,6 +2250,8 @@ export interface components {
             fulfillmentNote: string | null;
             dispatchReference: string | null;
             contact: components["schemas"]["CustomerFulfillmentContact"] | null;
+            /** @description Payment terms and state (D16), kept apart from the order state; null for orders placed before payment records existed. */
+            payment?: components["schemas"]["PaymentView"] | null;
         };
         CustomerFulfillmentContact: {
             name: string | null;
@@ -2604,6 +2646,8 @@ export interface components {
             /** @description Order owner only, when READY or OUT_FOR_DELIVERY; never in cook/staff views */
             handoverCode?: string | null;
             contact?: components["schemas"]["KitchenFulfillmentContact"] | null;
+            /** @description Payment terms and state (D16), kept apart from the order state; null for orders placed before payment records existed. */
+            payment?: components["schemas"]["PaymentView"] | null;
         };
         /** @description Outbox event after an operator retry (API-097). */
         OutboxStatus: {
@@ -2703,6 +2747,50 @@ export interface components {
             /** Format: uri */
             url: string;
             alt: string;
+        };
+        /**
+         * @description COD where the kitchen allows it for the total; DEPOSIT paid by the customer directly to the kitchen's approved recipient (D16). Matbakhy never holds the money.
+         * @enum {string}
+         */
+        PaymentMethod: "COD" | "DEPOSIT";
+        PaymentRecipient: {
+            /** @enum {string} */
+            method: "INSTAPAY" | "MOBILE_WALLET" | "BANK_TRANSFER";
+            /** @description The kitchen's approved, intentionally public payment identifier */
+            identifier: string;
+            name: string;
+        };
+        QuotePaymentTerms: {
+            method: components["schemas"]["PaymentMethod"];
+            depositBps: number;
+            deposit: components["schemas"]["NonNegativeMoney"];
+            remainder: components["schemas"]["NonNegativeMoney"];
+            recipient: components["schemas"]["PaymentRecipient"] | null;
+        };
+        /**
+         * @description CUSTOMER_TRANSFER_REPORTED is the customer's statement, not payment. KITCHEN_RECEIPT_REPORTED is the kitchen's statement after checking its own account, not a bank confirmation.
+         * @enum {string}
+         */
+        PaymentState: "NOT_REQUIRED" | "WAITING_FOR_DEPOSIT" | "CUSTOMER_TRANSFER_REPORTED" | "KITCHEN_RECEIPT_REPORTED" | "DISPUTED" | "RECONCILE_PENDING" | "EXPIRED";
+        PaymentView: {
+            method: components["schemas"]["PaymentMethod"];
+            state: components["schemas"]["PaymentState"];
+            deposit: components["schemas"]["NonNegativeMoney"];
+            remainder: components["schemas"]["NonNegativeMoney"];
+            recipient: components["schemas"]["PaymentRecipient"] | null;
+            /** Format: date-time */
+            depositExpiresAt: string | null;
+            version: number;
+        };
+        PaymentTransferReport: {
+            /** @description Optional transfer reference from the customer's app; never a card or account secret */
+            reference?: string;
+        };
+        PaymentReceiptReport: {
+            expectedVersion: number;
+            /** @description Must equal the deposit; a different amount or "not received" is reported through the mismatch path (MB-052) */
+            amountMinor: number;
+            reference?: string;
         };
         /** @description No status, role, customerId or price override is accepted. */
         PlaceOrderRequest: {
@@ -3056,7 +3144,7 @@ export interface components {
             unitPrice: components["schemas"]["NonNegativeMoney"];
             lineTotal: components["schemas"]["NonNegativeMoney"];
         };
-        /** @description No client price, tax, fee or commission fields are accepted. */
+        /** @description No client price, tax, fee or commission fields are accepted. paymentMethod defaults to COD (D16). */
         QuoteRequest: {
             items: components["schemas"]["QuoteItemRequest"][];
             /** Format: uuid */
@@ -3067,6 +3155,7 @@ export interface components {
              * @description Required when fulfillmentMode is DELIVERY
              */
             addressId?: string;
+            paymentMethod?: components["schemas"]["PaymentMethod"];
         };
         QuoteResponse: {
             /** Format: uuid */
@@ -3086,6 +3175,7 @@ export interface components {
             /** Format: date-time */
             acceptanceDeadlinePreview: string;
             warnings: string[];
+            payment: components["schemas"]["QuotePaymentTerms"];
         };
         RatingSummary: {
             count: number;
@@ -4180,6 +4270,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OrderView"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postOrdersPaymentTransferReport: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentTransferReport"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentView"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postCookOrdersPaymentReceipt: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentReceiptReport"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentView"];
                 };
             };
             "4XX": components["responses"]["Error"];
