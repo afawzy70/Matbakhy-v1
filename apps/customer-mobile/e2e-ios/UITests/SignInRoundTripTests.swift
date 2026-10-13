@@ -71,7 +71,11 @@ final class SignInRoundTripTests: XCTestCase {
             for root in roots {
                 let notNow = root.buttons["Not Now"].firstMatch
                 if notNow.exists && notNow.isHittable {
-                    notNow.tap()
+                    // Run 46: XCTest's own interruption handling may dismiss the prompt first, and tapping the vanished
+                    // element fails the test. A tap on the screen position cannot fail; if the prompt is already gone it
+                    // lands on empty space below the account actions.
+                    let f = notNow.frame
+                    app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0)).withOffset(CGVector(dx: f.midX, dy: f.midY)).tap()
                     print("MB031-SAVE-PASSWORD-DISMISSED")
                 }
             }
