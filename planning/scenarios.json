@@ -2120,8 +2120,10 @@
       "given": "A published meal whose price was changed twice and whose description was edited once without a price change",
       "when": "The owning cook opens its price history; another cook requests the same history",
       "then": "The active price equals the current meal price; two previous prices are listed newest first with Africa/Cairo times; the description-only edit adds no entry; the other cook gets not found",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-048/evidence.json"
+      ]
     },
     {
       "id": "TC-154",
@@ -2154,8 +2156,10 @@
       "given": "A price update and an order placement for the same meal run concurrently",
       "when": "Either commits first",
       "then": "Update first: placement refused with PRICE_CHANGED, no stock or order; placement first: order committed at its validated price and the update applies afterwards",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ]
     },
     {
       "id": "TC-156",
@@ -2171,8 +2175,10 @@
       "given": "An order committed but its response was lost, then the meal price changed",
       "when": "The customer recovers the order and later orders are priced",
       "then": "The same single order is returned at its original item prices, total and commission; no second order; its financial records are unchanged",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ]
     }
   ]
 }

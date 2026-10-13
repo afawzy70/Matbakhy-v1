@@ -1172,7 +1172,7 @@
         "verification/runs/20261012-MB-031/evidence.json"
       ],
       "review_status": "PASS",
-      "completion_note": "Native shell and authentication: release variants launch and the system-browser PKCE sign-in round trip passes on an Android emulator and an iOS simulator (native run 19) at fd689aa; fixed a defect where sign-in after sign-out or account switch silently reused the previous person's browser login. Emulator/simulator only; device and store builds are MB-034/MB-035. TC-048 order-link clause verified server-side; native re-check in MB-033."
+      "completion_note": "Native shell and authentication: release variants launch and the system-browser PKCE sign-in round trip passes on an Android emulator and an iOS simulator (native run 19) at fd689aa; fixed a defect where sign-in after sign-out or account switch silently reused the previous person's browser login. Emulator/simulator only; device and store builds are MB-034/MB-035. TC-048 order-link clause verified server-side; native re-check in MB-033. 2026-10-13: defect found in native runs 36/37 (iOS) — the app never used its refresh token, so the first request after the 5-minute access-token lifetime got 401, ended the session and cleared the basket. Fixed in c4b1598 (refresh before requests, one shared refresh, refused refresh ends the session); unit and app tests red first (verification/runs/20261013-MB-031-REFRESH). Native confirmation: iOS ordering phase H (about 10 minutes after sign-in) in the candidate E native run."
     },
     {
       "id": "MB-032",
@@ -1247,7 +1247,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004)."
+      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004). 2026-10-13: native dynamic-text phases (Android font scale 2.0, iOS accessibility XXXL; English and Arabic; discover, meal, cart, checkout, orders, order, notifications, support; screenshots as CI artifacts) and provider-independent notification permission (asked only on request; refusal safe; development builds only while O07 is open) added; native refusal phases on both platforms. Visual review of the screenshots by a person is still needed. Push delivery (O07), screen readers (BLK-003) and physical devices (BLK-004) remain open; not DONE."
     },
     {
       "id": "MB-034",
@@ -1470,7 +1470,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": " 2026-10-13 local (self-review): runtime DB role (owner migrates, API least privilege; 12 forbidden statements refused); audit-write failure fault-injected (denial still 403; critical change rolls back); Prometheus only on the management port; gauges bounded during a DB outage (defect found, fixed); local Loki/Alloy/Prometheus/Alertmanager/Grafana stack rehearsed (search by request ID, retention across redeploy/restart, collector outage, alerts to a local test sink) and runbook rehearsal against a deliberately failed outbox event (staff retry API NOT_RUN). Evidence: verification/runs/20261013-MB-039-LOCAL. Deployed checks AUD-01/LOG-01/OPS-01..03 NOT_RUN (MB-040); retention O06; real alert routing O07."
     },
     {
       "id": "MB-040",
@@ -1714,7 +1714,7 @@
       "id": "MB-048",
       "phase": "P07",
       "title": "Show kitchen meal price history (D14)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "MB-014",
@@ -1738,9 +1738,12 @@
       "scenario_ids": [
         "TC-153"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": "Approved increment: Owner decision D13/D14 (session prompt 2026-10-13 09:47 Asia/Kuwait)"
+      "evidence": [
+        "verification/runs/20261013-MB-048/evidence.json",
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D14 kitchen price history at bc305c6 (self-review): API-099 owner-scoped, derived from immutable meal revisions (no entry for edits without a price change; read-only; meal_revision UPDATE/DELETE refused for the runtime role, RuntimeRoleIntegrationTest); cook UI with Active price and previous prices in Africa/Cairo time; browser journey on the real stack changes a price through it. TC-153 PASS."
     },
     {
       "id": "MB-049",
@@ -1774,9 +1777,11 @@
         "TC-155",
         "TC-156"
       ],
-      "evidence": [],
+      "evidence": [
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ],
       "review_status": "NOT_RUN",
-      "completion_note": "Owner decision: Owner decision D13/D14 (session prompt 2026-10-13 09:47 Asia/Kuwait)"
+      "completion_note": "D13 at bc305c6 (self-review): TC-155 and TC-156 PASS (candidate E backend verify); TC-154 web component tests and the real-stack browser journey PASS; Android emulator PASS (native runs 36, 37); iOS simulator phase H pending native run 39 (runs 36/37 blocked by the MB-031 token-refresh defect, fixed in c4b1598)."
     }
   ]
 }
