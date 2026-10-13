@@ -5,7 +5,11 @@ import com.matbakhy.identity.api.CurrentAccount;
 import com.matbakhy.shared.error.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -18,10 +22,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ApiSecurityErrors implements AuthenticationEntryPoint, AccessDeniedHandler {
 
-    private final com.matbakhy.operations.api.AuditLog audit;
+    private static final Logger log = LoggerFactory.getLogger(ApiSecurityErrors.class);
 
-    ApiSecurityErrors(com.matbakhy.operations.api.AuditLog audit) {
+    private final com.matbakhy.operations.api.AuditLog audit;
+    private final Counter auditFailures;
+
+    ApiSecurityErrors(com.matbakhy.operations.api.AuditLog audit, MeterRegistry registry) {
         this.audit = audit;
+        this.auditFailures = Counter.builder("matbakhy.audit.write.failures").tag("kind", "denial").baseUnit("events")
+                .description("Denials refused without their audit row because the audit write failed (alert: > 0)").register(registry);
     }
 
     /** TC-007: an authenticated actor denied a privileged operation leaves a redacted audit record. */
@@ -31,9 +40,16 @@ public class ApiSecurityErrors implements AuthenticationEntryPoint, AccessDenied
             // Bounded so that a denial on an arbitrarily long path is still recorded: the action column holds 120 characters and
             // the object ID is indexed (MB-039).
             String uri = request.getRequestURI();
-            audit.record(new com.matbakhy.operations.api.AuditLog.Entry(actor.id(), bounded("denied " + request.getMethod() + " " + uri, 120),
-                    null, "endpoint", bounded(uri, 512), com.matbakhy.operations.api.AuditLog.Outcome.DENIED, code.name(),
-                    requestId == null ? null : requestId.toString(), java.util.Map.of()));
+            try {
+                audit.record(new com.matbakhy.operations.api.AuditLog.Entry(actor.id(), bounded("denied " + request.getMethod() + " " + uri, 120),
+                        null, "endpoint", bounded(uri, 512), com.matbakhy.operations.api.AuditLog.Outcome.DENIED, code.name(),
+                        requestId == null ? null : requestId.toString(), java.util.Map.of()));
+            } catch (RuntimeException e) {
+                // MB-039: the request is refused whatever happens to its audit row. A failed denial write must not turn the
+                // refusal into an unhandled error; it is logged (no exception text, which may echo values) and counted for alerting.
+                auditFailures.increment();
+                log.error("AUDIT_WRITE_FAILED denial {} refused without its audit row ({})", code.name(), e.getClass().getSimpleName());
+            }
         }
     }
 

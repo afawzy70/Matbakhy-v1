@@ -40,6 +40,7 @@ class ConfigurationIntegrationTest {
 
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
+    @Autowired io.micrometer.core.instrument.MeterRegistry meters;
     @Autowired TestLogins logins;
     @Autowired JsonMapper json;
     @Autowired Clock clock;
@@ -209,5 +210,49 @@ class ConfigurationIntegrationTest {
         assertThat(change("flag:no-such-flag", "{\"enabled\":true}", "", 0, mfa).getStatus()).isEqualTo(404);
         ok(change("flag:ordering-enabled", "{\"enabled\":true}", "", v + 1, mfa), 200);
         quote();
+    }
+
+    /**
+     * MB-039 (AUD-01): audit-write failure, injected with a test-only trigger. A critical change whose audit row cannot be
+     * written must not commit (no unaudited change, no phantom success). A denial whose audit row cannot be written must
+     * still be refused.
+     */
+    @Test
+    void a_failed_audit_write_rolls_back_the_change_and_never_turns_a_denial_into_success() throws Exception {
+        String key = "zone:" + zone;
+        long before = zoneVersion();
+        int changesBefore = jdbc.queryForObject("SELECT count(*) FROM config_change", Integer.class);
+        AccountAuthentication mfa = logins.loginWithMfa(writer, "Writer");
+        double failuresBefore = meters.counter("matbakhy.audit.write.failures", "kind", "denial").count();
+        String customerId = customer().getPrincipal().id().toString();
+        jdbc.execute("""
+                CREATE OR REPLACE FUNCTION mb039_fail_audit() RETURNS trigger LANGUAGE plpgsql AS $$
+                BEGIN
+                    IF NEW.object_id = '%s' OR NEW.actor_id = '%s'::uuid THEN RAISE EXCEPTION 'forced audit write failure'; END IF;
+                    RETURN NEW;
+                END $$""".formatted(key, customerId));
+        jdbc.execute("CREATE TRIGGER mb039_fail_audit BEFORE INSERT ON audit_event FOR EACH ROW EXECUTE FUNCTION mb039_fail_audit()");
+        MockHttpServletResponse failed;
+        MockHttpServletResponse denied;
+        try {
+            failed = change(key, "{\"active\":true,\"deliveryFeeMinor\":4500}", "", before, mfa);
+            denied = change(key, "{\"active\":true,\"deliveryFeeMinor\":9900}", "", before, customer());
+        } finally {
+            jdbc.execute("DROP TRIGGER mb039_fail_audit ON audit_event");
+            jdbc.execute("DROP FUNCTION mb039_fail_audit()");
+        }
+        assertThat(failed.getStatus()).as(failed.getContentAsString()).isGreaterThanOrEqualTo(500);
+        assertThat(failed.getContentAsString()).contains("requestId").doesNotContain("forced audit write failure");
+        assertThat(zoneVersion()).as("the change did not commit").isEqualTo(before);
+        assertThat(jdbc.queryForObject("SELECT delivery_fee_minor FROM service_zone WHERE id = ?", Long.class, zone)).isEqualTo(3000);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM config_change", Integer.class)).isEqualTo(changesBefore);
+        assertThat(denied.getStatus()).as("still refused with the ordinary denial").isEqualTo(403);
+        assertThat(denied.getContentAsString()).contains("FORBIDDEN");
+        assertThat(meters.counter("matbakhy.audit.write.failures", "kind", "denial").count()).isEqualTo(failuresBefore + 1);
+        assertThat(jdbc.queryForObject("SELECT delivery_fee_minor FROM service_zone WHERE id = ?", Long.class, zone)).isEqualTo(3000);
+
+        // Once the audit store works again, the same change succeeds and is audited.
+        ok(change(key, "{\"active\":true,\"deliveryFeeMinor\":4500}", "", before, mfa), 200);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'config.change' AND object_id = ?", Integer.class, key)).isEqualTo(1);
     }
 }
