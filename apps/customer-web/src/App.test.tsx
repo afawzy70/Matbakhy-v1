@@ -1374,3 +1374,44 @@ describe("MB-053: direct deposit checkout and honest payment status", () => {
     expect(screen.getByTestId("payment-status").textContent).not.toMatch(/bank (verified|confirmed)/i);
   });
 });
+
+/** MB-054 (D17, TC-164): browsing activity is sent in one batch with a per-tab visitor id; failures never affect the page. */
+describe("MB-054: organic activity", () => {
+  it("sends one batch for a meal view and an add to cart, with the visitor id kept only for this tab", async () => {
+    window.sessionStorage.clear();
+    window.location.hash = "#/meal/55555555-5555-4555-8555-555555555555";
+    const meal = {
+      id: "55555555-5555-4555-8555-555555555555",
+      title: "Koshari",
+      kitchen: { id: "k5", name: "Kitchen five" },
+      portionText: "1 box",
+      price: egp(9000),
+      description: "",
+      ingredients: "",
+      allergenCodes: [],
+      allergenStatement: null,
+      photo: null,
+      nextSlots: [{ id: "s5", startsAt: "2026-10-14T12:00:00Z", availablePortions: 5, fulfillmentModes: ["PICKUP"] }],
+      availability: "AVAILABLE",
+    };
+    const { fetchImpl, calls } = server({
+      [`GET /api/v1/meals/${meal.id}`]: () => ({ status: 200, body: meal }),
+      "GET /api/v1/kitchens/k5/reviews": () => ({ status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } }),
+      "POST /api/v1/activity": () => ({ status: 503, body: { code: "SERVICE_UNAVAILABLE" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("radio"));
+    fireEvent.click(screen.getByRole("button", { name: /^أضف إلى السلة|^Add to cart/ }));
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/activity")).toBe(true), { timeout: 3000 });
+    const sent = calls.filter((c) => c.path === "/api/v1/activity");
+    expect(sent).toHaveLength(1);
+    const body = sent[0]?.body as { visitorId: string; events: { kind: string; subjectId: string }[] };
+    expect(body.events).toEqual([
+      { kind: "MEAL_VIEW", subjectId: meal.id },
+      { kind: "ADD_TO_CART", subjectId: meal.id },
+    ]);
+    expect(body.visitorId).toBe(window.sessionStorage.getItem("matbakhy.visitor"));
+    expect(window.localStorage.getItem("matbakhy.visitor")).toBeNull();
+    expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").lines).toHaveLength(1);
+  });
+});

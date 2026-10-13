@@ -1,3 +1,4 @@
+import { useTrack } from "./activity";
 import { brand } from "@matbakhy/design-tokens";
 import { useState } from "react";
 import { formatMoney, formatTime, type Schemas } from "./api";
@@ -45,6 +46,8 @@ export function Browse({ ctx }: { ctx: Ctx }) {
       }),
     `${zoneId}|${query}|${category}|${sort}|${maxPriceMinor}|${locale}`,
   );
+  // MB-054: the dishes shown in the list count as impressions (once per visitor and day on the server).
+  useTrack(ctx.api, "MEAL_IMPRESSION", meals.status === "ok" && mode === "dishes" ? meals.data.items.map((m) => m.id) : []);
   const filtered = category !== null || maxPriceMinor !== null || sort !== "NEWEST" || query !== "";
   const clear = () => {
     setCategory(null);

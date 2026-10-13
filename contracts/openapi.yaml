@@ -1271,6 +1271,73 @@ paths:
           $ref: "#/components/responses/Error"
         5XX:
           $ref: "#/components/responses/Error"
+  /api/v1/activity:
+    post:
+      operationId: postActivity
+      tags:
+        - discovery
+      summary: "API-110: organic browsing activity (D17, MB-054); visitors allowed; 202 either way"
+      description: >-
+        Up to 50 events per request. Each counts once per visitor, kind, subject and Cairo day; the visitor id is a random
+        per-session value stored only as a per-day keyed hash. Declared crawlers, unknown subjects and events beyond the
+        per-visitor daily cap are dropped without saying so. Returns no data. Never used for ranking, targeting or billing.
+      x-matbakhy-id: API-110
+      x-permission: PUBLIC
+      x-implemented: true
+      security: []
+      responses:
+        "202":
+          description: Accepted (whether or not each event counted)
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityBatch"
+  /api/v1/cook/insights:
+    get:
+      operationId: getCookInsights
+      tags:
+        - cook
+      summary: "API-111: the cook's own free activity and sales report (D17, MB-054); no profit claim"
+      description: >-
+        Own kitchen only (the kitchen comes from the caller). Cairo dates, default the last 30 days, at most 366 days.
+        Activity is distinct visitors per day; orders, capacity and money come from server records. Gross sales, paid or
+        verified refunds and the known net are separate; the net is not profit.
+      x-matbakhy-id: API-111
+      x-permission: COOK
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookInsights"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
   /api/v1/orders/{orderId}/cancellation-requests:
     post:
       operationId: postOrdersCancellationRequests
@@ -6261,6 +6328,93 @@ components:
           type: string
           minLength: 1
           maxLength: 64
+    ActivityEvent:
+      type: object
+      additionalProperties: false
+      required: [kind, subjectId]
+      properties:
+        kind:
+          type: string
+          enum: [MEAL_IMPRESSION, MEAL_VIEW, KITCHEN_VIEW, ADD_TO_CART]
+        subjectId:
+          type: string
+          format: uuid
+          description: The meal (impression, view, add to cart) or the kitchen (kitchen view)
+    ActivityBatch:
+      type: object
+      additionalProperties: false
+      required: [visitorId, events]
+      properties:
+        visitorId:
+          type: string
+          pattern: "^[A-Za-z0-9-]{8,64}$"
+          description: Random per browser session; never an account, device or advertising id
+        events:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ActivityEvent"
+    CookInsights:
+      type: object
+      additionalProperties: false
+      required: [kitchenId, from, to, timezone, activity, orders, capacity, money, definitions]
+      properties:
+        kitchenId:
+          type: string
+          format: uuid
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        timezone:
+          type: string
+        activity:
+          type: object
+          additionalProperties: false
+          required: [mealImpressions, mealViews, kitchenViews, addToCart]
+          properties:
+            mealImpressions: {type: integer, minimum: 0}
+            mealViews: {type: integer, minimum: 0}
+            kitchenViews: {type: integer, minimum: 0}
+            addToCart: {type: integer, minimum: 0}
+        orders:
+          type: object
+          additionalProperties: false
+          required: [quotes, placed, completed, cancelled, rejected, expired, deliveryFailed, repeatCustomers]
+          properties:
+            quotes: {type: integer, minimum: 0}
+            placed: {type: integer, minimum: 0}
+            completed: {type: integer, minimum: 0}
+            cancelled: {type: integer, minimum: 0}
+            rejected: {type: integer, minimum: 0}
+            expired: {type: integer, minimum: 0}
+            deliveryFailed: {type: integer, minimum: 0}
+            repeatCustomers: {type: integer, minimum: 0}
+        capacity:
+          type: object
+          additionalProperties: false
+          required: [portionsOffered, portionsTaken]
+          properties:
+            portionsOffered: {type: integer, minimum: 0}
+            portionsTaken: {type: integer, minimum: 0}
+        money:
+          type: object
+          additionalProperties: false
+          required: [grossSales, refunds, netKnown]
+          properties:
+            grossSales:
+              $ref: "#/components/schemas/NonNegativeMoney"
+            refunds:
+              $ref: "#/components/schemas/NonNegativeMoney"
+            netKnown:
+              $ref: "#/components/schemas/Money"
+        definitions:
+          type: array
+          items:
+            type: string
     PendingRecipients:
       type: object
       additionalProperties: false

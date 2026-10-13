@@ -983,6 +983,24 @@
       "response_type": "PendingRecipients",
       "contract": "Kitchen payment recipients waiting for staff approval (D16)",
       "implemented": true
+    },
+    {
+      "id": "API-110",
+      "method": "POST",
+      "path": "/api/v1/activity",
+      "permission": "PUBLIC",
+      "response_type": "NoContent",
+      "contract": "Organic browsing activity, counted once per visitor, kind, subject and Cairo day; stored without identity; 202 either way (D17, MB-054)",
+      "implemented": true
+    },
+    {
+      "id": "API-111",
+      "method": "GET",
+      "path": "/api/v1/cook/insights",
+      "permission": "COOK",
+      "response_type": "CookInsights",
+      "contract": "The cook's own free report: activity, orders, capacity, gross sales, refunds and known net; no profit claim (D17, MB-054)",
+      "implemented": true
     }
   ]
 }

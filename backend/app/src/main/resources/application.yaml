@@ -83,6 +83,10 @@ matbakhy:
     max-attempts: 5
     expiry-after-slot-end: 2h
     max-attempts-per-actor-per-hour: 30
+  activity:
+    # MB-054: the default key is accepted only in LOCAL/CI; deployed environments must set ACTIVITY_HASH_KEY.
+    hash-key: ${ACTIVITY_HASH_KEY:local-dev-only-activity-hash-key-not-a-secret}
+    max-events-per-visitor-day: 300
   finance:
     posting-job:
       enabled: ${LEDGER_POSTING_JOB_ENABLED:true}

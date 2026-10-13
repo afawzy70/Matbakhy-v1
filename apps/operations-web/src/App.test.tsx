@@ -377,6 +377,40 @@ describe("operations-web cook workspace", () => {
     expect(screen.getByRole("cell", { name: "MB-1002" })).toBeTruthy();
   });
 
+  it("MB-054 (D17): the cook's free report keeps interest, orders, portions and money apart and never claims profit", async () => {
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/insights": () => ({
+        status: 200,
+        body: {
+          kitchenId: "k1", from: "2026-09-14", to: "2026-10-13", timezone: "Africa/Cairo",
+          activity: { mealImpressions: 40, mealViews: 12, kitchenViews: 5, addToCart: 3 },
+          orders: { quotes: 4, placed: 3, completed: 2, cancelled: 1, rejected: 0, expired: 0, deliveryFailed: 0, repeatCustomers: 1 },
+          capacity: { portionsOffered: 20, portionsTaken: 2 },
+          money: { grossSales: egp(20000), refunds: egp(2500), netKnown: egp(17500) },
+          definitions: ["NET_IS_NOT_PROFIT"],
+        },
+      }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأداء" }));
+    const report = await screen.findByTestId("insights");
+    const value = (label: string) => within(report).getByText(label).nextElementSibling?.textContent;
+    expect(value("مشاهدات صفحات الأطباق")).toBe("12");
+    expect(value("عملاء لهم طلبان مكتملان أو أكثر")).toBe("1");
+    expect(value("الكميات المعروضة")).toBe("20");
+    expect(value("إجمالي المبيعات (الطلبات المكتملة)")).toBe(new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" }).format(200));
+    expect(value("الصافي المعروف بعد الاستردادات")).toBe(new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" }).format(175));
+    expect(within(report).getByText("هذا ليس ربحًا؛ لا تُحتسب أي تكاليف.")).toBeTruthy();
+    // No figure is labelled as profit or margin; the only mention of profit is the disclaimer. Nothing is sponsored.
+    expect([...report.querySelectorAll("dt")].map((d) => d.textContent).join("|")).not.toMatch(/ربح|هامش/);
+    expect(report.textContent).not.toMatch(/إعلان|ممول|ترويج/);
+    expect(calls.some((c) => c.path.startsWith("/api/v1/cook/insights"))).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await within(await screen.findByTestId("insights")).findByText("This is not profit; no costs are included.")).toBeTruthy();
+  });
+
   it("MB-052 (D16): the cook sees the deposit and reports receipt or a problem; it is never called a bank confirmation", async () => {
     const pay = (state: string, version = 1) => ({
       method: "DEPOSIT", state, deposit: egp(13500), remainder: egp(13500), version, depositExpiresAt: "2026-10-11T10:25:00Z",

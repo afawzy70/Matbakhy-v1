@@ -57,6 +57,8 @@ class SecurityConfiguration {
 
     static final String REGISTRATION_ID = "keycloak";
     static final String DELETION_REQUEST = "/api/v1/me/deletion-requests";
+    /** MB-054: anonymous browsing activity (no data returned; deduplicated, capped and stored without identity). */
+    static final String ACTIVITY = "/api/v1/activity";
     static final String[] PUBLIC_GET = {"/api/v1/configuration/public", "/api/v1/zones", "/api/v1/meals", "/api/v1/meals/*",
             "/api/v1/kitchens/*", "/api/v1/kitchens/*/slots", "/api/v1/kitchens/*/reviews", "/api/v1/policies/*"};
 
@@ -150,6 +152,7 @@ class SecurityConfiguration {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, ACTIVITY).permitAll()
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
@@ -173,6 +176,7 @@ class SecurityConfiguration {
                         .requestMatchers(SecurityConfiguration::managementScrape).permitAll()
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, ACTIVITY).permitAll()
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())

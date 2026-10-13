@@ -648,6 +648,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-110: organic browsing activity (D17, MB-054); visitors allowed; 202 either way
+         * @description Up to 50 events per request. Each counts once per visitor, kind, subject and Cairo day; the visitor id is a random per-session value stored only as a per-day keyed hash. Declared crawlers, unknown subjects and events beyond the per-visitor daily cap are dropped without saying so. Returns no data. Never used for ranking, targeting or billing.
+         */
+        post: operations["postActivity"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cook/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-111: the cook's own free activity and sales report (D17, MB-054); no profit claim
+         * @description Own kitchen only (the kitchen comes from the caller). Cairo dates, default the last 30 days, at most 366 days. Activity is distinct visitors per day; orders, capacity and money come from server records. Gross sales, paid or verified refunds and the known net are separate; the net is not profit.
+         */
+        get: operations["getCookInsights"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orders/{orderId}/cancellation-requests": {
         parameters: {
             query?: never;
@@ -2988,6 +3028,55 @@ export interface components {
             expectedVersion: number;
             reference: string;
         };
+        ActivityEvent: {
+            /** @enum {string} */
+            kind: "MEAL_IMPRESSION" | "MEAL_VIEW" | "KITCHEN_VIEW" | "ADD_TO_CART";
+            /**
+             * Format: uuid
+             * @description The meal (impression, view, add to cart) or the kitchen (kitchen view)
+             */
+            subjectId: string;
+        };
+        ActivityBatch: {
+            /** @description Random per browser session; never an account, device or advertising id */
+            visitorId: string;
+            events: components["schemas"]["ActivityEvent"][];
+        };
+        CookInsights: {
+            /** Format: uuid */
+            kitchenId: string;
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+            timezone: string;
+            activity: {
+                mealImpressions: number;
+                mealViews: number;
+                kitchenViews: number;
+                addToCart: number;
+            };
+            orders: {
+                quotes: number;
+                placed: number;
+                completed: number;
+                cancelled: number;
+                rejected: number;
+                expired: number;
+                deliveryFailed: number;
+                repeatCustomers: number;
+            };
+            capacity: {
+                portionsOffered: number;
+                portionsTaken: number;
+            };
+            money: {
+                grossSales: components["schemas"]["NonNegativeMoney"];
+                refunds: components["schemas"]["NonNegativeMoney"];
+                netKnown: components["schemas"]["Money"];
+            };
+            definitions: string[];
+        };
         PendingRecipients: {
             items: {
                 /** Format: uuid */
@@ -4737,6 +4826,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PendingRecipients"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postActivity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivityBatch"];
+            };
+        };
+        responses: {
+            /** @description Accepted (whether or not each event counted) */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getCookInsights: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CookInsights"];
                 };
             };
             "4XX": components["responses"]["Error"];

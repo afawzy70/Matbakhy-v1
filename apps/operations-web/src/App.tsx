@@ -7,6 +7,7 @@ import { Onboarding } from "./cook/Onboarding";
 import { Orders } from "./cook/Orders";
 import { SettingsPanel } from "./cook/Settings";
 import { Slots } from "./cook/Slots";
+import { Insights } from "./cook/Insights";
 import { Statement } from "./cook/Statement";
 import { Cases } from "./ops/Cases";
 import { Catalogue } from "./ops/Catalogue";
@@ -18,7 +19,7 @@ import { Staff } from "./ops/Staff";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
-const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
+const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "insights", "settings"] as const;
 type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance" | "configuration" | "staff";
 
 export function title(locale: Locale): string {
@@ -204,6 +205,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "meals" ? <Meals ctx={ctx} /> : null}
             {current === "slots" ? <Slots ctx={ctx} /> : null}
             {current === "statement" ? <Statement ctx={ctx} /> : null}
+            {current === "insights" ? <Insights ctx={ctx} /> : null}
             {current === "settings" ? <SettingsPanel ctx={ctx} /> : null}
             {current === "reviews" ? <Reviews ctx={ctx} /> : null}
             {current === "catalogue" ? <Catalogue ctx={ctx} /> : null}

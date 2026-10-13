@@ -1,3 +1,4 @@
+import { useTrack } from "./activity";
 import { brand } from "@matbakhy/design-tokens";
 import { FoodCard } from "./Browse";
 import { Status, useServer, type Ctx } from "./shared";
@@ -6,6 +7,7 @@ import { Status, useServer, type Ctx } from "./shared";
 export function Kitchen({ ctx, slug }: { ctx: Ctx; slug: string }) {
   const { t, locale } = ctx;
   const [kitchen, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/kitchens/{slug}", { params: { path: { slug } } }), `${slug}|${locale}`);
+  useTrack(ctx.api, "KITCHEN_VIEW", kitchen.status === "ok" ? [kitchen.data.kitchenId] : []);
   return (
     <Status ctx={ctx} state={kitchen} onRetry={reload}>
       {(k) => (

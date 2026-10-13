@@ -32,6 +32,7 @@ init_secrets() {
       -e "s|^PREVIEW_USER_PASSWORD=.*|PREVIEW_USER_PASSWORD=$(openssl rand -hex 10)|" \
       -e "s|^PHONE_CODE_PEPPER=.*|PHONE_CODE_PEPPER=$(hex)|" \
       -e "s|^HANDOVER_HASH_KEY=.*|HANDOVER_HASH_KEY=$(hex)|" \
+      -e "s|^ACTIVITY_HASH_KEY=.*|ACTIVITY_HASH_KEY=$(hex)|" \
       -e "s|^HANDOVER_ENCRYPTION_KEY=.*|HANDOVER_ENCRYPTION_KEY=$(b64)|" \
       -e "s|^PUSH_TOKEN_HASH_KEY=.*|PUSH_TOKEN_HASH_KEY=$(hex)|" \
       -e "s|^PUSH_TOKEN_ENCRYPTION_KEY=.*|PUSH_TOKEN_ENCRYPTION_KEY=$(b64)|" \
