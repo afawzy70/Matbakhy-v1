@@ -1,0 +1,26 @@
+# Reviewed Gitleaks false positives (one fingerprint per line: commit:file:rule:line).
+# 2026-10-13: the independent QA branch qa/independent-cross-role-4eaee3a-20261012 (commit 8707b23) records
+# synthetic Idempotency-Key values of the form "ops-<uuid>" in its evidence; generic-api-key matches the JSON key
+# name "key". They are random request nonces from an isolated synthetic QA stack, not credentials. Reviewed by the
+# implementation agent (value shape checked: 40 characters, ops- prefix plus a UUID). Add new entries only after
+# the same review; never ignore a whole file or rule.
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/cases.md:generic-api-key:461
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/cases.md:generic-api-key:463
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:2443
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:2639
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:2746
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:2859
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:3636
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:3656
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:5933
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:6727
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/results.json:generic-api-key:6899
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:2123
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:2319
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:2426
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:2539
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:2790
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:2810
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:3569
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:3660
+8707b2329c539168403ff868641bb9d77116b9f4:qa/independent-cross-role-4eaee3a/evidence/reviewed-results.json:generic-api-key:3832
