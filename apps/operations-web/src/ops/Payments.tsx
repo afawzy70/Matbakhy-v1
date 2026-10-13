@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { formatMoney, formatTime, type Schemas } from "../api";
-import { ErrorLine, Status, useMutation, useServer, type Ctx } from "../cook/shared";
+import { ErrorLine, Status, useMutation, useServer, type Ctx, type Loaded } from "../cook/shared";
 
 type QueueState = "DISPUTED" | "RECONCILE_PENDING" | "REFUND_OWED";
 type Item = Schemas["PaymentQueue"]["items"][number];
@@ -12,11 +12,16 @@ type Pending = Schemas["PendingRecipients"]["items"][number];
  */
 export function PaymentsOps({ ctx }: { ctx: Ctx }) {
   const { t } = ctx;
+  const [recipients, reload] = useServer<Schemas["PendingRecipients"]>(ctx, () => ctx.api.GET("/api/v1/ops/payment-recipients"));
+  // Both panels need finance.verify; finance staff with read access only see nothing here rather than two error cards.
+  if (recipients.status === "error" && recipients.code === "FORBIDDEN") {
+    return null;
+  }
   return (
     <div className="stack">
       <section className="card" aria-labelledby="recipients-heading">
         <h2 id="recipients-heading">{t.pay.pendingRecipients}</h2>
-        <Recipients ctx={ctx} />
+        <Recipients ctx={ctx} state={recipients} reload={reload} />
       </section>
       <section className="card" aria-labelledby="payments-heading">
         <h2 id="payments-heading">{t.pay.queueTitle}</h2>
@@ -27,9 +32,8 @@ export function PaymentsOps({ ctx }: { ctx: Ctx }) {
   );
 }
 
-function Recipients({ ctx }: { ctx: Ctx }) {
+function Recipients({ ctx, state, reload }: { ctx: Ctx; state: Loaded<Schemas["PendingRecipients"]>; reload: () => void }) {
   const { t } = ctx;
-  const [state, reload] = useServer<Schemas["PendingRecipients"]>(ctx, () => ctx.api.GET("/api/v1/ops/payment-recipients"));
   return (
     <Status ctx={ctx} state={state} onRetry={reload}>
       {(r) =>

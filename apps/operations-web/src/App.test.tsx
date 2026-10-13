@@ -441,6 +441,22 @@ describe("operations-web cook workspace", () => {
     expect(calls.find((c) => c.path.endsWith("/payment/decision"))?.body).toEqual({ expectedVersion: 4, outcome: "REFUND_OWED", reason: "kitchen rejected after the transfer" });
   });
 
+  it("MB-052: finance staff without the verify permission see no payment panels and no error cards", async () => {
+    const forbidden = () => ({ status: 403, body: { code: "FORBIDDEN" } });
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": forbidden,
+      "GET /api/v1/ops/finance/statements": () => ({ status: 404, body: { code: "NOT_FOUND" } }),
+      "GET /api/v1/ops/payment-recipients": forbidden,
+      "GET /api/v1/ops/payments": forbidden,
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("button", { name: "عرض" })).toBeTruthy();
+    await waitFor(() => expect(screen.queryByText("جارٍ التحميل…")).toBeNull());
+    expect(screen.queryByText("غير مسموح.")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "حسابات تنتظر الموافقة" })).toBeNull();
+  });
+
   it("gives a reviewer the application queue and asks for MFA step-up when a decision needs it", async () => {
     const review = {
       id: "a1",
