@@ -1,6 +1,7 @@
 package com.matbakhy.orders.internal;
 
 import com.matbakhy.cooks.api.KitchenDirectory;
+import com.matbakhy.operations.api.AuditLog;
 import com.matbakhy.shared.error.ApiException;
 import com.matbakhy.shared.error.ApiException.FieldError;
 import com.matbakhy.shared.error.ErrorCode;
@@ -45,17 +46,128 @@ public class PaymentService {
     record Profile(int depositBps, Long codMaxTotalMinor, Recipient recipient) {
     }
 
+    /** The kitchen's own view of its payment terms; the recipient is offered to customers only once APPROVED. */
+    public record ProfileView(int depositBps, Long codMaxTotalMinor, Recipient recipient, String recipientStatus, long version) {
+    }
+
+    public enum Problem { NOT_RECEIVED, AMOUNT_MISMATCH }
+
+    /** Staff outcomes on an ended order. Deliberately no outcome that marks money as received. */
+    public enum Decision { REFUND_OWED, CLOSED_NO_FUNDS }
+
+    public record QueueItem(UUID orderId, String publicNumber, UUID kitchenId, String orderState, String state, Money deposit,
+                            String lastReason, Instant updatedAt, long version) {
+    }
+
     private static final Set<String> AFTER_TRANSFER = Set.of("CUSTOMER_TRANSFER_REPORTED", "KITCHEN_RECEIPT_REPORTED", "DISPUTED");
 
     private final JdbcTemplate jdbc;
     private final KitchenDirectory kitchens;
+    private final AuditLog audit;
     private final Clock clock;
 
-    PaymentService(JdbcTemplate jdbc, KitchenDirectory kitchens, Clock clock) {
+    PaymentService(JdbcTemplate jdbc, KitchenDirectory kitchens, AuditLog audit, Clock clock) {
         this.jdbc = jdbc;
         this.kitchens = kitchens;
+        this.audit = audit;
         this.clock = clock;
     }
+
+    private static final Set<String> ENDED = Set.of("COMPLETED", "REJECTED", "EXPIRED", "CANCELLED", "DELIVERY_FAILED");
+
+    private UUID ownKitchen(UUID cookId) {
+        return kitchens.ownedBy(cookId).map(KitchenDirectory.KitchenStatus::kitchenId)
+                .orElseThrow(() -> new ApiException(ErrorCode.FORBIDDEN, "not a cook"));
+    }
+
+    // ---- MB-052: the kitchen's payment profile and its approval ----
+
+    public ProfileView profileOf(UUID cookId) {
+        return profileView(ownKitchen(cookId));
+    }
+
+    private ProfileView profileView(UUID kitchenId) {
+        return jdbc.query("""
+                SELECT deposit_bps, cod_max_total_minor, recipient_method, recipient_identifier, recipient_name, recipient_status, version
+                FROM kitchen_payment_profile WHERE kitchen_id = ?""", rs -> rs.next()
+                ? new ProfileView(rs.getInt(1), (Long) rs.getObject(2),
+                        rs.getString(4) == null ? null : new Recipient(rs.getString(3), rs.getString(4), rs.getString(5)), rs.getString(6), rs.getLong(7))
+                : new ProfileView(0, null, null, "NONE", 0), kitchenId);
+    }
+
+    /**
+     * The kitchen sets its deposit share, its COD cap and the account customers pay. A new or changed recipient is not
+     * offered to customers until staff approve it again.
+     */
+    @Transactional
+    public ProfileView updateProfile(UUID cookId, long expectedVersion, int depositBps, Long codMaxTotalMinor, Recipient r) {
+        UUID kitchen = ownKitchen(cookId);
+        if (depositBps < 0 || depositBps > 10_000) {
+            throw invalid("depositBps", "RANGE_0_10000");
+        }
+        if (codMaxTotalMinor != null && codMaxTotalMinor < 0) {
+            throw invalid("codMaxTotalMinor", "NOT_NEGATIVE");
+        }
+        if (depositBps > 0 && r == null) {
+            throw invalid("recipient", "REQUIRED_FOR_DEPOSIT");
+        }
+        if (r != null && (r.method() == null || !Set.of("INSTAPAY", "MOBILE_WALLET", "BANK_TRANSFER").contains(r.method())
+                || r.identifier() == null || r.identifier().strip().length() < 3 || r.identifier().strip().length() > 64
+                || r.name() == null || r.name().strip().length() < 2 || r.name().strip().length() > 80)) {
+            throw invalid("recipient", "INVALID_RECIPIENT");
+        }
+        ProfileView current = profileView(kitchen);
+        if (current.version() != expectedVersion) {
+            throw new ApiException(ErrorCode.VERSION_CONFLICT, "payment profile changed");
+        }
+        Recipient next = r == null ? null : new Recipient(r.method(), r.identifier().strip(), r.name().strip());
+        boolean sameRecipient = java.util.Objects.equals(next, current.recipient());
+        String status = sameRecipient && next != null ? current.recipientStatus() : "NONE";
+        int n = jdbc.update("""
+                INSERT INTO kitchen_payment_profile (kitchen_id, deposit_bps, cod_max_total_minor, recipient_method, recipient_identifier, recipient_name,
+                                                     recipient_status, version)
+                VALUES (?, ?, ?, ?, ?, ?, 'NONE', 1)
+                ON CONFLICT (kitchen_id) DO UPDATE SET deposit_bps = EXCLUDED.deposit_bps, cod_max_total_minor = EXCLUDED.cod_max_total_minor,
+                    recipient_method = EXCLUDED.recipient_method, recipient_identifier = EXCLUDED.recipient_identifier,
+                    recipient_name = EXCLUDED.recipient_name, recipient_status = ?,
+                    approved_by = CASE WHEN ? = 'APPROVED' THEN kitchen_payment_profile.approved_by END,
+                    approved_at = CASE WHEN ? = 'APPROVED' THEN kitchen_payment_profile.approved_at END,
+                    version = kitchen_payment_profile.version + 1
+                WHERE kitchen_payment_profile.version = ?""",
+                kitchen, depositBps, codMaxTotalMinor, next == null ? null : next.method(), next == null ? null : next.identifier(),
+                next == null ? null : next.name(), status, status, status, expectedVersion);
+        if (n != 1) {
+            throw new ApiException(ErrorCode.VERSION_CONFLICT, "payment profile changed");
+        }
+        audit.record(new AuditLog.Entry(cookId, "payment.profile_update", null, "kitchen", kitchen.toString(), AuditLog.Outcome.ALLOWED, null,
+                requestId(), Map.of("depositBps", depositBps, "recipientChanged", !sameRecipient)));
+        return profileView(kitchen);
+    }
+
+    /** Staff (finance.verify, recent MFA) approve the recipient after checking it against the approved cook. Audited. */
+    @Transactional
+    public ProfileView approveRecipient(UUID staffId, UUID kitchenId, long expectedVersion, String reason) {
+        if (reason == null || reason.strip().length() < 10 || reason.strip().length() > 500) {
+            throw invalid("reason", "LENGTH_10_500");
+        }
+        if (kitchens.ownedBy(staffId).map(KitchenDirectory.KitchenStatus::kitchenId).filter(kitchenId::equals).isPresent()) {
+            throw new ApiException(ErrorCode.FORBIDDEN, "cannot approve your own kitchen's recipient");
+        }
+        ProfileView current = profileView(kitchenId);
+        if (current.recipient() == null || current.version() == 0) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "no recipient to approve", List.of(new FieldError("recipient", "MISSING")));
+        }
+        int n = jdbc.update("""
+                UPDATE kitchen_payment_profile SET recipient_status = 'APPROVED', approved_by = ?, approved_at = ?, version = version + 1
+                WHERE kitchen_id = ? AND version = ?""", staffId, Timestamp.from(clock.instant()), kitchenId, expectedVersion);
+        if (n != 1) {
+            throw new ApiException(ErrorCode.VERSION_CONFLICT, "payment profile changed");
+        }
+        audit.record(new AuditLog.Entry(staffId, "payment.recipient_approve", "finance.verify", "kitchen", kitchenId.toString(),
+                AuditLog.Outcome.ALLOWED, reason.strip(), requestId(), Map.of("method", current.recipient().method())));
+        return profileView(kitchenId);
+    }
+
 
     /** The kitchen's current terms; {@code lock} takes a share lock so a change serializes with a placement (as in D13). */
     Profile profile(UUID kitchenId, boolean lock) {
@@ -133,14 +245,16 @@ public class PaymentService {
      */
     @Transactional
     public PaymentView kitchenReceipt(UUID cookId, UUID orderId, long expectedVersion, long amountMinor, String reference) {
-        UUID kitchen = kitchens.ownedBy(cookId).map(KitchenDirectory.KitchenStatus::kitchenId)
-                .orElseThrow(() -> new ApiException(ErrorCode.FORBIDDEN, "not a cook"));
+        UUID kitchen = ownKitchen(cookId);
         Map<String, Object> p = jdbc.queryForList("""
-                SELECT p.state, p.version, p.deposit_minor FROM order_payment p JOIN customer_order o ON o.id = p.order_id
+                SELECT p.state, p.version, p.deposit_minor, o.state AS order_state FROM order_payment p JOIN customer_order o ON o.id = p.order_id
                 WHERE p.order_id = ? AND o.kitchen_id = ? FOR UPDATE OF p""", orderId, kitchen).stream().findFirst()
                 .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "order not found"));
         String state = (String) p.get("state");
-        if (!"WAITING_FOR_DEPOSIT".equals(state) && !"CUSTOMER_TRANSFER_REPORTED".equals(state)) {
+        if (ENDED.contains((String) p.get("order_state"))) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "order ended; report a refund instead", List.of(new FieldError("payment", "ORDER_ENDED")));
+        }
+        if (!Set.of("WAITING_FOR_DEPOSIT", "CUSTOMER_TRANSFER_REPORTED", "DISPUTED").contains(state)) {
             throw new ApiException(ErrorCode.STATE_CONFLICT, "no deposit is waiting", List.of(new FieldError("payment", "NO_DEPOSIT_WAITING")));
         }
         if ((Long) p.get("version") != expectedVersion) {
@@ -151,6 +265,97 @@ public class PaymentService {
         }
         move(orderId, state, "KITCHEN_RECEIPT_REPORTED", expectedVersion, "COOK", cookId, amountMinor, reference, null);
         return view(orderId).orElseThrow();
+    }
+
+    /** The kitchen reports that nothing arrived, or a different amount (TC-161). Processing pauses; ops see it in their queue. */
+    @Transactional
+    public PaymentView reportProblem(UUID cookId, UUID orderId, long expectedVersion, Problem kind, Long amountSeen, String reference) {
+        if (kind == Problem.AMOUNT_MISMATCH && (amountSeen == null || amountSeen < 0)) {
+            throw invalid("amountMinor", "REQUIRED_FOR_MISMATCH");
+        }
+        Map<String, Object> p = lockForKitchen(cookId, orderId);
+        String state = (String) p.get("state");
+        if (!Set.of("WAITING_FOR_DEPOSIT", "CUSTOMER_TRANSFER_REPORTED", "RECONCILE_PENDING").contains(state)) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "nothing to dispute", List.of(new FieldError("payment", "NOTHING_TO_DISPUTE")));
+        }
+        checkVersion(p, expectedVersion);
+        move(orderId, state, "DISPUTED", expectedVersion, "COOK", cookId, kind == Problem.AMOUNT_MISMATCH ? amountSeen : null, reference, kind.name());
+        return view(orderId).orElseThrow();
+    }
+
+    /** Payments that need ops attention, newest first (finance.verify). */
+    public List<QueueItem> queue(String state) {
+        if (!Set.of("DISPUTED", "RECONCILE_PENDING", "REFUND_OWED").contains(state)) {
+            throw invalid("state", "ALLOWED_DISPUTED|RECONCILE_PENDING|REFUND_OWED");
+        }
+        return jdbc.query("""
+                SELECT p.order_id, o.public_number, o.kitchen_id, o.state, p.state, p.deposit_minor, p.updated_at, p.version,
+                       (SELECT e.reason_code FROM payment_event e WHERE e.order_id = p.order_id AND e.reason_code IS NOT NULL
+                        ORDER BY e.occurred_at DESC LIMIT 1)
+                FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE p.state = ? ORDER BY p.updated_at DESC LIMIT 100""",
+                (rs, n) -> new QueueItem(rs.getObject(1, UUID.class), rs.getString(2), rs.getObject(3, UUID.class), rs.getString(4), rs.getString(5),
+                        egp(rs.getLong(6)), rs.getString(9), rs.getTimestamp(7).toInstant(), rs.getLong(8)), state);
+    }
+
+    /**
+     * Staff decide on an ended order's open payment, with a reason (audited): the kitchen owes a refund, or the matter
+     * is closed without funds. There is no decision that marks money as received.
+     */
+    @Transactional
+    public PaymentView decide(UUID staffId, UUID orderId, long expectedVersion, Decision outcome, String reason) {
+        if (reason == null || reason.strip().length() < 10 || reason.strip().length() > 500) {
+            throw invalid("reason", "LENGTH_10_500");
+        }
+        Map<String, Object> p = jdbc.queryForList("""
+                SELECT p.state, p.version, o.state AS order_state FROM order_payment p JOIN customer_order o ON o.id = p.order_id
+                WHERE p.order_id = ? FOR UPDATE OF p""", orderId).stream().findFirst()
+                .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "order not found"));
+        if (!ENDED.contains((String) p.get("order_state"))) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "decide once the order has ended", List.of(new FieldError("orderId", "ORDER_ACTIVE")));
+        }
+        String state = (String) p.get("state");
+        if (!Set.of("DISPUTED", "RECONCILE_PENDING").contains(state)) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "nothing to decide", List.of(new FieldError("payment", "NOTHING_TO_DECIDE")));
+        }
+        checkVersion(p, expectedVersion);
+        move(orderId, state, outcome.name(), expectedVersion, "STAFF", staffId, null, null, outcome.name());
+        audit.record(new AuditLog.Entry(staffId, "payment.decision", "finance.verify", "order", orderId.toString(), AuditLog.Outcome.ALLOWED,
+                reason.strip(), requestId(), Map.of("outcome", outcome.name(), "from", state)));
+        return view(orderId).orElseThrow();
+    }
+
+    /** The kitchen reports the refund it sent, with the transfer reference (its statement, not a bank confirmation). */
+    @Transactional
+    public PaymentView reportRefund(UUID cookId, UUID orderId, long expectedVersion, String reference) {
+        if (reference == null || reference.isBlank() || reference.strip().length() > 64) {
+            throw invalid("reference", "REQUIRED");
+        }
+        Map<String, Object> p = lockForKitchen(cookId, orderId);
+        String state = (String) p.get("state");
+        if (!Set.of("REFUND_OWED", "RECONCILE_PENDING").contains(state)) {
+            throw new ApiException(ErrorCode.STATE_CONFLICT, "no refund due", List.of(new FieldError("payment", "NO_REFUND_DUE")));
+        }
+        checkVersion(p, expectedVersion);
+        move(orderId, state, "REFUNDED", expectedVersion, "COOK", cookId, (Long) p.get("deposit_minor"), reference, null);
+        return view(orderId).orElseThrow();
+    }
+
+    private Map<String, Object> lockForKitchen(UUID cookId, UUID orderId) {
+        UUID kitchen = ownKitchen(cookId);
+        return jdbc.queryForList("""
+                SELECT p.state, p.version, p.deposit_minor FROM order_payment p JOIN customer_order o ON o.id = p.order_id
+                WHERE p.order_id = ? AND o.kitchen_id = ? FOR UPDATE OF p""", orderId, kitchen).stream().findFirst()
+                .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "order not found"));
+    }
+
+    private static void checkVersion(Map<String, Object> p, long expected) {
+        if ((Long) p.get("version") != expected) {
+            throw new ApiException(ErrorCode.VERSION_CONFLICT, "payment changed");
+        }
+    }
+
+    private static String requestId() {
+        return org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY);
     }
 
     /** No preparation of a deposit order before the kitchen has reported receipt (TC-159). */

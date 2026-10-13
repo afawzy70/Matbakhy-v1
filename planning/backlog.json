@@ -1824,7 +1824,7 @@
       "id": "MB-051",
       "phase": "P07",
       "title": "Deposit-required checkout and separated payment state (D16)",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-017",
@@ -1851,15 +1851,17 @@
         "TC-159",
         "TC-160"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261013-MB-051/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Server part of D16 at 61d8dd5 (self-review): kitchen payment profile, COD/deposit quote terms with stale-terms refusal, immutable order_payment snapshot and append-only payment_event, API-100 customer transfer report (idempotent, not payment), API-101 kitchen receipt report (exact amount, not bank verification), preparation gate, reconciliation on close. TC-158/159/160 PASS. Limits recorded in docs/product/09-deposit-payment-states.md. Synthetic data only; live money blocked."
     },
     {
       "id": "MB-052",
       "phase": "P07",
       "title": "Kitchen receipt acknowledgement, mismatches, disputes and refunds (D16)",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-051",
@@ -1885,7 +1887,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": "Server part (self-review): payment profile (API-102/103), recipient approval with recent MFA (API-104), problem reports (API-105), ops queue (API-106), staff decisions without any 'received' outcome (API-107), kitchen refund report (API-108); PaymentReconciliationIntegrationTest 3/3 (written before the code but not executed red). Cook and ops screens not done; no automatic support case or customer notification yet."
     },
     {
       "id": "MB-053",

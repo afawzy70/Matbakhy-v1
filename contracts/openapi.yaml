@@ -1023,6 +1023,230 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/PaymentReceiptReport"
+  /api/v1/cook/payment-profile:
+    get:
+      operationId: getCookPaymentProfile
+      tags:
+        - cook
+      summary: "API-102: own kitchen's payment terms (D16)"
+      description: Deposit share, COD cap, recipient and its approval status.
+      x-matbakhy-id: API-102
+      x-permission: COOK
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPaymentProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    put:
+      operationId: putCookPaymentProfile
+      tags:
+        - cook
+      summary: "API-103: set own payment terms (D16); a new or changed recipient needs staff approval again"
+      description: Optimistic version. The recipient is offered to customers only after staff approval.
+      x-matbakhy-id: API-103
+      x-permission: COOK
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPaymentProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KitchenPaymentProfileUpdate"
+  /api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval:
+    post:
+      operationId: postOpsKitchensPaymentRecipientApproval
+      tags:
+        - ops
+      summary: "API-104: approve a kitchen's payment recipient (finance.verify, recent MFA, reason; audited)"
+      description: Staff check the recipient against the approved cook; never for their own kitchen.
+      x-matbakhy-id: API-104
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: kitchenId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPaymentProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonedVersion"
+  /api/v1/cook/orders/{orderId}/payment/problem:
+    post:
+      operationId: postCookOrdersPaymentProblem
+      tags:
+        - cook
+      summary: "API-105: kitchen reports deposit not received or a different amount (D16)"
+      description: Moves the payment to DISPUTED; preparation stays blocked; ops see it in their queue.
+      x-matbakhy-id: API-105
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentProblemReport"
+  /api/v1/ops/payments:
+    get:
+      operationId: getOpsPayments
+      tags:
+        - ops
+      summary: "API-106: payments needing attention (D16)"
+      description: DISPUTED, RECONCILE_PENDING or REFUND_OWED, newest first, at most 100.
+      x-matbakhy-id: API-106
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [DISPUTED, RECONCILE_PENDING, REFUND_OWED]
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentQueue"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/orders/{orderId}/payment/decision:
+    post:
+      operationId: postOpsOrdersPaymentDecision
+      tags:
+        - ops
+      summary: "API-107: decide an ended order's open payment (REFUND_OWED or CLOSED_NO_FUNDS; reason; audited)"
+      description: Only after the order has ended. No decision marks money as received.
+      x-matbakhy-id: API-107
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentDecision"
+  /api/v1/cook/orders/{orderId}/payment/refund:
+    post:
+      operationId: postCookOrdersPaymentRefund
+      tags:
+        - cook
+      summary: "API-108: kitchen reports the refund it sent, with the transfer reference (D16)"
+      description: The kitchen's statement, not a bank confirmation.
+      x-matbakhy-id: API-108
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRefundReport"
   /api/v1/orders/{orderId}/cancellation-requests:
     post:
       operationId: postOrdersCancellationRequests
@@ -5826,7 +6050,7 @@ components:
             - type: "null"
     PaymentState:
       type: string
-      enum: [NOT_REQUIRED, WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, RECONCILE_PENDING, EXPIRED]
+      enum: [NOT_REQUIRED, WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, RECONCILE_PENDING, EXPIRED, REFUND_OWED, REFUNDED, CLOSED_NO_FUNDS]
       description: CUSTOMER_TRANSFER_REPORTED is the customer's statement, not payment. KITCHEN_RECEIPT_REPORTED is the kitchen's statement after checking its own account, not a bank confirmation.
     PaymentView:
       type: object
@@ -5874,6 +6098,141 @@ components:
           type: integer
           minimum: 1
           description: Must equal the deposit; a different amount or "not received" is reported through the mismatch path (MB-052)
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+    KitchenPaymentProfile:
+      type: object
+      additionalProperties: false
+      required: [depositBps, codMaxTotalMinor, recipient, recipientStatus, version]
+      properties:
+        depositBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        codMaxTotalMinor:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+        recipientStatus:
+          type: string
+          enum: [NONE, APPROVED]
+        version:
+          type: integer
+          minimum: 0
+    KitchenPaymentProfileUpdate:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, depositBps]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        depositBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        codMaxTotalMinor:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+    ReasonedVersion:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, reason]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reason:
+          type: string
+          minLength: 10
+          maxLength: 500
+    PaymentProblemReport:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, kind]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        kind:
+          type: string
+          enum: [NOT_RECEIVED, AMOUNT_MISMATCH]
+        amountMinor:
+          type: integer
+          minimum: 0
+          description: Required for AMOUNT_MISMATCH (the amount the kitchen saw)
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+    PaymentQueue:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [orderId, publicNumber, kitchenId, orderState, state, deposit, lastReason, updatedAt, version]
+            properties:
+              orderId: *a1
+              publicNumber:
+                type: string
+              kitchenId: *a1
+              orderState:
+                $ref: "#/components/schemas/OrderState"
+              state:
+                $ref: "#/components/schemas/PaymentState"
+              deposit:
+                $ref: "#/components/schemas/NonNegativeMoney"
+              lastReason:
+                type:
+                  - string
+                  - "null"
+              updatedAt:
+                type: string
+                format: date-time
+              version:
+                type: integer
+                minimum: 0
+    PaymentDecision:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, outcome, reason]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        outcome:
+          type: string
+          enum: [REFUND_OWED, CLOSED_NO_FUNDS]
+        reason:
+          type: string
+          minLength: 10
+          maxLength: 500
+    PaymentRefundReport:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, reference]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
         reference:
           type: string
           minLength: 1

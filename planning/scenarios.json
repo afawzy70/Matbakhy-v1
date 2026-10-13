@@ -2217,8 +2217,10 @@
       "given": "A kitchen requiring a deposit with an approved recipient",
       "when": "The customer quotes and places an order",
       "then": "The quote and order hold deposit due, remainder, method, recipient identifier, expiry and terms in integer EGP; later recipient or rate changes do not alter the placed order",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-051/evidence.json"
+      ]
     },
     {
       "id": "TC-159",
@@ -2233,8 +2235,10 @@
       "given": "A deposit-required order WAITING_FOR_DEPOSIT",
       "when": "The customer reports a transfer (twice, concurrently) and the kitchen tries to start preparation",
       "then": "One report is recorded; the order cannot be accepted into preparation until the kitchen reports receipt and separately accepts; nothing is labelled bank verified",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-051/evidence.json"
+      ]
     },
     {
       "id": "TC-160",
@@ -2250,8 +2254,10 @@
       "given": "A reported transfer and an approaching deposit expiry",
       "when": "The expiry passes, or the kitchen reports receipt just before it",
       "then": "The order moves to reconciliation rather than silently expiring; capacity is released only once; no double payment request",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-051/evidence.json"
+      ]
     },
     {
       "id": "TC-161",

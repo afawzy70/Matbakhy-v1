@@ -504,6 +504,130 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cook/payment-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-102: own kitchen's payment terms (D16)
+         * @description Deposit share, COD cap, recipient and its approval status.
+         */
+        get: operations["getCookPaymentProfile"];
+        /**
+         * API-103: set own payment terms (D16); a new or changed recipient needs staff approval again
+         * @description Optimistic version. The recipient is offered to customers only after staff approval.
+         */
+        put: operations["putCookPaymentProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-104: approve a kitchen's payment recipient (finance.verify, recent MFA, reason; audited)
+         * @description Staff check the recipient against the approved cook; never for their own kitchen.
+         */
+        post: operations["postOpsKitchensPaymentRecipientApproval"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cook/orders/{orderId}/payment/problem": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-105: kitchen reports deposit not received or a different amount (D16)
+         * @description Moves the payment to DISPUTED; preparation stays blocked; ops see it in their queue.
+         */
+        post: operations["postCookOrdersPaymentProblem"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ops/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-106: payments needing attention (D16)
+         * @description DISPUTED, RECONCILE_PENDING or REFUND_OWED, newest first, at most 100.
+         */
+        get: operations["getOpsPayments"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ops/orders/{orderId}/payment/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-107: decide an ended order's open payment (REFUND_OWED or CLOSED_NO_FUNDS; reason; audited)
+         * @description Only after the order has ended. No decision marks money as received.
+         */
+        post: operations["postOpsOrdersPaymentDecision"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cook/orders/{orderId}/payment/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-108: kitchen reports the refund it sent, with the transfer reference (D16)
+         * @description The kitchen's statement, not a bank confirmation.
+         */
+        post: operations["postCookOrdersPaymentRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orders/{orderId}/cancellation-requests": {
         parameters: {
             query?: never;
@@ -2771,7 +2895,7 @@ export interface components {
          * @description CUSTOMER_TRANSFER_REPORTED is the customer's statement, not payment. KITCHEN_RECEIPT_REPORTED is the kitchen's statement after checking its own account, not a bank confirmation.
          * @enum {string}
          */
-        PaymentState: "NOT_REQUIRED" | "WAITING_FOR_DEPOSIT" | "CUSTOMER_TRANSFER_REPORTED" | "KITCHEN_RECEIPT_REPORTED" | "DISPUTED" | "RECONCILE_PENDING" | "EXPIRED";
+        PaymentState: "NOT_REQUIRED" | "WAITING_FOR_DEPOSIT" | "CUSTOMER_TRANSFER_REPORTED" | "KITCHEN_RECEIPT_REPORTED" | "DISPUTED" | "RECONCILE_PENDING" | "EXPIRED" | "REFUND_OWED" | "REFUNDED" | "CLOSED_NO_FUNDS";
         PaymentView: {
             method: components["schemas"]["PaymentMethod"];
             state: components["schemas"]["PaymentState"];
@@ -2791,6 +2915,58 @@ export interface components {
             /** @description Must equal the deposit; a different amount or "not received" is reported through the mismatch path (MB-052) */
             amountMinor: number;
             reference?: string;
+        };
+        KitchenPaymentProfile: {
+            depositBps: number;
+            codMaxTotalMinor: number | null;
+            recipient: components["schemas"]["PaymentRecipient"] | null;
+            /** @enum {string} */
+            recipientStatus: "NONE" | "APPROVED";
+            version: number;
+        };
+        KitchenPaymentProfileUpdate: {
+            expectedVersion: number;
+            depositBps: number;
+            codMaxTotalMinor?: number | null;
+            recipient?: components["schemas"]["PaymentRecipient"] | null;
+        };
+        ReasonedVersion: {
+            expectedVersion: number;
+            reason: string;
+        };
+        PaymentProblemReport: {
+            expectedVersion: number;
+            /** @enum {string} */
+            kind: "NOT_RECEIVED" | "AMOUNT_MISMATCH";
+            /** @description Required for AMOUNT_MISMATCH (the amount the kitchen saw) */
+            amountMinor?: number;
+            reference?: string;
+        };
+        PaymentQueue: {
+            items: {
+                /** Format: uuid */
+                orderId: string;
+                publicNumber: string;
+                /** Format: uuid */
+                kitchenId: string;
+                orderState: components["schemas"]["OrderState"];
+                state: components["schemas"]["PaymentState"];
+                deposit: components["schemas"]["NonNegativeMoney"];
+                lastReason: string | null;
+                /** Format: date-time */
+                updatedAt: string;
+                version: number;
+            }[];
+        };
+        PaymentDecision: {
+            expectedVersion: number;
+            /** @enum {string} */
+            outcome: "REFUND_OWED" | "CLOSED_NO_FUNDS";
+            reason: string;
+        };
+        PaymentRefundReport: {
+            expectedVersion: number;
+            reference: string;
         };
         /** @description No status, role, customerId or price override is accepted. */
         PlaceOrderRequest: {
@@ -4316,6 +4492,190 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["PaymentReceiptReport"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentView"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getCookPaymentProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KitchenPaymentProfile"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    putCookPaymentProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KitchenPaymentProfileUpdate"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KitchenPaymentProfile"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postOpsKitchensPaymentRecipientApproval: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kitchenId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReasonedVersion"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KitchenPaymentProfile"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postCookOrdersPaymentProblem: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentProblemReport"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentView"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getOpsPayments: {
+        parameters: {
+            query: {
+                state: "DISPUTED" | "RECONCILE_PENDING" | "REFUND_OWED";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentQueue"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postOpsOrdersPaymentDecision: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentDecision"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaymentView"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postCookOrdersPaymentRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PaymentRefundReport"];
             };
         };
         responses: {

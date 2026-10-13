@@ -911,6 +911,69 @@
       "response_type": "PaymentView",
       "contract": "Kitchen reports the deposit arrived in its own account (D16); exact amount and current version; not a bank confirmation",
       "implemented": true
+    },
+    {
+      "id": "API-102",
+      "method": "GET",
+      "path": "/api/v1/cook/payment-profile",
+      "permission": "COOK",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Own kitchen's deposit share, COD cap and recipient with approval status (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-103",
+      "method": "PUT",
+      "path": "/api/v1/cook/payment-profile",
+      "permission": "COOK",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Set own payment terms; a new or changed recipient needs staff approval again (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-104",
+      "method": "POST",
+      "path": "/api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Approve a kitchen's recipient; recent MFA, reason, audited; never own kitchen (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-105",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/problem",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports deposit not received or a different amount; payment DISPUTED (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-106",
+      "method": "GET",
+      "path": "/api/v1/ops/payments",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PaymentQueue",
+      "contract": "Payments needing attention: DISPUTED, RECONCILE_PENDING, REFUND_OWED (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-107",
+      "method": "POST",
+      "path": "/api/v1/ops/orders/{orderId}/payment/decision",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PaymentView",
+      "contract": "Decide an ended order's open payment (REFUND_OWED or CLOSED_NO_FUNDS); reason; audited; never 'received' (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-108",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/refund",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports the refund it sent with the transfer reference (D16)",
+      "implemented": true
     }
   ]
 }
