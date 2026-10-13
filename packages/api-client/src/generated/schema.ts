@@ -2718,7 +2718,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            type: "ORDER_PLACED" | "ORDER_ACCEPTED" | "ORDER_PREPARING" | "ORDER_READY" | "ORDER_OUT_FOR_DELIVERY" | "ORDER_COMPLETED" | "ORDER_REJECTED" | "ORDER_EXPIRED" | "ORDER_DELIVERY_FAILED" | "ORDER_CANCELLED";
+            type: "ORDER_PLACED" | "ORDER_ACCEPTED" | "ORDER_PREPARING" | "ORDER_READY" | "ORDER_OUT_FOR_DELIVERY" | "ORDER_COMPLETED" | "ORDER_REJECTED" | "ORDER_EXPIRED" | "ORDER_DELIVERY_FAILED" | "ORDER_CANCELLED" | "PAYMENT_CUSTOMER_TRANSFER_REPORTED" | "PAYMENT_KITCHEN_RECEIPT_REPORTED" | "PAYMENT_DISPUTED" | "PAYMENT_REFUND_OWED" | "PAYMENT_REFUNDED";
             /** Format: uuid */
             orderId: string | null;
             /** @description Non-sensitive template parameters (order number, state). */

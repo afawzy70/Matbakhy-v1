@@ -12,6 +12,7 @@ import com.matbakhy.app.security.TestLogins;
 import com.matbakhy.app.support.IntegrationTest;
 import com.matbakhy.app.support.TestCommerce;
 import com.matbakhy.app.support.TestKitchens;
+import com.matbakhy.notifications.internal.OutboxDispatcher;
 import java.time.Clock;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -43,6 +44,7 @@ class PaymentReconciliationIntegrationTest {
     @Autowired TestLogins logins;
     @Autowired JsonMapper json;
     @Autowired Clock clock;
+    @Autowired OutboxDispatcher dispatcher;
 
     TestCommerce fx;
     String customerSubject;
@@ -230,5 +232,32 @@ class PaymentReconciliationIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT string_agg(to_state || ':' || actor_type, ',' ORDER BY occurred_at) FROM payment_event WHERE order_id = ?",
                 String.class, order)).isEqualTo("WAITING_FOR_DEPOSIT:CUSTOMER,KITCHEN_RECEIPT_REPORTED:COOK,RECONCILE_PENDING:COOK,REFUND_OWED:STAFF,REFUNDED:COOK");
         assertThat(jdbc.queryForObject("SELECT state FROM customer_order WHERE id = ?", String.class, order)).isEqualTo("REJECTED");
+    }
+
+    private String notices(String subject, UUID order) {
+        UUID user = logins.login(subject, "User").getPrincipal().id();
+        return String.join(",", jdbc.queryForList("SELECT type || '/' || (params->>'state') FROM notification WHERE recipient_id = ? AND order_id = ? "
+                + "AND type LIKE 'PAYMENT_%' ORDER BY created_at, type", String.class, user, order));
+    }
+
+    @Test
+    void payment_changes_reach_the_other_party_as_in_app_notifications_once() throws Exception {
+        approvedRecipient();
+        UUID order = depositOrder();
+        ok(call(post("/api/v1/orders/" + order + "/payment/transfer-report").content("{}"), as(customerSubject)), 200);
+        ok(call(post("/api/v1/orders/" + order + "/payment/transfer-report").content("{}"), as(customerSubject)), 200);
+        ok(call(post("/api/v1/cook/orders/" + order + "/payment/problem").content(
+                "{\"expectedVersion\":" + paymentVersion(order) + ",\"kind\":\"NOT_RECEIVED\"}"), as(cookSubject)), 200);
+        ok(call(post("/api/v1/cook/orders/" + order + "/payment/receipt").content(
+                "{\"expectedVersion\":" + paymentVersion(order) + ",\"amountMinor\":13500}"), as(cookSubject)), 200);
+        while (dispatcher.dispatchOnce("test-" + UUID.randomUUID(), 50) > 0) {
+            // drain
+        }
+        assertThat(notices(cookSubject, order)).as("the kitchen hears that the customer reported a transfer, once")
+                .isEqualTo("PAYMENT_CUSTOMER_TRANSFER_REPORTED/PAYMENT_CUSTOMER_TRANSFER_REPORTED");
+        assertThat(notices(customerSubject, order)).as("the customer hears the kitchen's reports")
+                .isEqualTo("PAYMENT_DISPUTED/PAYMENT_DISPUTED,PAYMENT_KITCHEN_RECEIPT_REPORTED/PAYMENT_KITCHEN_RECEIPT_REPORTED");
+        JsonNode inbox = ok(call(get("/api/v1/notifications"), as(customerSubject)), 200);
+        assertThat(inbox.toString()).contains("PAYMENT_DISPUTED").doesNotContain("instapay", "13500");
     }
 }

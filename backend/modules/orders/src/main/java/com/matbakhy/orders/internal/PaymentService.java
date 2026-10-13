@@ -425,7 +425,19 @@ public class PaymentService {
                                            occurred_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 UUID.randomUUID(), orderId, from, to, actorType, actorId, amount, reference == null || reference.isBlank() ? null : reference.strip(),
                 reasonCode, org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY), Timestamp.from(at));
+        if (NOTIFIED.contains(to)) {
+            // MB-052 follow-up: the other party hears about it (in-app; channels per O07), in the same transaction.
+            jdbc.update("""
+                    INSERT INTO outbox_event (id, aggregate_type, aggregate_id, event_type, payload, available_at, created_at, request_id)
+                    VALUES (?, 'order', ?, ?, ?::jsonb, ?, ?, ?)""",
+                    UUID.randomUUID(), orderId, "PAYMENT_" + to, "{\"orderId\":\"" + orderId + "\",\"state\":\"PAYMENT_" + to + "\"}",
+                    Timestamp.from(at), Timestamp.from(at), org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY));
+        }
     }
+
+    /** Payment states the other party is told about: the customer's report goes to the kitchen, the rest to the customer. */
+    static final java.util.Set<String> NOTIFIED = java.util.Set.of("CUSTOMER_TRANSFER_REPORTED", "KITCHEN_RECEIPT_REPORTED", "DISPUTED",
+            "REFUND_OWED", "REFUNDED");
 
     private static Money egp(long minor) {
         return new Money(minor, "EGP");
