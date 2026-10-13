@@ -72,3 +72,12 @@ tests:
       - eval_time: 8m
         alertname: DiskPressure
         exp_alerts: [{exp_labels: {severity: warning, job: node, mountpoint: "/", fstype: ext4}, exp_annotations: {summary: "Less than 15% disk free on the host"}}]
+  - interval: 1m
+    input_series:
+      # A failed event, then the database goes away for 3 minutes (NaN), then the value is read again.
+      - series: 'matbakhy_outbox_failed_events{job="api"}'
+        values: '1 1 NaN NaN NaN 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: OutboxFailed
+        exp_alerts: [{exp_labels: {severity: ops, job: api}, exp_annotations: {summary: "Outbox events exhausted their retries", runbook: "docs/operations/08-troubleshooting-runbook.md#3-inspect-and-retry-dead-letters"}}]

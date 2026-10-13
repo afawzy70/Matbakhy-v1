@@ -78,7 +78,7 @@ Evidence: `verification/runs/20261013-MB-039-LOCAL/OBSERVABILITY-REHEARSAL.md` (
 - **Metrics (OPS-02, local):** the API publishes health and Prometheus metrics only on a separate management port (8081) that the proxy never forwards; the API port refuses them (ManagementPortIntegrationTest). Prometheus scrapes the API, the host (disk, memory, backup age via node-exporter's textfile) and the pipeline itself.
 - **Alerts:** the proposed thresholds from [01-environments.md](01-environments.md) are rules in `observability/alerts.yml` with `promtool` unit tests. All are **provisional**. Alertmanager sends every alert to a local test sink; there is no real recipient (O07). Exercised end to end: failing outbox, stale backup (fires, then resolves after `deploy.sh` backup), API down, database down, disk pressure (real, on the rehearsal host).
 - **Defect found in the rehearsal and fixed:** during a database outage each gauge waited for a connection, the scrape timed out and only ApiDown fired. Gauges now read with a 1.5 s budget and a 10 s back-off (red first: 57 s → under 4 s), and DatabaseUnavailable fires.
-- **Open tuning:** data alerts such as OutboxFailed show "resolved" while their data is missing during an outage; proposal in the evidence file.
+- **Tuning applied:** OutboxFailed now uses the maximum over 15 minutes. A short outage that makes the gauge NaN no longer sends a false "resolved" (promtool test, red against the old rule). Other data alerts with a `for:` clause keep their pending state rules; real-traffic tuning stays provisional.
 - **Runbook:** [08-troubleshooting-runbook.md](08-troubleshooting-runbook.md) now uses these tools. Not yet rehearsed against a deliberately failed synthetic event on the preview (OPS-03).
 
 ## Preview checks
