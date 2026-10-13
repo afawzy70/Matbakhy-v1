@@ -107,7 +107,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                   }}
                 />
               ))}
-              <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }} accessibilityLabel={t.quantity}>
+              <View style={{ flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" }} accessibilityLabel={t.quantity}>
                 <Button label="−" accessibilityLabel={t.decrease} variant="secondary" disabled={quantity <= 1} onPress={() => setQuantity(quantity - 1)} />
                 <Body locale={locale} strong>
                   {quantity}

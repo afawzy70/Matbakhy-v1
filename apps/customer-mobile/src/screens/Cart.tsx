@@ -348,7 +348,8 @@ function OrderForm({
   }
   return (
     <Card testID="order-form">
-      <View style={{ flexDirection: "row", gap: 8 }}>
+      {/* Wraps at large text sizes: at the largest iOS size the second choice ran past the screen edge (native run 39). */}
+      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         {(["DELIVERY", "PICKUP"] as const)
           .filter((m) => basket.modes.includes(m))
           .map((m) => (

@@ -390,7 +390,15 @@ final class OrderingTests: XCTestCase {
         tapScrolled("go-to-cart")
         expect(element("cart-lines"), "[\(lang)] Cart: basket lines missing")
         shot("dt-\(lang)-cart")
-        reach("get-quote", "[\(lang)] Checkout: calculate total not reachable at large text")
+        // Nothing may extend past the screen edge (native run 39: the Pickup choice did at the largest size).
+        let width = app.windows.firstMatch.frame.width
+        for id in ["mode-DELIVERY", "mode-PICKUP", "get-quote"] where element(id).exists {
+            let frame = element(id).frame
+            XCTAssertTrue(frame.minX >= 0 && frame.maxX <= width + 0.5, "[\(lang)] \(id) runs past the screen edge: \(frame) in width \(width)")
+        }
+        // Place order appears only with a quote: calculate the total first.
+        tapScrolled("get-quote")
+        expect(element("quote"), "[\(lang)] Checkout: no quote at large text")
         reach("place-order", "[\(lang)] Checkout: place order not reachable at large text")
         shot("dt-\(lang)-checkout")
         app.navigationBars.buttons.firstMatch.tap()

@@ -355,7 +355,9 @@ dynamic_text_pass() {
   tap_scrolled 'resource-id="go-to-cart"'
   wait_for 'resource-id="cart-lines"' 30 >/dev/null || fail "[$lang] Cart: basket lines missing"
   shot "dt-$lang-cart"
-  wait_scrolled 'resource-id="get-quote"' 30 || fail "[$lang] Checkout: calculate total not reachable at large text"
+  # Place order appears only with a quote: calculate the total first (native run 39).
+  tap_scrolled 'resource-id="get-quote"'
+  wait_scrolled 'resource-id="quote"' 60 || fail "[$lang] Checkout: no quote at large text"
   wait_scrolled 'resource-id="place-order"' 30 || fail "[$lang] Checkout: place order not reachable at large text"
   shot "dt-$lang-checkout"
   adb shell input keyevent 4
