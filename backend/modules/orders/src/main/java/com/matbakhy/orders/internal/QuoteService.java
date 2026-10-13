@@ -135,10 +135,16 @@ public class QuoteService implements QuoteDirectory {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public ValidQuote requireValid(UUID customerId, UUID quoteId) {
         Map<String, Object> q = jdbc.queryForList("SELECT * FROM quote WHERE id = ? AND customer_id = ?", quoteId, customerId).stream()
                 .findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "quote not found"));
+        // D13: lock the active policy and the rows that price this quote before reading them, so a concurrent price, fee or
+        // policy change is serialized with the placement: an update that commits first is seen here (stale quote refused);
+        // an update that comes later waits until this placement commits (the order keeps its validated price).
+        jdbc.queryForList("SELECT version FROM commerce_policy WHERE status = 'ACTIVE' FOR SHARE", Integer.class);
+        meals.lockPricing(jdbc.queryForList("SELECT meal_id FROM quote_item WHERE quote_id = ?", UUID.class, quoteId),
+                (UUID) q.get("kitchen_id"), (UUID) q.get("zone_id"));
         Instant now = clock.instant();
         Instant expires = ((Timestamp) q.get("expires_at")).toInstant();
         if (!now.isBefore(expires)) {

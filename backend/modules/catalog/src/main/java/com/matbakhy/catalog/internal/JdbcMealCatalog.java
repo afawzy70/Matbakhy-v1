@@ -1,6 +1,7 @@
 package com.matbakhy.catalog.internal;
 
 import com.matbakhy.catalog.api.MealCatalog;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.UUID;
@@ -28,6 +29,15 @@ class JdbcMealCatalog implements MealCatalog {
     public Optional<String> revisionSnapshot(UUID mealId, int revision) {
         return jdbc.query("SELECT snapshot::text FROM meal_revision WHERE meal_id = ? AND revision = ?", (rs, n) -> rs.getString(1), mealId,
                 revision).stream().findFirst();
+    }
+
+    @Override
+    public void lockPricing(Collection<UUID> mealIds, UUID kitchenId, UUID zoneIdOrNull) {
+        jdbc.queryForList("SELECT id FROM meal WHERE id = ANY(?) ORDER BY id FOR SHARE", UUID.class, (Object) mealIds.toArray(UUID[]::new));
+        if (zoneIdOrNull != null) {
+            jdbc.queryForList("SELECT kitchen_id FROM kitchen_zone WHERE kitchen_id = ? AND zone_id = ? FOR SHARE", UUID.class, kitchenId, zoneIdOrNull);
+            jdbc.queryForList("SELECT id FROM service_zone WHERE id = ? FOR SHARE", UUID.class, zoneIdOrNull);
+        }
     }
 
     @Override

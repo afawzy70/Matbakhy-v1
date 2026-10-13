@@ -1,0 +1,20 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.orders.PriceChangeIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 42.04 s <<< FAILURE! -- in com.matbakhy.app.orders.PriceChangeIntegrationTest
+com.matbakhy.app.orders.PriceChangeIntegrationTest.when_the_price_update_takes_effect_first_the_waiting_placement_is_refused -- Time elapsed: 1.605 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[{"id":"e0c310b7-deec-4440-9a9d-51232e757d98","publicNumber":"MB-100002","version":0,"state":"PENDING_ACCEPTANCE","fulfillmentMode":"PICKUP","items":[{"mealId":"4b0d3f0e-afc7-4379-8347-1aa9520b94a1","title":"كشري","allergenStatement":"GLUTEN","quantity":2,"unitPrice":{"amountMinor":12000,"currency":"EGP"},"lineTotal":{"amountMinor":24000,"currency":"EGP"}}],"subtotal":{"amountMinor":24000,"currency":"EGP"},"deliveryFee":{"amountMinor":0,"currency":"EGP"},"tax":{"amountMinor":0,"currency":"EGP"},"total":{"amountMinor":24000,"currency":"EGP"},"slot":{"id":"6a1bbd45-e0ba-4ba0-9252-bf6c354cc3e2","startsAt":"2026-10-13T12:53:00Z","endsAt":"2026-10-13T13:23:00Z","timezone":"Africa/Cairo","cutoffAt":"2026-10-13T10:53:00Z","availablePortions":18,"fulfillmentModes":["PICKUP"]},"acceptBy":"2026-10-13T07:08:36.704954Z","events":[{"sequence":1,"fromState":null,"toState":"PENDING_ACCEPTANCE","occurredAt":"2026-10-13T06:53:36.730349Z","actorType":"CUSTOMER","reasonCode":null}],"allowedActions":["CANCEL"],"cashState":"DUE","supportCaseIds":[],"handoverCode":null,"contact":null}] 
+expected: 409
+ but was: 201
+	at com.matbakhy.app.orders.PriceChangeIntegrationTest.when_the_price_update_takes_effect_first_the_waiting_placement_is_refused(PriceChangeIntegrationTest.java:130)
+
+com.matbakhy.app.orders.PriceChangeIntegrationTest.when_the_placement_commits_first_the_order_keeps_its_validated_price_and_the_update_follows -- Time elapsed: 3.060 s <<< FAILURE!
+java.lang.AssertionError: 
+[the price update waits for the placement that validated first] 
+Expecting
+  <CompletableFuture[Completed: null]>
+not to be done.
+Be aware that the state of the future in this message might not reflect the one at the time when the assertion was performed as it is evaluated later on
+	at com.matbakhy.app.orders.PriceChangeIntegrationTest.when_the_placement_commits_first_the_order_keeps_its_validated_price_and_the_update_follows(PriceChangeIntegrationTest.java:152)
+
