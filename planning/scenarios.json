@@ -1035,8 +1035,10 @@
       "given": "Full order/error/OTP flows execute",
       "when": "Captured logs are scanned",
       "then": "No sensitive payloads; request ID traces transaction and provider failure",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-TC-056/evidence.json"
+      ]
     },
     {
       "id": "TC-057",
