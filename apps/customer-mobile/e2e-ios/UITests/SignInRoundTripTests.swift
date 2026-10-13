@@ -52,26 +52,33 @@ final class SignInRoundTripTests: XCTestCase {
         dismissKeyboard()
         guard let secret = field(secure: true, timeout: 10) else { return XCTFail("password field missing") }
         type(password + "\n", into: secret)
-        dismissSavePassword(until: app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "Synthetic")).firstMatch)
+        // customer-a signs in as "Customer SyntheticA", customer-b as "Customer SyntheticB".
+        dismissSavePassword(until: label(containing: "Synthetic" + username.suffix(1).uppercased()))
     }
 
     /// iOS may offer "Save Password?" after the provider's form is submitted; while it is up the redirect waits and the
     /// authorization code can expire (native run 38). Dismiss it when it appears.
     /// Run 43: the prompt appeared after a sequential 3 × 4 s look had ended, so all three places are now checked
     /// together, every half second, for up to 30 s; the wait ends early once the app shows the signed-in account.
+    /// Run 44: the prompt can come after a 30 s look, while the redirect waits behind it. The wait now lasts as long as the
+    /// sign-in itself (90 s), ends when the signed-in element appears, and keeps looking 3 s more in case the prompt lands
+    /// on top of the signed-in screen.
     private func dismissSavePassword(until done: XCUIElement? = nil) {
         let roots = [app, authUI, XCUIApplication(bundleIdentifier: "com.apple.springboard")]
-        let deadline = Date().addingTimeInterval(30)
+        var deadline = Date().addingTimeInterval(90)
+        var settled = false
         while Date() < deadline {
             for root in roots {
                 let notNow = root.buttons["Not Now"].firstMatch
                 if notNow.exists && notNow.isHittable {
                     notNow.tap()
                     print("MB031-SAVE-PASSWORD-DISMISSED")
-                    return
                 }
             }
-            if let done, done.exists { return }
+            if !settled, let done, done.exists {
+                settled = true
+                deadline = Date().addingTimeInterval(3)
+            }
             Thread.sleep(forTimeInterval: 0.5)
         }
     }
