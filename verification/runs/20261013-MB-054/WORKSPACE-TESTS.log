@@ -1,0 +1,53 @@
+Scope: 5 of 6 workspace projects
+packages/api-client test$ vitest run
+packages/design-tokens test$ vitest run
+packages/design-tokens test:  RUN  v5.0.3 /home/user/mb-evidence/packages/design-tokens
+packages/api-client test:  RUN  v5.0.3 /home/user/mb-evidence/packages/api-client
+packages/design-tokens test:  Test Files  1 passed (1)
+packages/design-tokens test:       Tests  47 passed (47)
+packages/design-tokens test:    Start at  12:46:32
+packages/design-tokens test:    Duration  424ms (transform 67%, import 15%, tests 15%, worker 3%)
+packages/design-tokens test: Done
+packages/api-client test:  Test Files  4 passed (4)
+packages/api-client test:       Tests  34 passed (34)
+packages/api-client test:    Start at  12:46:32
+packages/api-client test:    Duration  1.52s (import 58%, tests 26%, transform 16%, worker 1%)
+packages/api-client test: Done
+apps/customer-mobile test$ jest --ci
+apps/operations-web test$ vitest run
+apps/customer-web test$ vitest run
+apps/operations-web test:  RUN  v5.0.3 /home/user/mb-evidence/apps/operations-web
+apps/customer-web test:  RUN  v5.0.3 /home/user/mb-evidence/apps/customer-web
+apps/customer-mobile test: PASS src/auth.test.ts
+apps/customer-mobile test: PASS src/ordering.test.ts
+apps/customer-mobile test: PASS src/signIn.test.ts
+apps/operations-web test:  Test Files  1 passed (1)
+apps/operations-web test:       Tests  23 passed (23)
+apps/operations-web test:    Start at  12:46:34
+apps/operations-web test:    Duration  6.10s (tests 47%, environment 25%, transform 24%, import 4%)
+apps/operations-web test: Done
+apps/customer-mobile test: PASS src/App.test.tsx (7.094 s)
+apps/customer-mobile test:   ● Console
+apps/customer-mobile test:     console.error
+apps/customer-mobile test:       You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+apps/customer-mobile test:       at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+apps/customer-mobile test:       at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+apps/customer-mobile test:     console.error
+apps/customer-mobile test:       You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+apps/customer-mobile test:       at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+apps/customer-mobile test:       at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+apps/customer-mobile test:     console.error
+apps/customer-mobile test:       You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+apps/customer-mobile test:       at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+apps/customer-mobile test:       at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+apps/customer-mobile test: Test Suites: 4 passed, 4 total
+apps/customer-mobile test: Tests:       54 passed, 54 total
+apps/customer-mobile test: Snapshots:   0 total
+apps/customer-mobile test: Time:        8.154 s, estimated 22 s
+apps/customer-mobile test: Ran all test suites.
+apps/customer-mobile test: Done
+apps/customer-web test:  Test Files  1 passed (1)
+apps/customer-web test:       Tests  45 passed (45)
+apps/customer-web test:    Start at  12:46:34
+apps/customer-web test:    Duration  11.27s (tests 73%, environment 13%, transform 11%, import 2%)
+apps/customer-web test: Done

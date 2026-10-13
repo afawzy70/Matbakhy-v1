@@ -79,6 +79,10 @@ test("customer orders delivery and pickup in the customer web and follows the co
   const page = await customerContext.newPage();
   await addToCart(page);
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  // MB-054: the anonymous visitor's browsing reached the real API (CSRF included) and was counted, without identity.
+  const activity = () => sql(`SELECT string_agg(DISTINCT a.kind, ',' ORDER BY a.kind) FROM activity_daily a JOIN meal m ON m.id = a.subject_id
+                               WHERE m.title_ar = 'كشري تجريبي'`);
+  await expect.poll(activity, { timeout: 15_000 }).toBe("ADD_TO_CART,MEAL_IMPRESSION,MEAL_VIEW");
 
   // Checkout needs a session: sign in and come back to the cart.
   await page.getByRole("link", { name: c.nav.cart }).click();
