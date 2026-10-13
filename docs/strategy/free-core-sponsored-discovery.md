@@ -36,3 +36,30 @@ Ads-only may not cover support, trust/safety, OTP, cloud, payment, operations an
 
 ## Execution rule
 Record concept, do not interrupt the existing MVP plan. No billing, ad feature build, or current default commission removal is authorized by this exploratory proposal alone.
+
+## Owner clarification — 2026-10-13: growth offers are kitchen-pulled, not day-one monetization
+**Confirmed strategic direction:** all Matbakhy platform features and normal order handling launch completely free for both sides, with no platform commission and no paid placement at launch. Monetization is a future opt-in program, activated **per kitchen** only after that kitchen shows sufficient completed orders, meaningful earnings, good fulfillment quality, and reliable demand/traffic signals. No fixed threshold, package price or activation date has been approved. Do not auto-bill, lock core features or penalize unpaid organic visibility. External payment/delivery charges, where any apply, must still be clearly disclosed.
+
+The goal is that kitchens independently recognize an opportunity and request useful paid acceleration. Show relevant, evidence-based insights in cook portal, allow the kitchen to ask for a boost, and present a modest offer only when incremental value is plausible. Never use fake urgency, fabricated customer demand, imaginary ROI or guaranteed sales.
+
+### Product candidates to validate with cook interviews
+1. Boost best-selling meal in its actual service zone and availability window.
+2. Opt into discovery for qualified catering/family gathering enquiries if kitchen capacity and quality support it.
+3. Fill underutilized weekdays/slots with a budget-capped promotion.
+4. Optional meal photography, listing optimization and content help through approved service partners.
+5. Optional win-back promotions to previous customers using approved notification consent and privacy-preserving segmentation.
+6. Paid analytics/business coaching only if materially incremental beyond essential free dashboard.
+
+### Readiness logic and UX
+- Collect per-kitchen real completed orders, earnings and margin inputs *where voluntarily available*, fulfilled capacity, repeat orders, location-bound search demand, organic impressions, click-to-order conversion and reliable complaint/cancellation measures. Never conflate gross revenue with net profit.
+- Offer first FREE insight: what opportunity exists, baseline and confidence, concrete suggestion, no commitment.
+- Gate monetization behind minimum reliable sample size, quality, kitchen spare capacity and truly serviceable demand. Prefer kitchen opt-in or request to access full options.
+- Show a clearly labeled non-guaranteed test hypothesis (cost cap, duration, targeting, likely risks, cancellation terms, reporting), with full advertiser consent before activating a campaign.
+- Evaluate **incremental fulfilled orders** vs organic baseline, actual incremental kitchen contribution margin net of ad cost, cancellations and cook satisfaction. Customer order and attribution tracking must not over-credit advertising.
+- Do not target people based on sensitive traits; protect customer data and clearly label sponsored content.
+- Kitchen-by-kitchen eligibility should be explainable, appealable, reversible, and not discriminatory. The basic free marketplace must remain useful indefinitely.
+- Separate promotion of the platform from direct transfer deposit process: advertised orders still follow identical kitchen confirmation and order protection rules.
+
+### Explicit current-vs-future
+NOW / MVP: free marketplace, operational metrics needed for later evaluation, no advertising sale, no ad payment flow, no campaign billing and no hidden commission. A limited read-only growth-insights design may be considered only if it does not threaten MVP delivery.
+LATER after owner approval: opportunity detection, kitchen request/opt-in, pilot offers, paid campaigns and results measurement.
