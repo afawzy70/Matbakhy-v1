@@ -211,6 +211,10 @@ public class FinanceOpsService {
                     throw invalid("entryIds", "OUTSIDE_PERIOD");
                 }
                 long amount = ((Number) g.get("amount_minor")).longValue() * ("COMMISSION".equals(g.get("kind")) ? 1 : -1);
+                if (amount == 0) {
+                    // MB-050 (D10): a zero-commission group has nothing to settle.
+                    throw invalid("entryIds", "ZERO_AMOUNT");
+                }
                 try {
                     jdbc.update("INSERT INTO settlement_line (batch_id, ledger_group_id, amount_minor) VALUES (?, ?, ?)", batch, entry, amount);
                 } catch (DuplicateKeyException e) {
@@ -285,12 +289,13 @@ public class FinanceOpsService {
                 rs.getLong("version")), id).stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "settlement not found"));
     }
 
-    /** Ledger groups of a kitchen not in an active settlement line, for building a batch. */
+    /** Ledger groups of a kitchen with a non-zero amount, not in an active settlement line, for building a batch. */
     public List<SettlementLine> unsettled(UUID kitchenId) {
         return jdbc.query("""
                 SELECT g.id, g.kind, g.order_id, CASE WHEN g.kind = 'COMMISSION' THEN e.amount_minor ELSE -e.amount_minor END
                 FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id AND e.account = 'COOK_COMMISSION_RECEIVABLE'
-                WHERE g.kitchen_id = ? AND NOT EXISTS (SELECT 1 FROM settlement_line l WHERE l.ledger_group_id = g.id AND l.active)
+                WHERE g.kitchen_id = ? AND e.amount_minor <> 0
+                  AND NOT EXISTS (SELECT 1 FROM settlement_line l WHERE l.ledger_group_id = g.id AND l.active)
                 ORDER BY g.posted_at, g.id LIMIT 500""",
                 (rs, n) -> new SettlementLine(rs.getObject(1, UUID.class), rs.getString(2), rs.getObject(3, UUID.class), egp(rs.getLong(4))), kitchenId);
     }

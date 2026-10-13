@@ -144,6 +144,15 @@ class ZeroCommissionIntegrationTest {
                 logins.login(cookSubject, "Cook")), 200);
         assertThat(statement.get("summary").get("commissionPosted").get("amountMinor").asLong()).isZero();
         assertThat(statement.get("summary").get("commissionOutstanding").get("amountMinor").asLong()).isZero();
+
+        // Nothing to settle: a zero-amount group is neither listed for the cook nor accepted into a settlement batch.
+        assertThat(statement.get("unsettledEntries").size()).as("zero-amount entries are not presented").isZero();
+        UUID group = jdbc.queryForObject("SELECT id FROM ledger_group WHERE order_id = ? AND kind = 'COMMISSION'", UUID.class, id);
+        MockHttpServletResponse batch = call(post("/api/v1/ops/finance/settlements").header("Idempotency-Key", "zc-" + UUID.randomUUID())
+                .content("{\"kitchenId\":\"" + kitchen + "\",\"period\":{\"from\":\"" + today + "\",\"to\":\"" + today
+                        + "\"},\"entryIds\":[\"" + group + "\"]}"), logins.loginWithMfa(staff("finance.settlement", "finance.read"), "Settler"));
+        assertThat(batch.getStatus()).as(batch.getContentAsString()).isEqualTo(422);
+        assertThat(batch.getContentAsString()).contains("ZERO_AMOUNT");
     }
 
     @Test

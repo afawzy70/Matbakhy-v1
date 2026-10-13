@@ -142,7 +142,7 @@ public class StatementService {
         List<UnsettledEntry> unsettled = jdbc.query("""
                 SELECT g.id, g.kind, g.order_id, CASE WHEN g.kind = 'COMMISSION' THEN e.amount_minor ELSE -e.amount_minor END
                 FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id AND e.account = 'COOK_COMMISSION_RECEIVABLE'
-                WHERE g.kitchen_id = ? AND g.posted_at >= ? AND g.posted_at < ?
+                WHERE g.kitchen_id = ? AND g.posted_at >= ? AND g.posted_at < ? AND e.amount_minor <> 0
                   AND NOT EXISTS (SELECT 1 FROM settlement_line l WHERE l.ledger_group_id = g.id AND l.active)
                 ORDER BY g.posted_at, g.id LIMIT 500""",
                 (rs, n) -> new UnsettledEntry(rs.getObject(1, UUID.class), rs.getString(2), rs.getObject(3, UUID.class), egp(rs.getLong(4))),
