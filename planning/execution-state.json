@@ -3,9 +3,9 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P07",
-  "current_story": "MB-033",
+  "current_story": "MB-053",
   "last_tested_commit": "bc305c642442f1bdeaf0f1c92f30bc9976dcddc5",
-  "last_completed_story": "MB-049",
+  "last_completed_story": "MB-052",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -42,8 +42,8 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Window 2026-10-13 09:47:28 to 2026-10-14 00:00 Kuwait (D15). QA candidate E at bc305c6 (six local checks PASS; native run 39 D13 PASS on Android and iOS; workflow failed later in the MB-033 dynamic-text phase). Next: MB-033 native run 40 (overflow fix, largest-text phases, notification refusal), then MB-039 alert tuning; final checkpoint by 23:00.",
-  "updated_at": "2026-10-13T06:49:29Z",
+  "next_action": "Window 2026-10-13 09:47:28 to 2026-10-14 00:00 Kuwait (D15). Done today after candidate E: owner main decisions merged (39856f6); MB-050, MB-051, MB-052 DONE (self-review); MBQA-006 repaired (f8a0087, 12 variations PASS locally); MB-053 web and native built. In progress: QA candidate F six checks at ec68cb9; native run 43 at ae9fdbf (MB-033 phases and the MB-053 deposit phase). Next: record run 43 and candidate F, close MB-053 only if the native deposit phase passes on both platforms, publish the candidate F handoff; final checkpoint by 23:00.",
+  "updated_at": "2026-10-13T12:04:07Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [

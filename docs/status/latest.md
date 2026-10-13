@@ -2,7 +2,7 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-13 ~14:50 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
+- Observed: 2026-10-13 ~15:10 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge. The owner's `main` commits of 11:05–11:59 were merged into the branch at `39856f6` (no rebase, no force-push), which cleared the conflict. The PR is not merged (draft).
 - **New QA candidate E (immutable): `bc305c642442f1bdeaf0f1c92f30bc9976dcddc5`** ([handoff](../quality/09-qa-candidate-e-pricing-history.md)).
   - Scope: D13 informed price reconfirmation, D14 kitchen price history, the MB-031 token-refresh fix, and MB-039 local controls.
@@ -11,6 +11,8 @@ Implementation-agent report (self-reported, not an independent review certificat
     - D13 PASS on the Android emulator and the iOS simulator; same-session lowered limit PASS on both; regression PASS on both.
     - The workflow concluded failure in the new MB-033 dynamic-text phase (harness, plus an iOS overflow; fixed after the candidate).
   - Failed attempts, kept as records: C at `31025fc` (secret-scan false positive) and D at `cc52fa4` (brand guard; native sign-in).
+- **QA repair MBQA-006** (money amounts split inside numbers on narrow staff screens, independent report at `d877a15`): repaired in `f8a0087` (CSS only; no change to amounts, API or authorization). Red then green on the real local stack: the new browser test covers 2 roles × 320/390/1440 px × Arabic/English (12 variations) plus 200% text, keyboard scrolling of the statement table and no page-level sideways scroll ([record](../../verification/runs/20261013-MBQA-006/README.md)). FIXED_PENDING_INDEPENDENT_RETEST. Follow-up noted: zero-amount COMMISSION entries still listed in finance settlements under the 0% policy.
+- **QA candidate F** at `ec68cb9`: six local checks running (results to follow). Native run 43 at `ae9fdbf` running.
 - **Previous candidate `4555f599411da9683453bee209559c8d1f11cded`** stays valid for its scope. MBQA-003/004/005 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST. No newer independent QA report.
 - **Owner decisions today:** D13 (changed prices need informed reconfirmation; RQ-004 decided), D14 (kitchen price history, MB-048), D15 (execution window). From the owner's `main` commits: D10 updated (zero commission, no customer platform fee, no paid ads), D16 (MVP payment = eligible cash on receipt plus a deposit sent directly to the kitchen, kitchen-reported, never "bank verified"; live money blocked by legal/provider gates), D17 (staged sequence, [change matrix](../delivery/08-change-matrix-2026-10-13.md)).
 - **Stories:**
