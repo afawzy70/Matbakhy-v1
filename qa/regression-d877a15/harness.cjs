@@ -7,7 +7,7 @@ const API='http://localhost:39080',CUSTOMER='http://localhost:36173',OPS='http:/
 const SHA='d877a1576cd942200fe0a53b5a19fee76b996025';
 function clean(v,key=''){
  if(v==null)return v;
- if(['key','idempotencyKey'].includes(key)&&typeof v==='string'&&/[0-9a-f]{8}-[0-9a-f]{4}-/i.test(v))return '[REDACTED IDEMPOTENCY KEY]';
+ if(['key','idempotencyKey','idkey'].includes(key)&&typeof v==='string'&&/[0-9a-f]{8}-[0-9a-f]{4}-/i.test(v))return '[REDACTED IDEMPOTENCY KEY]';
  if(/password|secret|token|phone|address|private.*url|uploadUrl|idpLogoutUrl|handoverCode|contact|pickupLocation|privateLocation|recipientName|^street$|^building$|^floor$|^unit$|^landmark$/i.test(key))return '[REDACTED]';
  if(key==='code'&&typeof v==='string'&&/^\d{6}$/.test(v))return '[REDACTED]';
  if(typeof v==='string')return v.replace(/\+20\d{10}/g,'[REDACTED PHONE]').replace(/LOCAL_FIXTURE_ONLY/g,'[REDACTED LOCATION]').replace(/(?<!MB-)\b\d{6}\b/g,'[REDACTED SIX-DIGIT VALUE]');
