@@ -244,6 +244,45 @@ test("customer orders delivery and pickup in the customer web and follows the co
   expect(replaced, "confirming replaces the basket with the other slot").not.toBe(firstSlot);
   expect(replaced).toBeTruthy();
 
+  // MB-048/MB-049 (owner decisions D14/D13) on the real stack: the customer holds a quote; the kitchen raises the price in
+  // the operations web (the real meal edit) and sees it in the price history; placing the old quote is refused, the
+  // customer sees the kitchen's change with the old and new totals and places only after accepting the new total.
+  await page.goto(`${CUSTOMER}/#/checkout`);
+  await page.getByRole("button", { name: c.mode.PICKUP as string }).click();
+  await page.getByRole("button", { name: c.getQuote }).click();
+  await expect(page.getByText(c.total, { exact: true })).toBeVisible();
+  await page.getByLabel(c.terms).check();
+  const oldPrice = Number(sql(`SELECT price_minor FROM meal WHERE title_ar = 'كشري تجريبي'`));
+  const newPrice = oldPrice + 500;
+  const ordersBefore = sql(`SELECT count(*) FROM customer_order o JOIN app_user u ON u.id = o.customer_id WHERE u.subject = '${CUSTOMER_B}'`);
+  await cook.getByRole("button", { name: t.tabs.meals }).click();
+  const mealCard = cook.getByRole("article", { name: "كشري تجريبي" });
+  await mealCard.getByRole("button", { name: t.priceHistory }).click();
+  const history = mealCard.getByRole("region", { name: t.priceHistory });
+  await expect(history.getByText(new RegExp(t.activePrice))).toBeVisible();
+  await history.getByLabel(t.newPrice).fill((newPrice / 100).toFixed(2));
+  await history.getByRole("button", { name: t.changePrice }).click();
+  await expect(history.getByRole("list", { name: t.previousPrices })).toBeVisible();
+  expect(Number(sql(`SELECT price_minor FROM meal WHERE title_ar = 'كشري تجريبي'`)), "the kitchen's edit changed the price").toBe(newPrice);
+  await page.getByRole("button", { name: c.placeOrder }).click();
+  const notice = page.getByTestId("price-change");
+  await expect(notice).toContainText("المطبخ حدّث سعر «كشري تجريبي»");
+  await expect(page.getByRole("button", { name: c.placeOrder })).toBeDisabled();
+  expect(sql(`SELECT count(*) FROM customer_order o JOIN app_user u ON u.id = o.customer_id WHERE u.subject = '${CUSTOMER_B}'`),
+    "no order at the stale price").toBe(ordersBefore);
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await overflowing(page), `overflow ${width} price change`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await axe(page, "price-change");
+  await notice.getByRole("button", { name: c.acceptNewTotal }).click();
+  await page.getByLabel(c.terms).check();
+  await page.getByRole("button", { name: c.placeOrder }).click();
+  await expect(page).toHaveURL(/#\/orders\//);
+  expect(sql(`SELECT o.total_minor || '|' || i.unit_price_minor FROM customer_order o JOIN order_item i ON i.order_id = o.id JOIN app_user u ON u.id = o.customer_id
+              WHERE u.subject = '${CUSTOMER_B}' ORDER BY o.created_at DESC LIMIT 1`), "placed at the accepted new price").toBe(`${newPrice}|${newPrice}`);
+
   // MBQA-004 (independent QA, 4eaee3a): the customer opens a support case and reads the support team's public reply in
   // the customer web; a staff-only note never reaches the customer; another customer cannot open the case.
   await page.goto(`${CUSTOMER}/#/account`);

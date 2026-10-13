@@ -18,6 +18,11 @@ spring:
         tcpKeepAlive: true
   flyway:
     locations: classpath:db/migration
+    # MB-039: deployments migrate as the owner role (SPRING_FLYWAY_USER / SPRING_FLYWAY_PASSWORD) while the API connects
+    # as the least-privilege runtime role (DATABASE_USERNAME = DATABASE_RUNTIME_ROLE), granted by db/migration/afterMigrate.sql.
+    # Without these settings one role does both (local development and tests).
+    placeholders:
+      runtimeRole: ${DATABASE_RUNTIME_ROLE:}
   mvc:
     problemdetails:
       enabled: false
