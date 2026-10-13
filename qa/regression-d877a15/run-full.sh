@@ -24,4 +24,7 @@ phase 10 node qa/regression-d877a15/pricing.cjs
 phase 11 node qa/regression-d877a15/audit.cjs
 phase 12 node qa/regression-d877a15/additional.cjs
 phase 13 env IQA_LAYOUT_FULL=1 node qa/regression-d877a15/layout.cjs
+phase 14 env IQA_TARGET_FULL=1 node qa/regression-d877a15/permission-revocation.cjs
+# Verify real quote expiry before permanent replay; wait bounded, without changing clocks.
+phase 15 env IQA_TARGET_FULL=1 node qa/regression-d877a15/permanent-replay.cjs
 python3 qa/regression-d877a15/validate-run.py

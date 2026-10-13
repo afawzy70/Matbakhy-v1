@@ -923,12 +923,14 @@
     "priority": "P1",
     "preconditions": "Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README",
     "steps": [
-      "Launch native app; use system browser to sign inA; terminate/relaunch; logout; sign inB."
+      "On a fresh app/OS/data environment, sign in syntheticA using system browser and real PKCE credentials. Terminate, reopen and verify Account identity.",
+      "Sign out, verify unauthenticated state, then sign in syntheticB and verify its distinct identity.",
+      "Separately repeat after A has a persisted basket, favorite and order; check B cannot see A cached private state. This variation is not satisfied by the empty-state auth round trip."
     ],
     "expected": "Real A restored then cleared; B identity alone; no stale A private state.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -944,12 +946,13 @@
     "priority": "P1",
     "preconditions": "Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README",
     "steps": [
-      "Browse One; add; browse Two; Keep then Replace; open basket."
+      "Browse One12000/slot51/kitchenD1; add. Browse Two9000/slot52/kitchenD2; trigger Keep, verify original One/kitchenD1/slot51. Repeat and Replace, verify onlyTwo/kitchenD2/slot52, quantity1/estimated9000 and Basket reachable.",
+      "Separately provision two OPEN slots for one kitchen, test Keep and Replace and read resulting meal/kitchen/slot. Base one-slot native seed does not exercise this variation."
     ],
     "expected": "Prompt before mutation; keepOne12000/slot51; replaceTwo9000/slot52; basket reachable.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -971,8 +974,8 @@
     ],
     "expected": "Unconfirmed reachable offline; one recovered order9000; one allocation/reservation/cash/outbox/event.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -993,8 +996,8 @@
     ],
     "expected": "Quantity stops10; restored10>5 flagged; no quote before correction; state recoverable.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1015,8 +1018,8 @@
     ],
     "expected": "Fee3000; subtotal60000,total63000; same stored kitchenA/slot51/DELIVERY/ownaddress snapshot.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1032,13 +1035,13 @@
     "priority": "P1",
     "preconditions": "Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README",
     "steps": [
-      "Open saved own deliveryorder link from running Discover then after force-stop.",
-      "Attempt foreign orderlink."
+      "Open the exact owned core order deep link while foregrounded; verify ID/state/total. Terminate then cold-open the same link and verify identical identity.",
+      "In a separate B session, open A order link; verify authenticated denial and no leaked cached details."
     ],
     "expected": "Own exact orderreachable bothstarts; foreign403/404 without data.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1060,8 +1063,8 @@
     ],
     "expected": "Reads currentAPI-001 on focus; warns/blocks overlimit; correctedquotevalid.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": "qa/regression-d877a15/native/instrument.py; same PID Android / continuous running foreground iOS",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1077,13 +1080,14 @@
     "priority": "P1",
     "preconditions": "Android emulator or iOS simulator, independently; native seed One12000/Two9000 slots51/52; fresh isolated known seed described in README",
     "steps": [
-      "Add One×2; edit/decrease/remove belowfold controls; re-add.",
-      "Background/foreground and terminate/reopen; switchAR/EN; inspect keyboard,scroll,safeareas."
+      "With One quantity10, use the actual decrement control and verify every intermediate visible quantity to4. Assert EGP480.00; remove the last line and inspect empty state.",
+      "Add One again. Background/foreground without killing, verify same basket. Terminate and cold reopen, verify same persisted basket.",
+      "Switch AR then EN on Account; inspect rendered labels and independently inspect pixel alignment/direction, keyboard/scrolling/safe areas. Label changes alone do not establish RTL layout."
     ],
     "expected": "Exact quantities/estimatedsum; last removalempty; basket/session persists safely; arRTL/enLTR usable.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": "qa/regression-d877a15/native/instrument.py; remaining keyboard/safe-area variations explicitly separate",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1103,8 +1107,8 @@
     ],
     "expected": "Readable/reachable controls; denial does not block ordering; permission accurately presented.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": ".github/workflows/independent-qa-regression-native.yml, apps/customer-mobile/scripts/{auth,order}-roundtrip-{android,ios}.sh",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1231,8 +1235,8 @@
     ],
     "expected": "Own favorite persists in actual native list and removal removes own row. Foreign-account authorization is a separate API/access case; no native B-account favorite-cache claim.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": "qa/regression-d877a15/native/instrument.py; fixture-control.py; generated native UI harness",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1253,8 +1257,8 @@
     ],
     "expected": "Own public reply reachable/readable; private marker absent; customer can reply while OPEN.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Use independent browser state/cart reset without erasing pending submissions; legal cancellation/restoration in finally; connected C-ORDER→X-FULFILL→support/finance is one declared fixture chain, not a resettable case. Fresh Compose volumes for each new FULL REGRESSION; never share prior campaign DB.",
-    "automation": "qa/regression-d877a15/native/instrument.py; fixture-control.py; generated native UI harness",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1322,7 +1326,7 @@
     "expected": "Amounts remain readable as intact numeric tokens, with currency grouped intelligibly; no single-glyph monetary columns or broken order-number digits; ordinary line breaks between whole words allowed; desktop baseline also measured.",
     "invariants": "UI formatting preserves authoritative EGP minor-unit amounts; read-only actions never alter finance/order data",
     "cleanup": "Restore1440/en; close only own browser contexts; do not mutate order/cash/ledger.",
-    "automation": "qa/regression-d877a15/layout.cjs (TARGETED discovery; integrate in next fresh FULL REGRESSION)",
+    "automation": "qa/regression-d877a15/layout.cjs; IQA_LAYOUT_FULL=1 to append to fresh full runner, default TARGETED",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "No owner approval inferred. This tests functional readability under BR-046, not branding preferences; screen reader remains separate BLOCKED check."
   },
@@ -1346,7 +1350,7 @@
     "expected": "201 returns the SAME existing order and immutable prices/fees/total despite expired quote/current versions; no new order, reservation, cash obligation or placement event; cancellation is not undone.",
     "invariants": "one permanent customer+clientRequestId; cache miss does not cause revalidation/new placement; no duplicated effects",
     "cleanup": "Read-only baseline plus bounded idempotency response rows in own QA DB; no order recreated or cancellation repeated.",
-    "automation": "qa/regression-d877a15/permanent-replay.cjs (TARGETED extension; include next fresh full)",
+    "automation": "qa/regression-d877a15/permanent-replay.cjs; IQA_TARGET_FULL=1 for fresh full runner (real expiry), default TARGETED",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1370,7 +1374,7 @@
     "expected": "Authenticated staff loses previously permitted actions immediately403; refreshing hides revoked navigation; denied write changes nothing; restoration201 returns access200 without auth bypass.",
     "invariants": "server rereads actual grants; same authenticated identity; case messages/version unchanged after denial; recoverable administrator preserved.",
     "cleanup": "Restore only the revoked synthetic support grant in finally through real admin API; no user/session deletion.",
-    "automation": "qa/regression-d877a15/permission-revocation.cjs (TARGETED extension; next fresh full)",
+    "automation": "qa/regression-d877a15/permission-revocation.cjs; IQA_TARGET_FULL=1 for fresh full runner, default TARGETED",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1392,8 +1396,8 @@
     ],
     "expected": "Owning pending order CANCELLED; one release/event, no duplicate effect; original63000 total unchanged; other recovered order unaffected.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Synthetic cancellation is terminal and allowed; subsequent full regression starts with fresh native fixture. No production or real messages.",
-    "automation": "qa/regression-d877a15/native/instrument.py; independent iOS Hsegment; Android variation requires separately executed control",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   },
@@ -1415,8 +1419,8 @@
     ],
     "expected": "Real UI/API creates one valid owned case; text input/keyboard/scrolling permit submission; no foreign-order data.",
     "invariants": "no responsive-web/unit substitution; fresh OS/app/DB per campaign platform",
-    "cleanup": "Synthetic cancellation is terminal and allowed; subsequent full regression starts with fresh native fixture. No production or real messages.",
-    "automation": "qa/regression-d877a15/native/instrument.py; independent iOS Hsegment; Android variation requires separately executed control",
+    "cleanup": "New emulator/simulator and fresh independently seeded API/Postgres/Keycloak per full native campaign; bounded legal cancellation releases delivery stock. Test-only loopback fixture controller restores quantity policy; do not share or erase another campaign.",
+    "automation": ".github/workflows/independent-qa-regression-native.yml; qa/regression-d877a15/native/instrument.py and collect.py; pinned application native auth/order scripts (independently executed, assertion meaning reviewed)",
     "reviewStatus": "SELF_REVIEWED",
     "questions": "Commercial values are synthetic, O04 remains open. Applicant legal documents O06, support contacts O09; no owner approval inferred."
   }
