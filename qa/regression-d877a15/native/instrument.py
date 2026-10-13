@@ -40,7 +40,7 @@ for quantity in 9 8 7 6 5 4; do
   wait_scrolled_up 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"' 30 || fail "decrease missing during edit"
   pos=$(center_of 'resource-id="qty-dec-00000000-0000-4000-8000-00000000a0b1"')
   adb shell input tap $pos
-  wait_for "text=\"$quantity × Native Dish One[^\"]*\"" 30 >/dev/null || fail "one decrement did not reach $quantity"
+  wait_for "text=\\"$quantity × Native Dish One[^\\"]*\\"" 30 >/dev/null || fail "one decrement did not reach $quantity"
 done
 wait_for 'text="4 × Native Dish One[^\"]*"' 30 >/dev/null || fail "quantity not four"
 wait_scrolled 'resource-id="estimate"' 30 || fail "estimate control missing"

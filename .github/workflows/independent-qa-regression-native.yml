@@ -32,6 +32,8 @@ jobs:
         with:
           ref: ${{ github.sha }}
           path: iqa-controls
+      - name: Validate independent native controls before building
+        run: python3 iqa-controls/qa/regression-d877a15/native/validate-controls.py
       - name: Install pinned Node.js (checksum verified)
         run: |
           curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
@@ -106,6 +108,8 @@ jobs:
         with:
           ref: ${{ github.sha }}
           path: iqa-controls
+      - name: Validate independent native controls before building
+        run: python3 iqa-controls/qa/regression-d877a15/native/validate-controls.py
       - name: Install pinned Node.js (checksum verified)
         run: |
           curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-darwin-arm64.tar.xz"
