@@ -1925,7 +1925,7 @@
       "id": "MB-054",
       "phase": "P08",
       "title": "Privacy-safe organic activity and kitchen performance metrics (D17)",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "MB-016",
@@ -1947,9 +1947,11 @@
       "scenario_ids": [
         "TC-164"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261013-MB-054/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D17 Stage 2 at a89151f (self-review): API-110 organic activity counted once per visitor, kind, subject and Cairo day with only a per-day keyed hash stored; API-111 cook insights (activity, orders, portions, gross, paid refunds, known net; NET_IS_NOT_PROFIT); customer web events; cook Insights tab. TC-164 PASS (BACKEND-VERIFY, CONTRACT-CHECK, WORKSPACE-TESTS, BROWSER-E2E at a89151f). Real-stack browser check at 51c1c96 (test-only change): an anonymous visitor's impression, view and add-to-cart are stored. Limits in docs/product/10-organic-activity-and-cook-insights.md (native apps not instrumented, rotating bots need edge limits, retention under O06). No ranking, campaign, billing or profit figure."
     }
   ]
 }

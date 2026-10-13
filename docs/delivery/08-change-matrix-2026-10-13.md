@@ -12,7 +12,7 @@ This is a planning record, not a claim that anything is implemented. The work al
 | Stage 1: quote with deposit due, remainder, recipient, method, expiry, terms; immutable snapshot; payment state separate from order and fulfilment; no preparation before kitchen-reported receipt **and** separate acceptance | MB-051 | TC-158, TC-159, TC-160 | DONE (evidence `20261013-MB-051`) |
 | Stage 1: kitchen acknowledgement (identity, time, amount, reference, reason, audit), not-received and mismatch, disputes, refunds with a clear owner; never "bank verified" | MB-052 | TC-161, TC-162 | DONE (evidence `20261013-MB-052`) |
 | Stage 1: customer web, Android and iOS deposit checkout and honest status, with a shared contract | MB-053 | TC-163 | IN_PROGRESS: web and native screens built with component tests; native deposit phase awaits a CI run |
-| Stage 2: privacy-safe, deduplicated organic metrics; free cook reporting without profit claims; no sponsored ranking or billing | MB-054 | TC-164 | Built at `a89151f` ([product note](../product/10-organic-activity-and-cook-insights.md)); evidence run in progress |
+| Stage 2: privacy-safe, deduplicated organic metrics; free cook reporting without profit claims; no sponsored ranking or billing | MB-054 | TC-164 | DONE at `a89151f` (evidence `20261013-MB-054`, [product note](../product/10-organic-activity-and-cook-insights.md)) |
 | Stage 3–4: growth pilots, AI Concierge, automated payment verification, protection fund | none (deferred; owner go required) | none | Not planned now |
 | Live money | none | none | BLOCKED by legal/consumer, food-business and recipient-account/provider gates (D16) |
 

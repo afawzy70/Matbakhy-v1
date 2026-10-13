@@ -31,7 +31,8 @@ Implementation-agent report (self-reported, not an independent review certificat
   - **MB-051 DONE** (TC-158/159/160): deposit terms in quotes, immutable payment snapshot, payment state separate from the order, no preparation before the kitchen reports receipt.
   - **MB-052 DONE** (TC-161/162): staff-approved recipients (recent MFA), not-received and wrong-amount reports, disputes in the finance queue, refund obligation and refund report; cook and finance screens. DONE at `49a55f1` ([evidence](../../verification/runs/20261013-MB-052/evidence.json)). Follow-ups: automatic support case and customer notification for disputes and refund obligations.
   - **MB-053 IN_PROGRESS** (TC-163): web and native deposit choice, terms and honest status with component tests (mutation-checked); native deposit phase (Android and iOS) written, waiting for its CI run.
-  - MB-054 (P08) not started. Live money: not approved (D16 gates).
+  - **MB-054 DONE** (TC-164) at `a89151f`: organic activity counted once per visitor and day without identity; the cook's free Insights report (gross, paid refunds, known net, not profit); no ranking, campaign or billing ([note](../product/10-organic-activity-and-cook-insights.md), [evidence](../../verification/runs/20261013-MB-054/evidence.json)). Real-stack check: anonymous browsing activity is stored. Limits: native apps not instrumented; retention under O06.
+  - Live money: not approved (D16 gates).
   - MB-029 BLOCKED (BLK-003); MB-030 waits on MB-029.
 - **Secret scan:** the worktree history-scan correction from the morning stands. Fail-on-zero is kept. Narrow fingerprint exceptions: 20 QA-branch nonces plus 1 runbook command, each reviewed.
 - **Q1:** the commercial limit is O04; 10 is the synthetic policy only.
@@ -49,6 +50,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
+| MB-054 Privacy-safe organic activity and kitchen performance (D17) | DONE (self-review) | [run](../../verification/runs/20261013-MB-054/evidence.json) at `a89151f`: TC-164 PASS; real-stack activity check |
 | MB-053 Deposit checkout and honest status on web, Android and iOS (D16) | IN_PROGRESS | Web `6d5d2d0`, native `6611e69`, native deposit phase `49a55f1`; component tests PASS; native run pending |
 | MB-052 Kitchen acknowledgement, disputes and refunds (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-052/evidence.json) at `49a55f1`: TC-161/162 PASS; follow-ups: automatic support case and customer notification |
 | MB-051 Deposit quote, snapshot and payment states (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-051/evidence.json) at `61d8dd5` |

@@ -2324,8 +2324,10 @@
       "given": "Repeated page refreshes, a bot-like burst and two kitchens",
       "when": "Activity is recorded and the cook report is generated",
       "then": "Counts are deduplicated and per kitchen; no personal targeting data; gross sales, refunds and known net amounts are distinct; no profit claim; no sponsored result exists",
-      "status": "NOT_RUN",
-      "evidence": []
+      "status": "PASS",
+      "evidence": [
+        "verification/runs/20261013-MB-054/evidence.json"
+      ]
     }
   ]
 }
