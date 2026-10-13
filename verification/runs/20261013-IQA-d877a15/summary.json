@@ -1,0 +1,56 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "definedCases": 66,
+  "definedNativeCases": 13,
+  "concreteVariationRows": 170,
+  "executedVariations": 132,
+  "allRows": {
+    "PASS": 123,
+    "FAIL": 9,
+    "BLOCKED": 18,
+    "NOT_RUN": 20
+  },
+  "eligibleRows": {
+    "PASS": 123,
+    "FAIL": 9,
+    "BLOCKED": 18,
+    "NOT_RUN": 11
+  },
+  "byPlatform": {
+    "Android": {
+      "PASS": 11,
+      "NOT_RUN": 9,
+      "FAIL": 2,
+      "BLOCKED": 7
+    },
+    "Chromium web": {
+      "PASS": 52,
+      "FAIL": 6,
+      "BLOCKED": 1
+    },
+    "Chromium web/API/database": {
+      "PASS": 49
+    },
+    "Git/Gitleaks": {
+      "PASS": 1
+    },
+    "iOS": {
+      "PASS": 10,
+      "NOT_RUN": 8,
+      "FAIL": 1,
+      "BLOCKED": 8
+    },
+    "web": {
+      "BLOCKED": 2,
+      "NOT_RUN": 3
+    }
+  },
+  "freshFullWebGroups": {
+    "PASS": 46,
+    "FAIL": 1,
+    "BLOCKED": 0,
+    "NOT_RUN": 0
+  },
+  "freshFullWebAssertions": 395,
+  "note": "Latest full native attempt is not passed; original successful same-application campaign executions are explicitly sourced, with later tooling blockers retained. No release gate approved."
+}

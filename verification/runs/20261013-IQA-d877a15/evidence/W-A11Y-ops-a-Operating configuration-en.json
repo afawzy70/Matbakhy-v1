@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 320,
+  "scrollWidth": 320,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nOperating configuration\nStaff permissions\n\nChanges apply to new quotes only: a quote not yet placed is refused and must be recalculated; placed orders keep their values.\n\nCurrent pricing policy v1\n\nSYNTHETIC development policy (not for live use) · Synthetic policy (local only)\n\ntax 0% · commission 10% · synthetic-terms-v1 · synthetic-cancel-v1\n\nAccept new orders: ✓\nReason for change \nPause\nService zones and delivery fees\nTest zone A · EGP 30.00\nDelivery fee (EGP) \n Active\nReason for change \nSave\nTest zone B · EGP 45.00\nDelivery fee (EGP) \n Active\nReason for change \nSave\nTest zone (inactive) · EGP 30.00\nDelivery fee (EGP) \n Active\nReason for change \nSave\nChange log\nAPI: http://localhost:39080",
+  "cart": null,
+  "pending": false
+}

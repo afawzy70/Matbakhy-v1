@@ -1,0 +1,379 @@
+[
+  {
+    "role": "customer-a",
+    "route": "/",
+    "width": 1440,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "customer-a",
+    "route": "/",
+    "width": 1440,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "customer-a",
+    "route": "/",
+    "width": 390,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "customer-a",
+    "route": "/",
+    "width": 390,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "customer-a",
+    "route": "/",
+    "width": 320,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "customer-a",
+    "route": "/",
+    "width": 320,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "customer-a",
+    "route": "/meal/00000000-0000-0000-0000-000000000264",
+    "width": 1440,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious"
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/meal/00000000-0000-0000-0000-000000000264",
+    "width": 1440,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious"
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/meal/00000000-0000-0000-0000-000000000264",
+    "width": 390,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious"
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/meal/00000000-0000-0000-0000-000000000264",
+    "width": 390,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious"
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/meal/00000000-0000-0000-0000-000000000264",
+    "width": 320,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious"
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/meal/00000000-0000-0000-0000-000000000264",
+    "width": 320,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "aria-prohibited-attr",
+        "impact": "serious"
+      },
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/checkout",
+    "width": 1440,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/checkout",
+    "width": 1440,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/checkout",
+    "width": 390,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/checkout",
+    "width": 390,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/checkout",
+    "width": 320,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "customer-a",
+    "route": "/checkout",
+    "width": 320,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "link-in-text-block",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "cook-a",
+    "route": "Statement",
+    "width": 1440,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "cook-a",
+    "route": "Statement",
+    "width": 1440,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "cook-a",
+    "route": "Statement",
+    "width": 390,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "cook-a",
+    "route": "Statement",
+    "width": 390,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "cook-a",
+    "route": "Statement",
+    "width": 320,
+    "lang": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "impact": "serious"
+      }
+    ]
+  },
+  {
+    "role": "cook-a",
+    "route": "Statement",
+    "width": 320,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "support-a",
+    "route": "Support",
+    "width": 1440,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "support-a",
+    "route": "Support",
+    "width": 1440,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "support-a",
+    "route": "Support",
+    "width": 390,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "support-a",
+    "route": "Support",
+    "width": 390,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "support-a",
+    "route": "Support",
+    "width": 320,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "support-a",
+    "route": "Support",
+    "width": 320,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "ops-a",
+    "route": "Operating configuration",
+    "width": 1440,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "ops-a",
+    "route": "Operating configuration",
+    "width": 1440,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "ops-a",
+    "route": "Operating configuration",
+    "width": 390,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "ops-a",
+    "route": "Operating configuration",
+    "width": 390,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "ops-a",
+    "route": "Operating configuration",
+    "width": 320,
+    "lang": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "role": "ops-a",
+    "route": "Operating configuration",
+    "width": 320,
+    "lang": "ar",
+    "violations": [],
+    "incomplete": []
+  }
+]

@@ -1,0 +1,3434 @@
+[
+  {
+    "case": "C-AUTH",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-AUTH",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "C-AUTH",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "C-AUTH",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "C-AUTH",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 401 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-AUTH",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-DRAFT-CLOSE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-STALE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 409 ()"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "C-RECOVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 422 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELIVERY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-ONBOARD",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-A11Y",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CAPACITY-STALE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 409 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-MODERATE",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-AFTER-ACCEPT",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SETTINGS",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-FINANCE-SYNTHETIC-FINAL",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-SUPPORT-RESOLVE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "S-SECURITY-REVOKED",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-HISTORY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "P-LOST-PRICE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "P-LOST-PRICE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "P-LOST-PRICE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "P-LOST-PRICE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "P-LOST-PRICE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "P-LOST-PRICE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "ops-review",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "M-LOG-AUDIT",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-FILTER",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-CONCURRENCY",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "W-MONEY-REFLOW",
+    "role": "finance-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "S-PERMISSION-UI",
+    "role": "support-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-PERMANENT-REPLAY",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-PROFILE",
+    "role": "customer-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-INBOX-SHARE-REORDER",
+    "role": "cook-a",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  },
+  {
+    "case": "C-DELETION-INTAKE",
+    "role": "customer-b",
+    "type": "error",
+    "text": "Failed to load resource: the server responded with a status of 403 ()"
+  }
+]

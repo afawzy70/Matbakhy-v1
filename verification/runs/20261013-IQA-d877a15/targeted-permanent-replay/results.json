@@ -1,0 +1,229 @@
+{
+  "runType": "TARGETED",
+  "data": [
+    {
+      "id": "C-PERMANENT-REPLAY",
+      "actor": "Customer-a authenticated API/database",
+      "requirement": "BR-023/TC-023; fresh-key replay after real expiry",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "9043d8ad12ea49e633f47c82ac94a582154c718a",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T08:39:56.458Z",
+      "checks": [
+        {
+          "name": "Actual expired quote and owned cancelled order established",
+          "status": "PASS",
+          "expected": "owned; expired; CANCELLED",
+          "actual": {
+            "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+            "expired": true,
+            "state": "CANCELLED"
+          }
+        },
+        {
+          "name": "Fresh-key and repeated replay return identical existing immutable order",
+          "status": "PASS",
+          "expected": {
+            "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+            "totalMinor": 15025,
+            "feeMinor": 3000,
+            "status": 201
+          },
+          "actual": {
+            "first": {
+              "status": 201,
+              "data": {
+                "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+                "publicNumber": "MB-100008",
+                "version": 1,
+                "state": "CANCELLED",
+                "fulfillmentMode": "DELIVERY",
+                "items": [
+                  {
+                    "mealId": "00000000-0000-0000-0000-000000000263",
+                    "title": "QA Meal A1",
+                    "allergenStatement": "UNKNOWN",
+                    "quantity": 1,
+                    "unitPrice": {
+                      "amountMinor": 12025,
+                      "currency": "EGP"
+                    },
+                    "lineTotal": {
+                      "amountMinor": 12025,
+                      "currency": "EGP"
+                    }
+                  }
+                ],
+                "subtotal": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "deliveryFee": {
+                  "amountMinor": 3000,
+                  "currency": "EGP"
+                },
+                "tax": {
+                  "amountMinor": 0,
+                  "currency": "EGP"
+                },
+                "total": {
+                  "amountMinor": 15025,
+                  "currency": "EGP"
+                },
+                "slot": {
+                  "id": "00000000-0000-0000-0000-00000000019f",
+                  "startsAt": "2026-10-19T08:05:14.215162Z",
+                  "endsAt": "2026-10-19T10:05:14.215162Z",
+                  "timezone": "Africa/Cairo",
+                  "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                  "availablePortions": 49,
+                  "fulfillmentModes": [
+                    "DELIVERY"
+                  ]
+                },
+                "acceptBy": "2026-10-13T08:24:02.097955Z",
+                "events": [
+                  {
+                    "sequence": 1,
+                    "fromState": null,
+                    "toState": "PENDING_ACCEPTANCE",
+                    "occurredAt": "2026-10-13T08:09:02.104054Z",
+                    "actorType": "CUSTOMER",
+                    "reasonCode": null
+                  },
+                  {
+                    "sequence": 2,
+                    "fromState": "PENDING_ACCEPTANCE",
+                    "toState": "CANCELLED",
+                    "occurredAt": "2026-10-13T08:09:03.916769Z",
+                    "actorType": "CUSTOMER",
+                    "reasonCode": "CHANGED_MIND"
+                  }
+                ],
+                "allowedActions": [],
+                "cashState": "NOT_DUE",
+                "supportCaseIds": [],
+                "handoverCode": null,
+                "contact": null
+              }
+            },
+            "second": {
+              "status": 201,
+              "data": {
+                "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+                "publicNumber": "MB-100008",
+                "version": 1,
+                "state": "CANCELLED",
+                "fulfillmentMode": "DELIVERY",
+                "items": [
+                  {
+                    "mealId": "00000000-0000-0000-0000-000000000263",
+                    "title": "QA Meal A1",
+                    "allergenStatement": "UNKNOWN",
+                    "quantity": 1,
+                    "unitPrice": {
+                      "amountMinor": 12025,
+                      "currency": "EGP"
+                    },
+                    "lineTotal": {
+                      "amountMinor": 12025,
+                      "currency": "EGP"
+                    }
+                  }
+                ],
+                "subtotal": {
+                  "amountMinor": 12025,
+                  "currency": "EGP"
+                },
+                "deliveryFee": {
+                  "amountMinor": 3000,
+                  "currency": "EGP"
+                },
+                "tax": {
+                  "amountMinor": 0,
+                  "currency": "EGP"
+                },
+                "total": {
+                  "amountMinor": 15025,
+                  "currency": "EGP"
+                },
+                "slot": {
+                  "id": "00000000-0000-0000-0000-00000000019f",
+                  "startsAt": "2026-10-19T08:05:14.215162Z",
+                  "endsAt": "2026-10-19T10:05:14.215162Z",
+                  "timezone": "Africa/Cairo",
+                  "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                  "availablePortions": 49,
+                  "fulfillmentModes": [
+                    "DELIVERY"
+                  ]
+                },
+                "acceptBy": "2026-10-13T08:24:02.097955Z",
+                "events": [
+                  {
+                    "sequence": 1,
+                    "fromState": null,
+                    "toState": "PENDING_ACCEPTANCE",
+                    "occurredAt": "2026-10-13T08:09:02.104054Z",
+                    "actorType": "CUSTOMER",
+                    "reasonCode": null
+                  },
+                  {
+                    "sequence": 2,
+                    "fromState": "PENDING_ACCEPTANCE",
+                    "toState": "CANCELLED",
+                    "occurredAt": "2026-10-13T08:09:03.916769Z",
+                    "actorType": "CUSTOMER",
+                    "reasonCode": "CHANGED_MIND"
+                  }
+                ],
+                "allowedActions": [],
+                "cashState": "NOT_DUE",
+                "supportCaseIds": [],
+                "handoverCode": null,
+                "contact": null
+              }
+            }
+          }
+        },
+        {
+          "name": "Replay does not undo cancellation or duplicate any business effect",
+          "status": "PASS",
+          "expected": "same cancelled order and counts; no reservation",
+          "actual": {
+            "before": {
+              "orders": 1,
+              "allocations": 1,
+              "reserved": 0,
+              "cash": 1,
+              "placed": 1,
+              "events": 2
+            },
+            "after": {
+              "orders": 1,
+              "allocations": 1,
+              "reserved": 0,
+              "cash": 1,
+              "placed": 1,
+              "events": 2
+            }
+          }
+        }
+      ],
+      "evidence": [],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T08:39:59.093Z",
+      "variations": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "application": {
+    "id": "2b7d00a2-7ed0-4902-ae5b-d13332181c12",
+    "state": "SUBMITTED",
+    "draft": {
+      "publicName": "QA Applicant Kitchen",
+      "bio": "Independent synthetic kitchen application.",
+      "contactPhone": "[REDACTED]",
+      "privateLocation": "[REDACTED]",
+      "pickupEnabled": true,
+      "zoneIds": [
+        "00000000-0000-4000-8000-00000000a001"
+      ],
+      "documentIds": []
+    },
+    "currentRevision": 1,
+    "history": [
+      {
+        "revision": 1,
+        "submittedAt": "2026-10-13T10:39:01.319016Z",
+        "decision": null,
+        "decisionReason": null,
+        "decidedAt": null
+      }
+    ],
+    "version": 1
+  },
+  "approval": {
+    "id": "2b7d00a2-7ed0-4902-ae5b-d13332181c12",
+    "applicantId": "00000000-0000-0000-0000-0000000002be",
+    "state": "APPROVED",
+    "currentRevision": 1,
+    "revisions": [
+      {
+        "revision": 1,
+        "publicName": "QA Applicant Kitchen",
+        "bio": "Independent synthetic kitchen application.",
+        "contactPhone": "[REDACTED]",
+        "privateLocation": "[REDACTED]",
+        "pickupEnabled": true,
+        "zoneIds": [
+          "00000000-0000-4000-8000-00000000a001"
+        ],
+        "documentIds": [],
+        "submittedAt": "2026-10-13T10:39:01.319016Z",
+        "decision": "APPROVED",
+        "decisionReason": "Approved only synthetic QA application",
+        "reviewerId": "00000000-0000-0000-0000-0000000002c3",
+        "decidedAt": "2026-10-13T10:39:02.121459Z"
+      }
+    ],
+    "kitchenId": "f848ab3d-49d0-4232-a87f-edef046d94c9",
+    "version": 3,
+    "kitchen": {
+      "kitchenId": "f848ab3d-49d0-4232-a87f-edef046d94c9",
+      "ownerId": "00000000-0000-0000-0000-0000000002be",
+      "publicSlug": "kitchen-22c22543fb",
+      "displayName": "QA Applicant Kitchen",
+      "operatingState": "ACTIVE",
+      "stateReason": null,
+      "approvedRevision": 1,
+      "version": 0,
+      "activeOrders": {
+        "PENDING_ACCEPTANCE": 0,
+        "ACCEPTED": 0,
+        "PREPARING": 0,
+        "READY": 0,
+        "OUT_FOR_DELIVERY": 0
+      }
+    }
+  }
+}

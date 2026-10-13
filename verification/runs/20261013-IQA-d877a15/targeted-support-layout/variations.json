@@ -1,0 +1,74 @@
+[
+  {
+    "caseId": "S-SUPPORT",
+    "variation": "closed-thread/320/en",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "7bc2869a0fd37f2b32ace849fab0a69077824554",
+    "observedAt": "2026-10-13T08:28:43.644Z",
+    "locale": "en",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "S-SUPPORT-320-en-closed.png",
+      "S-SUPPORT-320-en-closed.json"
+    ]
+  },
+  {
+    "caseId": "S-SUPPORT",
+    "variation": "closed-thread/320/ar",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "7bc2869a0fd37f2b32ace849fab0a69077824554",
+    "observedAt": "2026-10-13T08:28:43.791Z",
+    "locale": "ar",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "S-SUPPORT-320-ar-closed.png",
+      "S-SUPPORT-320-ar-closed.json"
+    ]
+  },
+  {
+    "caseId": "S-SUPPORT",
+    "variation": "closed-thread/390/en",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "7bc2869a0fd37f2b32ace849fab0a69077824554",
+    "observedAt": "2026-10-13T08:28:43.942Z",
+    "locale": "en",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "S-SUPPORT-390-en-closed.png",
+      "S-SUPPORT-390-en-closed.json"
+    ]
+  },
+  {
+    "caseId": "S-SUPPORT",
+    "variation": "closed-thread/390/ar",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "7bc2869a0fd37f2b32ace849fab0a69077824554",
+    "observedAt": "2026-10-13T08:28:44.040Z",
+    "locale": "ar",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "S-SUPPORT-390-ar-closed.png",
+      "S-SUPPORT-390-ar-closed.json"
+    ]
+  }
+]

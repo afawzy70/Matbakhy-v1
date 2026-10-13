@@ -1,0 +1,35 @@
+{
+  "runType": "TARGETED",
+  "data": [
+    {
+      "case": "C-AUTH",
+      "role": "customer-a",
+      "type": "error",
+      "text": "Failed to load resource: net::ERR_CONNECTION_FAILED"
+    },
+    {
+      "case": "C-AUTH",
+      "role": "customer-a",
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "case": "C-AUTH",
+      "role": "customer-a",
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "case": "C-AUTH",
+      "role": "customer-a",
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()"
+    },
+    {
+      "case": "C-AUTH",
+      "role": "customer-a",
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 401 ()"
+    }
+  ]
+}

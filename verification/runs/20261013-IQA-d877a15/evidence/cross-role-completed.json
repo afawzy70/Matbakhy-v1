@@ -1,0 +1,113 @@
+{
+  "order": {
+    "id": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+    "publicNumber": "MB-100002",
+    "version": 4,
+    "state": "COMPLETED",
+    "fulfillmentMode": "PICKUP",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "allergenStatement": "UNKNOWN",
+        "quantity": 2,
+        "unitPrice": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 24050,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 24050,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 24050,
+      "currency": "EGP"
+    },
+    "slot": {
+      "id": "f9614def-ecce-4fe6-b612-34136e8c097f",
+      "startsAt": "2026-10-21T10:00:00Z",
+      "endsAt": "2026-10-21T12:00:00Z",
+      "timezone": "Africa/Cairo",
+      "cutoffAt": "2026-10-21T08:00:00Z",
+      "availablePortions": 6,
+      "fulfillmentModes": [
+        "PICKUP"
+      ]
+    },
+    "acceptBy": "2026-10-13T10:53:10.489988Z",
+    "events": [
+      {
+        "sequence": 1,
+        "fromState": null,
+        "toState": "PENDING_ACCEPTANCE",
+        "occurredAt": "2026-10-13T10:38:10.497384Z",
+        "actorType": "CUSTOMER",
+        "reasonCode": null
+      },
+      {
+        "sequence": 2,
+        "fromState": "PENDING_ACCEPTANCE",
+        "toState": "ACCEPTED",
+        "occurredAt": "2026-10-13T10:38:12.896805Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 3,
+        "fromState": "ACCEPTED",
+        "toState": "PREPARING",
+        "occurredAt": "2026-10-13T10:38:22.712718Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 4,
+        "fromState": "PREPARING",
+        "toState": "READY",
+        "occurredAt": "2026-10-13T10:38:22.829837Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 5,
+        "fromState": "READY",
+        "toState": "COMPLETED",
+        "occurredAt": "2026-10-13T10:38:23.102259Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      }
+    ],
+    "allowedActions": [],
+    "cashState": "DUE",
+    "supportCaseIds": [],
+    "handoverCode": null,
+    "contact": null
+  },
+  "counters": {
+    "slot": {
+      "reserved": 0,
+      "allocated": 0,
+      "consumed": 2
+    },
+    "meal": {
+      "reserved": 0,
+      "allocated": 0,
+      "consumed": 2
+    },
+    "events": 5
+  }
+}

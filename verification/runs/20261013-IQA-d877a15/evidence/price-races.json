@@ -1,0 +1,168 @@
+{
+  "updateFirst": {
+    "updated": {
+      "status": 200,
+      "data": {
+        "id": "00000000-0000-0000-0000-000000000264",
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "status": "PUBLISHED",
+        "content": {
+          "titleAr": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+          "titleEn": "QA Meal A2",
+          "descriptionAr": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+          "descriptionEn": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. ",
+          "portionAr": "حصة تجريبية",
+          "portionEn": "Synthetic portion",
+          "ingredientsAr": "أرز تجريبي",
+          "ingredientsEn": "Synthetic rice",
+          "allergenDeclaration": "UNKNOWN",
+          "allergenCodes": [],
+          "allergenNote": null,
+          "priceMinor": 9650,
+          "currency": "EGP",
+          "photos": [
+            {
+              "mediaId": "00000000-0000-0000-0000-0000000001f5",
+              "altAr": "صورة تجريبية",
+              "altEn": "Synthetic solid colour"
+            }
+          ],
+          "category": "MAIN_DISHES"
+        },
+        "revision": 2,
+        "publishedAt": "2026-10-13T10:37:12.682171Z",
+        "archivedAt": null,
+        "updatedAt": "2026-10-13T10:40:34.002717Z",
+        "version": 3,
+        "moderationState": "VISIBLE",
+        "moderationReason": null
+      }
+    },
+    "stale": {
+      "status": 409,
+      "data": {
+        "code": "PRICE_CHANGED",
+        "messageKey": "error.price_changed",
+        "fieldErrors": [
+          {
+            "field": "quoteId",
+            "code": "MEAL_CHANGED"
+          }
+        ],
+        "requestId": "ea2110b1-d39d-4b26-ba21-d5a242ef2d59",
+        "retryable": false
+      }
+    }
+  },
+  "placementFirst": {
+    "created": {
+      "status": 201,
+      "data": {
+        "id": "c479a203-c4df-4f1e-a2db-c70317bd0e5b",
+        "publicNumber": "MB-100007",
+        "version": 0,
+        "state": "PENDING_ACCEPTANCE",
+        "fulfillmentMode": "PICKUP",
+        "items": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000264",
+            "title": "QA Meal A2",
+            "allergenStatement": "UNKNOWN",
+            "quantity": 1,
+            "unitPrice": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            },
+            "lineTotal": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "subtotal": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "deliveryFee": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "tax": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "total": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "slot": {
+          "id": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-19T10:37:12.682171Z",
+          "endsAt": "2026-10-19T12:37:12.682171Z",
+          "timezone": "Africa/Cairo",
+          "cutoffAt": "2026-10-19T08:37:12.682171Z",
+          "availablePortions": 48,
+          "fulfillmentModes": [
+            "PICKUP"
+          ]
+        },
+        "acceptBy": "2026-10-13T10:55:37.468851Z",
+        "events": [
+          {
+            "sequence": 1,
+            "fromState": null,
+            "toState": "PENDING_ACCEPTANCE",
+            "occurredAt": "2026-10-13T10:40:38.807995Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": null
+          }
+        ],
+        "allowedActions": [
+          "CANCEL"
+        ],
+        "cashState": "DUE",
+        "supportCaseIds": [],
+        "handoverCode": null,
+        "contact": null
+      }
+    },
+    "changed": {
+      "status": 200,
+      "data": {
+        "id": "00000000-0000-0000-0000-000000000264",
+        "kitchenId": "00000000-0000-0000-0000-00000000012d",
+        "status": "PUBLISHED",
+        "content": {
+          "titleAr": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+          "titleEn": "QA Meal A2",
+          "descriptionAr": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+          "descriptionEn": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. ",
+          "portionAr": "حصة تجريبية",
+          "portionEn": "Synthetic portion",
+          "ingredientsAr": "أرز تجريبي",
+          "ingredientsEn": "Synthetic rice",
+          "allergenDeclaration": "UNKNOWN",
+          "allergenCodes": [],
+          "allergenNote": null,
+          "priceMinor": 9750,
+          "currency": "EGP",
+          "photos": [
+            {
+              "mediaId": "00000000-0000-0000-0000-0000000001f5",
+              "altAr": "صورة تجريبية",
+              "altEn": "Synthetic solid colour"
+            }
+          ],
+          "category": "MAIN_DISHES"
+        },
+        "revision": 4,
+        "publishedAt": "2026-10-13T10:37:12.682171Z",
+        "archivedAt": null,
+        "updatedAt": "2026-10-13T10:40:38.837145Z",
+        "version": 5,
+        "moderationState": "VISIBLE",
+        "moderationReason": null
+      }
+    }
+  }
+}

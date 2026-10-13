@@ -1,0 +1,209 @@
+{
+  "kitchens": {
+    "A": {
+      "id": "00000000-0000-0000-0000-00000000012d",
+      "slug": "qa-kitchen-a",
+      "name": "مطبخ تجريبي A"
+    },
+    "B": {
+      "id": "00000000-0000-0000-0000-00000000012e",
+      "slug": "qa-kitchen-b",
+      "name": "مطبخ تجريبي B"
+    },
+    "PAUSED": {
+      "id": "00000000-0000-0000-0000-00000000012f",
+      "slug": "qa-kitchen-paused",
+      "name": "مطبخ تجريبي PAUSED"
+    }
+  },
+  "meals": {
+    "A1": {
+      "id": "00000000-0000-0000-0000-000000000263",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "titleAr": "وجبة تجريبية A1",
+      "titleEn": "QA Meal A1",
+      "descriptionAr": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+      "descriptionEn": "Independent synthetic description for meal A1. ",
+      "priceMinor": 12025,
+      "capacity": 25
+    },
+    "A2": {
+      "id": "00000000-0000-0000-0000-000000000264",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "titleAr": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+      "titleEn": "QA Meal A2",
+      "descriptionAr": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+      "descriptionEn": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. ",
+      "priceMinor": 9550,
+      "capacity": 25
+    },
+    "A3": {
+      "id": "00000000-0000-0000-0000-000000000265",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "titleAr": "وجبة تجريبية A3",
+      "titleEn": "QA Meal A3",
+      "descriptionAr": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+      "descriptionEn": "Independent synthetic description for meal A3. ",
+      "priceMinor": 8025,
+      "capacity": 0
+    },
+    "B1": {
+      "id": "00000000-0000-0000-0000-00000000026d",
+      "kitchenId": "00000000-0000-0000-0000-00000000012e",
+      "titleAr": "وجبة تجريبية B1",
+      "titleEn": "QA Meal B1",
+      "descriptionAr": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+      "descriptionEn": "Independent synthetic description for meal B1. ",
+      "priceMinor": 8025,
+      "capacity": 25
+    },
+    "PAUSED1": {
+      "id": "00000000-0000-0000-0000-000000000277",
+      "kitchenId": "00000000-0000-0000-0000-00000000012f",
+      "titleAr": "وجبة تجريبية PAUSED1",
+      "titleEn": "QA Meal PAUSED1",
+      "descriptionAr": "وصف مستقل للوجبة PAUSED1 بمكونات تجريبية فقط. ",
+      "descriptionEn": "Independent synthetic description for meal PAUSED1. ",
+      "priceMinor": 8025,
+      "capacity": 25
+    }
+  },
+  "slots": {
+    "A1": {
+      "id": "00000000-0000-0000-0000-00000000019b",
+      "state": "OPEN",
+      "daysFromSeed": 3
+    },
+    "A2": {
+      "id": "00000000-0000-0000-0000-00000000019c",
+      "state": "OPEN",
+      "daysFromSeed": 4
+    },
+    "A3": {
+      "id": "00000000-0000-0000-0000-00000000019d",
+      "state": "CLOSED",
+      "daysFromSeed": 5
+    },
+    "A4": {
+      "id": "00000000-0000-0000-0000-00000000019e",
+      "state": "OPEN",
+      "daysFromSeed": -3
+    },
+    "A5": {
+      "id": "00000000-0000-0000-0000-00000000019f",
+      "state": "OPEN",
+      "daysFromSeed": 6
+    },
+    "B1": {
+      "id": "00000000-0000-0000-0000-0000000001a5",
+      "state": "OPEN",
+      "daysFromSeed": 3
+    },
+    "B2": {
+      "id": "00000000-0000-0000-0000-0000000001a6",
+      "state": "OPEN",
+      "daysFromSeed": 4
+    },
+    "B3": {
+      "id": "00000000-0000-0000-0000-0000000001a7",
+      "state": "CLOSED",
+      "daysFromSeed": 5
+    },
+    "B4": {
+      "id": "00000000-0000-0000-0000-0000000001a8",
+      "state": "OPEN",
+      "daysFromSeed": -3
+    },
+    "B5": {
+      "id": "00000000-0000-0000-0000-0000000001a9",
+      "state": "OPEN",
+      "daysFromSeed": 6
+    },
+    "PAUSED1": {
+      "id": "00000000-0000-0000-0000-0000000001af",
+      "state": "OPEN",
+      "daysFromSeed": 3
+    },
+    "PAUSED2": {
+      "id": "00000000-0000-0000-0000-0000000001b0",
+      "state": "OPEN",
+      "daysFromSeed": 4
+    },
+    "PAUSED3": {
+      "id": "00000000-0000-0000-0000-0000000001b1",
+      "state": "CLOSED",
+      "daysFromSeed": 5
+    },
+    "PAUSED4": {
+      "id": "00000000-0000-0000-0000-0000000001b2",
+      "state": "OPEN",
+      "daysFromSeed": -3
+    },
+    "PAUSED5": {
+      "id": "00000000-0000-0000-0000-0000000001b3",
+      "state": "OPEN",
+      "daysFromSeed": 6
+    }
+  },
+  "actors": {
+    "customer-a": "00000000-0000-0000-0000-0000000002bd",
+    "customer-b": "00000000-0000-0000-0000-0000000002be",
+    "cook-a": "00000000-0000-0000-0000-0000000002bf",
+    "cook-b": "00000000-0000-0000-0000-0000000002c0",
+    "cook-new": "00000000-0000-0000-0000-0000000002c1",
+    "ops-a": "00000000-0000-0000-0000-0000000002c2",
+    "ops-review": "00000000-0000-0000-0000-0000000002c3",
+    "support-a": "00000000-0000-0000-0000-0000000002c4",
+    "finance-a": "00000000-0000-0000-0000-0000000002c5",
+    "finance-b": "00000000-0000-0000-0000-0000000002c6",
+    "config-a": "00000000-0000-0000-0000-0000000002c7"
+  },
+  "subjects": {
+    "customer-a": "00000000-0000-4000-8000-0000000000a1",
+    "customer-b": "00000000-0000-4000-8000-0000000000b1",
+    "cook-a": "00000000-0000-4000-8000-0000000000c1",
+    "cook-b": "00000000-0000-4000-8000-0000000002c0",
+    "cook-new": "00000000-0000-4000-8000-0000000002c1",
+    "ops-a": "00000000-0000-4000-8000-0000000000d2",
+    "ops-review": "00000000-0000-4000-8000-0000000002c3",
+    "support-a": "00000000-0000-4000-8000-0000000002c4",
+    "finance-a": "00000000-0000-4000-8000-0000000002c5",
+    "finance-b": "00000000-0000-4000-8000-0000000002c6",
+    "config-a": "00000000-0000-4000-8000-0000000002c7"
+  },
+  "initialPermissions": {
+    "ops-a": [
+      "staff.grant",
+      "audit.read",
+      "config.read",
+      "config.write"
+    ],
+    "ops-review": [
+      "cook.review",
+      "content.moderate",
+      "order.ops",
+      "order.exception_cancel",
+      "order.handover_override"
+    ],
+    "support-a": [
+      "support.case"
+    ],
+    "finance-a": [
+      "finance.read",
+      "finance.verify",
+      "finance.refund_approve",
+      "finance.settlement"
+    ],
+    "finance-b": [
+      "finance.read",
+      "finance.verify",
+      "finance.refund_approve",
+      "finance.settlement"
+    ],
+    "config-a": [
+      "config.read",
+      "config.write",
+      "integration.ops"
+    ]
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "platform": "ios",
+  "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "execution": "real emulator/simulator; existing native UI harness invoked independently and assertions reviewed",
+  "checks": [
+    {
+      "name": "Exactly one recovered pickup and one later delivery order",
+      "expected": [
+        1,
+        1
+      ],
+      "actual": [
+        1,
+        1
+      ],
+      "status": "PASS"
+    },
+    {
+      "name": "Stored pickup and delivery totals",
+      "expected": [
+        9000,
+        63000
+      ],
+      "actual": [
+        9000,
+        63000
+      ],
+      "status": "PASS"
+    }
+  ],
+  "artifact": {
+    "bundleId": "com.matbakhy.customer.dev",
+    "version": "0.1.0",
+    "sha256": "cb1ec249bf88cba149757acaf92fd499b52ccd54d2cea0c77edad6fe763b32f3",
+    "signing": "ad-hoc simulator; no team/store certificate"
+  },
+  "device": [
+    {
+      "kind": "simulator",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-2",
+      "name": "iPhone 16e"
+    }
+  ],
+  "accountScreenshotPreserved": false,
+  "database": {
+    "orders": [
+      {
+        "id": "52a3e5ed-1c21-4727-adf7-5f3c4282fdf9",
+        "publicNumber": "MB-100002",
+        "customerId": "a53b2e06-3474-4a19-ae63-2ed290e972f4",
+        "state": "CANCELLED",
+        "totalMinor": 63000,
+        "slotId": "00000000-0000-4000-8000-00000000a051",
+        "kitchenId": "00000000-0000-4000-8000-00000000a0d1",
+        "items": [
+          {
+            "mealId": "00000000-0000-4000-8000-00000000a0b1",
+            "quantity": 5,
+            "unitPriceMinor": 12000
+          }
+        ]
+      },
+      {
+        "id": "2bab11df-904f-4ab8-99c0-6bbed4c1ab2b",
+        "publicNumber": "MB-100001",
+        "customerId": "a53b2e06-3474-4a19-ae63-2ed290e972f4",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 9000,
+        "slotId": "00000000-0000-4000-8000-00000000a052",
+        "kitchenId": "00000000-0000-4000-8000-00000000a0d2",
+        "items": [
+          {
+            "mealId": "00000000-0000-4000-8000-00000000a0b2",
+            "quantity": 1,
+            "unitPriceMinor": 9000
+          }
+        ]
+      }
+    ],
+    "slotCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a052",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ],
+    "mealCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a062",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ]
+  },
+  "trustInvariants": {
+    "ownCases": [
+      {
+        "reference": "CS-1AD6CB80",
+        "orderId": "52a3e5ed-1c21-4727-adf7-5f3c4282fdf9",
+        "state": "OPEN",
+        "category": "QUALITY"
+      },
+      {
+        "reference": "CS-DA877001",
+        "orderId": "2bab11df-904f-4ab8-99c0-6bbed4c1ab2b",
+        "state": "OPEN",
+        "category": "QUALITY"
+      }
+    ],
+    "publicFixtureMessages": 1,
+    "cancelledDeliveryAllocations": 1,
+    "cancelledDeliveryEvents": 1
+  },
+  "deliveryFinalState": "CANCELLED"
+}

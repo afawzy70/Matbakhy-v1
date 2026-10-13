@@ -1,0 +1,76 @@
+{
+  "case": {
+    "id": "9b794b9d-7eff-4a5c-9d1d-dbc34790e2fd",
+    "reference": "CS-4AD96E0C",
+    "orderId": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+    "orderNumber": "MB-100002",
+    "customerId": "00000000-0000-0000-0000-0000000002bd",
+    "category": "QUALITY",
+    "severity": "NORMAL",
+    "state": "CLOSED",
+    "description": "Independent synthetic QA support thread check.",
+    "cancellationReason": null,
+    "assigneeId": "00000000-0000-0000-0000-0000000002c4",
+    "slaDueAt": "2026-10-14T10:38:30.546131Z",
+    "overdue": false,
+    "firstResponseAt": "2026-10-13T10:38:31.635999Z",
+    "escalatedAt": null,
+    "resolutionCode": "INFORMATION_PROVIDED",
+    "resolvedAt": "2026-10-13T10:40:02.924904Z",
+    "createdAt": "2026-10-13T10:38:30.546131Z",
+    "updatedAt": "2026-10-13T10:40:03.102622Z",
+    "messages": [
+      {
+        "id": "d775d151-1631-415b-812f-9d1935d9c080",
+        "authorRole": "STAFF",
+        "visibility": "STAFF_ONLY",
+        "body": "QA PRIVATE NOTE NEVER FOR CUSTOMER",
+        "createdAt": "2026-10-13T10:38:31.405194Z"
+      },
+      {
+        "id": "a8bcd963-2fcf-4902-9f25-04d7503ed4ac",
+        "authorRole": "STAFF",
+        "visibility": "PUBLIC",
+        "body": "QA PUBLIC REPLY FOR CUSTOMER",
+        "createdAt": "2026-10-13T10:38:31.631941Z"
+      },
+      {
+        "id": "bd2754c7-ba0a-4bfe-aba9-77d184335c12",
+        "authorRole": "CUSTOMER",
+        "visibility": "PUBLIC",
+        "body": "QA CUSTOMER PUBLIC REPLY",
+        "createdAt": "2026-10-13T10:38:32.815080Z"
+      }
+    ],
+    "version": 6
+  },
+  "customerBeforeClosure": {
+    "id": "9b794b9d-7eff-4a5c-9d1d-dbc34790e2fd",
+    "reference": "CS-4AD96E0C",
+    "orderId": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+    "orderNumber": "MB-100002",
+    "category": "QUALITY",
+    "state": "RESOLVED",
+    "description": "Independent synthetic QA support thread check.",
+    "resolutionCode": "INFORMATION_PROVIDED",
+    "createdAt": "2026-10-13T10:38:30.546131Z",
+    "updatedAt": "2026-10-13T10:40:02.924904Z",
+    "messages": [
+      {
+        "id": "a8bcd963-2fcf-4902-9f25-04d7503ed4ac",
+        "authorRole": "STAFF",
+        "visibility": "PUBLIC",
+        "body": "QA PUBLIC REPLY FOR CUSTOMER",
+        "createdAt": "2026-10-13T10:38:31.631941Z"
+      },
+      {
+        "id": "bd2754c7-ba0a-4bfe-aba9-77d184335c12",
+        "authorRole": "CUSTOMER",
+        "visibility": "PUBLIC",
+        "body": "QA CUSTOMER PUBLIC REPLY",
+        "createdAt": "2026-10-13T10:38:32.815080Z"
+      }
+    ],
+    "version": 5
+  }
+}

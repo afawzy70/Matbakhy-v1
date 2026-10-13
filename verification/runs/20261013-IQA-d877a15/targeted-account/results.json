@@ -1,0 +1,251 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "C-PROFILE",
+      "actor": "Customer-a/b real web and API",
+      "requirement": "BR-001/005; API-010/016; TC-005/128",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "100a3f0fcd1a3e9af8a83be54f0d1f9f16889047",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T10:31:57.728Z",
+      "checks": [
+        {
+          "name": "UI saves own profile and preferred message language with version increment",
+          "status": "PASS",
+          "expected": "saved own name/ar and increased version",
+          "actual": {
+            "status": 200,
+            "after": {
+              "id": "00000000-0000-0000-0000-0000000002bd",
+              "displayName": "QA customer-a independently updated",
+              "locale": "ar",
+              "emailVerified": true,
+              "phoneVerified": "[REDACTED]",
+              "version": 1,
+              "capabilities": [
+                "BROWSE",
+                "ORDER"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Profile survives refresh and does not alter B",
+          "status": "PASS",
+          "expected": true,
+          "actual": true
+        },
+        {
+          "name": "Stale expectedVersion cannot overwrite persisted profile",
+          "status": "PASS",
+          "expected": "409; latest name retained",
+          "actual": {
+            "status": 409,
+            "data": {
+              "code": "VERSION_CONFLICT",
+              "messageKey": "error.version_conflict",
+              "fieldErrors": [],
+              "requestId": "7f0a64db-d2ea-4f32-b327-27888f0e1ec7",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Foreign customer cannot remove owned address",
+          "status": "PASS",
+          "expected": 404,
+          "actual": {
+            "status": 404,
+            "data": {
+              "code": "NOT_FOUND",
+              "messageKey": "error.not_found",
+              "fieldErrors": [],
+              "requestId": "af6f2420-c7ed-4ccc-a3c9-72fc7688bc42",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Actual own-address removal persists without changing historical order",
+          "status": "PASS",
+          "expected": "204 and absent",
+          "actual": {
+            "status": 204
+          }
+        },
+        {
+          "name": "Bounded synthetic profile restored through authorized API",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        }
+      ],
+      "evidence": [],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T10:32:01.776Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        },
+        {
+          "role": "customer-b",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    },
+    {
+      "id": "C-INBOX-SHARE-REORDER",
+      "actor": "Customer-a/b web/API",
+      "requirement": "TC-012/037/038/128; immutable history and current reorder",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "100a3f0fcd1a3e9af8a83be54f0d1f9f16889047",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T10:32:01.794Z",
+      "checks": [
+        {
+          "name": "Actual worker-created inbox item is durably marked read",
+          "status": "FAIL",
+          "expected": "204 and persisted readAt",
+          "actual": {
+            "status": 200,
+            "id": "6b4a6b21-b6a7-478b-9982-30b69f6c57fb"
+          }
+        },
+        {
+          "name": "Foreign notification mutation rejected",
+          "status": "PASS",
+          "expected": 404,
+          "actual": {
+            "status": 404,
+            "data": {
+              "code": "NOT_FOUND",
+              "messageKey": "error.not_found",
+              "fieldErrors": [],
+              "requestId": "264ce6db-a657-4e7c-a3fb-947fae1e1738",
+              "retryable": false
+            }
+          }
+        },
+        {
+          "name": "Mark-read retry idempotent and one logical notification per recipient/event",
+          "status": "FAIL",
+          "expected": "204; no duplicated logical event",
+          "actual": 200
+        },
+        {
+          "name": "Reorder opens public current offering and keeps completed prices/state",
+          "status": "FAIL",
+          "expected": "current price above historical agreed snapshot",
+          "actual": {
+            "currentPrice": 12025,
+            "oldPrice": 12025
+          }
+        },
+        {
+          "name": "Shared link remains selectable and exposes only public meal identity",
+          "status": "PASS",
+          "expected": "public meal URL; clipboard acknowledgement not a provider assertion",
+          "actual": "http://localhost:36173/#/meal/00000000-0000-0000-0000-000000000263"
+        }
+      ],
+      "evidence": [],
+      "status": "FAIL",
+      "finishedAt": "2026-10-13T10:32:02.649Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        },
+        {
+          "role": "customer-b",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    },
+    {
+      "id": "C-DELETION-INTAKE",
+      "actor": "Synthetic customer-b web/API/database",
+      "requirement": "BR-001; API-017; TC-128; O06 retention boundary",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "100a3f0fcd1a3e9af8a83be54f0d1f9f16889047",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T10:32:02.655Z",
+      "checks": [
+        {
+          "name": "Explicit confirmed UI deletion intake accepted",
+          "status": "PASS",
+          "expected": "one received request",
+          "actual": {
+            "status": 200,
+            "data": {
+              "id": "1d1508b2-6d72-40c7-85fb-6d1d8aad31bd",
+              "state": "RECEIVED",
+              "policyVersion": "retention-policy-draft",
+              "requestedAt": "2026-10-13T10:32:02.900394Z"
+            }
+          }
+        },
+        {
+          "name": "Intake disables only B and keeps one request",
+          "status": "PASS",
+          "expected": "B DELETION_REQUESTED; one",
+          "actual": {
+            "status": "DELETION_REQUESTED",
+            "requests": 1
+          }
+        },
+        {
+          "name": "Disabled account cannot execute private checkout",
+          "status": "PASS",
+          "expected": 403,
+          "actual": 403
+        },
+        {
+          "name": "Other synthetic account stays active",
+          "status": "PASS",
+          "expected": "ACTIVE",
+          "actual": "ACTIVE"
+        }
+      ],
+      "evidence": [],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T10:32:03.544Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        },
+        {
+          "role": "customer-b",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

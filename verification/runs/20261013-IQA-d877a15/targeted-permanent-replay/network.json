@@ -1,0 +1,1160 @@
+{
+  "runType": "TARGETED",
+  "data": [
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/zones",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "items": [
+          {
+            "id": "00000000-0000-4000-8000-00000000a001",
+            "code": "test-zone-a",
+            "name": "منطقة تجريبية أ",
+            "city": "مدينة تجريبية",
+            "deliveryFee": {
+              "amountMinor": 3000,
+              "currency": "EGP"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-00000000a002",
+            "code": "test-zone-b",
+            "name": "منطقة تجريبية ب",
+            "city": "مدينة تجريبية",
+            "deliveryFee": {
+              "amountMinor": 4500,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "id": "00000000-0000-0000-0000-0000000002bd",
+        "displayName": "QA customer-a",
+        "locale": "ar",
+        "emailVerified": true,
+        "phoneVerified": "[REDACTED]",
+        "version": 0,
+        "capabilities": [
+          "BROWSE",
+          "ORDER"
+        ]
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/configuration/public",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "orderingAvailable": true,
+        "orderLimits": {
+          "maxQuantityPerLine": 10,
+          "maxLinesPerOrder": 20,
+          "policyVersion": 1
+        }
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/meals?limit=50&sort=NEWEST",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "items": [
+          {
+            "id": "00000000-0000-0000-0000-00000000026d",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012e",
+              "slug": "qa-kitchen-b",
+              "name": "مطبخ تجريبي B",
+              "ratingSummary": {
+                "count": 0,
+                "averageTenths": null
+              }
+            },
+            "title": "وجبة تجريبية B1",
+            "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngB",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 8025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-0000000001a5",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-0000000001a6",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 2,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-0000000001a9",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000265",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "وجبة تجريبية A3",
+            "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 8025,
+              "currency": "EGP"
+            },
+            "nextSlots": [],
+            "availability": "UNAVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000264",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+            "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "17d523a2-72ac-43c5-8953-0783e485edac",
+                "startsAt": "2026-10-21T10:00:00Z",
+                "endsAt": "2026-10-21T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-21T08:00:00Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "a7c4be39-e020-4664-ac52-4f6871d787f1",
+                "startsAt": "2026-10-23T10:00:00Z",
+                "endsAt": "2026-10-23T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-23T08:00:00Z",
+                "availablePortions": 1,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000263",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "وجبة تجريبية A1",
+            "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 24,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "fafd13a4-823a-46e6-ace5-ce4bc3335249",
+                "startsAt": "2026-10-20T10:00:00Z",
+                "endsAt": "2026-10-20T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-20T08:00:00Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "17d523a2-72ac-43c5-8953-0783e485edac",
+                "startsAt": "2026-10-21T10:00:00Z",
+                "endsAt": "2026-10-21T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-21T08:00:00Z",
+                "availablePortions": 1,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/zones",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "items": [
+          {
+            "id": "00000000-0000-4000-8000-00000000a001",
+            "code": "test-zone-a",
+            "name": "منطقة تجريبية أ",
+            "city": "مدينة تجريبية",
+            "deliveryFee": {
+              "amountMinor": 3000,
+              "currency": "EGP"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-00000000a002",
+            "code": "test-zone-b",
+            "name": "منطقة تجريبية ب",
+            "city": "مدينة تجريبية",
+            "deliveryFee": {
+              "amountMinor": 4500,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/me",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "id": "00000000-0000-0000-0000-0000000002bd",
+        "displayName": "QA customer-a",
+        "locale": "ar",
+        "emailVerified": true,
+        "phoneVerified": "[REDACTED]",
+        "version": 0,
+        "capabilities": [
+          "BROWSE",
+          "ORDER"
+        ]
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/meals?limit=50&sort=NEWEST",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "items": [
+          {
+            "id": "00000000-0000-0000-0000-00000000026d",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012e",
+              "slug": "qa-kitchen-b",
+              "name": "مطبخ تجريبي B",
+              "ratingSummary": {
+                "count": 0,
+                "averageTenths": null
+              }
+            },
+            "title": "وجبة تجريبية B1",
+            "description": "وصف مستقل للوجبة B1 بمكونات تجريبية فقط. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngB",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 8025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-0000000001a5",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-0000000001a6",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 2,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-0000000001a9",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000265",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "وجبة تجريبية A3",
+            "description": "وصف مستقل للوجبة A3 بمكونات تجريبية فقط. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 8025,
+              "currency": "EGP"
+            },
+            "nextSlots": [],
+            "availability": "UNAVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000264",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "وجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة",
+            "description": "وصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "17d523a2-72ac-43c5-8953-0783e485edac",
+                "startsAt": "2026-10-21T10:00:00Z",
+                "endsAt": "2026-10-21T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-21T08:00:00Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "a7c4be39-e020-4664-ac52-4f6871d787f1",
+                "startsAt": "2026-10-23T10:00:00Z",
+                "endsAt": "2026-10-23T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-23T08:00:00Z",
+                "availablePortions": 1,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000263",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "وجبة تجريبية A1",
+            "description": "وصف مستقل للوجبة A1 بمكونات تجريبية فقط. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "صورة تجريبية"
+            },
+            "portionText": "حصة تجريبية",
+            "price": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 24,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "fafd13a4-823a-46e6-ace5-ce4bc3335249",
+                "startsAt": "2026-10-20T10:00:00Z",
+                "endsAt": "2026-10-20T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-20T08:00:00Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "17d523a2-72ac-43c5-8953-0783e485edac",
+                "startsAt": "2026-10-21T10:00:00Z",
+                "endsAt": "2026-10-21T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-21T08:00:00Z",
+                "availablePortions": 1,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/configuration/public",
+      "status": 200,
+      "language": "ar",
+      "body": {
+        "orderingAvailable": true,
+        "orderLimits": {
+          "maxQuantityPerLine": 10,
+          "maxLinesPerOrder": 20,
+          "policyVersion": 1
+        }
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/zones",
+      "status": 200,
+      "language": "en",
+      "body": {
+        "items": [
+          {
+            "id": "00000000-0000-4000-8000-00000000a001",
+            "code": "test-zone-a",
+            "name": "Test zone A",
+            "city": "Test city",
+            "deliveryFee": {
+              "amountMinor": 3000,
+              "currency": "EGP"
+            }
+          },
+          {
+            "id": "00000000-0000-4000-8000-00000000a002",
+            "code": "test-zone-b",
+            "name": "Test zone B",
+            "city": "Test city",
+            "deliveryFee": {
+              "amountMinor": 4500,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "GET",
+      "path": "/api/v1/meals?limit=50&sort=NEWEST",
+      "status": 200,
+      "language": "en",
+      "body": {
+        "items": [
+          {
+            "id": "00000000-0000-0000-0000-00000000026d",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012e",
+              "slug": "qa-kitchen-b",
+              "name": "مطبخ تجريبي B",
+              "ratingSummary": {
+                "count": 0,
+                "averageTenths": null
+              }
+            },
+            "title": "QA Meal B1",
+            "description": "Independent synthetic description for meal B1. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngB",
+              "alt": "Synthetic solid colour"
+            },
+            "portionText": "Synthetic portion",
+            "price": {
+              "amountMinor": 8025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-0000000001a5",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-0000000001a6",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 2,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-0000000001a9",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000265",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "QA Meal A3",
+            "description": "Independent synthetic description for meal A3. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "Synthetic solid colour"
+            },
+            "portionText": "Synthetic portion",
+            "price": {
+              "amountMinor": 8025,
+              "currency": "EGP"
+            },
+            "nextSlots": [],
+            "availability": "UNAVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000264",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "QA Meal A2",
+            "description": "Independent synthetic description for meal A2. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. Long description for QA. ",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "Synthetic solid colour"
+            },
+            "portionText": "Synthetic portion",
+            "price": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 25,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "17d523a2-72ac-43c5-8953-0783e485edac",
+                "startsAt": "2026-10-21T10:00:00Z",
+                "endsAt": "2026-10-21T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-21T08:00:00Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "a7c4be39-e020-4664-ac52-4f6871d787f1",
+                "startsAt": "2026-10-23T10:00:00Z",
+                "endsAt": "2026-10-23T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-23T08:00:00Z",
+                "availablePortions": 1,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000263",
+            "kitchen": {
+              "id": "00000000-0000-0000-0000-00000000012d",
+              "slug": "qa-kitchen-a",
+              "name": "مطبخ تجريبي A",
+              "ratingSummary": {
+                "count": 1,
+                "averageTenths": 40
+              }
+            },
+            "title": "QA Meal A1",
+            "description": "Independent synthetic description for meal A1.",
+            "photo": {
+              "url": "http://localhost:39990/matbakhy-public/iqa.pngA",
+              "alt": "Synthetic solid colour"
+            },
+            "portionText": "Synthetic portion",
+            "price": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "nextSlots": [
+              {
+                "id": "00000000-0000-0000-0000-00000000019b",
+                "startsAt": "2026-10-16T08:05:14.215162Z",
+                "endsAt": "2026-10-16T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-16T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019c",
+                "startsAt": "2026-10-17T08:05:14.215162Z",
+                "endsAt": "2026-10-17T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-17T06:05:14.215162Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "00000000-0000-0000-0000-00000000019f",
+                "startsAt": "2026-10-19T08:05:14.215162Z",
+                "endsAt": "2026-10-19T10:05:14.215162Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-19T06:05:14.215162Z",
+                "availablePortions": 24,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "fafd13a4-823a-46e6-ace5-ce4bc3335249",
+                "startsAt": "2026-10-20T10:00:00Z",
+                "endsAt": "2026-10-20T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-20T08:00:00Z",
+                "availablePortions": 3,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              },
+              {
+                "id": "17d523a2-72ac-43c5-8953-0783e485edac",
+                "startsAt": "2026-10-21T10:00:00Z",
+                "endsAt": "2026-10-21T12:00:00Z",
+                "timezone": "Africa/Cairo",
+                "cutoffAt": "2026-10-21T08:00:00Z",
+                "availablePortions": 1,
+                "fulfillmentModes": [
+                  "PICKUP",
+                  "DELIVERY"
+                ]
+              }
+            ],
+            "availability": "AVAILABLE"
+          }
+        ],
+        "nextCursor": null,
+        "hasMore": false
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "status": 201,
+      "body": {
+        "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+        "publicNumber": "MB-100008",
+        "version": 1,
+        "state": "CANCELLED",
+        "fulfillmentMode": "DELIVERY",
+        "items": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "title": "QA Meal A1",
+            "allergenStatement": "UNKNOWN",
+            "quantity": 1,
+            "unitPrice": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "lineTotal": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "subtotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "deliveryFee": {
+          "amountMinor": 3000,
+          "currency": "EGP"
+        },
+        "tax": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "total": {
+          "amountMinor": 15025,
+          "currency": "EGP"
+        },
+        "slot": {
+          "id": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-19T08:05:14.215162Z",
+          "endsAt": "2026-10-19T10:05:14.215162Z",
+          "timezone": "Africa/Cairo",
+          "cutoffAt": "2026-10-19T06:05:14.215162Z",
+          "availablePortions": 49,
+          "fulfillmentModes": [
+            "DELIVERY"
+          ]
+        },
+        "acceptBy": "2026-10-13T08:24:02.097955Z",
+        "events": [
+          {
+            "sequence": 1,
+            "fromState": null,
+            "toState": "PENDING_ACCEPTANCE",
+            "occurredAt": "2026-10-13T08:09:02.104054Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": null
+          },
+          {
+            "sequence": 2,
+            "fromState": "PENDING_ACCEPTANCE",
+            "toState": "CANCELLED",
+            "occurredAt": "2026-10-13T08:09:03.916769Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": "CHANGED_MIND"
+          }
+        ],
+        "allowedActions": [],
+        "cashState": "NOT_DUE",
+        "supportCaseIds": [],
+        "handoverCode": null,
+        "contact": null
+      }
+    },
+    {
+      "case": "C-PERMANENT-REPLAY",
+      "role": "customer-a",
+      "method": "POST",
+      "path": "/api/v1/orders",
+      "status": 201,
+      "body": {
+        "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+        "publicNumber": "MB-100008",
+        "version": 1,
+        "state": "CANCELLED",
+        "fulfillmentMode": "DELIVERY",
+        "items": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "title": "QA Meal A1",
+            "allergenStatement": "UNKNOWN",
+            "quantity": 1,
+            "unitPrice": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "lineTotal": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "subtotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "deliveryFee": {
+          "amountMinor": 3000,
+          "currency": "EGP"
+        },
+        "tax": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "total": {
+          "amountMinor": 15025,
+          "currency": "EGP"
+        },
+        "slot": {
+          "id": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-19T08:05:14.215162Z",
+          "endsAt": "2026-10-19T10:05:14.215162Z",
+          "timezone": "Africa/Cairo",
+          "cutoffAt": "2026-10-19T06:05:14.215162Z",
+          "availablePortions": 49,
+          "fulfillmentModes": [
+            "DELIVERY"
+          ]
+        },
+        "acceptBy": "2026-10-13T08:24:02.097955Z",
+        "events": [
+          {
+            "sequence": 1,
+            "fromState": null,
+            "toState": "PENDING_ACCEPTANCE",
+            "occurredAt": "2026-10-13T08:09:02.104054Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": null
+          },
+          {
+            "sequence": 2,
+            "fromState": "PENDING_ACCEPTANCE",
+            "toState": "CANCELLED",
+            "occurredAt": "2026-10-13T08:09:03.916769Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": "CHANGED_MIND"
+          }
+        ],
+        "allowedActions": [],
+        "cashState": "NOT_DUE",
+        "supportCaseIds": [],
+        "handoverCode": null,
+        "contact": null
+      }
+    }
+  ]
+}

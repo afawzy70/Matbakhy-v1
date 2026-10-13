@@ -1,0 +1,16 @@
+{"at": 1791887777.054319, "method": "GET", "path": "/api/v1/me", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887777.0575085, "method": "GET", "path": "/api/v1/meals", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887777.0580835, "method": "GET", "path": "/api/v1/configuration/public", "bearerPresent": false}
+{"at": 1791887777.0679584, "status": 200}
+{"at": 1791887777.0706232, "status": 200}
+{"at": 1791887777.0718486, "status": 200}
+{"at": 1791887779.5321443, "method": "GET", "path": "/api/v1/configuration/public", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887779.541408, "status": 200}
+{"at": 1791887785.099964, "method": "GET", "path": "/api/v1/me/addresses", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887785.106487, "status": 200}
+{"at": 1791887785.118859, "method": "GET", "path": "/api/v1/configuration/public", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887785.1326134, "status": 200}
+{"at": 1791887794.0376816, "method": "POST", "path": "/api/v1/quotes", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887794.1257806, "status": 201}
+{"at": 1791887809.3877645, "method": "POST", "path": "/api/v1/orders", "bearerPresent": true, "exp": 1791888072, "iat": 1791887772, "expired": false}
+{"at": 1791887809.4786856, "status": 201}

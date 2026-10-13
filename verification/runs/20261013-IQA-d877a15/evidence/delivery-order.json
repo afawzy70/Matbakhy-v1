@@ -1,0 +1,160 @@
+{
+  "quote": {
+    "quoteId": "225a5cab-ec9f-4307-acac-6f459b288461",
+    "expiresAt": "2026-10-13T10:43:48.680627583Z",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "mealRevision": 1,
+        "title": "QA Meal A1",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 12025,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3000,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 15025,
+      "currency": "EGP"
+    },
+    "cancellationPolicyVersion": "synthetic-cancel-v1",
+    "termsVersion": "synthetic-terms-v1",
+    "acceptanceDeadlinePreview": "2026-10-13T10:53:48.680627583Z",
+    "warnings": [
+      "SYNTHETIC_POLICY"
+    ]
+  },
+  "order": {
+    "id": "1aa0ea40-d843-48bf-abf1-8e7feb8d5273",
+    "publicNumber": "MB-100005",
+    "version": 5,
+    "state": "COMPLETED",
+    "fulfillmentMode": "DELIVERY",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "allergenStatement": "UNKNOWN",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 12025,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3000,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 15025,
+      "currency": "EGP"
+    },
+    "slot": {
+      "id": "00000000-0000-0000-0000-00000000019f",
+      "startsAt": "2026-10-19T10:37:12.682171Z",
+      "endsAt": "2026-10-19T12:37:12.682171Z",
+      "timezone": "Africa/Cairo",
+      "cutoffAt": "2026-10-19T08:37:12.682171Z",
+      "availablePortions": 49,
+      "fulfillmentModes": [
+        "DELIVERY"
+      ]
+    },
+    "acceptBy": "2026-10-13T10:53:48.820582Z",
+    "events": [
+      {
+        "sequence": 1,
+        "fromState": null,
+        "toState": "PENDING_ACCEPTANCE",
+        "occurredAt": "2026-10-13T10:38:48.826471Z",
+        "actorType": "CUSTOMER",
+        "reasonCode": null
+      },
+      {
+        "sequence": 2,
+        "fromState": "PENDING_ACCEPTANCE",
+        "toState": "ACCEPTED",
+        "occurredAt": "2026-10-13T10:38:49.784102Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 3,
+        "fromState": "ACCEPTED",
+        "toState": "PREPARING",
+        "occurredAt": "2026-10-13T10:38:49.890077Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 4,
+        "fromState": "PREPARING",
+        "toState": "READY",
+        "occurredAt": "2026-10-13T10:38:50.063516Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 5,
+        "fromState": "READY",
+        "toState": "OUT_FOR_DELIVERY",
+        "occurredAt": "2026-10-13T10:38:50.330714Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      },
+      {
+        "sequence": 6,
+        "fromState": "OUT_FOR_DELIVERY",
+        "toState": "COMPLETED",
+        "occurredAt": "2026-10-13T10:38:50.512513Z",
+        "actorType": "COOK",
+        "reasonCode": null
+      }
+    ],
+    "allowedActions": [],
+    "cashState": "DUE",
+    "fulfillmentNote": null,
+    "dispatchReference": "QA-DELIVERY-REFERENCE",
+    "contact": null
+  },
+  "database": {
+    "id": "1aa0ea40-d843-48bf-abf1-8e7feb8d5273",
+    "subtotal_minor": 12025,
+    "delivery_fee_minor": 3000,
+    "total_minor": 15025,
+    "commission_minor": 1203,
+    "commission_bps_snapshot": 1000,
+    "state": "COMPLETED"
+  }
+}

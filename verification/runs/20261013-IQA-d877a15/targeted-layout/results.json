@@ -1,0 +1,512 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "W-MONEY-REFLOW",
+      "actor": "Cook statement / finance web; Arabic and English",
+      "requirement": "BR-046/TC-046; MB-022/025/029; independent visual audit",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "aad01ec5c7865c293d4e55de9d5a9c7bd3ade129",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T08:20:12.033Z",
+      "checks": [
+        {
+          "name": "Money numeric tokens remain whole cook-a/320/en",
+          "status": "FAIL",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [
+              {
+                "area": "summary",
+                "text": "EGP 390.75",
+                "number": "390.75",
+                "lineCount": 6,
+                "width": 9.875,
+                "height": 255.9375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 150.25",
+                "number": "150.25",
+                "lineCount": 6,
+                "width": 9.875,
+                "height": 255.9375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 0.00",
+                "number": "0.00",
+                "lineCount": 4,
+                "width": 9.875,
+                "height": 204.75
+              },
+              {
+                "area": "summary",
+                "text": "EGP 240.50",
+                "number": "240.50",
+                "lineCount": 6,
+                "width": 9.875,
+                "height": 255.9375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 36.08",
+                "number": "36.08",
+                "lineCount": 5,
+                "width": 9.875,
+                "height": 230.34375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 5,
+                "width": 9.875,
+                "height": 230.34375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 5,
+                "width": 9.875,
+                "height": 230.34375
+              },
+              {
+                "area": "summary",
+                "text": "-EGP 12.02",
+                "number": "12.02",
+                "lineCount": 5,
+                "width": 9.875,
+                "height": 255.9375
+              },
+              {
+                "area": "table",
+                "text": "EGP 240.50",
+                "number": "240.50",
+                "lineCount": 2,
+                "width": 47.421875,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 2,
+                "width": 51.546875,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 150.25",
+                "number": "150.25",
+                "lineCount": 2,
+                "width": 47.421875,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 12.03",
+                "number": "12.03",
+                "lineCount": 2,
+                "width": 51.546875,
+                "height": 85.78125
+              }
+            ],
+            "measured": 12
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole cook-a/320/ar",
+          "status": "FAIL",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [
+              {
+                "area": "summary",
+                "text": "‏٣٩٠٫٧٥ ج.م.‏",
+                "number": "٣٩٠٫٧٥",
+                "lineCount": 2,
+                "width": 41.625,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "‏١٥٠٫٢٥ ج.م.‏",
+                "number": "١٥٠٫٢٥",
+                "lineCount": 2,
+                "width": 41.625,
+                "height": 51.1875
+              },
+              {
+                "area": "table",
+                "text": "‏٢٤٠٫٥٠ ج.م.‏",
+                "number": "٢٤٠٫٥٠",
+                "lineCount": 2,
+                "width": 46.453125,
+                "height": 111.375
+              },
+              {
+                "area": "table",
+                "text": "‏٢٤٫٠٥ ج.م.‏",
+                "number": "٢٤٫٠٥",
+                "lineCount": 2,
+                "width": 39.5,
+                "height": 111.375
+              },
+              {
+                "area": "table",
+                "text": "‏١٥٠٫٢٥ ج.م.‏",
+                "number": "١٥٠٫٢٥",
+                "lineCount": 2,
+                "width": 46.453125,
+                "height": 111.375
+              },
+              {
+                "area": "table",
+                "text": "‏١٢٫٠٣ ج.م.‏",
+                "number": "١٢٫٠٣",
+                "lineCount": 2,
+                "width": 39.5,
+                "height": 111.375
+              }
+            ],
+            "measured": 12
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole cook-a/390/en",
+          "status": "FAIL",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [
+              {
+                "area": "summary",
+                "text": "EGP 390.75",
+                "number": "390.75",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 150.25",
+                "number": "150.25",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 0.00",
+                "number": "0.00",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 240.50",
+                "number": "240.50",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 36.08",
+                "number": "36.08",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "-EGP 12.02",
+                "number": "12.02",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 76.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 240.50",
+                "number": "240.50",
+                "lineCount": 2,
+                "width": 53.671875,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 2,
+                "width": 57.890625,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 150.25",
+                "number": "150.25",
+                "lineCount": 2,
+                "width": 53.671875,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "EGP 12.03",
+                "number": "12.03",
+                "lineCount": 2,
+                "width": 57.890625,
+                "height": 85.78125
+              }
+            ],
+            "measured": 12
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole cook-a/390/ar",
+          "status": "FAIL",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [
+              {
+                "area": "table",
+                "text": "‏٢٤٫٠٥ ج.م.‏",
+                "number": "٢٤٫٠٥",
+                "lineCount": 2,
+                "width": 48.28125,
+                "height": 85.78125
+              },
+              {
+                "area": "table",
+                "text": "‏١٥٠٫٢٥ ج.م.‏",
+                "number": "١٥٠٫٢٥",
+                "lineCount": 2,
+                "width": 55.515625,
+                "height": 85.78125
+              }
+            ],
+            "measured": 12
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole cook-a/1440/en",
+          "status": "PASS",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [],
+            "measured": 12
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole cook-a/1440/ar",
+          "status": "PASS",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [],
+            "measured": 12
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole finance-a/320/en",
+          "status": "FAIL",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [
+              {
+                "area": "summary",
+                "text": "EGP 240.50",
+                "number": "240.50",
+                "lineCount": 6,
+                "width": 9.859375,
+                "height": 255.9375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 36.08",
+                "number": "36.08",
+                "lineCount": 5,
+                "width": 9.859375,
+                "height": 230.34375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 5,
+                "width": 9.859375,
+                "height": 230.34375
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 5,
+                "width": 9.859375,
+                "height": 230.34375
+              },
+              {
+                "area": "summary",
+                "text": "-EGP 12.02",
+                "number": "12.02",
+                "lineCount": 5,
+                "width": 9.859375,
+                "height": 255.9375
+              }
+            ],
+            "measured": 5
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole finance-a/320/ar",
+          "status": "PASS",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [],
+            "measured": 5
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole finance-a/390/en",
+          "status": "FAIL",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [
+              {
+                "area": "summary",
+                "text": "EGP 240.50",
+                "number": "240.50",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 36.08",
+                "number": "36.08",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "EGP 24.05",
+                "number": "24.05",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 51.1875
+              },
+              {
+                "area": "summary",
+                "text": "-EGP 12.02",
+                "number": "12.02",
+                "lineCount": 2,
+                "width": 51.78125,
+                "height": 76.78125
+              }
+            ],
+            "measured": 5
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole finance-a/390/ar",
+          "status": "PASS",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [],
+            "measured": 5
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole finance-a/1440/en",
+          "status": "PASS",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [],
+            "measured": 5
+          }
+        },
+        {
+          "name": "Money numeric tokens remain whole finance-a/1440/ar",
+          "status": "PASS",
+          "expected": "no decimal/grouped amount split across lines; currency may occupy its own whole line",
+          "actual": {
+            "broken": [],
+            "measured": 5
+          }
+        }
+      ],
+      "evidence": [
+        "W-MONEY-cook-a-320-en.png",
+        "W-MONEY-cook-a-320-en.json",
+        "W-MONEY-cook-a-320-ar.png",
+        "W-MONEY-cook-a-320-ar.json",
+        "W-MONEY-cook-a-390-en.png",
+        "W-MONEY-cook-a-390-en.json",
+        "W-MONEY-cook-a-390-ar.png",
+        "W-MONEY-cook-a-390-ar.json",
+        "W-MONEY-cook-a-1440-en.png",
+        "W-MONEY-cook-a-1440-en.json",
+        "W-MONEY-cook-a-1440-ar.png",
+        "W-MONEY-cook-a-1440-ar.json",
+        "W-MONEY-finance-a-320-en.png",
+        "W-MONEY-finance-a-320-en.json",
+        "W-MONEY-finance-a-320-ar.png",
+        "W-MONEY-finance-a-320-ar.json",
+        "W-MONEY-finance-a-390-en.png",
+        "W-MONEY-finance-a-390-en.json",
+        "W-MONEY-finance-a-390-ar.png",
+        "W-MONEY-finance-a-390-ar.json",
+        "W-MONEY-finance-a-1440-en.png",
+        "W-MONEY-finance-a-1440-en.json",
+        "W-MONEY-finance-a-1440-ar.png",
+        "W-MONEY-finance-a-1440-ar.json"
+      ],
+      "status": "FAIL",
+      "finishedAt": "2026-10-13T08:20:17.767Z",
+      "variations": [
+        {
+          "role": "cook-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        },
+        {
+          "role": "finance-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

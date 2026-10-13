@@ -1,0 +1,74 @@
+[
+  {
+    "caseId": "P-HISTORY",
+    "variation": "history-layout/320/en",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+    "observedAt": "2026-10-13T11:04:11.768Z",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "locale": "en",
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "P-HISTORY-320-en.png",
+      "P-HISTORY-320-en.json"
+    ]
+  },
+  {
+    "caseId": "P-HISTORY",
+    "variation": "history-layout/320/ar",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+    "observedAt": "2026-10-13T11:04:11.948Z",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "locale": "ar",
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "P-HISTORY-320-ar.png",
+      "P-HISTORY-320-ar.json"
+    ]
+  },
+  {
+    "caseId": "P-HISTORY",
+    "variation": "history-layout/390/en",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+    "observedAt": "2026-10-13T11:04:12.186Z",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "locale": "en",
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "P-HISTORY-390-en.png",
+      "P-HISTORY-390-en.json"
+    ]
+  },
+  {
+    "caseId": "P-HISTORY",
+    "variation": "history-layout/390/ar",
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+    "observedAt": "2026-10-13T11:04:12.378Z",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "locale": "ar",
+    "runType": "TARGETED",
+    "status": "PASS",
+    "evidence": [
+      "P-HISTORY-390-ar.png",
+      "P-HISTORY-390-ar.json"
+    ]
+  }
+]

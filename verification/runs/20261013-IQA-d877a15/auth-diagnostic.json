@@ -1,0 +1,1995 @@
+[
+  {
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "04b45ad3cc208c40e8c0f2aec19ebe96224e8c8d",
+    "runType": "TARGETED",
+    "mode": "immediate",
+    "status": 200,
+    "path": "http://localhost:36173/",
+    "ui": "مطبخي\nالسلة\nEnglish\nتسجيل الخروج\nمطبخي\nأكل بيتي من مطابخ قريبة منك\nحجز مسبق\nمحتاج إيه لسفرتك؟\nاختر حسب حاجتك\nوجبة ليا أو لينا\nلشخص أو فردين\nأكمل سفرتي\nصنف يكمل أكلك\nأجهز عزومة\nلجمعة ولمة العيلة\nالأكلات\nالمطابخ\nابحث عن طبق أو مطبخ\nابحث عن طبق أو مطبخ\nتصفية النتائج\nالكل\nأطباق رئيسية\nأطباق جانبية وسلطات\nشوربة\nمخبوزات\nحلويات\nفطار\nجاهز للطبخ\nأكلات بيتية متاحة للحجز\n١٦‏/١٠‏/٢٠٢٦، ١٠:٤٦ ص\nوجبة تجريبية B1\n‏٨٠٫٢٥ ج.م.‏\nمطبخ تجريبي B\n\nوصف مستقل للوجبة B1 بمكونات تجريبية فقط.\n\nحصة تجريبية\nعرض التفاصيل\nوجبة تجريبية A3\n‏٨٠٫٢٥ ج.م.‏\nمطبخ تجريبي A\n\nوصف مستقل للوجبة A3 بمكونات تجريبية فقط.\n\nحصة تجريبية\nغير متاح\n١٦‏/١٠‏/٢٠٢٦، ١٠:٤٦ ص\nوجبة تجريبية A2 عنوان عربي طويل لاختبار العرض في الهاتف والأرقام المختلطة\n‏٩٥٫٥٠ ج.م.‏\nمطبخ تجريبي A\n\nوصف مستقل للوجبة A2 بمكونات تجريبية فقط. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل للاختبار. وصف طويل ل",
+    "network": [
+      {
+        "timestamp": "2026-10-13T07:49:06.116Z",
+        "method": "GET",
+        "path": "http://localhost:36173/",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.264Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/main.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.334Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@vite/client",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.390Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-400.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.393Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@react-refresh",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.397Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-700.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.398Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-700.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.399Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-400.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.407Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.591Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/generated/tokens.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.592Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/app.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.596Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/vite@8.3.4_@types+node@26.6.5_terser@5.51.2_yaml@2.9.1/node_modules/vite/dist/client/env.mjs",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.637Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/App.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.637Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.638Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/rolldown-runtime-BvCyGRYZ.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.638Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/index.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.673Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/api.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.674Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Account.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.674Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/cart.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.707Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Browse.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.707Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Checkout.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.707Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Kitchen.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.707Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/i18n.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.707Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Meal.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/css.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Orders.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/logo.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/index.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/shared.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/tokens.json",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.710Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/openapi-fetch.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.711Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/money.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.711Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom_client.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.711Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:06.966Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-700-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.025Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-400-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.034Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.035Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 401,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.036Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.036Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.036Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 401,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.174Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.174Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.174Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.186Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.187Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.278Z",
+        "method": "GET",
+        "path": "http://localhost:39080/oauth2/authorization/keycloak",
+        "status": 302,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.966Z",
+        "method": "GET",
+        "path": "http://localhost:39080/login/oauth2/code/keycloak",
+        "status": 302,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:07.969Z",
+        "method": "GET",
+        "path": "http://localhost:36173/",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.059Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@vite/client",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.060Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/main.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.079Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.079Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom_client.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.079Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.081Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/rolldown-runtime-BvCyGRYZ.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.081Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.084Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@react-refresh",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.084Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/vite@8.3.4_@types+node@26.6.5_terser@5.51.2_yaml@2.9.1/node_modules/vite/dist/client/env.mjs",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.084Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-400.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.085Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-700.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.085Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-400.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.085Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-700.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.085Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/generated/tokens.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.085Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/app.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.086Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/App.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.092Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/index.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.094Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/api.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.096Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Account.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.097Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/cart.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.100Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Browse.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.100Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Checkout.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.100Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/i18n.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.102Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Kitchen.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.103Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Meal.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.105Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Orders.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.110Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/tokens.json",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.110Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/css.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.110Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/logo.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.110Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/index.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.110Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/shared.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.110Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/openapi-fetch.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.111Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/money.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.168Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-700-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.168Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-400-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.258Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.261Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.314Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.314Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.315Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.328Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.341Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.357Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.357Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.444Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      }
+    ]
+  },
+  {
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "04b45ad3cc208c40e8c0f2aec19ebe96224e8c8d",
+    "runType": "TARGETED",
+    "mode": "settled",
+    "status": 200,
+    "path": "http://localhost:36173/",
+    "ui": "مطبخي\nالسلة\nEnglish\nتسجيل الخروج\nمطبخي\nأكل بيتي من مطابخ قريبة منك\nحجز مسبق\nمحتاج إيه لسفرتك؟\nاختر حسب حاجتك\nوجبة ليا أو لينا\nلشخص أو فردين\nأكمل سفرتي\nصنف يكمل أكلك\nأجهز عزومة\nلجمعة ولمة العيلة\nالأكلات\nالمطابخ\nابحث عن طبق أو مطبخ\nابحث عن طبق أو مطبخ\nتصفية النتائج\nالكل\nأطباق رئيسية\nأطباق جانبية وسلطات\nشوربة\nمخبوزات\nحلويات\nفطار\nجاهز للطبخ\nأكلات بيتية متاحة للحجز\n\nجارٍ التحميل…\n\nالرئيسية\nطلباتي\nحسابي",
+    "network": [
+      {
+        "timestamp": "2026-10-13T07:49:08.899Z",
+        "method": "GET",
+        "path": "http://localhost:36173/",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.932Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/main.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.936Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@vite/client",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.946Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@react-refresh",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.946Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-400.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.949Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-700.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.950Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-700.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.955Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-400.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.955Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/generated/tokens.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.956Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/app.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:08.959Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.141Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/rolldown-runtime-BvCyGRYZ.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.144Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/vite@8.3.4_@types+node@26.6.5_terser@5.51.2_yaml@2.9.1/node_modules/vite/dist/client/env.mjs",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.180Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.180Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/App.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.203Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom_client.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.204Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/index.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.213Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/api.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.217Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/cart.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.220Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Account.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.221Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Browse.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.222Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Checkout.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.223Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Kitchen.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.224Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.224Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/tokens.json",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Meal.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/css.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/index.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.226Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/logo.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.226Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Orders.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.228Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/i18n.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.238Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/shared.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.238Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/money.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.238Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/openapi-fetch.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.580Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-700-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.580Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-400-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.639Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.639Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.640Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.641Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 401,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.669Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.669Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.669Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.669Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.669Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.678Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 401,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:09.979Z",
+        "method": "GET",
+        "path": "http://localhost:39080/oauth2/authorization/keycloak",
+        "status": 302,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:10.969Z",
+        "method": "GET",
+        "path": "http://localhost:39080/login/oauth2/code/keycloak",
+        "status": 302,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:10.981Z",
+        "method": "GET",
+        "path": "http://localhost:36173/",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.309Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@vite/client",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.311Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/main.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.313Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@react-refresh",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.318Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.318Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom_client.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.320Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.321Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/rolldown-runtime-BvCyGRYZ.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.321Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.323Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/vite@8.3.4_@types+node@26.6.5_terser@5.51.2_yaml@2.9.1/node_modules/vite/dist/client/env.mjs",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.327Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-400.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.327Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-700.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.327Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-400.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.327Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-700.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.327Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/generated/tokens.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.328Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/app.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.328Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/App.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.374Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/index.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.376Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/api.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.376Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Account.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.378Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/cart.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.379Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Browse.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.380Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Checkout.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.381Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/i18n.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.382Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Kitchen.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.382Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Meal.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.384Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Orders.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.385Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/tokens.json",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.385Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/css.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.386Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/logo.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.390Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/index.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.390Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/shared.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.390Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/openapi-fetch.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.391Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/money.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.566Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-700-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.567Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-400-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.567Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.595Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.617Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.617Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.617Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.671Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.680Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:11.680Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      }
+    ]
+  },
+  {
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "04b45ad3cc208c40e8c0f2aec19ebe96224e8c8d",
+    "runType": "TARGETED",
+    "mode": "immediate",
+    "status": 200,
+    "path": "http://localhost:36173/",
+    "ui": "مطبخي\nالسلة\nEnglish\nتسجيل الدخول\nمطبخي\nأكل بيتي من مطابخ قريبة منك\nحجز مسبق\nمحتاج إيه لسفرتك؟\nاختر حسب حاجتك\nوجبة ليا أو لينا\nلشخص أو فردين\nأكمل سفرتي\nصنف يكمل أكلك\nأجهز عزومة\nلجمعة ولمة العيلة\nالأكلات\nالمطابخ\nابحث عن طبق أو مطبخ\nابحث عن طبق أو مطبخ\nتصفية النتائج\nالكل\nأطباق رئيسية\nأطباق جانبية وسلطات\nشوربة\nمخبوزات\nحلويات\nفطار\nجاهز للطبخ\nأكلات بيتية متاحة للحجز\n\nجارٍ التحميل…\n\nالرئيسية",
+    "network": [
+      {
+        "timestamp": "2026-10-13T07:49:11.958Z",
+        "method": "GET",
+        "path": "http://localhost:36173/",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.008Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/main.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.021Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@vite/client",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.021Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@react-refresh",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.039Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-400.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.040Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-700.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.040Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-400.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.040Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/app.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.045Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/App.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.155Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.173Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-700.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.173Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/vite@8.3.4_@types+node@26.6.5_terser@5.51.2_yaml@2.9.1/node_modules/vite/dist/client/env.mjs",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.173Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/index.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.175Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/generated/tokens.css",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.175Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.227Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/api.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.227Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Checkout.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.227Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/cart.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.228Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Account.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.229Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Browse.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.249Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/rolldown-runtime-BvCyGRYZ.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.251Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Meal.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.251Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Kitchen.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.251Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Orders.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.251Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/i18n.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.251Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/tokens.json",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.278Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/css.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.278Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/logo.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.287Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/index.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.426Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/shared.tsx",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.426Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/openapi-fetch.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.427Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/money.ts",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.546Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom_client.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:12.592Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.794Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-400-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.794Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-700-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.918Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.919Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.922Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.922Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.923Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.931Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.931Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.935Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 401,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.936Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:13.936Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 401,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:14.339Z",
+        "method": "GET",
+        "path": "http://localhost:39080/oauth2/authorization/keycloak",
+        "status": 302,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.154Z",
+        "method": "GET",
+        "path": "http://localhost:39080/login/oauth2/code/keycloak",
+        "status": 302,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.168Z",
+        "method": "GET",
+        "path": "http://localhost:36173/",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.189Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@vite/client",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.190Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/main.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.191Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@react-refresh",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.191Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.192Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom_client.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.192Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react_jsx-dev-runtime.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.192Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/rolldown-runtime-BvCyGRYZ.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.194Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/react-dom.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.195Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/vite@8.3.4_@types+node@26.6.5_terser@5.51.2_yaml@2.9.1/node_modules/vite/dist/client/env.mjs",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.196Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-400.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.197Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/arabic-700.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.197Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-400.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.198Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/latin-700.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.199Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/generated/tokens.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.207Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/app.css",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.208Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/App.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.212Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/index.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.217Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/api.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.218Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Account.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.218Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/cart.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.221Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Browse.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.221Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Checkout.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.221Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/i18n.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.222Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/tokens.json",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.222Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/css.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.222Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Kitchen.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.222Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Meal.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/Orders.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/index.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/src/shared.tsx",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/design-tokens/src/logo.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/node_modules/.vite/deps/openapi-fetch.js",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.225Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/packages/api-client/src/money.ts",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.316Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-700-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.317Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-latin-400-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.325Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-700-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.331Z",
+        "method": "GET",
+        "path": "http://localhost:36173/@fs/workspace/matbakhy-regression-qa/node_modules/.pnpm/@fontsource+cairo@5.3.0/node_modules/@fontsource/cairo/files/cairo-arabic-400-normal.woff2",
+        "status": 304,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.336Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.344Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.344Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.344Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.362Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/configuration/public",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.363Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/me",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.363Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/zones",
+        "status": 200,
+        "cookieNames": []
+      },
+      {
+        "timestamp": "2026-10-13T07:49:15.363Z",
+        "method": "GET",
+        "path": "http://localhost:39080/api/v1/meals",
+        "status": 200,
+        "cookieNames": []
+      }
+    ]
+  }
+]

@@ -1,0 +1,191 @@
+{
+  "slotId": "9c275c87-c46b-4225-b4bd-cb88e281f38c",
+  "results": [
+    {
+      "status": 201,
+      "data": {
+        "id": "cf18fe52-5da9-47a9-992a-623df6ec132c",
+        "publicNumber": "MB-100010",
+        "version": 0,
+        "state": "PENDING_ACCEPTANCE",
+        "fulfillmentMode": "PICKUP",
+        "items": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000264",
+            "title": "QA Meal A2",
+            "allergenStatement": "UNKNOWN",
+            "quantity": 1,
+            "unitPrice": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            },
+            "lineTotal": {
+              "amountMinor": 9550,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "subtotal": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "deliveryFee": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "tax": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "total": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "slot": {
+          "id": "9c275c87-c46b-4225-b4bd-cb88e281f38c",
+          "startsAt": "2026-10-23T10:00:00Z",
+          "endsAt": "2026-10-23T12:00:00Z",
+          "timezone": "Africa/Cairo",
+          "cutoffAt": "2026-10-23T08:00:00Z",
+          "availablePortions": 0,
+          "fulfillmentModes": [
+            "PICKUP"
+          ]
+        },
+        "acceptBy": "2026-10-13T10:56:44.596679Z",
+        "events": [
+          {
+            "sequence": 1,
+            "fromState": null,
+            "toState": "PENDING_ACCEPTANCE",
+            "occurredAt": "2026-10-13T10:41:44.953187Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": null
+          }
+        ],
+        "allowedActions": [
+          "CANCEL"
+        ],
+        "cashState": "DUE",
+        "supportCaseIds": [],
+        "handoverCode": null,
+        "contact": null
+      }
+    },
+    {
+      "status": 409,
+      "data": {
+        "code": "STOCK_CHANGED",
+        "messageKey": "error.stock_changed",
+        "fieldErrors": [
+          {
+            "field": "items",
+            "code": "INSUFFICIENT_PORTIONS"
+          }
+        ],
+        "requestId": "a693d384-1ae4-4812-b452-b5f178fbac67",
+        "retryable": false
+      }
+    }
+  ],
+  "requests": [
+    {
+      "quoteId": "dce7f5ed-f462-47d3-b9fe-13a8216d1e9d",
+      "clientRequestId": "9dacc0d8-3328-497b-8dda-92eb7f1f9a55",
+      "acceptedPolicyVersions": {
+        "terms": "synthetic-terms-v1",
+        "cancellation": "synthetic-cancel-v1"
+      }
+    },
+    {
+      "quoteId": "d6eb4e83-f756-491b-a183-907c1816ca9c",
+      "clientRequestId": "e3b0f7b4-5e08-4d3e-980f-d989141f2324",
+      "acceptedPolicyVersions": {
+        "terms": "synthetic-terms-v1",
+        "cancellation": "synthetic-cancel-v1"
+      }
+    }
+  ],
+  "winnerOrder": "cf18fe52-5da9-47a9-992a-623df6ec132c",
+  "retry": {
+    "status": 201,
+    "data": {
+      "id": "cf18fe52-5da9-47a9-992a-623df6ec132c",
+      "publicNumber": "MB-100010",
+      "version": 0,
+      "state": "PENDING_ACCEPTANCE",
+      "fulfillmentMode": "PICKUP",
+      "items": [
+        {
+          "mealId": "00000000-0000-0000-0000-000000000264",
+          "title": "QA Meal A2",
+          "allergenStatement": "UNKNOWN",
+          "quantity": 1,
+          "unitPrice": {
+            "amountMinor": 9550,
+            "currency": "EGP"
+          },
+          "lineTotal": {
+            "amountMinor": 9550,
+            "currency": "EGP"
+          }
+        }
+      ],
+      "subtotal": {
+        "amountMinor": 9550,
+        "currency": "EGP"
+      },
+      "deliveryFee": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "tax": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "total": {
+        "amountMinor": 9550,
+        "currency": "EGP"
+      },
+      "slot": {
+        "id": "9c275c87-c46b-4225-b4bd-cb88e281f38c",
+        "startsAt": "2026-10-23T10:00:00Z",
+        "endsAt": "2026-10-23T12:00:00Z",
+        "timezone": "Africa/Cairo",
+        "cutoffAt": "2026-10-23T08:00:00Z",
+        "availablePortions": 0,
+        "fulfillmentModes": [
+          "PICKUP"
+        ]
+      },
+      "acceptBy": "2026-10-13T10:56:44.596679Z",
+      "events": [
+        {
+          "sequence": 1,
+          "fromState": null,
+          "toState": "PENDING_ACCEPTANCE",
+          "occurredAt": "2026-10-13T10:41:44.953187Z",
+          "actorType": "CUSTOMER",
+          "reasonCode": null
+        }
+      ],
+      "allowedActions": [
+        "CANCEL"
+      ],
+      "cashState": "DUE",
+      "supportCaseIds": [],
+      "handoverCode": null,
+      "contact": null
+    }
+  },
+  "collision": {
+    "status": 409,
+    "data": {
+      "code": "IDEMPOTENCY_CONFLICT",
+      "messageKey": "error.idempotency_conflict",
+      "fieldErrors": [],
+      "requestId": "ce8b6c13-a9de-4ac8-9089-a65ba0410897",
+      "retryable": false
+    }
+  }
+}

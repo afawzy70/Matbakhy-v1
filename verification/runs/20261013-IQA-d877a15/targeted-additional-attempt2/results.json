@@ -1,0 +1,36 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "C-PROFILE",
+      "actor": "Customer-a real API/database",
+      "requirement": "BR-005/012; API-016; historical delivery snapshots after address removal",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "b71df1d03d66f06331d50ec33b3fd678a1e2f542",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T11:06:18.792Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "remove.status is not a function"
+        }
+      ],
+      "evidence": [],
+      "exception": "remove.status is not a function",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-13T11:06:21.069Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

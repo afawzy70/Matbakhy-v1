@@ -1,0 +1,14 @@
+{
+  "id": "9b794b9d-7eff-4a5c-9d1d-dbc34790e2fd",
+  "reference": "CS-4AD96E0C",
+  "orderId": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+  "orderNumber": "MB-100002",
+  "category": "QUALITY",
+  "state": "OPEN",
+  "description": "Independent synthetic QA support thread check.",
+  "resolutionCode": null,
+  "createdAt": "2026-10-13T10:38:30.546131Z",
+  "updatedAt": "2026-10-13T10:38:30.546131Z",
+  "messages": [],
+  "version": 0
+}

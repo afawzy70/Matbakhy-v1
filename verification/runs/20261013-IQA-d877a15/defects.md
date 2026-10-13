@@ -30,18 +30,54 @@ Application: **d877a1576cd942200fe0a53b5a19fee76b996025**. Product code untouche
 
 **Repair acceptance:** all12 W-MONEY-REFLOW variations show intact monetary tokens and usable table mapping; recheck long labels/order numbers, table keyboard scrolling/focus, ARRTL/ENLTR, zoom/text scaling and desktop; retain authoritative amounts. Then pin the pushed repair and run the full suite from a new seed, not only this targeted test.
 
+## MBQA-007 — existing native favorite opens with an incorrect Add action
+
+**Severity:** Moderate: the customer cannot remove an existing favorite through its meal-detail action without first performing a misleading Add; removal from the Favorites list is an alternative UI path (independently confirmed on Android; iOS list-removal path not exercised). No pricing/inventory/data-loss effect demonstrated. **Status:** NEWLY_REPORTED on the pinned application; no regression claim. **Role/platform:** customer iOS, iPhone16e simulator iOS26.2. Shared Android code is an investigation lead; the same detail-reopening variation is NOT_RUN on Android and is not inflated into another confirmed failure.
+
+**Application:** d877a1576cd942200fe0a53b5a19fee76b996025. **Suite:** bc1018ef7bce660c312be3c984207ebfa39a65df; independent run38385888133/job115257457104. **Requirement:** delivered MB-028/032/TC-132 customer favorites; N-FAVORITES defines durable own add/list/remove. The action must reflect the actual saved relationship, not only the last mutation on one component instance.
+
+**Preconditions:** real fresh customer-a system-browser authentication, native seed One12000/meal00000000-0000-4000-8000-00000000a0b1/kitchenD1/slot51. No simulated authentication, changed token lifetime or mocked favorites backend.
+
+**Reproduction:**
+1. Open Native Dish One from Discover and press Add to favorites. Observe Remove from favorites after success.
+2. Back to Discover, open Favorites and verify Native Dish One appears from the actual own favorites read.
+3. Press that card's actual **Discover** button, opening the Meal screen.
+4. Inspect the favorite action. Expected Remove from favorites for the saved meal; actual **Add to favorites**.
+
+**Evidence/actual:** [sanitized native UI hierarchy and executed markers](native-reviewed-latest.json), public meal screen identifier `meal`, titleNativeDishOne/EGP120.00, and visible Add to favorites button at y664; required Remove action absent. Actual favorite add/list/route preceded this assertion in the compiled test. Fresh G authentication, same-process Q1/edit/remove/lifecycle all executed; this observation has a loaded public Meal screen, unlike the earlier generic load-error/OBS-002. Do not attribute it to token expiry without evidence. No safe screenshot was exported from the failing bundle; the actual public hierarchy is preserved.
+
+**Reproducibility:** one verified independent fresh-run reproduction; the next unchanged-application run retains the original assertion for confirmation. Android list removal is a different path: its failure snapshot showed No favorite dishes yet, revealing a wrong harness assumption about subsequently seeing a Meal-only Add control. It is not evidence of failed Android persistence or an independently reproduced Android detail bug.
+
+**Investigation area (separate from runtime proof):** shared native Meal initializes local favorite state false when opened; the Favorites→Meal navigation does not initialize it from the saved relationship. Inspect hydration/refetch on focus and account changes. Do not alter backend favorite ownership or weaken the Remove assertion.
+
+**Repair acceptance:** after real add→list→actual meal navigation, show Remove, perform removal and verify the own list/API relationship disappears after refresh/cold reopening; also test direct reopening of an existing favorite, AR/EN and account switching on Android and iOS separately. Keep the list-removal workaround working. Pin a published repair and run a new clean full campaign.
+
+## MBQA-008 — Arabic native labels change but the root keeps LTR placement
+
+**Severity:** Moderate, inconsistent Arabic reading/navigation orientation; no financial/state corruption shown. **Status:** NEWLY_REPORTED, no regression claim. **Role/platform:** customer Android API35 emulator, actual screenshot320×640. iOS pixel-layout variation is BLOCKED, not independently failing.
+
+**Application:** d877a1576cd942200fe0a53b5a19fee76b996025. **Suite:** ad752f8a42aa2dd82bb9e80ad96473e460da3991. **Run:**38389933951/job115270939945, screenshot captured11:48UTC. **Requirements:** BR-046 Arabic RTL/English LTR; MB-031/TC-131 delivered shell language/direction; N-EDIT-LAYOUT's independent pixel inspection. This is delivered default-direction behavior, not unfinished MB-033 scaling/push.
+
+**Reproduction:** launch the actual Android app, open Account in English, switch using العربية. Verify Arabic labels, then inspect account header/body alignment and bottom navigation. Expected Arabic root placement/mirrored navigation; actual account header/body remain left-placed, with Discover at far left and Account far right in the English LTR order. The driver's label-switch PASS is retained for that narrower assertion; it does not close the visual failure.
+
+**Evidence:** [actual unedited native screenshot](native/android-38389933951/android-arabic-account.png), [explicit independent visual review](native-rtl-review.json), executed locale marker in the native log extract. Only one Android visual reproduction verified. No iOS failure inferred from shared code.
+
+**Impact/workaround:** Arabic navigation/body positioning remains inconsistent despite translated labels; use English for the existing LTR layout while awaiting repair. **Investigation area:** native navigation direction and content alignment/stretch under the locale; inspect React Navigation and body/container direction handling, rather than translating strings again. The actual header is translated; this is a placement finding, not an untranslated-header claim.
+
+**Repair acceptance:** independently inspect EN/AR screenshots for mirrored root/header/tab placement and readable mixed Latin/Arabic text, quantities/prices, keyboard/scroll/safe areas. Preserve basket, session and pending-request state when switching. Execute Android and iOS separately on a newly pinned repair; complete fresh full regression before any overall pass claim.
+
 ## Historical findings — current independent disposition
 
 | ID | Fresh web result | Native result / limitation |
 |---|---|---|
-| MBQA-001 language switch | PASS: actual request language and rendered home/meal/kitchen; en/ar direction and preserved basket | Native language/layout supplementary execution pending; no inherited webPASS |
+| MBQA-001 language switch | PASS: actual request language and rendered home/meal/kitchen; en/ar direction and preserved basket | Android actual labels switched but root RTL fails MBQA-008; iOS later layout blocked; no inherited webPASS |
 | MBQA-002 unavailable selected slot | PASS: real competing reservation exhausts chosen slot while another positive; disabledAdd/no cart; legal release | Mixed-stock native variant not executed by one-slot fixtures; gap explicit |
-| FG-001 basket edit/remove/estimate | PASS:33600→43150→31125→19100→empty, exactkitchen/slot, persistence/replacements | Native core basket/replacement and quantity correction executed; extra remove/lifecycle states pending validated controls |
+| FG-001 basket edit/remove/estimate | PASS:33600→43150→31125→19100→empty, exactkitchen/slot, persistence/replacements | Native actual4/480/remove/empty and before/after background/cold state verified on both; exact Keep-slot/native language-state gaps explicit |
 | MBQA-003 web sign-out | PASS in fresh attempt6: reachable action, failed request retains session, provider logout completed, same-browserB requires credentials; pending warning cancel preserves originalrequest | Native original auth/logout/account switch independently executed; populated-cache variants remain a separate gap |
-| MBQA-004 public support reply | PASS in fresh web: true support PUBLIC/STAFF_ONLY writes, own visible conversation/customer reply, foreign404/private filtering; resolved/closed states | Native public conversation test pending; Support.tsx lists case references without a detail route. Code inspection is not runtimeFAIL; do not close the native gap yet |
+| MBQA-004 public support reply | PASS in fresh web: true support PUBLIC/STAFF_ONLY writes, own visible conversation/customer reply, foreign404/private filtering; resolved/closed states | Android own case listed/tapped, public thread unreachable (runtimeFAIL); iOS public-thread BLOCKED despite real creation/cancellation PASS, not inferred from shared code |
 | MBQA-005 DRAFT Close | PASS: noClose inDRAFT; direct invalidClose409 unchanged; OPEN exposes legalPause/Close | Staff-native not implemented |
 | OBS-001 recovery lookup network failure | PASS: actual lookup aborted, no uncaught rejection, originalkeys/pendingstate remain, same-order recovery | Separate native recovery independently executed; no cross-platform inference |
-| Q1 | PASS: actualsynthetic10, UI clamps/API422 for11; same-runningbrowser reads lowered5, blocks invalidquote, correctsto5 | Android same-process PID proofPASS; iOS restored-lower-limitcorePASS, same-process controls pending rebuilt tests |
+| Q1 | PASS: actualsynthetic10, UI clamps/API422 for11; same-runningbrowser reads lowered5, blocks invalidquote, correctsto5 | Android unchangedPID and iOS continuous-runningForeground lower-limit refresh independently verified; availability-below-policy fixture remains blocked |
 
 ## Not product defects
 

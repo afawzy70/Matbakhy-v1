@@ -1,0 +1,353 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "P-HISTORY",
+      "actor": "Owning cook browser",
+      "requirement": "D14/TC-153; BR-046/TC-046",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T11:04:09.918Z",
+      "checks": [
+        {
+          "name": "History intact money/no overflow 320/en",
+          "status": "PASS",
+          "expected": "intact active/previous prices; no document overflow",
+          "actual": {
+            "width": 320,
+            "documentWidth": 320,
+            "money": [
+              {
+                "number": "120.25",
+                "lines": 1
+              },
+              {
+                "number": "125.25",
+                "lines": 1
+              },
+              {
+                "number": "120.25",
+                "lines": 1
+              },
+              {
+                "number": "127.25",
+                "lines": 1
+              },
+              {
+                "number": "120.25",
+                "lines": 1
+              },
+              {
+                "number": "122.25",
+                "lines": 1
+              },
+              {
+                "number": "121.25",
+                "lines": 1
+              },
+              {
+                "number": "120.25",
+                "lines": 1
+              }
+            ]
+          }
+        },
+        {
+          "name": "History intact money/no overflow 320/ar",
+          "status": "PASS",
+          "expected": "intact active/previous prices; no document overflow",
+          "actual": {
+            "width": 320,
+            "documentWidth": 320,
+            "money": [
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٥٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٧٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٢٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢١٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              }
+            ]
+          }
+        },
+        {
+          "name": "History intact money/no overflow 390/en",
+          "status": "PASS",
+          "expected": "intact active/previous prices; no document overflow",
+          "actual": {
+            "width": 390,
+            "documentWidth": 390,
+            "money": [
+              {
+                "number": "120.25",
+                "lines": 1
+              },
+              {
+                "number": "125.25",
+                "lines": 1
+              },
+              {
+                "number": "120.25",
+                "lines": 1
+              },
+              {
+                "number": "127.25",
+                "lines": 1
+              },
+              {
+                "number": "120.25",
+                "lines": 1
+              },
+              {
+                "number": "122.25",
+                "lines": 1
+              },
+              {
+                "number": "121.25",
+                "lines": 1
+              },
+              {
+                "number": "120.25",
+                "lines": 1
+              }
+            ]
+          }
+        },
+        {
+          "name": "History intact money/no overflow 390/ar",
+          "status": "PASS",
+          "expected": "intact active/previous prices; no document overflow",
+          "actual": {
+            "width": 390,
+            "documentWidth": 390,
+            "money": [
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٥٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٧٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٢٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢١٫٢٥",
+                "lines": 1
+              },
+              {
+                "number": "١٢٠٫٢٥",
+                "lines": 1
+              }
+            ]
+          }
+        }
+      ],
+      "evidence": [
+        "P-HISTORY-320-en.png",
+        "P-HISTORY-320-en.json",
+        "P-HISTORY-320-ar.png",
+        "P-HISTORY-320-ar.json",
+        "P-HISTORY-390-en.png",
+        "P-HISTORY-390-en.json",
+        "P-HISTORY-390-ar.png",
+        "P-HISTORY-390-ar.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T11:04:12.378Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "cook-a",
+          "viewport": {
+            "width": 390,
+            "height": 1000
+          }
+        }
+      ]
+    },
+    {
+      "id": "C-INBOX-SHARE-REORDER",
+      "actor": "Customer web after authorized kitchen update",
+      "requirement": "TC-012/128; D13 current server quote",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T11:04:12.384Z",
+      "checks": [
+        {
+          "name": "Reorder navigation plus actual UI quote uses new current server price",
+          "status": "PASS",
+          "expected": "201; current unit/total12525, pickupfee0",
+          "actual": {
+            "status": 201,
+            "data": {
+              "quoteId": "48a7d0e4-dcd1-4304-bcc7-6a09f8943f2a",
+              "expiresAt": "2026-10-13T11:09:15.339501116Z",
+              "kitchenId": "00000000-0000-0000-0000-00000000012d",
+              "items": [
+                {
+                  "mealId": "00000000-0000-0000-0000-000000000263",
+                  "mealRevision": 11,
+                  "title": "QA Meal A1",
+                  "quantity": 1,
+                  "unitPrice": {
+                    "amountMinor": 12525,
+                    "currency": "EGP"
+                  },
+                  "lineTotal": {
+                    "amountMinor": 12525,
+                    "currency": "EGP"
+                  }
+                }
+              ],
+              "subtotal": {
+                "amountMinor": 12525,
+                "currency": "EGP"
+              },
+              "deliveryFee": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "tax": {
+                "amountMinor": 0,
+                "currency": "EGP"
+              },
+              "total": {
+                "amountMinor": 12525,
+                "currency": "EGP"
+              },
+              "cancellationPolicyVersion": "synthetic-cancel-v1",
+              "termsVersion": "synthetic-terms-v1",
+              "acceptanceDeadlinePreview": "2026-10-13T11:19:15.339501116Z",
+              "warnings": [
+                "SYNTHETIC_POLICY"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Completed order retains original24050 despite repriced reorder quote",
+          "status": "PASS",
+          "expected": {
+            "amountMinor": 24050,
+            "currency": "EGP"
+          },
+          "actual": {
+            "amountMinor": 24050,
+            "currency": "EGP"
+          }
+        },
+        {
+          "name": "Price prerequisite legally restored",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        }
+      ],
+      "evidence": [
+        "C-REORDER-current-quote.png",
+        "C-REORDER-current-quote.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T11:04:15.655Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "cook-a",
+          "viewport": {
+            "width": 390,
+            "height": 1000
+          }
+        },
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    },
+    {
+      "id": "C-PROFILE",
+      "actor": "Customer-a real API/database",
+      "requirement": "BR-005/012; API-016; historical delivery snapshots after address removal",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "ff00ff5a31b8b232b798a7860f28402b20fe389d",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T11:04:15.668Z",
+      "checks": [
+        {
+          "name": "Execution stopped; reproduce before defect classification",
+          "status": "BLOCKED",
+          "reason": "Real synthetic address prerequisite failed: 422"
+        }
+      ],
+      "evidence": [],
+      "exception": "Real synthetic address prerequisite failed: 422",
+      "status": "BLOCKED",
+      "finishedAt": "2026-10-13T11:04:15.754Z",
+      "contextsOpenAtCaseFinish": [
+        {
+          "role": "cook-a",
+          "viewport": {
+            "width": 390,
+            "height": 1000
+          }
+        },
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

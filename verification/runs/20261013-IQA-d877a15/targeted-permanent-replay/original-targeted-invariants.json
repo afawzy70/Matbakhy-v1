@@ -1,0 +1,191 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "testSuiteSha": "9043d8ad12ea49e633f47c82ac94a582154c718a",
+  "quoteExpired": true,
+  "request": {
+    "quoteId": "25f6de19-1351-4696-9384-c59800833b26",
+    "clientRequestId": "c95a09ce-85a2-4675-a922-566e826f80ba",
+    "acceptedPolicyVersions": {
+      "terms": "synthetic-terms-v1",
+      "cancellation": "synthetic-cancel-v1"
+    }
+  },
+  "original": {
+    "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+    "total": 15025,
+    "fee": 3000,
+    "state": "CANCELLED"
+  },
+  "before": {
+    "orders": 1,
+    "allocations": 1,
+    "reserved": 0,
+    "cash": 1,
+    "placed": 1,
+    "events": 2
+  },
+  "after": {
+    "orders": 1,
+    "allocations": 1,
+    "reserved": 0,
+    "cash": 1,
+    "placed": 1,
+    "events": 2
+  },
+  "results": [
+    {
+      "status": 201,
+      "data": {
+        "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+        "publicNumber": "MB-100008",
+        "version": 1,
+        "state": "CANCELLED",
+        "fulfillmentMode": "DELIVERY",
+        "items": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "title": "QA Meal A1",
+            "allergenStatement": "UNKNOWN",
+            "quantity": 1,
+            "unitPrice": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "lineTotal": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "subtotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "deliveryFee": {
+          "amountMinor": 3000,
+          "currency": "EGP"
+        },
+        "tax": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "total": {
+          "amountMinor": 15025,
+          "currency": "EGP"
+        },
+        "slot": {
+          "id": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-19T08:05:14.215162Z",
+          "endsAt": "2026-10-19T10:05:14.215162Z",
+          "timezone": "Africa/Cairo",
+          "cutoffAt": "2026-10-19T06:05:14.215162Z",
+          "availablePortions": 49,
+          "fulfillmentModes": [
+            "DELIVERY"
+          ]
+        },
+        "acceptBy": "2026-10-13T08:24:02.097955Z",
+        "events": [
+          {
+            "sequence": 1,
+            "fromState": null,
+            "toState": "PENDING_ACCEPTANCE",
+            "occurredAt": "2026-10-13T08:09:02.104054Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": null
+          },
+          {
+            "sequence": 2,
+            "fromState": "PENDING_ACCEPTANCE",
+            "toState": "CANCELLED",
+            "occurredAt": "2026-10-13T08:09:03.916769Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": "CHANGED_MIND"
+          }
+        ],
+        "allowedActions": [],
+        "cashState": "NOT_DUE",
+        "supportCaseIds": [],
+        "handoverCode": null,
+        "contact": null
+      }
+    },
+    {
+      "status": 201,
+      "data": {
+        "id": "0c20778d-15e4-4c7d-84be-fc26d5a1264b",
+        "publicNumber": "MB-100008",
+        "version": 1,
+        "state": "CANCELLED",
+        "fulfillmentMode": "DELIVERY",
+        "items": [
+          {
+            "mealId": "00000000-0000-0000-0000-000000000263",
+            "title": "QA Meal A1",
+            "allergenStatement": "UNKNOWN",
+            "quantity": 1,
+            "unitPrice": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            },
+            "lineTotal": {
+              "amountMinor": 12025,
+              "currency": "EGP"
+            }
+          }
+        ],
+        "subtotal": {
+          "amountMinor": 12025,
+          "currency": "EGP"
+        },
+        "deliveryFee": {
+          "amountMinor": 3000,
+          "currency": "EGP"
+        },
+        "tax": {
+          "amountMinor": 0,
+          "currency": "EGP"
+        },
+        "total": {
+          "amountMinor": 15025,
+          "currency": "EGP"
+        },
+        "slot": {
+          "id": "00000000-0000-0000-0000-00000000019f",
+          "startsAt": "2026-10-19T08:05:14.215162Z",
+          "endsAt": "2026-10-19T10:05:14.215162Z",
+          "timezone": "Africa/Cairo",
+          "cutoffAt": "2026-10-19T06:05:14.215162Z",
+          "availablePortions": 49,
+          "fulfillmentModes": [
+            "DELIVERY"
+          ]
+        },
+        "acceptBy": "2026-10-13T08:24:02.097955Z",
+        "events": [
+          {
+            "sequence": 1,
+            "fromState": null,
+            "toState": "PENDING_ACCEPTANCE",
+            "occurredAt": "2026-10-13T08:09:02.104054Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": null
+          },
+          {
+            "sequence": 2,
+            "fromState": "PENDING_ACCEPTANCE",
+            "toState": "CANCELLED",
+            "occurredAt": "2026-10-13T08:09:03.916769Z",
+            "actorType": "CUSTOMER",
+            "reasonCode": "CHANGED_MIND"
+          }
+        ],
+        "allowedActions": [],
+        "cashState": "NOT_DUE",
+        "supportCaseIds": [],
+        "handoverCode": null,
+        "contact": null
+      }
+    }
+  ]
+}

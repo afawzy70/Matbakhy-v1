@@ -1,0 +1,79 @@
+{
+  "115201812739": [
+    "2026-10-13T08:45:11.7053414Z PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data",
+    "2026-10-13T08:46:58.0241588Z IQA-PENDING-PRECONDITION verified held response and one committed order",
+    "2026-10-13T08:47:26.0209228Z side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1",
+    "2026-10-13T08:48:52.1076279Z PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold",
+    "2026-10-13T08:49:10.0723480Z IQA-Q1-SAME-SESSION verified PID 8573 unchanged",
+    "2026-10-13T08:49:58.5270692Z IQA-EDIT-REMOVE verified four/480/remove/empty",
+    "2026-10-13T08:50:16.5850392Z IQA-LIFECYCLE verified background and cold persisted basket",
+    "2026-10-13T08:50:37.9684420Z IQA-FAVORITES verified add/list/remove",
+    "2026-10-13T08:50:50.3628180Z IQA-LOCALE verified AR and EN account switching",
+    "2026-10-13T08:51:15.4148496Z FAIL: MBQA-004 public reply unreachable"
+  ],
+  "115209725892": [
+    "2026-10-13T09:09:55.6119220Z Test Case '-[SignInUITests.SignInRoundTripTests testSignInSignOutAndAccountSwitchLeaveNoPreviousUserSession]' passed (202.677 seconds).",
+    "2026-10-13T09:09:55.6203950Z Test Suite 'SignInRoundTripTests' passed at 2026-10-13 09:09:51.382.",
+    "2026-10-13T09:09:55.6310460Z Test Suite 'SignInUITests.xctest' passed at 2026-10-13 09:09:51.383.",
+    "2026-10-13T09:09:55.6417800Z Test Suite 'Selected tests' passed at 2026-10-13 09:09:51.383.",
+    "2026-10-13T09:13:25.3215940Z IQA-PENDING-PRECONDITION observed before termination",
+    "2026-10-13T09:13:25.3216660Z Test Case '-[SignInUITests.OrderingTests testA_ReplacementPromptAndSubmitThenKill]' passed (89.527 seconds).",
+    "2026-10-13T09:14:23.5585190Z Test Case '-[SignInUITests.OrderingTests testB_ReopenedOfflineSaysUnconfirmed]' passed (10.213 seconds).",
+    "2026-10-13T09:15:06.6323940Z Test Case '-[SignInUITests.OrderingTests testC_BackOnlineRecoversTheOneOrder]' passed (11.837 seconds).",
+    "2026-10-13T09:15:07.6291740Z side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1",
+    "2026-10-13T09:15:54.9407580Z Test Case '-[SignInUITests.OrderingTests testD_QuantityStopsAtThePolicyLimit]' passed (19.259 seconds).",
+    "2026-10-13T09:16:48.6856770Z Test Case '-[SignInUITests.OrderingTests testE_LoweredLimitBlocksQuoteThenDeliveryOrder]' passed (26.084 seconds).",
+    "2026-10-13T09:17:36.1959850Z Test Case '-[SignInUITests.OrderingTests testF_OrderDeepLinkWarmAndCold]' passed (16.676 seconds).",
+    "2026-10-13T09:21:02.3783110Z IQA-Q1-SAME-SESSION verified continuous runningForeground app",
+    "2026-10-13T09:21:02.3786130Z IQA-EDIT-REMOVE verified four/480/remove/empty",
+    "2026-10-13T09:21:02.3788100Z IQA-LIFECYCLE verified background and cold basket",
+    "2026-10-13T09:21:02.3796900Z Test Case '-[SignInUITests.OrderingTests testG_IndependentSameSessionPolicyEditAndRecovery]' failed (130.682 seconds).",
+    "2026-10-13T09:21:02.3802040Z FAIL: testG_IndependentSameSessionPolicyEditAndRecovery (xcodebuild exit 65)"
+  ],
+  "115181982659": [
+    "2026-10-13T07:55:54.0941300Z Test Case '-[SignInUITests.SignInRoundTripTests testSignInSignOutAndAccountSwitchLeaveNoPreviousUserSession]' passed (126.079 seconds).",
+    "2026-10-13T07:55:54.0945790Z Test Suite 'SignInRoundTripTests' passed at 2026-10-13 07:55:51.519.",
+    "2026-10-13T07:55:54.0946550Z Test Suite 'SignInUITests.xctest' passed at 2026-10-13 07:55:51.521.",
+    "2026-10-13T07:55:54.0947080Z Test Suite 'Selected tests' passed at 2026-10-13 07:55:51.521.",
+    "2026-10-13T07:58:24.0901340Z Test Case '-[SignInUITests.OrderingTests testA_ReplacementPromptAndSubmitThenKill]' passed (93.094 seconds).",
+    "2026-10-13T07:59:06.7973180Z Test Case '-[SignInUITests.OrderingTests testB_ReopenedOfflineSaysUnconfirmed]' passed (9.223 seconds).",
+    "2026-10-13T07:59:51.4515900Z Test Case '-[SignInUITests.OrderingTests testC_BackOnlineRecoversTheOneOrder]' passed (12.008 seconds).",
+    "2026-10-13T07:59:51.9832990Z side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1",
+    "2026-10-13T08:00:35.6325790Z Test Case '-[SignInUITests.OrderingTests testD_QuantityStopsAtThePolicyLimit]' passed (19.516 seconds).",
+    "2026-10-13T08:01:33.9008550Z Test Case '-[SignInUITests.OrderingTests testE_LoweredLimitBlocksQuoteThenDeliveryOrder]' passed (28.693 seconds).",
+    "2026-10-13T08:02:21.2176530Z Test Case '-[SignInUITests.OrderingTests testF_OrderDeepLinkWarmAndCold]' passed (15.969 seconds)."
+  ],
+  "115194630659": [
+    "2026-10-13T08:28:42.0021160Z Test Case '-[SignInUITests.SignInRoundTripTests testSignInSignOutAndAccountSwitchLeaveNoPreviousUserSession]' passed (171.167 seconds).",
+    "2026-10-13T08:28:42.0028920Z Test Suite 'SignInRoundTripTests' passed at 2026-10-13 08:28:39.813.",
+    "2026-10-13T08:28:42.0030830Z Test Suite 'SignInUITests.xctest' passed at 2026-10-13 08:28:39.815.",
+    "2026-10-13T08:28:42.0038040Z Test Suite 'Selected tests' passed at 2026-10-13 08:28:39.816.",
+    "2026-10-13T08:31:22.4283900Z IQA-PENDING-PRECONDITION observed before termination",
+    "2026-10-13T08:31:22.4286620Z Test Case '-[SignInUITests.OrderingTests testA_ReplacementPromptAndSubmitThenKill]' passed (97.100 seconds).",
+    "2026-10-13T08:32:11.0726040Z Test Case '-[SignInUITests.OrderingTests testB_ReopenedOfflineSaysUnconfirmed]' passed (9.991 seconds).",
+    "2026-10-13T08:32:59.4609190Z Test Case '-[SignInUITests.OrderingTests testC_BackOnlineRecoversTheOneOrder]' passed (10.872 seconds).",
+    "2026-10-13T08:33:00.0818460Z side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1",
+    "2026-10-13T08:33:42.2018260Z Test Case '-[SignInUITests.OrderingTests testD_QuantityStopsAtThePolicyLimit]' passed (17.818 seconds).",
+    "2026-10-13T08:34:34.1631620Z Test Case '-[SignInUITests.OrderingTests testE_LoweredLimitBlocksQuoteThenDeliveryOrder]' passed (26.784 seconds).",
+    "2026-10-13T08:35:12.0831800Z Test Case '-[SignInUITests.OrderingTests testF_OrderDeepLinkWarmAndCold]' passed (14.480 seconds).",
+    "2026-10-13T08:37:33.1569770Z IQA-Q1-SAME-SESSION verified continuous runningForeground app",
+    "2026-10-13T08:37:33.1640930Z IQA-EDIT-REMOVE verified four/480/remove/empty",
+    "2026-10-13T08:37:33.1649160Z IQA-LIFECYCLE verified background and cold basket",
+    "2026-10-13T08:37:33.2078980Z Test Case '-[SignInUITests.OrderingTests testG_IndependentSameSessionPolicyEditAndRecovery]' failed (65.469 seconds).",
+    "2026-10-13T08:37:33.2108740Z FAIL: testG_IndependentSameSessionPolicyEditAndRecovery (xcodebuild exit 65)"
+  ],
+  "115193649774": [
+    "2026-10-13T08:17:47.1167299Z PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data",
+    "2026-10-13T08:19:28.2642385Z IQA-PENDING-PRECONDITION verified held response and one committed order",
+    "2026-10-13T08:19:55.0987074Z side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1",
+    "2026-10-13T08:21:17.4418570Z PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold",
+    "2026-10-13T08:21:33.7958856Z IQA-Q1-SAME-SESSION verified PID 8668 unchanged"
+  ],
+  "115181982286": [
+    "2026-10-13T07:54:17.6044262Z PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data",
+    "2026-10-13T07:56:00.5194423Z IQA-PENDING-PRECONDITION verified held response and one committed order",
+    "2026-10-13T07:56:27.6246706Z side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1",
+    "2026-10-13T07:57:50.5158036Z PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold",
+    "2026-10-13T07:58:07.1191593Z IQA-Q1-SAME-SESSION verified PID 8499 unchanged"
+  ]
+}

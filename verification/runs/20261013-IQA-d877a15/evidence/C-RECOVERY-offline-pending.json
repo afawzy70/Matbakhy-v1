@@ -1,0 +1,28 @@
+{
+  "path": "/#/checkout",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy\nCart\nالعربية\nSign out\n\nYou are offline. We will try again when you are back online.\n\nCart\n\nKitchen: مطبخ تجريبي A\n\n19 Oct 2026, 13:37\n\nQA Meal A1\n−\n1\n+\nEGP 120.25\nRemove\nEstimated subtotal\nEGP 120.25\n\nThis is an estimate from the prices shown when you added each meal. The final total at the current price appears when you choose \"Calculate total\".\n\nEmpty cart\nCheckout\n\nWe could not confirm your order. Retry the same order; it will not be duplicated.\n\nRetry the same order\nDelivery\nPickup from the kitchen\nCalculate total\nMeals\nEGP 120.25\nDelivery fee\nEGP 0.00\nTax\nEGP 0.00\nTotal\nEGP 120.25\n\nPay in cash on receipt.\n\nSynthetic policy (test environment)\n\nI accept the terms and the cancellation policy\nPlace order\n\nWe could not confirm your order. Retry the same order; it will not be duplicated.\n\nHome\nMy orders\nMy account",
+  "cart": {
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "kitchenName": "مطبخ تجريبي A",
+    "slotId": "00000000-0000-0000-0000-00000000019f",
+    "slotStartsAt": "2026-10-19T10:37:12.682171Z",
+    "modes": [
+      "PICKUP",
+      "DELIVERY"
+    ],
+    "lines": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "title": "QA Meal A1",
+        "quantity": 1,
+        "unitPriceMinor": 12025,
+        "maxQuantity": 10
+      }
+    ]
+  },
+  "pending": true
+}

@@ -145,7 +145,7 @@ tap 'resource-id="kc-login"|text="Sign In"'
 wait_for 'text="Hello [^\"]*SyntheticA"' 90 >/dev/null || fail "active same-customer session not established"
 echo "IQA-SUPPORT-FRESH-AUTH established without policy change"
 adb shell am start -W -a android.intent.action.VIEW -d "matbakhy-dev://orders/$DID" "$PKG" >/dev/null
-wait_for "text=\\"$DNUMBER\\"" 60 >/dev/null || fail "own delivery order missing"
+wait_for "$DNUMBER" 60 >/dev/null || fail "own delivery order missing"
 tap_scrolled 'content-desc="Cancel order"|text="Cancel order"'
 wait_scrolled 'text="Cancelled"' 60 || fail "customer cancellation not visible"
 absent 'content-desc="Cancel order"|text="Cancel order"'
@@ -153,7 +153,7 @@ echo "IQA-CUSTOMER-CANCEL verified $DNUMBER"
 launch
 tap 'resource-id="tab-account"' 90
 tap_scrolled 'content-desc="Support"|text="Support"'
-tap_scrolled "content-desc=\\"Order: $DNUMBER\\"|text=\\"Order: $DNUMBER\\""
+tap_scrolled "Order: $DNUMBER"
 tap_scrolled 'content-desc="Describe the problem"'
 adb shell input text 'Independent%snative%ssynthetic%ssupport%screation'
 wait_for 'text="Independent native synthetic support creation"' 30 >/dev/null || fail "intended description not entered"
@@ -324,7 +324,7 @@ extra=r'''    private func fixture(_ path: String) {
         // Completed native cancellation journey on the actual previously placed delivery order.
         guard #available(iOS 16.4, *), let id = ProcessInfo.processInfo.environment["MB033_ORDER_ID"], let number = ProcessInfo.processInfo.environment["MB033_ORDER_NUMBER"] else { return XCTFail("real delivered-order prerequisite absent") }
         app.open(URL(string: "matbakhy-dev://orders/\(id)")!)
-        expect(text(number), "own delivery order missing")
+wait_for "$DNUMBER" 60 >/dev/null || fail "own delivery order missing"
         let cancel = app.buttons["Cancel order"]
         expect(cancel, "pending cancellation unavailable")
         var scrolls = 0

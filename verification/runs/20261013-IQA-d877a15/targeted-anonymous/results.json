@@ -1,0 +1,121 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "C-BROWSE",
+      "actor": "Anonymous customer web, narrow EN/AR",
+      "requirement": "BR-001/011/046; D11/D12; TC-001/016",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "782d3520eff01c7088198370c99c133a4b34a54d",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T11:18:07.576Z",
+      "checks": [
+        {
+          "name": "Genuinely anonymous prerequisite established",
+          "status": "PASS",
+          "expected": 401,
+          "actual": 401
+        },
+        {
+          "name": "D12 anonymous card reuses exact published description en",
+          "status": "PASS",
+          "expected": "same independently seeded/published description, no invented content",
+          "actual": {
+            "locale": "en",
+            "descriptionShown": true
+          }
+        },
+        {
+          "name": "D11 deferred one-person/two-person filter controls absent en",
+          "status": "PASS",
+          "expected": "no portion-size filtering control",
+          "actual": {
+            "visibleControls": [
+              "العربية",
+              "A meal for me or usFor one or two people",
+              "Complete my tableA dish to go with your meal",
+              "Prepare a gatheringFor family get-togethers",
+              "Dishes",
+              "Kitchens",
+              "Search for a meal or kitchen",
+              "Filter results",
+              "All",
+              "Main dishes",
+              "Sides and salads",
+              "Soups",
+              "Baked goods",
+              "Desserts",
+              "Breakfast",
+              "Ready to cook"
+            ]
+          }
+        },
+        {
+          "name": "Actual anonymous photo and narrow direction/no overflow en",
+          "status": "PASS",
+          "expected": "390px; correctdirection and rendered publicphoto",
+          "actual": {
+            "width": 390,
+            "documentWidth": 390,
+            "dir": "ltr"
+          }
+        },
+        {
+          "name": "D12 anonymous card reuses exact published description ar",
+          "status": "PASS",
+          "expected": "same independently seeded/published description, no invented content",
+          "actual": {
+            "locale": "ar",
+            "descriptionShown": true
+          }
+        },
+        {
+          "name": "D11 deferred one-person/two-person filter controls absent ar",
+          "status": "PASS",
+          "expected": "no portion-size filtering control",
+          "actual": {
+            "visibleControls": [
+              "English",
+              "وجبة ليا أو لينالشخص أو فردين",
+              "أكمل سفرتيصنف يكمل أكلك",
+              "أجهز عزومةلجمعة ولمة العيلة",
+              "الأكلات",
+              "المطابخ",
+              "ابحث عن طبق أو مطبخ",
+              "تصفية النتائج",
+              "الكل",
+              "أطباق رئيسية",
+              "أطباق جانبية وسلطات",
+              "شوربة",
+              "مخبوزات",
+              "حلويات",
+              "فطار",
+              "جاهز للطبخ"
+            ]
+          }
+        },
+        {
+          "name": "Actual anonymous photo and narrow direction/no overflow ar",
+          "status": "PASS",
+          "expected": "390px; correctdirection and rendered publicphoto",
+          "actual": {
+            "width": 390,
+            "documentWidth": 390,
+            "dir": "rtl"
+          }
+        }
+      ],
+      "evidence": [
+        "C-BROWSE-anonymous-390-en.png",
+        "C-BROWSE-anonymous-390-en.json",
+        "C-BROWSE-anonymous-390-ar.png",
+        "C-BROWSE-anonymous-390-ar.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T11:18:09.706Z",
+      "contextsOpenAtCaseFinish": []
+    }
+  ]
+}

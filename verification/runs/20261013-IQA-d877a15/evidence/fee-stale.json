@@ -1,0 +1,103 @@
+{
+  "old": {
+    "quoteId": "294051b7-dd97-4e1c-a69e-c59a821e4a01",
+    "expiresAt": "2026-10-13T10:45:31.574742050Z",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000264",
+        "mealRevision": 1,
+        "title": "QA Meal A2",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 9550,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3000,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 12550,
+      "currency": "EGP"
+    },
+    "cancellationPolicyVersion": "synthetic-cancel-v1",
+    "termsVersion": "synthetic-terms-v1",
+    "acceptanceDeadlinePreview": "2026-10-13T10:55:31.574742050Z",
+    "warnings": [
+      "SYNTHETIC_POLICY"
+    ]
+  },
+  "fresh": {
+    "quoteId": "7eecddba-094d-470c-a8aa-c2db48a3749d",
+    "expiresAt": "2026-10-13T10:45:31.912044904Z",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "items": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000264",
+        "mealRevision": 1,
+        "title": "QA Meal A2",
+        "quantity": 1,
+        "unitPrice": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        },
+        "lineTotal": {
+          "amountMinor": 9550,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "subtotal": {
+      "amountMinor": 9550,
+      "currency": "EGP"
+    },
+    "deliveryFee": {
+      "amountMinor": 3125,
+      "currency": "EGP"
+    },
+    "tax": {
+      "amountMinor": 0,
+      "currency": "EGP"
+    },
+    "total": {
+      "amountMinor": 12675,
+      "currency": "EGP"
+    },
+    "cancellationPolicyVersion": "synthetic-cancel-v1",
+    "termsVersion": "synthetic-terms-v1",
+    "acceptanceDeadlinePreview": "2026-10-13T10:55:31.912044904Z",
+    "warnings": [
+      "SYNTHETIC_POLICY"
+    ]
+  },
+  "stale": {
+    "status": 409,
+    "data": {
+      "code": "PRICE_CHANGED",
+      "messageKey": "error.price_changed",
+      "fieldErrors": [
+        {
+          "field": "quoteId",
+          "code": "TOTAL_CHANGED"
+        }
+      ],
+      "requestId": "8d367bdc-9286-4d75-be71-112446223315",
+      "retryable": false
+    }
+  }
+}

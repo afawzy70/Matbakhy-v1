@@ -1,0 +1,112 @@
+{
+  "runType": "TARGETED",
+  "data": [
+    {
+      "id": "C-AUTH",
+      "actor": "Customer web",
+      "requirement": "MB-009/027; BR-006/007",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "d98d3a1760f6cc9bc8759f76e71f51595a52a23d",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T07:58:12.347Z",
+      "checks": [
+        {
+          "name": "Real login maps correct synthetic identity",
+          "status": "PASS",
+          "expected": "00000000-0000-0000-0000-0000000002bd",
+          "actual": "00000000-0000-0000-0000-0000000002bd"
+        },
+        {
+          "name": "Session restored after reload",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Delivered customer account exposes sign-out action",
+          "status": "PASS",
+          "expected": "reachable Sign out control (CW11)",
+          "actual": [
+            "العربية",
+            "Sign out",
+            "Save",
+            "Get help with an order",
+            "Request account deletion"
+          ]
+        },
+        {
+          "name": "Failed logout retains authenticated session",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Logout revokes application session",
+          "status": "PASS",
+          "expected": 401,
+          "actual": 401
+        },
+        {
+          "name": "Same browser requires fresh login and maps B after A logout",
+          "status": "PASS",
+          "expected": "00000000-0000-0000-0000-0000000002be",
+          "actual": "00000000-0000-0000-0000-0000000002be"
+        },
+        {
+          "name": "Distinct real customer identities",
+          "status": "PASS",
+          "expected": "00000000-0000-0000-0000-0000000002be",
+          "actual": "00000000-0000-0000-0000-0000000002be"
+        },
+        {
+          "name": "Customer denied /api/v1/cook/dashboard",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        },
+        {
+          "name": "Customer denied /api/v1/ops/orders",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        },
+        {
+          "name": "Customer denied /api/v1/ops/cases",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        },
+        {
+          "name": "Customer denied /api/v1/ops/configuration",
+          "status": "PASS",
+          "expected": "403/404",
+          "actual": 403
+        }
+      ],
+      "evidence": [
+        "TARGETED-C-AUTH-account.png",
+        "TARGETED-C-AUTH-account.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T07:58:28.524Z",
+      "variations": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        },
+        {
+          "role": "customer-b",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

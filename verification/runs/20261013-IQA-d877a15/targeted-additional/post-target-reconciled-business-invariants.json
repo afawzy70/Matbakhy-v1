@@ -1,0 +1,16 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "testSuiteSha": "843d357a302ea07f6aa71cff88aad91d6e968247",
+  "observedAt": "2026-10-13T12:02:21.095569+00:00",
+  "environment": "matbakhy-regression-d877a15",
+  "scope": "all synthetic campaign orders; commission oracle applies to configured tax0,1000bps HALF_UP excluding delivery",
+  "checks": {
+    "mealCounterMismatches": 0,
+    "kitchenCounterMismatches": 0,
+    "moneyMismatches": 0,
+    "lineMoneyMismatches": 0,
+    "missingCash": 0,
+    "missingOrDuplicatePlacedEvents": 0,
+    "negativeCapacity": 0
+  }
+}

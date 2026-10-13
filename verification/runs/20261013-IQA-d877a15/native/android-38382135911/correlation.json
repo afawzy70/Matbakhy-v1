@@ -1,0 +1,96 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "platform": "android",
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "execution": "real emulator/simulator; existing native UI harness invoked independently and assertions reviewed",
+  "checks": [
+    {
+      "name": "Exactly one recovered pickup and one later delivery order",
+      "expected": [
+        1,
+        1
+      ],
+      "actual": [
+        1,
+        1
+      ],
+      "status": "PASS"
+    },
+    {
+      "name": "Stored pickup and delivery totals",
+      "expected": [
+        9000,
+        63000
+      ],
+      "actual": [
+        9000,
+        63000
+      ],
+      "status": "PASS"
+    }
+  ],
+  "artifact": {
+    "file": "apps/customer-mobile/android/app/build/outputs/apk/release/app-release.apk",
+    "sha256": "e4d7de14d7b3b0b2141e5a4050fe1dce49d998924fcfbac84cfb0ac0b3052fe0"
+  },
+  "metadataGap": "artifact/device or selected safe attachment unavailable; not an execution PASS",
+  "database": {
+    "orders": [
+      {
+        "id": "6647b8c1-d471-4bdd-80c9-6749c009557f",
+        "publicNumber": "MB-100002",
+        "customerId": "1b34a09b-59ab-4aa2-9e14-5437ce6264c2",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 63000,
+        "slotId": "00000000-0000-4000-8000-00000000a051",
+        "kitchenId": "00000000-0000-4000-8000-00000000a0d1",
+        "items": [
+          {
+            "mealId": "00000000-0000-4000-8000-00000000a0b1",
+            "quantity": 5,
+            "unitPriceMinor": 12000
+          }
+        ]
+      },
+      {
+        "id": "71bf9126-eb86-4bcb-87d5-3e4dce54a886",
+        "publicNumber": "MB-100001",
+        "customerId": "1b34a09b-59ab-4aa2-9e14-5437ce6264c2",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 9000,
+        "slotId": "00000000-0000-4000-8000-00000000a052",
+        "kitchenId": "00000000-0000-4000-8000-00000000a0d2",
+        "items": [
+          {
+            "mealId": "00000000-0000-4000-8000-00000000a0b2",
+            "quantity": 1,
+            "unitPriceMinor": 9000
+          }
+        ]
+      }
+    ],
+    "slotCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a052",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ],
+    "mealCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a062",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ]
+  },
+  "trustInvariants": {
+    "ownCases": [],
+    "publicFixtureMessages": 0,
+    "cancelledDeliveryAllocations": 0,
+    "cancelledDeliveryEvents": 0
+  },
+  "deliveryFinalState": "PENDING_ACCEPTANCE"
+}

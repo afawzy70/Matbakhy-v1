@@ -1,0 +1,100 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "S-PERMISSION-UI",
+      "actor": "Admin and support real browser/API",
+      "requirement": "BR-007/043; TC-007/043/126; immediate grants",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "c17785a4e8a8646fac01726b564e0628d687cb1e",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T09:06:18.344Z",
+      "checks": [
+        {
+          "name": "Same support browser stays authenticated after grant revocation",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        },
+        {
+          "name": "Revocation immediately denies actual previously allowed read/write",
+          "status": "PASS",
+          "expected": "403 authenticated denies",
+          "actual": {
+            "read": {
+              "status": 403,
+              "data": {
+                "code": "FORBIDDEN",
+                "messageKey": "error.forbidden",
+                "fieldErrors": [],
+                "requestId": "d2a58c09-2360-429c-be4e-d1595cca8985",
+                "retryable": false
+              }
+            },
+            "write": {
+              "status": 403,
+              "data": {
+                "code": "FORBIDDEN",
+                "messageKey": "error.forbidden",
+                "fieldErrors": [],
+                "requestId": "a8e0ca65-8667-4733-a59f-e0f1bfd0520a",
+                "retryable": false
+              }
+            }
+          }
+        },
+        {
+          "name": "Denied mutation adds no message",
+          "status": "PASS",
+          "expected": "3",
+          "actual": "3"
+        },
+        {
+          "name": "Refreshed UI hides revoked Support navigation",
+          "status": "PASS",
+          "expected": "no Support tab",
+          "actual": [
+            "العربية",
+            "Sign out"
+          ]
+        },
+        {
+          "name": "Bounded fixture grant restored through real authorized API",
+          "status": "PASS",
+          "expected": 201,
+          "actual": 201
+        },
+        {
+          "name": "UI/backend permission restored consistently",
+          "status": "PASS",
+          "expected": 200,
+          "actual": 200
+        }
+      ],
+      "evidence": [
+        "S-PERMISSION-UI-revoked.png",
+        "S-PERMISSION-UI-revoked.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T09:06:24.463Z",
+      "variations": [
+        {
+          "role": "ops-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        },
+        {
+          "role": "support-a",
+          "viewport": {
+            "width": 1440,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

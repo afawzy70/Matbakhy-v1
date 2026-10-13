@@ -1,0 +1,102 @@
+{
+  "scope": "three executed staff actions + audit read; local API logs only",
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "requestIds": [
+    "iqa-c1b235f9-fe19-457b-b443-7327d1a0df71",
+    "iqa-aa42beed-038d-4b07-ac8e-3e5979fee5e4",
+    "iqa-d4a54ed3-6174-4ae9-8f29-2b0c1bfdafc7"
+  ],
+  "events": [
+    {
+      "action": "access.support_case",
+      "requestId": "iqa-c1b235f9-fe19-457b-b443-7327d1a0df71",
+      "objectId": "047a3550-2890-4256-a9dd-d8e80b4b8167"
+    },
+    {
+      "action": "case.message",
+      "requestId": "iqa-d4a54ed3-6174-4ae9-8f29-2b0c1bfdafc7",
+      "objectId": "047a3550-2890-4256-a9dd-d8e80b4b8167"
+    },
+    {
+      "action": "access.order_contact",
+      "requestId": "iqa-aa42beed-038d-4b07-ac8e-3e5979fee5e4",
+      "objectId": "12db73f7-b270-45b9-9266-433345e8b690"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Audit read itself appends allowed audit event",
+      "status": "PASS",
+      "expected": "one new read event",
+      "actual": 1
+    },
+    {
+      "name": "Executed protected staff views and foreign denial",
+      "status": "PASS",
+      "expected": {
+        "case": 200,
+        "order": 200,
+        "foreign": 404
+      },
+      "actual": {
+        "case": 200,
+        "order": 200,
+        "foreign": 404
+      }
+    },
+    {
+      "name": "Private canary message submitted through authorized support API",
+      "status": "PASS",
+      "expected": 201,
+      "actual": 201
+    },
+    {
+      "name": "Staff case/order/message actions correlated in append-only audit",
+      "status": "PASS",
+      "expected": "each exact request ID present",
+      "actual": [
+        {
+          "action": "access.support_case",
+          "requestId": "iqa-c1b235f9-fe19-457b-b443-7327d1a0df71",
+          "objectId": "047a3550-2890-4256-a9dd-d8e80b4b8167"
+        },
+        {
+          "action": "case.message",
+          "requestId": "iqa-d4a54ed3-6174-4ae9-8f29-2b0c1bfdafc7",
+          "objectId": "047a3550-2890-4256-a9dd-d8e80b4b8167"
+        },
+        {
+          "action": "access.order_contact",
+          "requestId": "iqa-aa42beed-038d-4b07-ac8e-3e5979fee5e4",
+          "objectId": "12db73f7-b270-45b9-9266-433345e8b690"
+        }
+      ]
+    },
+    {
+      "name": "Audit detail excludes message canaries",
+      "status": "PASS",
+      "expected": "all generated private canaries absent",
+      "actual": {
+        "markersChecked": 4,
+        "events": 3
+      }
+    },
+    {
+      "name": "Executed-flow local API logs exclude private synthetic canaries",
+      "status": "PASS",
+      "expected": "canaries absent; local text logs, no deployed log-sink claim",
+      "actual": {
+        "markersChecked": 4,
+        "logBytes": 46031
+      }
+    },
+    {
+      "name": "Customer thread excludes private synthetic canaries",
+      "status": "PASS",
+      "expected": "private note not exposed",
+      "actual": {
+        "status": 200
+      }
+    }
+  ]
+}

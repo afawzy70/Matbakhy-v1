@@ -1,0 +1,60 @@
+{
+  "limitation": "All money/external evidence are synthetic test data. No physical cash, bank, payment provider or real transfer verified.",
+  "refund": {
+    "id": "beab0c27-eb3d-4292-ab29-d7908558baf3",
+    "orderId": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "caseReference": "CS-4AD96E0C",
+    "amount": {
+      "amountMinor": 24050,
+      "currency": "EGP"
+    },
+    "state": "VERIFIED",
+    "reason": "Synthetic refund accounting test; no money transfer",
+    "requestedBy": "00000000-0000-0000-0000-0000000002c5",
+    "approvedBy": "00000000-0000-0000-0000-0000000002c6",
+    "paidBy": "00000000-0000-0000-0000-0000000002c5",
+    "paymentReference": "QA-SYNTHETIC-NO-REFUND-TRANSFER",
+    "verifiedBy": "00000000-0000-0000-0000-0000000002c6",
+    "decisionReason": null,
+    "createdAt": "2026-10-13T10:39:52.471322Z",
+    "updatedAt": "2026-10-13T10:39:53.185793Z",
+    "version": 3
+  },
+  "settlement": {
+    "id": "cf03c948-6e08-4ead-a679-79bc7225c6c7",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "periodFrom": "2026-10-01",
+    "periodTo": "2026-10-13",
+    "state": "RECONCILED",
+    "total": {
+      "amountMinor": 2405,
+      "currency": "EGP"
+    },
+    "direction": "COOK_PAYS_PLATFORM",
+    "lines": [
+      {
+        "ledgerGroupId": "5781d8f2-d250-4117-8faa-0641bccbe02a",
+        "kind": "COMMISSION",
+        "orderId": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+        "amount": {
+          "amountMinor": 2405,
+          "currency": "EGP"
+        }
+      }
+    ],
+    "createdBy": "00000000-0000-0000-0000-0000000002c5",
+    "reviewedBy": "00000000-0000-0000-0000-0000000002c6",
+    "paymentReference": "QA-SYNTHETIC-NO-TRANSFER",
+    "paymentRecordedBy": "00000000-0000-0000-0000-0000000002c5",
+    "reconciledBy": "00000000-0000-0000-0000-0000000002c6",
+    "createdAt": "2026-10-13T10:39:46.513644Z",
+    "updatedAt": "2026-10-13T10:39:52.425830Z",
+    "version": 3
+  },
+  "reversal": {
+    "count": 1,
+    "amount": 2405
+  },
+  "unbalancedGroups": 0
+}

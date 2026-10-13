@@ -1,0 +1,243 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+  "observedAt": "2026-10-13T10:46:14.666665+00:00",
+  "environment": "matbakhy-regression-d877a15",
+  "scope": "all synthetic campaign orders; commission oracle applies to configured tax0,1000bps HALF_UP excluding delivery",
+  "migrations": [
+    {
+      "version": "1",
+      "success": true
+    },
+    {
+      "version": "2",
+      "success": true
+    },
+    {
+      "version": "3",
+      "success": true
+    },
+    {
+      "version": "4",
+      "success": true
+    },
+    {
+      "version": "5",
+      "success": true
+    },
+    {
+      "version": "6",
+      "success": true
+    },
+    {
+      "version": "7",
+      "success": true
+    },
+    {
+      "version": "8",
+      "success": true
+    },
+    {
+      "version": "9",
+      "success": true
+    },
+    {
+      "version": "10",
+      "success": true
+    },
+    {
+      "version": "11",
+      "success": true
+    },
+    {
+      "version": "12",
+      "success": true
+    },
+    {
+      "version": "13",
+      "success": true
+    },
+    {
+      "version": "14",
+      "success": true
+    },
+    {
+      "version": "15",
+      "success": true
+    },
+    {
+      "version": "16",
+      "success": true
+    },
+    {
+      "version": "17",
+      "success": true
+    },
+    {
+      "version": "18",
+      "success": true
+    },
+    {
+      "version": "19",
+      "success": true
+    },
+    {
+      "version": "20",
+      "success": true
+    },
+    {
+      "version": "21",
+      "success": true
+    },
+    {
+      "version": "22",
+      "success": true
+    },
+    {
+      "version": null,
+      "success": true
+    },
+    {
+      "version": null,
+      "success": true
+    }
+  ],
+  "orders": [
+    {
+      "id": "7d1ec542-92e0-44b7-840d-9ec0d90106a4",
+      "number": "MB-100001",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "00000000-0000-0000-0000-00000000019b",
+      "subtotalMinor": 36075,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 36075,
+      "commissionMinor": 3608
+    },
+    {
+      "id": "ba05d652-a023-4d0c-a125-ffe12b9817cf",
+      "number": "MB-100002",
+      "state": "COMPLETED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "f9614def-ecce-4fe6-b612-34136e8c097f",
+      "subtotalMinor": 24050,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 24050,
+      "commissionMinor": 2405
+    },
+    {
+      "id": "6f82a3dd-8095-4e76-a9bc-8823e718a120",
+      "number": "MB-100003",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012e",
+      "slotId": "00000000-0000-0000-0000-0000000001a5",
+      "subtotalMinor": 8025,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 8025,
+      "commissionMinor": 803
+    },
+    {
+      "id": "c478fbde-7958-44a6-8925-792dd858b340",
+      "number": "MB-100004",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "00000000-0000-0000-0000-00000000019f",
+      "subtotalMinor": 12025,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 12025,
+      "commissionMinor": 1203
+    },
+    {
+      "id": "cbf2bdd8-8d23-4213-8175-08c5f763cf1b",
+      "number": "MB-100008",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "00000000-0000-0000-0000-00000000019f",
+      "subtotalMinor": 12025,
+      "feeMinor": 3000,
+      "taxMinor": 0,
+      "totalMinor": 15025,
+      "commissionMinor": 1203
+    },
+    {
+      "id": "1aa0ea40-d843-48bf-abf1-8e7feb8d5273",
+      "number": "MB-100005",
+      "state": "COMPLETED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "00000000-0000-0000-0000-00000000019f",
+      "subtotalMinor": 12025,
+      "feeMinor": 3000,
+      "taxMinor": 0,
+      "totalMinor": 15025,
+      "commissionMinor": 1203
+    },
+    {
+      "id": "06390cf1-d10a-492d-9812-cf4ed8061159",
+      "number": "MB-100006",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012e",
+      "slotId": "00000000-0000-0000-0000-0000000001a6",
+      "subtotalMinor": 8025,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 8025,
+      "commissionMinor": 803
+    },
+    {
+      "id": "c479a203-c4df-4f1e-a2db-c70317bd0e5b",
+      "number": "MB-100007",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "00000000-0000-0000-0000-00000000019f",
+      "subtotalMinor": 9550,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 9550,
+      "commissionMinor": 955
+    },
+    {
+      "id": "12db73f7-b270-45b9-9266-433345e8b690",
+      "number": "MB-100009",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "00000000-0000-0000-0000-00000000019f",
+      "subtotalMinor": 9550,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 9550,
+      "commissionMinor": 955
+    },
+    {
+      "id": "cf18fe52-5da9-47a9-992a-623df6ec132c",
+      "number": "MB-100010",
+      "state": "CANCELLED",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "slotId": "9c275c87-c46b-4225-b4bd-cb88e281f38c",
+      "subtotalMinor": 9550,
+      "feeMinor": 0,
+      "taxMinor": 0,
+      "totalMinor": 9550,
+      "commissionMinor": 955
+    }
+  ],
+  "duplicateRequests": 0,
+  "ledgerGroups": [
+    {
+      "groupId": "99eeaa93-3217-421f-bb71-5b5d3184211a",
+      "balance": 0
+    },
+    {
+      "groupId": "5781d8f2-d250-4117-8faa-0641bccbe02a",
+      "balance": 0
+    },
+    {
+      "groupId": "ec95207c-4463-450a-b97f-9ceeea23a84e",
+      "balance": 0
+    }
+  ],
+  "quantityPolicy": 10
+}

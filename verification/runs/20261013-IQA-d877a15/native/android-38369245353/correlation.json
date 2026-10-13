@@ -1,0 +1,68 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "platform": "android",
+  "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "execution": "real emulator/simulator; existing native UI harness invoked independently and assertions reviewed",
+  "checks": [
+    {
+      "name": "Exactly one recovered pickup and one later delivery order",
+      "expected": [
+        1,
+        1
+      ],
+      "actual": [
+        1,
+        1
+      ],
+      "status": "PASS"
+    },
+    {
+      "name": "Stored pickup and delivery totals",
+      "expected": [
+        9000,
+        63000
+      ],
+      "actual": [
+        9000,
+        63000
+      ],
+      "status": "PASS"
+    }
+  ],
+  "database": {
+    "orders": [
+      {
+        "id": "2360d23b-0c2b-4e20-9f24-23a3996c7814",
+        "publicNumber": "MB-100002",
+        "customerId": "eda4cf69-a7a7-4756-a5ba-1a500e6a9704",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 63000,
+        "slotId": "00000000-0000-4000-8000-00000000a051"
+      },
+      {
+        "id": "c3bd13a5-c4f5-4ed5-84ad-4806e3acc725",
+        "publicNumber": "MB-100001",
+        "customerId": "eda4cf69-a7a7-4756-a5ba-1a500e6a9704",
+        "state": "PENDING_ACCEPTANCE",
+        "totalMinor": 9000,
+        "slotId": "00000000-0000-4000-8000-00000000a052"
+      }
+    ],
+    "slotCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a052",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ],
+    "mealCounters": [
+      {
+        "id": "00000000-0000-4000-8000-00000000a062",
+        "reserved": 1,
+        "allocated": 0,
+        "consumed": 0
+      }
+    ]
+  }
+}

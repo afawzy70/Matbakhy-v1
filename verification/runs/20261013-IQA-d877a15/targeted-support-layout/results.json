@@ -1,0 +1,111 @@
+{
+  "runType": "TARGETED",
+  "results": [
+    {
+      "id": "S-SUPPORT",
+      "actor": "Customer web narrow closed-thread variants",
+      "requirement": "TC-041/046/047; MBQA-004",
+      "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+      "testSuiteSha": "7bc2869a0fd37f2b32ace849fab0a69077824554",
+      "environment": "matbakhy-regression-d877a15",
+      "runtime": "Chromium real local API/PostgreSQL/Keycloak",
+      "variation": "en/1440x1000 unless explicit parameter checks",
+      "startedAt": "2026-10-13T08:28:42.093Z",
+      "checks": [
+        {
+          "name": "Own public thread usable 320/en",
+          "status": "PASS",
+          "expected": "public only; no overflow; correct direction",
+          "actual": {
+            "dimensions": {
+              "inner": 320,
+              "scroll": 320
+            },
+            "privateNoteVisible": false
+          }
+        },
+        {
+          "name": "Closed thread has no customer reply editor 320/en",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Own public thread usable 320/ar",
+          "status": "PASS",
+          "expected": "public only; no overflow; correct direction",
+          "actual": {
+            "dimensions": {
+              "inner": 320,
+              "scroll": 320
+            },
+            "privateNoteVisible": false
+          }
+        },
+        {
+          "name": "Closed thread has no customer reply editor 320/ar",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Own public thread usable 390/en",
+          "status": "PASS",
+          "expected": "public only; no overflow; correct direction",
+          "actual": {
+            "dimensions": {
+              "inner": 390,
+              "scroll": 390
+            },
+            "privateNoteVisible": false
+          }
+        },
+        {
+          "name": "Closed thread has no customer reply editor 390/en",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        },
+        {
+          "name": "Own public thread usable 390/ar",
+          "status": "PASS",
+          "expected": "public only; no overflow; correct direction",
+          "actual": {
+            "dimensions": {
+              "inner": 390,
+              "scroll": 390
+            },
+            "privateNoteVisible": false
+          }
+        },
+        {
+          "name": "Closed thread has no customer reply editor 390/ar",
+          "status": "PASS",
+          "expected": 0,
+          "actual": 0
+        }
+      ],
+      "evidence": [
+        "S-SUPPORT-320-en-closed.png",
+        "S-SUPPORT-320-en-closed.json",
+        "S-SUPPORT-320-ar-closed.png",
+        "S-SUPPORT-320-ar-closed.json",
+        "S-SUPPORT-390-en-closed.png",
+        "S-SUPPORT-390-en-closed.json",
+        "S-SUPPORT-390-ar-closed.png",
+        "S-SUPPORT-390-ar-closed.json"
+      ],
+      "status": "PASS",
+      "finishedAt": "2026-10-13T08:28:44.040Z",
+      "variations": [
+        {
+          "role": "customer-a",
+          "viewport": {
+            "width": 390,
+            "height": 1000
+          }
+        }
+      ]
+    }
+  ]
+}

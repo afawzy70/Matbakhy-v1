@@ -1,0 +1,10 @@
+{
+  "path": "/",
+  "lang": "en",
+  "dir": "ltr",
+  "width": 1440,
+  "scrollWidth": 1440,
+  "text": "Matbakhy — Cook workspace\nالعربية\nSign out\nHome\nOrders\nMeals\nSlots\nStatement\nSettings\nNew meal (draft)\nArabic name\nEnglish name\nPublic description\nPortion\nIngredients\nPrice (EGP)\nAllergens\nNone declared\nUnknown\nMeal photo\nCreate\nMy meals\nQA Meal A1\nPublished\n\nEGP 122.25\n\nPause\nArchive\nPrice history\n\nActive price: EGP 122.25 · since 13 Oct 2026, 13:40\n\nPrevious prices\nEGP 121.25 · 13 Oct 2026, 13:40\nEGP 120.25 · 13 Oct 2026, 13:37\n\nA new price applies to orders not yet placed; existing orders keep their agreed prices.\n\nNew price (EGP)\nChange price\nQA Meal A2\nPublished\n\nEGP 95.50\n\nPause\nArchive\nPrice history\nQA Meal A3\nPublished\n\nEGP 80.25\n\nPause\nArchive\nPrice history\nQA Created Dish\nDraft\n\nEGP 101.25\n\nPublish\nArchive\nPrice history\nAPI: http://localhost:39080",
+  "cart": null,
+  "pending": false
+}

@@ -1,0 +1,1106 @@
+[
+  {
+    "role": "cook-a",
+    "locale": "en",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:50.872Z",
+    "status": "FAIL",
+    "geometry": {
+      "viewport": 320,
+      "documentWidth": 320,
+      "money": [
+        {
+          "area": "summary",
+          "text": "EGP 390.75",
+          "number": "390.75",
+          "lineCount": 6,
+          "width": 9.875,
+          "height": 255.9375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 150.25",
+          "number": "150.25",
+          "lineCount": 6,
+          "width": 9.875,
+          "height": 255.9375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 0.00",
+          "number": "0.00",
+          "lineCount": 4,
+          "width": 9.875,
+          "height": 204.75
+        },
+        {
+          "area": "summary",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 6,
+          "width": 9.875,
+          "height": 255.9375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 36.08",
+          "number": "36.08",
+          "lineCount": 5,
+          "width": 9.875,
+          "height": 230.34375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 5,
+          "width": 9.875,
+          "height": 230.34375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 5,
+          "width": 9.875,
+          "height": 230.34375
+        },
+        {
+          "area": "summary",
+          "text": "-EGP 12.02",
+          "number": "12.02",
+          "lineCount": 5,
+          "width": 9.875,
+          "height": 255.9375
+        },
+        {
+          "area": "table",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 2,
+          "width": 47.421875,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 2,
+          "width": 51.546875,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 150.25",
+          "number": "150.25",
+          "lineCount": 2,
+          "width": 47.421875,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 12.03",
+          "number": "12.03",
+          "lineCount": 2,
+          "width": 51.546875,
+          "height": 85.78125
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-cook-a-320-en.png",
+      "W-MONEY-cook-a-320-en.json"
+    ]
+  },
+  {
+    "role": "cook-a",
+    "locale": "ar",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:51.044Z",
+    "status": "FAIL",
+    "geometry": {
+      "viewport": 320,
+      "documentWidth": 320,
+      "money": [
+        {
+          "area": "summary",
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "number": "٣٩٠٫٧٥",
+          "lineCount": 2,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏١٥٠٫٢٥ ج.م.‏",
+          "number": "١٥٠٫٢٥",
+          "lineCount": 2,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "number": "٠٫٠٠",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٣٦٫٠٨ ج.م.‏",
+          "number": "٣٦٫٠٨",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "؜-‏١٢٫٠٢ ج.م.‏",
+          "number": "١٢٫٠٢",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "table",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 2,
+          "width": 47.421875,
+          "height": 136.96875
+        },
+        {
+          "area": "table",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 2,
+          "width": 40.40625,
+          "height": 136.96875
+        },
+        {
+          "area": "table",
+          "text": "‏١٥٠٫٢٥ ج.م.‏",
+          "number": "١٥٠٫٢٥",
+          "lineCount": 2,
+          "width": 47.421875,
+          "height": 136.96875
+        },
+        {
+          "area": "table",
+          "text": "‏١٢٫٠٣ ج.م.‏",
+          "number": "١٢٫٠٣",
+          "lineCount": 2,
+          "width": 40.40625,
+          "height": 136.96875
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-cook-a-320-ar.png",
+      "W-MONEY-cook-a-320-ar.json"
+    ]
+  },
+  {
+    "role": "cook-a",
+    "locale": "en",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:51.194Z",
+    "status": "FAIL",
+    "geometry": {
+      "viewport": 390,
+      "documentWidth": 390,
+      "money": [
+        {
+          "area": "summary",
+          "text": "EGP 390.75",
+          "number": "390.75",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 150.25",
+          "number": "150.25",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 0.00",
+          "number": "0.00",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 36.08",
+          "number": "36.08",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "-EGP 12.02",
+          "number": "12.02",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 76.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 2,
+          "width": 53.671875,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 2,
+          "width": 57.890625,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 150.25",
+          "number": "150.25",
+          "lineCount": 2,
+          "width": 53.671875,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "EGP 12.03",
+          "number": "12.03",
+          "lineCount": 2,
+          "width": 57.890625,
+          "height": 85.78125
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-cook-a-390-en.png",
+      "W-MONEY-cook-a-390-en.json"
+    ]
+  },
+  {
+    "role": "cook-a",
+    "locale": "ar",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:51.461Z",
+    "status": "FAIL",
+    "geometry": {
+      "viewport": 390,
+      "documentWidth": 390,
+      "money": [
+        {
+          "area": "summary",
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "number": "٣٩٠٫٧٥",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏١٥٠٫٢٥ ج.م.‏",
+          "number": "١٥٠٫٢٥",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "number": "٠٫٠٠",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٣٦٫٠٨ ج.م.‏",
+          "number": "٣٦٫٠٨",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "؜-‏١٢٫٠٢ ج.م.‏",
+          "number": "١٢٫٠٢",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "table",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 56.40625,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 2,
+          "width": 49.125,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "‏١٥٠٫٢٥ ج.م.‏",
+          "number": "١٥٠٫٢٥",
+          "lineCount": 2,
+          "width": 56.40625,
+          "height": 85.78125
+        },
+        {
+          "area": "table",
+          "text": "‏١٢٫٠٣ ج.م.‏",
+          "number": "١٢٫٠٣",
+          "lineCount": 1,
+          "width": 49.125,
+          "height": 85.78125
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-cook-a-390-ar.png",
+      "W-MONEY-cook-a-390-ar.json"
+    ]
+  },
+  {
+    "role": "cook-a",
+    "locale": "en",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:51.727Z",
+    "status": "PASS",
+    "geometry": {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "money": [
+        {
+          "area": "summary",
+          "text": "EGP 390.75",
+          "number": "390.75",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 150.25",
+          "number": "150.25",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 0.00",
+          "number": "0.00",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 36.08",
+          "number": "36.08",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "-EGP 12.02",
+          "number": "12.02",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "table",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 1,
+          "width": 171.46875,
+          "height": 34.59375
+        },
+        {
+          "area": "table",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 1,
+          "width": 180.296875,
+          "height": 34.59375
+        },
+        {
+          "area": "table",
+          "text": "EGP 150.25",
+          "number": "150.25",
+          "lineCount": 1,
+          "width": 171.46875,
+          "height": 34.59375
+        },
+        {
+          "area": "table",
+          "text": "EGP 12.03",
+          "number": "12.03",
+          "lineCount": 1,
+          "width": 180.296875,
+          "height": 34.59375
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-cook-a-1440-en.png",
+      "W-MONEY-cook-a-1440-en.json"
+    ]
+  },
+  {
+    "role": "cook-a",
+    "locale": "ar",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:51.897Z",
+    "status": "PASS",
+    "geometry": {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "money": [
+        {
+          "area": "summary",
+          "text": "‏٣٩٠٫٧٥ ج.م.‏",
+          "number": "٣٩٠٫٧٥",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏١٥٠٫٢٥ ج.م.‏",
+          "number": "١٥٠٫٢٥",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٠٫٠٠ ج.م.‏",
+          "number": "٠٫٠٠",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٣٦٫٠٨ ج.م.‏",
+          "number": "٣٦٫٠٨",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "؜-‏١٢٫٠٢ ج.م.‏",
+          "number": "١٢٫٠٢",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "table",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 167.453125,
+          "height": 34.59375
+        },
+        {
+          "area": "table",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 151.765625,
+          "height": 34.59375
+        },
+        {
+          "area": "table",
+          "text": "‏١٥٠٫٢٥ ج.م.‏",
+          "number": "١٥٠٫٢٥",
+          "lineCount": 1,
+          "width": 167.453125,
+          "height": 34.59375
+        },
+        {
+          "area": "table",
+          "text": "‏١٢٫٠٣ ج.م.‏",
+          "number": "١٢٫٠٣",
+          "lineCount": 1,
+          "width": 151.765625,
+          "height": 34.59375
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-cook-a-1440-ar.png",
+      "W-MONEY-cook-a-1440-ar.json"
+    ]
+  },
+  {
+    "role": "finance-a",
+    "locale": "en",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:52.896Z",
+    "status": "FAIL",
+    "geometry": {
+      "viewport": 320,
+      "documentWidth": 320,
+      "money": [
+        {
+          "area": "summary",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 6,
+          "width": 9.859375,
+          "height": 255.9375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 36.08",
+          "number": "36.08",
+          "lineCount": 5,
+          "width": 9.859375,
+          "height": 230.34375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 5,
+          "width": 9.859375,
+          "height": 230.34375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 5,
+          "width": 9.859375,
+          "height": 230.34375
+        },
+        {
+          "area": "summary",
+          "text": "-EGP 12.02",
+          "number": "12.02",
+          "lineCount": 5,
+          "width": 9.859375,
+          "height": 255.9375
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-finance-a-320-en.png",
+      "W-MONEY-finance-a-320-en.json"
+    ]
+  },
+  {
+    "role": "finance-a",
+    "locale": "ar",
+    "viewport": {
+      "width": 320,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:53.049Z",
+    "status": "PASS",
+    "geometry": {
+      "viewport": 320,
+      "documentWidth": 320,
+      "money": [
+        {
+          "area": "summary",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٣٦٫٠٨ ج.م.‏",
+          "number": "٣٦٫٠٨",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "؜-‏١٢٫٠٢ ج.م.‏",
+          "number": "١٢٫٠٢",
+          "lineCount": 1,
+          "width": 41.625,
+          "height": 51.1875
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-finance-a-320-ar.png",
+      "W-MONEY-finance-a-320-ar.json"
+    ]
+  },
+  {
+    "role": "finance-a",
+    "locale": "en",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:53.182Z",
+    "status": "FAIL",
+    "geometry": {
+      "viewport": 390,
+      "documentWidth": 390,
+      "money": [
+        {
+          "area": "summary",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 36.08",
+          "number": "36.08",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 51.1875
+        },
+        {
+          "area": "summary",
+          "text": "-EGP 12.02",
+          "number": "12.02",
+          "lineCount": 2,
+          "width": 51.78125,
+          "height": 76.78125
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-finance-a-390-en.png",
+      "W-MONEY-finance-a-390-en.json"
+    ]
+  },
+  {
+    "role": "finance-a",
+    "locale": "ar",
+    "viewport": {
+      "width": 390,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:53.318Z",
+    "status": "PASS",
+    "geometry": {
+      "viewport": 390,
+      "documentWidth": 390,
+      "money": [
+        {
+          "area": "summary",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٣٦٫٠٨ ج.م.‏",
+          "number": "٣٦٫٠٨",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "؜-‏١٢٫٠٢ ج.م.‏",
+          "number": "١٢٫٠٢",
+          "lineCount": 1,
+          "width": 111.625,
+          "height": 25.59375
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-finance-a-390-ar.png",
+      "W-MONEY-finance-a-390-ar.json"
+    ]
+  },
+  {
+    "role": "finance-a",
+    "locale": "en",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:53.519Z",
+    "status": "PASS",
+    "geometry": {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "money": [
+        {
+          "area": "summary",
+          "text": "EGP 240.50",
+          "number": "240.50",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 36.08",
+          "number": "36.08",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "EGP 24.05",
+          "number": "24.05",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "-EGP 12.02",
+          "number": "12.02",
+          "lineCount": 1,
+          "width": 813.78125,
+          "height": 25.59375
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-finance-a-1440-en.png",
+      "W-MONEY-finance-a-1440-en.json"
+    ]
+  },
+  {
+    "role": "finance-a",
+    "locale": "ar",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+    "testSuiteSha": "4100a5c5063bf1fb4b4e0d60b3adeb9486cedc6e",
+    "runType": "FULL REGRESSION",
+    "startedAt": "2026-10-13T10:41:48.784Z",
+    "observedAt": "2026-10-13T10:41:53.685Z",
+    "status": "PASS",
+    "geometry": {
+      "viewport": 1440,
+      "documentWidth": 1440,
+      "money": [
+        {
+          "area": "summary",
+          "text": "‏٢٤٠٫٥٠ ج.م.‏",
+          "number": "٢٤٠٫٥٠",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٣٦٫٠٨ ج.م.‏",
+          "number": "٣٦٫٠٨",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "‏٢٤٫٠٥ ج.م.‏",
+          "number": "٢٤٫٠٥",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        },
+        {
+          "area": "summary",
+          "text": "؜-‏١٢٫٠٢ ج.م.‏",
+          "number": "١٢٫٠٢",
+          "lineCount": 1,
+          "width": 873.625,
+          "height": 25.59375
+        }
+      ]
+    },
+    "evidence": [
+      "W-MONEY-finance-a-1440-ar.png",
+      "W-MONEY-finance-a-1440-ar.json"
+    ]
+  }
+]

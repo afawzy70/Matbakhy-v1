@@ -1,0 +1,188 @@
+{
+  "stockOrder": {
+    "q": {
+      "quoteId": "286e4b96-8a60-4e6d-a29c-0ccb667559a4",
+      "expiresAt": "2026-10-13T10:42:39.804833190Z",
+      "kitchenId": "00000000-0000-0000-0000-00000000012d",
+      "items": [
+        {
+          "mealId": "00000000-0000-0000-0000-000000000263",
+          "mealRevision": 1,
+          "title": "QA Meal A1",
+          "quantity": 3,
+          "unitPrice": {
+            "amountMinor": 12025,
+            "currency": "EGP"
+          },
+          "lineTotal": {
+            "amountMinor": 36075,
+            "currency": "EGP"
+          }
+        }
+      ],
+      "subtotal": {
+        "amountMinor": 36075,
+        "currency": "EGP"
+      },
+      "deliveryFee": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "tax": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "total": {
+        "amountMinor": 36075,
+        "currency": "EGP"
+      },
+      "cancellationPolicyVersion": "synthetic-cancel-v1",
+      "termsVersion": "synthetic-terms-v1",
+      "acceptanceDeadlinePreview": "2026-10-13T10:52:39.804833190Z",
+      "warnings": [
+        "SYNTHETIC_POLICY"
+      ]
+    },
+    "o": {
+      "id": "7d1ec542-92e0-44b7-840d-9ec0d90106a4",
+      "publicNumber": "MB-100001",
+      "version": 0,
+      "state": "PENDING_ACCEPTANCE",
+      "fulfillmentMode": "PICKUP",
+      "items": [
+        {
+          "mealId": "00000000-0000-0000-0000-000000000263",
+          "title": "QA Meal A1",
+          "allergenStatement": "UNKNOWN",
+          "quantity": 3,
+          "unitPrice": {
+            "amountMinor": 12025,
+            "currency": "EGP"
+          },
+          "lineTotal": {
+            "amountMinor": 36075,
+            "currency": "EGP"
+          }
+        }
+      ],
+      "subtotal": {
+        "amountMinor": 36075,
+        "currency": "EGP"
+      },
+      "deliveryFee": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "tax": {
+        "amountMinor": 0,
+        "currency": "EGP"
+      },
+      "total": {
+        "amountMinor": 36075,
+        "currency": "EGP"
+      },
+      "slot": {
+        "id": "00000000-0000-0000-0000-00000000019b",
+        "startsAt": "2026-10-16T10:37:12.682171Z",
+        "endsAt": "2026-10-16T12:37:12.682171Z",
+        "timezone": "Africa/Cairo",
+        "cutoffAt": "2026-10-16T08:37:12.682171Z",
+        "availablePortions": 47,
+        "fulfillmentModes": [
+          "PICKUP"
+        ]
+      },
+      "acceptBy": "2026-10-13T10:52:39.865742Z",
+      "events": [
+        {
+          "sequence": 1,
+          "fromState": null,
+          "toState": "PENDING_ACCEPTANCE",
+          "occurredAt": "2026-10-13T10:37:39.878611Z",
+          "actorType": "CUSTOMER",
+          "reasonCode": null
+        }
+      ],
+      "allowedActions": [
+        "CANCEL"
+      ],
+      "cashState": "DUE",
+      "supportCaseIds": [],
+      "handoverCode": null,
+      "contact": null
+    },
+    "requestId": "57b8d036-432c-40de-890e-b72d671e8405",
+    "idkey": "[REDACTED IDEMPOTENCY KEY]"
+  },
+  "createdMeal": {
+    "id": "b1c9442c-05d8-430d-9729-8549cca7a9a1",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "status": "DRAFT",
+    "content": {
+      "titleAr": "وجبة QA منشأة",
+      "titleEn": "QA Created Dish",
+      "descriptionAr": "وصف وجبة اختبار مستقلة بمكونات تجريبية فقط",
+      "descriptionEn": null,
+      "portionAr": "حصة اختبار",
+      "portionEn": null,
+      "ingredientsAr": "أرز ومكونات اختبار",
+      "ingredientsEn": null,
+      "allergenDeclaration": "NONE_DECLARED",
+      "allergenCodes": [],
+      "allergenNote": null,
+      "priceMinor": 10125,
+      "currency": "EGP",
+      "photos": [
+        {
+          "mediaId": "ccc8433b-1017-4b45-aabd-11bb08a37490",
+          "altAr": null,
+          "altEn": null
+        }
+      ],
+      "category": null
+    },
+    "revision": 1,
+    "publishedAt": null,
+    "archivedAt": null,
+    "updatedAt": "2026-10-13T10:38:08.888698Z",
+    "version": 0,
+    "moderationState": "VISIBLE",
+    "moderationReason": null
+  },
+  "connectedSlot": {
+    "id": "f9614def-ecce-4fe6-b612-34136e8c097f",
+    "kitchenId": "00000000-0000-0000-0000-00000000012d",
+    "localDate": "2026-10-21",
+    "startsAt": "2026-10-21T10:00:00Z",
+    "endsAt": "2026-10-21T12:00:00Z",
+    "timezone": "Africa/Cairo",
+    "leadMinutes": 120,
+    "cutoffAt": "2026-10-21T08:00:00Z",
+    "maxPortions": 8,
+    "reserved": 0,
+    "allocated": 0,
+    "consumed": 0,
+    "availablePortions": 8,
+    "state": "DRAFT",
+    "orderable": false,
+    "meals": [
+      {
+        "mealId": "00000000-0000-0000-0000-000000000263",
+        "capacity": 3,
+        "reserved": 0,
+        "allocated": 0,
+        "consumed": 0,
+        "available": 3
+      },
+      {
+        "mealId": "00000000-0000-0000-0000-000000000264",
+        "capacity": 3,
+        "reserved": 0,
+        "allocated": 0,
+        "consumed": 0,
+        "available": 3
+      }
+    ],
+    "version": 0
+  }
+}

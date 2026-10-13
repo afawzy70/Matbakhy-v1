@@ -1,0 +1,22 @@
+{
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "testSuiteSha": "0c048a77d768d150f4fafacf495b98fe6653af5f",
+  "orderId": "31e1e50f-ae80-4610-9b22-12e963329cac",
+  "addressId": "[REDACTED]",
+  "before": {
+    "digest": "8fbd246d20a612a6046845c2a0912a4e",
+    "subtotal": 12025,
+    "fee": 3000,
+    "tax": 0,
+    "total": 15025,
+    "commission": 1203
+  },
+  "after": {
+    "digest": "8fbd246d20a612a6046845c2a0912a4e",
+    "subtotal": 12025,
+    "fee": 3000,
+    "tax": 0,
+    "total": 15025,
+    "commission": 1203
+  }
+}

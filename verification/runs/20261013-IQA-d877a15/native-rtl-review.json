@@ -1,0 +1,17 @@
+{
+  "caseId": "N-EDIT-LAYOUT",
+  "variation": "Arabic native root layout",
+  "applicationSha": "d877a1576cd942200fe0a53b5a19fee76b996025",
+  "testSuiteSha": "ad752f8a42aa2dd82bb9e80ad96473e460da3991",
+  "platform": "Android API35 emulator",
+  "observedAt": "2026-10-13T11:48:29.4895253Z",
+  "locale": "ar",
+  "screenshotResolution": "320x640",
+  "status": "FAIL",
+  "defect": "MBQA-008",
+  "expected": "Arabic root uses RTL placement: account title/body align to the right and navigation mirrors the English LTR order; mixed Latin names/numbers retain readable embedding.",
+  "actual": "Labels changed to Arabic, but account header/body remain placed at the left and the bottom navigation retains Discover at the far left and Account at the far right. Label-switch success did not establish RTL layout.",
+  "evidence": ["native/android-38389933951/android-arabic-account.png"],
+  "reviewer": "Codex independent QA agent; SELF_REVIEWED, no owner approval",
+  "scope": "Android screenshot independently inspected; iOS pixel layout BLOCKED after system-browser auth automation failure, not an inherited failure"
+}
