@@ -106,34 +106,34 @@ final class OrderingTests: XCTestCase {
         dismissSavePassword(until: element("mode-PICKUP"))
     }
 
-    /// iOS may offer "Save Password?" after the provider's form is submitted; while it is up the redirect waits and the
-    /// authorization code can expire (native run 38). Dismiss it when it appears.
-    /// Run 43: the prompt appeared after a sequential 3 × 4 s look had ended, so all three places are now checked
-    /// together, every half second, for up to 30 s; the wait ends early once the app shows the signed-in account.
-    /// Run 44: the prompt can come after a 30 s look, while the redirect waits behind it. The wait now lasts as long as the
-    /// sign-in itself (90 s), ends when the signed-in element appears, and keeps looking 3 s more in case the prompt lands
-    /// on top of the signed-in screen.
+    /// BLK-005 (bounded attempt 4, owner-authorised 2026-10-13 evening). Runs 43-47: polling the app, the sign-in sheet and
+    /// springboard for the "Save Password?" prompt either missed it, tapped it after XCTest had dismissed it (run 46), or
+    /// timed out querying other processes (run 47). Now XCTest handles the prompt itself: an interruption monitor taps
+    /// "Not Now", only the app's own hierarchy is polled, and while the prompt is visible one tap at the very top of the
+    /// screen (no control there) lets XCTest run the monitor. Sign-in stays real; nothing is bypassed.
     private func dismissSavePassword(until done: XCUIElement? = nil) {
-        let roots = [app, authUI, XCUIApplication(bundleIdentifier: "com.apple.springboard")]
+        let monitor = addUIInterruptionMonitor(withDescription: "Save Password") { alert in
+            let notNow = alert.buttons["Not Now"]
+            if notNow.exists {
+                notNow.tap()
+                print("MB031-SAVE-PASSWORD-DISMISSED")
+                return true
+            }
+            return false
+        }
+        defer { removeUIInterruptionMonitor(monitor) }
+        let prompt = app.alerts["Save Password?"]
         var deadline = Date().addingTimeInterval(90)
         var settled = false
         while Date() < deadline {
-            for root in roots {
-                let notNow = root.buttons["Not Now"].firstMatch
-                if notNow.exists && notNow.isHittable {
-                    // Run 46: XCTest's own interruption handling may dismiss the prompt first, and tapping the vanished
-                    // element fails the test. A tap on the screen position cannot fail; if the prompt is already gone it
-                    // lands on empty space below the account actions.
-                    let f = notNow.frame
-                    app.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0)).withOffset(CGVector(dx: f.midX, dy: f.midY)).tap()
-                    print("MB031-SAVE-PASSWORD-DISMISSED")
-                }
+            if prompt.exists {
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
             }
             if !settled, let done, done.exists {
                 settled = true
                 deadline = Date().addingTimeInterval(3)
             }
-            Thread.sleep(forTimeInterval: 0.5)
+            Thread.sleep(forTimeInterval: 1)
         }
     }
 
