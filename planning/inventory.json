@@ -15,6 +15,12 @@
       "purpose": "Ignored build output, dependencies, local config and local verification reports"
     },
     {
+      "path": ".gitleaksignore",
+      "state": "PRESENT",
+      "owner_story": "MB-008",
+      "purpose": "Reviewed Gitleaks false positives by fingerprint (synthetic QA idempotency keys); no file- or rule-wide exclusions"
+    },
+    {
       "path": "AGENTS.md",
       "state": "PRESENT",
       "owner_story": "MB-001",

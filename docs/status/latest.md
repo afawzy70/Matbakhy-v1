@@ -2,27 +2,25 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-12T22:10+03:00 (Asia/Kuwait); owner-authorized window 2026-10-12 until 00:00 on 2026-10-13
-- Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1) (not for merge)
-- **Independent QA (Codex, cross-role, tested `4eaee3a`, evidence `f76664c`):**
-  - **Findings:** MBQA-003 (no customer web sign-out), MBQA-004 (support replies unreadable), MBQA-005 (Close offered on a DRAFT slot) and OBS-001 are FIXED_PENDING_INDEPENDENT_RETEST in repair candidate **`4555f599411da9683453bee209559c8d1f11cded`** ([repair record](../quality/08-codex-qa-repair-cross-role.md)).
-  - **Q1:** a difference between tested versions (clients wired in `cdc592a`, after `4eaee3a`), plus one genuine gap fixed: the limit was read only once per page load.
-  - **RQ-004:** settled by TC-020/TC-042 and the contract (refuse and re-quote); owner confirmation requested ([note](../product/rq-004-stale-quote.md)).
-  - **Earlier findings:** MBQA-001/002 and FG-001 were independently retested PASS on web at `4eaee3a`.
-- **Repair candidate checks:** six local checks PASS at `4555f59` (`verification/runs/20261012-QA-REPAIR-2-CHECKS`); native run 35 at `4555f59` PASS on the Android emulator and iOS simulator ([38296110431](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38296110431)).
-- **Earlier Codex candidates:** A `cdc592a` (original findings) and the MB-033 candidate `f5d2ba0` (six local checks PASS) are superseded for retest by `4555f599411da9683453bee209559c8d1f11cded`.
-- Phase/story: P07. **MB-032 DONE** at `cdc592a` (self-review). Next eligible: MB-033.
-  - MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.
-  - MB-039 IN_PROGRESS: the owner's audit/log readiness work package is queued ([05-observability-readiness.md](../operations/05-observability-readiness.md)).
+- Observed: 2026-10-13T08:55+03:00 (Asia/Kuwait), pre-window preflight and record reconciliation. The authorized work window is 12:00–00:00 Kuwait (`docs/delivery/06-daily-execution.md`); implementation resumes inside it.
+- Active branch: `implementation/mvp` (head and latest pushed checkpoint in the git log); draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge.
+- **Independent QA retest candidate (immutable): `4555f599411da9683453bee209559c8d1f11cded`** ([handoff](../quality/08-codex-qa-repair-cross-role.md)).
+  - MBQA-003, MBQA-004, MBQA-005 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST. No newer independent QA or security report has been published (checked 2026-10-13: QA branches, issues, PR comments).
+  - Checks at the candidate: six local checks PASS (`verification/runs/20261012-QA-REPAIR-2-CHECKS`); native run 35 workflow success on the Android emulator and iOS simulator ([38296110431](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38296110431); job conclusions read, step logs not excerpted).
+  - MBQA-001/002 and FG-001 were independently retested PASS on web at `4eaee3a`.
+  - Earlier candidates `cdc592a` and `f5d2ba0` remain valid history; the retest target is `4555f59`.
+- **Product changes after the candidate** (not in the retest candidate; backend MB-039 only, each red first): staff support-case views audited (`885824b`); staff support messages audited with the request ID (`3d88aaa`); audit-detail redaction keeps whole-value UUIDs (`00b5189`); ECS log lines carry service name, environment and version (`1e8ca5d`, `0d0621d`); draft troubleshooting runbook (`b01453e`). Evidence: `verification/runs/20261012-MB-039-LOCAL/` (focused integration tests). Product CI runs on these pushes: see the Actions history; the full six-check set has not been re-run after `4555f59`.
+- **Correction (2026-10-13):** Product CI's Gitleaks job had been failing since the independent QA branch was published (synthetic idempotency keys flagged), and local SECRET-SCAN runs from git worktrees scanned 0 commits while printing PASS (MB-032 `cdc592a`, CANDIDATE-B/B2, repair-candidate checks `4555f59`). Fixed in `ed2ac56` and re-executed over full history: PASS ([record](../../verification/runs/20261013-SECRET-SCAN-FIX/README.md)). The four runs keep their recorded results with a correction note.
+- **Stories:**
+  - MB-032 DONE at `cdc592a` (self-review); MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.
+  - **MB-033 IN_PROGRESS:** delivery checkout, quantity limit and deep links on the emulator/simulator; not done: dynamic text, notification permission states, push (O07), screen readers (BLK-003), physical devices (BLK-004).
+  - **MB-039 IN_PROGRESS:** local audit/log controls implemented and tested ([07](../operations/07-audit-and-log-readiness.md)); runtime database role, log store, metrics collection and alerts not done; AUD-01/LOG-01/OPS-01..03 NOT_RUN (deployed, MB-040).
   - MB-029 BLOCKED on screen-reader testing (BLK-003; TC-047 BLOCKED); MB-030 waits on MB-029.
-  - Gates: P00–P05 PASS (self-reviewed evidence). The P06 gate is not passed (O05 open; MB-029/MB-030 not DONE).
-- **Q1:** clients follow the server's published per-line limit (API-001), TC-152 PASS. The limit value itself remains an owner decision under O04 ([note](../product/q1-quantity-limit-decision.md)).
-- **Web preview:**
-  - **Prepared (not deployed):** `deploy/web-preview` and [06-web-preview.md](../operations/06-web-preview.md), rehearsed locally.
-  - **Blocked on owner inputs:** hosting, domain/DNS, tester IPs, GHCR publication.
-  - **External testers:** blocked until AUD-01/LOG-01/OPS-01..03 pass on the preview.
-  - MB-040 is not started.
-- Model: `claude-opus-5-5`, effort `medium` (observed from session metadata at 14:20); token usage and cost not recorded here
+  - Gates: P00–P05 PASS (self-reviewed evidence). P06 not passed (O05 open; MB-029/MB-030 not DONE).
+- **Q1:** clients follow the server's published per-line limit (API-001, TC-152 PASS) and re-read it when the cart opens (`4555f59`). The commercial value is O04; 10 is the synthetic policy.
+- **RQ-004:** current behavior follows TC-020/TC-042 and the contract (refuse a stale quote with a recoverable 409; recalculation and explicit reconfirmation; placed orders keep snapshots). Owner confirmation has **not** been given ([note](../product/rq-004-stale-quote.md)).
+- **Web preview:** prepared and rehearsed locally, not deployed. Owner inputs: hosting, domain/DNS, tester access method (private network recommended because mobile and Wi-Fi addresses change), GHCR publication. External testers stay blocked until AUD-01/LOG-01/OPS-01..03 pass on the preview. MB-040 not started.
+- Model and usage: the session reports `claude-opus-5-5`; effort, tokens and cost UNKNOWN in this record.
 
 ## Story status (after the 2026-10-11 owner correction)
 
@@ -77,8 +75,8 @@ Implementation-agent report (self-reported, not an independent review certificat
 - Design tokens: owner-selected terracotta light palette and Cairo (self-hosted) from [approved/DESIGN.md](../design/approved/DESIGN.md), integrated from design PR #2 (merge `912d447`); dark palette is a derived draft (not owner-reviewed); brand name/logo/trademark still draft; WCAG contrast tested; specimens rendered with Cairo.
 - Design reference checks (2026-10-11): DOM checks PASS; browser check at 320/390/420 px PASS with the preinstalled Chromium (previously BLOCKED elsewhere); screenshots inspected and a 320 px wrapping defect fixed. Remote food photos did not load in this environment. Desktop/English/native rendering of the reference NOT_RUN.
 - Customer account and trust (MB-028): favorites, verified-order reviews with report, staff review queue and moderation (API-098, API-073), account page, preferred language, share link, order again via a new quote, basket replacement confirmation (TC-147). **Remaining UI work:** customer screens still use the earlier draft layout with the new palette and font; restyle to the approved homepage hierarchy (home, kitchen, meal, cart, checkout, order status) is next.
-- Customer web restyle (checkpoint evidence at `bad288f`, all six checks PASS, self-review): home, kitchen and meal pages follow the approved hierarchy on real data and are checked at 320/360/390/420/768/1440 px in Arabic RTL and English LTR (no overflow, 44 px controls); checkout and order status at 320/390 px; axe WCAG 2.2 A/AA scans show no serious/critical findings on these and five operations screens. Cart, checkout, order status and account use the new tokens and form controls but keep their earlier card layout; owner review of those screens is pending. **Decisions needed:** structured portion size (for the approved one-person/two-people filters) and a description in discovery cards both require meal data/contract changes; until decided, intent tiles reveal only sort and clear.
-- TC-018 correction: TC-018 now covers only server rejection of mixed baskets; client confirmation is TC-147 (web, PASS at `bec5830`) and TC-148 (native, NOT_RUN).
+- Customer web restyle (checkpoint evidence at `bad288f`, all six checks PASS, self-review): home, kitchen and meal pages follow the approved hierarchy on real data and are checked at 320/360/390/420/768/1440 px in Arabic RTL and English LTR (no overflow, 44 px controls); checkout and order status at 320/390 px; axe WCAG 2.2 A/AA scans show no serious/critical findings on these and five operations screens. Cart, checkout, order status and account use the new tokens and form controls but keep their earlier card layout; owner review of those screens is pending. **Decisions needed:** structured portion size (for the approved one-person/two-people filters) and a description in discovery cards both require meal data/contract changes; until decided, intent tiles reveal only sort and clear. *(History, 2026-10-11: the decisions named here were taken on 2026-10-12 as D11/D12 and applied in `5cc88c8`, which also restyled the remaining customer screens; see "Owner decisions 2026-10-12".)*
+- TC-018 correction: TC-018 now covers only server rejection of mixed baskets; client confirmation is TC-147 (web, PASS at `bec5830`) and TC-148 (native: PASS at `cdc592a`, native run 31, MB-032 evidence; recorded NOT_RUN on 2026-10-11).
 - Contract: OpenAPI 3.1 for 98 planned operations; implemented operations are typed, and a backend test checks that registry `implemented` flags equal the served routes. Generated TypeScript client.
 - Android / iOS (MB-031): Expo SDK 57 shell with environment config, Arabic/English, system-browser PKCE sign-in (fresh login every time; ephemeral on iOS), tokens in the OS secure store, account switch and sign-out that clear private data, crash boundary. Release variants launch on an Android emulator (API 35) and an iOS simulator, and the native sign-in round trip (customer-a, sign-out, customer-b, cancelled switch) passes on both in CI against the local Keycloak and API with synthetic users. **No physical device, signed or store build yet** (MB-034/MB-035).
 
@@ -113,7 +111,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 - O01–O10 remain OPEN. O06 now also covers cook documents and reapplication after rejection (REJECTED is final until decided).
 - Carried residuals: real MFA/OTP login in local Keycloak not configured (step-up tested with provider claims); audit CSV export (API-095); quote-path contact/address checks in MB-017; meal publication and order acceptance must use `KitchenDirectory` (MB-014/MB-019).
 
-## Today (2026-10-12)
+## History: 2026-10-12 morning (as recorded then; superseded statements marked)
 
 - D11/D12 applied (`5cc88c8`). Remaining customer screens restyled in the approved light system with a derived desktop layout; screenshots for owner review in [docs/design/review](../design/review/README.md).
 - MB-029: browser evidence at `6a84b26`, all six checks PASS. **TC-047 BLOCKED (BLK-003): no screen reader available; screen-reader testing NOT_RUN.** MB-029 is BLOCKED, not DONE; MB-030 not started.
@@ -123,14 +121,14 @@ Implementation-agent report (self-reported, not an independent review certificat
 - MB-031 DONE (`fd689aa`): native Android and iOS sign-in round trips in CI. Found and fixed a defect: after sign-out or on account switch, the previous person was silently signed back in by the provider's browser session.
 - GitHub CI: Product CI success on `d59cd26` (includes MB-039 backend); native builds success on `fd689aa` (run 19). Earlier native failures (runs 9, 11–13, 15–18) were harness problems fixed one by one; they stay visible in the Actions history.
 
-- MB-032 IN_PROGRESS:
+- MB-032 IN_PROGRESS at the time. *Superseded: MB-032 DONE at `cdc592a` (self-review), see the story table.*
   - Native tabs and screens (discover, meal, basket, checkout, orders, favorites, notifications, support) are on the branch, using the generated client.
   - Basket rule with native confirmation; placement keys stored before sending, with recovery.
   - Two product defects found by the native runs and fixed: sign-in reusing the previous login (`64161d5`), and every API response failing on device (`eb1a671`, with a regression test).
-  - Native ordering checks are wired into CI; native run 23 on `3f79630` is in progress.
+  - Native ordering checks are wired into CI; native run 23 on `3f79630` was in progress then. *Superseded: runs 23–29 failed on harness faults, run 30 onward passed; the latest native runs are listed in the story table.*
 - Retrospective test-hardening pass (owner-requested; regression coverage, not historical TDD): 9 tests added, all passing against `eb1a671`, with no product change. Report: [docs/quality/05-retrospective-hardening.md](../quality/05-retrospective-hardening.md).
 - Product CI passed at `3f79630`.
-- Q1 (per-line quantity limit): open owner question.
+- Q1 (per-line quantity limit): open owner question then. *Superseded: the mechanism was implemented in `4eaee3a`/`cdc592a` with a refresh on cart open in `4555f59`; only the commercial value remains open (O04).*
 
 ## Owner decisions 2026-10-12
 
@@ -142,7 +140,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 **Next story:** MB-033 (native lifecycle, push and accessibility). The owner's audit and log readiness package follows at the next MB-039 checkpoint.
 
 **Owner decisions and inputs still needed:**
-- **Web preview:** hosting provider, plan and budget; domain and DNS; testers' IP addresses; approval to publish the two preview images to GHCR. See [06-web-preview.md](../operations/06-web-preview.md); prices are unverified.
+- **Web preview:** hosting provider, plan and budget; domain and DNS; the tester access method (private network recommended, because mobile and Wi-Fi addresses change; IP allow-list otherwise); approval to publish the two preview images to GHCR. See [06-web-preview.md](../operations/06-web-preview.md); prices are unverified.
 - **Policy and launch decisions:**
   - O04: the real per-line quantity limit and commerce policy;
   - O05: visual approval;
