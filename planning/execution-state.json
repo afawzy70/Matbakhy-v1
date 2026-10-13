@@ -4,8 +4,8 @@
   "status": "IN_PROGRESS",
   "current_phase": "P07",
   "current_story": "MB-033",
-  "last_tested_commit": "4555f599411da9683453bee209559c8d1f11cded",
-  "last_completed_story": "MB-032",
+  "last_tested_commit": "bc305c642442f1bdeaf0f1c92f30bc9976dcddc5",
+  "last_completed_story": "MB-049",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
   "open_blockers": [
@@ -42,7 +42,7 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Inside the 12:00-00:00 Kuwait window: (1) RQ-004 client tests for stale-quote refusal (web, native); (2) MB-033 dynamic text sizing and notification-permission states with emulator/simulator execution; (3) MB-039 runtime DB role separation, audit-write failure behavior, local log store/metrics/alert sink and runbook rehearsal. Independent retest candidate 4555f599411da9683453bee209559c8d1f11cded unchanged (MBQA-003/004/005, OBS-001 FIXED_PENDING_INDEPENDENT_RETEST). 2026-10-13 preflight: secret-scan guardrail fixed (ed2ac56); four worktree evidence runs annotated. Blocking decisions: O07 push/staging providers, preview hosting and access method, O06 retention; BLK-003, BLK-004.",
+  "next_action": "Window 2026-10-13 09:47:28 to 2026-10-14 00:00 Kuwait (D15). QA candidate E at bc305c6 (six local checks PASS; native run 39 D13 PASS on Android and iOS; workflow failed later in the MB-033 dynamic-text phase). Next: MB-033 native run 40 (overflow fix, largest-text phases, notification refusal), then MB-039 alert tuning; final checkpoint by 23:00.",
   "updated_at": "2026-10-13T06:49:29Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",

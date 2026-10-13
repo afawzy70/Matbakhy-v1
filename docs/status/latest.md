@@ -2,25 +2,33 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
-- Observed: 2026-10-13T08:55+03:00 (Asia/Kuwait), pre-window preflight and record reconciliation. The authorized work window is 12:00–00:00 Kuwait (`docs/delivery/06-daily-execution.md`); implementation resumes inside it.
-- Active branch: `implementation/mvp` (head and latest pushed checkpoint in the git log); draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge.
-- **Independent QA retest candidate (immutable): `4555f599411da9683453bee209559c8d1f11cded`** ([handoff](../quality/08-codex-qa-repair-cross-role.md)).
-  - MBQA-003, MBQA-004, MBQA-005 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST. No newer independent QA or security report has been published (checked 2026-10-13: QA branches, issues, PR comments).
-  - Checks at the candidate: six local checks PASS (`verification/runs/20261012-QA-REPAIR-2-CHECKS`); native run 35 workflow success on the Android emulator and iOS simulator ([38296110431](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38296110431); job conclusions read, step logs not excerpted).
-  - MBQA-001/002 and FG-001 were independently retested PASS on web at `4eaee3a`.
-  - Earlier candidates `cdc592a` and `f5d2ba0` remain valid history; the retest target is `4555f59`.
-- **Product changes after the candidate** (not in the retest candidate; backend MB-039 only, each red first): staff support-case views audited (`885824b`); staff support messages audited with the request ID (`3d88aaa`); audit-detail redaction keeps whole-value UUIDs (`00b5189`); ECS log lines carry service name, environment and version (`1e8ca5d`, `0d0621d`); draft troubleshooting runbook (`b01453e`). Evidence: `verification/runs/20261012-MB-039-LOCAL/` (focused integration tests). Product CI runs on these pushes: see the Actions history; the full six-check set has not been re-run after `4555f59`.
-- **Correction (2026-10-13):** Product CI's Gitleaks job had been failing since the independent QA branch was published (synthetic idempotency keys flagged), and local SECRET-SCAN runs from git worktrees scanned 0 commits while printing PASS (MB-032 `cdc592a`, CANDIDATE-B/B2, repair-candidate checks `4555f59`). Fixed in `ed2ac56` and re-executed over full history: PASS ([record](../../verification/runs/20261013-SECRET-SCAN-FIX/README.md)). The four runs keep their recorded results with a correction note.
+- Observed: 2026-10-13 ~13:30 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
+- Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge. GitHub reports the PR as conflicting with `main`. It is not merged or rebased (draft; owner decision).
+- **New QA candidate E (immutable): `bc305c642442f1bdeaf0f1c92f30bc9976dcddc5`** ([handoff](../quality/09-qa-candidate-e-pricing-history.md)).
+  - Scope: D13 informed price reconfirmation, D14 kitchen price history, the MB-031 token-refresh fix, and MB-039 local controls.
+  - Six local checks PASS ([evidence](../../verification/runs/20261013-CANDIDATE-E/evidence.json)).
+  - Native run 39 at the candidate:
+    - D13 PASS on the Android emulator and the iOS simulator; same-session lowered limit PASS on both; regression PASS on both.
+    - The workflow concluded failure in the new MB-033 dynamic-text phase (harness, plus an iOS overflow; fixed after the candidate).
+  - Failed attempts, kept as records: C at `31025fc` (secret-scan false positive) and D at `cc52fa4` (brand guard; native sign-in).
+- **Previous candidate `4555f599411da9683453bee209559c8d1f11cded`** stays valid for its scope. MBQA-003/004/005 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST. No newer independent QA report.
+- **Owner decisions today:** D13 (changed prices need informed reconfirmation; RQ-004 decided), D14 (kitchen price history, MB-048), D15 (execution window).
 - **Stories:**
-  - MB-032 DONE at `cdc592a` (self-review); MB-031 DONE at `fd689aa`; MB-037 DONE at `e512ac4`; MB-028 DONE.
-  - **MB-033 IN_PROGRESS:** delivery checkout, quantity limit and deep links on the emulator/simulator; not done: dynamic text, notification permission states, push (O07), screen readers (BLK-003), physical devices (BLK-004).
-  - **MB-039 IN_PROGRESS:** local audit/log controls implemented and tested ([07](../operations/07-audit-and-log-readiness.md)); runtime database role, log store, metrics collection and alerts not done; AUD-01/LOG-01/OPS-01..03 NOT_RUN (deployed, MB-040).
-  - MB-029 BLOCKED on screen-reader testing (BLK-003; TC-047 BLOCKED); MB-030 waits on MB-029.
-  - Gates: P00–P05 PASS (self-reviewed evidence). P06 not passed (O05 open; MB-029/MB-030 not DONE).
-- **Q1:** clients follow the server's published per-line limit (API-001, TC-152 PASS) and re-read it when the cart opens (`4555f59`). The commercial value is O04; 10 is the synthetic policy.
-- **RQ-004:** current behavior follows TC-020/TC-042 and the contract (refuse a stale quote with a recoverable 409; recalculation and explicit reconfirmation; placed orders keep snapshots). Owner confirmation has **not** been given ([note](../product/rq-004-stale-quote.md)).
-- **Web preview:** prepared and rehearsed locally, not deployed. Owner inputs: hosting, domain/DNS, tester access method (private network recommended because mobile and Wi-Fi addresses change), GHCR publication. External testers stay blocked until AUD-01/LOG-01/OPS-01..03 pass on the preview. MB-040 not started.
-- Model and usage: the session reports `claude-opus-5-5`; effort, tokens and cost UNKNOWN in this record.
+  - **MB-048 DONE** (TC-153) and **MB-049 DONE** (TC-154 web/Android/iOS, TC-155, TC-156), self-review at candidate E.
+  - **MB-031** stays DONE. A defect was found today (no token refresh: sign-out about 5 minutes after sign-in, and the basket cleared). Fixed red first; confirmed natively in run 39.
+  - **MB-033 IN_PROGRESS.** Native largest-text phases (English and Arabic) and notification permission (asked only on request; refusal safe; development builds only while O07 is open) are implemented. A large-text overflow fix is being verified in native run 40. Open: visual review of the screenshots, push (O07), screen readers (BLK-003), physical devices (BLK-004).
+  - **MB-039 IN_PROGRESS** (local, self-review):
+    - runtime DB role;
+    - audit-write failure handling;
+    - management-port metrics; bounded gauges;
+    - local log, metrics and alert stack rehearsed;
+    - runbook rehearsal ([07](../operations/07-audit-and-log-readiness.md)).
+    - AUD-01/LOG-01/OPS-01..03 deployed: NOT_RUN (MB-040).
+  - MB-029 BLOCKED (BLK-003); MB-030 waits on MB-029.
+- **Secret scan:** the worktree history-scan correction from the morning stands. Fail-on-zero is kept. Narrow fingerprint exceptions: 20 QA-branch nonces plus 1 runbook command, each reviewed.
+- **Q1:** the commercial limit is O04; 10 is the synthetic policy only.
+- **Web preview:** prepared (now with the runtime role and observability services), not deployed. External testers stay blocked until AUD-01, LOG-01 and OPS-01..03 pass on the preview.
+- Model: the session reports `claude-opus-5-5`; effort, tokens and cost are UNKNOWN in this record.
 
 ## Story status (after the 2026-10-11 owner correction)
 
@@ -33,12 +41,14 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-005 Pin workspace and compatible toolchain | DONE (self-review) | Workspace compile + native Android Gradle and iOS Xcode compile at `34be845` ([native run](../../verification/runs/20261011-MB-005-native/evidence.json), [local](../../verification/runs/20261011-P01-local-34be845/evidence.json)) |
 | MB-006 Database and module boundaries | DONE (self-review) | Re-verified at `34be845` after MB-005 closed ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-006/evidence.json) |
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
-| MB-033 Implement native lifecycle push and accessibility | IN_PROGRESS | Deep links (warm/cold), foreground refetch, one recovery check at a time, session-read retry, native delivery and Q1 regression: Android emulator run 33 at `a8132aa` PASS; iOS simulator run 32 at `e3ba61a` PASS (phases D/E), run 34 at `f5d2ba0` PASS on both platforms incl. deep links ([record](../../verification/runs/20261012-MB-033-FOLLOWUP/README.md)). Push (O07), screen readers (BLK-003) and physical devices (BLK-004) not done |
+| MB-049 Informed reconfirmation of changed prices (D13) | DONE (self-review) | [run](../../verification/runs/20261013-MB-049/evidence.json) at `bc305c6`: TC-154 web, Android emulator, iOS simulator; TC-155/156 on PostgreSQL |
+| MB-048 Kitchen meal price history (D14) | DONE (self-review) | [run](../../verification/runs/20261013-MB-048/evidence.json) at `bc305c6`: TC-153 |
+| MB-033 Implement native lifecycle push and accessibility | IN_PROGRESS | Deep links (warm/cold), foreground refetch, one recovery check at a time, session-read retry, native delivery and Q1 regression: Android emulator run 33 at `a8132aa` PASS; iOS simulator run 32 at `e3ba61a` PASS (phases D/E), run 34 at `f5d2ba0` PASS on both platforms incl. deep links ([record](../../verification/runs/20261012-MB-033-FOLLOWUP/README.md)). Push (O07), screen readers (BLK-003) and physical devices (BLK-004) not done. 2026-10-13: native largest-text phases and notification permission added; verification in progress (run 40) |
 | MB-032 Implement native discovery and ordering | DONE (self-review) | [run](../../verification/runs/20261012-MB-032/evidence.json) at `cdc592a`: six local checks PASS; native run [38273197484](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484) — Android emulator and iOS simulator: basket keep/replace, kill during submit, offline reopen, one recovered order with one set of side effects, total parity. Delivery checkout not exercised natively |
 | MB-031 Build native shell and authentication | DONE (self-review) | [run](../../verification/runs/20261012-MB-031/evidence.json) at `fd689aa`; native run [38226241501](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501): Android emulator and iOS simulator launch and system-browser PKCE sign-in round trip |
 | MB-037 Prove concurrency retries and recovery | DONE (self-review) | [run](../../verification/runs/20261012-MB-037/evidence.json) at `e512ac4` |
 | MB-029 Verify accessibility RTL and responsive behavior | BLOCKED (BLK-003) | [run](../../verification/runs/20261012-MB-029/evidence.json) at `6a84b26`; TC-047 screen-reader testing NOT_RUN |
-| MB-039 Implement privacy observability and recovery tooling | IN_PROGRESS | Erasure, log redaction, gauges, local backup/restore rehearsal tested. Local audit/log readiness [record](../operations/07-audit-and-log-readiness.md): long-path denial audit fixed; staff order-contact views and audit reads audited; correlation and MDC tests. AUD-01/LOG-01/OPS-01..03 NOT_RUN (deployed, MB-040). Staging restore needs O07; retention needs O06 |
+| MB-039 Implement privacy observability and recovery tooling | IN_PROGRESS | Erasure, log redaction, gauges, local backup/restore rehearsal tested. Local audit/log readiness [record](../operations/07-audit-and-log-readiness.md): long-path denial audit fixed; staff order-contact views and audit reads audited; correlation and MDC tests. AUD-01/LOG-01/OPS-01..03 NOT_RUN (deployed, MB-040). Staging restore needs O07; retention needs O06. 2026-10-13 local: runtime DB role, audit-write failure, management-port metrics, bounded gauges, local log/metrics/alert stack and runbook rehearsals ([evidence](../../verification/runs/20261013-MB-039-LOCAL/)) |
 | MB-028 Complete customer account and trust features | DONE (self-review) | [run](../../verification/runs/20261011-MB-028/evidence.json) at `bec5830` (attempt 1 at `fe94d8b` failed the stale traceability matrix); includes API-098 and the web basket-replacement confirmation (TC-147) |
 | MB-027 Complete customer web purchase flow | DONE (self-review); draft visuals until O05 | [run](../../verification/runs/20261011-MB-027/evidence.json) at `0da4477`. CW05 basket editing was incomplete (QA FG-001) until `f600577`; repairs and TC-149/150/151 [run](../../verification/runs/20261012-QA-REPAIR/evidence.json) at `c35ad2d` (pending independent retest) |
 | MB-026 Build operating configuration and staff controls | DONE (self-review) | [run](../../verification/runs/20261011-MB-026/evidence.json) at `c96535b` |
@@ -137,10 +147,10 @@ Implementation-agent report (self-reported, not an independent review certificat
 
 ## Next action
 
-**Next tasks (inside the 12:00–00:00 Kuwait window):**
-1. RQ-004 client tests: a stale quote refused at placement removes the old quote, shows the price-changed message and needs a new quote and fresh terms acceptance (web and native).
-2. MB-033 dynamic text sizing on Android and iOS (Arabic RTL, English LTR): discovery, basket, checkout, orders, support, notifications; then notification-permission states without a provider.
-3. MB-039 local controls: runtime database role separation with mutation rejection under the runtime role; audit-write failure behavior; resource-bounded searchable logs and restricted metrics with a local alert sink; runbook rehearsal against a deliberately failed synthetic event.
+**Next tasks (inside today's window, deadline 00:00 Kuwait):**
+1. MB-033: read the result of native run 40 (large-text overflow fix, largest-text phases in English and Arabic, notification refusal on both platforms) and repair within three attempts; then review the CI screenshots.
+2. MB-039: tune the data-alert behaviour during outages (proposal: inhibit data alerts while DatabaseUnavailable or ApiDown fires); full-disk drill if it can be bounded locally.
+3. Independent retest of candidate E and of `4555f59` (MBQA-003/004/005, OBS-001) by the QA agent.
 
 **Decisions that block the next work** (everything else continues without them):
 
@@ -151,4 +161,4 @@ Implementation-agent report (self-reported, not an independent review certificat
 | O06 log retention and audit archival | Short operational log retention for the preview; audit kept append-only until an archival policy is approved | Retention can be configured only as a proposal | Local log store with size caps; audit controls |
 | Screen-reader tester (BLK-003) and physical devices (BLK-004) | One tester with TalkBack and VoiceOver on two physical devices | MB-029, MB-033 accessibility and device criteria cannot close | Automated checks and emulator/simulator runs (not substitutes) |
 
-Not blocking current work but still open: RQ-004 confirmation (current behavior continues), O04 commercial limit (synthetic 10 in development), O05 visual approval, RQ-001/002/003, O09.
+Not blocking current work but still open: O04 commercial limit (synthetic 10 in development), O05 visual approval, RQ-001/002/003, O09.
