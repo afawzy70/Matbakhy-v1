@@ -19,7 +19,15 @@ import com.matbakhy.notifications.api.NotificationChannels.PushSender;
 import com.matbakhy.notifications.api.NotificationChannels.Result;
 import com.matbakhy.notifications.internal.DeliveryWorker;
 import com.matbakhy.notifications.internal.OutboxDispatcher;
+import io.micrometer.core.instrument.MeterRegistry;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Clock;
+import java.util.HexFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -102,6 +110,7 @@ class LogRedactionIntegrationTest {
     @Autowired PhoneVerificationSender sender;
     @Autowired OutboxDispatcher dispatcher;
     @Autowired DeliveryWorker worker;
+    @Autowired MeterRegistry meters;
 
     @Test
     void captured_logs_hold_no_personal_data_or_secrets_and_one_request_id_traces_order_to_provider_failure(CapturedOutput output)
@@ -193,6 +202,89 @@ class LogRedactionIntegrationTest {
                     assertThat(l.path("message").asString()).isEqualTo("Unhandled failure");
                     assertThat(l.path("error").path("stack_trace").asString()).contains("java.lang.IllegalStateException (message redacted)");
                 });
+    }
+
+    static final String DOC_MARKER = "LEAKCHECK-DOCUMENT-CONTENT-4471";
+    static final String DOC_NAME = "leakcheck-national-id.pdf";
+    static final String WALLET = "leakcheck.wallet@instapay";
+    static final String WALLET_OWNER = "Leakcheck Wallet Owner";
+    static final String TRANSFER_REF = "LEAKCHECK-REF-8841";
+    static final String VISITOR = "leakcheck-visitor-7f2a91";
+
+    /**
+     * TC-056, second part (2026-10-13): private document content and file names, the kitchen's deposit recipient account,
+     * the customer's transfer reference (D16) and the anonymous activity visitor id (D17) appear neither in the
+     * structured logs nor in any metric name or tag.
+     */
+    @Test
+    void documents_payments_activity_and_metrics_hold_no_personal_data(CapturedOutput output) throws Exception {
+        TestCommerce fx = new TestCommerce(jdbc, clock);
+        fx.activateLaunchPolicy(0);
+        try {
+            String customerSubject = UUID.randomUUID().toString();
+            AccountAuthentication customer = logins.login(customerSubject, "Customer");
+            fx.verifyPhone(customer.getPrincipal().id());
+            String cookSubject = UUID.randomUUID().toString();
+            AccountAuthentication cook = logins.login(cookSubject, "Cook");
+            UUID kitchen = TestKitchens.approvedKitchen(jdbc, cook.getPrincipal().id(), logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id());
+            UUID meal = fx.meal(kitchen, 12000, "فتة", "Fatta");
+            UUID slot = fx.slot(kitchen, 300, 20, meal, 10);
+
+            // A private document with a marker in its content and a telling file name, uploaded through a signed URL.
+            byte[] doc = ("%PDF-1.4\n1 0 obj << /Type /Catalog /Title (" + DOC_MARKER + ") >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n")
+                    .getBytes(StandardCharsets.ISO_8859_1);
+            String sha = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(doc));
+            JsonNode ticket = ok(call(post("/api/v1/uploads").content("""
+                    {"purpose":"COOK_DOCUMENT","filename":"%s","contentType":"application/pdf","bytes":%d,"sha256":"%s"}"""
+                    .formatted(DOC_NAME, doc.length, sha)), cook), 201);
+            HttpResponse<String> put = HttpClient.newHttpClient().send(HttpRequest.newBuilder(URI.create(ticket.get("uploadUrl").asString()))
+                    .header("Content-Type", "application/pdf").PUT(HttpRequest.BodyPublishers.ofByteArray(doc)).build(),
+                    HttpResponse.BodyHandlers.ofString());
+            assertThat(put.statusCode()).as(put.body()).isEqualTo(200);
+            ok(call(post("/api/v1/uploads/" + ticket.get("uploadId").asString() + "/complete").content("{}"), cook), 200);
+
+            // The kitchen's deposit recipient, approved by finance staff, then a deposit order and the customer's transfer report.
+            ok(call(put("/api/v1/cook/payment-profile").content("""
+                    {"expectedVersion":0,"depositBps":5000,"codMaxTotalMinor":20000,
+                     "recipient":{"method":"INSTAPAY","identifier":"%s","name":"%s"}}""".formatted(WALLET, WALLET_OWNER)), cook), 200);
+            String financeSubject = UUID.randomUUID().toString();
+            UUID finance = logins.login(financeSubject, "Finance").getPrincipal().id();
+            jdbc.update("INSERT INTO user_grant (id, user_id, permission, grant_reason) VALUES (?, ?, 'finance.verify', 'test grant')", UUID.randomUUID(), finance);
+            long pv = jdbc.queryForObject("SELECT version FROM kitchen_payment_profile WHERE kitchen_id = ?", Long.class, kitchen);
+            ok(call(post("/api/v1/ops/kitchens/" + kitchen + "/payment-recipient/approval").content(
+                    "{\"expectedVersion\":" + pv + ",\"reason\":\"recipient name matches the approved cook\"}"), logins.loginWithMfa(financeSubject, "Finance")), 200);
+            JsonNode quote = ok(call(post("/api/v1/quotes").content("{\"items\":[{\"mealId\":\"" + meal + "\",\"quantity\":2}],\"slotId\":\"" + slot
+                    + "\",\"fulfillmentMode\":\"PICKUP\",\"paymentMethod\":\"DEPOSIT\"}"), customer), 201);
+            JsonNode order = ok(call(post("/api/v1/orders").header("Idempotency-Key", key()).content("""
+                    {"quoteId":"%s","clientRequestId":"%s","acceptedPolicyVersions":{"terms":"%s","cancellation":"%s"}}"""
+                    .formatted(quote.get("quoteId").asString(), UUID.randomUUID(), TestCommerce.TERMS, TestCommerce.CANCELLATION)), customer), 201);
+            ok(call(post("/api/v1/orders/" + order.get("id").asString() + "/payment/transfer-report").content(
+                    "{\"reference\":\"" + TRANSFER_REF + "\"}"), customer), 200);
+            while (dispatcher.dispatchOnce("leakcheck-worker-2", 100) > 0) {
+                // drain the payment notifications
+            }
+
+            // Anonymous activity with a known visitor id.
+            assertThat(mvc.perform(post("/api/v1/activity").contentType(MediaType.APPLICATION_JSON).content(
+                    "{\"visitorId\":\"" + VISITOR + "\",\"events\":[{\"kind\":\"MEAL_VIEW\",\"subjectId\":\"" + meal + "\"}]}"))
+                    .andReturn().getResponse().getStatus()).isEqualTo(202);
+
+            List<String> secrets = List.of(DOC_MARKER, DOC_NAME, "leakcheck-national-id", WALLET, WALLET_OWNER, TRANSFER_REF, VISITOR);
+            String logs = output.getAll();
+            StringBuilder metricText = new StringBuilder();
+            meters.getMeters().forEach(m -> metricText.append(m.getId().getName()).append(m.getId().getTags()).append('\n'));
+            for (String secret : secrets) {
+                assertThat(logs).as("logs must not contain %s", secret).doesNotContain(secret);
+                assertThat(metricText.toString()).as("metric names and tags must not contain %s", secret).doesNotContain(secret);
+            }
+            // The other test's contact and token values, in case it ran first in this context: metric tags carry none of them.
+            for (String secret : List.of(NAME, EMAIL, PHONE_LOCAL, PHONE_E164, STREET, RECIPIENT, PUSH_TOKEN, BEARER)) {
+                assertThat(metricText.toString()).as("metric names and tags must not contain %s", secret).doesNotContain(secret);
+            }
+            assertThat(meters.getMeters()).as("the registry was inspected").isNotEmpty();
+        } finally {
+            fx.activatePolicy(0);
+        }
     }
 
     private static List<String> traced(List<JsonNode> lines, String requestId) {
