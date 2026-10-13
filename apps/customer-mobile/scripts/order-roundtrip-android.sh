@@ -349,7 +349,7 @@ dynamic_text_pass() {
   wait_scrolled "$MEAL" 90 || fail "[$lang] Discover: meal not listed at large text"
   shot "dt-$lang-discover"
   tap_scrolled "$MEAL"
-  tap 'resource-id="slot-0"'
+  tap_scrolled 'resource-id="slot-0"'
   wait_scrolled 'resource-id="add-to-cart"' 30 || fail "[$lang] Meal: add to cart not reachable at large text"
   shot "dt-$lang-meal"
   tap_scrolled 'resource-id="add-to-cart"'
