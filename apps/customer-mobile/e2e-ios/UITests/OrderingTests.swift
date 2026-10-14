@@ -52,6 +52,30 @@ final class OrderingTests: XCTestCase {
         add(attachment)
     }
 
+    /// MB-033 report only (never fails the test): labelled elements that run past the left or right screen edge, printed
+    /// to the job log so the large-text pass can be reviewed where the screenshot artifacts cannot be downloaded.
+    private func edgeReport(_ name: String) {
+        guard let root = try? app.snapshot() else { return print("EDGE-REPORT \(name): no snapshot") }
+        let width = root.frame.width
+        var past: [String] = []
+        var stack: [XCUIElementSnapshot] = [root]
+        while let node = stack.popLast() {
+            stack.append(contentsOf: node.children)
+            let label = node.label.isEmpty ? node.identifier : node.label
+            let f = node.frame
+            if !label.isEmpty, f.width > 0, f.minX < -0.5 || f.maxX > width + 0.5 {
+                past.append("'\(label.prefix(40))' [\(Int(f.minX)),\(Int(f.maxX))]")
+            }
+        }
+        print("EDGE-REPORT \(name): width \(Int(width)), \(past.count) labelled element(s) past the edge"
+            + (past.isEmpty ? "" : "; " + past.prefix(10).joined(separator: "; ")))
+    }
+
+    private func dtShot(_ name: String) {
+        shot(name)
+        edgeReport(name)
+    }
+
     /// Scrolls until the element is hittable, then taps it.
     private func tapScrolled(_ id: String) {
         let target = element(id)
@@ -402,16 +426,16 @@ final class OrderingTests: XCTestCase {
         element("tab-discover").tap()
         let meal = element("meal-00000000-0000-4000-8000-00000000a0b1")
         expect(meal, "[\(lang)] Discover: meal not listed at large text", timeout: 90)
-        shot("dt-\(lang)-discover")
+        dtShot("dt-\(lang)-discover")
         meal.tap()
         expect(element("slot-0"), "[\(lang)] Meal: no slot")
         element("slot-0").tap()
         reach("add-to-cart", "[\(lang)] Meal: add to cart not reachable at large text")
-        shot("dt-\(lang)-meal")
+        dtShot("dt-\(lang)-meal")
         tapScrolled("add-to-cart")
         tapScrolled("go-to-cart")
         expect(element("cart-lines"), "[\(lang)] Cart: basket lines missing")
-        shot("dt-\(lang)-cart")
+        dtShot("dt-\(lang)-cart")
         // Nothing may extend past the screen edge (native run 39: the Pickup choice did at the largest size).
         let width = app.windows.firstMatch.frame.width
         for id in ["mode-DELIVERY", "mode-PICKUP", "get-quote"] where element(id).exists {
@@ -422,25 +446,25 @@ final class OrderingTests: XCTestCase {
         tapScrolled("get-quote")
         expect(element("quote"), "[\(lang)] Checkout: no quote at large text")
         reach("place-order", "[\(lang)] Checkout: place order not reachable at large text")
-        shot("dt-\(lang)-checkout")
+        dtShot("dt-\(lang)-checkout")
         app.navigationBars.buttons.firstMatch.tap()
         app.navigationBars.buttons.firstMatch.tap()
         element("tab-orders").tap()
         let order = element("order-\(number)")
         expect(order, "[\(lang)] Orders: \(number) not listed")
-        shot("dt-\(lang)-orders")
+        dtShot("dt-\(lang)-orders")
         order.tap()
         expect(element("order-items"), "[\(lang)] Order: items missing")
-        shot("dt-\(lang)-order")
+        dtShot("dt-\(lang)-order")
         app.navigationBars.buttons.firstMatch.tap()
         element("tab-account").tap()
         tapLabel(notifications)
         expect(element("notifications"), "[\(lang)] Notifications screen missing")
-        shot("dt-\(lang)-notifications")
+        dtShot("dt-\(lang)-notifications")
         app.navigationBars.buttons.firstMatch.tap()
         tapLabel(support)
         expect(element("support"), "[\(lang)] Support screen missing")
-        shot("dt-\(lang)-support")
+        dtShot("dt-\(lang)-support")
         app.navigationBars.buttons.firstMatch.tap()
         print("MB033-DYNAMIC-TEXT-OK \(lang)")
     }
