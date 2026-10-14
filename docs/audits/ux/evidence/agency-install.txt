@@ -1,0 +1,18 @@
+
+
+The Agency -- Installing agents
+  Repo:       /workspace/agency-agents
+  Installing: codex
+  Agents:     2 of 282
+
+
+  [====================] 1/1
+
+  [1/1] codex
+[OK]  Codex: 2 agents -> /run/codex-environment/codex-home/agents
+
+  +------------------------------------------------+
+  |   Done!  Installed 1 tool(s).                  |
+  +------------------------------------------------+
+
+  Run ./scripts/convert.sh to regenerate after adding or editing agents.
