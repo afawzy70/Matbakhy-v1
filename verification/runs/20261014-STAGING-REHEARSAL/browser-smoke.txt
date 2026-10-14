@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 e2e-staging/smoke.staging.ts:67:1 › customer web: Arabic RTL, a visible demo notice and a way to sign in (778ms)
+  ✓  2 e2e-staging/smoke.staging.ts:92:1 › authentication and a simulated deposit order as the preview customer (5.0s)
+  ✓  3 e2e-staging/smoke.staging.ts:153:1 › operations web: the kitchen cannot start preparing before it reports the deposit (2.1s)
+
+  3 passed (9.0s)

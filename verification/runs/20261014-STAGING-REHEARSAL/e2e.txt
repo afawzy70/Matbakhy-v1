@@ -1,0 +1,11 @@
+
+Running 6 tests using 1 worker
+
+  ✓  1 e2e/cook-workspace.e2e.ts:58:1 › cook fulfils pickup and delivery orders through the real API (25.8s)
+  ✓  2 e2e/customer-journey.e2e.ts:81:1 › customer orders delivery and pickup in the customer web and follows the cook's actions (52.4s)
+  ✓  3 e2e/customer-journey.e2e.ts:577:1 › customer screens keep the approved layout across widths and both directions (18.1s)
+  ✓  4 e2e/keyboard.e2e.ts:48:1 › keyboard-only customer and cook journeys with visible focus and focus restoration (4.8s)
+  ✓  5 e2e/money-reflow.e2e.ts:106:1 › MBQA-006: money amounts stay intact on the cook statement and the finance view (12 variations) (5.8s)
+  ✓  6 e2e/operations-layout.e2e.ts:81:1 › operations sections keep layout and accessibility across widths and both directions (49.4s)
+
+  6 passed (2.6m)

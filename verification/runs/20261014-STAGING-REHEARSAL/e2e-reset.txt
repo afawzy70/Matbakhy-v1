@@ -1,0 +1,64 @@
+pre-reset database backup
+backup /backups/db-20261014T094843Z/matbakhy-20261014T094843Z.dump written in 1s
+NOTICE:  database "matbakhy_restore_check" does not exist, skipping
+OK meal_slot_counters_match_allocations
+OK cook_slot_counters_match_meal_slots
+OK terminal_orders_hold_no_live_stock
+OK order_items_match_subtotal
+OK order_state_matches_latest_event
+OK one_cash_obligation_per_order
+OK ledger_groups_balanced
+OK ledger_only_for_completed_orders
+OK migrations_all_successful
+OK payment_state_matches_history
+restore_seconds=1 total_seconds=1
+RECONCILED matbakhy_restore_check
+backup verified: /backups/db-20261014T094843Z/matbakhy-20261014T094843Z.dump restored and reconciled
+ Container matbakhy-preview-api-1 Stopping 
+ Container matbakhy-preview-api-1 Stopped 
+DROP DATABASE
+CREATE DATABASE
+ Container matbakhy-preview-storage-1 Running 
+ Container matbakhy-preview-identity-1 Running 
+ Container matbakhy-preview-postgres-1 Running 
+ Container matbakhy-preview-postgres-1 Waiting 
+ Container matbakhy-preview-postgres-1 Healthy 
+ Container matbakhy-preview-postgres-1 Waiting 
+ Container matbakhy-preview-identity-1 Waiting 
+ Container matbakhy-preview-identity-1 Healthy 
+ Container matbakhy-preview-postgres-1 Healthy 
+ Container matbakhy-preview-api-1 Starting 
+ Container matbakhy-preview-api-1 Started 
+e2e-reset: empty application database (schema 28); run ./deploy.sh seed after the E2E window to restore the catalogue
+pre-reset database backup
+backup /backups/db-20261014T095149Z/matbakhy-20261014T095149Z.dump written in 1s
+NOTICE:  database "matbakhy_restore_check" does not exist, skipping
+OK meal_slot_counters_match_allocations
+OK cook_slot_counters_match_meal_slots
+OK terminal_orders_hold_no_live_stock
+OK order_items_match_subtotal
+OK order_state_matches_latest_event
+OK one_cash_obligation_per_order
+OK ledger_groups_balanced
+OK ledger_only_for_completed_orders
+OK migrations_all_successful
+OK payment_state_matches_history
+restore_seconds=1 total_seconds=1
+RECONCILED matbakhy_restore_check
+backup verified: /backups/db-20261014T095149Z/matbakhy-20261014T095149Z.dump restored and reconciled
+ Container matbakhy-preview-api-1 Stopping 
+ Container matbakhy-preview-api-1 Stopped 
+DROP DATABASE
+CREATE DATABASE
+ Container matbakhy-preview-storage-1 Running 
+ Container matbakhy-preview-identity-1 Running 
+ Container matbakhy-preview-postgres-1 Running 
+ Container matbakhy-preview-postgres-1 Waiting 
+ Container matbakhy-preview-postgres-1 Healthy 
+ Container matbakhy-preview-identity-1 Waiting 
+ Container matbakhy-preview-postgres-1 Waiting 
+ Container matbakhy-preview-identity-1 Healthy 
+ Container matbakhy-preview-postgres-1 Healthy 
+ Container matbakhy-preview-api-1 Starting 
+ Container matbakhy-preview-api-1 Started 
+e2e-reset: empty application database (schema 28); run ./deploy.sh seed after the E2E window to restore the catalogue

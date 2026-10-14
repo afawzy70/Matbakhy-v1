@@ -89,4 +89,20 @@ Not verified: the SSH forced-command transport itself (the local rehearsal runs 
 
 ## 6. What was rehearsed on the agent's machine, and what was not
 
-RESULTS_PLACEHOLDER
+Rehearsed on the agent's own machine against the local https name `mb.localhost`, with locally built images and synthetic data, at source commit `ea159c1` (clean volumes, fresh realm). Logs: `verification/runs/20261014-STAGING-REHEARSAL/README.md`. This is self-review evidence, not evidence from the Hetzner host.
+
+| Item | Result |
+|---|---|
+| Stack healthy from cold start (4 GB profile) | 133 s; startup order held (postgres, identity with realm imported, storage, api, proxy) |
+| Smoke (read-only) and browser smoke with a simulated deposit order | passed; browser smoke 3 of 3 |
+| Load: 10 clients, 60 s, with a database and storage backup running at the same time | 17,482 requests, all 200, no errors; backup exit 0 |
+| Memory: sum of per-service peaks | 1,310 MiB; tightest is identity at 77% of its 768 MiB ceiling, then storage at 66% of 192 MiB |
+| Out-of-memory kills and restarts | none |
+| Persistence across down/up with volumes kept | order count unchanged; smoke passed after restart |
+| API process killed with SIGKILL | restart policy brought it back healthy after 21 s |
+| Older API image on the current schema (28) | started; config, meals and zones answered 200 |
+| Remote-mode browser E2E window (fixture channel, no direct database access from the runner) | 6 of 6 passed; guarded reset twice, marker removed, catalogue seeded again |
+
+Defects found by this rehearsal and fixed in the same change set: Caddy directive order, JVM heap flag precedence, `deploy.sh check` matching a comment, Keycloak readiness before realm import, deposit orders rejected by reconcile, CSRF cookie not shared across subdomains, bootstrap admin holding grants.
+
+Not rehearsed, and not claimed: the Hetzner host itself, the SSH forced-command transport for the fixture channel, `deploy.sh up` with real image digests, registry pulls, public DNS and certificate issuance, and the outbound network allowlist.
