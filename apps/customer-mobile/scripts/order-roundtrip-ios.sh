@@ -23,7 +23,7 @@ phase() {
   set +e
   xcodebuild test-without-building -project MB031NativeChecks.xcodeproj -scheme SignInUITests -destination "id=$UDID" \
     -only-testing:"SignInUITests/OrderingTests/$name" -resultBundlePath "$RUNNER_TEMP/mb032-$name.xcresult" 2>&1 \
-    | tee "$RUNNER_TEMP/mb032-$name.log" | grep -E "Test Case|error:|MB0[3-5][0-9]-" 
+    | tee "$RUNNER_TEMP/mb032-$name.log" | grep -E "Test Case|error:|MB0[3-5][0-9]-|EDGE-REPORT" 
   status=${PIPESTATUS[0]}
   set -e
   if [ "$status" -ne 0 ]; then
@@ -136,7 +136,7 @@ phase_with_change() {
   grep -q "$marker" "$log" && eval "$change"
   wait $pid; status=$?
   set -e
-  grep -E "Test Case|error:|MB03[23]-|MB049-" "$log" || true
+  grep -E "Test Case|error:|MB03[23]-|MB049-|EDGE-REPORT" "$log" || true
   if [ "$status" -ne 0 ]; then
     echo "FAIL: $name (xcodebuild exit $status)"
     sed -n '/MB031-HIERARCHY-BEGIN/,/MB031-HIERARCHY-END/p' "$log" | head -120

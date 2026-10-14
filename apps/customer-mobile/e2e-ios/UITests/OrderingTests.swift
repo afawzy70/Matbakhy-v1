@@ -484,6 +484,8 @@ final class OrderingTests: XCTestCase {
     func testJ_NotificationRefusalIsSafe() {
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         app.launch()
+        // Run 50: tapped before the first frame appeared; wait like the other phases do.
+        expect(element("tab-account"), "app not ready: no Account tab")
         element("tab-account").tap()
         let undetermined = element("phone-alerts-undetermined")
         expect(undetermined, "permission not shown as not yet asked (the app must not ask on launch)")
