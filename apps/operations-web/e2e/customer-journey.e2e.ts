@@ -81,7 +81,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByText(c.signInToOrder)).toBeVisible();
   await page.getByRole("main").getByRole("link", { name: c.signIn }).click();
   await idpLogin(page, "customer-b");
-  await expect(page).toHaveURL(/5173\/#\/checkout/);
+  await expect(page).toHaveURL(/\/#\/checkout$/);
   await expect(page.getByRole("heading", { name: c.contact })).toBeVisible();
   fixture("customer_phone_verified", { subject: CUSTOMER_B, phone: "+201005556667" });
   await page.reload();
@@ -315,7 +315,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.goto(`${CUSTOMER}/#/account`);
   await expect(page.getByRole("button", { name: c.signOut })).toBeVisible();
   await page.getByRole("button", { name: c.signOut }).click();
-  await expect(page).toHaveURL(/5173\/?(#\/?)?$/);
+  await expect(page).toHaveURL(new RegExp(`^${CUSTOMER.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/?(#/?)?$`));
   await expect(page.getByRole("link", { name: c.signIn }).first()).toBeVisible();
   expect((await page.request.get(`${API}/api/v1/me`)).status(), "the server session ended").toBe(401);
   expect(await page.evaluate(() => window.localStorage.getItem("matbakhy.cart")), "basket cleared").toBeNull();

@@ -174,7 +174,8 @@ e2e() {
      E2E_USER_PASSWORD="$password" E2E_USERS="$users" E2E_IGNORE_HTTPS_ERRORS=1 E2E_CHROMIUM="$(chromium)" E2E_OUTPUT_DIR="$OUT/e2e-results" \
      E2E_FIXTURE_CMD="[\"sh\",\"$D/e2e-fixture.sh\"]" E2E_PSQL_PREFIX="$prefix" E2E_ENABLED_MARKER="$D/.e2e-enabled" \
      pnpm exec playwright test) 2>&1 | tee "$OUT/e2e.txt" || rc=$?
-  info "end of the window: marker removed, catalogue seeded again"
+  info "end of the window: second guarded reset, marker removed, catalogue seeded again"
+  (cd "$D" && set -a && . ./.env && set +a && E2E_RESET_CONFIRM="$DOMAIN" sh deploy.sh e2e-reset) >>"$OUT/e2e-reset.txt" 2>&1 || true
   rm -f "$D/.e2e-enabled"
   deploy seed >/dev/null 2>&1 || echo "seed after the E2E window failed" | tee -a "$OUT/e2e.txt"
   return $rc
