@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { strings } from "../src/i18n";
-import { axe, env, overflowing, sql } from "./fixtures";
+import { axe, fixture, idpLogin, overflowing } from "./fixtures";
 
 /**
  * MB-029 on the operations web, after the cook and customer workflows have created real data: the cook (cook-a) and a
@@ -8,17 +8,10 @@ import { axe, env, overflowing, sql } from "./fixtures";
  * at 360, 390, 768 and 1440 px. Every section must have no page-level horizontal overflow, every visible control at
  * least 44 px, and tables either fitting or scrolling inside their own container (no clipped totals). axe-core WCAG
  * 2.2 A/AA rules report no serious or critical finding at 390 and 1440 px. One meal gets a very long synthetic title
- * (test-only SQL) to exercise long values in lists and tables. Automated rules are not a full audit.
+ * (test-only fixture) to exercise long values in lists and tables. Automated rules are not a full audit.
  */
-const PASSWORD = env("E2E_USER_PASSWORD");
 // At the 120-character maximum for meal titles, with a long unbroken Latin token.
 const LONG_TITLE = "كشري تجريبي بعنوان طويل لاختبار التفاف النص في الجداول والقوائم VeryLongUnbrokenSyntheticTokenWithoutSpaces1234567890";
-
-async function idpLogin(page: Page, user: string) {
-  await page.locator("#username").fill(user);
-  await page.locator("#password").fill(PASSWORD);
-  await page.locator("#kc-login").click();
-}
 
 async function checkSection(page: Page, where: string, scan: boolean) {
   await page.waitForLoadState("networkidle");
@@ -78,8 +71,8 @@ async function everySection(page: Page, who: string) {
 
 test("operations sections keep layout and accessibility across widths and both directions", async ({ browser }) => {
   test.setTimeout(240_000);
-  sql(`UPDATE meal SET title_ar = '${LONG_TITLE}' WHERE id = (SELECT id FROM meal WHERE title_ar = 'كشري تجريبي')`);
-  for (const user of ["cook-a", "ops-a"]) {
+  fixture("meal_title_set", { from_title: "كشري تجريبي", to_title: LONG_TITLE });
+  for (const user of ["cook-a", "ops-a"] as const) {
     const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto("/");

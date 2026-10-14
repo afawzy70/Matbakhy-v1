@@ -185,11 +185,16 @@ e2e() {
   for _ in $(seq 1 60); do curl -fs -o /dev/null http://localhost:5174/ && curl -fs -o /dev/null http://localhost:5173/ && break; sleep 1; done
   curl -fsS -o /dev/null http://localhost:5174/ || { cat "$VERIFY_TMP/web.log"; die "operations web did not start"; }
   curl -fsS -o /dev/null http://localhost:5173/ || { cat "$VERIFY_TMP/customer.log"; die "customer web did not start"; }
-  local psql
-  psql="[\"docker\",\"compose\",\"--env-file\",\"$ENV_FILE\",\"-f\",\"$INFRA/compose.yaml\",\"exec\",\"-T\",\"postgres\",\"psql\",\"-U\",\"$POSTGRES_USER\",\"-d\",\"$POSTGRES_DB\"]"
+  # The suite has no database access: it sends fixture names to the same server-side script a staging host uses
+  # (deploy/web-preview/e2e-fixture.sh), which here reaches the throwaway database through docker compose exec.
+  local fixture_cmd
+  fixture_cmd="[\"sh\",\"$ROOT/deploy/web-preview/e2e-fixture.sh\"]"
+  : > "$VERIFY_TMP/.e2e-enabled"
+  export E2E_ENABLED_MARKER="$VERIFY_TMP/.e2e-enabled"
+  export E2E_PSQL_PREFIX="docker compose --env-file $ENV_FILE -f $INFRA/compose.yaml exec -T postgres psql -U $POSTGRES_USER -d $POSTGRES_DB"
   info "running browser workflows"
   (cd "$ROOT/apps/operations-web" && E2E_API_URL="http://localhost:${API_PORT}" E2E_OPS_URL="http://localhost:5174" E2E_CUSTOMER_URL="http://localhost:5173" \
-    E2E_USER_PASSWORD="$DEV_USER_PASSWORD" E2E_PSQL="$psql" E2E_OUTPUT_DIR="${E2E_OUTPUT_DIR:-$VERIFY_TMP/results}" \
+    E2E_USER_PASSWORD="$DEV_USER_PASSWORD" E2E_FIXTURE_CMD="$fixture_cmd" E2E_OUTPUT_DIR="${E2E_OUTPUT_DIR:-$VERIFY_TMP/results}" \
     pnpm exec playwright test)
 }
 

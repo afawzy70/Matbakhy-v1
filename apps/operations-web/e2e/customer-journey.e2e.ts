@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { strings as customerStrings } from "../../customer-web/src/i18n";
 import { strings } from "../src/i18n";
-import { axe, env, overflowing, sql } from "./fixtures";
+import { account, axe, env, fixture, idpLogin, overflowing } from "./fixtures";
 
 /**
  * TC-127 against the real local stack, after the cook workflow has published "كشري تجريبي" with an open slot: a
@@ -9,7 +9,7 @@ import { axe, env, overflowing, sql } from "./fixtures";
  * delivery address, gets a server quote and places the order; the first placement response is lost after the server
  * committed, and the retry with the same stored keys shows the one existing order. The cook accepts, prepares and
  * hands over in the operations web while the customer's order page follows each state and shows the handover code.
- * A pickup order is placed too. Phone verification is synthetic SQL (the fake SMS code is not exposed).
+ * A pickup order is placed too. Phone verification is a synthetic fixture (the fake SMS code is not exposed).
  *
  * MB-028 (TC-128): the customer reviews the completed order once, sees the visible rating on the meal page, keeps the
  * meal as a favorite in the account page and reports the review; a moderator (ops-a, granted by the cook workflow)
@@ -18,21 +18,14 @@ import { axe, env, overflowing, sql } from "./fixtures";
  * Approved-direction layout (docs/design/approved): at 320, 390 and 420 px the home (dishes and kitchens), kitchen
  * and meal pages render right-to-left without horizontal overflow and with every control at least 44 px.
  *
- * TC-147 (BR-018 client part): with a second synthetic slot of the same kitchen (test-only SQL), adding the meal for
+ * TC-147 (BR-018 client part): with a second synthetic slot of the same kitchen (test-only fixture), adding the meal for
  * the other slot asks before replacing the basket; keeping it leaves the basket unchanged, replacing it switches slot.
  */
 const c = customerStrings.ar;
 const t = strings.ar;
 const CUSTOMER = env("E2E_CUSTOMER_URL");
 const API = env("E2E_API_URL");
-const PASSWORD = env("E2E_USER_PASSWORD");
-const CUSTOMER_B = "00000000-0000-4000-8000-0000000000b1";
-
-async function idpLogin(page: Page, user: string) {
-  await page.locator("#username").fill(user);
-  await page.locator("#password").fill(PASSWORD);
-  await page.locator("#kc-login").click();
-}
+const CUSTOMER_B = account("customer-b").subject;
 
 /**
  * Phone-width layout check of the current screen (approved direction): no horizontal overflow and every visible
@@ -73,15 +66,14 @@ async function addToCart(page: Page) {
 test("customer orders delivery and pickup in the customer web and follows the cook's actions", async ({ browser }) => {
   // The journey also covers the support thread and sign-out (MBQA-003/004) since the independent QA repairs.
   test.setTimeout(360_000);
-  expect(sql(`SELECT count(*) FROM meal WHERE title_ar = 'كشري تجريبي' AND status = 'PUBLISHED' AND moderation_state = 'VISIBLE'`),
+  expect(fixture("published_meal_count", { title: "كشري تجريبي" }),
     "cook workflow ran first").toBe("1");
   const customerContext = await browser.newContext();
   const page = await customerContext.newPage();
   await addToCart(page);
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   // MB-054: the anonymous visitor's browsing reached the real API (CSRF included) and was counted, without identity.
-  const activity = () => sql(`SELECT string_agg(DISTINCT a.kind, ',' ORDER BY a.kind) FROM activity_daily a JOIN meal m ON m.id = a.subject_id
-                               WHERE m.title_ar = 'كشري تجريبي'`);
+  const activity = () => fixture("meal_activity_kinds", { title: "كشري تجريبي" });
   await expect.poll(activity, { timeout: 15_000 }).toBe("ADD_TO_CART,MEAL_IMPRESSION,MEAL_VIEW");
 
   // Checkout needs a session: sign in and come back to the cart.
@@ -91,7 +83,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await idpLogin(page, "customer-b");
   await expect(page).toHaveURL(/5173\/#\/checkout/);
   await expect(page.getByRole("heading", { name: c.contact })).toBeVisible();
-  sql(`UPDATE app_user SET phone_e164 = '+201005556667', phone_verified_at = now() WHERE subject = '${CUSTOMER_B}'`);
+  fixture("customer_phone_verified", { subject: CUSTOMER_B, phone: "+201005556667" });
   await page.reload();
 
   // Delivery address through the UI, then a server quote.
@@ -128,7 +120,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.getByRole("button", { name: c.retryOrder }).first().click();
   await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.PENDING_ACCEPTANCE as string)).toBeVisible();
   await page.unroute(`${API}/api/v1/orders`);
-  expect(sql(`SELECT count(*) FROM customer_order o JOIN app_user u ON u.id = o.customer_id WHERE u.subject = '${CUSTOMER_B}'`),
+  expect(fixture("customer_order_count", { subject: CUSTOMER_B }),
     "the lost response did not create a second order").toBe("1");
   const number = (await page.getByRole("heading", { level: 2 }).textContent())?.split(" · ")[0]?.trim() ?? "";
 
@@ -163,7 +155,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByRole("button", { name: c.submitReview })).toBeVisible();
   await page.getByRole("button", { name: c.submitReview }).click();
   await expect(page.getByText(c.reviewed), "the server refuses a second review of the same order").toBeVisible();
-  expect(sql(`SELECT count(*) FROM review r JOIN customer_order o ON o.id = r.order_id WHERE o.public_number = '${number}'`)).toBe("1");
+  expect(fixture("order_review_count", { number })).toBe("1");
 
   // A pickup order as well.
   await addToCart(page);
@@ -210,10 +202,10 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await expect(page.getByRole("button", { name: c.unfavorite })).toBeVisible();
   await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toHaveCount(0);
   await expect(page.getByText(c.noReviews)).toBeVisible();
-  expect(sql(`SELECT count(*) FROM audit_event WHERE action = 'review.moderation'`)).toBe("1");
+  expect(fixture("audit_count", { action: "review.moderation" })).toBe("1");
   await opsContext.close();
 
-  const mealId = sql(`SELECT id FROM meal WHERE title_ar = 'كشري تجريبي'`);
+  const mealId = fixture("meal_id_by_title", { title: "كشري تجريبي" });
   await page.goto(`${CUSTOMER}/#/`);
   await page.getByRole("button", { name: c.home.kitchens }).click();
   await expect(page.getByRole("article", { name: /.+/ }).first()).toBeVisible();
@@ -221,13 +213,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.goto(`${CUSTOMER}/#/meal/${mealId}`);
 
   // One kitchen and one slot per basket: replacing needs explicit confirmation; cancelling keeps the basket.
-  sql(`WITH s AS (SELECT * FROM cook_slot WHERE kitchen_id = (SELECT kitchen_id FROM meal WHERE title_ar = 'كشري تجريبي') AND state = 'OPEN'
-         ORDER BY starts_at LIMIT 1),
-       n AS (INSERT INTO cook_slot (id, kitchen_id, local_date, starts_at, ends_at, lead_minutes, cutoff_at, max_portions, state)
-         SELECT gen_random_uuid(), kitchen_id, local_date + 1, starts_at + interval '1 day', ends_at + interval '1 day', lead_minutes,
-                cutoff_at + interval '1 day', max_portions, 'OPEN' FROM s RETURNING id)
-       INSERT INTO meal_slot (id, cook_slot_id, meal_id, capacity)
-         SELECT gen_random_uuid(), n.id, ms.meal_id, ms.capacity FROM n, meal_slot ms JOIN s ON ms.cook_slot_id = s.id`);
+  fixture("second_open_slot_for_meal_kitchen", { title: "كشري تجريبي" });
   const cartSlot = () => page.evaluate(() => (JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "null") as { slotId: string } | null)?.slotId);
   await page.reload();
   await expect(page.getByRole("radio")).toHaveCount(2);
@@ -257,9 +243,9 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.getByRole("button", { name: c.getQuote }).click();
   await expect(page.getByText(c.total, { exact: true })).toBeVisible();
   await page.getByLabel(c.terms).check();
-  const oldPrice = Number(sql(`SELECT price_minor FROM meal WHERE title_ar = 'كشري تجريبي'`));
+  const oldPrice = Number(fixture("meal_price_minor", { title: "كشري تجريبي" }));
   const newPrice = oldPrice + 500;
-  const ordersBefore = sql(`SELECT count(*) FROM customer_order o JOIN app_user u ON u.id = o.customer_id WHERE u.subject = '${CUSTOMER_B}'`);
+  const ordersBefore = fixture("customer_order_count", { subject: CUSTOMER_B });
   await cook.getByRole("button", { name: t.tabs.meals }).click();
   const mealCard = cook.getByRole("article", { name: "كشري تجريبي" });
   await mealCard.getByRole("button", { name: t.priceHistory }).click();
@@ -268,12 +254,12 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await history.getByLabel(t.newPrice).fill((newPrice / 100).toFixed(2));
   await history.getByRole("button", { name: t.changePrice }).click();
   await expect(history.getByRole("list", { name: t.previousPrices })).toBeVisible();
-  expect(Number(sql(`SELECT price_minor FROM meal WHERE title_ar = 'كشري تجريبي'`)), "the kitchen's edit changed the price").toBe(newPrice);
+  expect(Number(fixture("meal_price_minor", { title: "كشري تجريبي" })), "the kitchen's edit changed the price").toBe(newPrice);
   await page.getByRole("button", { name: c.placeOrder }).click();
   const notice = page.getByTestId("price-change");
   await expect(notice).toContainText("المطبخ حدّث سعر «كشري تجريبي»");
   await expect(page.getByRole("button", { name: c.placeOrder })).toBeDisabled();
-  expect(sql(`SELECT count(*) FROM customer_order o JOIN app_user u ON u.id = o.customer_id WHERE u.subject = '${CUSTOMER_B}'`),
+  expect(fixture("customer_order_count", { subject: CUSTOMER_B }),
     "no order at the stale price").toBe(ordersBefore);
   for (const width of [320, 390]) {
     await page.setViewportSize({ width, height: 900 });
@@ -285,8 +271,7 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.getByLabel(c.terms).check();
   await page.getByRole("button", { name: c.placeOrder }).click();
   await expect(page).toHaveURL(/#\/orders\//);
-  expect(sql(`SELECT o.total_minor || '|' || i.unit_price_minor FROM customer_order o JOIN order_item i ON i.order_id = o.id JOIN app_user u ON u.id = o.customer_id
-              WHERE u.subject = '${CUSTOMER_B}' ORDER BY o.created_at DESC LIMIT 1`), "placed at the accepted new price").toBe(`${newPrice}|${newPrice}`);
+  expect(fixture("order_latest_totals", { subject: CUSTOMER_B }), "placed at the accepted new price").toBe(`${newPrice}|${newPrice}`);
 
   // MBQA-004 (independent QA, 4eaee3a): the customer opens a support case and reads the support team's public reply in
   // the customer web; a staff-only note never reaches the customer; another customer cannot open the case.
@@ -298,14 +283,9 @@ test("customer orders delivery and pickup in the customer web and follows the co
   await page.getByRole("button", { name: c.openCase }).click();
   const caseLink = page.getByRole("link", { name: new RegExp(`CS-[0-9A-F]{8} · ${number}`) });
   await expect(caseLink).toBeVisible();
-  const caseId = sql(`SELECT c.id FROM support_case c JOIN customer_order o ON o.id = c.order_id WHERE o.public_number = '${number}'
-                      ORDER BY c.created_at DESC LIMIT 1`);
-  // Staff messages as test-only SQL with a synthetic staff author (the staff reply UI is covered by the operations tests).
-  sql(`INSERT INTO case_message (id, case_id, author_id, author_role, visibility, body, created_at)
-       SELECT gen_random_uuid(), '${caseId}', u.id, 'STAFF', v.visibility, v.body, now() + v.delay
-       FROM (SELECT id FROM app_user WHERE subject <> '${CUSTOMER_B}' ORDER BY created_at LIMIT 1) u,
-            (VALUES ('STAFF_ONLY', 'E2E PRIVATE NOTE NEVER FOR CUSTOMER', interval '1 second'),
-                    ('PUBLIC', 'E2E PUBLIC REPLY FOR CUSTOMER', interval '2 seconds')) AS v(visibility, body, delay)`);
+  const caseId = fixture("support_case_id_for_order", { number });
+  // Staff messages as a test-only fixture with a synthetic staff author (the staff reply UI is covered by the operations tests).
+  fixture("support_staff_messages", { case_id: caseId, customer_subject: CUSTOMER_B });
   await caseLink.click();
   await expect(page.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toBeVisible();
   await expect(page.getByText(c.fromSupport)).toBeVisible();
@@ -358,8 +338,8 @@ test("customer orders delivery and pickup in the customer web and follows the co
  * A/AA rules (axe-core) report no serious or critical finding at 390 and 1440 px. Automated rules are not a full audit.
  */
 test("customer screens keep the approved layout across widths and both directions", async ({ browser }) => {
-  const kitchenSlug = sql(`SELECT public_slug FROM kitchen k JOIN meal m ON m.kitchen_id = k.id WHERE m.title_ar = 'كشري تجريبي'`);
-  const mealId = sql(`SELECT id FROM meal WHERE title_ar = 'كشري تجريبي'`);
+  const kitchenSlug = fixture("kitchen_slug_by_meal_title", { title: "كشري تجريبي" });
+  const mealId = fixture("meal_id_by_title", { title: "كشري تجريبي" });
   const context = await browser.newContext();
   const page = await context.newPage();
   for (const width of [320, 360, 390, 420, 768, 1440]) {

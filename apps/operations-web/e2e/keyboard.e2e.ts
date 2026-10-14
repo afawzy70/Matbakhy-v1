@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { strings as customerStrings } from "../../customer-web/src/i18n";
 import { strings } from "../src/i18n";
-import { env } from "./fixtures";
+import { account, env } from "./fixtures";
 
 /**
  * MB-029 / TC-047 keyboard-only journeys on the real stack (after the purchase journey, which leaves two open slots of
@@ -96,7 +96,7 @@ test("keyboard-only customer and cook journeys with visible focus and focus rest
   await tabTo(page, (e) => e.tag === "A" && e.text === c.signIn, "sign in");
   await page.keyboard.press("Enter");
   await page.locator("#username").focus();
-  await page.keyboard.type("customer-b");
+  await page.keyboard.type(account("customer-b").username);
   await page.keyboard.press("Tab");
   await page.keyboard.type(PASSWORD);
   await page.keyboard.press("Enter");
@@ -121,7 +121,7 @@ test("keyboard-only customer and cook journeys with visible focus and focus rest
   await tabTo(cook, (e) => e.tag === "A" && e.text === t.signIn, "sign in");
   await cook.keyboard.press("Enter");
   await cook.locator("#username").focus();
-  await cook.keyboard.type("cook-a");
+  await cook.keyboard.type(account("cook-a").username);
   await cook.keyboard.press("Tab");
   await cook.keyboard.type(PASSWORD);
   await cook.keyboard.press("Enter");

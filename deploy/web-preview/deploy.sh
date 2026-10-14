@@ -8,6 +8,9 @@
 #   ./deploy.sh backup         PostgreSQL dump (checksum + manifest), verified by a restore into a scratch database, and an image-storage archive
 #   ./deploy.sh restore-db F   restore a dump into an empty database and reconcile it (scripts/db-restore.sh)
 #   ./deploy.sh prune-qa [--apply]   list (or, with --apply, delete) QA artifacts older than QA_ARTIFACT_RETENTION_DAYS
+#   ./deploy.sh status         running images, database schema version, last releases (read-only)
+#   ./deploy.sh rollback-plan [N]   what rolling back to the release N entries before the last one needs (prints only; changes nothing)
+#   ./deploy.sh e2e-reset      E2E window only: verified backup, then recreate the empty application database (guarded)
 # Nothing here builds images, creates cloud resources or changes DNS.
 set -eu
 cd "$(dirname "$0")"
@@ -71,18 +74,103 @@ wait_healthy() {
   done
 }
 
+# Database schema version (highest applied Flyway migration), 0 when there is no database yet.
+schema_version() {
+  v=$(compose exec -T postgres psql -U matbakhy -d matbakhy -At \
+        -c "SELECT COALESCE(max(version::int), 0) FROM flyway_schema_history WHERE success AND version IS NOT NULL" 2>/dev/null | tr -d '[:space:]') || v=0
+  case "$v" in ''|*[!0-9]*) v=0 ;; esac
+  echo "$v"
+}
+
+# One line per successful deploy: when, which commit and image digests, schema before and after, and the pre-deploy backup.
+# It is what rollback-plan reads. It holds no secret.
+release_log() { echo "${RELEASE_LOG:-${BACKUP_DIR:-/srv/matbakhy-backups}/releases.log}"; }
+record_release() {
+  mkdir -p "$(dirname "$(release_log)")"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$RELEASE_COMMIT" "$API_IMAGE" "$FRONT_IMAGE" \
+    "$1" "$2" "${3:--}" >> "$(release_log)"
+}
+
 up() {
   check
   render
+  LAST_BACKUP_DIR=""
+  schema_before=0
   if [ -n "$(compose ps -q postgres 2>/dev/null)" ]; then
     echo "pre-deploy database backup"; backup_db
+    schema_before=$(schema_version)
   fi
-  compose pull
+  # Images are pinned by digest, so only missing ones are pulled (an image already present is identical by definition).
+  compose pull --policy missing
   compose up -d
   wait_healthy
   # Buckets are idempotent; the public bucket is readable anonymously (s3.json), the private one is not.
   compose exec -T storage sh -c 'printf "s3.bucket.create -name matbakhy-public\ns3.bucket.create -name matbakhy-private\n" | weed shell' >/dev/null 2>&1 || true
-  echo "up: $RELEASE_COMMIT"
+  record_release "$schema_before" "$(schema_version)" "${LAST_BACKUP_DIR:--}"
+  echo "up: $RELEASE_COMMIT (schema $schema_before -> $(schema_version))"
+}
+
+status() {
+  load
+  echo "== containers"; compose ps --format 'table {{.Service}}\t{{.Status}}\t{{.Image}}' || true
+  echo "== schema version: $(schema_version)"
+  echo "== configured: RELEASE_COMMIT=$RELEASE_COMMIT"
+  echo "   API_IMAGE=$API_IMAGE"
+  echo "   FRONT_IMAGE=$FRONT_IMAGE"
+  echo "== last releases ($(release_log))"
+  if [ -f "$(release_log)" ]; then tail -n 5 "$(release_log)" | awk -F'\t' '{printf "   %s  %s  schema %s -> %s  backup %s\n", $1, substr($2,1,12), $5, $6, $7}'; else echo "   none recorded"; fi
+}
+
+# Read-only. Tells the operator what a rollback to the release N entries before the last one involves. Rolling back
+# images is safe without touching data only when the database schema has not moved since that release or every
+# migration since then is expand-only (CI enforces the annotation: scripts/check_migration_compat.py).
+rollback_plan() {
+  load
+  n=${1:-1}
+  case "$n" in ''|*[!0-9]*|0) die "usage: ./deploy.sh rollback-plan [N]  (N >= 1)" ;; esac
+  log=$(release_log)
+  [ -f "$log" ] || die "no release log at $log: nothing to roll back to"
+  total=$(wc -l < "$log" | tr -d ' ')
+  [ "$total" -gt "$n" ] || die "only $total release(s) recorded; cannot go back $n"
+  target=$(sed -n "$((total - n))p" "$log")
+  later=$(sed -n "$((total - n + 1))p" "$log")
+  t_commit=$(printf '%s' "$target" | cut -f2); t_api=$(printf '%s' "$target" | cut -f3); t_front=$(printf '%s' "$target" | cut -f4)
+  t_schema=$(printf '%s' "$target" | cut -f6); t_when=$(printf '%s' "$target" | cut -f1)
+  first_backup=$(printf '%s' "$later" | cut -f7)
+  current=$(schema_version)
+  echo "target release: $t_commit (deployed $t_when, schema $t_schema)"
+  echo "current schema: $current"
+  echo "put these three values into .env:"
+  echo "  RELEASE_COMMIT=$t_commit"
+  echo "  API_IMAGE=$t_api"
+  echo "  FRONT_IMAGE=$t_front"
+  if [ "$current" = "$t_schema" ]; then
+    echo "verdict: the schema has not moved since that release. Image-only rollback: edit .env, then ./deploy.sh up. Data is kept."
+  else
+    echo "verdict: the schema moved from $t_schema to $current since that release (migrations V$((t_schema + 1)) to V$current)."
+    echo "  Image-only rollback is safe ONLY if every one of those migrations is expand-only (check the release notes; CI refuses a"
+    echo "  breaking migration without its rollback-compat annotation). Rehearse on a copy first."
+    echo "  Otherwise restore the backup taken before the first deploy that applied them: $first_backup"
+    echo "  (./deploy.sh restore-db <dump> restores into matbakhy_restore and reconciles it; data written since that backup is LOST,"
+    echo "  and the application database must be pointed at the restored one by the owner)."
+  fi
+}
+
+# E2E window only (owner decision 2026-10-14). The browser suite expects an empty application database. This wipes ALL
+# application data (the identity provider keeps its users). It refuses unless: the host has the e2e marker file, the customer
+# hosts are not public, and the operator typed the preview domain as confirmation. A verified backup is taken first.
+e2e_reset() {
+  load
+  marker=${E2E_ENABLED_MARKER:-./.e2e-enabled}
+  [ -f "$marker" ] || die "e2e is not enabled on this host (no $marker); create it deliberately for an E2E window"
+  case " ${CUSTOMER_ALLOWED_IPS:-} " in *" 0.0.0.0/0 "*|*" ::/0 "*) die "customer hosts are public (CUSTOMER_ALLOWED_IPS): narrow them to the staff list before an E2E reset" ;; esac
+  [ "${E2E_RESET_CONFIRM:-}" = "$PREVIEW_DOMAIN" ] || die "set E2E_RESET_CONFIRM=$PREVIEW_DOMAIN to confirm that all application data is wiped"
+  echo "pre-reset database backup"; backup_db
+  compose stop api
+  compose exec -T postgres psql -U matbakhy -d postgres -v ON_ERROR_STOP=1 -c "DROP DATABASE IF EXISTS matbakhy WITH (FORCE)" -c "CREATE DATABASE matbakhy OWNER matbakhy"
+  compose up -d api
+  wait_healthy
+  echo "e2e-reset: empty application database (schema $(schema_version)); run ./deploy.sh seed after the E2E window to restore the catalogue"
 }
 
 seed() {
@@ -92,6 +180,7 @@ seed() {
 
 backup_db() {
   stamp=$(date -u +%Y%m%dT%H%M%SZ)
+  LAST_BACKUP_DIR="/backups/db-$stamp"
   compose exec -T -e PGDATABASE=matbakhy -e PGUSER=matbakhy postgres sh -s "/backups/db-$stamp" < ../../scripts/db-backup.sh
   verify_backup "/backups/db-$stamp"
   backup_metric
@@ -143,5 +232,8 @@ case "${1:-}" in
   backup) backup ;;
   restore-db) shift; restore_db "${1:-}" ;;
   prune-qa) shift; load; sh ./prune-qa-artifacts.sh "$@" ;;
-  *) sed -n '2,12p' "$0"; exit 2 ;;
+  status) status ;;
+  rollback-plan) shift; rollback_plan "${1:-}" ;;
+  e2e-reset) e2e_reset ;;
+  *) sed -n '2,15p' "$0"; exit 2 ;;
 esac

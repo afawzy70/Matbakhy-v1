@@ -1,24 +1,16 @@
 import { expect, test, type Page } from "@playwright/test";
 import { strings } from "../src/i18n";
-import { env, sql } from "./fixtures";
+import { account, fixture, idpLogin, type AccountName } from "./fixtures";
 
 /**
  * QA repair MBQA-006 (W-MONEY-REFLOW): on the cook Statement and the finance view, every money amount stays one intact
  * token (currency and digits on one line, never a vertical column of glyphs) at 320, 390 and 1440 px in Arabic RTL and
  * English LTR: 2 roles × 3 widths × 2 locales = 12 variations. Runs after the cook workflow, which completed real
  * orders for kitchen d1. The statement table either fits or scrolls inside its own focusable region, and keyboard
- * scrolling reaches the end. A 200% root text size at 390 px is checked as well. ops-a gets finance.read by test-only
- * SQL (synthetic grant).
+ * scrolling reaches the end. A 200% root text size at 390 px is checked as well. ops-a gets finance.read by a
+ * test-only fixture (synthetic grant).
  */
-const PASSWORD = env("E2E_USER_PASSWORD");
 const KITCHEN = "00000000-0000-4000-8000-0000000000d1";
-const OPS_SUBJECT = "00000000-0000-4000-8000-0000000000d2";
-
-async function idpLogin(page: Page, user: string) {
-  await page.locator("#username").fill(user);
-  await page.locator("#password").fill(PASSWORD);
-  await page.locator("#kc-login").click();
-}
 
 /** Each formatted amount (EGP + no-break space + digits, or Arabic digits + no-break space + ج.م.) and the lines it spans. */
 async function moneyTokens(page: Page): Promise<{ text: string; lines: number }[]> {
@@ -62,7 +54,7 @@ async function checkVariation(page: Page, where: string) {
   }
 }
 
-async function open(browser: import("@playwright/test").Browser, user: string) {
+async function open(browser: import("@playwright/test").Browser, user: AccountName) {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("/");
@@ -94,7 +86,7 @@ async function variations(page: Page, who: string, show: (locale: "ar" | "en") =
 
 test("MBQA-006: money amounts stay intact on the cook statement and the finance view (12 variations)", async ({ browser }) => {
   test.setTimeout(240_000);
-  expect(Number(sql(`SELECT count(*) FROM customer_order WHERE kitchen_id = '${KITCHEN}' AND state = 'COMPLETED'`))).toBeGreaterThan(0);
+  expect(Number(fixture("kitchen_completed_order_count"))).toBeGreaterThan(0);
 
   const cook = await open(browser, "cook-a");
   await variations(cook.page, "cook", async (locale) => {
@@ -103,9 +95,7 @@ test("MBQA-006: money amounts stay intact on the cook statement and the finance 
   });
   await cook.context.close();
 
-  sql(`INSERT INTO user_grant (id, user_id, permission, grant_reason)
-       SELECT gen_random_uuid(), id, 'finance.read', 'e2e synthetic grant (MBQA-006)' FROM app_user WHERE subject = '${OPS_SUBJECT}'
-       AND NOT EXISTS (SELECT 1 FROM user_grant g WHERE g.user_id = app_user.id AND g.permission = 'finance.read' AND g.revoked_at IS NULL)`);
+  fixture("staff_finance_read_grant", { subject: account("ops-a").subject });
   const finance = await open(browser, "ops-a");
   await variations(finance.page, "finance", async (locale) => {
     const t = strings[locale];
