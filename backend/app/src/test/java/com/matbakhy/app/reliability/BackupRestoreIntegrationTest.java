@@ -111,6 +111,7 @@ class BackupRestoreIntegrationTest {
         UUID pending;
         UUID completed;
         UUID rejected;
+        UUID deposit;
 
         // ---- live system: orders in several states, stock movements and a posted commission ----
         try (ConfigurableApplicationContext app = boot(source)) {
@@ -123,7 +124,8 @@ class BackupRestoreIntegrationTest {
             AccountAuthentication customer = logins.login(customerSubject, "Customer");
             fx.verifyPhone(customer.getPrincipal().id());
             AccountAuthentication cook = logins.login(UUID.randomUUID().toString(), "Cook");
-            UUID kitchen = TestKitchens.approvedKitchen(jdbc, cook.getPrincipal().id(), logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id());
+            UUID reviewer = logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id();
+            UUID kitchen = TestKitchens.approvedKitchen(jdbc, cook.getPrincipal().id(), reviewer);
             UUID meal = fx.meal(kitchen, 12000, "فتة", "Fatta");
             UUID slot = fx.slot(kitchen, 300, 20, meal, 10);
 
@@ -139,6 +141,19 @@ class BackupRestoreIntegrationTest {
             pending = ids[0];
             completed = ids[1];
             rejected = ids[2];
+            // A deposit order (D16, found in the local staging rehearsal): the cash still due is the remainder, not the total, and the
+            // payment history must survive the restore. Reconciliation has to accept it.
+            jdbc.update("""
+                    INSERT INTO kitchen_payment_profile (kitchen_id, deposit_bps, cod_max_total_minor, recipient_method, recipient_identifier,
+                                                         recipient_name, recipient_status, approved_by, approved_at)
+                    VALUES (?, 5000, NULL, 'INSTAPAY', 'synthetic.kitchen@instapay', 'Synthetic Kitchen', 'APPROVED', ?, now())""", kitchen, reviewer);
+            JsonNode depositQuote = ok(json, call(mvc, post("/api/v1/quotes").content("{\"items\":[{\"mealId\":\"" + meal + "\",\"quantity\":2}],\"slotId\":\""
+                    + slot + "\",\"fulfillmentMode\":\"PICKUP\",\"paymentMethod\":\"DEPOSIT\"}"), customer), 201);
+            JsonNode depositOrder = ok(json, call(mvc, post("/api/v1/orders").header("Idempotency-Key", "bkp-" + UUID.randomUUID()).content("""
+                    {"quoteId":"%s","clientRequestId":"%s","acceptedPolicyVersions":{"terms":"%s","cancellation":"%s"}}"""
+                    .formatted(depositQuote.get("quoteId").asString(), UUID.randomUUID(), TestCommerce.TERMS, TestCommerce.CANCELLATION)), customer), 201);
+            deposit = UUID.fromString(depositOrder.get("id").asString());
+            ok(json, call(mvc, post("/api/v1/orders/" + deposit + "/payment/transfer-report").content("{}"), customer), 200);
             for (String step : new String[] {"accept", "prepare", "ready"}) {
                 cook(mvc, json, jdbc, cook, completed, step, "");
             }
@@ -150,7 +165,7 @@ class BackupRestoreIntegrationTest {
 
         ExecResult live = sh(source, "psql -X -At -F ' ' -v ON_ERROR_STOP=1 -f /work/reconcile.sql");
         assertThat(live.getExitCode()).as(live.getStderr()).isZero();
-        assertThat(live.getStdout().lines().toList()).as("the live database reconciles").hasSize(9).allSatisfy(l -> assertThat(l).endsWith(" 0"));
+        assertThat(live.getStdout().lines().toList()).as("the live database reconciles").hasSize(10).allSatisfy(l -> assertThat(l).endsWith(" 0"));
 
         // ---- backup ----
         long backupStart = System.nanoTime();
@@ -159,7 +174,7 @@ class BackupRestoreIntegrationTest {
         assertThat(backup.getExitCode()).as(backup.getStdout() + backup.getStderr()).isZero();
         String dump = psqlLess(sh(source, "ls /backups/*.dump").getStdout().strip());
         assertThat(sh(source, "cat " + dump.replace(".dump", ".manifest")).getStdout())
-                .contains("schema_version=28", "rows.customer_order=3", "rows.ledger_group=1", "rows.ledger_entry=2");
+                .contains("schema_version=28", "rows.customer_order=4", "rows.ledger_group=1", "rows.ledger_entry=2");
 
         // Written after the backup: lost on restore. That window is the RPO of a backup-only recovery.
         psql(source, "UPDATE meal_slot SET capacity = capacity + 1");
@@ -181,6 +196,9 @@ class BackupRestoreIntegrationTest {
             assertThat(ok(json, call(mvc, get("/api/v1/orders/" + completed), customer), 200).get("state").asString()).isEqualTo("COMPLETED");
             assertThat(ok(json, call(mvc, get("/api/v1/orders/" + pending), customer), 200).get("state").asString()).isEqualTo("PENDING_ACCEPTANCE");
             assertThat(ok(json, call(mvc, get("/api/v1/orders/" + rejected), customer), 200).get("state").asString()).isEqualTo("REJECTED");
+            JsonNode restoredDeposit = ok(json, call(mvc, get("/api/v1/orders/" + deposit), customer), 200).get("payment");
+            assertThat(restoredDeposit.get("state").asString()).as("the payment history survived the restore").isEqualTo("CUSTOMER_TRANSFER_REPORTED");
+            assertThat(restoredDeposit.get("deposit").get("amountMinor").asLong()).isEqualTo(restoredDeposit.get("remainder").get("amountMinor").asLong());
             assertThat(jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history WHERE success", Integer.class))
                     .as("no migration re-applied on start").isEqualTo(jdbc.queryForObject("SELECT count(*) FROM flyway_schema_history", Integer.class));
             assertThat(jdbc.queryForObject("SELECT sum(capacity) FROM meal_slot", Integer.class)).as("the post-backup write is not in the restore").isEqualTo(10);
@@ -191,11 +209,14 @@ class BackupRestoreIntegrationTest {
         // ---- reconciliation catches damage ----
         assertThat(sh(source, "RESTORE_CONFIRM_TARGET=matbakhy_damaged /work/db-restore.sh " + dump + " matbakhy_damaged /work/reconcile.sql").getExitCode()).isZero();
         psql("matbakhy_damaged", "UPDATE meal_slot SET reserved = reserved + 1 WHERE id = (SELECT id FROM meal_slot LIMIT 1)");
+        ExecResult payDamage = psql("matbakhy_damaged", "UPDATE order_payment SET state = 'DISPUTED' WHERE method = 'DEPOSIT'");
+        assertThat(payDamage.getExitCode()).as(payDamage.getStderr()).isZero();
         psql("matbakhy_damaged", "ALTER TABLE ledger_entry DISABLE TRIGGER USER; "
                 + "INSERT INTO ledger_entry (id, group_id, account, direction, amount_minor) "
                 + "SELECT gen_random_uuid(), id, 'COOK_COMMISSION_RECEIVABLE', 'DEBIT', 1 FROM ledger_group LIMIT 1");
         ExecResult damaged = sh("matbakhy_damaged", "psql -X -At -F ' ' -v ON_ERROR_STOP=1 -f /work/reconcile.sql");
-        assertThat(damaged.getStdout()).contains("meal_slot_counters_match_allocations 1", "cook_slot_counters_match_meal_slots 1", "ledger_groups_balanced 1");
+        assertThat(damaged.getStdout()).contains("meal_slot_counters_match_allocations 1", "cook_slot_counters_match_meal_slots 1", "ledger_groups_balanced 1",
+                "payment_state_matches_history 1");
 
         // ---- refusals ----
         ExecResult overExisting = sh(source, "RESTORE_CONFIRM_TARGET=matbakhy_restored /work/db-restore.sh " + dump + " matbakhy_restored /work/reconcile.sql");
