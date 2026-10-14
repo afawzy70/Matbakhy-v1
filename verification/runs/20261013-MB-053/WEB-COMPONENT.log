@@ -1,0 +1,13 @@
+
+> @matbakhy/customer-web@0.1.0 test /home/user/mb-evidence/apps/customer-web
+> vitest run
+
+
+ RUN  v5.0.3 /home/user/mb-evidence/apps/customer-web
+
+
+ Test Files  1 passed (1)
+      Tests  45 passed (45)
+   Start at  16:05:09
+   Duration  9.87s (tests 74%, environment 15%, transform 8%, import 3%)
+

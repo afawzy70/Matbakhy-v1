@@ -14,7 +14,7 @@ class BlueprintGuards(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name) / "repo"
-        shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns(".git", "__pycache__", "local", "node_modules"))
+        shutil.copytree(ROOT, self.root, ignore=shutil.ignore_patterns(".git", "__pycache__", "local", "node_modules", "target", "dist", ".expo", "android", "ios"))
 
     def tearDown(self):
         self.temp.cleanup()
@@ -33,11 +33,16 @@ class BlueprintGuards(unittest.TestCase):
         self.assertTrue(any("cycle" in x for x in validate(self.root)))
 
     def test_done_without_evidence_cannot_pass(self):
-        self.change("planning/backlog.json", lambda d: d["stories"][0].update(status="DONE"))
+        def mark(d):
+            # MB-003 is TODO and its dependency is DONE, so the only defect is the missing evidence.
+            story = next(s for s in d["stories"] if s["id"] == "MB-003")
+            story.update(status="DONE", evidence=[], review_status="NOT_RUN")
+        self.change("planning/backlog.json", mark)
         self.assertTrue(any("DONE without evidence" in x for x in validate(self.root)))
 
     def test_scenario_pass_without_evidence_is_rejected(self):
-        self.change("planning/scenarios.json", lambda d: d["scenarios"][0].update(status="PASS"))
+        # Clear evidence explicitly so the check is exercised whatever the scenario's real status is.
+        self.change("planning/scenarios.json", lambda d: d["scenarios"][0].update(status="PASS", evidence=[]))
         self.assertTrue(any("PASS without observed" in x for x in validate(self.root)))
 
     def test_rule_losing_coverage_is_rejected(self):

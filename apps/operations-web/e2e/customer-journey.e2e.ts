@@ -1,0 +1,379 @@
+import { expect, test, type Page } from "@playwright/test";
+import { strings as customerStrings } from "../../customer-web/src/i18n";
+import { strings } from "../src/i18n";
+import { account, axe, env, fixture, idpLogin, overflowing } from "./fixtures";
+
+/**
+ * TC-127 against the real local stack, after the cook workflow has published "كشري تجريبي" with an open slot: a
+ * customer finds the meal in the customer web, signs in through the identity provider and returns to checkout, adds a
+ * delivery address, gets a server quote and places the order; the first placement response is lost after the server
+ * committed, and the retry with the same stored keys shows the one existing order. The cook accepts, prepares and
+ * hands over in the operations web while the customer's order page follows each state and shows the handover code.
+ * A pickup order is placed too. Phone verification is a synthetic fixture (the fake SMS code is not exposed).
+ *
+ * MB-028 (TC-128): the customer reviews the completed order once, sees the visible rating on the meal page, keeps the
+ * meal as a favorite in the account page and reports the review; a moderator (ops-a, granted by the cook workflow)
+ * finds it in the reported-review queue and hides it with a reason, after which it leaves the public list and rating.
+ *
+ * Approved-direction layout (docs/design/approved): at 320, 390 and 420 px the home (dishes and kitchens), kitchen
+ * and meal pages render right-to-left without horizontal overflow and with every control at least 44 px.
+ *
+ * TC-147 (BR-018 client part): with a second synthetic slot of the same kitchen (test-only fixture), adding the meal for
+ * the other slot asks before replacing the basket; keeping it leaves the basket unchanged, replacing it switches slot.
+ */
+const c = customerStrings.ar;
+const t = strings.ar;
+const CUSTOMER = env("E2E_CUSTOMER_URL");
+const API = env("E2E_API_URL");
+const CUSTOMER_B = account("customer-b").subject;
+
+/**
+ * Phone-width layout check of the current screen (approved direction): no horizontal overflow and every visible
+ * control at least 44 px at 320 and 390 px. With E2E_SCREENSHOT_DIR set, review screenshots are saved as well.
+ */
+async function shot(page: Page, name: string) {
+  await axe(page, name);
+  const viewport = page.viewportSize();
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await overflowing(page), `overflow ${width} ${name}`).toEqual([]);
+    const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
+      els.filter((e) => {
+        const r = e.getBoundingClientRect();
+        return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
+      }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
+    expect(undersized, `touch targets ${width} ${name}`).toEqual([]);
+    if (process.env.E2E_SCREENSHOT_DIR) {
+      await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${name}-${width}.png`, fullPage: true });
+    }
+  }
+  if (viewport) {
+    await page.setViewportSize(viewport);
+  }
+}
+
+async function addToCart(page: Page) {
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByLabel(c.search).fill("كشري");
+  await page.getByRole("search").getByRole("button", { name: c.search }).click();
+  await page.getByRole("link", { name: "كشري تجريبي", exact: true }).click();
+  await page.getByRole("radio").first().check();
+  await page.getByLabel(c.quantity, { exact: true }).fill("1");
+  await page.getByRole("button", { name: c.addToCart }).click();
+  await expect(page.getByText(c.added)).toBeVisible();
+}
+
+test("customer orders delivery and pickup in the customer web and follows the cook's actions", async ({ browser }) => {
+  // The journey also covers the support thread and sign-out (MBQA-003/004) since the independent QA repairs.
+  test.setTimeout(360_000);
+  expect(fixture("published_meal_count", { title: "كشري تجريبي" }),
+    "cook workflow ran first").toBe("1");
+  const customerContext = await browser.newContext();
+  const page = await customerContext.newPage();
+  await addToCart(page);
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  // MB-054: the anonymous visitor's browsing reached the real API (CSRF included) and was counted, without identity.
+  const activity = () => fixture("meal_activity_kinds", { title: "كشري تجريبي" });
+  await expect.poll(activity, { timeout: 15_000 }).toBe("ADD_TO_CART,MEAL_IMPRESSION,MEAL_VIEW");
+
+  // Checkout needs a session: sign in and come back to the cart.
+  await page.getByRole("link", { name: c.nav.cart }).click();
+  await expect(page.getByText(c.signInToOrder)).toBeVisible();
+  await page.getByRole("main").getByRole("link", { name: c.signIn }).click();
+  await idpLogin(page, "customer-b");
+  await expect(page).toHaveURL(/\/#\/checkout$/);
+  await expect(page.getByRole("heading", { name: c.contact })).toBeVisible();
+  fixture("customer_phone_verified", { subject: CUSTOMER_B, phone: "+201005556667" });
+  await page.reload();
+
+  // Delivery address through the UI, then a server quote.
+  await page.getByRole("button", { name: c.mode.DELIVERY as string }).click();
+  await page.getByRole("button", { name: c.newAddress }).click();
+  await page.getByLabel(c.addressFields.label as string).fill("Home");
+  await page.getByLabel(c.addressFields.recipientName as string).fill("Customer B");
+  await page.getByLabel(c.addressFields.governorate as string).fill("Cairo");
+  await page.getByLabel(c.addressFields.city as string).fill("Test city");
+  await page.getByLabel(c.addressFields.street as string).fill("Synthetic street 9");
+  await page.getByLabel(c.addressFields.building as string).fill("12");
+  await page.getByLabel(c.phone).last().fill("+201005556667");
+  await page.getByLabel(c.zone).last().selectOption({ label: "منطقة تجريبية أ" });
+  await page.getByRole("button", { name: c.saveAddress }).click();
+  // The saved address, not the first radio on the page: the MB-053 payment choice is a radio group too.
+  await page.getByRole("group", { name: c.address }).getByRole("radio").first().check();
+  await page.getByRole("button", { name: c.getQuote }).click();
+  await expect(page.getByText(c.total, { exact: true })).toBeVisible();
+  await shot(page, "checkout-quote");
+  await page.getByLabel(c.terms).check();
+
+  // The first placement reaches the server and commits, but the response is lost.
+  let lost = false;
+  await page.route(`${API}/api/v1/orders`, async (route) => {
+    if (!lost && route.request().method() === "POST") {
+      lost = true;
+      await route.fetch();
+      await route.abort("failed");
+      return;
+    }
+    await route.continue();
+  });
+  await page.getByRole("button", { name: c.placeOrder }).click();
+  await page.getByRole("button", { name: c.retryOrder }).first().click();
+  await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.PENDING_ACCEPTANCE as string)).toBeVisible();
+  await page.unroute(`${API}/api/v1/orders`);
+  expect(fixture("customer_order_count", { subject: CUSTOMER_B }),
+    "the lost response did not create a second order").toBe("1");
+  const number = (await page.getByRole("heading", { level: 2 }).textContent())?.split(" · ")[0]?.trim() ?? "";
+
+  // The cook acts in the operations web; the customer page follows (10 s refresh).
+  const cookContext = await browser.newContext();
+  const cook = await cookContext.newPage();
+  await cook.goto("/");
+  await cook.getByRole("link", { name: t.signIn }).click();
+  await idpLogin(cook, "cook-a");
+  await cook.getByRole("button", { name: t.tabs.orders, exact: true }).click();
+  const card = cook.getByRole("article", { name: number });
+  await card.getByRole("button", { name: t.action.ACCEPT as string }).click();
+  await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.ACCEPTED as string)).toBeVisible({ timeout: 20_000 });
+  await card.getByRole("button", { name: t.action.PREPARE as string }).click();
+  await card.getByRole("button", { name: t.action.READY as string }).click();
+  await expect(page.getByText(c.handoverCode)).toBeVisible({ timeout: 20_000 });
+  const code = (await page.locator("strong[dir=ltr]").textContent())?.trim() ?? "";
+  await shot(page, "order-ready");
+  await card.getByLabel(t.deliveryReference).fill("Synthetic courier 2");
+  await card.getByRole("button", { name: t.action.DISPATCH as string }).click();
+  await expect(card.getByText(t.state.OUT_FOR_DELIVERY as string, { exact: true })).toBeVisible();
+  await card.getByLabel(t.handoverCode).fill(code);
+  await card.getByRole("button", { name: t.action.HANDOVER as string }).click();
+  await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.COMPLETED as string)).toBeVisible({ timeout: 20_000 });
+
+  // One review per completed order, sent through the order page.
+  await page.getByLabel(c.rating).selectOption("4");
+  await page.getByLabel(c.comment).fill("طعم ممتاز - مراجعة تجريبية");
+  await page.getByRole("button", { name: c.submitReview }).click();
+  await expect(page.getByText(c.reviewed)).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("button", { name: c.submitReview })).toBeVisible();
+  await page.getByRole("button", { name: c.submitReview }).click();
+  await expect(page.getByText(c.reviewed), "the server refuses a second review of the same order").toBeVisible();
+  expect(fixture("order_review_count", { number })).toBe("1");
+
+  // A pickup order as well.
+  await addToCart(page);
+  await page.getByRole("link", { name: c.nav.cart }).click();
+  await page.getByRole("button", { name: c.mode.PICKUP as string }).click();
+  await page.getByRole("button", { name: c.getQuote }).click();
+  await page.getByLabel(c.terms).check();
+  await page.getByRole("button", { name: c.placeOrder }).click();
+  await expect(page.getByRole("heading", { level: 2 }).getByText(c.state.PENDING_ACCEPTANCE as string)).toBeVisible();
+  await page.getByRole("link", { name: c.nav.orders }).click();
+  await expect(page.getByRole("link", { name: /^MB-/ })).toHaveCount(2);
+  await shot(page, "order-list");
+
+  // Favorite the meal, see it in the account page, and see the visible review and rating on the meal page.
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByLabel(c.search).fill("كشري");
+  await page.getByRole("search").getByRole("button", { name: c.search }).click();
+  await page.getByRole("link", { name: "كشري تجريبي", exact: true }).click();
+  await page.getByRole("button", { name: c.favorite }).click();
+  await expect(page.getByRole("button", { name: c.unfavorite })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toBeVisible();
+  await expect(page.getByText(/من 5/)).toBeVisible();
+  await page.getByRole("link", { name: c.nav.account }).click();
+  await expect(page.getByRole("heading", { name: c.favorites })).toBeVisible();
+  await shot(page, "account");
+  await expect(page.getByRole("region", { name: c.favorites }).getByRole("link", { name: "كشري تجريبي" })).toBeVisible();
+  await page.goBack();
+  await page.getByLabel(c.report).selectOption("SPAM");
+  await expect(page.getByText(c.reported)).toBeVisible();
+
+  // A moderator hides the reported review with a reason; it leaves the public list.
+  const opsContext = await browser.newContext({ baseURL: env("E2E_OPS_URL") });
+  const ops = await opsContext.newPage();
+  await ops.goto("/");
+  await ops.getByRole("link", { name: t.signIn }).click();
+  await idpLogin(ops, "ops-a");
+  await ops.getByRole("button", { name: t.ops.catalogue }).click();
+  const reviewCard = ops.getByRole("article", { name: /طعم ممتاز - مراجعة تجريبية/ });
+  await expect(reviewCard.getByText(t.ops.reportCount(1))).toBeVisible();
+  await reviewCard.getByLabel(t.reason).fill("e2e synthetic moderation");
+  await reviewCard.getByRole("button", { name: t.ops.hide }).click();
+  await expect(reviewCard).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("button", { name: c.unfavorite })).toBeVisible();
+  await expect(page.getByText(/طعم ممتاز - مراجعة تجريبية/)).toHaveCount(0);
+  await expect(page.getByText(c.noReviews)).toBeVisible();
+  expect(fixture("audit_count", { action: "review.moderation" })).toBe("1");
+  await opsContext.close();
+
+  const mealId = fixture("meal_id_by_title", { title: "كشري تجريبي" });
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByRole("button", { name: c.home.kitchens }).click();
+  await expect(page.getByRole("article", { name: /.+/ }).first()).toBeVisible();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`${CUSTOMER}/#/meal/${mealId}`);
+
+  // One kitchen and one slot per basket: replacing needs explicit confirmation; cancelling keeps the basket.
+  fixture("second_open_slot_for_meal_kitchen", { title: "كشري تجريبي" });
+  const cartSlot = () => page.evaluate(() => (JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "null") as { slotId: string } | null)?.slotId);
+  await page.reload();
+  await expect(page.getByRole("radio")).toHaveCount(2);
+  await page.getByRole("radio").first().check();
+  await page.getByRole("button", { name: c.addToCart }).click();
+  await expect(page.getByText(c.added)).toBeVisible();
+  const firstSlot = await cartSlot();
+  await page.getByRole("radio").nth(1).check();
+  await page.getByRole("button", { name: c.addToCart }).click();
+  const prompt = page.getByRole("alertdialog", { name: c.replaceTitle });
+  await expect(prompt).toBeVisible();
+  await prompt.getByRole("button", { name: c.keepBasket }).click();
+  await expect(page.getByText(c.basketKept)).toBeVisible();
+  expect(await cartSlot(), "cancelling keeps the previous basket").toBe(firstSlot);
+  await page.getByRole("button", { name: c.addToCart }).click();
+  await page.getByRole("alertdialog", { name: c.replaceTitle }).getByRole("button", { name: c.replaceBasket }).click();
+  await expect(page.getByText(c.added)).toBeVisible();
+  const replaced = await cartSlot();
+  expect(replaced, "confirming replaces the basket with the other slot").not.toBe(firstSlot);
+  expect(replaced).toBeTruthy();
+
+  // MB-048/MB-049 (owner decisions D14/D13) on the real stack: the customer holds a quote; the kitchen raises the price in
+  // the operations web (the real meal edit) and sees it in the price history; placing the old quote is refused, the
+  // customer sees the kitchen's change with the old and new totals and places only after accepting the new total.
+  await page.goto(`${CUSTOMER}/#/checkout`);
+  await page.getByRole("button", { name: c.mode.PICKUP as string }).click();
+  await page.getByRole("button", { name: c.getQuote }).click();
+  await expect(page.getByText(c.total, { exact: true })).toBeVisible();
+  await page.getByLabel(c.terms).check();
+  const oldPrice = Number(fixture("meal_price_minor", { title: "كشري تجريبي" }));
+  const newPrice = oldPrice + 500;
+  const ordersBefore = fixture("customer_order_count", { subject: CUSTOMER_B });
+  await cook.getByRole("button", { name: t.tabs.meals }).click();
+  const mealCard = cook.getByRole("article", { name: "كشري تجريبي" });
+  await mealCard.getByRole("button", { name: t.priceHistory }).click();
+  const history = mealCard.getByRole("region", { name: t.priceHistory });
+  await expect(history.getByText(new RegExp(t.activePrice))).toBeVisible();
+  await history.getByLabel(t.newPrice).fill((newPrice / 100).toFixed(2));
+  await history.getByRole("button", { name: t.changePrice }).click();
+  await expect(history.getByRole("list", { name: t.previousPrices })).toBeVisible();
+  expect(Number(fixture("meal_price_minor", { title: "كشري تجريبي" })), "the kitchen's edit changed the price").toBe(newPrice);
+  await page.getByRole("button", { name: c.placeOrder }).click();
+  const notice = page.getByTestId("price-change");
+  await expect(notice).toContainText("المطبخ حدّث سعر «كشري تجريبي»");
+  await expect(page.getByRole("button", { name: c.placeOrder })).toBeDisabled();
+  expect(fixture("customer_order_count", { subject: CUSTOMER_B }),
+    "no order at the stale price").toBe(ordersBefore);
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await overflowing(page), `overflow ${width} price change`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await axe(page, "price-change");
+  await notice.getByRole("button", { name: c.acceptNewTotal }).click();
+  await page.getByLabel(c.terms).check();
+  await page.getByRole("button", { name: c.placeOrder }).click();
+  await expect(page).toHaveURL(/#\/orders\//);
+  expect(fixture("order_latest_totals", { subject: CUSTOMER_B }), "placed at the accepted new price").toBe(`${newPrice}|${newPrice}`);
+
+  // MBQA-004 (independent QA, 4eaee3a): the customer opens a support case and reads the support team's public reply in
+  // the customer web; a staff-only note never reaches the customer; another customer cannot open the case.
+  await page.goto(`${CUSTOMER}/#/account`);
+  // The order select is identified by its option (its label's text also contains the options).
+  await page.locator(`select:has(option:text-is("${number}"))`).selectOption({ label: number });
+  await page.getByLabel(c.caseCategory).selectOption("QUALITY");
+  await page.getByLabel(c.caseDescription).fill("e2e synthetic support case description");
+  await page.getByRole("button", { name: c.openCase }).click();
+  const caseLink = page.getByRole("link", { name: new RegExp(`CS-[0-9A-F]{8} · ${number}`) });
+  await expect(caseLink).toBeVisible();
+  const caseId = fixture("support_case_id_for_order", { number });
+  // Staff messages as a test-only fixture with a synthetic staff author (the staff reply UI is covered by the operations tests).
+  fixture("support_staff_messages", { case_id: caseId, customer_subject: CUSTOMER_B });
+  await caseLink.click();
+  await expect(page.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toBeVisible();
+  await expect(page.getByText(c.fromSupport)).toBeVisible();
+  await expect(page.getByText("E2E PRIVATE NOTE NEVER FOR CUSTOMER")).toHaveCount(0);
+  await page.getByLabel(c.yourReply).fill("e2e customer follow-up");
+  await page.getByRole("button", { name: c.sendReply }).click();
+  await expect(page.getByText("e2e customer follow-up")).toBeVisible();
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await overflowing(page), `overflow ${width} support case`).toEqual([]);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await axe(page, "support-case");
+  const otherContext = await browser.newContext();
+  const other = await otherContext.newPage();
+  await other.goto(`${CUSTOMER}/#/`);
+  await other.getByRole("link", { name: c.signIn }).first().click();
+  await idpLogin(other, "customer-a");
+  await other.goto(`${CUSTOMER}/#/support/${caseId}`);
+  await expect(other.getByRole("alert")).toBeVisible();
+  await expect(other.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toHaveCount(0);
+  expect((await other.request.get(`${API}/api/v1/support/cases/${caseId}`)).status(), "another customer's case is not found").toBe(404);
+  await otherContext.close();
+
+  // MBQA-003 (independent QA, 4eaee3a): a visible, localized sign-out ends the server session, clears this browser's
+  // private state and the identity provider session; reload and back navigation show nothing of the account.
+  await page.goto(`${CUSTOMER}/#/account`);
+  await expect(page.getByRole("button", { name: c.signOut })).toBeVisible();
+  await page.getByRole("button", { name: c.signOut }).click();
+  await expect(page).toHaveURL(new RegExp(`^${CUSTOMER.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/?(#/?)?$`));
+  await expect(page.getByRole("link", { name: c.signIn }).first()).toBeVisible();
+  expect((await page.request.get(`${API}/api/v1/me`)).status(), "the server session ended").toBe(401);
+  expect(await page.evaluate(() => window.localStorage.getItem("matbakhy.cart")), "basket cleared").toBeNull();
+  await page.reload();
+  await expect(page.getByRole("link", { name: c.nav.account })).toHaveCount(0);
+  await page.goBack();
+  await expect(page.getByText("E2E PUBLIC REPLY FOR CUSTOMER")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: c.signOut })).toHaveCount(0);
+  await page.goto(`${CUSTOMER}/#/`);
+  await page.getByRole("link", { name: c.signIn }).first().click();
+  await expect(page.locator("#username"), "the next sign-in asks for credentials (no silent identity-provider session)").toBeVisible();
+
+  await cookContext.close();
+  await customerContext.close();
+});
+
+/**
+ * MB-029 / approved direction on real data (after the journey above): home, kitchen and meal pages in Arabic RTL and
+ * English LTR at 320-1440 px have no horizontal overflow, every control is at least 44 px, and the automated WCAG 2.2
+ * A/AA rules (axe-core) report no serious or critical finding at 390 and 1440 px. Automated rules are not a full audit.
+ */
+test("customer screens keep the approved layout across widths and both directions", async ({ browser }) => {
+  const kitchenSlug = fixture("kitchen_slug_by_meal_title", { title: "كشري تجريبي" });
+  const mealId = fixture("meal_id_by_title", { title: "كشري تجريبي" });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  for (const width of [320, 360, 390, 420, 768, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ["#/", "#/kitchen/" + kitchenSlug, "#/meal/" + mealId]) {
+      for (const locale of ["ar", "en"] as const) {
+        await page.goto(`${CUSTOMER}/${route}`);
+        await page.reload(); // a hash-only navigation keeps the in-page language choice
+        if (locale === "en") {
+          await page.getByRole("button", { name: "English" }).click();
+        }
+        const s = locale === "ar" ? c : customerStrings.en;
+        await expect(page.locator("html")).toHaveAttribute("dir", locale === "ar" ? "rtl" : "ltr");
+        await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
+        if (route === "#/") {
+          await expect(page.getByRole("button", { name: s.home.intents.SELF.title })).toBeVisible();
+        }
+        const where = `${locale} ${width} ${route}`;
+        expect(await overflowing(page), `overflow ${where}`).toEqual([]);
+        const undersized = await page.locator("button:visible, a:visible, input:visible, select:visible").evaluateAll((els) =>
+          els.filter((e) => {
+            const r = e.getBoundingClientRect();
+            return r.width > 0 && (r.width < 43.9 || r.height < 43.9);
+          }).map((e) => `${e.tagName}:${(e.textContent ?? "").trim().slice(0, 30)}`));
+        expect(undersized, `touch targets ${where}`).toEqual([]);
+        if (width === 390 || width === 1440) {
+          await axe(page, where);
+        }
+        if (process.env.E2E_SCREENSHOT_DIR && (width === 320 || width === 390 || width === 420 || width === 1440)) {
+          await page.screenshot({ path: `${process.env.E2E_SCREENSHOT_DIR}/${locale}${route.replace(/[#/]+/g, "_").slice(0, 12)}-${width}.png`, fullPage: true });
+        }
+      }
+    }
+  }
+  await context.close();
+});
+

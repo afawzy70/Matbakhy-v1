@@ -1,0 +1,6 @@
+# Excerpt from GitHub Actions job 115280292051 (run 38392564050, native run 43, source ae9fdbf), job "Android debug APK (Gradle)".
+# The same phase passed again in run 38402170785 (46, b8006db) and run 38407586755 (47 attempt 1, 7ce20da).
+2026-10-13T12:22:10.4578614Z == MB-033 notification permission: asked only when the customer chooses; a refusal is safe
+2026-10-13T12:22:34.4214260Z screenshot 30-alerts-denied: 8d2e22acf566a35a
+2026-10-13T12:22:39.1211904Z screenshot 31-notifications-after-refusal: 9e2c974e5aab5db8
+2026-10-13T12:22:39.1600371Z ok: not asked on launch; Allow opened the system dialog; Don't allow left the app usable with the Settings path and in-app notifications

@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "P02-GATE",
+  "phase": "P02",
+  "source_commit": "b2260d37e0ecbc165529f1e980656ea5063d382e",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T10:54:52.933559+00:00",
+  "finished_at": "2026-10-11T11:00:55.489457+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P02-CHECK-1",
+      "name": "Identity OTP and address integration",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "IdentityIntegrationTest",
+        "ContactIntegrationTest",
+        "EgyptianPhoneTest",
+        "ProviderConfigurationTest",
+        "StaffAssuranceTest"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/P02-CHECK-1.log"
+    },
+    {
+      "id": "P02-CHECK-2",
+      "name": "Role isolation and cook application integration",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "StaffAccessIntegrationTest",
+        "CookWorkflowIntegrationTest",
+        "ModuleBoundaryTest",
+        "ContractRoutesTest",
+        "MigrationIntegrationTest"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/P02-CHECK-2.log"
+    },
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. CookWorkflowIntegrationTest and ContractRoutesTest",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/LOCAL-STACK.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P02-gate/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-001",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: IdentityIntegrationTest: anonymous GET /api/v1/me returns 401 UNAUTHENTICATED without profile fields and without a login redirect; a suspended account's valid token returns 403 ACCOUNT_DISABLED with no profile data; public GET routes are not behind authentication. ApiErrorIntegrationTest: unknown private routes return 401 before revealing existence."
+    },
+    {
+      "id": "TC-002",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: Web: with a valid session cookie, PATCH /api/v1/me and POST /api/v1/auth/logout without the X-XSRF-TOKEN header return 403 and the database/session are unchanged; with the token they succeed. Native: Keycloak refuses authorization for matbakhy-mobile without code_challenge (error=invalid_request, no code), refuses an unregistered redirect_uri (400, no redirect), and a code exchange with the wrong PKCE verifier fails with invalid_grant; the backend web client also sends a PKCE challenge. The native client has no secret (public client)."
+    },
+    {
+      "id": "TC-003",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: ContactIntegrationTest: after verifying +201011112222 the checkout contact policy passes; starting a challenge for +201033334444 replaces the stored number, clears phone_verified_at and the policy throws CONTACT_VERIFICATION_REQUIRED until the new number is verified; a code issued for the previous number can no longer verify. Quote/order endpoints that call this policy arrive in MB-017."
+    },
+    {
+      "id": "TC-004",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: Wrong code 422 and not verified; correct code verifies once; replaying the used code 422; expired code (clock +5m1s) 422 and not verified; 5 wrong attempts then the correct code returns 429 and the account stays unverified; resend within 60 s 429; 6th send in an hour 429; same number from another account blocked by the per-number limit; another account's challenge 404. Only an HMAC is stored and captured application logs do not contain the code. A mutation removing the expiry check made the expiry test fail."
+    },
+    {
+      "id": "TC-005",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: Customer B listing, patching or archiving customer A's address id gets no A data (404) and A's row is unchanged; addresses require recipient, phone, governorate, city, active zone, street and building; inactive zone 422 ZONE_NOT_SERVED; unpaired coordinates 422; a privileged userId field 400; stale version 409; archive is soft. Quote creation with another user's address is enforced in MB-017 via owner-scoped address lookup."
+    },
+    {
+      "id": "TC-006",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-2 (named classes must run) and the full backend verify: StaffAccessIntegrationTest.kitchen_scope_matrix: a kitchen-owned resource of cook A is readable by cook A; cook B, a customer and staff without cook.review get 404 with no data; staff with cook.review get 200 and an ALLOWED audit event; cook.review does not confer staff.grant. ContactIntegrationTest (MB-010) covers cross-customer addresses and challenges. Real kitchen/order/case resources apply the same AccessPolicy as they are built (MB-012 onward) and will be re-tested there."
+    },
+    {
+      "id": "TC-007",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-2 (named classes must run) and the full backend verify: A customer granting themselves staff.grant gets 403 FORBIDDEN, no grant row, and a DENIED audit event; a role field in a customer request is rejected (400); an admin without recent MFA gets 403 STEP_UP_REQUIRED (audited); after revocation the same identity's next request (MockMvc) and the same unexpired Keycloak JWT (IdentityIntegrationTest) get 403 with a DENIED audit event; self-escalation and last-admin revocation are refused and audited (a mutation removing noRollbackFor made the audit assertion fail)."
+    },
+    {
+      "id": "TC-008",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-2 (named classes must run) and the full backend verify: CookWorkflowIntegrationTest on PostgreSQL: an account with no application, an incomplete application (422 with REQUIRED/PICKUP_OR_ZONE_REQUIRED field errors, no revision) or one under review, changes-requested or rejected has no kitchen, so KitchenDirectory.ownedBy is empty and nothing can sell; only APPROVE by a cook.review holder with recent MFA creates the kitchen (canSell true). Rejected and changes-requested revisions keep their snapshot, decision, reason, reviewer and time; database triggers reject rewriting or deleting them. Meal publication (MB-014) and order acceptance (MB-019) do not exist yet and must call KitchenDirectory; they are re-tested there."
+    },
+    {
+      "id": "TC-009",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-2 (named classes must run) and the full backend verify: Ops PAUSE makes canSell false while canAcceptOrders and canFulfillAcceptedOrders stay true; SUSPEND makes canSell and canAcceptOrders false while canFulfillAcceptedOrders stays true; the public profile reports available=false; the application stays APPROVED (operating state separate); RESTORE returns to selling; every change is audited. The cook cannot change state through ops (403), staff cannot change their own kitchen (403, audited), no-MFA is STEP_UP_REQUIRED. A mutation letting suspended kitchens accept orders made the test fail. Discovery/checkout/fulfilment views (MB-016/017/019) must use this policy and will be re-tested there."
+    },
+    {
+      "id": "TC-109",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: Real web OIDC login creates a PostgreSQL-backed session; idle-expired session returns 401; logout deletes only that session row (old cookie then 401) while a second session of the same user still works; bearer tokens for another client's audience, tampered payloads, self-signed tokens with an admin role claim, malformed tokens and expired tokens (clock advanced 1 h) return 401; a provider-asserted realm admin role grants no staff permission (403 FORBIDDEN); staff step-up probe without MFA returns 403 STEP_UP_REQUIRED; one local account per (issuer, subject); CORS preflight from an unlisted origin is 403. Local stack smoke completes a full web login through the API container."
+    },
+    {
+      "id": "TC-110",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-1 (named classes must run) and the full backend verify: Profile/address APIs, Egyptian normalization (18 normalization cases), OTP adapter with isolated fake sender (deployed environments refuse the fake), verification limits, deletion-request intake (disables access, idempotent retry) and cross-account address rejection pass on PostgreSQL through the real security chain; contract and registry updated (API-011..017 implemented)."
+    },
+    {
+      "id": "TC-111",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-2 (named classes must run) and the full backend verify: Deny-by-default AccessPolicy, server-side grants with expiry/revocation, step-up for grant changes, last-admin protection, expired grants conferring nothing, append-only audit (UPDATE/DELETE rejected by trigger) and redaction (phone and email removed from stored reason; token/code keys masked) all verified on PostgreSQL; audit read API returns redacted entries."
+    },
+    {
+      "id": "TC-112",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P02-CHECK-2 (named classes must run) and the full backend verify: Only scoped reviewers can decide: customers, finance.read staff, unauthenticated callers and reviewers without recent MFA are refused with no state change; self-review is 403 and audited (mutation removing the check made the test fail); incomplete applications cannot be submitted (mutation removing a required field check failed the test); stale revision/version, missing reason, missing Idempotency-Key and skipping UNDER_REVIEW are refused; idempotent replay returns the same result, key reuse with another body is IDEMPOTENCY_CONFLICT, and four concurrent approvals create exactly one kitchen and one approval audit. Private location and contact never appear in the queue or public profile; reviewer detail reads are audited. Registry implemented flags equal the served /api routes (mutation detected)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-P02-gate/P02-CHECK-1.log",
+    "verification/runs/20261011-P02-gate/P02-CHECK-2.log",
+    "verification/runs/20261011-P02-gate/BACKEND-VERIFY.log",
+    "verification/runs/20261011-P02-gate/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-P02-gate/LOCAL-STACK.log",
+    "verification/runs/20261011-P02-gate/SECRET-SCAN.log",
+    "verification/runs/20261011-P02-gate/GUARDRAIL-TESTS.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Gate re-verification of MB-009..MB-012 at one source commit; no product code changed since the story runs except MB-012 itself.",
+      "Carried residuals (not gate blockers by the configured checks): real MFA/OTP login in Keycloak not configured locally; PowerShell bootstrap BLK-002; audit CSV export API-095; cook documents with MB-013/O06; quote-path contact and address checks re-tested in MB-017; kitchen/order/case scope re-tested as those resources are built."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

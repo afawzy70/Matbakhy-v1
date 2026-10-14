@@ -1,0 +1,60 @@
+FAIL src/App.test.tsx
+  ● deep links (MB-033) › keeps the customer signed in when the first secure-storage read of the session fails
+
+    Unable to find an element with text: MB-000900
+
+    [36m<View>[39m
+      [36m<RNSScreenStack>[39m
+        [36m<RNSScreen[39m
+          [33maria-hidden[39m=[32m{false}[39m
+        [36m>[39m
+          [36m<RNSScreenContentWrapper>[39m
+            [36m<RCTScrollView[39m
+              [33mtestID[39m=[32m"order-sign-in"[39m
+            [36m>[39m
+              [36m<View>[39m
+                [36m<Text>[39m
+                  [0mSign in to see your orders and favorites.[0m
+                [36m</Text>[39m
+                [36m<View[39m
+                  [33maccessibilityLabel[39m=[32m"Sign in"[39m
+                  [33maccessibilityRole[39m=[32m"button"[39m
+                  [33maccessibilityState[39m=[32m{
+                    {
+                      "disabled": false,
+                    }
+                  }[39m
+                  [33maccessible[39m=[32m{true}[39m
+                [36m>[39m
+                  [36m<Text>[39m
+                    [0mSign in[0m
+                  [36m</Text>[39m
+                [36m</View>[39m
+              [36m</View>[39m
+            [36m</RCTScrollView>[39m
+          [36m</RNSScreenContentWrapper>[39m
+          [36m<RNSScreenStackHeaderConfig[39m
+            [33mpointerEvents[39m=[32m"box-none"[39m
+            [33mtitle[39m=[32m"Orders"[39m
+          [36m/>[39m
+        [36m</RNSScreen>[39m
+      [36m</RNSScreenStack>[39m
+    [36m</View>[39m
+
+      272 |     try {
+      273 |       await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes(() => json(200, order))} />);
+    > 274 |       expect(await screen.findByText("MB-000900")).toBeTruthy();
+          |                           ^
+      275 |       expect(failed).toBe(true);
+      276 |     } finally {
+      277 |       SecureStore.getItemAsync.mockImplementation(original);
+
+      at Object.findByText (src/App.test.tsx:274:27)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       1 failed, 37 skipped, 38 total
+Snapshots:   0 total
+Time:        2.77 s, estimated 3 s
+Ran all test suites with tests matching "first secure-storage read of the session".

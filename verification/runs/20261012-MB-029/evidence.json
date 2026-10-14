@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-029",
+  "phase": "P06",
+  "source_commit": "6a84b26bdab9b1c9dbe3b74022450132e89ae62c",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-12T04:22:59.207906+00:00",
+  "finished_at": "2026-10-12T04:34:06.488912+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-029/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-029/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-029/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack: cook, customer purchase, customer layout matrix, keyboard-only journeys, operations layout matrix (Playwright, Chromium, axe-core)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-029/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-029/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-MB-029/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-046",
+      "status": "PASS",
+      "observed": "Customer home, kitchen and meal pages at 320/360/390/420/768/1440 px in Arabic RTL and English LTR, plus cart/checkout with quote, order status, order list and account at 320/390/768/1440 px, and every cook and staff operations section (cook-a: 6, ops-a: 4) at 360/390/768/1440 px in both directions: no page-level horizontal overflow (offending elements are named when it fails), every visible button/link/input/select at least 44 px, tables either fit or scroll inside their own container, html dir matches the language. Long values: a 117-character meal title with an unbroken 60-character token wraps in operations lists and cards. Defects found and fixed before this run: undersized link buttons, checkboxes and inputs; form fields and fieldsets that could not shrink; unbroken words; a content-box card overflowing at 320 px; desktop navigation and total-divider layout."
+    },
+    {
+      "id": "TC-129",
+      "status": "PASS",
+      "observed": "Critical journeys pass at the required widths in both directions on PostgreSQL, Keycloak, the S3 emulator and the API: purchase (delivery with lost-response retry, pickup), cook fulfilment and handover, reviews, favorites, moderation, basket replacement, and the layout matrices above (360/390/768/1440 included) with no lost actions or clipped totals; axe-core WCAG 2.2 A/AA rules report no serious or critical finding on the customer pages (390 and 1440 px, both languages) and on every operations section (390 and 1440 px, both languages). Automated rules are not a full audit."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-MB-029/BACKEND-VERIFY.log",
+    "verification/runs/20261012-MB-029/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261012-MB-029/LOCAL-STACK.log",
+    "verification/runs/20261012-MB-029/BROWSER-E2E.log",
+    "verification/runs/20261012-MB-029/SECRET-SCAN.log",
+    "verification/runs/20261012-MB-029/GUARDRAIL-TESTS.log",
+    "verification/runs/20261012-MB-029/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "TC-046 and TC-129 observed in the browser on the real stack; the checks were shown to fail on real defects and on a deliberate mutation (focus outlines removed).",
+      "TC-047 is NOT claimed: keyboard-only journeys, visible focus and dialog focus restoration pass, but screen-reader testing was not performed (no screen reader in this environment), so TC-047 is BLOCKED and MB-029 is not DONE."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

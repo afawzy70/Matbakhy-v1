@@ -1,0 +1,90 @@
+{
+  "run_id": "20261011-MB-021",
+  "story_id": "MB-021",
+  "phase": "P04",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. NotificationIntegrationTest (PostgreSQL)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-037",
+      "observed": "NotificationIntegrationTest: with the email provider throwing, an order is placed (201) and dispatched; the cook's inbox row exists and the order stays PENDING_ACCEPTANCE with an unchanged version. The delivery is retried only after its backoff (first next attempt > now+25 s), reaches DEAD after exactly 5 provider calls and is not called again. GET /ops/integrations (integration.ops) lists the dead delivery with attempts 5 and error class only, no account ids; customers and finance.read staff get 403. A permanent provider rejection is DEAD after one attempt. An outbox event whose fan-out fails (injected trigger) rolls back its inbox rows, becomes FAILED after 5 attempts, is not retried further, and is replayed by an operator (stale version 409, customer 403, idempotent replay, audited once, non-FAILED 409) and then SENT with one cook inbox row."
+    },
+    {
+      "id": "TC-038",
+      "observed": "Two workers dispatch concurrently with a duplicate ORDER_ACCEPTED event queued after the newer PREPARING event: exactly one ORDER_ACCEPTED inbox row for the customer and 3 rows in total for the order, all events SENT, order version unchanged. Two concurrent delivery workers send each email exactly once (SENT). A live lease of a crashed worker is respected and reclaimed after expiry; the crashed worker can no longer record. Inbox order follows event order when the newest event is dispatched first. Mutations (dedup per event id, unbounded retries, ignoring live leases, recording without lease ownership, processing-time stamps) failed the tests."
+    },
+    {
+      "id": "TC-121",
+      "observed": "Inbox pages newest first with cursor (2 + 1), params carry order number and state, readAt null; mark read is owner-only (404 for others) and idempotent; unreadOnly filters; invalid cursor/limit 422; anonymous 401. Device registration stores only a keyed hash and AES-GCM ciphertext (plaintext absent in DB and response); the push provider receives the decrypted token; invalid platform/installation 422; re-registration by another account revokes the first; unregister 204 then 404; a device revoked after fan-out is DEAD with DEVICE_UNREGISTERED and not sent. ProviderConfigurationTest: channel stand-ins only in LOCAL/CI, development token keys refused in PRODUCTION."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-021/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Defect found by the full-suite run and fixed before evidence: UPDATE ... RETURNING does not keep the claim order, so inbox timestamps followed processing order; inbox rows now carry event occurrence time and claimed events are processed in creation order; the test now forces out-of-order dispatch.",
+      "Hardening: deployed environments refuse development push-token keys and the logging channel stand-ins (O07).",
+      "Residual: provider calls are at-least-once after a lease expiry (providers deduplicate by delivery id); real providers/templates O07; retention O06."
+    ]
+  },
+  "open_defects": []
+}

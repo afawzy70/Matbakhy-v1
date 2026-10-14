@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-002",
+  "phase": "P00",
+  "source_commit": "1a1fdadac8b0f4bff2cefdf4a9c791ed150f12d8",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v22.22.0",
+    "pnpm": "10.28.0",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T08:21:20.223733+00:00",
+  "finished_at": "2026-10-11T08:21:22.925514+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P00-CHECK-1",
+      "name": "Scope and traceability review",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-002/P00-CHECK-1.log"
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-002/BLUEPRINT.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning/scope guardrail negative tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-002/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-102",
+      "status": "PASS",
+      "observed": "validate_blueprint.py PASS (64 rules each owned by one story with scenario coverage, 110 scenarios, acyclic graph) and check_scope.py PASS: no story depends on a later phase; customer web, operations web, customer mobile and separate Android/iOS verification stories exist; payment/courier/social extension sections retained; generated docs/product/08-traceability.md is current with dependency order and open-decision launch blockers. Negative tests reject lost client target, merged native verification, later-phase dependency, stale matrix and removed deferred extension."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-002/P00-CHECK-1.log",
+    "verification/runs/20261011-MB-002/BLUEPRINT.log",
+    "verification/runs/20261011-MB-002/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-002/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "All 64 rules are PROPOSED_DEFAULT and treated as mandatory; each maps to one owning story and at least one scenario.",
+      "Topological order and phase ordering verified; matrix generated, not hand-edited.",
+      "Backlog content is unchanged (frozen as delivered); future scope changes must regenerate the matrix or the check fails."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

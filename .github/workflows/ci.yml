@@ -1,0 +1,81 @@
+name: Product CI (build, test, contract, local stack, secrets)
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  NODE_VERSION: "24.21.0"
+  # SHA-256 of node-v24.21.0-linux-x64.tar.xz from https://nodejs.org/dist/v24.21.0/SHASUMS256.txt
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+  NODE_SHA256: "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6"
+
+jobs:
+  workspace:
+    name: Workspace from clean checkout (P01-CHECK-1/2)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Select JDK 21
+        run: echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV" && echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+      - name: Enable pinned pnpm
+        run: corepack enable && pnpm --version
+      - name: Backend, contract, typecheck, lint, tests, builds and native JS bundles
+        run: scripts/check_workspace.sh
+
+  local-stack:
+    name: Local stack bootstrap and smoke (P01-CHECK-3)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Select JDK 21 and pnpm
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV" && echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+          corepack enable
+      - name: Bootstrap, smoke and tear down
+        run: scripts/dev.sh verify
+
+  design:
+    name: Design tokens, specimens and prototype journeys (P00-CHECK-2)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - name: Install workspace from lockfile
+        run: corepack enable && pnpm install --frozen-lockfile
+      - name: Design checks with the runner's Chrome
+        run: CHROMIUM_PATH="$(command -v google-chrome)" scripts/check_design.sh
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+        with:
+          fetch-depth: 0
+      - name: Gitleaks (history and tree)
+        run: scripts/check_secrets.sh

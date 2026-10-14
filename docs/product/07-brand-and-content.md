@@ -1,5 +1,7 @@
 # Brand, Arabic content and UX direction
 
+**2026-10-11 owner update:** The [approved-direction reference](../design/approved/DESIGN.md) governs palette, Cairo typography and homepage hierarchy. The review package below still defines remaining screen coverage; it does not reopen the selected visual direction. Logo/trademark and whole-product approval remain separate.
+
 Branding starts in P00 before final UI implementation. `Matbakhy / مطبخي` is a working name. No trademark clearance or legal registration is claimed. Keep logo, name, slogan, color tokens and typography editable in shared assets/configuration.
 
 ## Proposed direction to prototype
@@ -26,3 +28,15 @@ All user-facing text uses translation keys with explicit fallback. No raw backen
 These are draft tone examples, not approved legal text. Required terms, privacy notices, cancellation wording and ingredient/allergen statements need owner-approved content before pilot. Never generate a dietary suitability guarantee from a label.
 
 Minimum accessibility target is WCAG 2.2 AA for web; test native screen readers, dynamic text and touch targets. Color never carries status alone. Respect reduced motion. Every form has visible labels, associated errors and a sensible focus order.
+
+## Editable brand system (MB-003, draft)
+
+Status: **DRAFT, pending owner approval (O05)**. Trademark clearance has not been searched or registered.
+
+- Source of truth: [`packages/design-tokens/tokens.json`](../../packages/design-tokens/tokens.json). It holds the brand name and slogan (Arabic/English), light and dark semantic colors, typography, spacing, radii, elevation, touch-target minimum, usage notes and the required contrast pairs.
+- Web apps import the generated `tokens.css` (`--mb-*` custom properties) and the font. The native app imports the same TypeScript tokens. App titles and headings read the brand name from tokens; HTML titles are injected at build time. Tests fail if app source hard-codes the brand name or a hex color, so renaming or recoloring needs only `tokens.json` (then `pnpm --filter @matbakhy/design-tokens generate`).
+- Draft wordmark: `wordmarkSvg()` draws a cooking-pot mark with steam plus the brand name from tokens. It is a placeholder for review, not an approved logo.
+- Palette and font (updated 2026-10-11 to the owner-selected direction): the light palette in `tokens.json` follows [approved/DESIGN.md](../design/approved/DESIGN.md) (page #FFF8F6, primary #982505, secondary #6B5148, text #211A17/#59413B, outlines #8D716A/#E1BFB7; no green decorative accent). The dark palette is a derived draft the owner has not reviewed. Font: Cairo (Arabic and Latin glyphs), SIL Open Font License 1.1, self-hosted from `@fontsource/cairo` 5.3.0 in both web apps (no runtime font CDN). Native font loading is part of the native shell (MB-031). The superseded IBM Plex Sans Arabic package remains only as a dev dependency for the archived behavioral prototype in `docs/design/prototype`.
+- Contrast: every listed pair is tested against WCAG 2.2 thresholds in both themes (4.5:1 for text, 3:1 for focus indicators and `borderStrong` component boundaries). `border` is for decorative dividers only.
+- Bidirectional content: wrap embedded opposite-direction runs (amounts with currency, Latin inside Arabic, mixed addresses) in `<bdi>` or `unicode-bidi: isolate`.
+- Specimens: `pnpm --filter @matbakhy/design-tokens specimen <dir>` renders light/dark × Arabic/English × phone/desktop with Chromium and fails unless the Arabic font actually loaded.

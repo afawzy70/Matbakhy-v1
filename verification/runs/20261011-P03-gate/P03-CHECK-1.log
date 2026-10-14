@@ -1,0 +1,544 @@
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=41913 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Matbakhy backend                                                   [pom]
+[INFO] Matbakhy shared primitives                                         [jar]
+[INFO] Matbakhy operations module                                         [jar]
+[INFO] Matbakhy identity module                                           [jar]
+[INFO] Matbakhy availability module                                       [jar]
+[INFO] Matbakhy catalog module                                            [jar]
+[INFO] Matbakhy cooks module                                              [jar]
+[INFO] Matbakhy orders module                                             [jar]
+[INFO] Matbakhy finance module                                            [jar]
+[INFO] Matbakhy support module                                            [jar]
+[INFO] Matbakhy notifications module                                      [jar]
+[INFO] Matbakhy application                                               [jar]
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-backend >--------------------
+[INFO] Building Matbakhy backend 0.1.0-SNAPSHOT                          [1/12]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-backend ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-shared >--------------------
+[INFO] Building Matbakhy shared primitives 0.1.0-SNAPSHOT                [2/12]
+[INFO]   from shared/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-shared ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-shared ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/shared/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/shared/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-shared ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-shared ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/shared/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-shared ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-shared ---
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-shared ---
+[INFO] 
+[INFO] ------------------< com.matbakhy:matbakhy-operations >------------------
+[INFO] Building Matbakhy operations module 0.1.0-SNAPSHOT                [3/12]
+[INFO]   from modules/operations/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-operations ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-operations ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/operations/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/operations/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-operations ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-operations ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/operations/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-operations ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-operations ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-operations ---
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-identity >-------------------
+[INFO] Building Matbakhy identity module 0.1.0-SNAPSHOT                  [4/12]
+[INFO]   from modules/identity/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-identity ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-identity ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/identity/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/identity/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-identity ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-identity ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/identity/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-identity ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-identity ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-identity ---
+[INFO] 
+[INFO] -----------------< com.matbakhy:matbakhy-availability >-----------------
+[INFO] Building Matbakhy availability module 0.1.0-SNAPSHOT              [5/12]
+[INFO]   from modules/availability/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-availability ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-availability ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/availability/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/availability/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-availability ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-availability ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/availability/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-availability ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-availability ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-availability ---
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-catalog >--------------------
+[INFO] Building Matbakhy catalog module 0.1.0-SNAPSHOT                   [6/12]
+[INFO]   from modules/catalog/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-catalog ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-catalog ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/catalog/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/catalog/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-catalog ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-catalog ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/catalog/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-catalog ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-catalog ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-catalog ---
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-cooks >---------------------
+[INFO] Building Matbakhy cooks module 0.1.0-SNAPSHOT                     [7/12]
+[INFO]   from modules/cooks/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-cooks ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-cooks ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/cooks/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/cooks/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-cooks ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-cooks ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/cooks/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-cooks ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-cooks ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-cooks ---
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-orders >--------------------
+[INFO] Building Matbakhy orders module 0.1.0-SNAPSHOT                    [8/12]
+[INFO]   from modules/orders/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-orders ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-orders ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/orders/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/orders/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-orders ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-orders ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/orders/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-orders ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-orders ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-orders ---
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-finance >--------------------
+[INFO] Building Matbakhy finance module 0.1.0-SNAPSHOT                   [9/12]
+[INFO]   from modules/finance/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-finance ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-finance ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/finance/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/finance/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-finance ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-finance ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/finance/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-finance ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-finance ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-finance ---
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-support >--------------------
+[INFO] Building Matbakhy support module 0.1.0-SNAPSHOT                  [10/12]
+[INFO]   from modules/support/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-support ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-support ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/support/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/support/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-support ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-support ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/support/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-support ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-support ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-support ---
+[INFO] 
+[INFO] ----------------< com.matbakhy:matbakhy-notifications >-----------------
+[INFO] Building Matbakhy notifications module 0.1.0-SNAPSHOT            [11/12]
+[INFO]   from modules/notifications/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-notifications ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-notifications ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/notifications/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/notifications/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-notifications ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-notifications ---
+[INFO] skip non existing resourceDirectory /home/user/Matbakhy-v1/backend/modules/notifications/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-notifications ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-notifications ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-notifications ---
+[INFO] 
+[INFO] ---------------------< com.matbakhy:matbakhy-app >----------------------
+[INFO] Building Matbakhy application 0.1.0-SNAPSHOT                     [12/12]
+[INFO]   from app/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-app ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-app ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 11 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-app ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-app ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-app ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-app ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=41913 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running com.matbakhy.app.catalog.DiscoveryIntegrationTest
+12:23:25.794 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.matbakhy.app.catalog.DiscoveryIntegrationTest]: DiscoveryIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+12:23:25.931 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.catalog.DiscoveryIntegrationTest
+12:23:26.002 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.matbakhy.app.catalog.DiscoveryIntegrationTest]: DiscoveryIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+12:23:26.009 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.catalog.DiscoveryIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T12:23:26.420Z  INFO 12846 --- [matbakhy] [           main] c.m.a.catalog.DiscoveryIntegrationTest   : Starting DiscoveryIntegrationTest using Java 21.0.12.1 with PID 12846 (started by root in /home/user/Matbakhy-v1/backend/app)
+2026-10-11T12:23:26.423Z  INFO 12846 --- [matbakhy] [           main] c.m.a.catalog.DiscoveryIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T12:23:28.330Z  INFO 12846 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T12:23:28.348Z  INFO 12846 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T12:23:28.348Z  INFO 12846 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T12:23:28.428Z  INFO 12846 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1982 ms
+2026-10-11T12:23:28.682Z  INFO 12846 --- [matbakhy] [           main] org.testcontainers.images.PullPolicy     : Image pull policy will be performed by: DefaultPullPolicy()
+2026-10-11T12:23:28.684Z  INFO 12846 --- [matbakhy] [           main] o.t.utility.ImageNameSubstitutor         : Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+2026-10-11T12:23:28.695Z  INFO 12846 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Testcontainers version: 2.0.5
+2026-10-11T12:23:28.857Z  INFO 12846 --- [matbakhy] [           main] o.t.d.DockerClientProviderStrategy       : Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+2026-10-11T12:23:29.366Z  INFO 12846 --- [matbakhy] [           main] o.t.d.DockerClientProviderStrategy       : Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+2026-10-11T12:23:29.368Z  INFO 12846 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Docker host IP address is localhost
+2026-10-11T12:23:29.389Z  INFO 12846 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Connected to docker: 
+  Server Version: 29.8.2
+  API Version: 1.56
+  Operating System: Ubuntu 24.04.5 LTS
+  Total Memory: 16093 MB
+2026-10-11T12:23:29.689Z  INFO 12846 --- [matbakhy] [           main] tc.testcontainers/ryuk:0.14.0            : Creating container for image: testcontainers/ryuk:0.14.0
+2026-10-11T12:23:29.695Z  INFO 12846 --- [matbakhy] [           main] o.t.utility.RegistryAuthLocator          : Failure when attempting to lookup auth config. Please ignore if you don't have images in an authenticated registry. Details: (dockerImageName: testcontainers/ryuk:0.14.0, configFile: /root/.docker/config.json, configEnv: DOCKER_AUTH_CONFIG). Falling back to docker-java default behaviour. Exception message: Status 404: No config supplied. Checked in order: /root/.docker/config.json (file not found), DOCKER_AUTH_CONFIG (not set)
+2026-10-11T12:23:29.839Z  INFO 12846 --- [matbakhy] [           main] tc.testcontainers/ryuk:0.14.0            : Container testcontainers/ryuk:0.14.0 is starting: 5718313fc4813866f3243420f3c269669722c80d3e44cc304165e36c6bcd35d3
+2026-10-11T12:23:30.208Z  INFO 12846 --- [matbakhy] [           main] tc.testcontainers/ryuk:0.14.0            : Container testcontainers/ryuk:0.14.0 started in PT0.518028414S
+2026-10-11T12:23:30.215Z  INFO 12846 --- [matbakhy] [           main] o.t.utility.RyukResourceReaper           : Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+2026-10-11T12:23:30.216Z  INFO 12846 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Checking the system...
+2026-10-11T12:23:30.217Z  INFO 12846 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : ✔︎ Docker server version should be at least 1.6.0
+2026-10-11T12:23:30.286Z  INFO 12846 --- [matbakhy] [           main] tc.adobe/s3mock:5.2.3@sha256:ab01a6...   : Creating container for image: adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92
+2026-10-11T12:23:30.354Z  INFO 12846 --- [matbakhy] [           main] tc.adobe/s3mock:5.2.3@sha256:ab01a6...   : Container adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92 is starting: b6469654e5c10b23f5a5d518a3bb52a491a0891d84fd274ad16025a22388d559
+2026-10-11T12:23:30.665Z  INFO 12846 --- [matbakhy] [           main] o.t.c.wait.strategy.HttpWaitStrategy     : /eloquent_agnesi: Waiting for 60 seconds for URL: http://localhost:33307/ (where port 33307 maps to container port 9090)
+2026-10-11T12:23:36.691Z  INFO 12846 --- [matbakhy] [           main] tc.adobe/s3mock:5.2.3@sha256:ab01a6...   : Container adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92 started in PT6.404293036S
+2026-10-11T12:23:36.811Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T12:23:36.895Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: 17b0dfd72f06ce5118a3175962ab6423e8520a1d8bc1ec7ed3a4662d4840bada
+2026-10-11T12:23:38.800Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.988403664S
+2026-10-11T12:23:38.801Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33308/test?loggerLevel=OFF)
+2026-10-11T12:23:39.287Z  INFO 12846 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33308/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T12:23:39.363Z  INFO 12846 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T12:23:39.368Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 9 migrations (execution time 00:00.023s)
+2026-10-11T12:23:39.384Z  INFO 12846 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T12:23:39.484Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T12:23:39.509Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T12:23:39.560Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T12:23:39.588Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T12:23:39.640Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T12:23:39.680Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T12:23:39.733Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "6 - media assets"
+2026-10-11T12:23:39.768Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "7 - meals"
+2026-10-11T12:23:39.821Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "8 - slots"
+2026-10-11T12:23:39.862Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "9 - discovery"
+2026-10-11T12:23:39.887Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 9 migrations to schema "public", now at version v9 (execution time 00:00.252s)
+2026-10-11T12:23:41.831Z  INFO 12846 --- [matbakhy] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-10-11T12:23:41.832Z  INFO 12846 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-11T12:23:41.850Z  INFO 12846 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T12:23:41.869Z  INFO 12846 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 37 ms
+2026-10-11T12:23:42.132Z  INFO 12846 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-11T12:23:42.174Z  INFO 12846 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@13668c8b
+2026-10-11T12:23:42.198Z  INFO 12846 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-11T12:23:42.391Z  INFO 12846 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 36551 (http) with context path '/'
+2026-10-11T12:23:42.407Z  INFO 12846 --- [matbakhy] [           main] c.m.a.catalog.DiscoveryIntegrationTest   : Started DiscoveryIntegrationTest in 16.338 seconds (process running for 17.798)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-10-11T12:23:43.816Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid maxPriceMinor
+2026-10-11T12:23:43.824Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid cursor
+2026-10-11T12:23:43.915Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not selling
+2026-10-11T12:23:44.365Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid cursor
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 18.71 s -- in com.matbakhy.app.catalog.DiscoveryIntegrationTest
+[INFO] Running com.matbakhy.app.catalog.MealIntegrationTest
+2026-10-11T12:23:44.387Z  INFO 12846 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.catalog.MealIntegrationTest]: MealIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T12:23:44.396Z  INFO 12846 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.catalog.MealIntegrationTest
+2026-10-11T12:23:44.397Z  INFO 12846 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.catalog.MealIntegrationTest]: MealIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T12:23:44.402Z  INFO 12846 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.catalog.MealIntegrationTest
+2026-10-11T12:23:44.580Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: meal not publishable
+2026-10-11T12:23:44.591Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid meal
+2026-10-11T12:23:44.629Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid meal
+2026-10-11T12:23:44.638Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid meal
+2026-10-11T12:23:45.992Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid meal
+2026-10-11T12:23:46.020Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid meal
+2026-10-11T12:23:46.183Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: meal not publishable
+2026-10-11T12:23:46.191Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: meal not public
+2026-10-11T12:23:46.288Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: meal not found
+2026-10-11T12:23:46.301Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: meal not found
+2026-10-11T12:23:46.688Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: stale meal version
+2026-10-11T12:23:46.712Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: meal not publishable
+2026-10-11T12:23:47.020Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not selling
+2026-10-11T12:23:47.047Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure KITCHEN_UNAVAILABLE: kitchen cannot sell
+2026-10-11T12:23:47.284Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: meal not public
+2026-10-11T12:23:47.295Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: archived meals are read-only
+2026-10-11T12:23:47.308Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: cannot publish from ARCHIVED
+2026-10-11T12:23:47.339Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure FORBIDDEN: caller has no approved kitchen
+2026-10-11T12:23:47.346Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure FORBIDDEN: caller has no approved kitchen
+2026-10-11T12:23:47.543Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: meal not public
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.252 s -- in com.matbakhy.app.catalog.MealIntegrationTest
+[INFO] Running com.matbakhy.app.web.ContractRoutesTest
+2026-10-11T12:23:47.640Z  INFO 12846 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.web.ContractRoutesTest]: ContractRoutesTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T12:23:47.660Z  INFO 12846 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.ContractRoutesTest
+2026-10-11T12:23:47.662Z  INFO 12846 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.web.ContractRoutesTest]: ContractRoutesTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T12:23:47.666Z  INFO 12846 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.ContractRoutesTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T12:23:47.706Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ContractRoutesTest    : Starting ContractRoutesTest using Java 21.0.12.1 with PID 12846 (started by root in /home/user/Matbakhy-v1/backend/app)
+2026-10-11T12:23:47.707Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ContractRoutesTest    : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T12:23:48.072Z  INFO 12846 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T12:23:48.074Z  INFO 12846 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T12:23:48.074Z  INFO 12846 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T12:23:48.088Z  INFO 12846 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 379 ms
+2026-10-11T12:23:48.163Z  INFO 12846 --- [matbakhy] [           main] tc.adobe/s3mock:5.2.3@sha256:ab01a6...   : Creating container for image: adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92
+2026-10-11T12:23:48.267Z  INFO 12846 --- [matbakhy] [           main] tc.adobe/s3mock:5.2.3@sha256:ab01a6...   : Container adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92 is starting: 6d36d40b19b7721d1e609b13ac45d5d8791ef60e33961ee68bb486e9bd31a4cc
+2026-10-11T12:23:48.548Z  INFO 12846 --- [matbakhy] [           main] o.t.c.wait.strategy.HttpWaitStrategy     : /stoic_robinson: Waiting for 60 seconds for URL: http://localhost:33309/ (where port 33309 maps to container port 9090)
+2026-10-11T12:23:54.459Z  INFO 12846 --- [matbakhy] [           main] tc.adobe/s3mock:5.2.3@sha256:ab01a6...   : Container adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92 started in PT6.2964091S
+2026-10-11T12:23:54.478Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T12:23:54.555Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: 5ef50502ad3f2851faac6a4ced1bb65d7dece9cf8ebf396f381f9b4251cb41dd
+2026-10-11T12:23:56.251Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.772886497S
+2026-10-11T12:23:56.251Z  INFO 12846 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33310/test?loggerLevel=OFF)
+2026-10-11T12:23:56.355Z  INFO 12846 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33310/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T12:23:56.384Z  INFO 12846 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T12:23:56.386Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 9 migrations (execution time 00:00.009s)
+2026-10-11T12:23:56.395Z  INFO 12846 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T12:23:56.436Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T12:23:56.441Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T12:23:56.471Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T12:23:56.496Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T12:23:56.543Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T12:23:56.576Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T12:23:56.614Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "6 - media assets"
+2026-10-11T12:23:56.641Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "7 - meals"
+2026-10-11T12:23:56.673Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "8 - slots"
+2026-10-11T12:23:56.700Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "9 - discovery"
+2026-10-11T12:23:56.715Z  INFO 12846 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 9 migrations to schema "public", now at version v9 (execution time 00:00.187s)
+2026-10-11T12:23:57.134Z  INFO 12846 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-11T12:23:57.150Z  INFO 12846 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@22445d8e
+2026-10-11T12:23:57.151Z  INFO 12846 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-11T12:23:57.162Z  INFO 12846 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T12:23:57.203Z  INFO 12846 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 45489 (http) with context path '/'
+2026-10-11T12:23:57.207Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ContractRoutesTest    : Started ContractRoutesTest in 9.534 seconds (process running for 32.598)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.581 s -- in com.matbakhy.app.web.ContractRoutesTest
+[INFO] Running com.matbakhy.app.media.MediaIntegrationTest
+2026-10-11T12:23:57.221Z  INFO 12846 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.media.MediaIntegrationTest]: MediaIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T12:23:57.237Z  INFO 12846 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.media.MediaIntegrationTest
+2026-10-11T12:23:57.238Z  INFO 12846 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.media.MediaIntegrationTest]: MediaIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T12:23:57.243Z  INFO 12846 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.media.MediaIntegrationTest
+2026-10-11T12:23:57.864Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid upload contentType
+2026-10-11T12:23:57.893Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid upload bytes
+2026-10-11T12:23:58.401Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure RATE_LIMITED: upload ticket limit
+2026-10-11T12:23:58.660Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not visible to caller
+2026-10-11T12:23:58.677Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not visible to caller
+2026-10-11T12:23:58.732Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not visible to caller
+2026-10-11T12:23:58.771Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not visible to caller
+2026-10-11T12:23:59.045Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not found
+2026-10-11T12:23:59.220Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure DEPENDENCY_UNAVAILABLE: scanner verdict UNKNOWN
+2026-10-11T12:23:59.400Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not visible to caller
+2026-10-11T12:23:59.409Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not found
+2026-10-11T12:23:59.417Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: media not visible to caller
+2026-10-11T12:23:59.604Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid cook application draft
+2026-10-11T12:23:59.612Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid cook application draft
+2026-10-11T12:23:59.619Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid cook application draft
+2026-10-11T12:23:59.665Z  INFO 12846 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: upload not received yet
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.481 s -- in com.matbakhy.app.media.MediaIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 28, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-app ---
+[INFO] 
+[INFO] --- spring-boot:4.1.1:repackage (repackage) @ matbakhy-app ---
+[INFO] Replacing main artifact /home/user/Matbakhy-v1/backend/app/target/matbakhy-app-0.1.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /home/user/Matbakhy-v1/backend/app/target/matbakhy-app-0.1.0-SNAPSHOT.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Matbakhy backend 0.1.0-SNAPSHOT:
+[INFO] 
+[INFO] Matbakhy backend ................................... SUCCESS [  0.339 s]
+[INFO] Matbakhy shared primitives ......................... SUCCESS [  0.856 s]
+[INFO] Matbakhy operations module ......................... SUCCESS [  0.156 s]
+[INFO] Matbakhy identity module ........................... SUCCESS [  0.085 s]
+[INFO] Matbakhy availability module ....................... SUCCESS [  0.059 s]
+[INFO] Matbakhy catalog module ............................ SUCCESS [  0.051 s]
+[INFO] Matbakhy cooks module .............................. SUCCESS [  0.055 s]
+[INFO] Matbakhy orders module ............................. SUCCESS [  0.025 s]
+[INFO] Matbakhy finance module ............................ SUCCESS [  0.030 s]
+[INFO] Matbakhy support module ............................ SUCCESS [  0.027 s]
+[INFO] Matbakhy notifications module ...................... SUCCESS [  0.022 s]
+[INFO] Matbakhy application ............................... SUCCESS [ 37.595 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  39.721 s
+[INFO] Finished at: 2026-10-11T12:24:01Z
+[INFO] ------------------------------------------------------------------------
+PASS: MediaIntegrationTest (10 tests)
+PASS: MealIntegrationTest (10 tests)
+PASS: DiscoveryIntegrationTest (7 tests)
+PASS: ContractRoutesTest (1 tests)

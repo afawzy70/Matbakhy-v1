@@ -1,0 +1,28 @@
+Source: GitHub Actions native run 19, https://github.com/afawzy70/Matbakhy-v1/actions/runs/38226241501
+Job "Android debug APK (Gradle)" (ubuntu-24.04), head fd689aa901e5fef2d3188bc583d2de8fc104e85d. Excerpt copied by the implementation agent.
+
+Steps (all success): Gradle assembleDebug; Gradle assembleRelease (JS bundle embedded; debug-keystore signed; not a store build);
+start local stack (PostgreSQL, Keycloak, API; synthetic users, random local passwords); KVM; launch on emulator; sign-in round trip.
+
+-- MB-031 launch on Android emulator (API 35 google_apis x86_64)
+PASS: Android release-variant build launched; signed-out home with sign-in visible; no fatal errors
+
+-- MB-031 native sign-in round trip on Android
+browsers: package:com.android.chrome
+host-21 tcp:8080 tcp:8080
+host-21 tcp:8180 tcp:8180
+== 1. customer-a signs in through the system browser
+screenshot 1-login-form-customer-a: ea96d4dad4f8a91c
+screenshot 2-signed-in-a: 0bea05ccfcaeabbb
+ok: signed in as customer-a; session restored after restart
+== 2. sign-out removes the session
+screenshot 3-signed-out-after-restart: 5f2028817e937914
+ok: after sign-out and restart the app is signed out and shows nothing of customer-a
+== 3. next sign-in demands a fresh login; customer-b signs in
+screenshot 4-login-form-customer-b: bf38e677b69a2869
+screenshot 5-signed-in-b: 3becf0d7a40bc623
+ok: login form shown again; signed in as customer-b; nothing of customer-a visible
+== 4. switch account also demands a fresh login; cancelling leaves the app signed out
+screenshot 6-switch-login-form: bf38e677b69a2869
+screenshot 7-cancelled-switch: c7506e5789740c21
+PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data

@@ -1,0 +1,229 @@
+# Web preview on one VPS (prepared, not deployed)
+
+**Owner direction (2026-10-12):** try the web application first. Apple Developer, Google Play and TestFlight setup are deferred.
+
+This is an **early web preview** for the owner's own test journeys. It is not the controlled staging environment of MB-040, and it is not a release. Nothing has been purchased, deployed, published or put into DNS.
+
+## What it is
+
+| Service | Image | Exposure |
+|---|---|---|
+| Proxy and web apps | Our `matbakhy-preview-front` image: Caddy plus the customer web and operations web builds | Ports 80/443. Hosts `app.`, `ops.`, `api.`, `id.` and `media.<domain>`, each restricted to `ALLOWED_CLIENT_IPS` |
+| API | Our `matbakhy-api` image, `APP_ENV=PREVIEW` | Internal; only `/api/*` and the OIDC login paths go through the proxy, actuator does not |
+| Identity | Keycloak 26.8.0 in production mode (`start`) on PostgreSQL, preview realm imported | Internal; the proxy blocks `/admin` |
+| Database | PostgreSQL 16.15 (two databases: `matbakhy`, `keycloak`) | Internal only, persistent volume |
+| Image storage | SeaweedFS (S3-compatible) | Internal; `media.<domain>` for signed uploads and public meal photos |
+
+- **Images.** Images are immutable: ours are built in CI at one commit (`.github/workflows/preview-images.yml`, manual) and deployed by digest. Third-party images are pinned by digest. Nothing is built on the server.
+- **What `APP_ENV=PREVIEW` means** (added in this change, with tests):
+  - It keeps the synthetic fixtures, the synthetic commerce policy and providers that never send anything: no SMS, no e-mail, no push, and a fake malware scanner.
+  - It requires everything a deployed environment requires: a real phone pepper, handover and push-token keys, real storage credentials with a public base URL, a confidential web client secret and secure cookies.
+  - STAGING and PRODUCTION still refuse every fake.
+
+**Why not STAGING.** `APP_ENV=STAGING` cannot start today:
+- there is no SMS, e-mail, push or malware-scanning provider (O07);
+- there is no approved commerce policy (O04).
+
+This is intended, and it is unchanged.
+
+## Files
+
+`deploy/web-preview/`:
+
+| File | Purpose |
+|---|---|
+| `compose.yaml` | Services, internal network, health checks, resource limits, bounded logs |
+| `Caddyfile` | HTTPS, two access classes (customer, staff; deny by default), security headers. Tested by running the real Caddy (`scripts/test_proxy_access.py`) |
+| `compose.4gb.yaml` | Memory ceilings and JVM heap shares for a 2 vCPU / 4 GB host; Grafana optional |
+| `front.Dockerfile` | Proxy plus both web builds |
+| `.env.example` | Placeholders only |
+| `deploy.sh` | Commands: `init-secrets`, `render`, `up`, `seed`, `smoke`, `backup`, `restore-db`, `status`, `rollback-plan`, `prune-qa`, `e2e-reset` |
+| `e2e-fixture.sh`, `e2e-fixtures/` | Staging-only test setup channel for the browser E2E suite: named, allow-listed SQL fixtures behind a marker file ([11](11-staging-deployment-and-rollback.md)) |
+| `prune-qa-artifacts.sh` | Lists (or with `--apply` deletes) QA artifacts older than the retention |
+| `identity/matbakhy-realm.preview.json` | Realm template |
+| `storage/s3.json.template` | Storage identities and access |
+| `postgres/10-keycloak.sh` | Creates the Keycloak database on first start |
+| `observability/` | Log collection (Alloy → Loki), metrics and alert rules (Prometheus, `promtool` tests), Alertmanager to a local test sink, Grafana data sources (MB-039) |
+| `postgres/20-runtime-role.sh` | Creates the API's least-privilege runtime role `matbakhy_app` on first start (MB-039) |
+| `seed-preview.sql` | Synthetic catalogue and accounts |
+| `smoke.sh` | Read-only HTTPS smoke test (customer web, operations web, API, authentication, boundary of privileged operations) |
+
+## Verified locally (self-review, 2026-10-12)
+
+The rehearsal used the real `compose.yaml` and `deploy.sh render` with generated secrets. It ran without the proxy, because Docker Hub rate-limited the Caddy pull.
+
+Results are in `verification/runs/20261012-STAGING-PREP/rehearsal.log`:
+- Keycloak production mode on PostgreSQL started healthy with the preview realm; its issuer is `https://id.<domain>/realms/matbakhy`.
+- The API in PREVIEW mode started healthy with real secrets and SeaweedFS.
+- Both buckets were created; anonymous listing is refused for both.
+- The seed loaded 2 kitchens, 3 published meals and 6 open slots. Discovery serves them, and API-001 returns the per-line limit (10).
+- **Sign-in behind the proxy headers:**
+  - redirects to `https://id.<domain>/…` with `redirect_uri=https://api.<domain>/login/oauth2/code/keycloak`;
+  - the session and XSRF cookies are `Secure`, and the session cookie is `HttpOnly; SameSite=Lax`.
+- Logs are ECS JSON.
+- **Backup and restore:**
+  - database backup: dump with checksum and manifest, restored into a new database, every reconciliation check OK;
+  - image-storage archive: taken with storage briefly stopped.
+- **Memory after start:**
+
+  | Service | Memory |
+  |---|---|
+  | API | 277 MiB |
+  | Keycloak | 557 MiB |
+  | PostgreSQL | 84 MiB |
+  | SeaweedFS | 69 MiB |
+  | Total | about 1 GiB, idle |
+
+- Both web apps build with the preview API address embedded.
+
+**NOT_RUN** (needs the server or a registry):
+- Caddy, TLS certificates and the IP allow-list;
+- the image workflow, and therefore the base image tags `caddy:2.10.2-alpine` and `node:24.21.0-alpine`;
+- an anonymous read of a public meal photo;
+- a full browser sign-in and order through the proxy;
+- the read-only `smoke.sh` against real HTTPS.
+
+## Sizing
+
+The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Builds and heavy tests stay in CI.
+
+- **Observation only, not capacity evidence:** in the local rehearsal, idle memory was about 1 GiB in total (API 277 MiB, Keycloak 557 MiB, PostgreSQL 84 MiB, SeaweedFS 69 MiB). Idle figures say nothing about peaks under use; load is not measured (MB-038).
+- **Container limits** (in `compose.yaml`; they add up to about 6.9 GiB with the observability services. That leaves only about 1 GiB of the 8 GB target for the OS, backups and page cache: the limits are ceilings, and idle use in the local rehearsal was about 1.2 GiB for all eleven services, but the owner may prefer more memory (O07)):
+
+| Service | Memory | CPU | Logs (json-file) |
+|---|---|---|---|
+| API | 2 GiB | 1.5 | 10 MB × 3 |
+| Keycloak | 1 GiB | — | 10 MB × 3 |
+| PostgreSQL | 1.5 GiB | — | 10 MB × 3 |
+| Storage | 512 MiB | — | 10 MB × 3 |
+| Proxy | 256 MiB | — | 10 MB × 3 |
+| Observability (Loki 384, Alloy 256, Prometheus 512, Alertmanager 128, Grafana 256, node-exporter 64, sink 64) | about 1.6 GiB | about 2 | 10 MB × 3 each |
+
+- 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside. The owner selected a 2 vCPU / 4 GB Hetzner server on 2026-10-14; the lowered ceilings, retention defaults and push flag for it are in [09-staging-hetzner-preparation.md](09-staging-hetzner-preparation.md) (`compose.4gb.yaml`). Peak use is unmeasured.
+
+### Bounded load and smoke plan (prepared, NOT_RUN)
+
+Run only on the preview server, with synthetic users and data, from an allowed client. It is a sanity check for a handful of testers, not a capacity claim; the MB-038 load test remains the capacity evidence.
+
+1. **Smoke** (`deploy.sh smoke`, read-only): health through the proxy is not exposed; API-001, meal list, a public photo, the OIDC discovery document, the login redirect.
+2. **Step load**, at most 10 minutes in total, stopped at the first failed threshold:
+   - browse (meal list and meal detail, anonymous): 1, 5, then 10 concurrent virtual users, 2 minutes each;
+   - signed-in quote and order with the synthetic customers: at most 2 concurrent, 20 orders in total, each with its own idempotency key; afterwards the reconcile query (`/reconcile.sql`) must show stock, orders and cash obligations consistent.
+3. **Thresholds (provisional):** p95 below 800 ms for browse and 1.5 s for quote and order; no 5xx; no container restart or OOM kill (`docker inspect` restart count, kernel log); memory below 85 % of each limit; disk below 70 %.
+4. **Record:** tool and version, commands, start and end time, `docker stats` samples every 10 s, results against the thresholds, in `verification/runs/<date>-PREVIEW-LOAD/`.
+5. **Not in scope:** sustained or soak load, Keycloak brute-force behaviour, anything against a third-party service.
+
+## Cost (UNVERIFIED)
+
+The official pricing pages (hetzner.com, digitalocean.com) were not reachable from the implementation environment, so every figure below comes from third-party trackers and must be checked on the provider's page before buying. The figures are unverified, and the trackers disagree on some of them.
+
+| | Recommended: Hetzner Cloud CX33 (EU, shared x86) | Fallback: DigitalOcean Basic Droplet |
+|---|---|---|
+| Size | 4 vCPU, 8 GB RAM, 80 GB disk, 20 TB traffic | 4 vCPU, 8 GB RAM, 160 GB disk, about 5 TB transfer |
+| Price | About €8.99 per month after the mid-2026 increase (earlier €5.49); one tracker reports a "currently not available" label. If unavailable, the CPX32 (4 vCPU, 8 GB, 160 GB) is reported at about €35.49–35.99 per month after the increase. Prices exclude VAT. | About US$48 per month; one source lists this tier with 2 vCPU |
+| Billing | Hourly up to a monthly cap; no prepaid commitment needed | Hourly up to a monthly cap |
+| Public IPv4 | About €0.50 per month extra (excluding VAT) | Included |
+| Provider backups | About +20 % of the server price | About +20 % weekly / +30 % daily |
+| Domain | The owner's existing domain, or a new one at about US$10–15 per year (registrar-dependent) | Same |
+
+Neither price is a prepaid promotional price. The script's own backups are free, but they stay on the same server until they are copied off it.
+
+**Recommendation:** Hetzner CX33 if it is available in an EU location, otherwise the fallback. Both have EU regions close enough to Egypt for a preview. Expected total: about €10–12 per month with IPv4 and provider backups, or about US$58 per month on the fallback, plus the domain. Unverified.
+
+## Tester access (recommendation; owner decision needed)
+
+> **Update 2026-10-14:** the owner approved the first Internet-accessible staging on the PREVIEW profile. The proxy now has two classes: customer hosts (`CUSTOMER_ALLOWED_IPS`, public only by the owner's explicit setting) and the kitchen/staff side (`STAFF_ALLOWED_IPS`). See [09](09-staging-hetzner-preparation.md) and [12](12-owner-server-setup.md). The comparison below still applies to the staff side and to a restricted preview.
+
+The preview must stay **deny-by-default**: nothing reachable for a client that has not been let in. The current package does this with an IP allow-list (`ALLOWED_CLIENT_IPS` in Caddy). That works for fixed office or home lines but not for testers on mobile data or moving between Wi-Fi networks, whose public address changes; Egyptian mobile carriers also use carrier-grade NAT, so one allowed address can be shared with strangers.
+
+The access method must work for: browser sign-in and the OIDC redirects between `app.`/`ops.`, `id.` and `api.`; native app API calls (later, when native builds point at the preview); signed photo uploads to `media.`; and recovery testing (offline, restart, retry).
+
+| Option | Changing IPs | OIDC and native | Deny-by-default | Cost and effort | Notes |
+|---|---|---|---|---|---|
+| **A. Private network overlay (WireGuard, or a managed WireGuard service such as Tailscale)** — recommended | Yes: the device keeps its overlay address on any network | Yes: the same hostnames resolve to the server's overlay address (split DNS or a hosts entry); TLS certificates stay valid with a DNS-01 challenge, or an internal CA trusted on test devices | Yes: ports 80/443 are closed on the public interface; only the overlay and SSH (key only) are open | Plain WireGuard: free, one key per device, manual setup. Managed service: free personal tier exists (UNVERIFIED limits and terms) | Testers install a VPN app; recovery tests can still toggle the device network (switching the VPN off is an "offline" test) |
+| B. IP allow-list (current) | No: every address change locks the tester out until the list is edited | Yes | Yes | Free | Fine for the owner on a fixed line; poor for mobile testers; shared CGNAT addresses weaken it |
+| C. Identity-aware proxy in front of the apps (an extra login before the application, e.g. a forward-auth gateway or a hosted access service) | Yes | Fragile: a second login wraps the application's own OIDC flow; native API calls carry bearer tokens and cannot answer the proxy's browser login without per-device service tokens | Yes | Extra component or a third-party account | Adds a second sign-in and a new failure mode exactly where recovery testing needs clean behaviour |
+| D. Basic auth on the proxy | Yes | Breaks native calls and OIDC redirects unless excluded, and exclusions reopen the API | Partly | Free | Not recommended |
+
+**Recommendation: option A**, plain WireGuard to start (no new third-party account), keeping the IP allow-list as a second layer only for the owner's fixed line if wanted. The proxy's `remote_ip` matcher then lists the overlay range instead of public addresses. Nothing has been set up.
+
+**Owner decisions:**
+1. Access method: A (recommended), B, or another.
+2. If A: plain WireGuard (manual keys) or a managed service (a new third-party account; terms and limits to be checked by the owner).
+3. Who receives access, and on how many devices.
+4. Certificates for overlay-only hosts: DNS-01 with the DNS provider's API token (stored only on the server), or an internal CA installed on test devices.
+
+## Owner inputs needed before anything is created
+
+1. **Hosting and budget:**
+   - approve the provider and plan above, or another;
+   - create the account and payment method, and the server (Ubuntu 24.04 LTS);
+   - give SSH access with a key.
+2. **Domain:**
+   - the domain or subdomain to use;
+   - DNS `A` (and `AAAA`) records for `app.`, `ops.`, `api.`, `id.` and `media.` pointing at the server, created by the owner when ready.
+3. **Access:** the access method (see "Tester access"); for the IP allow-list, the testers' public IP addresses or ranges for `ALLOWED_CLIENT_IPS`; for the private network, the list of tester devices.
+4. **Certificates:** an e-mail address for the certificate authority (`ACME_EMAIL`).
+5. **Images:** approval to run `preview-images.yml`, which pushes two images to GHCR under the repository owner. Package visibility must be checked: the images contain no secrets, but the front image contains the domain.
+6. **Who may use it before the audit and log checks pass:** the owner alone, or nobody (see Readiness).
+7. **Limitations to acknowledge:**
+   - synthetic data only;
+   - no real SMS, e-mail, push or malware scanning;
+   - a synthetic commerce policy (O04 open);
+   - staff actions that need MFA are not available, because no OTP is configured in the preview realm.
+
+## Procedure (after the inputs exist)
+
+1. **Server setup:** install Docker Engine and the Compose plugin. Firewall: allow 22 from the owner's address only, and 80/443.
+2. **Copy the repository at the release commit:** `git archive <RELEASE_COMMIT> | tar -x -C /srv/matbakhy-preview/src`. The scripts under `scripts/` and `infra/db/reconcile.sql` are used from there.
+3. **Secrets:** in `src/deploy/web-preview`, run `./deploy.sh init-secrets`. Then set `PREVIEW_DOMAIN`, `ACME_EMAIL` and `ALLOWED_CLIENT_IPS` in `.env`.
+4. **Images:** run the image workflow for the same commit with the domain. Copy `RELEASE_COMMIT`, `API_IMAGE` and `FRONT_IMAGE` (digests) from the job summary into `.env`. `deploy.sh` refuses tags without a digest, placeholders, and short SHAs.
+5. **Start and check:**
+   1. `./deploy.sh up`: backs up first if a database exists, then pulls, starts, waits for health and creates the buckets.
+   2. `./deploy.sh seed`: first deploy only.
+   3. `./deploy.sh smoke`.
+6. **Test accounts** (realm `matbakhy`, password `PREVIEW_USER_PASSWORD` from `.env`):
+   - `preview-customer-1` and `preview-customer-2` (phones pre-verified);
+   - `preview-cook-1` (owns "مطبخ المعاينة"; pickup, and delivery to Test zone A);
+   - `preview-ops-1` (first staff administrator through `STAFF_BOOTSTRAP_SUBJECT`);
+   - `preview-ops-2` (staff-style account without grants).
+7. **Keycloak administration:** `docker compose exec identity /opt/keycloak/bin/kcadm.sh …`. The console is not published.
+
+## Migrations, rollback and recovery
+
+- **Migrations:** Flyway runs forward-only at API start. `up` always takes a database backup first.
+- **Database roles (MB-039):**
+  - Flyway connects as the owner `matbakhy` (`SPRING_FLYWAY_USER`/`SPRING_FLYWAY_PASSWORD`). The API itself connects as `matbakhy_app` (`APP_DB_PASSWORD`, generated by `init-secrets`).
+  - After every migrate, the callback `db/migration/afterMigrate.sql` grants `matbakhy_app` table and sequence access, and nothing else: no DDL, no trigger changes, no UPDATE/DELETE on append-only tables (audit, ledger, order events and items, meal revisions, configuration changes), no DELETE on orders. Case messages and payment events (V27) allow UPDATE only for the account-erasure change their triggers permit, and never DELETE.
+  - The role is created only when the PostgreSQL volume is first initialised. **An existing preview volume** created before this change has no `matbakhy_app`. Create it once as the owner (`CREATE ROLE matbakhy_app LOGIN PASSWORD '…'`, the value from `.env`), then restart the API.
+  - After `restore-db` into `matbakhy_restore`, the next API start against that database re-applies the grants.
+  - Local rehearsal (2026-10-13, self-review): `verification/runs/20261013-MB-039-LOCAL/PREVIEW-RUNTIME-ROLE-REHEARSAL.txt`. On the deployed preview this is NOT_RUN.
+- **Rollback without schema change:** put the previous `API_IMAGE`/`FRONT_IMAGE` digests back into `.env`, then run `./deploy.sh up`.
+- **Rollback after a migration:** the schema cannot be downgraded. To roll back:
+  1. stop the API;
+  2. restore the pre-deploy dump with `./deploy.sh restore-db /backups/db-<stamp>/matbakhy-<stamp>.dump` (it restores into the new database `matbakhy_restore` and reconciles it);
+  3. point `DATABASE_URL` at it, or rename it;
+  4. start the previous images.
+
+  Data written after that backup is lost.
+- **Backups:**
+  - `./deploy.sh backup` writes the database dump (checksum and manifest) and a storage archive to `BACKUP_DIR`.
+  - Copy them off the server, owner's choice; until then they share the server's fate.
+  - The retention period is O06 (open); keep 7 days as a proposal.
+- **Logs:** each container keeps at most 3 × 10 MB. The API logs ECS JSON with request IDs and no personal data in messages (MB-039).
+
+## Readiness
+
+- **Audit and log readiness (owner direction 2026-10-12, [05-observability-readiness.md](05-observability-readiness.md)):**
+  - AUD-01, LOG-01 and OPS-01..03 must be shown on the preview itself before external testers get access.
+  - Today this package provides only part of them: ECS JSON logs, bounded container log files and health checks.
+  - It does not yet provide searchable log collection, restricted metrics, exercised alerts, the audit coverage matrix or the troubleshooting runbook. Those are queued under MB-039 and verified under MB-040.
+  - All five checks are **NOT_RUN**. An owner-only smoke deployment would still need the owner's explicit acceptance of this gap; external testers stay blocked until the checks pass.
+- **Early web preview:** package prepared and rehearsed locally (above), not deployed. Ready to deploy once the owner inputs exist; the remaining checks are listed under NOT_RUN.
+- **MB-040 controlled staging:** not started and blocked by:
+  - MB-034/035/036/038;
+  - O07 providers;
+  - O04 approved commerce policy;
+  - O05 visual approval.
+
+  Deployment files do not close MB-040.

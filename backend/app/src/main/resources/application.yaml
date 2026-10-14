@@ -1,0 +1,132 @@
+spring:
+  application:
+    name: matbakhy
+  jackson:
+    time-zone: UTC
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/matbakhy}
+    username: ${DATABASE_USERNAME:matbakhy}
+    password: ${DATABASE_PASSWORD:}
+    # Bounded waits (MB-037): without a socket timeout a request on a pooled connection blocks forever when the
+    # database stops answering. Long one-off operations (e.g. a large migration) can raise the socket timeout.
+    hikari:
+      connection-timeout: ${DATABASE_CONNECTION_TIMEOUT_MS:5000}
+      validation-timeout: 2000
+      data-source-properties:
+        connectTimeout: 5
+        socketTimeout: ${DATABASE_SOCKET_TIMEOUT_SECONDS:30}
+        tcpKeepAlive: true
+  flyway:
+    locations: classpath:db/migration
+    # MB-039: deployments migrate as the owner role (SPRING_FLYWAY_USER / SPRING_FLYWAY_PASSWORD) while the API connects
+    # as the least-privilege runtime role (DATABASE_USERNAME = DATABASE_RUNTIME_ROLE), granted by db/migration/afterMigrate.sql.
+    # Without these settings one role does both (local development and tests).
+    placeholders:
+      runtimeRole: ${DATABASE_RUNTIME_ROLE:}
+  mvc:
+    problemdetails:
+      enabled: false
+  session:
+    timeout: ${WEB_SESSION_TIMEOUT:30m}
+    jdbc:
+      initialize-schema: never
+logging:
+  # Every line carries the request ID (MB-039, TC-056). Deployed environments switch the console to structured JSON
+  # with LOGGING_STRUCTURED_FORMAT_CONSOLE=ecs; the MDC request ID becomes a JSON field there.
+  pattern:
+    level: "%5p [%X{requestId:-}]"
+  # Stable ECS service fields (MB-039): environment from APP_ENV, version from the deployed image's source SHA.
+  structured:
+    ecs:
+      service:
+        name: matbakhy-api
+        environment: ${APP_ENV:LOCAL}
+        version: ${MATBAKHY_VERSION:unknown}
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+    include-binding-errors: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+matbakhy:
+  identity:
+    issuer: ${OIDC_ISSUER:http://localhost:8180/realms/matbakhy}
+    backchannel-issuer: ${OIDC_BACKCHANNEL_ISSUER:}
+    api-audience: ${OIDC_API_AUDIENCE:matbakhy-api}
+    web-client-id: ${OIDC_WEB_CLIENT_ID:matbakhy-web}
+    web-client-secret: ${OIDC_WEB_CLIENT_SECRET:}
+    allowed-origins: ${WEB_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}
+    post-login-redirect: ${WEB_POST_LOGIN_REDIRECT:http://localhost:5173/}
+    mfa-acr-values: ${OIDC_MFA_ACR_VALUES:mfa,2}
+    step-up-max-age: ${OIDC_STEP_UP_MAX_AGE:10m}
+    # Provider subject that receives staff.grant + audit.read on first login while no administrator exists.
+    bootstrap-admin-subject: ${STAFF_BOOTSTRAP_SUBJECT:}
+    # Parent domain of a deployment with sibling hosts (app., ops., api.); the readable XSRF-TOKEN cookie is set for it. Blank locally.
+    web-cookie-domain: ${WEB_COOKIE_DOMAIN:}
+  phone-verification:
+    # The default pepper is accepted only in LOCAL/CI; deployed environments must provide PHONE_CODE_PEPPER.
+    code-pepper: ${PHONE_CODE_PEPPER:local-dev-only-pepper-not-a-secret-000000}
+    code-ttl: 5m
+    max-attempts: 5
+    resend-interval: 60s
+    max-sends-per-account-per-hour: ${PHONE_MAX_SENDS_PER_ACCOUNT_PER_HOUR:5}
+    max-sends-per-phone-per-hour: ${PHONE_MAX_SENDS_PER_PHONE_PER_HOUR:5}
+  handover:
+    # Defaults are accepted only in LOCAL/CI; deployed environments must provide both keys (base64, 32 bytes for encryption).
+    hash-key: ${HANDOVER_HASH_KEY:local-dev-only-handover-hash-key-not-secret}
+    encryption-key: ${HANDOVER_ENCRYPTION_KEY:local-dev-only-handover-encryption-key-not-secret}
+    max-attempts: 5
+    expiry-after-slot-end: 2h
+    max-attempts-per-actor-per-hour: 30
+  activity:
+    # MB-054: the default key is accepted only in LOCAL/CI; deployed environments must set ACTIVITY_HASH_KEY.
+    hash-key: ${ACTIVITY_HASH_KEY:local-dev-only-activity-hash-key-not-a-secret}
+    max-events-per-visitor-day: 300
+  finance:
+    posting-job:
+      enabled: ${LEDGER_POSTING_JOB_ENABLED:true}
+      interval: 30s
+  privacy:
+    # PROPOSED default pending O06 (privacy and retention policy): erase personal data 14 days after a deletion request,
+    # once the customer has no active order. Change only with an approved policy version.
+    deletion-grace: ${PRIVACY_DELETION_GRACE:P14D}
+    erasure-job:
+      enabled: ${PRIVACY_ERASURE_JOB_ENABLED:true}
+  notifications:
+    # Development keys are accepted only in LOCAL/CI (providers are refused elsewhere until O07 is decided).
+    token-hash-key: ${PUSH_TOKEN_HASH_KEY:local-dev-only-push-token-hash-key-not-secret}
+    token-encryption-key: ${PUSH_TOKEN_ENCRYPTION_KEY:local-dev-only-push-token-encryption-key-not-secret}
+    max-attempts: 5
+    initial-backoff: 30s
+    lease: 60s
+    jobs-enabled: ${NOTIFICATION_JOBS_ENABLED:true}
+    # O07 feature flag: external push delivery is OFF unless explicitly enabled. Enable only with provider credentials,
+    # device testing and the owner's approval; deployed environments refuse the flag until a real adapter exists.
+    push-enabled: ${PUSH_DELIVERY_ENABLED:false}
+    poll-interval: 5s
+  orders:
+    expiry-job:
+      enabled: ${ORDER_EXPIRY_JOB_ENABLED:true}
+      interval: 30s
+  storage:
+    # Defaults target the local S3 emulator (infra/compose.yaml); deployed environments must override them.
+    endpoint: ${OBJECT_STORAGE_ENDPOINT:http://localhost:9090}
+    client-endpoint: ${OBJECT_STORAGE_CLIENT_ENDPOINT:}
+    region: ${OBJECT_STORAGE_REGION:eu-central-1}
+    access-key: ${OBJECT_STORAGE_ACCESS_KEY:local-emulator-only}
+    secret-key: ${OBJECT_STORAGE_SECRET_KEY:local-emulator-only}
+    private-bucket: ${OBJECT_STORAGE_PRIVATE_BUCKET:matbakhy-private}
+    public-bucket: ${OBJECT_STORAGE_PUBLIC_BUCKET:matbakhy-public}
+    public-base-url: ${OBJECT_STORAGE_PUBLIC_BASE_URL:}
+  # Required: LOCAL, CI, STAGING or PRODUCTION. No default, so a deployment cannot start unconfigured.
+  environment: ${APP_ENV}
+  market:
+    currency: EGP
+    timezone: Africa/Cairo

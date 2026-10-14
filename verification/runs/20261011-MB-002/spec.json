@@ -1,0 +1,64 @@
+{
+  "run_id": "20261011-MB-002",
+  "story_id": "MB-002",
+  "phase": "P00",
+  "checks": [
+    {
+      "id": "P00-CHECK-1",
+      "name": "Scope and traceability review",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning/scope guardrail negative tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-102",
+      "observed": "validate_blueprint.py PASS (64 rules each owned by one story with scenario coverage, 110 scenarios, acyclic graph) and check_scope.py PASS: no story depends on a later phase; customer web, operations web, customer mobile and separate Android/iOS verification stories exist; payment/courier/social extension sections retained; generated docs/product/08-traceability.md is current with dependency order and open-decision launch blockers. Negative tests reject lost client target, merged native verification, later-phase dependency, stale matrix and removed deferred extension."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-002/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "All 64 rules are PROPOSED_DEFAULT and treated as mandatory; each maps to one owning story and at least one scenario.",
+      "Topological order and phase ordering verified; matrix generated, not hand-edited.",
+      "Backlog content is unchanged (frozen as delivered); future scope changes must regenerate the matrix or the check fails."
+    ]
+  },
+  "open_defects": []
+}

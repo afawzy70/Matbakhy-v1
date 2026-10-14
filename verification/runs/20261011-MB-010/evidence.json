@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-010",
+  "phase": "P02",
+  "source_commit": "0724f73e3a41483650ca28d7b7295b3808d4f100",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T10:12:28.447506+00:00",
+  "finished_at": "2026-10-11T10:16:55.404498+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. ContactIntegrationTest, EgyptianPhoneTest, ProviderConfigurationTest, identity regression",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-010/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-010/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify incl. dev zone fixtures and OIDC login",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-010/LOCAL-STACK.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-010/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-010/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-003",
+      "status": "PASS",
+      "observed": "ContactIntegrationTest: after verifying +201011112222 the checkout contact policy passes; starting a challenge for +201033334444 replaces the stored number, clears phone_verified_at and the policy throws CONTACT_VERIFICATION_REQUIRED until the new number is verified; a code issued for the previous number can no longer verify. Quote/order endpoints that call this policy arrive in MB-017."
+    },
+    {
+      "id": "TC-004",
+      "status": "PASS",
+      "observed": "Wrong code 422 and not verified; correct code verifies once; replaying the used code 422; expired code (clock +5m1s) 422 and not verified; 5 wrong attempts then the correct code returns 429 and the account stays unverified; resend within 60 s 429; 6th send in an hour 429; same number from another account blocked by the per-number limit; another account's challenge 404. Only an HMAC is stored and captured application logs do not contain the code. A mutation removing the expiry check made the expiry test fail."
+    },
+    {
+      "id": "TC-005",
+      "status": "PASS",
+      "observed": "Customer B listing, patching or archiving customer A's address id gets no A data (404) and A's row is unchanged; addresses require recipient, phone, governorate, city, active zone, street and building; inactive zone 422 ZONE_NOT_SERVED; unpaired coordinates 422; a privileged userId field 400; stale version 409; archive is soft. Quote creation with another user's address is enforced in MB-017 via owner-scoped address lookup."
+    },
+    {
+      "id": "TC-110",
+      "status": "PASS",
+      "observed": "Profile/address APIs, Egyptian normalization (18 normalization cases), OTP adapter with isolated fake sender (deployed environments refuse the fake), verification limits, deletion-request intake (disables access, idempotent retry) and cross-account address rejection pass on PostgreSQL through the real security chain; contract and registry updated (API-011..017 implemented)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-010/BACKEND-VERIFY.log",
+    "verification/runs/20261011-MB-010/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-010/LOCAL-STACK.log",
+    "verification/runs/20261011-MB-010/SECRET-SCAN.log",
+    "verification/runs/20261011-MB-010/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-010/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Repairs during story: nested records in package-private services were not visible to the web layer; registry edit regex skipped templated paths (caught by the parity test) and was redone line-targeted; brittle migration version assertion now compares applied versions with shipped files; local stack lacked the dev profile so zone fixtures never loaded.",
+      "Residual: per-number hourly limit lets an attacker exhaust a victim number's sends for an hour (accepted trade-off against SMS flooding; revisit in MB-036 rate-limit review).",
+      "Residual: no real SMS provider (O07); deployed environments fail fast by design. Deletion purge/retention follows O06 (open).",
+      "TC-003/TC-005 quote-path assertions depend on MB-017 and will be re-exercised there."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

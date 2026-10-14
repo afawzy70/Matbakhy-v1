@@ -1,0 +1,1211 @@
+
+== Clean clone of committed HEAD b2260d37e0ecbc165529f1e980656ea5063d382e
+
+== Toolchain versions
+node 24.21.0, pnpm 10.34.6, java 21
+
+== Backend: ./mvnw verify
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=41913 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Matbakhy backend                                                   [pom]
+[INFO] Matbakhy shared primitives                                         [jar]
+[INFO] Matbakhy operations module                                         [jar]
+[INFO] Matbakhy identity module                                           [jar]
+[INFO] Matbakhy cooks module                                              [jar]
+[INFO] Matbakhy catalog module                                            [jar]
+[INFO] Matbakhy availability module                                       [jar]
+[INFO] Matbakhy orders module                                             [jar]
+[INFO] Matbakhy finance module                                            [jar]
+[INFO] Matbakhy support module                                            [jar]
+[INFO] Matbakhy notifications module                                      [jar]
+[INFO] Matbakhy application                                               [jar]
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-backend >--------------------
+[INFO] Building Matbakhy backend 0.1.0-SNAPSHOT                          [1/12]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-backend ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-shared >--------------------
+[INFO] Building Matbakhy shared primitives 0.1.0-SNAPSHOT                [2/12]
+[INFO]   from shared/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-shared ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-shared ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/shared/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/shared/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-shared ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 6 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-shared ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/shared/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-shared ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-shared ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=41913 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running com.matbakhy.shared.MoneyTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.148 s -- in com.matbakhy.shared.MoneyTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-shared ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/shared/target/matbakhy-shared-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] ------------------< com.matbakhy:matbakhy-operations >------------------
+[INFO] Building Matbakhy operations module 0.1.0-SNAPSHOT                [3/12]
+[INFO]   from modules/operations/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-operations ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-operations ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/operations/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/operations/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-operations ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 6 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-operations ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/operations/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-operations ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-operations ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-operations ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/operations/target/matbakhy-operations-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-identity >-------------------
+[INFO] Building Matbakhy identity module 0.1.0-SNAPSHOT                  [4/12]
+[INFO]   from modules/identity/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-identity ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-identity ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/identity/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/identity/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-identity ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 24 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-identity ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/identity/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-identity ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-identity ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-identity ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/identity/target/matbakhy-identity-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-cooks >---------------------
+[INFO] Building Matbakhy cooks module 0.1.0-SNAPSHOT                     [5/12]
+[INFO]   from modules/cooks/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-cooks ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-cooks ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/cooks/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/cooks/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-cooks ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 11 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-cooks ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/cooks/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-cooks ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-cooks ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-cooks ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/cooks/target/matbakhy-cooks-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-catalog >--------------------
+[INFO] Building Matbakhy catalog module 0.1.0-SNAPSHOT                   [6/12]
+[INFO]   from modules/catalog/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-catalog ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-catalog ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/catalog/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/catalog/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-catalog ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 3 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-catalog ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/catalog/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-catalog ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-catalog ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-catalog ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/catalog/target/matbakhy-catalog-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] -----------------< com.matbakhy:matbakhy-availability >-----------------
+[INFO] Building Matbakhy availability module 0.1.0-SNAPSHOT              [7/12]
+[INFO]   from modules/availability/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-availability ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-availability ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/availability/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/availability/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-availability ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-availability ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/availability/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-availability ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-availability ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-availability ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/availability/target/matbakhy-availability-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-orders >--------------------
+[INFO] Building Matbakhy orders module 0.1.0-SNAPSHOT                    [8/12]
+[INFO]   from modules/orders/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-orders ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-orders ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/orders/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/orders/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-orders ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-orders ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/orders/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-orders ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-orders ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-orders ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/orders/target/matbakhy-orders-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-finance >--------------------
+[INFO] Building Matbakhy finance module 0.1.0-SNAPSHOT                   [9/12]
+[INFO]   from modules/finance/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-finance ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-finance ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/finance/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/finance/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-finance ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-finance ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/finance/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-finance ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-finance ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-finance ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/finance/target/matbakhy-finance-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-support >--------------------
+[INFO] Building Matbakhy support module 0.1.0-SNAPSHOT                  [10/12]
+[INFO]   from modules/support/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-support ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-support ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/support/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/support/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-support ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-support ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/support/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-support ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-support ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-support ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/support/target/matbakhy-support-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] ----------------< com.matbakhy:matbakhy-notifications >-----------------
+[INFO] Building Matbakhy notifications module 0.1.0-SNAPSHOT            [11/12]
+[INFO]   from modules/notifications/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-notifications ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-notifications ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/notifications/src/main/resources
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/notifications/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-notifications ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 2 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-notifications ---
+[INFO] skip non existing resourceDirectory /tmp/tmp.IfhlWDefIK/repo/backend/modules/notifications/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-notifications ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-notifications ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-notifications ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/modules/notifications/target/matbakhy-notifications-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] ---------------------< com.matbakhy:matbakhy-app >----------------------
+[INFO] Building Matbakhy application 0.1.0-SNAPSHOT                     [12/12]
+[INFO]   from app/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-app ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-app ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 7 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-app ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 20 source files with javac [debug parameters release 21] to target/classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-app ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-app ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 27 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-app ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=41913 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running com.matbakhy.app.identity.ContactIntegrationTest
+10:57:47.633 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.identity.ContactIntegrationTest
+10:57:47.737 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.identity.ContactIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:57:48.157Z  INFO 7864 --- [matbakhy] [           main] c.m.app.identity.ContactIntegrationTest  : Starting ContactIntegrationTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:57:48.159Z  INFO 7864 --- [matbakhy] [           main] c.m.app.identity.ContactIntegrationTest  : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:57:49.946Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T10:57:49.962Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:57:49.962Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:57:50.004Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1819 ms
+2026-10-11T10:57:50.274Z  INFO 7864 --- [matbakhy] [           main] org.testcontainers.images.PullPolicy     : Image pull policy will be performed by: DefaultPullPolicy()
+2026-10-11T10:57:50.276Z  INFO 7864 --- [matbakhy] [           main] o.t.utility.ImageNameSubstitutor         : Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')
+2026-10-11T10:57:50.292Z  INFO 7864 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Testcontainers version: 2.0.5
+2026-10-11T10:57:50.426Z  INFO 7864 --- [matbakhy] [           main] o.t.d.DockerClientProviderStrategy       : Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first
+2026-10-11T10:57:50.930Z  INFO 7864 --- [matbakhy] [           main] o.t.d.DockerClientProviderStrategy       : Found Docker environment with local Unix socket (unix:///var/run/docker.sock)
+2026-10-11T10:57:50.932Z  INFO 7864 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Docker host IP address is localhost
+2026-10-11T10:57:50.958Z  INFO 7864 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Connected to docker: 
+  Server Version: 29.8.2
+  API Version: 1.56
+  Operating System: Ubuntu 24.04.5 LTS
+  Total Memory: 16093 MB
+2026-10-11T10:57:51.266Z  INFO 7864 --- [matbakhy] [           main] tc.testcontainers/ryuk:0.14.0            : Creating container for image: testcontainers/ryuk:0.14.0
+2026-10-11T10:57:51.271Z  INFO 7864 --- [matbakhy] [           main] o.t.utility.RegistryAuthLocator          : Failure when attempting to lookup auth config. Please ignore if you don't have images in an authenticated registry. Details: (dockerImageName: testcontainers/ryuk:0.14.0, configFile: /root/.docker/config.json, configEnv: DOCKER_AUTH_CONFIG). Falling back to docker-java default behaviour. Exception message: Status 404: No config supplied. Checked in order: /root/.docker/config.json (file not found), DOCKER_AUTH_CONFIG (not set)
+2026-10-11T10:57:51.403Z  INFO 7864 --- [matbakhy] [           main] tc.testcontainers/ryuk:0.14.0            : Container testcontainers/ryuk:0.14.0 is starting: 52ed5e288c4b52d029344dfdbeaa40f8a9a73cc11a5aa5dd72f59db3cf371a51
+2026-10-11T10:57:51.764Z  INFO 7864 --- [matbakhy] [           main] tc.testcontainers/ryuk:0.14.0            : Container testcontainers/ryuk:0.14.0 started in PT0.497580396S
+2026-10-11T10:57:51.770Z  INFO 7864 --- [matbakhy] [           main] o.t.utility.RyukResourceReaper           : Ryuk started - will monitor and terminate Testcontainers containers on JVM exit
+2026-10-11T10:57:51.770Z  INFO 7864 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : Checking the system...
+2026-10-11T10:57:51.771Z  INFO 7864 --- [matbakhy] [           main] org.testcontainers.DockerClientFactory   : ✔︎ Docker server version should be at least 1.6.0
+2026-10-11T10:57:51.830Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:57:51.901Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: 8aa2f78d4213cdb6bd2bd87cbc9b857dd7fe772b7a4ea32681758b29e7c5967e
+2026-10-11T10:57:53.747Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.917243072S
+2026-10-11T10:57:53.749Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33025/test?loggerLevel=OFF)
+2026-10-11T10:57:54.276Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33025/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:57:54.339Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:57:54.345Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.021s)
+2026-10-11T10:57:54.362Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:57:54.460Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:57:54.477Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:57:54.531Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:57:54.560Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:57:54.608Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:57:54.641Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:57:54.688Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.137s)
+2026-10-11T10:57:56.061Z  INFO 7864 --- [matbakhy] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring TestDispatcherServlet ''
+2026-10-11T10:57:56.061Z  INFO 7864 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-11T10:57:56.078Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:57:56.096Z  INFO 7864 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 35 ms
+2026-10-11T10:57:56.319Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-10-11T10:57:56.360Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1d7914a5
+2026-10-11T10:57:56.362Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-10-11T10:57:56.505Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 42421 (http) with context path '/'
+2026-10-11T10:57:56.523Z  INFO 7864 --- [matbakhy] [           main] c.m.app.identity.ContactIntegrationTest  : Started ContactIntegrationTest in 8.726 seconds (process running for 10.348)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+2026-10-11T10:57:57.528Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge ccc49eb9-f311-44ee-92a4-af56d23a5428 issued
+2026-10-11T10:57:57.582Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verified via challenge ccc49eb9-f311-44ee-92a4-af56d23a5428
+2026-10-11T10:57:57.596Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 24372fa5-1183-42b4-98e9-9ad40122a25d issued
+2026-10-11T10:57:57.610Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verified via challenge 24372fa5-1183-42b4-98e9-9ad40122a25d
+2026-10-11T10:57:57.649Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge ca3ca6e5-aba4-48a5-af45-377e27c32872 issued
+2026-10-11T10:57:57.657Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge ca3ca6e5-aba4-48a5-af45-377e27c32872
+2026-10-11T10:57:57.660Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed ca3ca6e5-aba4-48a5-af45-377e27c32872
+2026-10-11T10:57:57.679Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verified via challenge ca3ca6e5-aba4-48a5-af45-377e27c32872
+2026-10-11T10:57:57.688Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge ca3ca6e5-aba4-48a5-af45-377e27c32872
+2026-10-11T10:57:57.689Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed ca3ca6e5-aba4-48a5-af45-377e27c32872
+2026-10-11T10:57:57.713Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: phone not an Egyptian mobile number
+2026-10-11T10:57:57.737Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 066d5b3d-3da9-43fe-82ab-40b85bf1ef2b issued
+2026-10-11T10:57:57.744Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: challenge not found for caller
+2026-10-11T10:57:57.793Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: zone not active
+2026-10-11T10:57:57.803Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: address phone
+2026-10-11T10:57:57.814Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: coordinates pair
+2026-10-11T10:57:57.872Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: address version conflict
+2026-10-11T10:57:58.012Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: address not found for caller
+2026-10-11T10:57:58.027Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: address not found for caller
+2026-10-11T10:57:58.061Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge fed866ac-eea3-43ac-951a-584c4af46e68 issued
+2026-10-11T10:57:58.071Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge fed866ac-eea3-43ac-951a-584c4af46e68
+2026-10-11T10:57:58.072Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed fed866ac-eea3-43ac-951a-584c4af46e68
+2026-10-11T10:57:58.094Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 5109b75d-8816-40ff-9f82-0359859f5c04 issued
+2026-10-11T10:57:58.102Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure RATE_LIMITED: resend interval
+2026-10-11T10:57:58.112Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 45234749-0bf9-444b-8fea-b375494b1ab8 issued
+2026-10-11T10:57:58.122Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge aa1f65dc-bf59-4d8f-b782-5afc65850b9a issued
+2026-10-11T10:57:58.146Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge bc949040-2219-4011-822e-489671d00861 issued
+2026-10-11T10:57:58.161Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 91f519ff-d445-459d-a366-023ab0d77aad issued
+2026-10-11T10:57:58.185Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure RATE_LIMITED: hourly send limit
+2026-10-11T10:57:58.195Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure RATE_LIMITED: hourly send limit
+2026-10-11T10:57:58.222Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 998245e5-dfee-4df4-8495-696cd8e53c3d issued
+2026-10-11T10:57:58.232Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.233Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.241Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.242Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.250Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.251Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.258Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.260Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.269Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification failed for challenge 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.270Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: verification failed 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.280Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure RATE_LIMITED: challenge locked 998245e5-dfee-4df4-8495-696cd8e53c3d
+2026-10-11T10:57:58.309Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge acbbc8b3-4df7-4b76-9a61-6d72813cc694 issued
+2026-10-11T10:57:58.320Z  INFO 7864 --- [matbakhy] [           main] c.m.i.internal.PhoneVerificationService  : Phone verification challenge 7b4ccd9a-0065-443e-880b-c4a01b12b072 issued
+2026-10-11T10:57:58.333Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERIFICATION_FAILED: number changed since challenge acbbc8b3-4df7-4b76-9a61-6d72813cc694
+[INFO] Tests run: 11, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 11.02 s -- in com.matbakhy.app.identity.ContactIntegrationTest
+[INFO] Running com.matbakhy.app.identity.EgyptianPhoneTest
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.130 s -- in com.matbakhy.app.identity.EgyptianPhoneTest
+[INFO] Running com.matbakhy.app.identity.IdentityIntegrationTest
+2026-10-11T10:57:58.506Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.identity.IdentityIntegrationTest
+2026-10-11T10:57:58.513Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.identity.IdentityIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:57:58.658Z  INFO 7864 --- [matbakhy] [           main] t.k.8.0@sha256:27b323...                 : Creating container for image: keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741
+2026-10-11T10:57:58.779Z  INFO 7864 --- [matbakhy] [           main] t.k.8.0@sha256:27b323...                 : Container keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741 is starting: 7437c5289e706bdbf8243b282867d963a65db2fc8b0f4b4e84c37458ddb86257
+2026-10-11T10:57:59.065Z  INFO 7864 --- [matbakhy] [           main] o.t.c.wait.strategy.HttpWaitStrategy     : /crazy_nightingale: Waiting for 180 seconds for URL: http://localhost:33027/health/ready (where port 33027 maps to container port 9000)
+2026-10-11T10:58:28.317Z  INFO 7864 --- [matbakhy] [           main] t.k.8.0@sha256:27b323...                 : Container keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741 started in PT29.659301363S
+2026-10-11T10:58:28.321Z  INFO 7864 --- [matbakhy] [           main] c.m.a.identity.IdentityIntegrationTest   : Starting IdentityIntegrationTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:58:28.322Z  INFO 7864 --- [matbakhy] [           main] c.m.a.identity.IdentityIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:58:28.714Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 39961 (http)
+2026-10-11T10:58:28.716Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:58:28.716Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:58:28.730Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 404 ms
+2026-10-11T10:58:28.788Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:58:28.893Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: 9a080a1b26f80fe38b24d7a93706f452d9290380348c8356520d728ab69b05a4
+2026-10-11T10:58:30.549Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.760906524S
+2026-10-11T10:58:30.550Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33028/test?loggerLevel=OFF)
+2026-10-11T10:58:30.651Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33028/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:58:30.671Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:58:30.672Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.006s)
+2026-10-11T10:58:30.682Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:58:30.719Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:58:30.725Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:58:30.765Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:58:30.787Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:58:30.827Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:58:30.862Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:58:30.900Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.122s)
+2026-10-11T10:58:31.263Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-10-11T10:58:31.277Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@1343eae6
+2026-10-11T10:58:31.277Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-10-11T10:58:31.314Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:58:31.348Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 39961 (http) with context path '/'
+2026-10-11T10:58:31.353Z  INFO 7864 --- [matbakhy] [           main] c.m.a.identity.IdentityIntegrationTest   : Started IdentityIntegrationTest in 32.83 seconds (process running for 45.177)
+2026-10-11T10:58:33.055Z  INFO 7864 --- [matbakhy] [io-39961-exec-1] o.a.c.c.C.[Tomcat-1].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-11T10:58:33.057Z  INFO 7864 --- [matbakhy] [io-39961-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-11T10:58:33.060Z  INFO 7864 --- [matbakhy] [io-39961-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-10-11T10:58:34.697Z  INFO 7864 --- [matbakhy] [io-39961-exec-7] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: profile version conflict
+[INFO] Tests run: 17, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 37.63 s -- in com.matbakhy.app.identity.IdentityIntegrationTest
+[INFO] Running com.matbakhy.app.identity.StaffAccessIntegrationTest
+2026-10-11T10:58:36.132Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.identity.StaffAccessIntegrationTest
+2026-10-11T10:58:36.139Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.identity.StaffAccessIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:58:36.178Z  INFO 7864 --- [matbakhy] [           main] c.m.a.i.StaffAccessIntegrationTest       : Starting StaffAccessIntegrationTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:58:36.178Z  INFO 7864 --- [matbakhy] [           main] c.m.a.i.StaffAccessIntegrationTest       : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:58:36.519Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T10:58:36.520Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:58:36.521Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:58:36.538Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 357 ms
+2026-10-11T10:58:36.629Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:58:36.738Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: cbb1484fff63edb060c9b460c24ac28c9777d920be5a70ab5cda926984fe7b0f
+2026-10-11T10:58:38.255Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.625926908S
+2026-10-11T10:58:38.257Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33029/test?loggerLevel=OFF)
+2026-10-11T10:58:38.382Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33029/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:58:38.406Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:58:38.408Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.006s)
+2026-10-11T10:58:38.417Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:58:38.452Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:58:38.456Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:58:38.489Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:58:38.513Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:58:38.566Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:58:38.613Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:58:38.653Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.144s)
+2026-10-11T10:58:38.965Z  INFO 7864 --- [matbakhy] [           main] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+2026-10-11T10:58:38.965Z  INFO 7864 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-11T10:58:38.970Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:58:38.979Z  INFO 7864 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 14 ms
+2026-10-11T10:58:39.002Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Starting...
+2026-10-11T10:58:39.018Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-3 - Added connection org.postgresql.jdbc.PgConnection@6f800942
+2026-10-11T10:58:39.019Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-3 - Start completed.
+2026-10-11T10:58:39.060Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 39415 (http) with context path '/'
+2026-10-11T10:58:39.065Z  INFO 7864 --- [matbakhy] [           main] c.m.a.i.StaffAccessIntegrationTest       : Started StaffAccessIntegrationTest in 2.921 seconds (process running for 52.89)
+2026-10-11T10:58:39.294Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure FORBIDDEN: self escalation
+2026-10-11T10:58:39.308Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: unknown permission
+2026-10-11T10:58:39.326Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: last administrator
+2026-10-11T10:58:39.434Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not visible to caller
+2026-10-11T10:58:39.443Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not visible to caller
+2026-10-11T10:58:39.448Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not visible to caller
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.370 s -- in com.matbakhy.app.identity.StaffAccessIntegrationTest
+[INFO] Running com.matbakhy.app.providers.ProviderConfigurationTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.004 s -- in com.matbakhy.app.providers.ProviderConfigurationTest
+[INFO] Running com.matbakhy.app.config.EnvironmentGuardTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.008 s -- in com.matbakhy.app.config.EnvironmentGuardTest
+[INFO] Running com.matbakhy.app.web.ApiErrorIntegrationTest
+2026-10-11T10:58:39.526Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.ApiErrorIntegrationTest
+2026-10-11T10:58:39.530Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.ApiErrorIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:58:39.561Z  INFO 7864 --- [matbakhy] [           main] c.m.app.web.ApiErrorIntegrationTest      : Starting ApiErrorIntegrationTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:58:39.561Z  INFO 7864 --- [matbakhy] [           main] c.m.app.web.ApiErrorIntegrationTest      : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:58:39.967Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T10:58:39.970Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:58:39.970Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:58:39.985Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 422 ms
+2026-10-11T10:58:40.059Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:58:40.153Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: ddf97008d923cee15e7cee27459806f93769ba6a7aa1144d56e18591abcdcf9f
+2026-10-11T10:58:41.816Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.757030933S
+2026-10-11T10:58:41.816Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33030/test?loggerLevel=OFF)
+2026-10-11T10:58:41.927Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33030/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:58:41.948Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:58:41.950Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.007s)
+2026-10-11T10:58:41.964Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:58:42.009Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:58:42.014Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:58:42.052Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:58:42.073Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:58:42.117Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:58:42.160Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:58:42.208Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.145s)
+2026-10-11T10:58:42.597Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Starting...
+2026-10-11T10:58:42.627Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-4 - Added connection org.postgresql.jdbc.PgConnection@2f6b60ee
+2026-10-11T10:58:42.628Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-4 - Start completed.
+2026-10-11T10:58:42.640Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:58:42.697Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 32983 (http) with context path '/'
+2026-10-11T10:58:42.708Z  INFO 7864 --- [matbakhy] [           main] c.m.app.web.ApiErrorIntegrationTest      : Started ApiErrorIntegrationTest in 3.173 seconds (process running for 56.533)
+2026-10-11T10:58:42.750Z  INFO 7864 --- [matbakhy] [o-auto-3-exec-1] o.a.c.c.C.[Tomcat-3].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-11T10:58:42.751Z  INFO 7864 --- [matbakhy] [o-auto-3-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-11T10:58:42.753Z  INFO 7864 --- [matbakhy] [o-auto-3-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-10-11T10:58:42.818Z  INFO 7864 --- [matbakhy] [o-auto-3-exec-3] c.matbakhy.app.web.ApiExceptionHandler   : API failure STOCK_CHANGED: synthetic stock conflict
+2026-10-11T10:58:42.942Z ERROR 7864 --- [matbakhy] [-auto-3-exec-10] c.matbakhy.app.web.ApiExceptionHandler   : Unhandled failure
+
+java.lang.IllegalStateException: internal detail that must not leak: SELECT * FROM secret
+	at com.matbakhy.app.web.ApiErrorIntegrationTest$ProbeController.boom(ApiErrorIntegrationTest.java:51) ~[test-classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622) ~[tomcat-embed-core-11.0.24.jar:6.1]
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874) ~[spring-webmvc-7.0.9.jar:7.0.9]
+	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710) ~[tomcat-embed-core-11.0.24.jar:6.1]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:132) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:59) ~[tomcat-embed-websocket-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$2(FilterChainProxy.java:235) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:491) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:353) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:84) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:131) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:336) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195) ~[spring-security-web-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317) ~[spring-security-config-7.1.1.jar:7.1.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.session.web.http.SessionRepositoryFilter.doFilterInternal(SessionRepositoryFilter.java:143) ~[spring-session-core-4.1.1.jar:4.1.1]
+	at org.springframework.session.web.http.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:82) ~[spring-session-core-4.1.1.jar:4.1.1]
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at com.matbakhy.app.web.RequestIdFilter.doFilterInternal(RequestIdFilter.java:38) ~[classes/:na]
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116) ~[spring-web-7.0.9.jar:7.0.9]
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:111) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:77) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:535) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:115) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:86) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:71) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:347) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:406) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:71) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:1307) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:2036) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:74) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:949) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:483) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:74) ~[tomcat-embed-core-11.0.24.jar:11.0.24]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.442 s -- in com.matbakhy.app.web.ApiErrorIntegrationTest
+[INFO] Running com.matbakhy.app.web.StrictJsonIntegrationTest
+2026-10-11T10:58:42.965Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.StrictJsonIntegrationTest
+2026-10-11T10:58:42.974Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.StrictJsonIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:58:43.022Z  INFO 7864 --- [matbakhy] [           main] c.m.app.web.StrictJsonIntegrationTest    : Starting StrictJsonIntegrationTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:58:43.023Z  INFO 7864 --- [matbakhy] [           main] c.m.app.web.StrictJsonIntegrationTest    : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:58:43.302Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T10:58:43.304Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:58:43.304Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:58:43.319Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 294 ms
+2026-10-11T10:58:43.379Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:58:43.462Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: 66925b4908832ea6fa2bc003f5f61b2a191e4640371f61d0f179fa004230402e
+2026-10-11T10:58:45.100Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.72162113S
+2026-10-11T10:58:45.101Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33031/test?loggerLevel=OFF)
+2026-10-11T10:58:45.194Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33031/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:58:45.211Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:58:45.213Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.005s)
+2026-10-11T10:58:45.222Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:58:45.254Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:58:45.259Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:58:45.293Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:58:45.313Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:58:45.351Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:58:45.376Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:58:45.410Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.114s)
+2026-10-11T10:58:45.785Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Starting...
+2026-10-11T10:58:45.805Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-5 - Added connection org.postgresql.jdbc.PgConnection@703ecfa3
+2026-10-11T10:58:45.806Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Start completed.
+2026-10-11T10:58:45.819Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:58:45.844Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 36075 (http) with context path '/'
+2026-10-11T10:58:45.848Z  INFO 7864 --- [matbakhy] [           main] c.m.app.web.StrictJsonIntegrationTest    : Started StrictJsonIntegrationTest in 2.868 seconds (process running for 59.672)
+2026-10-11T10:58:45.871Z  INFO 7864 --- [matbakhy] [o-auto-4-exec-1] o.a.c.c.C.[Tomcat-4].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-11T10:58:45.871Z  INFO 7864 --- [matbakhy] [o-auto-4-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-11T10:58:45.873Z  INFO 7864 --- [matbakhy] [o-auto-4-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+[INFO] Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.135 s -- in com.matbakhy.app.web.StrictJsonIntegrationTest
+[INFO] Running com.matbakhy.app.web.ContractRoutesTest
+2026-10-11T10:58:46.097Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.web.ContractRoutesTest]: ContractRoutesTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:46.106Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.ContractRoutesTest
+2026-10-11T10:58:46.109Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.web.ContractRoutesTest]: ContractRoutesTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:46.113Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.web.ContractRoutesTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:58:46.143Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ContractRoutesTest    : Starting ContractRoutesTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:58:46.144Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ContractRoutesTest    : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:58:46.425Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T10:58:46.426Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:58:46.426Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:58:46.438Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 293 ms
+2026-10-11T10:58:46.488Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:58:46.567Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: 864c4aaef1d7fec64be4bac177788b97e9b2c2cf2497aec115dfdeb68540f420
+2026-10-11T10:58:48.168Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.680374448S
+2026-10-11T10:58:48.170Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33032/test?loggerLevel=OFF)
+2026-10-11T10:58:48.356Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33032/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:58:48.396Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:58:48.398Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.010s)
+2026-10-11T10:58:48.415Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:58:48.462Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:58:48.466Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:58:48.532Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:58:48.565Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:58:48.613Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:58:48.653Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:58:48.694Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.158s)
+2026-10-11T10:58:49.062Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Starting...
+2026-10-11T10:58:49.080Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-6 - Added connection org.postgresql.jdbc.PgConnection@4a6faf7d
+2026-10-11T10:58:49.081Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-6 - Start completed.
+2026-10-11T10:58:49.096Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:58:49.123Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 40299 (http) with context path '/'
+2026-10-11T10:58:49.128Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ContractRoutesTest    : Started ContractRoutesTest in 3.011 seconds (process running for 62.952)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.076 s -- in com.matbakhy.app.web.ContractRoutesTest
+[INFO] Running com.matbakhy.app.ApplicationShellTest
+2026-10-11T10:58:49.177Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.ApplicationShellTest]: ApplicationShellTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:49.201Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.ApplicationShellTest
+2026-10-11T10:58:49.203Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.ApplicationShellTest]: ApplicationShellTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:49.216Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.ApplicationShellTest
+2026-10-11T10:58:49.236Z  INFO 7864 --- [matbakhy] [o-auto-5-exec-1] o.a.c.c.C.[Tomcat-5].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-11T10:58:49.236Z  INFO 7864 --- [matbakhy] [o-auto-5-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-10-11T10:58:49.238Z  INFO 7864 --- [matbakhy] [o-auto-5-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.147 s -- in com.matbakhy.app.ApplicationShellTest
+[INFO] Running com.matbakhy.app.cooks.CookWorkflowIntegrationTest
+2026-10-11T10:58:49.328Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.cooks.CookWorkflowIntegrationTest]: CookWorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:49.341Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.cooks.CookWorkflowIntegrationTest
+2026-10-11T10:58:49.342Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.cooks.CookWorkflowIntegrationTest]: CookWorkflowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:49.346Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.cooks.CookWorkflowIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-10-11T10:58:49.368Z  INFO 7864 --- [matbakhy] [           main] c.m.a.cooks.CookWorkflowIntegrationTest  : Starting CookWorkflowIntegrationTest using Java 21.0.12.1 with PID 7864 (started by root in /tmp/tmp.IfhlWDefIK/repo/backend/app)
+2026-10-11T10:58:49.371Z  INFO 7864 --- [matbakhy] [           main] c.m.a.cooks.CookWorkflowIntegrationTest  : No active profile set, falling back to 1 default profile: "default"
+2026-10-11T10:58:49.596Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 0 (http)
+2026-10-11T10:58:49.597Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-10-11T10:58:49.597Z  INFO 7864 --- [matbakhy] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-11T10:58:49.606Z  INFO 7864 --- [matbakhy] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 234 ms
+2026-10-11T10:58:49.711Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+2026-10-11T10:58:49.817Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: cbd014475b12761d78c6ab04fa85ac432da8d3b18a4ff7757c23e5bb664daa83
+2026-10-11T10:58:51.275Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.564150246S
+2026-10-11T10:58:51.276Z  INFO 7864 --- [matbakhy] [           main] t.p.15-alpine@sha256:721873...           : Container is started (JDBC URL: jdbc:postgresql://localhost:33033/test?loggerLevel=OFF)
+2026-10-11T10:58:51.399Z  INFO 7864 --- [matbakhy] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:33033/test?loggerLevel=OFF (PostgreSQL 16.15)
+2026-10-11T10:58:51.420Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "public"."flyway_schema_history" does not exist yet
+2026-10-11T10:58:51.424Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 5 migrations (execution time 00:00.009s)
+2026-10-11T10:58:51.434Z  INFO 7864 --- [matbakhy] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "public"."flyway_schema_history" ...
+2026-10-11T10:58:51.464Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": << Empty Schema >>
+2026-10-11T10:58:51.467Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "1 - baseline identity and idempotency"
+2026-10-11T10:58:51.499Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "2 - web sessions"
+2026-10-11T10:58:51.518Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "3 - zones addresses phone verification"
+2026-10-11T10:58:51.556Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "4 - grants and audit"
+2026-10-11T10:58:51.587Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "5 - cook applications and kitchens"
+2026-10-11T10:58:51.626Z  INFO 7864 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 5 migrations to schema "public", now at version v5 (execution time 00:00.121s)
+2026-10-11T10:58:51.884Z  INFO 7864 --- [matbakhy] [           main] o.a.c.c.C.[Tomcat-6].[localhost].[/]     : Initializing Spring TestDispatcherServlet ''
+2026-10-11T10:58:51.884Z  INFO 7864 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-10-11T10:58:51.889Z  INFO 7864 --- [matbakhy] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-10-11T10:58:51.896Z  INFO 7864 --- [matbakhy] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 12 ms
+2026-10-11T10:58:51.916Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Starting...
+2026-10-11T10:58:51.930Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-7 - Added connection org.postgresql.jdbc.PgConnection@58095469
+2026-10-11T10:58:51.931Z  INFO 7864 --- [matbakhy] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-7 - Start completed.
+2026-10-11T10:58:51.969Z  INFO 7864 --- [matbakhy] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 32925 (http) with context path '/'
+2026-10-11T10:58:51.972Z  INFO 7864 --- [matbakhy] [           main] c.m.a.cooks.CookWorkflowIntegrationTest  : Started CookWorkflowIntegrationTest in 2.621 seconds (process running for 65.796)
+2026-10-11T10:58:52.180Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: reason required
+2026-10-11T10:58:52.274Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure FORBIDDEN: own kitchen
+2026-10-11T10:58:52.288Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not found
+2026-10-11T10:58:52.441Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: incomplete cook application
+2026-10-11T10:58:52.591Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: bad cursor
+2026-10-11T10:58:52.625Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: application not found
+2026-10-11T10:58:52.756Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: PAUSE not allowed from SUSPENDED
+2026-10-11T10:58:52.791Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: stale application version
+2026-10-11T10:58:52.797Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: invalid cook application draft
+2026-10-11T10:58:52.831Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: incomplete cook application
+2026-10-11T10:58:52.875Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure FORBIDDEN: self review
+2026-10-11T10:58:52.982Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure IDEMPOTENCY_CONFLICT: Idempotency-Key reused with a different request
+2026-10-11T10:58:53.051Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: application not editable in REJECTED
+2026-10-11T10:58:53.064Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: application cannot be submitted in REJECTED
+2026-10-11T10:58:53.076Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: application is REJECTED, expected UNDER_REVIEW
+2026-10-11T10:58:53.088Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: no cook application
+2026-10-11T10:58:53.105Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: no cook application
+2026-10-11T10:58:53.184Z  INFO 7864 --- [matbakhy] [pool-3-thread-3] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: stale application version
+2026-10-11T10:58:53.186Z  INFO 7864 --- [matbakhy] [pool-3-thread-4] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: stale application version
+2026-10-11T10:58:53.310Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: application is SUBMITTED, expected UNDER_REVIEW
+2026-10-11T10:58:53.338Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VALIDATION_FAILED: reason required
+2026-10-11T10:58:53.351Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure VERSION_CONFLICT: stale application version
+2026-10-11T10:58:53.362Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure MALFORMED_REQUEST: Idempotency-Key missing or malformed
+2026-10-11T10:58:53.433Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: kitchen not found
+2026-10-11T10:58:53.435Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure NOT_FOUND: bad slug
+2026-10-11T10:58:53.538Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: decision targets a stale revision
+2026-10-11T10:58:53.580Z  INFO 7864 --- [matbakhy] [           main] c.matbakhy.app.web.ApiExceptionHandler   : API failure STATE_CONFLICT: application not editable in APPROVED
+[INFO] Tests run: 16, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.258 s -- in com.matbakhy.app.cooks.CookWorkflowIntegrationTest
+[INFO] Running com.matbakhy.app.db.MigrationIntegrationTest
+2026-10-11T10:58:53.586Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.db.MigrationIntegrationTest]: MigrationIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:53.593Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.db.MigrationIntegrationTest
+2026-10-11T10:58:53.594Z  INFO 7864 --- [matbakhy] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.matbakhy.app.db.MigrationIntegrationTest]: MigrationIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-10-11T10:58:53.597Z  INFO 7864 --- [matbakhy] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.db.MigrationIntegrationTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.082 s -- in com.matbakhy.app.db.MigrationIntegrationTest
+[INFO] Running com.matbakhy.app.architecture.ModuleBoundaryTest
+2026-10-11T10:58:53.681Z  INFO 7864 --- [matbakhy] [           main] com.tngtech.archunit.core.PluginLoader   : Detected Java version 21.0.12.1
+2026-10-11T10:58:56.960Z  INFO 7864 --- [matbakhy] [           main] com.tngtech.archunit.core.PluginLoader   : Detected Java version 21.0.12.1
+[INFO] Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.364 s -- in com.matbakhy.app.architecture.ModuleBoundaryTest
+[INFO] Running com.matbakhy.app.security.StaffAssuranceTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.012 s -- in com.matbakhy.app.security.StaffAssuranceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 113, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ matbakhy-app ---
+[INFO] Building jar: /tmp/tmp.IfhlWDefIK/repo/backend/app/target/matbakhy-app-0.1.0-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:4.1.1:repackage (repackage) @ matbakhy-app ---
+[INFO] Replacing main artifact /tmp/tmp.IfhlWDefIK/repo/backend/app/target/matbakhy-app-0.1.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to /tmp/tmp.IfhlWDefIK/repo/backend/app/target/matbakhy-app-0.1.0-SNAPSHOT.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Matbakhy backend 0.1.0-SNAPSHOT:
+[INFO] 
+[INFO] Matbakhy backend ................................... SUCCESS [  0.320 s]
+[INFO] Matbakhy shared primitives ......................... SUCCESS [  3.285 s]
+[INFO] Matbakhy operations module ......................... SUCCESS [  0.662 s]
+[INFO] Matbakhy identity module ........................... SUCCESS [  0.871 s]
+[INFO] Matbakhy cooks module .............................. SUCCESS [  0.750 s]
+[INFO] Matbakhy catalog module ............................ SUCCESS [  0.211 s]
+[INFO] Matbakhy availability module ....................... SUCCESS [  0.099 s]
+[INFO] Matbakhy orders module ............................. SUCCESS [  0.113 s]
+[INFO] Matbakhy finance module ............................ SUCCESS [  0.128 s]
+[INFO] Matbakhy support module ............................ SUCCESS [  0.108 s]
+[INFO] Matbakhy notifications module ...................... SUCCESS [  0.144 s]
+[INFO] Matbakhy application ............................... SUCCESS [01:17 min]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  01:24 min
+[INFO] Finished at: 2026-10-11T10:59:01Z
+[INFO] ------------------------------------------------------------------------
+
+== Workspace install from lockfile
+Scope: all 6 workspace projects
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +863
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 863, reused 860, downloaded 0, added 724
+Progress: resolved 863, reused 860, downloaded 0, added 863, done
+
+devDependencies:
++ @eslint/js 10.0.1
++ eslint 10.12.0
++ eslint-plugin-react-hooks 7.1.1
++ globals 17.13.0
++ typescript 6.0.3
++ typescript-eslint 8.71.1
+
+Done in 2.2s using pnpm v10.34.6
+
+== API contract: OpenAPI lint and generated client drift
+
+> matbakhy-workspace@ contract:check /tmp/tmp.IfhlWDefIK/repo
+> pnpm --filter @matbakhy/api-client run lint:contract && pnpm --filter @matbakhy/api-client run check:drift
+
+
+> @matbakhy/api-client@0.1.0 lint:contract /tmp/tmp.IfhlWDefIK/repo/packages/api-client
+> redocly lint ../../contracts/openapi.yaml --config redocly.yaml
+
+validating ../../contracts/openapi.yaml...
+[1] ../../contracts/openapi.yaml:755:3 at #/paths/~1api~1v1~1orders~1{orderId}~1events
+
+Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/events`.
+
+753 |       5XX:
+754 |         $ref: "#/components/responses/Error"
+755 | /api/v1/orders/{orderId}/events:
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+756 |   get:
+757 |     operationId: getOrdersEvents
+
+Warning was generated by the no-ambiguous-paths rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-ambiguous-paths
+
+
+[2] ../../contracts/openapi.yaml:786:3 at #/paths/~1api~1v1~1orders~1{orderId}~1cancel
+
+Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/cancel`.
+
+784 |       5XX:
+785 |         $ref: "#/components/responses/Error"
+786 | /api/v1/orders/{orderId}/cancel:
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+787 |   post:
+788 |     operationId: postOrdersCancel
+
+Warning was generated by the no-ambiguous-paths rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-ambiguous-paths
+
+
+[3] ../../contracts/openapi.yaml:822:3 at #/paths/~1api~1v1~1orders~1{orderId}~1cancellation-requests
+
+Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/cancellation-requests`.
+
+820 |           schema:
+821 |             $ref: "#/components/schemas/TransitionCommand"
+822 | /api/v1/orders/{orderId}/cancellation-requests:
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+823 |   post:
+824 |     operationId: postOrdersCancellationRequests
+
+Warning was generated by the no-ambiguous-paths rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-ambiguous-paths
+
+
+[4] ../../contracts/openapi.yaml:857:3 at #/paths/~1api~1v1~1orders~1{orderId}~1reviews
+
+Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/reviews`.
+
+855 |           schema:
+856 |             $ref: "#/components/schemas/PostOrdersCancellationRequestsRequest"
+857 | /api/v1/orders/{orderId}/reviews:
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+858 |   post:
+859 |     operationId: postOrdersReviews
+
+Warning was generated by the no-ambiguous-paths rule.
+
+Reference: https://redocly.com/docs/cli/rules/oas/no-ambiguous-paths
+
+
+../../contracts/openapi.yaml: validated in 128ms
+
+Woohoo! Your API description is valid. 🎉
+You have 4 warnings.
+
+
+> @matbakhy/api-client@0.1.0 check:drift /tmp/tmp.IfhlWDefIK/repo/packages/api-client
+> node scripts/check-drift.mjs
+
+✨ openapi-typescript 7.13.0
+ ⚠  Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/events`. at #/paths/~1api~1v1~1orders~1{orderId}~1events
+ ⚠  Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/cancel`. at #/paths/~1api~1v1~1orders~1{orderId}~1cancel
+ ⚠  Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/cancellation-requests`. at #/paths/~1api~1v1~1orders~1{orderId}~1cancellation-requests
+ ⚠  Paths should resolve unambiguously. Found two ambiguous paths: `/api/v1/orders/by-request/{clientRequestId}` and `/api/v1/orders/{orderId}/reviews`. at #/paths/~1api~1v1~1orders~1{orderId}~1reviews
+🚀 ../../contracts/openapi.yaml → /tmp/matbakhy-api-Z3CrOI/schema.ts [304.8ms]
+PASS: generated client types match contracts/openapi.yaml
+
+== Typecheck, lint, unit tests and web builds
+
+> matbakhy-workspace@ typecheck /tmp/tmp.IfhlWDefIK/repo
+> pnpm -r --if-present run typecheck
+
+Scope: 5 of 6 workspace projects
+packages/api-client typecheck$ tsc -p tsconfig.json
+packages/design-tokens typecheck$ tsc -p tsconfig.json
+packages/design-tokens typecheck: Done
+packages/api-client typecheck: Done
+apps/customer-mobile typecheck$ tsc -p tsconfig.json
+apps/customer-web typecheck$ tsc -p tsconfig.json
+apps/operations-web typecheck$ tsc -p tsconfig.json
+apps/customer-mobile typecheck: Done
+apps/customer-web typecheck: Done
+apps/operations-web typecheck: Done
+
+> matbakhy-workspace@ lint /tmp/tmp.IfhlWDefIK/repo
+> eslint .
+
+
+> matbakhy-workspace@ test /tmp/tmp.IfhlWDefIK/repo
+> pnpm -r --if-present run test
+
+Scope: 5 of 6 workspace projects
+packages/api-client test$ vitest run
+packages/design-tokens test$ vitest run
+packages/design-tokens test:  RUN  v5.0.3 /tmp/tmp.IfhlWDefIK/repo/packages/design-tokens
+packages/api-client test:  RUN  v5.0.3 /tmp/tmp.IfhlWDefIK/repo/packages/api-client
+packages/design-tokens test:  Test Files  1 passed (1)
+packages/design-tokens test:       Tests  37 passed (37)
+packages/design-tokens test:    Start at  10:59:18
+packages/design-tokens test:    Duration  414ms (transform 72%, import 14%, tests 12%, worker 2%)
+packages/design-tokens test: Done
+packages/api-client test:  Test Files  3 passed (3)
+packages/api-client test:       Tests  31 passed (31)
+packages/api-client test:    Start at  10:59:18
+packages/api-client test:    Duration  892ms (import 56%, transform 23%, tests 19%, worker 1%)
+packages/api-client test: Done
+apps/customer-mobile test$ jest --ci
+apps/customer-web test$ vitest run
+apps/operations-web test$ vitest run
+apps/customer-web test:  RUN  v5.0.3 /tmp/tmp.IfhlWDefIK/repo/apps/customer-web
+apps/operations-web test:  RUN  v5.0.3 /tmp/tmp.IfhlWDefIK/repo/apps/operations-web
+apps/operations-web test:  Test Files  1 passed (1)
+apps/operations-web test:       Tests  2 passed (2)
+apps/operations-web test:    Start at  10:59:19
+apps/operations-web test:    Duration  1.60s (environment 61%, tests 24%, import 9%, transform 6%, worker 1%)
+apps/operations-web test: Done
+apps/customer-web test:  Test Files  1 passed (1)
+apps/customer-web test:       Tests  2 passed (2)
+apps/customer-web test:    Start at  10:59:19
+apps/customer-web test:    Duration  1.88s (environment 56%, tests 23%, transform 11%, import 10%, worker 1%)
+apps/customer-web test: Done
+apps/customer-mobile test: PASS src/App.test.tsx
+apps/customer-mobile test:   customer-mobile shell
+apps/customer-mobile test:     ✓ starts in Arabic and switches to English (850 ms)
+apps/customer-mobile test: Test Suites: 1 passed, 1 total
+apps/customer-mobile test: Tests:       1 passed, 1 total
+apps/customer-mobile test: Snapshots:   0 total
+apps/customer-mobile test: Time:        4.768 s
+apps/customer-mobile test: Ran all test suites.
+apps/customer-mobile test: Done
+
+> matbakhy-workspace@ build /tmp/tmp.IfhlWDefIK/repo
+> pnpm -r --if-present run build
+
+Scope: 5 of 6 workspace projects
+apps/customer-web build$ tsc -p tsconfig.json && vite build
+apps/operations-web build$ tsc -p tsconfig.json && vite build
+apps/customer-web build: vite v8.3.4 building client environment for production...
+apps/customer-web build: transforming...
+apps/operations-web build: vite v8.3.4 building client environment for production...
+apps/operations-web build: transforming...
+apps/customer-web build: ✓ 25 modules transformed.
+apps/operations-web build: ✓ 25 modules transformed.
+apps/customer-web build: rendering chunks...
+apps/operations-web build: rendering chunks...
+apps/customer-web build: computing gzip size...
+apps/customer-web build: dist/index.html                                                      0.40 kB │ gzip:  0.28 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-latin-400-normal-CFZh1unN.woff     17.51 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-latin-700-normal-Cl4F7CZR.woff     17.78 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-latin-400-normal-Bo5KPYvw.woff2    19.16 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-latin-700-normal-BzSf6GNr.woff2    19.50 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-arabic-400-normal-CyU-ddYS.woff2   42.84 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-arabic-400-normal-EA1o-u_Q.woff    44.13 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-arabic-700-normal-DrtBj6UE.woff2   44.28 kB
+apps/customer-web build: dist/assets/ibm-plex-sans-arabic-arabic-700-normal-9rXc6cUL.woff    44.36 kB
+apps/customer-web build: dist/assets/index-BatFp_D7.css                                       3.50 kB │ gzip:  1.04 kB
+apps/customer-web build: dist/assets/index-Btg7SSbh.js                                      193.39 kB │ gzip: 61.55 kB
+apps/customer-web build: ✓ built in 511ms
+apps/customer-web build: Done
+apps/operations-web build: computing gzip size...
+apps/operations-web build: dist/index.html                                                      0.42 kB │ gzip:  0.30 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-latin-400-normal-CFZh1unN.woff     17.51 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-latin-700-normal-Cl4F7CZR.woff     17.78 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-latin-400-normal-Bo5KPYvw.woff2    19.16 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-latin-700-normal-BzSf6GNr.woff2    19.50 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-arabic-400-normal-CyU-ddYS.woff2   42.84 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-arabic-400-normal-EA1o-u_Q.woff    44.13 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-arabic-700-normal-DrtBj6UE.woff2   44.28 kB
+apps/operations-web build: dist/assets/ibm-plex-sans-arabic-arabic-700-normal-9rXc6cUL.woff    44.36 kB
+apps/operations-web build: dist/assets/index-BatFp_D7.css                                       3.50 kB │ gzip:  1.04 kB
+apps/operations-web build: dist/assets/index-DJSl_q3C.js                                      193.44 kB │ gzip: 61.59 kB
+apps/operations-web build: ✓ built in 453ms
+apps/operations-web build: Done
+
+== customer-mobile: Android and iOS JavaScript bundles
+
+> @matbakhy/customer-mobile@0.1.0 bundle:native /tmp/tmp.IfhlWDefIK/repo/apps/customer-mobile
+> expo export --platform android --platform ios --output-dir dist --no-minify
+
+Expo Autolinking module resolution enabled
+Starting Metro Bundler
+
+iOS Bundled 6031ms apps/customer-mobile/index.ts (532 modules)
+Android Bundled 10974ms apps/customer-mobile/index.ts (584 modules)
+
+› ios bundles (1):
+_expo/static/js/ios/index-920770d82289d9c255a6b440fcab3749.hbc (1.4MB)
+
+› android bundles (1):
+_expo/static/js/android/index-382bc985d22a537194566876e4c671ed.hbc (1.4MB)
+
+› Files (1):
+metadata.json (244B)
+
+Exported: dist
+
+PASS: clean checkout installed and compiled backend, web and Expo projects with pinned versions

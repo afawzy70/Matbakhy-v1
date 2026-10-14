@@ -37,7 +37,7 @@ Use a modular monolith: one backend deployment and database, explicit domain mod
 | `scripts` | Portable developer, validation, migration, smoke and evidence commands |
 | `tests/e2e`, `tests/mobile`, `tests/load` | Cross-surface journeys, native flows and load scenarios |
 
-These application paths do not exist yet. Create them through the backlog, not empty placeholder code presented as implementation.
+Create these paths through the backlog, not empty placeholder code presented as implementation. [planning/inventory.json](../../planning/inventory.json) records which exist.
 
 ## ADR-001: module boundaries
 

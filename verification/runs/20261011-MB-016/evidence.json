@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-016",
+  "phase": "P03",
+  "source_commit": "03aa8d0fc92e17f7b4f60b10f56dca331436d2e4",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T12:16:00.552839+00:00",
+  "finished_at": "2026-10-11T12:22:35.177662+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. DiscoveryIntegrationTest (PostgreSQL)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-016/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-016/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-016/LOCAL-STACK.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-016/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-016/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-016",
+      "status": "PASS",
+      "observed": "DiscoveryIntegrationTest: with 26 meals in a kitchen, the oldest matching meal is absent from the first page of 20 but a new server query with q (or category or price filter) returns it; reusing the earlier cursor with changed filters is 422 CURSOR_FILTER_MISMATCH, so clients must restart the query. NEWEST, PRICE_ASC and PRICE_DESC each page through all 23 eligible meals with repeated prices and timestamps exactly once (id tie-breaker). Mutations dropping the tie-breaker and the cursor/filter binding each failed a test. Client behaviour (fresh query on filter change) is verified with the web/native discovery screens (MB-027/MB-031)."
+    },
+    {
+      "id": "TC-017",
+      "status": "PASS",
+      "observed": "Draft, paused and archived meals and all meals of paused or suspended kitchens are excluded from discovery; a paused kitchen's meal detail is 404 while its public profile reports available=false; restoring the kitchen brings its meal back. A mutation removing the ACTIVE-kitchen condition failed the test. The favorites part (unavailable explanation without a broken route) belongs to MB-028 and is re-tested there."
+    },
+    {
+      "id": "TC-116",
+      "status": "PASS",
+      "observed": "Zone filter returns only kitchens delivering to the zone; date and slot filters return only meals with an orderable slot there and restrict nextSlots to it; availability AVAILABLE/SOLD_OUT/UNAVAILABLE with portions bounded by meal and slot aggregate; past-cutoff slots stop counting; at most five next slots in start order; meal detail uses the same offers; Arabic search ignores diacritics and letter variants, English titles and kitchen names are searchable, wildcards literal; English localization with Arabic fallback; no private fields; zone list active-only, localized, stable paging; invalid sort 400, invalid price range or cursor 422."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-016/BACKEND-VERIFY.log",
+    "verification/runs/20261011-MB-016/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-016/LOCAL-STACK.log",
+    "verification/runs/20261011-MB-016/SECRET-SCAN.log",
+    "verification/runs/20261011-MB-016/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-016/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review defect fixed before evidence: a Java text block dropped the trailing space before a concatenated SQL predicate (syntax error caught by tests).",
+      "Updated IdentityIntegrationTest.public_browsing_stays_anonymous: it asserted 404 only because the route did not exist; it now asserts 200 without redirect, preserving its intent (public route outside authentication).",
+      "Proposed defaults recorded: fixed category list; zone filter means delivery to that zone; sorts NEWEST/PRICE_ASC/PRICE_DESC.",
+      "Residual: discovery reads kitchen and slot tables as a read model (documented); search uses sequential normalization without a trigram index - revisit with realistic volumes (EXPLAIN) before pilot; registry cityId filter for zones not implemented (no city entity)."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

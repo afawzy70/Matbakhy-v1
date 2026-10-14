@@ -1,0 +1,95 @@
+{
+  "run_id": "20261011-MB-015",
+  "story_id": "MB-015",
+  "phase": "P03",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. SlotIntegrationTest (PostgreSQL, test clock)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-013",
+      "observed": "SlotIntegrationTest: with five obligated portions (3 reserved + 2 allocated) of a meal, lowering that meal's capacity to 4 or the slot maximum to 4, removing the meal and cancelling the slot all return 409 BELOW_OBLIGATIONS/state conflict; capacity and counters stay unchanged; setting both to exactly 5 succeeds with 0 available; database checks reject direct updates below obligations. A mutation removing the slot-level check failed the test. Obligations are set by test SQL until order placement exists (MB-018), which re-tests the path with real orders."
+    },
+    {
+      "id": "TC-014",
+      "observed": "Using the JDK Africa/Cairo rules (transitions found dynamically, test clock 10 days before): a local time inside the spring gap is 422 NONEXISTENT_LOCAL_TIME; a time repeated in the autumn is 422 AMBIGUOUS_LOCAL_TIME without an offset and 422 for an invalid offset; with each valid offset it maps to exactly one UTC instant, the two being one hour apart on the same local date. Ordinary slots store the exact UTC instant of the Cairo wall-clock time and cutoff = start - 120 min; other zones are refused. A mutation removing the ambiguity check failed the test. Client display is verified with the client stories."
+    },
+    {
+      "id": "TC-015",
+      "observed": "With the server test clock advanced past cutoff, SlotDirectory.orderableAt is false, the public listing drops the slot, capacity edits are 409 SLOT_CLOSED, reopening is refused and CLOSED is final; creating a slot whose cutoff already passed is 409 CUTOFF_PASSED. No client time is accepted by any slot API. A mutation removing the public cutoff filter failed the test. Quote/order rejection at cutoff uses SlotDirectory and is re-tested in MB-017/MB-018."
+    },
+    {
+      "id": "TC-115",
+      "observed": "Slot tables and constraints (counter bounds at both levels, cutoff consistency, same-kitchen trigger, per-kitchen start uniqueness, no overlap), Cairo/UTC rules, pause/close/cancel transitions, capacity bounds and aggregate counters with last-portion arithmetic (meal with 4 left limited to the slot's last 1; both 0 when the aggregate is full), owner scope (other cook 404, non-cook 403, stale version 409), public listing with fulfillment modes and zone filter, suspended kitchen 404, keyset pagination."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-015/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Design decision (proposed default, documented): a slot lies within one local Cairo date and cannot cross midnight; times are immutable after creation; slots start at most 60 days ahead; lead 30-1440 minutes.",
+      "Self-review: availability must not depend on catalog or cooks (discovery will depend on availability), so kitchens and meals arrive through the SlotParticipants port implemented by catalog.",
+      "Residual: counters are written by order placement/acceptance/preparation (MB-018/MB-019); cancelling a slot with obligations needs the ops exception workflow (MB-019/MB-023).",
+      "Residual: TC-014 depends on the JDK time-zone data for Egypt; tzdata updates must be part of runtime upgrades."
+    ]
+  },
+  "open_defects": []
+}

@@ -36,8 +36,21 @@ Check exact artifact/config/migration and health/business smoke. Stop rollout, a
 
 ## Backup restoration drill
 
-Restore to isolated environment with outbound providers disabled, never over live data for a drill. Verify schema, row counts/hashes where useful, pending orders, allocations, finance balances and outbox. Measure recovery time and data age. Rotate/restage credentials and enable providers only after duplicate-side-effect review. A file existing in a bucket is not a successful backup test.
+Restore to isolated environment with outbound providers disabled, never over live data for a drill. Verify schema, row counts/hashes where useful, pending orders, allocations, finance balances and outbox. Measure recovery time and data age. Rotate/restage credentials and enable providers only after duplicate-side-effect review. A file existing in a bucket is not a successful backup test. Tooling: `scripts/db-backup.sh`, `scripts/db-restore.sh` and `infra/db/reconcile.sql`; see `04-privacy-and-recovery.md`.
 
 ## Account compromise / lost staff access
 
 Revoke affected identity sessions and grants, rotate compromised secrets, preserve audit, review suspicious actions and contain affected features. Use documented recoverable-admin procedure; never create a public default administrator. Restore least privilege and verify. Escalate privacy/legal notification assessment to owner.
+
+## Database unavailable (MB-037)
+
+- **What happens:** while PostgreSQL is unreachable, API requests fail within bounded waits and return a retryable `503 DEPENDENCY_UNAVAILABLE`, with no database detail. Clients retry; order placement is safe to retry with the same keys. When the database returns, the running application recovers without a restart. This is verified by `DatabaseOutageRecoveryIntegrationTest` on real PostgreSQL.
+- **Timeouts:**
+  - Connect timeout is 5 s.
+  - Pool wait is `DATABASE_CONNECTION_TIMEOUT_MS`, default 5000.
+  - Socket timeout is `DATABASE_SOCKET_TIMEOUT_SECONDS`, default 30.
+  - Raise the socket timeout only for a known long one-off operation, such as a large migration run separately.
+- **Operator response:**
+  1. Confirm with the database provider.
+  2. Watch the 503 rate and outbox age.
+  3. After recovery, check that pending outbox events drain and that the ledger and stock reconciliation queries show no imbalance.

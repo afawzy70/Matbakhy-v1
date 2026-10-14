@@ -1,0 +1,11 @@
+GitHub Actions run 38128068345, job 114436520902 "iOS simulator build (Xcode, unsigned)", head_sha 34be845bc5ab5b283c3c62998b090eff71a80f19
+Runner: macos-26 (GitHub-hosted). Conclusion: success. Steps: checkout, Node 24.21.0 (checksum verified), installed Xcode list and xcodebuild -version (step "Toolchain versions" in the job log), pnpm install --frozen-lockfile, expo prebuild --platform ios --clean (CocoaPods install), xcodebuild -workspace MatbakhyDev.xcworkspace -scheme MatbakhyDev -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build, artifact identity.
+Excerpt (retrieved via GitHub API job logs):
+2026-10-11T09:25:48.5776900Z ** BUILD SUCCEEDED **
+2026-10-11T09:25:48.9421830Z build/Build/Products/Debug-iphonesimulator/MatbakhyDev.app
+2026-10-11T09:25:48.9527490Z com.matbakhy.customer.dev
+2026-10-11T09:25:48.9608920Z 0.1.0
+2026-10-11T09:25:49.0453010Z 9f37fcc46601814a9ef7569742f2fc9532a37341a60cc27289f0d2be0240bf4a  build/Build/Products/Debug-iphonesimulator/MatbakhyDev.app/MatbakhyDev
+Exact Xcode version: recorded in the job's "Toolchain versions" step (not reproduced in this excerpt).
+Previous attempts: run 38127355259 (macos-15, Xcode 16.4) FAILED in the ExpoModulesJSI xcframework script phase; run 38127899749 CANCELLED by a newer push.
+Scope: unsigned simulator compilation only. No simulator launch, device install, signing or TestFlight.

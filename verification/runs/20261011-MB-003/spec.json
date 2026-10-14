@@ -1,0 +1,107 @@
+{
+  "run_id": "20261011-MB-003",
+  "story_id": "MB-003",
+  "phase": "P00",
+  "checks": [
+    {
+      "id": "TOKENS-TESTS",
+      "name": "Design token tests: WCAG contrast both themes, completeness, CSS drift, no hard-coded brand name/hex in apps",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@matbakhy/design-tokens",
+        "test"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    },
+    {
+      "id": "SPECIMEN-RENDER",
+      "name": "Chromium specimen render with Arabic font load assertion (light/dark x ar/en x phone/desktop)",
+      "command": [
+        "pnpm",
+        "--filter",
+        "@matbakhy/design-tokens",
+        "specimen",
+        "../../verification/runs/20261011-MB-003/specimen"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Regression: clean-clone workspace check (apps consume tokens)",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-103",
+      "observed": "Brand name, slogan, colors, typography and spacing live only in packages/design-tokens/tokens.json; customer web, operations web and the Expo app read them (tests assert app titles derive from tokens and that app source contains no hard-coded brand name or hex color), so name/logo/colors change without business-code edits. Contrast tests pass for every listed pair in light and dark themes (text >=4.5:1, focus and borderStrong >=3:1). Chromium rendered 8 specimens (light/dark x ar/en x 390/1280 px) with IBM Plex Sans Arabic loaded (document.fonts checks), showing the draft wordmark, Arabic glyph set, Arabic-Indic and Latin digits, bidi-isolated mixed content and contrast swatches. Trademark clearance remains OPEN (O05)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-003/review.md",
+    "verification/runs/20261011-MB-003/specimen/specimen-results.json",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-ar-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-ar-desktop.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-en-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-light-en-desktop.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-ar-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-ar-desktop.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-en-phone.png",
+    "verification/runs/20261011-MB-003/specimen/specimen-dark-en-desktop.png"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Visual self-review of rendered specimens found unisolated mixed-direction amounts, an off-center button label and 1.5:1 border contrast unsuitable for form controls; fixed with <bdi> runs, inline-flex centering and a tested borderStrong token (>=3:1). Bracket mirroring in the Arabic total line verified by measuring glyph positions.",
+      "Brand, wordmark and palette are drafts for owner review (O05); no trademark search performed.",
+      "Font licensing: IBM Plex Sans Arabic under OFL-1.1 via @fontsource 5.3.0.",
+      "Native app uses token values but native rendering/fonts are not verified on devices (MB-005 native BLOCKED; P07)."
+    ]
+  },
+  "open_defects": []
+}

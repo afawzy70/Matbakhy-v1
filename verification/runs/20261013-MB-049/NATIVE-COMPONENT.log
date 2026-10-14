@@ -1,0 +1,34 @@
+
+> @matbakhy/customer-mobile@0.1.0 test /home/user/Matbakhy-v1-candE/apps/customer-mobile
+> jest --ci
+
+PASS src/ordering.test.ts
+PASS src/auth.test.ts
+PASS src/signIn.test.ts
+PASS src/App.test.tsx (20.038 s)
+  ● Console
+
+    console.error
+      You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+
+      at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+      at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+
+    console.error
+      You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+
+      at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+      at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+
+    console.error
+      You seem to have overlapping act() calls, this is not supported. Be sure to await previous act() calls before making a new one.
+
+      at popActScope (../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:556:17)
+      at ../../node_modules/.pnpm/react@19.2.3/node_modules/react/cjs/react.development.js:844:17
+
+
+Test Suites: 4 passed, 4 total
+Tests:       52 passed, 52 total
+Snapshots:   0 total
+Time:        21.27 s
+Ran all test suites.

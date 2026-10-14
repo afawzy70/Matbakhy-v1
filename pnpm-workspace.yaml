@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+
+peerDependencyRules:
+  # openapi-typescript 7.13 declares typescript ^5 but is exercised with 6.0.3 by the
+  # generation drift check and api-client typecheck (MB-007). Revisit when it declares 6.x.
+  allowedVersions:
+    openapi-typescript>typescript: "6"

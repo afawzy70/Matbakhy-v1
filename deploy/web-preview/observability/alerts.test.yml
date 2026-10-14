@@ -1,0 +1,83 @@
+# promtool test rules alerts.test.yml — unit tests for the proposed alert rules (MB-039, OPS-02).
+rule_files: [alerts.yml]
+evaluation_interval: 15s
+tests:
+  - interval: 15s
+    input_series:
+      - series: 'up{job="api"}'
+        values: '1 1 0 0 0 0 0 0'
+      - series: 'matbakhy_outbox_failed_events{job="api"}'
+        values: '0 0 1 1 1 1 1 1'
+      - series: 'matbakhy_ledger_unbalanced_groups{job="api"}'
+        values: '0 0 0 0 0 0 0 0'
+    alert_rule_test:
+      - eval_time: 1m45s
+        alertname: ApiDown
+        exp_alerts: [{exp_labels: {severity: critical, job: api}, exp_annotations: {summary: "API metrics endpoint unreachable", runbook: "docs/operations/08-troubleshooting-runbook.md#4-missing-or-suspicious-telemetry"}}]
+      - eval_time: 45s
+        alertname: OutboxFailed
+        exp_alerts: [{exp_labels: {severity: ops, job: api}, exp_annotations: {summary: "Outbox events exhausted their retries", runbook: "docs/operations/08-troubleshooting-runbook.md#3-inspect-and-retry-dead-letters"}}]
+      - eval_time: 1m45s
+        alertname: LedgerUnbalanced
+        exp_alerts: []
+  - interval: 1m
+    input_series:
+      - series: 'matbakhy_outbox_failed_events{job="api"}'
+        values: '0 0 NaN NaN NaN NaN'
+      - series: 'matbakhy_audit_write_failures_events_total{job="api",kind="denial"}'
+        values: '0 0 0 1 1 1'
+      - series: 'matbakhy_outbox_oldest_pending_age_seconds{job="api"}'
+        values: '0 100 400 500 600 700'
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: DatabaseUnavailable
+        exp_alerts: [{exp_labels: {severity: critical, job: api}, exp_annotations: {summary: "API cannot read the database"}}]
+      - eval_time: 4m
+        alertname: AuditWriteFailed
+        exp_alerts: [{exp_labels: {severity: critical, job: api, kind: denial}, exp_annotations: {summary: "A denial was refused without its audit row (audit store failing)"}}]
+      - eval_time: 5m
+        alertname: OutboxStale
+        exp_alerts: [{exp_labels: {severity: warning, job: api}, exp_annotations: {summary: "Oldest pending outbox event older than 5 minutes"}}]
+  - interval: 1m
+    input_series:
+      # A backup at t=0 (timestamp 0), scraped every minute; 26 hours later the last success is stale.
+      - series: 'matbakhy_backup_last_success_timestamp_seconds{job="node"}'
+        values: '0x1600'
+    alert_rule_test:
+      - eval_time: 20h
+        alertname: BackupStale
+        exp_alerts: []
+      - eval_time: 26h
+        alertname: BackupStale
+        exp_alerts: [{exp_labels: {severity: incident, job: node}, exp_annotations: {summary: "No verified database backup in 24 hours"}}]
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node"}'
+        values: '1x10'
+    alert_rule_test:
+      # No backup has ever been recorded: the metric is absent, which is also stale.
+      - eval_time: 6m
+        alertname: BackupStale
+        exp_alerts: [{exp_labels: {severity: incident}, exp_annotations: {summary: "No verified database backup in 24 hours"}}]
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{job="node",mountpoint="/",fstype="ext4"}'
+        values: '50 50 10 10 10 10 10 10 10'
+      - series: 'node_filesystem_size_bytes{job="node",mountpoint="/",fstype="ext4"}'
+        values: '100x8'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: DiskPressure
+        exp_alerts: []
+      - eval_time: 8m
+        alertname: DiskPressure
+        exp_alerts: [{exp_labels: {severity: warning, job: node, mountpoint: "/", fstype: ext4}, exp_annotations: {summary: "Less than 15% disk free on the host"}}]
+  - interval: 1m
+    input_series:
+      # A failed event, then the database goes away for 3 minutes (NaN), then the value is read again.
+      - series: 'matbakhy_outbox_failed_events{job="api"}'
+        values: '1 1 NaN NaN NaN 1 1'
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: OutboxFailed
+        exp_alerts: [{exp_labels: {severity: ops, job: api}, exp_annotations: {summary: "Outbox events exhausted their retries", runbook: "docs/operations/08-troubleshooting-runbook.md#3-inspect-and-retry-dead-letters"}}]

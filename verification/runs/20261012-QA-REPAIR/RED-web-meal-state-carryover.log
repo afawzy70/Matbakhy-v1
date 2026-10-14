@@ -1,0 +1,35 @@
+# Defect found while turning FG-001 green: meal page keeps the previous meal's quantity on direct meal-to-meal navigation (FG-001 code applied; App.tsx unchanged)
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/customer-web
+
+ ❯ src/App.test.tsx (24 tests | 1 failed | 23 skipped) 599ms
+   ❯ QA repair FG-001: the basket can be edited and shows an estimate (CW05) (4)
+     × edits quantities and removes lines with correct integer arithmetic, then shows the empty state 597ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > QA repair FG-001: the basket can be edited and shows an estimate (CW05) > edits quantities and removes lines with correct integer arithmetic, then shows the empty state
+AssertionError: expected 'EGP 431.50' to match /336\.00/
+
+- Expected:
+/336\.00/
+
++ Received:
+"EGP 431.50"
+
+ ❯ src/App.test.tsx:734:30
+    732|     const cart = await cartSection();
+    733|     expect(within(cart).getByText("Kitchen A")).toBeTruthy();
+    734|     expect(await estimate()).toMatch(/336\.00/); // 2 × 120.25 + 95.50
+       |                              ^
+    735|     expect(within(cart).getByText(/estimate/i, { selector: "p" }).text…
+    736|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 23 skipped (24)
+   Start at  11:51:06
+   Duration  2.50s (environment 39%, transform 28%, tests 26%, import 6%, worker 1%)
+

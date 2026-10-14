@@ -1,0 +1,53 @@
+# Red phase: Q1 native clients, before reading the published limit (HEAD 4eaee3a1f53b929b9e7685fd30da689d470d095c, tests uncommitted)
+FAIL src/App.test.tsx
+  ● Q1 on native: quantity limits come from the server's active policy › caps the meal quantity at the policy limit although the slot has more portions
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 3
+    + Received  + 6
+
+    - ObjectContaining {
+    -   "maxQuantity": 10,
+    -   "quantity": 10,
+    + Object {
+    +   "maxQuantity": 15,
+    +   "mealId": "mq",
+    +   "quantity": 15,
+    +   "title": "Dish mq",
+    +   "unitPriceMinor": 12000,
+      }
+
+      348 |     await fireEvent.press(screen.getByTestId("add-to-cart"));
+      349 |     expect(await screen.findByText(t.added)).toBeTruthy();
+    > 350 |     expect(JSON.parse(mockStore.get("matbakhy.basket.v1") ?? "{}").lines[0]).toEqual(expect.objectContaining({ quantity: 10, maxQuantity: 10 }));
+          |                                                                              ^
+      351 |   });
+      352 |
+      353 |   it("explains a basket line above a lowered limit, and lets the customer reduce it", async () => {
+
+      at Object.toEqual (src/App.test.tsx:350:78)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Q1 on native: quantity limits come from the server's active policy › explains a basket line above a lowered limit, and lets the customer reduce it
+
+    TypeError: t.overLineLimit is not a function
+
+      358 |     await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/configuration/public": limits })} />);
+      359 |     await fireEvent.press(await screen.findByTestId("open-cart"));
+    > 360 |     expect(await screen.findByText(t.overLineLimit(10))).toBeTruthy();
+          |                                      ^
+      361 |     expect(screen.getByTestId("qty-inc-mq").props.accessibilityState.disabled).toBe(true);
+      362 |     await fireEvent.press(screen.getByTestId("qty-dec-mq"));
+      363 |     await fireEvent.press(screen.getByTestId("qty-dec-mq"));
+
+      at Object.overLineLimit (src/App.test.tsx:360:38)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       2 failed, 30 skipped, 32 total
+Snapshots:   0 total
+Time:        2.047 s, estimated 4 s
+Ran all test suites with tests matching "Q1 on native".

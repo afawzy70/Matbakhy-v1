@@ -1,0 +1,38 @@
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/customer-web
+
+ ❯ src/App.test.tsx (37 tests | 1 failed | 36 skipped) 169ms
+   ❯ QA repair OBS-001: recovery lookup transport failure (1)
+     × keeps the unconfirmed order and its keys, offers the retry, and raises no unhandled error 167ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > QA repair OBS-001: recovery lookup transport failure > keeps the unconfirmed order and its keys, offers the retry, and raises no unhandled error
+AssertionError: expected [ TypeError: Failed to fetch ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   TypeError {
++     "message": "Failed to fetch",
++   },
++ ]
+
+ ❯ src/App.test.tsx:1147:25
+    1145|       await waitFor(() => expect(calls.some((c) => c.path.startsWith("…
+    1146|       await new Promise((r) => setTimeout(r, 50));
+    1147|       expect(unhandled).toEqual([]);
+       |                         ^
+    1148|       expect(window.localStorage.getItem("matbakhy.pendingPlacement"))…
+    1149|       expect(window.localStorage.getItem("matbakhy.cart")).not.toBeNul…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 36 skipped (37)
+   Start at  18:59:28
+   Duration  1.91s (environment 45%, transform 37%, tests 10%, import 8%)
+

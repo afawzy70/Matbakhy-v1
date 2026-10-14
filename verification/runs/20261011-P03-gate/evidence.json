@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "P03-GATE",
+  "phase": "P03",
+  "source_commit": "bd0000c3f4f4ba979284d5ddee0d16f29e3515dd",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T12:23:20.608117+00:00",
+  "finished_at": "2026-10-11T12:31:20.524788+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P03-CHECK-1",
+      "name": "Media publication and discovery integration",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "MediaIntegrationTest",
+        "MealIntegrationTest",
+        "DiscoveryIntegrationTest",
+        "ContractRoutesTest"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/P03-CHECK-1.log"
+    },
+    {
+      "id": "P03-CHECK-2",
+      "name": "Availability cutoff timezone and stock constraints",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "SlotIntegrationTest",
+        "MigrationIntegrationTest",
+        "ModuleBoundaryTest"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/P03-CHECK-2.log"
+    },
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. DiscoveryIntegrationTest (PostgreSQL)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/LOCAL-STACK.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P03-gate/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-010",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: MediaIntegrationTest with PostgreSQL and the digest-pinned S3 emulator: HTML declared as JPEG and PDF declared as PNG are rejected UNSUPPORTED_TYPE, PNG declared as JPEG TYPE_MISMATCH; tickets over 8 MiB and SVG are 422; a larger-than-declared object is SIZE_MISMATCH, tampered bytes CHECKSUM_MISMATCH, 100x100 and a PNG header claiming 30000x30000 are DIMENSIONS, a truncated JPEG UNREADABLE; EICAR-marked content is MALWARE (audited) and an unknown scan leaves the media QUARANTINED with 503 and no public object. Rejected bytes are removed from the private bucket and nothing appears in the public bucket. A verification document is APPROVED without a public URL; other customers and reviewers get 404 until it is frozen into a submitted application revision, after which a cook.review holder receives a 5-minute signed read (audited) and others still get 404. Mutations (skip type check, publish original bytes, drop reviewer scoping) each failed a test."
+    },
+    {
+      "id": "TC-011",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: MealIntegrationTest: a draft without an allergen declaration gets 422 naming allergenDeclaration REQUIRED on PUBLISH, stays DRAFT and its public detail is 404; a bare draft's 422 lists every missing requirement (Arabic description/portion/ingredients, declaration, price, approved photo); CONTAINS without codes, codes with NONE_DECLARED, price 0, fractional price (400), unknown allergen code (400), a client kitchenId (400), another cook's or a pending photo (PHOTO_NOT_APPROVED) are refused; a kitchen that cannot sell gets 409 KITCHEN_UNAVAILABLE and its published meals disappear publicly until restored. Mutations removing the declaration requirement, the kitchen check and the public selling filter each failed a test."
+    },
+    {
+      "id": "TC-012",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: Editing a published meal's price and allergens creates revision 2 while revision 1 keeps 9500 piastres and GLUTEN only; stale versions are 409; a no-op edit adds no revision; a published meal cannot drop its photos; archiving removes it from public access, makes it read-only and keeps revisions; the database rejects updating or deleting meal_revision rows and deleting meals. Orders and reorder do not exist yet: order items must copy MealService.revision snapshots (MB-017/MB-019), where history and reorder are re-tested."
+    },
+    {
+      "id": "TC-013",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-2 (named classes must run) and the full backend verify: SlotIntegrationTest: with five obligated portions (3 reserved + 2 allocated) of a meal, lowering that meal's capacity to 4 or the slot maximum to 4, removing the meal and cancelling the slot all return 409 BELOW_OBLIGATIONS/state conflict; capacity and counters stay unchanged; setting both to exactly 5 succeeds with 0 available; database checks reject direct updates below obligations. A mutation removing the slot-level check failed the test. Obligations are set by test SQL until order placement exists (MB-018), which re-tests the path with real orders."
+    },
+    {
+      "id": "TC-014",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-2 (named classes must run) and the full backend verify: Using the JDK Africa/Cairo rules (transitions found dynamically, test clock 10 days before): a local time inside the spring gap is 422 NONEXISTENT_LOCAL_TIME; a time repeated in the autumn is 422 AMBIGUOUS_LOCAL_TIME without an offset and 422 for an invalid offset; with each valid offset it maps to exactly one UTC instant, the two being one hour apart on the same local date. Ordinary slots store the exact UTC instant of the Cairo wall-clock time and cutoff = start - 120 min; other zones are refused. A mutation removing the ambiguity check failed the test. Client display is verified with the client stories."
+    },
+    {
+      "id": "TC-015",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-2 (named classes must run) and the full backend verify: With the server test clock advanced past cutoff, SlotDirectory.orderableAt is false, the public listing drops the slot, capacity edits are 409 SLOT_CLOSED, reopening is refused and CLOSED is final; creating a slot whose cutoff already passed is 409 CUTOFF_PASSED. No client time is accepted by any slot API. A mutation removing the public cutoff filter failed the test. Quote/order rejection at cutoff uses SlotDirectory and is re-tested in MB-017/MB-018."
+    },
+    {
+      "id": "TC-016",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: DiscoveryIntegrationTest: with 26 meals in a kitchen, the oldest matching meal is absent from the first page of 20 but a new server query with q (or category or price filter) returns it; reusing the earlier cursor with changed filters is 422 CURSOR_FILTER_MISMATCH, so clients must restart the query. NEWEST, PRICE_ASC and PRICE_DESC each page through all 23 eligible meals with repeated prices and timestamps exactly once (id tie-breaker). Mutations dropping the tie-breaker and the cursor/filter binding each failed a test. Client behaviour (fresh query on filter change) is verified with the web/native discovery screens (MB-027/MB-031)."
+    },
+    {
+      "id": "TC-017",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: Draft, paused and archived meals and all meals of paused or suspended kitchens are excluded from discovery; a paused kitchen's meal detail is 404 while its public profile reports available=false; restoring the kitchen brings its meal back. A mutation removing the ACTIVE-kitchen condition failed the test. The favorites part (unavailable explanation without a broken route) belongs to MB-028 and is re-tested there."
+    },
+    {
+      "id": "TC-113",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: Signed private upload flow (signed PUT bound to type/length, 10 minutes, key never derived from the filename); byte/type/dimension limits; fail-closed scan adapter; metadata stripping proven by a JPEG carrying a synthetic GPS Exif marker whose public variant has neither the marker nor an Exif segment; approved public derivative served from the public bucket only after a clean scan; scoped deletes (another account cannot delete; deletion removes private and public objects; documents in a submitted revision cannot be deleted). Database constraints reject a public key on non-approved or document media and APPROVED without a clean scan. The local stack smoke performs ticket, direct PUT, completion and signed read through the compose API."
+    },
+    {
+      "id": "TC-114",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: Meal CRUD with Arabic/English fields, portion, ingredients and explicit allergens; versioning; publication guards; archive semantics; public MealDetail per the core DTO (Arabic default, English via Accept-Language with Vary, NONE_DECLARED as explicit code) without owner identity, private location, contact, status or version, versus the cook DTO with content, status and version; owner scope (other cook 404, non-cook 403, anonymous 401) and keyset pagination with search."
+    },
+    {
+      "id": "TC-115",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-2 (named classes must run) and the full backend verify: Slot tables and constraints (counter bounds at both levels, cutoff consistency, same-kitchen trigger, per-kitchen start uniqueness, no overlap), Cairo/UTC rules, pause/close/cancel transitions, capacity bounds and aggregate counters with last-portion arithmetic (meal with 4 left limited to the slot's last 1; both 0 when the aggregate is full), owner scope (other cook 404, non-cook 403, stale version 409), public listing with fulfillment modes and zone filter, suspended kitchen 404, keyset pagination."
+    },
+    {
+      "id": "TC-116",
+      "status": "PASS",
+      "observed": "Re-run at the gate commit by P03-CHECK-1 (named classes must run) and the full backend verify: Zone filter returns only kitchens delivering to the zone; date and slot filters return only meals with an orderable slot there and restrict nextSlots to it; availability AVAILABLE/SOLD_OUT/UNAVAILABLE with portions bounded by meal and slot aggregate; past-cutoff slots stop counting; at most five next slots in start order; meal detail uses the same offers; Arabic search ignores diacritics and letter variants, English titles and kitchen names are searchable, wildcards literal; English localization with Arabic fallback; no private fields; zone list active-only, localized, stable paging; invalid sort 400, invalid price range or cursor 422."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-P03-gate/P03-CHECK-1.log",
+    "verification/runs/20261011-P03-gate/P03-CHECK-2.log",
+    "verification/runs/20261011-P03-gate/BACKEND-VERIFY.log",
+    "verification/runs/20261011-P03-gate/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-P03-gate/LOCAL-STACK.log",
+    "verification/runs/20261011-P03-gate/SECRET-SCAN.log",
+    "verification/runs/20261011-P03-gate/GUARDRAIL-TESTS.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Gate re-verification of MB-013..MB-016 at one source commit.",
+      "Carried residuals (not gate blockers by the configured checks): production storage policy and real scanner unverified (emulator; O07/P09); order history/reorder and real-order capacity obligations re-tested in MB-017..MB-019; favorites presentation MB-028; discovery search indexing before pilot."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

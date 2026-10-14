@@ -1,0 +1,33 @@
+# Preview runtime-role rehearsal 2026-10-13T10:20:16+03:00
+## API startup (owner migrates, runtime role connects)
+47:2026-10-13T07:19:58.896Z  INFO [] 23186 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 24 migrations to schema "public", now at version v22 (execution time 00:00.775s)
+48:2026-10-13T07:19:58.931Z  INFO [] 23186 --- [matbakhy] [           main] o.f.c.i.c.SqlScriptCallbackFactory       : Executing SQL callback: afterMigrate - 
+54:2026-10-13T07:20:02.329Z  INFO [] 23186 --- [matbakhy] [           main] com.matbakhy.app.MatbakhyApplication     : Started MatbakhyApplication in 9.627 seconds (process running for 10.387)
+## Health
+{"groups":["liveness","readiness"],"status":"UP"}
+## Public read as runtime role: GET /api/v1/zones -> HTTP 200
+## Connections by role
+matbakhy_app|10
+## Forbidden statements as matbakhy_app (expect permission denied / must be owner)
+-- UPDATE audit_event SET reason='x'
+   ERROR:  permission denied for table audit_event
+-- DELETE FROM ledger_entry
+   ERROR:  permission denied for table ledger_entry
+-- TRUNCATE audit_event
+   ERROR:  permission denied for table audit_event
+-- ALTER TABLE audit_event DISABLE TRIGGER ALL
+   ERROR:  must be owner of table audit_event
+-- CREATE TABLE evil(id int)
+   ERROR:  permission denied for schema public
+   LINE 1: CREATE TABLE evil(id int)
+                        ^
+-- UPDATE flyway_schema_history SET success=false
+   ERROR:  permission denied for table flyway_schema_history
+-- DELETE FROM customer_order
+   ERROR:  permission denied for table customer_order
+## Allowed as matbakhy_app
+3
+## Restart on the same database (no pending migrations; callback re-applies grants)
+21:2026-10-13T07:20:38.953Z  INFO [] 23670 --- [matbakhy] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+22:2026-10-13T07:20:39.028Z  INFO [] 23670 --- [matbakhy] [           main] o.f.c.i.c.SqlScriptCallbackFactory       : Executing SQL callback: afterMigrate - 
+28:2026-10-13T07:20:42.986Z  INFO [] 23670 --- [matbakhy] [           main] com.matbakhy.app.MatbakhyApplication     : Started MatbakhyApplication in 9.045 seconds (process running for 9.753)

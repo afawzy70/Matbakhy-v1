@@ -6,7 +6,7 @@
       "id": "MB-001",
       "phase": "P00",
       "title": "Reconcile scope and repository baseline",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [],
       "implementation_steps": [
@@ -26,15 +26,17 @@
       "scenario_ids": [
         "TC-101"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-001/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 1a1fdadac8b0f4bff2cefdf4a9c791ed150f12d8; SELF_REVIEW only"
     },
     {
       "id": "MB-002",
       "phase": "P00",
       "title": "Freeze traceable MVP backlog",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-001"
@@ -56,15 +58,17 @@
       "scenario_ids": [
         "TC-102"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-002/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 1a1fdadac8b0f4bff2cefdf4a9c791ed150f12d8; SELF_REVIEW only"
     },
     {
       "id": "MB-003",
       "phase": "P00",
       "title": "Prepare editable brand system",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-001"
@@ -86,15 +90,17 @@
       "scenario_ids": [
         "TC-103"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-003/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 430fb9371ad673acbd7665345811f0558a7bc766; SELF_REVIEW only; brand is a draft pending owner approval (O05)"
     },
     {
       "id": "MB-004",
       "phase": "P00",
       "title": "Produce reviewable UX package",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-002",
@@ -117,15 +123,17 @@
       "scenario_ids": [
         "TC-104"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-004/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source be2562757e27b2124283f7d3d051c9bb9052f872; SELF_REVIEW only; owner visual approval PENDING (docs/design/approval.md)"
     },
     {
       "id": "MB-005",
       "phase": "P01",
       "title": "Pin workspace and compatible toolchain",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-002"
@@ -149,15 +157,18 @@
       "scenario_ids": [
         "TC-105"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-005-native/evidence.json",
+        "verification/runs/20261011-MB-005/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "DONE at source 34be845bc5ab5b283c3c62998b090eff71a80f19: local clean-checkout workspace compile (verification/runs/20261011-P01-local-34be845) plus native Android Gradle and iOS Xcode simulator compilation on GitHub-hosted runners (run 38128068345), separate evidence per platform; SELF_REVIEW; no device verification"
     },
     {
       "id": "MB-006",
       "phase": "P01",
       "title": "Establish database and module boundaries",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -179,15 +190,18 @@
       "scenario_ids": [
         "TC-106"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-006/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "DONE after dependency MB-005 closed: affected checks re-run at 34be845bc5ab5b283c3c62998b090eff71a80f19 (verification/runs/20261011-P01-local-34be845); original story evidence retained; SELF_REVIEW"
     },
     {
       "id": "MB-007",
       "phase": "P01",
       "title": "Implement contract toolchain",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005"
@@ -209,15 +223,18 @@
       "scenario_ids": [
         "TC-107"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-007/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "DONE after dependency MB-005 closed: affected checks re-run at 34be845bc5ab5b283c3c62998b090eff71a80f19 (verification/runs/20261011-P01-local-34be845); original story evidence retained; SELF_REVIEW"
     },
     {
       "id": "MB-008",
       "phase": "P01",
       "title": "Create local stack and required CI commands",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-006",
@@ -241,15 +258,18 @@
       "scenario_ids": [
         "TC-108"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-008/evidence.json",
+        "verification/runs/20261011-P01-local-34be845/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "DONE after dependency MB-005 closed: affected checks re-run at 34be845bc5ab5b283c3c62998b090eff71a80f19 (verification/runs/20261011-P01-local-34be845); original story evidence retained; SELF_REVIEW"
     },
     {
       "id": "MB-009",
       "phase": "P02",
       "title": "Integrate identity and sessions",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-008"
@@ -277,15 +297,17 @@
         "TC-002",
         "TC-109"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-009/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 44d5a558d4f1f20039657dce70c39f7ec4efb609 (attempt 1 at 2edf3ef failed secret scan, repaired); SELF_REVIEW only"
     },
     {
       "id": "MB-010",
       "phase": "P02",
       "title": "Build profile address and phone verification",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-009"
@@ -315,15 +337,17 @@
         "TC-005",
         "TC-110"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-010/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 0724f73e3a41483650ca28d7b7295b3808d4f100; SELF_REVIEW only; quote-path parts of TC-003/TC-005 re-exercised in MB-017"
     },
     {
       "id": "MB-011",
       "phase": "P02",
       "title": "Enforce scoped permissions and auditing",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-009"
@@ -351,15 +375,17 @@
         "TC-007",
         "TC-111"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-011/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source 4dcc1170960fe289c2d4bfd5f265bd61be1487fd; SELF_REVIEW only; kitchen/order/case scope re-exercised as those modules land"
     },
     {
       "id": "MB-012",
       "phase": "P02",
       "title": "Implement cook application workflow",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -386,15 +412,17 @@
         "TC-009",
         "TC-112"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-012/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: application documents with MB-013/O06; reapplication after rejection pending O06; cook self-pause and suspension order impact with cook workspace/orders; real MFA login not configured locally."
     },
     {
       "id": "MB-013",
       "phase": "P03",
       "title": "Implement safe media lifecycle",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-008",
@@ -422,15 +450,17 @@
         "TC-010",
         "TC-113"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-013/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: emulator cannot prove bucket privacy or signed-URL expiry (verify on production provider, O07/P09); static PDF marker check; no public delete endpoint; required document kinds/retention O06."
     },
     {
       "id": "MB-014",
       "phase": "P03",
       "title": "Implement meals and publication",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-012",
@@ -458,15 +488,17 @@
         "TC-012",
         "TC-114"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-014/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: slots/availability (MB-015/016), ratings (MB-024), order history/reorder re-test (MB-017/019), moderation (MB-023)."
     },
     {
       "id": "MB-015",
       "phase": "P03",
       "title": "Implement dated slots and capacity",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-014"
@@ -495,15 +527,17 @@
         "TC-015",
         "TC-115"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-015/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: counters written by MB-018/019; slot cancellation with obligations via ops (MB-019/023); one-local-date slots (proposed default)."
     },
     {
       "id": "MB-016",
       "phase": "P03",
       "title": "Implement serviceable discovery",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-014",
@@ -531,15 +565,17 @@
         "TC-017",
         "TC-116"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-016/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Residuals: favorites unavailable presentation (MB-028); search index/EXPLAIN before pilot; zones cityId filter not implemented."
     },
     {
       "id": "MB-017",
       "phase": "P04",
       "title": "Implement authoritative quotes",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -572,15 +608,17 @@
         "TC-021",
         "TC-117"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-017/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Synthetic policy values pending O04; placement uses requireValid in MB-018; basket replacement prompt is a client story."
     },
     {
       "id": "MB-018",
       "phase": "P04",
       "title": "Implement atomic order placement",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-017",
@@ -613,15 +651,17 @@
         "TC-025",
         "TC-118"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-018/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Lifecycle, outbox worker, expiry and handover in MB-019; finance posting MB-020/025; pilot-volume load test P08."
     },
     {
       "id": "MB-019",
       "phase": "P04",
       "title": "Implement lifecycle and handover",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-018"
@@ -656,15 +696,17 @@
         "TC-031",
         "TC-119"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-019/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Cancellation requests with MB-024; ops order list/view, cook dashboard and outbox worker later; handover parameters proposed defaults."
     },
     {
       "id": "MB-020",
       "phase": "P04",
       "title": "Implement cash and ledger core",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-018",
@@ -692,15 +734,17 @@
         "TC-033",
         "TC-120"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-020/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Refunds/statements/settlements MB-025; discrepancy cases MB-024; real rates O04."
     },
     {
       "id": "MB-021",
       "phase": "P04",
       "title": "Implement outbox and notifications",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-018"
@@ -728,15 +772,17 @@
         "TC-038",
         "TC-121"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-021/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Leased outbox dispatch, persistent inbox, bounded email/push delivery with dead letter, encrypted devices, ops health/replay; self-reviewed; providers are LOCAL/CI stand-ins until O07."
     },
     {
       "id": "MB-022",
       "phase": "P05",
       "title": "Build cook workspace",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-012",
@@ -763,15 +809,17 @@
       "scenario_ids": [
         "TC-122"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-022/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Cook workspace (operations web) on the real API with dashboard/settings/statement endpoints and a Playwright workflow; self-reviewed; refunds/remittances in statements await MB-025."
     },
     {
       "id": "MB-023",
       "phase": "P05",
       "title": "Build operations approval and moderation",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-012",
@@ -797,15 +845,17 @@
       "scenario_ids": [
         "TC-123"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-023/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Staff review queue, kitchen state with impact, meal moderation and step-up prompt; self-reviewed. Review moderation (API-073) carried to MB-028 because customer reviews do not exist before it; not claimed here."
     },
     {
       "id": "MB-024",
       "phase": "P05",
       "title": "Build support and order exceptions",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-019",
@@ -832,15 +882,17 @@
         "TC-041",
         "TC-124"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-024/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Support cases with private staff notes, safety escalation and SLA; cancellation requests resolved through audited exception cancellation; ops order monitoring; self-reviewed. Proposed SLA/category defaults recorded."
     },
     {
       "id": "MB-025",
       "phase": "P05",
       "title": "Build finance operations",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-020",
@@ -871,15 +923,17 @@
         "TC-036",
         "TC-125"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-025/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Full refunds bounded by verified collection with commission reversal, unique reviewed settlements with remittance evidence, separation of duties; self-reviewed. Finance UI component-tested; not in the browser workflow. Proposed defaults await O04."
     },
     {
       "id": "MB-026",
       "phase": "P05",
       "title": "Build operating configuration and staff controls",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-011",
@@ -909,15 +963,17 @@
         "TC-043",
         "TC-126"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-026/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Versioned configuration (policy, zones, ordering switch) with append-only change log, approval guard and MFA; staff permissions UI; self-reviewed. Scheduled changes not supported; real policy values O04."
     },
     {
       "id": "MB-027",
       "phase": "P06",
       "title": "Complete customer web purchase flow",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-016",
@@ -946,17 +1002,25 @@
       "scenario_ids": [
         "TC-044",
         "TC-045",
-        "TC-127"
+        "TC-127",
+        "TC-149",
+        "TC-150",
+        "TC-151",
+        "TC-152"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-027/evidence.json",
+        "verification/runs/20261012-QA-REPAIR/evidence.json",
+        "verification/runs/20261012-MB-032/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Customer web purchase flow on the real API with stable-key placement verified in the browser; self-reviewed; draft visuals until O05."
     },
     {
       "id": "MB-028",
       "phase": "P06",
       "title": "Complete customer account and trust features",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -970,7 +1034,9 @@
         "favorites/share links",
         "verified-order reviews/report",
         "reorder via new quote",
-        "inbox/support"
+        "inbox/support",
+        "Review moderation for staff (API-073), carried from MB-023 because reviews are created in this story",
+        "Basket replacement confirmation in the customer web (BR-018 client part, split from TC-018 on 2026-10-11)"
       ],
       "artifacts": [
         "apps/customer-web",
@@ -986,17 +1052,20 @@
       "scenario_ids": [
         "TC-039",
         "TC-040",
-        "TC-128"
+        "TC-128",
+        "TC-147"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261011-MB-028/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Verified at bec5830 (attempt 2; attempt 1 at fe94d8b failed only the stale traceability matrix). Includes staff review queue API-098 and the web basket-replacement confirmation (TC-147, split from TC-018). Customer screens use the approved palette and Cairo but still the draft layout; restyle to the approved homepage hierarchy pending."
     },
     {
       "id": "MB-029",
       "phase": "P06",
       "title": "Verify accessibility RTL and responsive behavior",
-      "status": "TODO",
+      "status": "BLOCKED",
       "priority": "P0",
       "depends_on": [
         "MB-022",
@@ -1030,9 +1099,11 @@
         "TC-047",
         "TC-129"
       ],
-      "evidence": [],
+      "evidence": [
+        "verification/runs/20261012-MB-029/evidence.json"
+      ],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": "Not DONE. Evidence at 6a84b26 (self-review): TC-046 and TC-129 PASS; TC-047 BLOCKED on screen-reader testing (BLK-003). Keyboard, focus and layout parts verified in the browser."
     },
     {
       "id": "MB-030",
@@ -1069,7 +1140,7 @@
       "id": "MB-031",
       "phase": "P07",
       "title": "Build native shell and authentication",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-005",
@@ -1097,15 +1168,17 @@
         "TC-048",
         "TC-131"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261012-MB-031/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Native shell and authentication: release variants launch and the system-browser PKCE sign-in round trip passes on an Android emulator and an iOS simulator (native run 19) at fd689aa; fixed a defect where sign-in after sign-out or account switch silently reused the previous person's browser login. Emulator/simulator only; device and store builds are MB-034/MB-035. TC-048 order-link clause verified server-side; native re-check in MB-033. 2026-10-13: defect found in native runs 36/37 (iOS) — the app never used its refresh token, so the first request after the 5-minute access-token lifetime got 401, ended the session and cleared the basket. Fixed in c4b1598 (refresh before requests, one shared refresh, refused refresh ends the session); unit and app tests red first (verification/runs/20261013-MB-031-REFRESH). Native confirmation: iOS ordering phase H (about 10 minutes after sign-in) in the candidate E native run."
     },
     {
       "id": "MB-032",
       "phase": "P07",
       "title": "Implement native discovery and ordering",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-031",
@@ -1132,17 +1205,20 @@
       ],
       "scenario_ids": [
         "TC-049",
-        "TC-132"
+        "TC-132",
+        "TC-148"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261012-MB-032/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Evidence at source cdc592a (SELF_REVIEW): six local checks PASS; native run 31 Android emulator and iOS simulator ordering PASS (keep/replace, kill during submit, offline reopen, one recovered order with one set of side effects, total parity). Delivery checkout not exercised natively."
     },
     {
       "id": "MB-033",
       "phase": "P07",
       "title": "Implement native lifecycle push and accessibility",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-032",
@@ -1171,7 +1247,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004). 2026-10-13: native dynamic-text phases (Android font scale 2.0, iOS accessibility XXXL; English and Arabic; discover, meal, cart, checkout, orders, order, notifications, support; screenshots as CI artifacts) and provider-independent notification permission (asked only on request; refusal safe; development builds only while O07 is open) added; native refusal phases on both platforms. Visual review of the screenshots by a person is still needed. Push delivery (O07), screen readers (BLK-003) and physical devices (BLK-004) remain open; not DONE. 2026-10-13 evening: TC-050 observed on both platforms (iOS run 40 phase J at 9c0db34, verification/runs/20261013-MB-033-NATIVE/NATIVE-dfec36a.log; Android runs 43/46/47, verification/runs/20261013-NATIVE-43/) recorded as evidence run verification/runs/20261013-TC-050 at 60b833d: TC-050 PASS. Android every phase PASS in runs 43, 46, 47. iOS reruns after run 40 blocked by the simulator Save Password prompt in the sign-in harness (BLK-005). Still open: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots; not DONE. Native run 48 at f05e3d6: iOS every phase A-K PASS (BLK-005 resolved), Android every phase PASS."
     },
     {
       "id": "MB-034",
@@ -1279,7 +1355,7 @@
       "id": "MB-037",
       "phase": "P08",
       "title": "Prove concurrency retries and recovery",
-      "status": "TODO",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-019",
@@ -1309,9 +1385,11 @@
         "TC-058",
         "TC-137"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": null
+      "evidence": [
+        "verification/runs/20261012-MB-037/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Self-reviewed. Evidence at e512ac4: racing posting instances, exact deadline boundary, database outage (found and fixed missing socket timeout; 503 DEPENDENCY_UNAVAILABLE), restart recovery across two application instances, crash between provider send and recording. Residuals: at-least-once external sends; batch ends on a recording error (delay, not loss); load/multi-node in MB-038/staging."
     },
     {
       "id": "MB-038",
@@ -1354,7 +1432,7 @@
       "id": "MB-039",
       "phase": "P08",
       "title": "Implement privacy observability and recovery tooling",
-      "status": "TODO",
+      "status": "IN_PROGRESS",
       "priority": "P0",
       "depends_on": [
         "MB-010",
@@ -1366,15 +1444,18 @@
         "redacted structured logs/metrics/alerts",
         "migration checks",
         "backup/restore automation",
-        "provider outage dashboards"
+        "provider outage dashboards",
+        "Complete owner-requested audit/log readiness work package in docs/operations/05-observability-readiness.md at the next eligible checkpoint; preserve active MB-032 and QA work"
       ],
       "artifacts": [
         "infra",
         "scripts",
-        "docs/operations"
+        "docs/operations",
+        "docs/operations/05-observability-readiness.md"
       ],
       "acceptance": [
-        "No PII/secrets in captured logs; restored staging database reconciles orders/stock/ledger; deletion policy enforced"
+        "No PII/secrets in captured logs; restored staging database reconciles orders/stock/ledger; deletion policy enforced",
+        "Audit transaction/permission coverage, redacted cross-worker log correlation, bounded searchable logs and exercised operational alerts have exact-SHA evidence per docs/operations/05-observability-readiness.md; deployed checks remain explicit until executed"
       ],
       "rule_ids": [
         "BR-055",
@@ -1389,7 +1470,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": " 2026-10-13 local (self-review): runtime DB role (owner migrates, API least privilege; 12 forbidden statements refused); audit-write failure fault-injected (denial still 403; critical change rolls back); Prometheus only on the management port; gauges bounded during a DB outage (defect found, fixed); local Loki/Alloy/Prometheus/Alertmanager/Grafana stack rehearsed (search by request ID, retention across redeploy/restart, collector outage, alerts to a local test sink) and runbook rehearsal against a deliberately failed outbox event (staff retry API NOT_RUN). Evidence: verification/runs/20261013-MB-039-LOCAL. Deployed checks AUD-01/LOG-01/OPS-01..03 NOT_RUN (MB-040); retention O06; real alert routing O07. 2026-10-13 evening: TC-056 PASS at the local test level (verification/runs/20261013-TC-056 at 1aa501a): logs and metrics hold no tokens, OTPs, contact, address, document content, deposit recipient, transfer reference or activity visitor id; deployed LOG-01 still NOT_RUN. TC-055 PASS under the fixture policy (verification/runs/20261013-TC-055 at 0a94978); defect found and fixed: erasure failed for customers with a support reply and left deposit transfer references (V27, 241a166). Preview backups now count only after a restore check (BR-057, deploy.sh). TC-057 (staging restore, RPO/RTO) and deployed checks remain."
     },
     {
       "id": "MB-040",
@@ -1410,14 +1491,16 @@
         "separate sandbox credentials",
         "TLS/config checks",
         "deploy pinned artifacts and migrations",
-        "smoke and rollback rehearsal"
+        "smoke and rollback rehearsal",
+        "Verify AUD-01/LOG-01/OPS-01..03 from docs/operations/05-observability-readiness.md before external tester access, including an early web preview; preserve full-story dependencies"
       ],
       "artifacts": [
         "infra",
         "verification/runs"
       ],
       "acceptance": [
-        "Staging web/ops/native point to same tested API; restored/redeployed release works without fake production providers"
+        "Staging web/ops/native point to same tested API; restored/redeployed release works without fake production providers",
+        "Deployed audit/log readiness checklist is evidenced before external tester access; local evidence alone does not satisfy staging readiness"
       ],
       "rule_ids": [
         "BR-060"
@@ -1626,6 +1709,251 @@
       "evidence": [],
       "review_status": "NOT_RUN",
       "completion_note": null
+    },
+    {
+      "id": "MB-048",
+      "phase": "P07",
+      "title": "Show kitchen meal price history (D14)",
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "MB-014",
+        "MB-022"
+      ],
+      "implementation_steps": [
+        "Owner-scoped price-history read derived from immutable meal revisions (no new store)",
+        "Kitchen meal management: active price label and previous changes with Africa/Cairo time and EGP",
+        "Explain that new prices affect only orders not yet placed"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web",
+        "contracts"
+      ],
+      "acceptance": [
+        "The active price is labelled and equals the authoritative current meal price; previous actual price changes are listed newest first with their saved time (Africa/Cairo, EGP); edits that did not change the price add no entry; no fabricated dates or prices",
+        "Another kitchen's meal history is not found; no staff notes or personal data are exposed; history cannot be edited or deleted (out of scope: scheduled or bulk pricing, promotions, analytics, rollback)"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-153"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-048/evidence.json",
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D14 kitchen price history at bc305c6 (self-review): API-099 owner-scoped, derived from immutable meal revisions (no entry for edits without a price change; read-only; meal_revision UPDATE/DELETE refused for the runtime role, RuntimeRoleIntegrationTest); cook UI with Active price and previous prices in Africa/Cairo time; browser journey on the real stack changes a price through it. TC-153 PASS."
+    },
+    {
+      "id": "MB-049",
+      "phase": "P07",
+      "title": "Informed reconfirmation of changed prices before placement (D13, RQ-004)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-017",
+        "MB-018",
+        "MB-027",
+        "MB-032"
+      ],
+      "implementation_steps": [
+        "Serialize concurrent price/fee/policy updates and placement (share locks during revalidation)",
+        "Web and native: on PRICE_CHANGED re-quote, show previous and new affected prices and totals with accurate attribution, require explicit acceptance before placing",
+        "Recover a committed order with a lost response at its original price"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/customer-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "A stale quote is refused at placement with a recoverable reason, consumes no stock and creates no order or obligation; the customer sees the previous and new affected prices and total attributed to the kitchen only for meal prices, and must explicitly accept the fresh quote before placing; editing the basket or leaving stays possible; a refresh failure or second change requires review again",
+        "Concurrent update and placement are serialized (update first: re-quote required; placement first: order kept at its committed price); a committed order with a lost response is recovered at its original price without a second order; committed orders and their financial calculations never change after later price changes; verified on web, Android emulator and iOS simulator"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-154",
+        "TC-155",
+        "TC-156"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-049/evidence.json",
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D13 at bc305c6 = QA candidate E (self-review): TC-155/156 PASS (backend verify, real PostgreSQL); TC-154 PASS on web (component tests red first; real-stack browser journey in BROWSER-E2E), Android emulator and iOS simulator (native run 39 phase H: notice with old/new prices and totals, no order at the stale price, placed only after explicit acceptance, stored 13000|13000|1). The run 39 workflow failed later, in the MB-033 dynamic-text phase (not D13). Independent retest pending."
+    },
+    {
+      "id": "MB-050",
+      "phase": "P07",
+      "title": "Zero platform commission and fees at launch (D10)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-020",
+        "MB-025",
+        "MB-026",
+        "MB-027"
+      ],
+      "implementation_steps": [
+        "Server and database refuse a non-zero commission rate for live policies; the development policy is 0%",
+        "Ledger, statements and finance views carry zero commission without hiding non-zero amounts",
+        "Customer, cook and ops screens show no platform commission or service fee; regression tests updated"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/customer-web",
+        "apps/operations-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "No commission or platform/service fee is calculated, stored as non-zero, posted to the ledger or shown in customer web, Android, iOS, cook or ops screens at launch; a non-zero commission configuration is refused by the server; the dormant capability stays testable only in synthetic test fixtures"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-157"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-050/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D10 at 07d7236 (self-review): server refuses non-zero commission; V23 database check for live policies; development policy 0%; launch order carries 0 commission from quote to ledger and statement; cook statement, ops finance and configuration say there is no platform commission; customer apps never show commission or a service fee. TC-157 PASS. Dormant commission arithmetic covered only by synthetic fixtures."
+    },
+    {
+      "id": "MB-051",
+      "phase": "P07",
+      "title": "Deposit-required checkout and separated payment state (D16)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-017",
+        "MB-018",
+        "MB-019",
+        "MB-020",
+        "MB-050"
+      ],
+      "implementation_steps": [
+        "Quote and immutable order snapshot: deposit due, remainder, method, approved kitchen recipient identifier, expiry, terms",
+        "Payment state machine separate from order and fulfilment states: WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, EXPIRED/RECONCILE_PENDING",
+        "No preparation before kitchen-reported receipt and separate acceptance; race-safe expiry and capacity"
+      ],
+      "artifacts": [
+        "backend",
+        "contracts"
+      ],
+      "acceptance": [
+        "Eligible COD and deposit-required orders have correct integer EGP amounts, recipient and remainder in an immutable snapshot; a customer's transfer report never counts as payment; preparation is impossible before kitchen-reported receipt and acceptance; nothing is labelled bank verified; expiry after a reported transfer reconciles instead of silently closing; development/test fixtures only, live money blocked"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-158",
+        "TC-159",
+        "TC-160"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-051/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Server part of D16 at 61d8dd5 (self-review): kitchen payment profile, COD/deposit quote terms with stale-terms refusal, immutable order_payment snapshot and append-only payment_event, API-100 customer transfer report (idempotent, not payment), API-101 kitchen receipt report (exact amount, not bank verification), preparation gate, reconciliation on close. TC-158/159/160 PASS. Limits recorded in docs/product/09-deposit-payment-states.md. Synthetic data only; live money blocked."
+    },
+    {
+      "id": "MB-052",
+      "phase": "P07",
+      "title": "Kitchen receipt acknowledgement, mismatches, disputes and refunds (D16)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-051",
+        "MB-022",
+        "MB-024",
+        "MB-025"
+      ],
+      "implementation_steps": [
+        "Cook acknowledges receipt or reports not received/mismatch with identity, time, amount, optional reference and reason (audited)",
+        "Ops dispute and reconciliation queue; refund obligations with clear owner; no fabricated confirmation"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Kitchen-reported receipt, not-received and mismatched-amount paths are audited and object-scoped; disputes pause processing and reach ops; a kitchen that cannot fulfil after reported receipt records a refund obligation; staff cannot mark funds received without the kitchen's report; cross-kitchen payment data is not visible"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-161",
+        "TC-162"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-052/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D16 kitchen acknowledgement at 49a55f1 (self-review): staff-approved recipients (finance.verify with recent MFA, audited; a changed recipient needs re-approval), kitchen not-received and wrong-amount reports to DISPUTED, finance queue, refund obligation (REFUND_OWED, audited, ended orders only) and kitchen refund report (REFUNDED), no staff path to mark money received; cook and finance screens (API-103..109). TC-161/162 PASS. Follow-ups: automatic support case and customer notification for DISPUTED/REFUND_OWED. Synthetic data only; live money blocked."
+    },
+    {
+      "id": "MB-053",
+      "phase": "P07",
+      "title": "Deposit checkout and payment status on web, Android and iOS (D16)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-051",
+        "MB-027",
+        "MB-032"
+      ],
+      "implementation_steps": [
+        "Shared contract: recipient, amount, expiry and terms; 'I transferred' with optional reference; status and next steps",
+        "Arabic RTL and English LTR parity; native verification"
+      ],
+      "artifacts": [
+        "apps/customer-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "Customers see the approved recipient, amount, expiry and refund/cancellation terms before placing, can report a transfer once (idempotent), and always see an honest payment status (reported by you, reported by the kitchen, disputed) on web, Android and iOS; no 'bank verified' or 'protected' claims"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-163"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-053/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D16 customer deposit checkout and honest status on web (6d5d2d0), Android and iOS (6611e69, native phase 49a55f1). TC-163 PASS (evidence at 6b7741f): component tests on web and native, deposit integration tests, native run 48 at f05e3d6 with the full deposit journey on the Android emulator and the iOS simulator (iOS after BLK-005 was resolved with an XCTest interruption monitor; sign-in real). Self-review; synthetic data; live money blocked (D16)."
+    },
+    {
+      "id": "MB-054",
+      "phase": "P08",
+      "title": "Privacy-safe organic activity and kitchen performance metrics (D17)",
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "MB-016",
+        "MB-022",
+        "MB-050"
+      ],
+      "implementation_steps": [
+        "Deduplicated, consent/privacy-compliant events: impressions, views, add-to-cart, quotes, orders, fulfilment, cancellations, repeat orders, capacity, GMV",
+        "Free cook report: gross sales, refunds, known net amounts, definitions and windows; no profit claims"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Activity counts are deduplicated and robust to refresh/bot inflation, scoped per kitchen, contain no personal targeting data, distinguish gross sales from net amounts and never claim profit; no sponsored ranking, campaign or billing exists"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-164"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-054/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D17 Stage 2 at a89151f (self-review): API-110 organic activity counted once per visitor, kind, subject and Cairo day with only a per-day keyed hash stored; API-111 cook insights (activity, orders, portions, gross, paid refunds, known net; NET_IS_NOT_PROFIT); customer web events; cook Insights tab. TC-164 PASS (BACKEND-VERIFY, CONTRACT-CHECK, WORKSPACE-TESTS, BROWSER-E2E at a89151f). Real-stack browser check at 51c1c96 (test-only change): an anonymous visitor's impression, view and add-to-cart are stored. Limits in docs/product/10-organic-activity-and-cook-insights.md (native apps not instrumented, rotating bots need edge limits, retention under O06). No ranking, campaign, billing or profit figure."
     }
   ]
 }

@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-023",
+  "phase": "P05",
+  "source_commit": "1ce81e4244814d75b8c3cf11139161a4621c121b",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T15:41:57.987176+00:00",
+  "finished_at": "2026-10-11T15:52:37.291359+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. ModerationIntegrationTest and identity step-up (PostgreSQL, Keycloak)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-023/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-023/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-023/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Cook and staff browser workflow against the real local stack (Playwright, Chromium)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-023/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-023/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-023/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-123",
+      "status": "PASS",
+      "observed": "ModerationIntegrationTest: hiding a published meal (content.moderate; cook and cook.review 403; reason required 422; stale version 409; repeat 409) removes it from discovery, public detail (404) and quotes; the cook's content and status are unchanged, the cook sees HIDDEN with the reason, and pause/republish does not lift it; the catalogue lists it without private kitchen data; restore makes it discoverable and orderable again; two audit events. Suspension (cook.review with MFA) reports activeOrders PENDING_ACCEPTANCE 1 and removes the kitchen's meals from discovery, detail and checkout; restore re-enables them. Identity: stepUp=true sends acr_values and max_age=0 with PKCE. Browser workflow (scripts/dev.sh e2e): ops-a without grants sees no staff sections; with synthetic content.moderate and cook.review grants sees reviews and catalogue but not cook tabs; hides the meal (public detail 404, customer quote refused) and restores it (detail 200); opens the approved application with private location and the kitchen panel with impact; a suspension attempt without MFA shows the step-up link (stepUp=true) and the kitchen stays ACTIVE; the cook gets 403 on the catalogue. Operations web component tests: reviewer queue, signed document link, decision body and step-up prompt; moderation needs a reason. Private documents: never in public responses (MediaIntegrationTest/CookWorkflowIntegrationTest within backend verify). Approval reflection: no kitchen means no workspace and no selling (cook workflow tests, browser onboarding state). Mutations dropping the discovery or quote filter failed the tests."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-023/BACKEND-VERIFY.log",
+    "verification/runs/20261011-MB-023/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-023/LOCAL-STACK.log",
+    "verification/runs/20261011-MB-023/BROWSER-E2E.log",
+    "verification/runs/20261011-MB-023/SECRET-SCAN.log",
+    "verification/runs/20261011-MB-023/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-023/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Moderation enforced in discovery, detail and quotes; mutations detected.",
+      "Impact summary via cooks.api port implemented by orders (acyclic modules).",
+      "Not done: review moderation (API-073) needs reviews from MB-028; carried there, not claimed.",
+      "Residual: MFA step-up actions cannot complete on local Keycloak (UI prompt verified; decisions covered by backend MFA tests); synthetic SQL grants in the browser workflow."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

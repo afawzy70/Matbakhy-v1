@@ -1,0 +1,66 @@
+[
+  {
+    "lang": "ar",
+    "viewport": "phone",
+    "width": 390,
+    "status": "PASS",
+    "steps": [
+      "discovery",
+      "empty zone",
+      "sold out meal cannot be added",
+      "delivery checkout and order tracking",
+      "pickup checkout has no delivery fee",
+      "stock changed blocks submission",
+      "cook accepts and rejects within deadline",
+      "operations approves cook and opens cash discrepancy case"
+    ]
+  },
+  {
+    "lang": "ar",
+    "viewport": "desktop",
+    "width": 1280,
+    "status": "PASS",
+    "steps": [
+      "discovery",
+      "empty zone",
+      "sold out meal cannot be added",
+      "delivery checkout and order tracking",
+      "pickup checkout has no delivery fee",
+      "stock changed blocks submission",
+      "cook accepts and rejects within deadline",
+      "operations approves cook and opens cash discrepancy case"
+    ]
+  },
+  {
+    "lang": "en",
+    "viewport": "phone",
+    "width": 390,
+    "status": "PASS",
+    "steps": [
+      "discovery",
+      "empty zone",
+      "sold out meal cannot be added",
+      "delivery checkout and order tracking",
+      "pickup checkout has no delivery fee",
+      "stock changed blocks submission",
+      "cook accepts and rejects within deadline",
+      "operations approves cook and opens cash discrepancy case"
+    ]
+  },
+  {
+    "lang": "en",
+    "viewport": "desktop",
+    "width": 1280,
+    "status": "PASS",
+    "steps": [
+      "discovery",
+      "empty zone",
+      "sold out meal cannot be added",
+      "delivery checkout and order tracking",
+      "pickup checkout has no delivery fee",
+      "stock changed blocks submission",
+      "cook accepts and rejects within deadline",
+      "operations approves cook and opens cash discrepancy case"
+    ]
+  }
+]

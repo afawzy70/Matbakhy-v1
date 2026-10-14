@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "status": "DESIGN_NOT_IMPLEMENTED",
-  "note": "OIDC authorization/callback/logout routes are framework-managed and must be documented after provider/client spike. This inventory is not complete OpenAPI. Expand validated request/response schemas in MB-007 before client implementation.",
+  "note": "Route inventory. contracts/openapi.yaml (MB-007) is the typed contract; packages/api-client tests fail when the two disagree on method, path, permission or implementation state. OIDC authorization/callback/logout routes are framework-managed and documented in MB-009.",
   "endpoints": [
     {
       "id": "API-001",
@@ -9,8 +9,8 @@
       "path": "/api/v1/configuration/public",
       "permission": "PUBLIC",
       "response_type": "PublicConfiguration",
-      "contract": "locale, zones summary, enabled fulfillment modes, support/public policy versions only",
-      "implemented": false
+      "contract": "Ordering availability and order limits from the active commerce policy (per-line quantity limit, lines per order, policy version); locale, zones summary, fulfillment modes and support/public policy versions are not served yet; never commission, tax or staff-only fields",
+      "implemented": true
     },
     {
       "id": "API-002",
@@ -19,7 +19,7 @@
       "permission": "PUBLIC",
       "response_type": "ZonePage",
       "contract": "cityId, active=true, cursor, limit; no private cook locations",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-003",
@@ -28,7 +28,7 @@
       "permission": "PUBLIC",
       "response_type": "MealPage",
       "contract": "q, zoneId, date, slotId, categoryId, minPriceMinor, maxPriceMinor, sort, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-004",
@@ -37,7 +37,7 @@
       "permission": "PUBLIC",
       "response_type": "MealDetail",
       "contract": "published public meal or 404",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-005",
@@ -46,7 +46,7 @@
       "permission": "PUBLIC",
       "response_type": "KitchenPublic",
       "contract": "public profile, operational approval label and visible rating summary",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-006",
@@ -55,7 +55,7 @@
       "permission": "PUBLIC",
       "response_type": "SlotPage",
       "contract": "date, fulfillmentMode, zoneId; future eligible slots",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-007",
@@ -64,7 +64,7 @@
       "permission": "PUBLIC",
       "response_type": "ReviewPage",
       "contract": "visible only, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-008",
@@ -82,7 +82,7 @@
       "permission": "AUTHENTICATED",
       "response_type": "CustomerProfile",
       "contract": "current subject mapping, contact verification, locale and scoped capabilities",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-010",
@@ -91,7 +91,7 @@
       "permission": "SELF",
       "response_type": "CustomerProfile",
       "contract": "displayName, locale, expectedVersion; no role fields",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-011",
@@ -100,7 +100,7 @@
       "permission": "SELF",
       "response_type": "PhoneChallenge",
       "contract": "phoneE164; generic response, expiry/resend limit; dev OTP never in production response",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-012",
@@ -109,7 +109,7 @@
       "permission": "SELF",
       "response_type": "VerificationResult",
       "contract": "code, expected challenge ownership; single use",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-013",
@@ -118,7 +118,7 @@
       "permission": "SELF",
       "response_type": "AddressPage",
       "contract": "own addresses only",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-014",
@@ -127,7 +127,7 @@
       "permission": "SELF",
       "response_type": "Address",
       "contract": "label, recipient, phone, zoneId, street, building, optional floor/unit/landmark/coordinates",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-015",
@@ -136,7 +136,7 @@
       "permission": "SELF",
       "response_type": "Address",
       "contract": "allowed address fields, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-016",
@@ -145,7 +145,7 @@
       "permission": "SELF",
       "response_type": "NoContent",
       "contract": "archive own address; historical snapshots retained",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-017",
@@ -154,7 +154,7 @@
       "permission": "SELF",
       "response_type": "DeletionRequest",
       "contract": "confirmed intent and current policy; idempotent request",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-018",
@@ -163,7 +163,7 @@
       "permission": "SELF",
       "response_type": "FavoritePage",
       "contract": "own, cursor, limit; unavailable items annotated",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-019",
@@ -172,7 +172,7 @@
       "permission": "SELF",
       "response_type": "Favorite",
       "contract": "idempotent add",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-020",
@@ -181,7 +181,7 @@
       "permission": "SELF",
       "response_type": "NoContent",
       "contract": "idempotent remove",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-021",
@@ -190,7 +190,7 @@
       "permission": "CUSTOMER",
       "response_type": "QuoteResponse",
       "contract": "QuoteRequest; verified contact; one cook/slot; authoritative amounts",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-022",
@@ -199,7 +199,7 @@
       "permission": "CUSTOMER",
       "response_type": "OrderView",
       "contract": "PlaceOrderRequest; Idempotency-Key required; returns 201 plus Location",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-023",
@@ -208,7 +208,7 @@
       "permission": "SELF",
       "response_type": "OrderPage",
       "contract": "state group, cursor, limit; own orders",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-024",
@@ -217,7 +217,7 @@
       "permission": "SELF",
       "response_type": "OrderView",
       "contract": "lookup permanent request reference for unknown response recovery",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-025",
@@ -226,7 +226,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "OrderView",
       "contract": "customer-scoped fields including available handover challenge",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-026",
@@ -235,7 +235,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "OrderEventPage",
       "contract": "afterSequence, cursor, limit; chronological immutable events",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-027",
@@ -244,7 +244,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode; pending only; Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-028",
@@ -253,7 +253,7 @@
       "permission": "ORDER_OWNER",
       "response_type": "SupportCase",
       "contract": "expectedVersion, reasonCode, note; accepted or later; no direct transition",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-029",
@@ -262,16 +262,16 @@
       "permission": "ORDER_OWNER",
       "response_type": "Review",
       "contract": "rating, text; completed only, unique order",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-030",
       "method": "POST",
       "path": "/api/v1/reviews/{reviewId}/reports",
       "permission": "AUTHENTICATED",
-      "response_type": "Report",
+      "response_type": "NoContent",
       "contract": "reasonCode, bounded description; rate limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-031",
@@ -280,7 +280,7 @@
       "permission": "SELF",
       "response_type": "NotificationPage",
       "contract": "unreadOnly, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-032",
@@ -289,7 +289,7 @@
       "permission": "SELF",
       "response_type": "Notification",
       "contract": "idempotent mark read",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-033",
@@ -298,7 +298,7 @@
       "permission": "SELF",
       "response_type": "DeviceRegistration",
       "contract": "platform, pushToken, environment, appVersion; encrypt token",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-034",
@@ -307,7 +307,7 @@
       "permission": "SELF",
       "response_type": "NoContent",
       "contract": "unregister current owned installation",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-035",
@@ -316,7 +316,7 @@
       "permission": "CUSTOMER",
       "response_type": "SupportCase",
       "contract": "orderId, category, description, attachmentIds; scope",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-036",
@@ -325,7 +325,7 @@
       "permission": "SELF",
       "response_type": "SupportCasePage",
       "contract": "own cases only, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-037",
@@ -334,7 +334,7 @@
       "permission": "CASE_OWNER",
       "response_type": "SupportCase",
       "contract": "public messages only, no private notes",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-038",
@@ -343,7 +343,7 @@
       "permission": "CASE_OWNER",
       "response_type": "CaseMessage",
       "contract": "body, attachmentIds; customer-visible; Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-039",
@@ -352,7 +352,7 @@
       "permission": "AUTHENTICATED_SCOPED",
       "response_type": "UploadTicket",
       "contract": "purpose, filename, contentType, bytes, sha256; scoped storage key/expiry",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-040",
@@ -361,7 +361,7 @@
       "permission": "UPLOAD_OWNER",
       "response_type": "MediaStatus",
       "contract": "checksum, upload completion; quarantine and scan",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-041",
@@ -370,7 +370,7 @@
       "permission": "UPLOAD_OWNER_OR_REVIEWER",
       "response_type": "MediaStatus",
       "contract": "state or authorized private signed read; no public private-doc URL",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-042",
@@ -379,7 +379,7 @@
       "permission": "COOK_APPLICANT",
       "response_type": "CookApplication",
       "contract": "current own revision and decision history",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-043",
@@ -388,7 +388,7 @@
       "permission": "COOK_APPLICANT",
       "response_type": "CookApplication",
       "contract": "public profile, contact/location refs, documents, zones, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-044",
@@ -397,7 +397,7 @@
       "permission": "COOK_APPLICANT",
       "response_type": "CookApplication",
       "contract": "expectedVersion; full validation",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-045",
@@ -406,7 +406,7 @@
       "permission": "COOK",
       "response_type": "CookDashboard",
       "contract": "own active queue counts/slot totals and deadlines",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-046",
@@ -415,7 +415,7 @@
       "permission": "COOK",
       "response_type": "CookMealPage",
       "contract": "status, q, cursor, limit; own kitchen",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-047",
@@ -424,7 +424,7 @@
       "permission": "COOK",
       "response_type": "CookMeal",
       "contract": "localized fields, portion, price, ingredients, allergens, approved media refs",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-048",
@@ -433,7 +433,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookMeal",
       "contract": "editable fields and expectedVersion; no kitchen reassignment",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-049",
@@ -442,7 +442,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookMeal",
       "contract": "action=PUBLISH/PAUSE/ARCHIVE, expectedVersion; guards",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-050",
@@ -451,7 +451,7 @@
       "permission": "COOK",
       "response_type": "CookSlotPage",
       "contract": "date range, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-051",
@@ -460,7 +460,7 @@
       "permission": "COOK",
       "response_type": "CookSlot",
       "contract": "localDate, localStart/localEnd, timezone, maxPortions, leadMinutes, mealCapacities",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-052",
@@ -469,7 +469,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookSlot",
       "contract": "capacity, mealCapacities, state, expectedVersion; cannot undercut obligations",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-053",
@@ -478,7 +478,7 @@
       "permission": "COOK",
       "response_type": "CookOrderPage",
       "contract": "state, from, to, sort, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-054",
@@ -487,7 +487,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookOrderView",
       "contract": "own kitchen, minimum fulfillment contact, no customer handover code",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-055",
@@ -496,7 +496,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, Idempotency-Key; before acceptBy",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-056",
@@ -505,7 +505,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-057",
@@ -514,7 +514,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-058",
@@ -523,7 +523,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-059",
@@ -532,7 +532,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, delivery reference, Idempotency-Key; delivery only",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-060",
@@ -541,7 +541,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, code, Idempotency-Key; correct mode/state",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-061",
@@ -550,7 +550,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode, note, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-062",
@@ -559,7 +559,7 @@
       "permission": "COOK_OWNER",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode; ACCEPTED before preparation only; Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-063",
@@ -568,7 +568,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CashCollection",
       "contract": "CashReport, Idempotency-Key; no finance verification authority",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-064",
@@ -577,7 +577,7 @@
       "permission": "COOK",
       "response_type": "StatementPage",
       "contract": "period, cursor, limit; own receivables/refunds/remittances",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-065",
@@ -586,7 +586,7 @@
       "permission": "COOK_OWNER",
       "response_type": "CookSettings",
       "contract": "public profile, enabled modes/zones, pause; expectedVersion; cannot self-clear suspension",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-066",
@@ -604,7 +604,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "ApplicationPage",
       "contract": "state, q, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-068",
@@ -613,7 +613,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "ApplicationReview",
       "contract": "revision, private documents via expiring scoped access",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-069",
@@ -622,7 +622,7 @@
       "permission": "COOK_REVIEW",
       "response_type": "CookApplication",
       "contract": "decision, reason, revision, expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-070",
@@ -631,16 +631,16 @@
       "permission": "COOK_REVIEW",
       "response_type": "KitchenAdmin",
       "contract": "pause/suspend/restore, reason, expectedVersion; affected order review",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-071",
       "method": "GET",
       "path": "/api/v1/ops/catalogue",
       "permission": "CONTENT_MODERATE",
-      "response_type": "MealPage",
+      "response_type": "OpsCataloguePage",
       "contract": "flags/status/kitchen/query pagination",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-072",
@@ -649,7 +649,7 @@
       "permission": "CONTENT_MODERATE",
       "response_type": "CookMeal",
       "contract": "action, reason, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-073",
@@ -658,7 +658,7 @@
       "permission": "CONTENT_MODERATE",
       "response_type": "Review",
       "contract": "visibility, reason, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-074",
@@ -667,7 +667,7 @@
       "permission": "ORDER_OPS",
       "response_type": "OpsOrderPage",
       "contract": "state, kitchen, date, exceptions, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-075",
@@ -676,7 +676,7 @@
       "permission": "ORDER_OPS",
       "response_type": "OpsOrderView",
       "contract": "events/stock/finance refs with scoped contact fields",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-076",
@@ -685,7 +685,7 @@
       "permission": "ORDER_EXCEPTION_CANCEL",
       "response_type": "OrderView",
       "contract": "expectedVersion, reasonCode, caseId, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-077",
@@ -694,16 +694,16 @@
       "permission": "ORDER_HANDOVER_OVERRIDE",
       "response_type": "OrderView",
       "contract": "fresh MFA, expectedVersion, reason, evidenceRef, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-078",
       "method": "GET",
       "path": "/api/v1/ops/cases",
       "permission": "SUPPORT",
-      "response_type": "SupportCasePage",
+      "response_type": "StaffSupportCasePage",
       "contract": "category/severity/assignee/state/SLA pagination",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-079",
@@ -712,7 +712,7 @@
       "permission": "SUPPORT",
       "response_type": "StaffSupportCase",
       "contract": "staff notes included only with staff scope",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-080",
@@ -721,7 +721,7 @@
       "permission": "SUPPORT",
       "response_type": "CaseMessage",
       "contract": "body, visibility=PUBLIC/STAFF_ONLY, attachments, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-081",
@@ -730,7 +730,7 @@
       "permission": "SUPPORT",
       "response_type": "StaffSupportCase",
       "contract": "assignment/state/resolution, reason, expectedVersion",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-082",
@@ -739,7 +739,7 @@
       "permission": "FINANCE",
       "response_type": "CashPage",
       "contract": "state/kitchen/period pagination",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-083",
@@ -748,7 +748,7 @@
       "permission": "FINANCE_VERIFY",
       "response_type": "CashCollection",
       "contract": "decision, verified amount/ref, expectedVersion, reason, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-084",
@@ -757,7 +757,7 @@
       "permission": "FINANCE_REFUND",
       "response_type": "Refund",
       "contract": "orderId, caseId, fullAmountMinor, reason, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-085",
@@ -766,7 +766,7 @@
       "permission": "FINANCE_REFUND",
       "response_type": "Refund",
       "contract": "action=APPROVE/REJECT/PAYMENT_RECORDED/VERIFY, evidenceRef where needed, expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-086",
@@ -775,7 +775,7 @@
       "permission": "FINANCE",
       "response_type": "StatementPage",
       "contract": "kitchen/period/state pagination; direction explicit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-087",
@@ -784,7 +784,7 @@
       "permission": "FINANCE_SETTLEMENT",
       "response_type": "Settlement",
       "contract": "kitchenId, period, entryIds, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-088",
@@ -793,7 +793,7 @@
       "permission": "FINANCE_SETTLEMENT",
       "response_type": "Settlement",
       "contract": "action=REVIEW/PAYMENT_RECORDED/RECONCILE/CANCEL, evidenceRef, expectedVersion, Idempotency-Key",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-089",
@@ -802,7 +802,7 @@
       "permission": "CONFIG_READ",
       "response_type": "ConfigurationVersions",
       "contract": "permission-filtered operational and finance policies",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-090",
@@ -811,7 +811,7 @@
       "permission": "CONFIG_WRITE_SCOPED",
       "response_type": "PolicyVersion",
       "contract": "value, effectiveAt, reason, approvalReference, expectedVersion; step-up",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-091",
@@ -820,7 +820,7 @@
       "permission": "STAFF_GRANT",
       "response_type": "StaffPage",
       "contract": "scoped roles/status, cursor, limit",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-092",
@@ -829,7 +829,7 @@
       "permission": "STAFF_GRANT",
       "response_type": "Grant",
       "contract": "permission, scope, expiry, reason, expectedVersion; step-up; no self-escalation",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-093",
@@ -838,7 +838,7 @@
       "permission": "STAFF_GRANT",
       "response_type": "Grant",
       "contract": "grantId, reason, expectedVersion; last-admin protection",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-094",
@@ -847,7 +847,7 @@
       "permission": "AUDIT_READ_SCOPED",
       "response_type": "AuditPage",
       "contract": "actor/object/date/action, cursor, limit; redacted",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-095",
@@ -865,7 +865,7 @@
       "permission": "INTEGRATION_OPS",
       "response_type": "IntegrationHealth",
       "contract": "redacted health and dead-letter counts; no secrets",
-      "implemented": false
+      "implemented": true
     },
     {
       "id": "API-097",
@@ -874,7 +874,133 @@
       "permission": "INTEGRATION_OPS",
       "response_type": "OutboxStatus",
       "contract": "reason, expectedVersion, Idempotency-Key; safe predefined replay only",
-      "implemented": false
+      "implemented": true
+    },
+    {
+      "id": "API-098",
+      "method": "GET",
+      "path": "/api/v1/ops/reviews",
+      "permission": "CONTENT_MODERATE",
+      "response_type": "ReviewQueue",
+      "contract": "moderation queue; reported visible or hidden reviews, bounded",
+      "implemented": true
+    },
+    {
+      "id": "API-099",
+      "method": "GET",
+      "path": "/api/v1/cook/meals/{mealId}/price-history",
+      "permission": "COOK_OWNER",
+      "response_type": "MealPriceHistory",
+      "contract": "Own meal's active price and previous actual price changes from immutable revisions (D14); another kitchen's meal is 404",
+      "implemented": true
+    },
+    {
+      "id": "API-100",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/payment/transfer-report",
+      "permission": "ORDER_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Customer reports a sent deposit (D16); idempotent; a report is not payment",
+      "implemented": true
+    },
+    {
+      "id": "API-101",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/receipt",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports the deposit arrived in its own account (D16); exact amount and current version; not a bank confirmation",
+      "implemented": true
+    },
+    {
+      "id": "API-102",
+      "method": "GET",
+      "path": "/api/v1/cook/payment-profile",
+      "permission": "COOK",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Own kitchen's deposit share, COD cap and recipient with approval status (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-103",
+      "method": "PUT",
+      "path": "/api/v1/cook/payment-profile",
+      "permission": "COOK",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Set own payment terms; a new or changed recipient needs staff approval again (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-104",
+      "method": "POST",
+      "path": "/api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Approve a kitchen's recipient; recent MFA, reason, audited; never own kitchen (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-105",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/problem",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports deposit not received or a different amount; payment DISPUTED (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-106",
+      "method": "GET",
+      "path": "/api/v1/ops/payments",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PaymentQueue",
+      "contract": "Payments needing attention: DISPUTED, RECONCILE_PENDING, REFUND_OWED (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-107",
+      "method": "POST",
+      "path": "/api/v1/ops/orders/{orderId}/payment/decision",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PaymentView",
+      "contract": "Decide an ended order's open payment (REFUND_OWED or CLOSED_NO_FUNDS); reason; audited; never 'received' (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-108",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/refund",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports the refund it sent with the transfer reference (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-109",
+      "method": "GET",
+      "path": "/api/v1/ops/payment-recipients",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PendingRecipients",
+      "contract": "Kitchen payment recipients waiting for staff approval (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-110",
+      "method": "POST",
+      "path": "/api/v1/activity",
+      "permission": "PUBLIC",
+      "response_type": "NoContent",
+      "contract": "Organic browsing activity, counted once per visitor, kind, subject and Cairo day; stored without identity; 202 either way (D17, MB-054)",
+      "implemented": true
+    },
+    {
+      "id": "API-111",
+      "method": "GET",
+      "path": "/api/v1/cook/insights",
+      "permission": "COOK",
+      "response_type": "CookInsights",
+      "contract": "The cook's own free report: activity, orders, capacity, gross sales, refunds and known net; no profit claim (D17, MB-054)",
+      "implemented": true
     }
   ]
 }

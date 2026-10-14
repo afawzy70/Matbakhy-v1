@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.finance.ZeroCommissionIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 29.21 s <<< FAILURE! -- in com.matbakhy.app.finance.ZeroCommissionIntegrationTest
+com.matbakhy.app.finance.ZeroCommissionIntegrationTest.a_non_zero_commission_is_refused_by_the_server_and_for_live_policies_by_the_database -- Time elapsed: 1.692 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[{"id":"405cfb6c-6f4a-4943-9ecd-c57827ffa78c","key":"commerce-policy","version":2,"value":{"label":"Launch policy","synthetic":true,"taxRateBps":0,"commissionRateBps":1000,"maxItemQuantity":10,"quoteTtlSeconds":300,"acceptanceWindowMinutes":15,"minAcceptanceMinutes":5,"cancellationPolicyVersion":"cancel-v2","termsVersion":"terms-v2"},"reason":"launch terms D10","approvalReference":null,"actorId":"bdf69182-67e1-4c40-b0b2-2b663a11beba","createdAt":"2026-10-13T10:25:20.530087915Z"}] 
+expected: 422
+ but was: 200
+	at com.matbakhy.app.finance.ZeroCommissionIntegrationTest.a_non_zero_commission_is_refused_by_the_server_and_for_live_policies_by_the_database(ZeroCommissionIntegrationTest.java:153)
+
+com.matbakhy.app.finance.ZeroCommissionIntegrationTest.the_development_policy_has_no_commission -- Time elapsed: 0.046 s <<< FAILURE!
+java.lang.AssertionError: 
+
+Expecting actual:
+  "-- SYNTHETIC development commerce policy (dev profile only; EnvironmentGuard forbids devdata outside LOCAL/CI).
+-- Values are placeholders pending owner decision O04, never real commercial terms.
+INSERT INTO commerce_policy (version, label, synthetic, status, tax_rate_bps, commission_rate_bps, max_item_quantity, quote_ttl_seconds,
+                             acceptance_window_minutes, min_acceptance_minutes, cancellation_policy_version, terms_version)
+VALUES (1, 'SYNTHETIC development policy (not for live use)', true, 'ACTIVE', 0, 1000, 10, 300, 15, 5, 'synthetic-cancel-v1', 'synthetic-terms-v1')
+ON CONFLICT (version) DO NOTHING;
+"
+to contain:
+  "'ACTIVE', 0, 0, 10," 
+	at com.matbakhy.app.finance.ZeroCommissionIntegrationTest.the_development_policy_has_no_commission(ZeroCommissionIntegrationTest.java:166)
+

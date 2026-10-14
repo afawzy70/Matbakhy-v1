@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-005",
+  "phase": "P01",
+  "source_commit": "babfe81253eafdeb3947194ed2a08914aa1a39a5",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T08:32:26.111154+00:00",
+  "finished_at": "2026-10-11T08:33:14.022553+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean clone: pinned versions, backend verify, frozen install, typecheck, lint, tests, web builds, Android/iOS JS bundles",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-005/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-005/BLUEPRINT.log"
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-005/SCOPE.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-005/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-105",
+      "status": "PASS",
+      "observed": "check_workspace.sh from a fresh clone of the tested commit: Node 24.21.0, pnpm 10.34.6 and JDK 21 matched pins; ./mvnw verify ran enforcer (Java/Maven versions, dependency convergence) and 6 backend tests; pnpm install --frozen-lockfile succeeded; typecheck, lint, 5 web/mobile unit tests and both Vite builds passed; Expo export produced Android and iOS Hermes bundles. Native Gradle/Xcode compilation is out of scope (MB-047)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-005/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-005/BLUEPRINT.log",
+    "verification/runs/20261011-MB-005/SCOPE.log",
+    "verification/runs/20261011-MB-005/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-005/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Versions selected from Maven Central, npm and nodejs.org on 2026-10-11; TypeScript held at 6.0.3 because typescript-eslint supports <6.1.",
+      "React pinned to Expo SDK 57's 19.2.3 across the workspace to avoid duplicate React.",
+      "Actuator exposes only health without details; error responses never include stack traces or messages.",
+      "Defect found and repaired: guardrail tests depended on story position/status and failed after MB-001 DONE (CI run 38124549506); fixed by ID-based selection.",
+      "Residual: Windows/macOS command documentation is NOT_RUN; expo-doctor networked checks cannot run here (exp.host unresolvable); Maven Central 429 required a machine-local mirror."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

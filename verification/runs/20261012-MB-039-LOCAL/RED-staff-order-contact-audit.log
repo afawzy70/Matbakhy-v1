@@ -1,0 +1,16 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.support.cases.SupportIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 16.23 s <<< FAILURE! -- in com.matbakhy.app.support.cases.SupportIntegrationTest
+com.matbakhy.app.support.cases.SupportIntegrationTest.a_cancellation_request_never_changes_the_order_and_is_resolved_by_an_audited_exception_cancel -- Time elapsed: 0.288 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+Expecting actual:
+  []
+to contain exactly (and in same order):
+  ["access.order_contact|ALLOWED|{}"]
+but could not find the following elements:
+  ["access.order_contact|ALLOWED|{}"]
+
+	at com.matbakhy.app.support.cases.SupportIntegrationTest.a_cancellation_request_never_changes_the_order_and_is_resolved_by_an_audited_exception_cancel(SupportIntegrationTest.java:260)
+

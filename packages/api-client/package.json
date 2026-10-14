@@ -1,0 +1,29 @@
+{
+  "name": "@matbakhy/api-client",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Generated TypeScript types and typed fetch client for the Matbakhy API (contracts/openapi.yaml)",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "lint:contract": "redocly lint ../../contracts/openapi.yaml --config redocly.yaml",
+    "generate": "openapi-typescript ../../contracts/openapi.yaml --output src/generated/schema.ts",
+    "check:drift": "node scripts/check-drift.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "openapi-fetch": "0.17.0"
+  },
+  "devDependencies": {
+    "@redocly/cli": "2.62.1",
+    "@types/node": "24.19.2",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "openapi-typescript": "7.13.0",
+    "typescript": "6.0.3",
+    "vitest": "5.0.3",
+    "yaml": "2.9.1"
+  }
+}

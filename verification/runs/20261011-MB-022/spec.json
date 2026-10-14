@@ -1,0 +1,93 @@
+{
+  "run_id": "20261011-MB-022",
+  "story_id": "MB-022",
+  "phase": "P05",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. CookWorkspaceIntegrationTest and identity returnTo (PostgreSQL, Keycloak)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Cook workspace browser workflow against the real local stack (Playwright, Chromium)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-122",
+      "observed": "scripts/dev.sh e2e (throwaway PostgreSQL, Keycloak, S3 emulator, API; operations web dev server; Chromium): cook-a signs in through Keycloak and sees no kitchen and no application; after synthetic approval the dashboard shows the kitchen; the cook creates a meal with an uploaded PNG photo (signed upload verified and approved by the server), publishes it, creates a slot for tomorrow and opens it. customer-a signs in (operations web shows no kitchen; GET /cook/dashboard 403), adds an address and places one pickup and one delivery order through the real API. The cook sees both on the dashboard with server-time deadlines, accepts, prepares and marks both ready; sees the delivery contact and address; a wrong pickup handover code shows the verification error and the customer's real code completes it; the delivery order is dispatched with a reference and completed with the customer's code. A cash report on the completed pickup order makes it REPORTED (also in the customer's order view); the statement lists both orders with the coverage note; pausing sales blocks a new quote and resuming allows it; the UI switches from Arabic RTL to English LTR. CookWorkspaceIntegrationTest (5): own-kitchen dashboard, other cook's order 404, customer 403; pause/resume and staff pause/suspension rules (409), serviceability/zone/version validation, public profile update, audit; statement lines, posted commission 2400 of 24000, period/cursor validation, other cook empty. Identity: returnTo honoured only for allowed origins (6 cases). Operations web component tests (9). Mutations: stale version from the UI and an open returnTo both failed tests."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-022/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Defect fixed before commit: resume on a suspended kitchen returned 200 without change; now 409.",
+      "returnTo restricted to exact configured origins with absolute paths; covered against real Keycloak.",
+      "Brand guard (TC-103) kept; API client factory renamed instead.",
+      "Residual: synthetic SQL approval and phone verification in the browser workflow (local MFA/SMS unavailable); cross-site cookie/CSRF arrangement for deployed domains decided with hosting (P09); Chromium only; browser workflow not yet in GitHub CI; refunds/remittances MB-025."
+    ]
+  },
+  "open_defects": []
+}

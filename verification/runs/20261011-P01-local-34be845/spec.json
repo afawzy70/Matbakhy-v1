@@ -1,0 +1,86 @@
+{
+  "run_id": "20261011-P01-local-34be845",
+  "story_id": "P01-LOCAL",
+  "phase": "P01",
+  "checks": [
+    {
+      "id": "P01-CHECK-1",
+      "name": "Backend workspace and PostgreSQL baseline",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "P01-CHECK-2",
+      "name": "Web/native shell and contract bootstrap (clean clone)",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "P01-CHECK-3",
+      "name": "Local stack bootstrap and smoke",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "P01-CHECK-4",
+      "name": "Secret scan",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-106",
+      "observed": "P01-CHECK-1 at this commit: Flyway migrates blank Testcontainers PostgreSQL 16 to V1; duplicate issuer+subject and idempotency scope rejected; CHECK/FK constraints enforced; ArchUnit rules pass on production modules and fail on violating fixtures; standard API errors."
+    },
+    {
+      "id": "TC-107",
+      "observed": "P01-CHECK-2 at this commit: Redocly lint valid, generated client has no drift, 31 contract tests including malformed money rejection pass; P01-CHECK-1 StrictJsonIntegrationTest rejects 12 malformed bodies."
+    },
+    {
+      "id": "TC-108",
+      "observed": "P01-CHECK-3 at this commit: throwaway compose project with PostgreSQL, Keycloak realm discovery, S3 buckets, mail capture and API health/Flyway smoke passed and was removed; bootstrap failure-path tests pass; P01-CHECK-4 secret scan clean."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Re-verification of MB-006/MB-007/MB-008 behavior at 34be845 after the owner correction, so closure can rest on checks run at the same source as MB-005 native evidence. No code changes to these stories since their original runs."
+    ]
+  },
+  "open_defects": []
+}

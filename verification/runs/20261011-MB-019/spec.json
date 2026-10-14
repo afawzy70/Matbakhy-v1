@@ -1,0 +1,107 @@
+{
+  "run_id": "20261011-MB-019",
+  "story_id": "MB-019",
+  "phase": "P04",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. OrderLifecycleIntegrationTest (PostgreSQL, races, test clock)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-026",
+      "observed": "OrderLifecycleIntegrationTest: on a COMPLETED order, cook accept/prepare/cancel are 409 naming COMPLETED; a PATCH status route does not exist (404/405); the database trigger refuses updating a terminal order; history keeps 5 events. A stale expectedVersion on accept is 409 VERSION_CONFLICT and the order stays pending."
+    },
+    {
+      "id": "TC-027",
+      "observed": "Four rounds of concurrent cook accept, customer cancel and expiry: before the deadline exactly one of ACCEPTED/CANCELLED results, after it exactly one of EXPIRED/CANCELLED (accept refused as DEADLINE_PASSED); always exactly one transition event, at most one released allocation, counters consistent (reserved 0; allocated 2 only when accepted). The expiry job expires an overdue order once by server time and a second run does nothing; acceptance afterwards is 409. Note: a mutation removing the order row lock and guarded update was not detected because the stock-counter guard and database checks still make the losing transaction roll back (defence in depth); the lock remains as the primary guard."
+    },
+    {
+      "id": "TC-028",
+      "observed": "A customer cancels a pending order (reason required from an allowlist, 422 otherwise): CANCELLED, stock released, cash NOT_DUE. Cancelling a PREPARING order is 409 CANCELLATION_REQUEST_REQUIRED and the order is unchanged; another customer gets 404. The cancellation-request case (API-028) arrives with support (MB-024)."
+    },
+    {
+      "id": "TC-029",
+      "observed": "After preparation (consumed 2), an ops exception cancel with order.exception_cancel, reason and case reference cancels the order; the idempotent retry returns the same result, a new attempt is 409 (terminal); consumed stays 2 and no allocation is released; the action is audited; customers get 403. Reject and cook cancel each release exactly once (meal and slot counters return to 0 reserved/allocated)."
+    },
+    {
+      "id": "TC-030",
+      "observed": "Dispatch and delivery-failure on a READY pickup order are 409 WRONG_FULFILLMENT_MODE; handover on a READY delivery order is 409 WRONG_FULFILLMENT_MODE until dispatched; dispatch needs a delivery reference (422); the delivery then completes with the code and the history reads PENDING_ACCEPTANCE, ACCEPTED, PREPARING, READY, OUT_FOR_DELIVERY, COMPLETED. A mutation removing the dispatch mode check failed the test."
+    },
+    {
+      "id": "TC-031",
+      "observed": "Four wrong codes are 422 WRONG_CODE, the fifth locks (CHALLENGE_LOCKED) and even the right code is then refused; the customer no longer sees a code. A valid code completes once and its replay is 409; attempts are logged and per-actor limited (429 after 30 per hour). The ops override needs order.handover_override (403 without) and recent MFA (403 STEP_UP_REQUIRED), then completes with event reason HANDOVER_OVERRIDE, actor STAFF and an audit entry. Only a hash and ciphertext are stored. A mutation removing attempt counting failed the test."
+    },
+    {
+      "id": "TC-119",
+      "observed": "Explicit commands with version guards and idempotency; expiry scheduler; cancel/reject/prepare/ready/dispatch/complete/fail; secure handover challenge (HMAC + AES-GCM bound to the order, owner-only display, bounded attempts); audited MFA override; pickup flow moves stock reserved, allocated, consumed with matching events and outbox; cook views show customer contact only while active and never the code; other cooks get 404; suspension blocks acceptance but not fulfilment of accepted orders."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-019/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review defect fixed: expiry was called on the same bean (self-invocation skipped the transaction); moved to a separate job bean calling the transactional service.",
+      "Self-review defect fixed: wrong handover attempts were rolled back because the inner idempotency transaction marked the shared transaction rollback-only; idempotency now leaves ApiException rollback to the caller.",
+      "Contract corrections: cook command responses reference CookOrderView (cooks never receive OrderView with a handover code); exception cancel has its own request schema with caseId; OrderView.contact typed.",
+      "Residual: cancellation requests (API-028) need support cases (MB-024); ops order list/view (API-074/075), cook dashboard (API-045) and the outbox delivery worker are later stories; handover parameters are proposed defaults to review before pilot; order-row lock removal is masked by stock guards in the race test (see TC-027)."
+    ]
+  },
+  "open_defects": []
+}

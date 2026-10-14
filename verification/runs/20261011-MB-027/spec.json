@@ -1,0 +1,100 @@
+{
+  "run_id": "20261011-MB-027",
+  "story_id": "MB-027",
+  "phase": "P06",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Cook, staff and customer browser workflows against the real local stack (Playwright, Chromium)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-044",
+      "observed": "Browser journey (scripts/dev.sh e2e): the first POST /api/v1/orders reaches the server and commits, then the response is aborted; the customer web shows the retry prompt, the retry with the stored keys shows the existing order and the database holds exactly one order for the customer. A mutation using fresh keys on retry failed the journey. Component tests: both attempts carry the same Idempotency-Key and clientRequestId, keys are stored before sending and cleared with the cart afterwards; after a reload a stored pending placement is resolved by the by-request lookup without a new POST."
+    },
+    {
+      "id": "TC-045",
+      "observed": "Component tests: discovery shows a retry action after a server error and an empty state after retry; signed-out checkout asks to sign in with a return address to the cart; an offline banner reacts to the browser offline event; placement shows the server reason for definitive errors and never shows success without a server order. Browser journey: loading and success states through discovery, cart, quote and order page."
+    },
+    {
+      "id": "TC-127",
+      "observed": "Browser journey on PostgreSQL, Keycloak, S3 emulator and API: customer-b searches the customer web, opens the published meal, chooses a slot, adds it to the cart, signs in through Keycloak and returns to the cart, adds a delivery address in the UI, gets a server quote (synthetic policy warning, cash on receipt), places the order (lost-response retry) and follows it: the cook accepts, prepares and marks it ready in the operations web; the customer page shows ACCEPTED, then the handover code; the cook dispatches and enters the code; the customer page shows COMPLETED. A pickup order is then placed; the customer's order list shows both. Arabic RTL default verified."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-027/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Stable-key placement verified in the browser against the real API; mutation detected.",
+      "No client-side prices; server reasons shown for definitive errors.",
+      "Residual: draft visual design until O05 (P06 gate blocked on O05); synthetic phone verification in the journey."
+    ]
+  },
+  "open_defects": []
+}

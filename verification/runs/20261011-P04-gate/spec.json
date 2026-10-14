@@ -1,0 +1,192 @@
+{
+  "run_id": "20261011-P04-gate",
+  "story_id": "P04-GATE",
+  "phase": "P04",
+  "checks": [
+    {
+      "id": "P04-CHECK-1",
+      "name": "Transactional order lifecycle and concurrency",
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "QuoteIntegrationTest",
+        "OrderPlacementIntegrationTest",
+        "OrderLifecycleIntegrationTest",
+        "CommerceConfigurationTest"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "P04-CHECK-2",
+      "name": "Cash ledger and outbox failure recovery",
+      "command": [
+        "scripts/check_backend_suite.sh",
+        "CashAndLedgerIntegrationTest",
+        "NotificationIntegrationTest",
+        "ProviderConfigurationTest"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. all P04 integration suites (PostgreSQL)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-018",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: QuoteIntegrationTest: a quote mixing a meal of another kitchen is 422 MIXED_KITCHENS_OR_SLOT, a meal not offered in the slot 422, duplicate lines 422, over-maximum quantity 422, empty basket 422, unknown slot 404; a quote names exactly one slot and its kitchen. A mutation removing the kitchen check failed the test. The client replace-basket confirmation is verified with the web/native cart (MB-027/MB-031)."
+    },
+    {
+      "id": "TC-019",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Two meals at 12000 piastres and a zone fee of 3000 with synthetic tax 0 give subtotal 24000, fee 3000, tax 0, total 27000 (stored and returned); pickup gives fee 0 and total 24000; with 14% tax 7005 gives 981 (half-up) and 7986. Requests carrying total, deliveryFee, unitPriceMinor, unitPrice or customerId fields are 400 and create no quote; fractional quantity is 400."
+    },
+    {
+      "id": "TC-020",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: QuoteDirectory.requireValid accepts a fresh quote and refuses a stale one with recoverable reasons: meal repriced (PRICE_CHANGED/MEAL_CHANGED), address edited (STATE_CONFLICT/ADDRESS_CHANGED), zone fee changed (TOTAL_CHANGED), policy replaced (POLICY_CHANGED), slot paused (SLOT_CLOSED), 301 s of server time (QUOTE_EXPIRED); another customer's quote is 404. A mutation removing the revision check failed the test. The order placement endpoint that calls it is MB-018, which re-tests submission of stale quotes."
+    },
+    {
+      "id": "TC-021",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Delivery to an address in a zone the kitchen does not serve is 422 NOT_SERVICEABLE and no quote is created (no conversion to pickup or another zone); delivery without address 422; pickup with an address 422; another customer's address 404; pickup when the kitchen disabled it is 422 PICKUP_NOT_OFFERED. A mutation charging 0 for unserved zones failed the test."
+    },
+    {
+      "id": "TC-022",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: OrderPlacementIntegrationTest: a test-only trigger raises an error on the outbox insert (after the stock update) for this kitchen; the request returns 500 INTERNAL_ERROR without the internal message and leaves no order, allocation, reserved counter, cash obligation or idempotency record; after dropping the trigger the same key and clientRequestId complete once (one order, reserved 2)."
+    },
+    {
+      "id": "TC-023",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: The same key and body replays the original order (same id); after deleting the cached idempotency records (retention elapsed) the same key, and a new key with the same clientRequestId, both return the same order; exactly one order, one event and reserved=1 remain; the recovery lookup by clientRequestId returns it and an unknown reference is 404. A mutation removing the permanent clientRequestId check failed the test."
+    },
+    {
+      "id": "TC-024",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: The same key with another body is 409 IDEMPOTENCY_CONFLICT; the same clientRequestId with another quote is 409 IDEMPOTENCY_CONFLICT; reusing a quote for another request is 409 QUOTE_ALREADY_USED; the original order keeps its version and item and reserved stays 1."
+    },
+    {
+      "id": "TC-025",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: One portion left and 20 distinct verified customers each holding a valid quote place concurrently: exactly one 201 and nineteen 409 STOCK_CHANGED; slot and meal reserved counters are 1, one order and allocations summing to 1. A mutation removing the row locks failed the test."
+    },
+    {
+      "id": "TC-026",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: OrderLifecycleIntegrationTest: on a COMPLETED order, cook accept/prepare/cancel are 409 naming COMPLETED; a PATCH status route does not exist (404/405); the database trigger refuses updating a terminal order; history keeps 5 events. A stale expectedVersion on accept is 409 VERSION_CONFLICT and the order stays pending."
+    },
+    {
+      "id": "TC-027",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Four rounds of concurrent cook accept, customer cancel and expiry: before the deadline exactly one of ACCEPTED/CANCELLED results, after it exactly one of EXPIRED/CANCELLED (accept refused as DEADLINE_PASSED); always exactly one transition event, at most one released allocation, counters consistent (reserved 0; allocated 2 only when accepted). The expiry job expires an overdue order once by server time and a second run does nothing; acceptance afterwards is 409. Note: a mutation removing the order row lock and guarded update was not detected because the stock-counter guard and database checks still make the losing transaction roll back (defence in depth); the lock remains as the primary guard."
+    },
+    {
+      "id": "TC-028",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: A customer cancels a pending order (reason required from an allowlist, 422 otherwise): CANCELLED, stock released, cash NOT_DUE. Cancelling a PREPARING order is 409 CANCELLATION_REQUEST_REQUIRED and the order is unchanged; another customer gets 404. The cancellation-request case (API-028) arrives with support (MB-024)."
+    },
+    {
+      "id": "TC-029",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: After preparation (consumed 2), an ops exception cancel with order.exception_cancel, reason and case reference cancels the order; the idempotent retry returns the same result, a new attempt is 409 (terminal); consumed stays 2 and no allocation is released; the action is audited; customers get 403. Reject and cook cancel each release exactly once (meal and slot counters return to 0 reserved/allocated)."
+    },
+    {
+      "id": "TC-030",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Dispatch and delivery-failure on a READY pickup order are 409 WRONG_FULFILLMENT_MODE; handover on a READY delivery order is 409 WRONG_FULFILLMENT_MODE until dispatched; dispatch needs a delivery reference (422); the delivery then completes with the code and the history reads PENDING_ACCEPTANCE, ACCEPTED, PREPARING, READY, OUT_FOR_DELIVERY, COMPLETED. A mutation removing the dispatch mode check failed the test."
+    },
+    {
+      "id": "TC-031",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Four wrong codes are 422 WRONG_CODE, the fifth locks (CHALLENGE_LOCKED) and even the right code is then refused; the customer no longer sees a code. A valid code completes once and its replay is 409; attempts are logged and per-actor limited (429 after 30 per hour). The ops override needs order.handover_override (403 without) and recent MFA (403 STEP_UP_REQUIRED), then completes with event reason HANDOVER_OVERRIDE, actor STAFF and an audit entry. Only a hash and ciphertext are stored. A mutation removing attempt counting failed the test."
+    },
+    {
+      "id": "TC-032",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: CashAndLedgerIntegrationTest: a delivery order taken to COMPLETED through real lifecycle commands (handover with the customer's code) shows cash DUE in the customer view and in the finance list (amount due 27000, orderState COMPLETED, report null); no cash report row exists; customers get 403 on the finance list. Commission posting leaves the cash obligation DUE."
+    },
+    {
+      "id": "TC-033",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Order with subtotal 24000 (2 x 12000) and delivery 3000 under a synthetic 1000 bps policy: posting the completion event twice yields true then false and exactly one ledger group with base 24000 (delivery excluded) and rate 1000; debit COOK_COMMISSION_RECEIVABLE 2400 equals credit PLATFORM_COMMISSION_REVENUE 2400; retiring/replacing the active policy does not change it; ledger rows are append-only and a one-sided entry is rejected at commit by the deferred balance trigger; the posting job posts each completion once. Mutations posting an unbalanced credit or removing the duplicate guard failed the tests."
+    },
+    {
+      "id": "TC-037",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: NotificationIntegrationTest: with the email provider throwing, an order is placed (201) and dispatched; the cook's inbox row exists and the order stays PENDING_ACCEPTANCE with an unchanged version. The delivery is retried only after its backoff (first next attempt > now+25 s), reaches DEAD after exactly 5 provider calls and is not called again. GET /ops/integrations (integration.ops) lists the dead delivery with attempts 5 and error class only, no account ids; customers and finance.read staff get 403. A permanent provider rejection is DEAD after one attempt. An outbox event whose fan-out fails (injected trigger) rolls back its inbox rows, becomes FAILED after 5 attempts, is not retried further, and is replayed by an operator (stale version 409, customer 403, idempotent replay, audited once, non-FAILED 409) and then SENT with one cook inbox row."
+    },
+    {
+      "id": "TC-038",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Two workers dispatch concurrently with a duplicate ORDER_ACCEPTED event queued after the newer PREPARING event: exactly one ORDER_ACCEPTED inbox row for the customer and 3 rows in total for the order, all events SENT, order version unchanged. Two concurrent delivery workers send each email exactly once (SENT). A live lease of a crashed worker is respected and reclaimed after expiry; the crashed worker can no longer record. Inbox order follows event order when the newest event is dispatched first. Mutations (dedup per event id, unbounded retries, ignoring live leases, recording without lease ownership, processing-time stamps) failed the tests."
+    },
+    {
+      "id": "TC-117",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: One cook/slot validation, integer totals from the policy snapshot (policy version stored on the quote), serviceability and own-address checks, verified contact, server-time cutoff and acceptance window (409 ACCEPTANCE_WINDOW_TOO_SHORT 4 minutes before cutoff, SLOT_CLOSED after), paused kitchen 409, quote expiry, no capacity hold (two full-capacity quotes leave counters at 0; quantities above remaining meal or slot portions are 409 STOCK_CHANGED), immutable quotes (triggers), no usable policy 409 NO_APPROVED_POLICY, real policy cannot be ACTIVE unapproved, synthetic policies permitted only in LOCAL/CI (unit test)."
+    },
+    {
+      "id": "TC-118",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Persistent idempotency plus permanent clientRequestId; deterministic stock locks; order, item (meal revision snapshot, unaffected by later meal edits/archiving), address and contact snapshots; reservation, PLACED event, ORDER_PLACED outbox (no personal data) and DUE cash obligation of 35000 in one transaction; commission snapshot 10% of subtotal excluding delivery; stale/expired/foreign/unaccepted quotes and forged fields refused with no stock change; owner-only order, events and list (other customer 404), ACTIVE/PAST paging, recovery lookup."
+    },
+    {
+      "id": "TC-119",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Explicit commands with version guards and idempotency; expiry scheduler; cancel/reject/prepare/ready/dispatch/complete/fail; secure handover challenge (HMAC + AES-GCM bound to the order, owner-only display, bounded attempts); audited MFA override; pickup flow moves stock reserved, allocated, consumed with matching events and outbox; cook views show customer contact only while active and never the code; other cooks get 404; suspension blocks acceptance but not fulfilment of accepted orders."
+    },
+    {
+      "id": "TC-120",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Cash report separate from the order: exact report -> REPORTED (order view shows REPORTED), second report 409; finance.read cannot verify (403); a different finance.verify user verifies -> VERIFIED, repeat 409. Short (20000 of 27000) and zero reports make the obligation DISPUTED with signed discrepancy; VERIFY with a partial amount is 422, DISPUTE needs a reason, then DISPUTED. Reports need a COMPLETED order of the own kitchen (409/404), collectedAt not in the future and CASH/EGP (422). A cook who also holds finance.verify cannot verify their own report (403, audited DENIED). A mutation treating short reports as success failed the test."
+    },
+    {
+      "id": "TC-121",
+      "observed": "Re-run at the gate commit by the named P04 suites and the full backend verify: Inbox pages newest first with cursor (2 + 1), params carry order number and state, readAt null; mark read is owner-only (404 for others) and idempotent; unreadOnly filters; invalid cursor/limit 422; anonymous 401. Device registration stores only a keyed hash and AES-GCM ciphertext (plaintext absent in DB and response); the push provider receives the decrypted token; invalid platform/installation 422; re-registration by another account revokes the first; unregister 204 then 404; a device revoked after fan-out is DEAD with DEVICE_UNREGISTERED and not sent. ProviderConfigurationTest: channel stand-ins only in LOCAL/CI, development token keys refused in PRODUCTION."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Gate re-verification of MB-017..MB-021 at one source commit.",
+      "Carried residuals (not gate blockers by the configured checks): real commission/tax/fee policy values O04 (synthetic policy only in LOCAL/CI); handover defaults to review before pilot; real email/push providers O07 (LOCAL/CI stand-ins, deployed environments refuse them); refunds/settlements MB-025; cancellation requests MB-024; a mutation removing the order row lock was not detected because the stock guard and constraints still serialize the race (recorded in MB-019)."
+    ]
+  },
+  "open_defects": []
+}

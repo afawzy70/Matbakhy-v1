@@ -1,16 +1,77 @@
 {
   "schema_version": 1,
   "project": "Matbakhy-v1",
-  "status": "READY_TO_START",
-  "current_phase": "P00",
-  "current_story": null,
-  "last_tested_commit": null,
-  "last_completed_story": null,
-  "last_successful_gate": null,
-  "working_branch": null,
-  "open_blockers": [],
-  "next_action": "Read CLAUDE.md and execute MB-001; do not mark planning artifacts as implemented product.",
-  "updated_at": "2026-10-11T00:00:00Z",
+  "status": "IN_PROGRESS",
+  "current_phase": "P07",
+  "current_story": "MB-033",
+  "last_tested_commit": "52e4e21cd3788e0429855ded44e52ca3041d03c5",
+  "last_completed_story": "MB-053",
+  "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
+  "working_branch": "implementation/mvp",
+  "open_blockers": [
+    {
+      "id": "BLK-002",
+      "affects": [
+        "docs/operations/01-environments.md PowerShell bootstrap"
+      ],
+      "owner": "Ahmed Fawzy (Windows runner or PowerShell access)",
+      "first_seen": "2026-10-11T08:59:00Z",
+      "missing": "No PowerShell runtime available to test Windows bootstrap scripts (GitHub release downloads denied)",
+      "next_action": "Provide a Windows/pwsh runner; until then Windows developers use WSL2 + scripts/dev.sh"
+    },
+    {
+      "id": "BLK-003",
+      "affects": [
+        "MB-029 / TC-047 (screen readers)",
+        "MB-030 (depends on MB-029)"
+      ],
+      "owner": "Ahmed Fawzy (assistive-technology tester or explicit deferral decision)",
+      "first_seen": "2026-10-12T04:35:00Z",
+      "missing": "No screen reader (NVDA/JAWS/VoiceOver/TalkBack/Orca) is available in the implementation environment, so TC-047's screen-reader requirement cannot be performed; axe scans are not a substitute",
+      "next_action": "Either have a person run the critical web journeys with NVDA (Windows) or VoiceOver (macOS/iOS) using docs/quality/04-external-qa-handoff.md and record the results, or explicitly decide to defer screen-reader verification to a named later story"
+    },
+    {
+      "id": "BLK-004",
+      "affects": [
+        "MB-033 physical-device verification (Android and iOS)",
+        "MB-034/MB-035 release builds"
+      ],
+      "owner": "Ahmed Fawzy (physical test devices or a device-farm decision)",
+      "first_seen": "2026-10-12T18:10:00Z",
+      "missing": "No physical Android or iOS device is available to the implementation agent; native evidence comes from GitHub-hosted emulator and simulator runs only",
+      "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
+    }
+  ],
+  "next_action": "Window until 2026-10-15 00:00 Kuwait. Hetzner staging: PREPARED, NOT DEPLOYED, access not ready (docs/operations/09). Candidate J six checks PASS at 52e4e21 (verification/runs/20261014-CANDIDATE-J). When the owner reports a reachable staging server: run AUD-01, LOG-01, OPS-01..03, TC-057 first, then the real-API regression suite (needs a remote-target adaptation of the browser suite). Push (O07) stays behind PUSH_DELIVERY_ENABLED=false; BLK-003 and BLK-004 stay open; MB-033 not DONE; MB-029 BLOCKED; do not merge the draft PR.",
+  "updated_at": "2026-10-14T07:02:36Z",
   "heartbeat": null,
-  "runtime_note": "No continuously running supervisor is installed or active."
+  "runtime_note": "No continuously running supervisor is installed or active.",
+  "resolved_blockers": [
+    {
+      "id": "BLK-001",
+      "resolved": "2026-10-11T09:28:00Z",
+      "resolution": "Native Android Gradle and iOS Xcode simulator compilation evidence produced on GitHub-hosted runners for this public repository (run 38128068345). Device/emulator/simulator verification remains required in P07 (MB-034/MB-035)."
+    },
+    {
+      "id": "BLK-005",
+      "affects": [
+        "MB-053 TC-163 iOS deposit phase",
+        "MB-033/MB-049 iOS regression phases after run 40"
+      ],
+      "owner": "Implementation agent (next window)",
+      "first_seen": "2026-10-13T12:06:00Z",
+      "missing": "On the GitHub macOS simulator the iOS 'Save Password?' prompt interferes with the XCUITest sign-in harness; three materially different harness fixes (5efc139, 1db23f0, 7ce20da) each got further (both accounts now sign in) but the test still fails (last: UI query timeout). The app's sign-in works (API log). Android is unaffected.",
+      "next_action": "Next window: disable simulator password AutoFill before tests, or use addUIInterruptionMonitor, or set autocomplete=off on the local test realm's login form (test-only). See verification/runs/20261013-NATIVE-43/RUNS-44-47.md",
+      "resolved_at": "2026-10-13T16:05:44Z",
+      "resolution": "f05e3d6: XCTest UI interruption monitor taps \"Not Now\"; only the app hierarchy is polled; native run 48 (38421819591) iOS every phase A-K PASS. Sign-in real, nothing bypassed."
+    }
+  ],
+  "work_window": {
+    "policy": "opens with the owner's first start/continue prompt of the day; ends at the next 00:00 Asia/Kuwait (owner decision 2026-10-13)",
+    "start": "2026-10-14T06:35:02+03:00",
+    "session_start": "2026-10-14T06:38:54+03:00",
+    "deadline": "2026-10-15T00:00:00+03:00",
+    "no_new_story_after": "2026-10-14T23:00:00+03:00",
+    "final_wrap_up": "2026-10-14T23:30:00+03:00"
+  }
 }

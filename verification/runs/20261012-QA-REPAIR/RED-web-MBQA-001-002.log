@@ -1,0 +1,1216 @@
+# Red phase: new regression tests against unchanged product code (HEAD 5bd7681ba9d70179263115a1d94e1634d9183cb4, tests uncommitted)
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/customer-web
+
+ ❯ src/App.test.tsx (20 tests | 4 failed | 15 skipped) 2707ms
+   ❯ QA repair MBQA-002: an exhausted selected slot cannot be added (2)
+     × refuses the exhausted slot without writing the basket, and adds the slot that has stock up to its portions 334ms
+   ❯ QA repair MBQA-001: catalogue requests use the language the customer just chose (3)
+     × browse: switching Arabic → English → Arabic requests and shows each language 1071ms
+     × meal detail and kitchen page follow both switch directions 1053ms
+     × a slow answer for a language the customer already left is never shown 158ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-002: an exhausted selected slot cannot be added > refuses the exhausted slot without writing the basket, and adds the slot that has stock up to its portions
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/App.test.tsx:512:28
+    510|     fireEvent.click(s1 as HTMLInputElement);
+    511|     const add = () => screen.getByRole("button", { name: /^Add to cart…
+    512|     expect(add().disabled).toBe(true);
+       |                            ^
+    513|     fireEvent.click(add());
+    514|     expect(screen.queryByText("Added to cart.")).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-001: catalogue requests use the language the customer just chose > browse: switching Arabic → English → Arabic requests and shows each language
+TestingLibraryElementError: Unable to find role="article" and name "Koshari"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="app"
+    >
+      <header
+        class="topbar"
+      >
+        <h1>
+          Matbakhy
+        </h1>
+        <div
+          class="topbar-actions"
+        >
+          <a
+            class="button secondary"
+            href="#/checkout"
+          >
+            Cart
+          </a>
+          <button
+            class="secondary"
+            type="button"
+          >
+            العربية
+          </button>
+          <a
+            class="button secondary"
+            href="http://localhost:8080/oauth2/authorization/keycloak?returnTo=http%3A%2F%2Flocalhost%3A3000%2F%23"
+          >
+            Sign in
+          </a>
+        </div>
+      </header>
+      <main
+        class="shell"
+      >
+        <div
+          class="home stack"
+        >
+          <section
+            aria-label="Matbakhy"
+            class="brand-strip"
+          >
+            <div>
+              <strong>
+                Matbakhy
+              </strong>
+              <span>
+                Home-cooked meals from kitchens near you
+              </span>
+            </div>
+            <span
+              class="pill"
+            >
+              Preorder
+            </span>
+          </section>
+          <section
+            aria-labelledby="intent-heading"
+            class="stack-sm"
+          >
+            <div
+              class="row between"
+            >
+              <h2
+                id="intent-heading"
+              >
+                What does your table need?
+              </h2>
+              <span
+                class="muted small"
+              >
+                Choose by need
+              </span>
+            </div>
+            <div
+              class="intents"
+            >
+              <button
+                aria-pressed="false"
+                class="intent"
+                type="button"
+              >
+                <strong>
+                  A meal for me or us
+                </strong>
+                <span
+                  class="small"
+                >
+                  For one or two people
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="intent"
+                type="button"
+              >
+                <strong>
+                  Complete my table
+                </strong>
+                <span
+                  class="small"
+                >
+                  A dish to go with your meal
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="intent"
+                type="button"
+              >
+                <strong>
+                  Prepare a gathering
+                </strong>
+                <span
+                  class="small"
+                >
+                  For family get-togethers
+                </span>
+              </button>
+            </div>
+          </section>
+          <div
+            aria-label="Show by"
+            class="mode-switch"
+            role="group"
+          >
+            <button
+              aria-pressed="true"
+              type="button"
+            >
+              Dishes
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Kitchens
+            </button>
+          </div>
+          <form
+            class="search-bar"
+            role="search"
+          >
+            <label
+              class="grow"
+            >
+              <span
+                class="sr-only"
+              >
+                Search for a meal or kitchen
+              </span>
+              <input
+                aria-label="Search for a meal or kitchen"
+                maxlength="80"
+                placeholder="Search for a meal or kitchen"
+                type="search"
+                value=""
+              />
+            </label>
+            <button
+              type="submit"
+            >
+              Search for a meal or kitchen
+            </button>
+            <button
+              aria-controls="filters"
+              aria-expanded="false"
+              class="secondary"
+              type="button"
+            >
+              Filter results
+            </button>
+          </form>
+          <div
+            aria-label="Categories"
+            class="chips"
+            role="group"
+          >
+            <button
+              aria-pressed="true"
+              type="button"
+            >
+              All
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Main dishes
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Sides and salads
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Soups
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Baked goods
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Desserts
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Breakfast
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Ready to cook
+            </button>
+          </div>
+          <section
+            aria-labelledby="results-heading"
+            class="stack-sm"
+          >
+            <h2
+              id="results-heading"
+            >
+              Home-cooked meals to preorder
+            </h2>
+            <ul
+              class="food-list"
+            >
+              <li>
+                <article
+                  aria-label="كشري"
+                  class="food-card"
+                >
+                  <div
+                    class="food-photo"
+                  />
+                  <div
+                    class="food-body"
+                  >
+                    <div
+                      class="row between"
+                    >
+                      <h3>
+                        <a
+                          href="#/meal/b1b1b1b1-0000-4000-8000-000000000001"
+                        >
+                          كشري
+                        </a>
+                      </h3>
+                      <span
+                        class="price"
+                      >
+                        <bdi>
+                          EGP 95.50
+                        </bdi>
+                      </span>
+                    </div>
+                    <a
+                      class="kitchen-link"
+                      href="#/kitchen/kitchen-b"
+                    >
+                      مطبخ منى
+                    </a>
+                    <p
+                      class="dish-description"
+                    >
+                      عدس وأرز
+                    </p>
+                    <div
+                      class="row between card-actions"
+                    >
+                      <span
+                        class="pill portion"
+                      >
+                        طبق واحد
+                      </span>
+                      <a
+                        aria-label="View details: كشري"
+                        class="button"
+                        href="#/meal/b1b1b1b1-0000-4000-8000-000000000001"
+                      >
+                        View details
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </main>
+      <nav
+        aria-label="Matbakhy"
+        class="bottom-nav"
+      >
+        <a
+          aria-current="page"
+          href="#/"
+        >
+          Home
+        </a>
+      </nav>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="app"
+    >
+      <header
+        class="topbar"
+      >
+        <h1>
+          Matbakhy
+        </h1>
+        <div
+          class="topbar-actions"
+        >
+          <a
+            class="button secondary"
+            href="#/checkout"
+          >
+            Cart
+          </a>
+          <button
+            class="secondary"
+            type="button"
+          >
+            العربية
+          </button>
+          <a
+            class="button secondary"
+            href="http://localhost:8080/oauth2/authorization/keycloak?returnTo=http%3A%2F%2Flocalhost%3A3000%2F%23"
+          >
+            Sign in
+          </a>
+        </div>
+      </header>
+      <main
+        class="shell"
+      >
+        <div
+          class="home stack"
+        >
+          <section
+            aria-label="Matbakhy"
+            class="brand-strip"
+          >
+            <div>
+              <strong>
+                Matbakhy
+              </strong>
+              <span>
+                Home-cooked meals from kitchens near you
+              </span>
+            </div>
+            <span
+              class="pill"
+            >
+              Preorder
+            </span>
+          </section>
+          <section
+            aria-labelledby="intent-heading"
+            class="stack-sm"
+          >
+            <div
+              class="row between"
+            >
+              <h2
+                id="intent-heading"
+              >
+                What does your table need?
+              </h2>
+              <span
+                class="muted small"
+              >
+                Choose by need
+              </span>
+            </div>
+            <div
+              class="intents"
+            >
+              <button
+                aria-pressed="false"
+                class="intent"
+                type="button"
+              >
+                <strong>
+                  A meal for me or us
+                </strong>
+                <span
+                  class="small"
+                >
+                  For one or two people
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="intent"
+                type="button"
+              >
+                <strong>
+                  Complete my table
+                </strong>
+                <span
+                  class="small"
+                >
+                  A dish to go with your meal
+                </span>
+              </button>
+              <button
+                aria-pressed="false"
+                class="intent"
+                type="button"
+              >
+                <strong>
+                  Prepare a gathering
+                </strong>
+                <span
+                  class="small"
+                >
+                  For family get-togethers
+                </span>
+              </button>
+            </div>
+          </section>
+          <div
+            aria-label="Show by"
+            class="mode-switch"
+            role="group"
+          >
+            <button
+              aria-pressed="true"
+              type="button"
+            >
+              Dishes
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Kitchens
+            </button>
+          </div>
+          <form
+            class="search-bar"
+            role="search"
+          >
+            <label
+              class="grow"
+            >
+              <span
+                class="sr-only"
+              >
+                Search for a meal or kitchen
+              </span>
+              <input
+                aria-label="Search for a meal or kitchen"
+                maxlength="80"
+                placeholder="Search for a meal or kitchen"
+                type="search"
+                value=""
+              />
+            </label>
+            <button
+              type="submit"
+            >
+              Search for a meal or kitchen
+            </button>
+            <button
+              aria-controls="filters"
+              aria-expanded="false"
+              class="secondary"
+              type="button"
+            >
+              Filter results
+            </button>
+          </form>
+          <div
+            aria-label="Categories"
+            class="chips"
+            role="group"
+          >
+            <button
+              aria-pressed="true"
+              type="button"
+            >
+              All
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Main dishes
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Sides and salads
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Soups
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Baked goods
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Desserts
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Breakfast
+            </button>
+            <button
+              aria-pressed="false"
+              type="button"
+            >
+              Ready to cook
+            </button>
+          </div>
+          <section
+            aria-labelledby="results-heading"
+            class="stack-sm"
+          >
+            <h2
+              id="results-heading"
+            >
+              Home-cooked meals to preorder
+            </h2>
+            <ul
+              class="food-list"
+            >
+              <li>
+                <article
+                  aria-label="كشري"
+                  class="food-card"
+                >
+                  <div
+                    class="food-photo"
+                  />
+                  <div
+                    class="food-body"
+                  >
+                    <div
+                      class="row between"
+                    >
+                      <h3>
+                        <a
+                          href="#/meal/b1b1b1b1-0000-4000-8000-000000000001"
+                        >
+                          كشري
+                        </a>
+                      </h3>
+                      <span
+                        class="price"
+                      >
+                        <bdi>
+                          EGP 95.50
+                        </bdi>
+                      </span>
+                    </div>
+                    <a
+                      class="kitchen-link"
+                      href="#/kitchen/kitchen-b"
+                    >
+                      مطبخ منى
+                    </a>
+                    <p
+                      class="dish-description"
+                    >
+                      عدس وأرز
+                    </p>
+                    <div
+                      class="row between card-actions"
+                    >
+                      <span
+                        class="pill portion"
+                      >
+                        طبق واحد
+                      </span>
+                      <a
+                        aria-label="View details: كشري"
+                        class="button"
+                        href="#/meal/b1b1b1b1-0000-4000-8000-000000000001"
+                      >
+                        View details
+                      </a>
+                    </div>
+                  </div>
+                </article>
+              </li>
+            </ul>
+          </section>
+        </div>
+      </main>
+      <nav
+        aria-label="Matbakhy"
+        class="bottom-nav"
+      >
+        <a
+          aria-current="page"
+          href="#/"
+        >
+          Home
+        </a>
+      </nav>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:599:29
+    597|     expect(await screen.findByRole("article", { name: "كشري" })).toBeT…
+    598|     fireEvent.click(screen.getByRole("button", { name: "English" }));
+    599|     const en = await screen.findByRole("article", { name: "Koshari" });
+       |                             ^
+    600|     expect(within(en).getByText("Lentils and rice")).toBeTruthy();
+    601|     expect(within(en).getByText("One plate")).toBeTruthy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-001: catalogue requests use the language the customer just chose > meal detail and kitchen page follow both switch directions
+TestingLibraryElementError: Unable to find role="heading" and name "Koshari"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="app"
+    >
+      <header
+        class="topbar"
+      >
+        <h1>
+          Matbakhy
+        </h1>
+        <div
+          class="topbar-actions"
+        >
+          <a
+            class="button secondary"
+            href="#/checkout"
+          >
+            Cart
+          </a>
+          <button
+            class="secondary"
+            type="button"
+          >
+            العربية
+          </button>
+          <a
+            class="button secondary"
+            href="http://localhost:8080/oauth2/authorization/keycloak?returnTo=http%3A%2F%2Flocalhost%3A3000%2F%23%2Fmeal%2Fb1b1b1b1-0000-4000-8000-000000000001"
+          >
+            Sign in
+          </a>
+        </div>
+      </header>
+      <main
+        class="shell"
+      >
+        <article
+          aria-labelledby="meal-title"
+          class="meal-detail stack"
+        >
+          <a
+            href="#/"
+          >
+            Back
+          </a>
+          <div
+            aria-hidden="true"
+            class="hero"
+          />
+          <div
+            class="row between"
+          >
+            <h2
+              id="meal-title"
+            >
+              كشري
+            </h2>
+            <span
+              class="price"
+            >
+              <bdi>
+                EGP 95.50
+              </bdi>
+            </span>
+          </div>
+          <a
+            class="kitchen-link"
+            href="#/kitchen/kitchen-b"
+          >
+            مطبخ منى
+          </a>
+          <section
+            aria-label="Portion"
+            class="card pad stack-sm"
+          >
+            <strong>
+              طبق واحد
+            </strong>
+          </section>
+          <section
+            aria-labelledby="about-heading"
+            class="stack-sm"
+          >
+            <h3
+              id="about-heading"
+            >
+              About this dish
+            </h3>
+            <p>
+              عدس وأرز
+            </p>
+          </section>
+          <section
+            aria-labelledby="ingredients-heading"
+            class="card pad stack-sm"
+          >
+            <h3
+              id="ingredients-heading"
+            >
+              Ingredients and allergy information
+            </h3>
+            <p />
+            <p>
+              The kitchen declared no known allergens in this dish.
+            </p>
+          </section>
+          <fieldset
+            class="slots"
+          >
+            <legend>
+              Cooking slots
+            </legend>
+            <p
+              class="muted"
+            >
+              No slots available right now.
+            </p>
+          </fieldset>
+          <div
+            class="buy-bar"
+          >
+            <div
+              aria-label="Choose quantity"
+              class="qty"
+              role="group"
+            >
+              <button
+                aria-label="Decrease quantity"
+                class="secondary"
+                disabled=""
+                type="button"
+              >
+                −
+              </button>
+              <input
+                aria-label="Quantity"
+                max="20"
+                min="1"
+                type="number"
+                value="1"
+              />
+              <button
+                aria-label="Increase quantity"
+                class="secondary"
+                type="button"
+              >
+                +
+              </button>
+            </div>
+            <button
+              disabled=""
+              type="button"
+            >
+              Add to cart
+               · 
+              <bdi>
+                EGP 95.50
+              </bdi>
+            </button>
+          </div>
+          <p
+            class="muted small"
+          >
+            The final total is calculated in the cart at the current price.
+          </p>
+          <p
+            class="row"
+          >
+            <bdi
+              class="muted"
+              dir="ltr"
+            >
+              http://localhost:3000/#/meal/b1b1b1b1-0000-4000-8000-000000000001
+            </bdi>
+            <button
+              class="secondary"
+              type="button"
+            >
+              Copy link to share
+            </button>
+          </p>
+          <section
+            aria-labelledby="reviews-heading"
+            class="stack"
+          >
+            <h3
+              id="reviews-heading"
+            >
+              Reviews
+            </h3>
+            <p
+              class="muted"
+            >
+              No reviews yet.
+            </p>
+            <ul
+              class="rows"
+            />
+          </section>
+        </article>
+      </main>
+      <nav
+        aria-label="Matbakhy"
+        class="bottom-nav"
+      >
+        <a
+          href="#/"
+        >
+          Home
+        </a>
+      </nav>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="app"
+    >
+      <header
+        class="topbar"
+      >
+        <h1>
+          Matbakhy
+        </h1>
+        <div
+          class="topbar-actions"
+        >
+          <a
+            class="button secondary"
+            href="#/checkout"
+          >
+            Cart
+          </a>
+          <button
+            class="secondary"
+            type="button"
+          >
+            العربية
+          </button>
+          <a
+            class="button secondary"
+            href="http://localhost:8080/oauth2/authorization/keycloak?returnTo=http%3A%2F%2Flocalhost%3A3000%2F%23%2Fmeal%2Fb1b1b1b1-0000-4000-8000-000000000001"
+          >
+            Sign in
+          </a>
+        </div>
+      </header>
+      <main
+        class="shell"
+      >
+        <article
+          aria-labelledby="meal-title"
+          class="meal-detail stack"
+        >
+          <a
+            href="#/"
+          >
+            Back
+          </a>
+          <div
+            aria-hidden="true"
+            class="hero"
+          />
+          <div
+            class="row between"
+          >
+            <h2
+              id="meal-title"
+            >
+              كشري
+            </h2>
+            <span
+              class="price"
+            >
+              <bdi>
+                EGP 95.50
+              </bdi>
+            </span>
+          </div>
+          <a
+            class="kitchen-link"
+            href="#/kitchen/kitchen-b"
+          >
+            مطبخ منى
+          </a>
+          <section
+            aria-label="Portion"
+            class="card pad stack-sm"
+          >
+            <strong>
+              طبق واحد
+            </strong>
+          </section>
+          <section
+            aria-labelledby="about-heading"
+            class="stack-sm"
+          >
+            <h3
+              id="about-heading"
+            >
+              About this dish
+            </h3>
+            <p>
+              عدس وأرز
+            </p>
+          </section>
+          <section
+            aria-labelledby="ingredients-heading"
+            class="card pad stack-sm"
+          >
+            <h3
+              id="ingredients-heading"
+            >
+              Ingredients and allergy information
+            </h3>
+            <p />
+            <p>
+              The kitchen declared no known allergens in this dish.
+            </p>
+          </section>
+          <fieldset
+            class="slots"
+          >
+            <legend>
+              Cooking slots
+            </legend>
+            <p
+              class="muted"
+            >
+              No slots available right now.
+            </p>
+          </fieldset>
+          <div
+            class="buy-bar"
+          >
+            <div
+              aria-label="Choose quantity"
+              class="qty"
+              role="group"
+            >
+              <button
+                aria-label="Decrease quantity"
+                class="secondary"
+                disabled=""
+                type="button"
+              >
+                −
+              </button>
+              <input
+                aria-label="Quantity"
+                max="20"
+                min="1"
+                type="number"
+                value="1"
+              />
+              <button
+                aria-label="Increase quantity"
+                class="secondary"
+                type="button"
+              >
+                +
+              </button>
+            </div>
+            <button
+              disabled=""
+              type="button"
+            >
+              Add to cart
+               · 
+              <bdi>
+                EGP 95.50
+              </bdi>
+            </button>
+          </div>
+          <p
+            class="muted small"
+          >
+            The final total is calculated in the cart at the current price.
+          </p>
+          <p
+            class="row"
+          >
+            <bdi
+              class="muted"
+              dir="ltr"
+            >
+              http://localhost:3000/#/meal/b1b1b1b1-0000-4000-8000-000000000001
+            </bdi>
+            <button
+              class="secondary"
+              type="button"
+            >
+              Copy link to share
+            </button>
+          </p>
+          <section
+            aria-labelledby="reviews-heading"
+            class="stack"
+          >
+            <h3
+              id="reviews-heading"
+            >
+              Reviews
+            </h3>
+            <p
+              class="muted"
+            >
+              No reviews yet.
+            </p>
+            <ul
+              class="rows"
+            />
+          </section>
+        </article>
+      </main>
+      <nav
+        aria-label="Matbakhy"
+        class="bottom-nav"
+      >
+        <a
+          href="#/"
+        >
+          Home
+        </a>
+      </nav>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:616:25
+    614|     expect(await screen.findByRole("heading", { name: "كشري" })).toBeT…
+    615|     fireEvent.click(screen.getByRole("button", { name: "English" }));
+    616|     expect(await screen.findByRole("heading", { name: "Koshari" })).to…
+       |                         ^
+    617|     expect(screen.getByText("Lentils and rice")).toBeTruthy();
+    618|     expect(lastLanguage(calls, `/api/v1/meals/${mealId}`)).toBe("en");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/App.test.tsx > QA repair MBQA-001: catalogue requests use the language the customer just chose > a slow answer for a language the customer already left is never shown
+AssertionError: expected <article …(2)>…(2)</article> to be null
+
+- Expected:
+null
+
++ Received:
+<article
+  aria-label="Koshari"
+  class="food-card"
+>
+  <div
+    class="food-photo"
+  />
+  <div
+    class="food-body"
+  >
+    <div
+      class="row between"
+    >
+      <h3>
+        <a
+          href="#/meal/b1b1b1b1-0000-4000-8000-000000000001"
+        >
+          Koshari
+        </a>
+      </h3>
+      <span
+        class="price"
+      >
+        <bdi>
+          ‏٩٥٫٥٠ ج.م.‏
+        </bdi>
+      </span>
+    </div>
+    <a
+      class="kitchen-link"
+      href="#/kitchen/kitchen-b"
+    >
+      Mona's kitchen
+    </a>
+    <p
+      class="dish-description"
+    >
+      Lentils and rice
+    </p>
+    <div
+      class="row between card-actions"
+    >
+      <span
+        class="pill portion"
+      >
+        One plate
+      </span>
+      <a
+        aria-label="عرض التفاصيل: Koshari"
+        class="button"
+        href="#/meal/b1b1b1b1-0000-4000-8000-000000000001"
+      >
+        عرض التفاصيل
+      </a>
+    </div>
+  </div>
+</article>
+
+ ❯ src/App.test.tsx:654:64
+    652|     held.forEach((release) => release());
+    653|     await new Promise((r) => setTimeout(r, 20));
+    654|     expect(screen.queryByRole("article", { name: "Koshari" })).toBeNul…
+       |                                                                ^
+    655|     expect(screen.getByRole("article", { name: "كشري" })).toBeTruthy();
+    656|     expect(document.documentElement.lang).toBe("ar");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed | 15 skipped (20)
+   Start at  11:45:45
+   Duration  4.41s (tests 64%, environment 18%, transform 14%, import 4%)
+

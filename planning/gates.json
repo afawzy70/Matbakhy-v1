@@ -3,7 +3,7 @@
   "gates": [
     {
       "id": "P00",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -11,27 +11,39 @@
           "id": "P00-CHECK-1",
           "name": "Scope and traceability review",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "python3",
+            "scripts/check_scope.py"
+          ],
+          "timeout_seconds": 120,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Inventory, decision register, rule/story/scenario traceability, client targets, deferred scope and generated matrix (scripts/check_scope.py). Planning scope only."
         },
         {
           "id": "P00-CHECK-2",
           "name": "Brand and UX artifacts review",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_design.sh"
+          ],
+          "timeout_seconds": 900,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Design token tests (contrast, drift, no hard-coded brand), Chromium specimen render with Arabic font assertion, and all prototype journeys in ar/en at 390/1280 px. Visual approval is a separate owner record (docs/design/approval.md)."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "run": "verification/runs/20261011-P00-gate/evidence.json",
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P00 --commit 34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "review": "SELF_REVIEW",
+        "note": "Owner visual approval (O05) is not a P00 requirement and remains PENDING; it gates P06."
+      }
     },
     {
       "id": "P01",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -39,27 +51,68 @@
           "id": "P01-CHECK-1",
           "name": "Backend workspace and PostgreSQL baseline",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "bash",
+            "-c",
+            "cd backend && ./mvnw -B -ntp verify"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Maven verify: enforcer, unit tests, Flyway migration and constraint tests on Testcontainers PostgreSQL 16 (Docker required), ArchUnit module boundary tests."
         },
         {
           "id": "P01-CHECK-2",
           "name": "Web/native shell and contract/CI bootstrap",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_workspace.sh"
+          ],
+          "timeout_seconds": 2400,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Clean clone of HEAD: pinned toolchain, backend verify, frozen install, OpenAPI lint and client drift, typecheck, lint, unit/contract tests, web builds, Android/iOS JS bundles."
+        },
+        {
+          "id": "P01-CHECK-3",
+          "name": "Local stack bootstrap and smoke",
+          "kind": "command",
+          "command": [
+            "scripts/dev.sh",
+            "verify"
+          ],
+          "timeout_seconds": 1800,
+          "required": true,
+          "configured": true,
+          "setup_note": "Isolated compose project: PostgreSQL, Keycloak realm discovery, S3 emulator buckets, mail sink capture, API health and Flyway baseline; torn down afterwards. Requires Docker."
+        },
+        {
+          "id": "P01-CHECK-4",
+          "name": "Secret scan",
+          "kind": "command",
+          "command": [
+            "scripts/check_secrets.sh"
+          ],
+          "timeout_seconds": 600,
+          "required": true,
+          "configured": true,
+          "setup_note": "Gitleaks (digest-pinned) over full git history and working tree; redacted output."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "runs": [
+          "verification/runs/20261011-P01-local-34be845/evidence.json",
+          "verification/runs/20261011-MB-005-native/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P01 --commit 34be845bc5ab5b283c3c62998b090eff71a80f19",
+        "review": "SELF_REVIEW",
+        "note": "Native compilation on GitHub-hosted runners (run 38128068345); no device verification (P07)."
+      }
     },
     {
       "id": "P02",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -67,27 +120,50 @@
           "id": "P02-CHECK-1",
           "name": "Identity OTP and address integration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "IdentityIntegrationTest",
+            "ContactIntegrationTest",
+            "EgyptianPhoneTest",
+            "ProviderConfigurationTest",
+            "StaffAssuranceTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Real Keycloak 26.8 and PostgreSQL 16 (Testcontainers; Docker required): OIDC web session/CSRF/PKCE/bearer, expiry/logout, suspended and deleted accounts, OTP and address ownership, Egyptian phone normalization, fake SMS provider confined to LOCAL/CI. Fails if any named class did not run."
         },
         {
           "id": "P02-CHECK-2",
           "name": "Role isolation and cook application integration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "StaffAccessIntegrationTest",
+            "CookWorkflowIntegrationTest",
+            "ModuleBoundaryTest",
+            "ContractRoutesTest",
+            "MigrationIntegrationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16 (Testcontainers): deny-by-default object scope, grants/step-up/revocation, append-only audit, cook application review/approval/operating state, module boundaries, registry-route parity and migrations. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "b2260d37e0ecbc165529f1e980656ea5063d382e",
+        "runs": [
+          "verification/runs/20261011-P02-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P02 --commit b2260d37e0ecbc165529f1e980656ea5063d382e",
+        "review": "SELF_REVIEW",
+        "note": "Local container evidence; no independent security review. Carried residuals listed in the gate evidence review findings."
+      }
     },
     {
       "id": "P03",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -95,27 +171,47 @@
           "id": "P03-CHECK-1",
           "name": "Media publication and discovery integration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "MediaIntegrationTest",
+            "MealIntegrationTest",
+            "DiscoveryIntegrationTest",
+            "ContractRoutesTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16 and the digest-pinned S3 emulator (Testcontainers; Docker required): signed uploads, type/size/dimension checks, fail-closed scan, metadata-free public variants, scoped document reads, meal publication guards and revisions, discovery filters/pagination/eligibility, registry-route parity. Fails if any named class did not run."
         },
         {
           "id": "P03-CHECK-2",
           "name": "Availability cutoff timezone and stock constraints",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "SlotIntegrationTest",
+            "MigrationIntegrationTest",
+            "ModuleBoundaryTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16: Cairo/DST scheduling, server-time cutoff, capacity bounds against obligations at meal and slot level, migrations and module boundaries. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "bd0000c3f4f4ba979284d5ddee0d16f29e3515dd",
+        "runs": [
+          "verification/runs/20261011-P03-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P03 --commit bd0000c3f4f4ba979284d5ddee0d16f29e3515dd",
+        "review": "SELF_REVIEW",
+        "note": "Local container evidence with PostgreSQL and the S3 emulator; no independent review. Production storage policy and scanner unverified (O07/P09)."
+      }
     },
     {
       "id": "P04",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -123,27 +219,47 @@
           "id": "P04-CHECK-1",
           "name": "Transactional order lifecycle and concurrency",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "QuoteIntegrationTest",
+            "OrderPlacementIntegrationTest",
+            "OrderLifecycleIntegrationTest",
+            "CommerceConfigurationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16 (Testcontainers; Docker required): server-owned quotes, atomic placement with idempotency and a 20-customer capacity race, injected-failure rollback, legal transitions only, expiry/accept races, stock moves exactly once, secure handover. Fails if any named class did not run."
         },
         {
           "id": "P04-CHECK-2",
           "name": "Cash ledger and outbox failure recovery",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "CashAndLedgerIntegrationTest",
+            "NotificationIntegrationTest",
+            "ProviderConfigurationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16: completion never implies payment, separated cash verification, balanced once-only commission groups, provider outage leaves order/inbox committed with bounded retries and visible dead letters, leased workers and duplicate events deliver once, operator replay of failed events. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "8412e873d28f2dab1388275a7ee32c9f9ccc4067",
+        "runs": [
+          "verification/runs/20261011-P04-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P04 --commit 8412e873d28f2dab1388275a7ee32c9f9ccc4067",
+        "review": "SELF_REVIEW",
+        "note": "Local container evidence with PostgreSQL; no independent review. Real commerce policy values (O04) and notification providers (O07) unverified; synthetic policy and logging channels in LOCAL/CI only."
+      }
     },
     {
       "id": "P05",
-      "status": "NOT_RUN",
+      "status": "PASS",
       "required_decisions": [],
       "required_approvals": [],
       "checks": [
@@ -151,23 +267,44 @@
           "id": "P05-CHECK-1",
           "name": "Cook and operations browser workflows",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/dev.sh",
+            "e2e"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "Throwaway local stack (PostgreSQL, Keycloak, S3 emulator, API) plus the operations web; Playwright/Chromium workflow: cook onboarding state, meal with uploaded photo, slot, pickup and delivery fulfilment with handover codes, cash report, statement, pause/resume; staff moderation, review queue with MFA step-up prompt, support queue with private notes, cancellation request resolved by exception cancellation. Synthetic users and SQL approval/grants (no local MFA). Finance, configuration and staff screens are component-tested only."
         },
         {
           "id": "P05-CHECK-2",
           "name": "Support finance reconciliation and staff configuration",
           "kind": "command",
-          "command": null,
-          "timeout_seconds": 1200,
+          "command": [
+            "scripts/check_backend_suite.sh",
+            "SupportIntegrationTest",
+            "FinanceOperationsIntegrationTest",
+            "ConfigurationIntegrationTest",
+            "StaffAccessIntegrationTest",
+            "CookWorkspaceIntegrationTest",
+            "ModerationIntegrationTest",
+            "CashAndLedgerIntegrationTest"
+          ],
+          "timeout_seconds": 1800,
           "required": true,
-          "configured": false,
-          "setup_note": "Replace with an actual bounded test/review-evidence validation command when this phase is implemented; no echo-success placeholders."
+          "configured": true,
+          "setup_note": "PostgreSQL 16: support privacy/SLA/cancellation requests, refunds/reversal/settlements with separation of duties and concurrency, versioned configuration with approval guard and ordering switch, staff self-escalation and last-admin protection, cook workspace scope, moderation and suspension effects, cash and ledger. Fails if any named class did not run."
         }
-      ]
+      ],
+      "evidence": {
+        "source_commit": "6736a860de134b7dd62f291b4c3013d62ac10356",
+        "runs": [
+          "verification/runs/20261011-P05-gate/evidence.json"
+        ],
+        "validated_by": "python3 scripts/validate_blueprint.py --phase P05 --commit 6736a860de134b7dd62f291b4c3013d62ac10356",
+        "review": "SELF_REVIEW",
+        "note": "Local throwaway stack with real Keycloak, PostgreSQL and S3 emulator; browser workflows on Chromium; no independent review. Local MFA unavailable (step-up actions backend-tested only); finance/configuration/staff screens component-tested; policy values O04, visual design O05 open."
+      }
     },
     {
       "id": "P06",

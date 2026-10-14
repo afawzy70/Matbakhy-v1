@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>4.1.1</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.matbakhy</groupId>
+  <artifactId>matbakhy-backend</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>Matbakhy backend</name>
+  <description>Spring Boot modular monolith for the Matbakhy MVP</description>
+
+  <modules>
+    <module>shared</module>
+    <module>modules/identity</module>
+    <module>modules/cooks</module>
+    <module>modules/catalog</module>
+    <module>modules/availability</module>
+    <module>modules/orders</module>
+    <module>modules/finance</module>
+    <module>modules/support</module>
+    <module>modules/notifications</module>
+    <module>modules/operations</module>
+    <module>app</module>
+  </modules>
+
+  <properties>
+    <java.version>21</java.version>
+    <maven.compiler.release>21</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <archunit.version>1.5.1</archunit.version>
+    <!-- Production database major version; digest pinned (PostgreSQL 16.15, alpine, multi-arch index). -->
+    <aws.sdk.version>2.55.0</aws.sdk.version>
+    <!-- Local S3-compatible emulator used by integration tests (same image as infra/compose.yaml). -->
+    <s3mock.test.image>adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92</s3mock.test.image>
+    <postgres.test.image>postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea</postgres.test.image>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>${aws.sdk.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-shared</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-identity</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-cooks</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-catalog</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-availability</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-orders</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-finance</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-notifications</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.matbakhy</groupId>
+        <artifactId>matbakhy-operations</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <version>${archunit.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <matbakhy.test.postgres-image>${postgres.test.image}</matbakhy.test.postgres-image>
+              <matbakhy.test.s3mock-image>${s3mock.test.image}</matbakhy.test.s3mock-image>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-toolchain</id>
+            <goals><goal>enforce</goal></goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[21,22)</version>
+                  <message>Matbakhy backend requires JDK 21 (see docs/engineering/toolchain.md).</message>
+                </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>[3.9.11,4)</version>
+                  <message>Use the Maven wrapper: ./mvnw</message>
+                </requireMavenVersion>
+                <dependencyConvergence/>
+                <banDuplicatePomDependencyVersions/>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

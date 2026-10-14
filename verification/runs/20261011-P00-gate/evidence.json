@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "P00-GATE",
+  "phase": "P00",
+  "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T09:21:34.228619+00:00",
+  "finished_at": "2026-10-11T09:22:01.165725+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P00-CHECK-1",
+      "name": "Scope and traceability review",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P00-gate/P00-CHECK-1.log"
+    },
+    {
+      "id": "P00-CHECK-2",
+      "name": "Brand and UX artifacts review",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_design.sh",
+        "verification/runs/20261011-P00-gate"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P00-gate/P00-CHECK-2.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P00-gate/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-101",
+      "status": "PASS",
+      "observed": "check_scope.py PASS at this commit: inventory matches the filesystem; decision register and decisions.json agree with D01-D10 PROPOSED_DEFAULT and O01-O10 OPEN, no fabricated approvals; the MB-047 split is recorded as a pending proposal, not applied."
+    },
+    {
+      "id": "TC-102",
+      "status": "PASS",
+      "observed": "check_scope.py PASS at this commit: every rule has an owning story and scenario, the dependency graph is acyclic and phase-ordered, the four client targets and separate Android/iOS verification stories exist, deferred extensions are retained and the traceability matrix is current."
+    },
+    {
+      "id": "TC-103",
+      "status": "PASS",
+      "observed": "check_design.sh at this commit: token tests PASS (contrast in both themes, no hard-coded brand name or hex in apps, CSS current) and 8 specimens rendered with IBM Plex Sans Arabic loaded."
+    },
+    {
+      "id": "TC-104",
+      "status": "PASS",
+      "observed": "check_design.sh at this commit: all 8 prototype journeys PASS in ar/en at 390/1280 px; docs/design/approval.md remains PENDING (approval not fabricated)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-P00-gate/P00-CHECK-1.log",
+    "verification/runs/20261011-P00-gate/P00-CHECK-2.log",
+    "verification/runs/20261011-P00-gate/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-P00-gate/ux/journey-results.json",
+    "verification/runs/20261011-P00-gate/specimen/specimen-results.json"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "P00 gate re-verification at a single commit; story-level reviews are in the MB-001..MB-004 runs. Owner visual approval (O05) is not a P00 gate requirement and remains PENDING; it gates P06."
+    ]
+  },
+  "approvals": [],
+  "open_defects": [],
+  "note": "Screenshots from this gate run were not retained (identical journeys/specimens are kept in the MB-003/MB-004 runs); JSON results and logs are retained."
+}

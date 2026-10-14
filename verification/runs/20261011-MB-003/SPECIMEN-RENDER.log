@@ -1,0 +1,5 @@
+
+> @matbakhy/design-tokens@0.1.0 specimen /home/user/Matbakhy-v1/packages/design-tokens
+> node scripts/render-specimen.mjs ../../verification/runs/20261011-MB-003/specimen
+
+PASS: rendered 8 specimens with IBM Plex Sans Arabic loaded into /home/user/Matbakhy-v1/verification/runs/20261011-MB-003/specimen

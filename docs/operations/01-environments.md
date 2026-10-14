@@ -28,3 +28,7 @@ Validate migration against empty and previous-release schemas. Take/check a reco
 Structured JSON logs: timestamp, level, component, request/trace ID, safe order/event ID, duration, error code. Metrics: request latency/error rate, order submission success, stock conflict, acceptance expiry, outbox age/dead-letter, DB pool/lock latency, failed auth/OTP limit, cash variance, unmatched finance events, backup age and deployment version. Avoid high-cardinality PII labels.
 
 Proposed initial alerts: any ledger imbalance/oversell → critical; sustained valid-order failure >1% over 10 minutes → investigate; oldest outbox pending >5 minutes → warning; repeated failed jobs/dead letters → ops; no successful backup in 24 hours → incident. Tune noise with actual pilot data; do not weaken invariant alerts. Route alerts only to approved operator channels.
+
+## Pre-preview audit and log readiness
+
+Owner direction (2026-10-12): complete the [audit and log readiness checklist](05-observability-readiness.md) under MB-039, with deployed verification under MB-040, before external tester access to an early web preview. Continue current mobile recovery and independent QA; prepare the checklist at the next eligible observability checkpoint. An early preview does not close MB-040 or waive its existing dependencies.

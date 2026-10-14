@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-054",
+  "phase": "P08",
+  "source_commit": "a89151f20acbd805bcf932c85ff98a6d7f035725",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-13T12:39:49.903455+00:00",
+  "finished_at": "2026-10-13T12:50:44.444762+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (ActivityInsightsIntegrationTest and regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-054/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "CONTRACT-CHECK",
+      "name": "Contract lint and generated-client drift",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm run contract:check"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-054/CONTRACT-CHECK.log"
+    },
+    {
+      "id": "WORKSPACE-TESTS",
+      "name": "Workspace component tests (customer web activity, cook insights)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm -r test"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-054/WORKSPACE-TESTS.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real local stack (cook Insights tab in the layout and axe sweep)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-054/BROWSER-E2E.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-164",
+      "status": "PASS",
+      "observed": "ActivityInsightsIntegrationTest on PostgreSQL (red first: 3 of 4 failed): ten refreshes by one visitor count one impression, one meal view, one kitchen view and one add-to-cart; a second visitor adds one view; a declared crawler and unknown subjects are not counted (202 either way); malformed kinds and visitor ids are refused; two kitchens are counted separately; the table stores only day, kind, subject, kitchen and a 32-byte keyed hash, never the visitor id. The cook report for two completed orders, one cancelled order and a paid refund of 2500 shows quotes 3, placed 3, completed 2, cancelled 1, repeat customers 1, portions 20 offered and 2 taken, gross 20000, refunds 2500, known net 17500, definitions including NET_IS_NOT_PROFIT, and no profit, margin, sponsor, customer or phone field; the other kitchen's report shows 0. A customer gets 403, an anonymous caller 401, a kitchenId parameter cannot select another kitchen, and a window over 366 days is refused. Discovery has no sponsored, promoted or advert data."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261013-MB-054/BACKEND-VERIFY.log",
+    "verification/runs/20261013-MB-054/CONTRACT-CHECK.log",
+    "verification/runs/20261013-MB-054/WORKSPACE-TESTS.log",
+    "verification/runs/20261013-MB-054/BROWSER-E2E.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "MB-054 at a89151f. Self-review, not independent review.",
+      "Limits: a bot that rotates visitor ids on every request is bounded only by the request size (50 events), not by the per-visitor cap; edge rate limiting is a preview/deployment control. Native apps do not send activity yet (web only). Search/filter context is not recorded. Retention of activity rows is decided under O06 (no deletion job yet). Deposit refunds reported by kitchens (order_payment REFUNDED) are not in the refunds figure, which counts paid or verified refunds from the finance workflow.",
+      "No sponsored ranking, campaign, billing or profit figure exists (Stage 3-4 not started; owner go required)."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

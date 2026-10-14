@@ -1,0 +1,23 @@
+backup /backups/db-20261014T094442Z/matbakhy-20261014T094442Z.dump written in 1s
+NOTICE:  database "matbakhy_restore_check" does not exist, skipping
+OK meal_slot_counters_match_allocations
+OK cook_slot_counters_match_meal_slots
+OK terminal_orders_hold_no_live_stock
+OK order_items_match_subtotal
+OK order_state_matches_latest_event
+OK one_cash_obligation_per_order
+OK ledger_groups_balanced
+OK ledger_only_for_completed_orders
+OK migrations_all_successful
+OK payment_state_matches_history
+restore_seconds=1 total_seconds=2
+RECONCILED matbakhy_restore_check
+backup verified: /backups/db-20261014T094442Z/matbakhy-20261014T094442Z.dump restored and reconciled
+ Container matbakhy-preview-storage-1 Stopping 
+ Container matbakhy-preview-storage-1 Stopped 
+ Container matbakhy-preview-storage-run-b8f455718cf7 Creating 
+ Container matbakhy-preview-storage-run-b8f455718cf7 Created 
+ Container matbakhy-preview-storage-1 Starting 
+ Container matbakhy-preview-storage-1 Started 
+backups in /tmp/mb-rehearsal/backups
+backup exit 0

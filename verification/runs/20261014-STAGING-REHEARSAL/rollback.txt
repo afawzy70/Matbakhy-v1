@@ -1,0 +1,11 @@
+schema before: == schema version: 28
+older image: healthy
+api-1  | {"@timestamp":"2026-10-14T09:48:04.129619208Z","log":{"level":"INFO","logger":"org.flywaydb.core.FlywayExecutor"},"process":{"pid":1,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"ea159c1f7d52d20675e8f9a0d6d23330401fab54","envir
+api-1  | {"@timestamp":"2026-10-14T09:48:04.349990749Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbValidate"},"process":{"pid":1,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"ea159c1f7d52d20675e8f9a0d6d23330401
+api-1  | {"@timestamp":"2026-10-14T09:48:04.459725209Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":1,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"ea159c1f7d52d20675e8f9a0d6d23330401f
+api-1  | {"@timestamp":"2026-10-14T09:48:04.461341270Z","log":{"level":"WARN","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":1,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"ea159c1f7d52d20675e8f9a0d6d23330401f
+api-1  | {"@timestamp":"2026-10-14T09:48:04.506075553Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":1,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"ea159c1f7d52d20675e8f9a0d6d23330401f
+older image GET /api/v1/configuration/public -> 200
+older image GET /api/v1/meals?limit=3 -> 200
+older image GET /api/v1/zones -> 200
+PASS: web preview smoke test for mb.localhost

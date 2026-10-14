@@ -1,0 +1,88 @@
+{
+  "run_id": "20261011-MB-013",
+  "story_id": "MB-013",
+  "phase": "P03",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. MediaIntegrationTest (PostgreSQL + S3 emulator) and cook regression",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify incl. signed upload round trip through the compose API",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-010",
+      "observed": "MediaIntegrationTest with PostgreSQL and the digest-pinned S3 emulator: HTML declared as JPEG and PDF declared as PNG are rejected UNSUPPORTED_TYPE, PNG declared as JPEG TYPE_MISMATCH; tickets over 8 MiB and SVG are 422; a larger-than-declared object is SIZE_MISMATCH, tampered bytes CHECKSUM_MISMATCH, 100x100 and a PNG header claiming 30000x30000 are DIMENSIONS, a truncated JPEG UNREADABLE; EICAR-marked content is MALWARE (audited) and an unknown scan leaves the media QUARANTINED with 503 and no public object. Rejected bytes are removed from the private bucket and nothing appears in the public bucket. A verification document is APPROVED without a public URL; other customers and reviewers get 404 until it is frozen into a submitted application revision, after which a cook.review holder receives a 5-minute signed read (audited) and others still get 404. Mutations (skip type check, publish original bytes, drop reviewer scoping) each failed a test."
+    },
+    {
+      "id": "TC-113",
+      "observed": "Signed private upload flow (signed PUT bound to type/length, 10 minutes, key never derived from the filename); byte/type/dimension limits; fail-closed scan adapter; metadata stripping proven by a JPEG carrying a synthetic GPS Exif marker whose public variant has neither the marker nor an Exif segment; approved public derivative served from the public bucket only after a clean scan; scoped deletes (another account cannot delete; deletion removes private and public objects; documents in a submitted revision cannot be deleted). Database constraints reject a public key on non-approved or document media and APPROVED without a clean scan. The local stack smoke performs ticket, direct PUT, completion and signed read through the compose API."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-013/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review defect fixed before evidence: a truncated JPEG decoded with only a warning and was approved; any decoder warning now rejects (UNREADABLE), covered by test.",
+      "Self-review defect fixed: completion of a document did not return the owner's signed read; view now derives read access from purpose and state only after the caller's scope is established.",
+      "Residual: the S3 emulator enforces neither bucket privacy nor signed-URL expiry or content-length; production storage policy (infra/storage/README.md) and a real scanner must be configured and verified before live uploads (O07, P09). Deployed environments refuse to start without them.",
+      "Residual: PDF active-content detection is a conservative static marker check (obfuscated names can evade it); documents are only served as attachments via signed URLs and a real scanner is required before live use.",
+      "Residual: no public delete endpoint yet (service-level scoped delete); meal photo attachment and moderation arrive with MB-014; required document kinds and retention are O06."
+    ]
+  },
+  "open_defects": []
+}

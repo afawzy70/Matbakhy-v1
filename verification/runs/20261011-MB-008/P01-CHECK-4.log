@@ -1,0 +1,9 @@
+== git history
+[90m8:58AM[0m [32mINF[0m [1m15 commits scanned.[0m
+[90m8:58AM[0m [32mINF[0m [1mscanned ~1453542 bytes (1.45 MB) in 344ms[0m
+[90m8:58AM[0m [32mINF[0m [1mno leaks found[0m
+== working tree (tracked and untracked, excluding dependencies and build output)
+[90m8:58AM[0m [33mWRN[0m [1mskipping file: too large max_size=5MB, size=27MB[0m [36mpath=[0m/repo/backend/app/target/matbakhy-app-0.1.0-SNAPSHOT.jar
+[90m8:58AM[0m [32mINF[0m [1mscanned ~4932935 bytes (4.93 MB) in 1.03s[0m
+[90m8:58AM[0m [32mINF[0m [1mno leaks found[0m
+PASS: no secrets detected

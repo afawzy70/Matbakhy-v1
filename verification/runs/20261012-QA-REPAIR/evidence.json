@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-027",
+  "phase": "P06",
+  "source_commit": "c35ad2d0be06f045059e19fbcc1c6e25209cb645",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-12T12:11:10.317158+00:00",
+  "finished_at": "2026-10-12T12:29:44.340305+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-QA-REPAIR/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-QA-REPAIR/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-QA-REPAIR/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-QA-REPAIR/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-QA-REPAIR/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261012-QA-REPAIR/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-149",
+      "status": "PASS",
+      "observed": "Customer web basket (CW05): component tests drive real meal pages and the cart; 2 × 120.25 + 95.50 shows an estimated subtotal of 336.00 EGP; raising A2 gives 431.50, lowering A1 gives 311.25, removing A1 gives 191.00, removing the last line shows the empty state and clears storage; quantity stays within 1 and min(20, portions when added) (3 portions: 360.75); all four replacement paths keep or replace the exact saved kitchen, slot and lines with estimates 240.50 / 80.25 / 240.50 / 95.50; the kitchen name is shown; the estimate is labelled separately from the server quote, an edit removes a quote already shown and the next quote request carries the new quantity; a pending placement disables editing. The keyboard browser journey (BROWSER-E2E, real stack) raises and lowers a basket quantity and sees the estimate. Tests were run red first (RED-web-FG-001.log). Fixes QA finding FG-001; pending independent retest."
+    },
+    {
+      "id": "TC-150",
+      "status": "PASS",
+      "observed": "Customer web component tests with a bilingual fake API that answers in the request's Accept-Language: switching Arabic → English → Arabic on browse, meal detail and kitchen page sends each request in the chosen language and shows that language's title, description, portion text and kitchen name; an English answer held back until after the switch back to Arabic is never shown. Red against the unchanged code (RED-web-MBQA-001-002.log). Fixes QA finding MBQA-001; pending independent retest. Native client is created per language (not affected)."
+    },
+    {
+      "id": "TC-151",
+      "status": "PASS",
+      "observed": "Customer web and native component tests with a meal whose first slot has 0 portions and second 3: selecting the exhausted slot leaves Add disabled, shows that the time is sold out, and writes nothing to the basket; the slot with stock caps the quantity at 3 and adds exactly that meal × 3 in that slot; switching back to the exhausted slot cannot rewrite the basket; an entirely sold-out meal stays unpurchasable. Red against the unchanged code on web and native (RED-web-MBQA-001-002.log, RED-native-MBQA-002.log). Server stock enforcement unchanged (BACKEND-VERIFY). Fixes QA finding MBQA-002; pending independent retest."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-QA-REPAIR/BACKEND-VERIFY.log",
+    "verification/runs/20261012-QA-REPAIR/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261012-QA-REPAIR/LOCAL-STACK.log",
+    "verification/runs/20261012-QA-REPAIR/BROWSER-E2E.log",
+    "verification/runs/20261012-QA-REPAIR/SECRET-SCAN.log",
+    "verification/runs/20261012-QA-REPAIR/GUARDRAIL-TESTS.log",
+    "verification/runs/20261012-QA-REPAIR/RED-web-MBQA-001-002.log",
+    "verification/runs/20261012-QA-REPAIR/RED-native-MBQA-002.log",
+    "verification/runs/20261012-QA-REPAIR/RED-web-FG-001.log",
+    "verification/runs/20261012-QA-REPAIR/RED-web-meal-state-carryover.log",
+    "verification/runs/20261012-QA-REPAIR/RED-native-basket-editing.log",
+    "docs/quality/07-codex-qa-repair.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Repairs for independent Codex QA findings MBQA-002, MBQA-001 and FG-001 (report at a7ed1f3, tested eb1a671); status FIXED_PENDING_INDEPENDENT_RETEST, not closed by independent QA.",
+      "Every regression test was run against the unchanged product code first and failed for the reported reason; logs are kept in this run directory.",
+      "A further defect found by the new tests (meal page kept the previous meal's quantity on direct meal-to-meal navigation) was fixed by keying the page by meal id.",
+      "The basket's unit price and portion limit are display-only snapshots for the estimate; quotes send meal ids and quantities only, and the server remains authoritative for price and stock.",
+      "Not resolved here: RQ-001/RQ-002/RQ-003 (proposals in docs/quality/07-codex-qa-repair.md), Q1 per-line limit, operations-web language follow-up, native emulator/simulator verification of basket editing (MB-032)."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

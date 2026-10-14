@@ -1,0 +1,29 @@
+# Red phase: API-001 public configuration (Q1 option A), before any controller (HEAD f3ff3f0a987f5e409be1db816574c5839570be67, test uncommitted)
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.orders.PublicConfigurationIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 22.43 s <<< FAILURE! -- in com.matbakhy.app.orders.PublicConfigurationIntegrationTest
+com.matbakhy.app.orders.PublicConfigurationIntegrationTest.anyone_can_read_the_active_per_line_limit_and_nothing_commercial_beyond_it -- Time elapsed: 1.120 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+expected: 200
+ but was: 404
+	at com.matbakhy.app.orders.PublicConfigurationIntegrationTest.publicConfiguration(PublicConfigurationIntegrationTest.java:48)
+	at com.matbakhy.app.orders.PublicConfigurationIntegrationTest.anyone_can_read_the_active_per_line_limit_and_nothing_commercial_beyond_it(PublicConfigurationIntegrationTest.java:55)
+
+com.matbakhy.app.orders.PublicConfigurationIntegrationTest.a_newly_activated_policy_is_published_at_once -- Time elapsed: 0.020 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+expected: 200
+ but was: 404
+	at com.matbakhy.app.orders.PublicConfigurationIntegrationTest.publicConfiguration(PublicConfigurationIntegrationTest.java:48)
+	at com.matbakhy.app.orders.PublicConfigurationIntegrationTest.a_newly_activated_policy_is_published_at_once(PublicConfigurationIntegrationTest.java:69)
+
+com.matbakhy.app.orders.PublicConfigurationIntegrationTest.while_ordering_is_paused_no_limits_are_offered -- Time elapsed: 0.019 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+expected: 200
+ but was: 404
+	at com.matbakhy.app.orders.PublicConfigurationIntegrationTest.publicConfiguration(PublicConfigurationIntegrationTest.java:48)
+	at com.matbakhy.app.orders.PublicConfigurationIntegrationTest.while_ordering_is_paused_no_limits_are_offered(PublicConfigurationIntegrationTest.java:78)
+

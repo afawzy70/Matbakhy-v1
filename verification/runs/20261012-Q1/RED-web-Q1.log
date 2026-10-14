@@ -1,0 +1,666 @@
+# Red phase: Q1 web clients, before reading the published limit (HEAD 4eaee3a1f53b929b9e7685fd30da689d470d095c, tests uncommitted)
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/customer-web
+
+ ❯ src/App.test.tsx (27 tests | 2 failed | 24 skipped) 2561ms
+   ❯ Q1: quantity limits come from the server's active policy (3)
+     × caps the meal quantity at the policy limit when the slot has more portions, and at the portions when fewer 1286ms
+     × explains a basket line above a lowered limit and offers no quote until it is reduced 1035ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > Q1: quantity limits come from the server's active policy > caps the meal quantity at the policy limit when the slot has more portions, and at the portions when fewer
+AssertionError: expected 15 to be 10 // Object.is equality
+
+Ignored nodes: comments, script, style
+<html
+  dir="ltr"
+  lang="en"
+>
+  <head>
+    <title>
+      Matbakhy
+    </title>
+  </head>
+  <body>
+    <div>
+      <div
+        class="app"
+      >
+        <header
+          class="topbar"
+        >
+          <h1>
+            Matbakhy
+          </h1>
+          <div
+            class="topbar-actions"
+          >
+            <a
+              class="button secondary"
+              href="#/checkout"
+            >
+              Cart
+            </a>
+            <button
+              class="secondary"
+              type="button"
+            >
+              العربية
+            </button>
+            <a
+              class="button secondary"
+              href="http://localhost:8080/oauth2/authorization/keycloak?returnTo=http%3A%2F%2Flocalhost%3A3000%2F%23%2Fmeal%2Fc1c1c1c1-0000-4000-8000-0000000000c1"
+            >
+              Sign in
+            </a>
+          </div>
+        </header>
+        <main
+          class="shell"
+        >
+          <article
+            aria-labelledby="meal-title"
+            class="meal-detail stack"
+          >
+            <a
+              href="#/"
+            >
+              Back
+            </a>
+            <div
+              aria-hidden="true"
+              class="hero"
+            />
+            <div
+              class="row between"
+            >
+              <h2
+                id="meal-title"
+              >
+                QA Meal Q1
+              </h2>
+              <span
+                class="price"
+              >
+                <bdi>
+                  EGP 50.00
+                </bdi>
+              </span>
+            </div>
+            <a
+              class="kitchen-link"
+              href="#/kitchen/kitchen-q"
+            >
+              Kitchen Q
+            </a>
+            <section
+              aria-label="Portion"
+              class="card pad stack-sm"
+            >
+              <strong>
+                1 plate
+              </strong>
+            </section>
+            <section
+              aria-labelledby="about-heading"
+              class="stack-sm"
+            >
+              <h3
+                id="about-heading"
+              >
+                About this dish
+              </h3>
+              <p />
+            </section>
+            <section
+              aria-labelledby="ingredients-heading"
+              class="card pad stack-sm"
+            >
+              <h3
+                id="ingredients-heading"
+              >
+                Ingredients and allergy information
+              </h3>
+              <p />
+              <p>
+                The kitchen declared no known allergens in this dish.
+              </p>
+            </section>
+            <fieldset
+              class="slots"
+            >
+              <legend>
+                Cooking slots
+              </legend>
+              <label
+                class="slot-option"
+              >
+                <input
+                  name="slot"
+                  type="radio"
+                />
+                <span>
+                  13 Oct 2026, 13:00
+                   · 
+                  15 left
+                   · 
+                  Pickup from the kitchen
+                </span>
+              </label>
+            </fieldset>
+            <div
+              class="buy-bar"
+            >
+              <div
+                aria-label="Choose quantity"
+                class="qty"
+                role="group"
+              >
+                <button
+                  aria-label="Decrease quantity"
+                  class="secondary"
+                  type="button"
+                >
+                  −
+                </button>
+                <input
+                  aria-label="Quantity"
+                  max="15"
+                  min="1"
+                  type="number"
+                  value="15"
+                />
+                <button
+                  aria-label="Increase quantity"
+                  class="secondary"
+                  disabled=""
+                  type="button"
+                >
+                  +
+                </button>
+              </div>
+              <button
+                type="button"
+              >
+                Add to cart
+                 · 
+                <bdi>
+                  EGP 750.00
+                </bdi>
+              </button>
+            </div>
+            <p
+              class="muted small"
+            >
+              The final total is calculated in the cart at the current price.
+            </p>
+            <p
+              class="row"
+            >
+              <bdi
+                class="muted"
+                dir="ltr"
+              >
+                http://localhost:3000/#/meal/c1c1c1c1-0000-4000-8000-0000000000c1
+              </bdi>
+              <button
+                class="secondary"
+                type="button"
+              >
+                Copy link to share
+              </button>
+            </p>
+            <section
+              aria-labelledby="reviews-heading"
+              class="stack"
+            >
+              <h3
+                id="reviews-heading"
+              >
+                Reviews
+              </h3>
+              <p
+                class="muted"
+              >
+                No reviews yet.
+              </p>
+              <ul
+                class="rows"
+              />
+            </section>
+          </article>
+        </main>
+        <nav
+          aria-label="Matbakhy"
+          class="bottom-nav"
+        >
+          <a
+            href="#/"
+          >
+            Home
+          </a>
+        </nav>
+      </div>
+    </div>
+  </body>
+</html>
+
+- Expected
++ Received
+
+- 10
++ 15
+
+ ❯ src/App.test.tsx:889:60
+    887|     render(<App fetchImpl={fetchImpl} />);
+    888|     fireEvent.click(screen.getByRole("button", { name: "English" }));
+    889|     await waitFor(async () => expect(await maxReachable()).toBe(10));
+       |                                                            ^
+    890|     fireEvent.change(screen.getByRole("spinbutton", { name: "Quantity"…
+    891|     expect((screen.getByRole("spinbutton", { name: "Quantity" }) as HT…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/App.test.tsx > Q1: quantity limits come from the server's active policy > explains a basket line above a lowered limit and offers no quote until it is reduced
+TestingLibraryElementError: Unable to find an element with the text: At most 10 per meal can be ordered now. Reduce the quantity to continue.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="app"
+    >
+      <header
+        class="topbar"
+      >
+        <h1>
+          Matbakhy
+        </h1>
+        <div
+          class="topbar-actions"
+        >
+          <a
+            aria-current="page"
+            class="button secondary"
+            href="#/checkout"
+          >
+            Cart
+          </a>
+          <button
+            class="secondary"
+            type="button"
+          >
+            العربية
+          </button>
+        </div>
+      </header>
+      <main
+        class="shell"
+      >
+        <div
+          class="transaction stack"
+        >
+          <section
+            aria-labelledby="cart-heading"
+            class="card"
+          >
+            <h2
+              id="cart-heading"
+            >
+              Cart
+            </h2>
+            <p>
+              <span
+                class="muted"
+              >
+                Kitchen
+                : 
+              </span>
+              <strong>
+                Kitchen Q
+              </strong>
+            </p>
+            <p>
+              <span
+                class="pill slot-pill"
+              >
+                13 Oct 2026, 13:00
+              </span>
+            </p>
+            <ul
+              class="line-items"
+            >
+              <li
+                class="cart-line"
+              >
+                <span
+                  class="cart-line-title"
+                >
+                  QA Meal Q1
+                </span>
+                <div
+                  aria-label="Quantity: QA Meal Q1"
+                  class="qty"
+                  role="group"
+                >
+                  <button
+                    aria-label="Decrease quantity: QA Meal Q1"
+                    class="secondary"
+                    type="button"
+                  >
+                    −
+                  </button>
+                  <output
+                    aria-live="polite"
+                  >
+                    12
+                  </output>
+                  <button
+                    aria-label="Increase quantity: QA Meal Q1"
+                    class="secondary"
+                    type="button"
+                  >
+                    +
+                  </button>
+                </div>
+                <bdi
+                  class="muted"
+                >
+                  EGP 600.00
+                </bdi>
+                <button
+                  aria-label="Remove QA Meal Q1"
+                  class="secondary"
+                  type="button"
+                >
+                  Remove
+                </button>
+              </li>
+            </ul>
+            <dl
+              class="summary"
+            >
+              <dt>
+                Estimated subtotal
+              </dt>
+              <dd>
+                <bdi>
+                  EGP 600.00
+                </bdi>
+              </dd>
+            </dl>
+            <p
+              class="muted small"
+            >
+              This is an estimate from the prices shown when you added each meal. The final total at the current price appears when you choose "Calculate total".
+            </p>
+            <button
+              class="secondary"
+              type="button"
+            >
+              Empty cart
+            </button>
+          </section>
+          <section
+            aria-labelledby="order-heading"
+            class="card form"
+          >
+            <h2
+              id="order-heading"
+            >
+              Checkout
+            </h2>
+            <div
+              aria-label="Checkout"
+              class="mode-switch"
+              role="group"
+            >
+              <button
+                aria-pressed="true"
+                type="button"
+              >
+                Pickup from the kitchen
+              </button>
+            </div>
+            <button
+              class="cta"
+              type="button"
+            >
+              Calculate total
+            </button>
+          </section>
+        </div>
+      </main>
+      <nav
+        aria-label="Matbakhy"
+        class="bottom-nav"
+      >
+        <a
+          href="#/"
+        >
+          Home
+        </a>
+        <a
+          href="#/orders"
+        >
+          My orders
+        </a>
+        <a
+          href="#/account"
+        >
+          My account
+        </a>
+      </nav>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="app"
+    >
+      <header
+        class="topbar"
+      >
+        <h1>
+          Matbakhy
+        </h1>
+        <div
+          class="topbar-actions"
+        >
+          <a
+            aria-current="page"
+            class="button secondary"
+            href="#/checkout"
+          >
+            Cart
+          </a>
+          <button
+            class="secondary"
+            type="button"
+          >
+            العربية
+          </button>
+        </div>
+      </header>
+      <main
+        class="shell"
+      >
+        <div
+          class="transaction stack"
+        >
+          <section
+            aria-labelledby="cart-heading"
+            class="card"
+          >
+            <h2
+              id="cart-heading"
+            >
+              Cart
+            </h2>
+            <p>
+              <span
+                class="muted"
+              >
+                Kitchen
+                : 
+              </span>
+              <strong>
+                Kitchen Q
+              </strong>
+            </p>
+            <p>
+              <span
+                class="pill slot-pill"
+              >
+                13 Oct 2026, 13:00
+              </span>
+            </p>
+            <ul
+              class="line-items"
+            >
+              <li
+                class="cart-line"
+              >
+                <span
+                  class="cart-line-title"
+                >
+                  QA Meal Q1
+                </span>
+                <div
+                  aria-label="Quantity: QA Meal Q1"
+                  class="qty"
+                  role="group"
+                >
+                  <button
+                    aria-label="Decrease quantity: QA Meal Q1"
+                    class="secondary"
+                    type="button"
+                  >
+                    −
+                  </button>
+                  <output
+                    aria-live="polite"
+                  >
+                    12
+                  </output>
+                  <button
+                    aria-label="Increase quantity: QA Meal Q1"
+                    class="secondary"
+                    type="button"
+                  >
+                    +
+                  </button>
+                </div>
+                <bdi
+                  class="muted"
+                >
+                  EGP 600.00
+                </bdi>
+                <button
+                  aria-label="Remove QA Meal Q1"
+                  class="secondary"
+                  type="button"
+                >
+                  Remove
+                </button>
+              </li>
+            </ul>
+            <dl
+              class="summary"
+            >
+              <dt>
+                Estimated subtotal
+              </dt>
+              <dd>
+                <bdi>
+                  EGP 600.00
+                </bdi>
+              </dd>
+            </dl>
+            <p
+              class="muted small"
+            >
+              This is an estimate from the prices shown when you added each meal. The final total at the current price appears when you choose "Calculate total".
+            </p>
+            <button
+              class="secondary"
+              type="button"
+            >
+              Empty cart
+            </button>
+          </section>
+          <section
+            aria-labelledby="order-heading"
+            class="card form"
+          >
+            <h2
+              id="order-heading"
+            >
+              Checkout
+            </h2>
+            <div
+              aria-label="Checkout"
+              class="mode-switch"
+              role="group"
+            >
+              <button
+                aria-pressed="true"
+                type="button"
+              >
+                Pickup from the kitchen
+              </button>
+            </div>
+            <button
+              class="cta"
+              type="button"
+            >
+              Calculate total
+            </button>
+          </section>
+        </div>
+      </main>
+      <nav
+        aria-label="Matbakhy"
+        class="bottom-nav"
+      >
+        <a
+          href="#/"
+        >
+          Home
+        </a>
+        <a
+          href="#/orders"
+        >
+          My orders
+        </a>
+        <a
+          href="#/account"
+        >
+          My account
+        </a>
+      </nav>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/App.test.tsx:922:25
+    920|     render(<App fetchImpl={fetchImpl} />);
+    921|     fireEvent.click(screen.getByRole("button", { name: "English" }));
+    922|     expect(await screen.findByText("At most 10 per meal can be ordered…
+       |                         ^
+    923|     expect((await screen.findByRole("button", { name: "Calculate total…
+    924|     const minus = screen.getByRole("button", { name: "Decrease quantit…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed | 24 skipped (27)
+   Start at  15:48:41
+   Duration  3.99s (tests 67%, environment 16%, transform 14%, import 4%)
+

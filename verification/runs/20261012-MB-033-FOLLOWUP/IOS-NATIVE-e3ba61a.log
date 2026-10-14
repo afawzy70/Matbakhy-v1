@@ -1,0 +1,18 @@
+Native run 32 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38283912106), job 114927568913, source e3ba61acb7b7c5cbd12d50641ec99064551e86c6
+iOS simulator, step "MB-032 native ordering on iOS" (excerpt of the job log, 2026-10-12T17:56–17:59Z): conclusion success
+Test Case '-[SignInUITests.OrderingTests testB_ReopenedOfflineSaysUnconfirmed]' passed (10.637 seconds).
+Test Case '-[SignInUITests.OrderingTests testC_BackOnlineRecoversTheOneOrder]' passed (11.678 seconds).
+side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1
+order MB-100001; stored total_minor 9000; app shows: MB032-ORDER-TOTAL Total: EGP 90.00
+== phase D (MB-033 Q1): the quantity control stops at min(policy limit 10, 15 available portions)
+MB033-QUANTITY-STOPPED-AT 10
+Test Case '-[SignInUITests.OrderingTests testD_QuantityStopsAtThePolicyLimit]' passed (20.363 seconds).
+== phase E (MB-033 Q1 + delivery): the limit drops to 5; the saved basket must be corrected before a delivery order
+MB033-OVER-LIMIT-BLOCKED
+MB033-DELIVERY-QUOTE-TOTAL Total: EGP 630.00
+MB033-DELIVERY-FEE Delivery: EGP 30.00
+MB033-DELIVERY-ORDER-NUMBER MB-100002
+Test Case '-[SignInUITests.OrderingTests testE_LoweredLimitBlocksQuoteThenDeliveryOrder]' passed (28.301 seconds).
+quotes for the customer: 1 before phase E, 2 after
+delivery order MB-100002 (mode|fee|total|address snapshot|kitchen|state): DELIVERY|3000|63000|true|00000000-0000-4000-8000-00000000a0d1|PENDING_ACCEPTANCE
+PASS: iOS ... quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total

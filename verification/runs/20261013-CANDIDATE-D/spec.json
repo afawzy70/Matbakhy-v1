@@ -1,0 +1,93 @@
+{
+  "run_id": "20261013-CANDIDATE-D",
+  "story_id": "MB-049",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-155",
+      "observed": "Real PostgreSQL (PriceChangeIntegrationTest, part of BACKEND-VERIFY): update first — the kitchen edit holds the meal row FOR UPDATE, the placement waits on the FOR SHARE lock and is then refused 409 PRICE_CHANGED (MEAL_CHANGED) with no order, allocation or reserved stock; placement first — the order holds its locks, the price update waits, the order commits at 12000 and the meal is 15000 afterwards. Red first: verification/runs/20261013-PRICE-CHANGE/RED-backend-price-race.log."
+    },
+    {
+      "id": "TC-156",
+      "observed": "Real PostgreSQL (PriceChangeIntegrationTest): an order committed with its response lost, then the meal price and the delivery fee changed; recovery by client request ID and a repeated placement with the same idempotency key return the same single order at total 35000 with the original item prices; commission and cash obligation unchanged; reserved portions 3; no second order."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Local regression checks for QA candidate D: D13 informed reconfirmation, D14 price history, MB-031 token refresh fix (found in native runs 36/37), MB-033 notification permission and native dynamic-text phases, MB-039 runtime role, audit-write failure, management-port metrics, bounded gauges and the local observability stack. Self-review, not independent review. Native results are separate (verification/runs/20261013-PRICE-CHANGE). Supersedes the failed candidate C attempt at 31025fc (secret scan). This run does not mark any story DONE."
+    ]
+  },
+  "open_defects": []
+}

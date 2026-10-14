@@ -1,0 +1,35 @@
+{
+  "run_id": "20261013-TC-055",
+  "story_id": "MB-039",
+  "phase": "P08",
+  "checks": [
+    {
+      "id": "ERASURE",
+      "name": "AccountErasureIntegrationTest and RuntimeRoleIntegrationTest on PostgreSQL",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp -pl app -am test -Dtest=AccountErasureIntegrationTest,RuntimeRoleIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-055",
+      "observed": "Under the fixture policy (14-day grace, policy version retention-policy-draft): a deletion request disables the account at once (403); nothing is erased during the grace period or while an order is active; then the account, addresses, order contact and address snapshots, review text, support case description and the customer's own support replies, favorites, devices and the customer's deposit transfer references are erased in one run, the identity link is removed (signing in again creates a new empty account with no access to the history), a second run changes nothing, and the audit record holds counts only. Order amounts and items stay; terminal orders stay immutable otherwise; a completed order's ledger entries are unchanged and every group still balances; the kitchen's and staff's payment history stays. A cook account is put on hold for staff review instead (private cook documents are kept for that review). Under the least-privilege runtime role the erasure update is permitted while delete, truncate and disabling the append-only triggers are refused. Before the 2026-10-13 fix (V27) erasure failed for any customer with a support reply."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "TC-055 under the fixture policy. Self-review, not independent review. The approved retention periods and the final anonymization rules are O06; the fixture policy is not an approved policy. MB-039 stays IN_PROGRESS (TC-057 needs a staging restore; deployed AUD-01/LOG-01/OPS-01..03 NOT_RUN)."
+    ]
+  },
+  "open_defects": []
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-051",
+  "phase": "P07",
+  "source_commit": "61d8dd5c28489fa62ea85fbe8ae07fe9f54d27d2",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-13T11:11:03.107137+00:00",
+  "finished_at": "2026-10-13T11:17:57.394379+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (DepositPaymentIntegrationTest and regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-051/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "CONTRACT-CHECK",
+      "name": "Contract lint and generated-client drift",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm run contract:check"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-051/CONTRACT-CHECK.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-158",
+      "status": "PASS",
+      "observed": "DepositPaymentIntegrationTest on PostgreSQL: with a kitchen profile of 50% deposit, COD cap EGP 200.00 and an approved InstaPay recipient, a DEPOSIT quote of 27000 shows deposit 13500, remainder 13500 and the recipient; a COD quote above the cap is refused (COD_NOT_ELIGIBLE) and a small COD quote has no deposit; the placed order snapshots deposit, remainder, recipient and deadline in order_payment, cash due at hand-over is 13500; a later change of the kitchen's terms leaves the order unchanged, an UPDATE of the terms is refused (immutable), and a quote made before the change is refused at placement with 409 PRICE_CHANGED / PAYMENT_CHANGED."
+    },
+    {
+      "id": "TC-159",
+      "status": "PASS",
+      "observed": "Two concurrent customer transfer reports both answer 200 and record one CUSTOMER_TRANSFER_REPORTED event; another customer gets 404; the kitchen may accept but prepare is refused 409 DEPOSIT_NOT_RECEIVED; another cook cannot report receipt (403/404); a different amount is refused 422; the exact amount moves the payment to KITCHEN_RECEIPT_REPORTED (response contains no 'verified'), after which prepare succeeds; the payment timeline is WAITING_FOR_DEPOSIT:CUSTOMER, CUSTOMER_TRANSFER_REPORTED:CUSTOMER, KITCHEN_RECEIPT_REPORTED:COOK. A COD order has no payment step (report refused 409; prepare allowed)."
+    },
+    {
+      "id": "TC-160",
+      "status": "PASS",
+      "observed": "At the acceptance deadline the expiry job closes both deposit orders: the one with a reported transfer goes to payment RECONCILE_PENDING, the one without to EXPIRED; the order is EXPIRED and its capacity is released once. A deposit reported received just before expiry, and automatic reconciliation of a deposit for an accepted-but-unpaid order, are not covered here (documented limits; MB-052)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261013-MB-051/BACKEND-VERIFY.log",
+    "verification/runs/20261013-MB-051/CONTRACT-CHECK.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "MB-051 server part at 61d8dd5. Self-review, not independent review. Customer/kitchen screens are MB-053/MB-052; recipient approval by staff and mismatch/dispute paths are MB-052; live money is blocked by D16 gates."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

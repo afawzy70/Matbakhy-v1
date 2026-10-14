@@ -1,0 +1,51 @@
+{
+  "realm": "matbakhy-test",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "accessTokenLifespan": 300,
+  "roles": { "realm": [ { "name": "admin", "description": "Synthetic role used to prove token roles grant nothing" } ] },
+  "clients": [
+    {
+      "clientId": "matbakhy-web",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "${WEB_SECRET}",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:${APP_PORT}/login/oauth2/code/keycloak"],
+      "attributes": { "post.logout.redirect.uris": "http://localhost:5173/" },
+      "protocolMappers": [ { "name": "api-audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+        "config": { "included.custom.audience": "matbakhy-api", "access.token.claim": "true", "id.token.claim": "false" } } ]
+    },
+    {
+      "clientId": "matbakhy-mobile",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["matbakhy-dev://auth/callback"],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "protocolMappers": [ { "name": "api-audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
+        "config": { "included.custom.audience": "matbakhy-api", "access.token.claim": "true", "id.token.claim": "false" } } ]
+    },
+    {
+      "clientId": "unrelated-app",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["unrelated-app://callback"],
+      "attributes": { "pkce.code.challenge.method": "S256" }
+    }
+  ],
+  "users": [
+    { "username": "customer-a", "email": "customer-a@matbakhy.test", "emailVerified": true, "enabled": true,
+      "firstName": "Customer", "lastName": "SyntheticA", "realmRoles": ["admin"],
+      "credentials": [ { "type": "password", "value": "${PASSWORD_A}", "temporary": false } ] },
+    { "username": "customer-b", "email": "customer-b@matbakhy.test", "emailVerified": true, "enabled": true,
+      "firstName": "Customer", "lastName": "SyntheticB",
+      "credentials": [ { "type": "password", "value": "${PASSWORD_B}", "temporary": false } ] }
+  ]
+}

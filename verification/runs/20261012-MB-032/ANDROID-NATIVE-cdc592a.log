@@ -1,0 +1,18 @@
+# Excerpt of GitHub Actions native run 31 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38273197484),
+# job "Android debug APK (Gradle)" (114892251241), source cdc592a2492a691de714a3d0bf23b31f25599480, emulator API 35.
+# Retrieved with the GitHub API job-log tool and inspected by the implementation agent.
+PASS: Android release-variant build launched; Discover tab visible; no fatal errors
+PASS: Android system-browser PKCE round trip; secure-storage restore; sign-out and account switch leave no previous-user session or data
+== seed synthetic kitchens and meals
+== TC-148: basket replacement asks first
+ok: keep leaves the basket; replace replaces it
+== sign in from the cart
+== TC-049: kill the app while the order response is held back
+app killed while the response was held back
+orders in the database after the kill: 1
+== reopen offline
+ok: offline and unconfirmed, nothing claimed
+== back online: recover the one order
+side effects (orders|allocations|meal-slot reserved|cook-slot reserved|cash obligations|ORDER_PLACED events|order events): 1|1|1|1|1|1|1
+order MB-100001; database (number|total_minor): MB-100001|9000; app shows text="Total: EGP 90.00"; quote showed text="Total: EGP 90.00"
+PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total

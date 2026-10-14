@@ -1,0 +1,25 @@
+# Red phase: native MBQA-002 test against unchanged product code (HEAD 5bd7681ba9d70179263115a1d94e1634d9183cb4, test uncommitted)
+FAIL src/App.test.tsx
+  ● QA repair MBQA-002 on native: an exhausted selected slot cannot be added › refuses the exhausted slot without writing the basket and adds the slot that has stock up to its portions
+
+    expect(received).toBeUndefined()
+
+    Received: "{\"kitchenId\":\"k1\",\"slotId\":\"sx-empty\",\"slotStartsAt\":\"2026-10-13T10:00:00Z\",\"modes\":[\"DELIVERY\",\"PICKUP\"],\"lines\":[{\"mealId\":\"mx\",\"title\":\"Dish mx\",\"quantity\":1}]}"
+
+      228 |     await fireEvent.press(screen.getByTestId("add-to-cart"));
+      229 |     await act(async () => undefined);
+    > 230 |     expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
+          |                                                 ^
+      231 |     expect(screen.queryByText(t.added)).toBeNull();
+      232 |     expect(screen.getByText(t.slotSoldOut)).toBeTruthy();
+      233 |
+
+      at Object.toBeUndefined (src/App.test.tsx:230:49)
+      at asyncGeneratorStep (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at _next (../../node_modules/.pnpm/@babel+runtime@7.29.10/node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 3 skipped, 1 of 4 total
+Tests:       1 failed, 24 skipped, 25 total
+Snapshots:   0 total
+Time:        2.435 s, estimated 3 s
+Ran all test suites with tests matching "MBQA-002".

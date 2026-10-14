@@ -4,7 +4,17 @@
 
 This policy supersedes the earlier one-time, open-ended execution instruction. Use one fresh owner-facing Claude Code prompt per workday, grounded in latest repository progress and verification. Within each daily session, continue autonomously through eligible work without asking permission after ordinary tasks.
 
-The work window is 12:00 noon to 00:00 midnight in Asia/Kuwait. Identify a workday by its starting date. Stop starting new stories around 23:30; finish or safely checkpoint current operations, record remaining checks and push by midnight when possible. Do not terminate migrations or destructive operations abruptly. If started outside this window, perform a safe checkpoint/preflight and await the next authorized window rather than assuming overnight implementation is authorized. Runtime interruptions and quota limits may end work earlier. Do not spend tokens idle-waiting until noon or manufacture busywork to fill twelve hours.
+## Owner direction — 2026-10-13 (supersedes the fixed 12:00 start)
+
+The daily work window **opens when the owner sends the first prompt of that day instructing the agent to start or continue work**, and it **always ends at the next 00:00 midnight, Asia/Kuwait**.
+- Later prompts during the same window do not extend the deadline.
+- After midnight, a new owner start/continue prompt is required to open the next window. Informational questions alone do not open a window.
+- This is never a rolling 24-hour session and never unlimited.
+- Record each window's actual start and deadline with the timezone in the daily report and `planning/execution-state.json`.
+- Plan the final checkpoint before midnight: stop starting new work early enough to save evidence, push, and leave a safe, resumable state (by default stop new stories about 60 minutes before the deadline; do not leave unbounded execution running beyond it). Do not terminate migrations or destructive operations abruptly.
+- Without an owner start/continue prompt for the day, perform at most a safe checkpoint/preflight. Do not wait idle, install an unsolicited scheduler, or claim automatic continuation after the session stops; the window is an authorization, not a persistent scheduler.
+
+*History: until 2026-10-13 the window was fixed at 12:00 noon to 00:00 midnight Asia/Kuwait, with new stories stopping around 23:30.* Runtime interruptions and quota limits may end work earlier. Do not manufacture busywork to fill the window.
 
 A prompt and scheduled review are not an installed process supervisor. They cannot guarantee automatic start/stop, recovery or twelve hours of continuous execution.
 
@@ -32,6 +42,6 @@ The first session should start on Opus. Later decisions can move up or down acco
 
 ## Required daily prompt
 
-Include the dated work window and timezone; selected model and selection command; observed branch/source SHA and instruction to reconcile newer changes; current phase and concrete eligible task IDs; priority defects; bounded goals and acceptance evidence; existing repository reading/authority rules; implement/test/review/repair/continue loop; checkpoint/publication rules; precise blockers and approval boundaries; and the midnight stop/resume procedure.
+Include the dated work window (start = the owner's start prompt, deadline = next 00:00) and timezone; selected model and selection command; observed branch/source SHA and instruction to reconcile newer changes; current phase and concrete eligible task IDs; priority defects; bounded goals and acceptance evidence; existing repository reading/authority rules; implement/test/review/repair/continue loop; checkpoint/publication rules; precise blockers and approval boundaries; and the midnight stop/resume procedure.
 
 Use confirmed current evidence, not an assumed empty repository. If access fails, clearly state the limitation and provide conditional preflight instructions without inventing current tasks or completion. Reuse the master start prompt's execution and safety rules but replace its unlimited duration with the daily cutoff. Earlier unfinished work carries forward based on dependencies and evidence.

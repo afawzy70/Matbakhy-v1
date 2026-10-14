@@ -1,0 +1,106 @@
+{
+  "run_id": "20261011-MB-008",
+  "story_id": "MB-008",
+  "phase": "P01",
+  "checks": [
+    {
+      "id": "P01-CHECK-1",
+      "name": "Backend workspace and PostgreSQL baseline",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "P01-CHECK-2",
+      "name": "Web/native shell and contract bootstrap (clean clone)",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "P01-CHECK-3",
+      "name": "Local stack bootstrap and smoke",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "P01-CHECK-4",
+      "name": "Secret scan",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "BOOTSTRAP-GUARDS",
+      "name": "Bootstrap failure-path tests and planning guardrails",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-108",
+      "observed": "scripts/dev.sh verify generated a throwaway env with random passwords, built the API jar and image, started PostgreSQL, Keycloak, S3Mock, Mailpit and API to healthy, then smoke-checked API health, Flyway baseline row, Keycloak matbakhy realm OIDC discovery issuer, both S3 buckets and Mailpit capture of a synthetic message, and removed the project. test_dev_bootstrap.py shows doctor names each missing prerequisite and starts nothing, up runs doctor first, non-local env files are refused and smoke fails with a clear message when the stack is down. Gitleaks found no leaks in history or tree (and flagged a planted fake key in a separate manual probe). P01-CHECK-1/2 pass."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-008/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "First verify run passed all smoke checks but the cleanup trap referenced an out-of-scope local variable; fixed.",
+      "test_scope used a hard-coded PLANNED path (infra) that this story created; made dynamic (assertion unchanged).",
+      "Product CI not yet observed on GitHub at the tested commit; result recorded separately after push.",
+      "Keycloak realm has no clients/users yet (MB-009). S3Mock is a local emulator only, not production storage.",
+      "BLK-002: PowerShell bootstrap not provided because no PowerShell runtime is available to test it; WSL2 documented.",
+      "GitHub Actions other than checkout are avoided because their SHAs cannot be verified from this environment (api.github.com denied)."
+    ]
+  },
+  "open_defects": []
+}

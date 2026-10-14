@@ -1,0 +1,18 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.support.cases.SupportIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 26.50 s <<< FAILURE! -- in com.matbakhy.app.support.cases.SupportIntegrationTest
+com.matbakhy.app.support.cases.SupportIntegrationTest.staff_notes_stay_private_and_safety_cases_are_escalated_first -- Time elapsed: 1.782 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+
+Expecting actual:
+  [null]
+to contain exactly (and in same order):
+  ["trace-case-msg-0001"]
+but some elements were not found:
+  ["trace-case-msg-0001"]
+and others were not expected:
+  [null]
+
+	at com.matbakhy.app.support.cases.SupportIntegrationTest.staff_notes_stay_private_and_safety_cases_are_escalated_first(SupportIntegrationTest.java:170)
+

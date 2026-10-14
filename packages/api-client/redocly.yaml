@@ -1,0 +1,14 @@
+# Contract lint for contracts/openapi.yaml (MB-007). Errors fail the build.
+extends:
+  - recommended-strict
+rules:
+  operation-summary: error
+  security-defined: error
+  no-unused-components: error
+  # No license is granted for this repository yet; choosing one is an owner/legal decision.
+  info-license: off
+  # /orders/by-request/{clientRequestId} vs /orders/{orderId}/...: orderId is a UUID, so the literal
+  # segment "by-request" can never match it and literal segments take precedence in Spring MVC.
+  # Kept visible as a warning rather than silenced.
+  no-ambiguous-paths: warn
+telemetry: off

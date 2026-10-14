@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "P01-LOCAL",
+  "phase": "P01",
+  "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T09:24:06.583393+00:00",
+  "finished_at": "2026-10-11T09:26:36.241169+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P01-CHECK-1",
+      "name": "Backend workspace and PostgreSQL baseline",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P01-local-34be845/P01-CHECK-1.log"
+    },
+    {
+      "id": "P01-CHECK-2",
+      "name": "Web/native shell and contract bootstrap (clean clone)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P01-local-34be845/P01-CHECK-2.log"
+    },
+    {
+      "id": "P01-CHECK-3",
+      "name": "Local stack bootstrap and smoke",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P01-local-34be845/P01-CHECK-3.log"
+    },
+    {
+      "id": "P01-CHECK-4",
+      "name": "Secret scan",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P01-local-34be845/P01-CHECK-4.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P01-local-34be845/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-106",
+      "status": "PASS",
+      "observed": "P01-CHECK-1 at this commit: Flyway migrates blank Testcontainers PostgreSQL 16 to V1; duplicate issuer+subject and idempotency scope rejected; CHECK/FK constraints enforced; ArchUnit rules pass on production modules and fail on violating fixtures; standard API errors."
+    },
+    {
+      "id": "TC-107",
+      "status": "PASS",
+      "observed": "P01-CHECK-2 at this commit: Redocly lint valid, generated client has no drift, 31 contract tests including malformed money rejection pass; P01-CHECK-1 StrictJsonIntegrationTest rejects 12 malformed bodies."
+    },
+    {
+      "id": "TC-108",
+      "status": "PASS",
+      "observed": "P01-CHECK-3 at this commit: throwaway compose project with PostgreSQL, Keycloak realm discovery, S3 buckets, mail capture and API health/Flyway smoke passed and was removed; bootstrap failure-path tests pass; P01-CHECK-4 secret scan clean."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-P01-local-34be845/P01-CHECK-1.log",
+    "verification/runs/20261011-P01-local-34be845/P01-CHECK-2.log",
+    "verification/runs/20261011-P01-local-34be845/P01-CHECK-3.log",
+    "verification/runs/20261011-P01-local-34be845/P01-CHECK-4.log",
+    "verification/runs/20261011-P01-local-34be845/GUARDRAIL-TESTS.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Re-verification of MB-006/MB-007/MB-008 behavior at 34be845 after the owner correction, so closure can rest on checks run at the same source as MB-005 native evidence. No code changes to these stories since their original runs."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

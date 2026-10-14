@@ -1,0 +1,11 @@
+matbakhy-preview-alert-sink-1 oom=false restarts=0
+matbakhy-preview-alertmanager-1 oom=false restarts=0
+matbakhy-preview-alloy-1 oom=false restarts=0
+matbakhy-preview-api-1 oom=false restarts=0
+matbakhy-preview-identity-1 oom=false restarts=0
+matbakhy-preview-loki-1 oom=false restarts=0
+matbakhy-preview-node-exporter-1 oom=false restarts=0
+matbakhy-preview-postgres-1 oom=false restarts=0
+matbakhy-preview-prometheus-1 oom=false restarts=0
+matbakhy-preview-proxy-1 oom=false restarts=0
+matbakhy-preview-storage-1 oom=false restarts=0

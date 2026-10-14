@@ -94,12 +94,12 @@
     {
       "id": "D10",
       "topic": "Revenue",
-      "status": "PROPOSED_DEFAULT",
-      "value": "Configurable commission on item subtotal",
+      "status": "ACCEPTED",
+      "value": "MVP launch: 0% Matbakhy commission, no customer platform/service fee, no paid ads or billing. The configurable commission stays as inactive technical capability only (not enabled or charged); third-party delivery or transfer costs are disclosed as such, never as platform fees. Later opt-in per-kitchen growth tools need evidence and explicit owner approval.",
       "owner": "Ahmed Fawzy",
       "required_before": "P04",
-      "approval_reference": null,
-      "build_with_default": true
+      "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
+      "build_with_default": false
     },
     {
       "id": "O01",
@@ -136,7 +136,7 @@
     },
     {
       "id": "O04",
-      "topic": "Commission, tax, invoices, refunds and settlement policy",
+      "topic": "Refund/cancellation rules, taxes, invoices and settlement policy (commission decided by D10: 0% at MVP)",
       "status": "OPEN",
       "value": null,
       "owner": "Ahmed Fawzy",
@@ -210,6 +210,76 @@
       "approval_reference": null,
       "build_with_default": true,
       "blocking_scope": "Only dependent launch/design/native-signing activity; independent implementation continues"
+    },
+    {
+      "id": "D11",
+      "topic": "Structured portion-size filtering",
+      "status": "ACCEPTED",
+      "value": "Deferred from MVP. Hide the approved homepage's one-person/two-people filter controls; do not substitute sorting for a control that implies filtering; no data-model or API change for portion filtering now. Explicit deferred scope item.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-12 06:21 Asia/Kuwait (MVP decisions 1 and 2)",
+      "build_with_default": false
+    },
+    {
+      "id": "D12",
+      "topic": "Meal-card descriptions in discovery",
+      "status": "ACCEPTED",
+      "value": "Optional. Reuse the existing published meal description through the existing discovery contract when available; omit cleanly when absent. Do not invent descriptions or add a content-management feature.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-12 06:21 Asia/Kuwait (MVP decisions 1 and 2)",
+      "build_with_default": false
+    },
+    {
+      "id": "D13",
+      "topic": "Price changes before an order is placed (RQ-004)",
+      "status": "ACCEPTED",
+      "value": "A displayed price or unexpired quote does not guarantee the old price. The server revalidates at placement; a stale quote is refused (409 PRICE_CHANGED), consumes no stock and creates no order or obligation. The client obtains a fresh server quote, shows the previous and new affected prices and totals with accurate attribution (kitchen meal price vs delivery fee, tax or policy), and requires an explicit customer acceptance before placing; never a silent charge or silent resubmission. After an order is committed, its item prices, fees, total and policy snapshots are immutable. Concurrent price update and placement are serialized; a committed order with a lost response is recovered at its original price.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
+    },
+    {
+      "id": "D14",
+      "topic": "Kitchen meal price history",
+      "status": "ACCEPTED",
+      "value": "Approved increment: a simple price-history view in the kitchen meal management showing the active price and previous actual price changes with Africa/Cairo date/time and EGP formatting, derived from immutable meal revisions; out of scope: scheduled or bulk pricing, promotions, analytics, editing or deleting history, rollback.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P06",
+      "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
+    },
+    {
+      "id": "D15",
+      "topic": "Daily execution window",
+      "status": "ACCEPTED",
+      "value": "The work window opens with the owner's first start/continue prompt of the day and ends at the next 00:00 Asia/Kuwait; later prompts do not extend it; informational questions do not open a window; not a rolling 24-hour session.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P00",
+      "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
+    },
+    {
+      "id": "D16",
+      "topic": "MVP payment methods",
+      "status": "ACCEPTED",
+      "value": "Eligible cash on delivery/pickup plus manual deposits paid directly by the customer to the approved kitchen recipient (InstaPay, eligible regulated mobile wallets, permitted bank transfer). No platform custody, wallet, escrow or gateway. The customer's 'transferred' report is not evidence; the kitchen's acknowledgement after checking its own account is recorded as kitchen-reported, never as bank verification. Deposit-required orders cannot start preparation before the acknowledgement and a separate kitchen acceptance. Disputes, refunds, expiry and price snapshots are auditable. Live money is blocked until legal/consumer, food-business and recipient-account/provider gates clear.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
+      "build_with_default": false
+    },
+    {
+      "id": "D17",
+      "topic": "Free core and growth instrumentation",
+      "status": "ACCEPTED",
+      "value": "Record privacy-safe, deduplicated organic activity and kitchen performance (impressions, views, add-to-cart, quotes, orders, fulfilment, cancellations, repeat orders, capacity, GMV) with clear definitions; free cook reporting distinguishes gross sales, refunds and known net amounts and never claims profit. No sponsored ranking, paid campaigns, billing or commercial thresholds in the MVP. Growth pilots, AI Concierge and automated payment verification are later stages needing explicit owner go.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P08",
+      "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
+      "build_with_default": false
     }
   ]
 }

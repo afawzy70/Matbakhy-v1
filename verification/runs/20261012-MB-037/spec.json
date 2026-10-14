@@ -1,0 +1,96 @@
+{
+  "run_id": "20261012-MB-037",
+  "story_id": "MB-037",
+  "phase": "P06",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-058",
+      "observed": "Real PostgreSQL: outbox and delivery workers lease work with FOR UPDATE SKIP LOCKED; two workers and duplicate events give one inbox record and one send (NotificationIntegrationTest); a live lease of a dead worker is respected and an expired one reclaimed, also across an application restart (RestartRecoveryIntegrationTest: application A places three orders and stops after its worker claims their events; application B delivers exactly one notification per recipient/order/type after lease expiry, a second pass changes nothing; a mutation ignoring live leases fails); a crash between provider send and recording leaves the delivery pending, which is resent once with the same delivery id and recorded once; two LedgerPostingJob instances racing over five completions post exactly one balanced group each; twenty customers racing for the last portion produce exactly one order; accept/cancel/expire racing produce one legal transition and at most one stock release; an injected failure after the stock update rolls back and a retry completes once."
+    },
+    {
+      "id": "TC-137",
+      "observed": "No oversell (last-portion race), no duplicate order (idempotency and request-id retries), no ledger imbalance (racing posting instances, balanced per group), recovery after restart (two application instances on the same real PostgreSQL), database outage (container paused: requests fail within the socket timeout as retryable 503 DEPENDENCY_UNAVAILABLE without internal detail, and the same running application serves reads and writes after unpause; the first run hung, which led to bounded connect/pool/socket timeouts), server-clock boundaries (acceptance allowed 1 ms before accept_by and refused exactly at it, expiry at that instant; mutation fails the test)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261012-MB-037/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Real defect found and fixed: no JDBC socket timeout, so requests hung indefinitely when the database froze.",
+      "Database unavailability now maps to a retryable 503 DEPENDENCY_UNAVAILABLE.",
+      "Residuals: external sends are at-least-once (stable delivery id for provider dedupe); an exception while recording one delivery ends that batch, delaying the remaining deliveries until their lease expires; load-level concurrency and multi-node deployment are P08/P09 capacity and staging work."
+    ]
+  },
+  "open_defects": []
+}

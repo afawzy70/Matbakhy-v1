@@ -1,0 +1,12 @@
+# Native run 36, source f5c8f50, job 115174748021 "iOS simulator build": failure in phase H (harness/session), A-G passed.
+07:43:06 MB032-ORDER-NUMBER MB-100001 / side effects 1|1|1|1|1|1|1 (phases A-C passed)
+07:44:00 MB033-QUANTITY-STOPPED-AT 10 (phase D passed)
+07:45:26 MB033-OVER-LIMIT-BLOCKED; delivery MB-100002 DELIVERY|3000|63000 (phase E passed)
+07:46:31 MB033-DEEP-LINK-OK MB-100002 (phase F passed)
+07:47:44 MB033-G-READY / MB033-SAME-SESSION-LIMIT-OK; testG passed (29.4 s)   <- same-session lowered limit, iOS
+07:50:58 testH failed: "mode-PICKUP missing". The accessibility hierarchy shows the cart with
+         "1 x Native Dish One . EGP 120.00" and "Sign in to see your orders and favorites." / "Sign in":
+         the relaunched app was signed out (about 11 minutes after phase A's sign-in). No price-change step ran.
+Classification: harness/session state, not a D13 result. Observation kept open: why the relaunch lost the session
+(phase G's running process was terminated by the next launch; possibly a token refresh interrupted by termination).
+Repair (next run): phase H prints MB049-SIGNED-OUT-AT-START when this happens and signs in again.

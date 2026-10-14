@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-005",
+  "phase": "P01",
+  "source_commit": "34be845bc5ab5b283c3c62998b090eff71a80f19",
+  "environment": {
+    "local": {
+      "host": "cloud development container (not a supported-platform claim)",
+      "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+      "python": "3.13.16",
+      "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+      "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+      "node": "v24.21.0",
+      "pnpm": "10.34.6",
+      "docker": "Docker version 29.8.2, build 7fc2dff"
+    },
+    "android": "GitHub-hosted ubuntu-24.04, Temurin 17, preinstalled Android SDK",
+    "ios": "GitHub-hosted macos-26, Xcode per IOS-NATIVE.log"
+  },
+  "started_at": "2026-10-11T09:24:06.583393+00:00",
+  "finished_at": "2026-10-11T09:27:33.239691+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "WORKSPACE-COMPILE",
+      "name": "Clean-checkout workspace compile (backend, web, Expo JS) at the same source",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-P01-local-34be845/P01-CHECK-2.log"
+    },
+    {
+      "id": "ANDROID-NATIVE-COMPILE",
+      "name": "Android native Gradle debug build (GitHub-hosted ubuntu-24.04)",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38128068345 (job: Android debug APK (Gradle))",
+      "log_path": "verification/runs/20261011-MB-005-native/ANDROID-NATIVE.log"
+    },
+    {
+      "id": "IOS-NATIVE-COMPILE",
+      "name": "iOS native Xcode simulator build, unsigned (GitHub-hosted macos-26)",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38128068345 (job: iOS simulator build (Xcode, unsigned))",
+      "log_path": "verification/runs/20261011-MB-005-native/IOS-NATIVE.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-105",
+      "status": "PASS",
+      "observed": "From a clean checkout of 34be845 with pinned versions: backend Maven verify, frozen pnpm install, typecheck, lint, tests, web builds and Expo Android/iOS JS bundles pass locally (check_workspace.sh); the minimal customer-mobile shell compiles natively for Android (Gradle assembleDebug, APK hash and package recorded) and iOS (xcodebuild iphonesimulator, unsigned) on GitHub-hosted runners, with separate evidence per platform. No install, emulator or device test is claimed."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-005-native/ANDROID-NATIVE.log",
+    "verification/runs/20261011-MB-005-native/IOS-NATIVE.log",
+    "verification/runs/20261011-P01-local-34be845/P01-CHECK-2.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Native builds ran on GitHub-hosted runners for this public repository (no spend); the development container cannot download the Android SDK and has no macOS.",
+      "iOS attempt 1 (run 38127355259, macos-15/Xcode 16.4) failed in the ExpoModulesJSI xcframework script phase; attempt 2 (run 38127899749) was cancelled by a newer push; attempt 3 (run 38128068345, macos-26) is the evidence run.",
+      "Compilation only: no signing, store upload, emulator/simulator launch or physical device verification (P07 stories)."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

@@ -1,0 +1,64 @@
+{
+  "run_id": "20261011-MB-001",
+  "story_id": "MB-001",
+  "phase": "P00",
+  "checks": [
+    {
+      "id": "P00-CHECK-1",
+      "name": "Scope and traceability review",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning/scope guardrail negative tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-101",
+      "observed": "check_scope.py PASS: every top-level path is listed in planning/inventory.json with correct PRESENT/PLANNED state; decisions.json and the register agree (D01-D10 PROPOSED_DEFAULT, O01-O10 OPEN, no approval references); negative tests show unlisted/planned-but-present/missing paths and fabricated ACCEPTED or valued OPEN decisions are rejected. Reconciliation section records the observed baseline commit, absence of application code and environment limits."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-001/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Inventory/register were consistent with the observed repository; no stale progress claims found.",
+      "O10 is nominally due at P00 but remains OPEN; recorded explicitly with D07 deferral default and limited blocking scope.",
+      "Inventory check covers top-level paths only; deeper planned paths (e.g. backend/modules/*) are owned by later story artifacts, accepted as residual limitation."
+    ]
+  },
+  "open_defects": []
+}

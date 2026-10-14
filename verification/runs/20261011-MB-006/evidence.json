@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-006",
+  "phase": "P01",
+  "source_commit": "845b6cabe68ce974240283d6b2da85cd5ac92fdc",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-11T08:39:36.983468+00:00",
+  "finished_at": "2026-10-11T08:40:56.790922+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "P01-CHECK-1",
+      "name": "Backend workspace and PostgreSQL baseline (mvnw verify with Testcontainers)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-006/P01-CHECK-1.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Regression: clean-clone workspace check",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-006/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-006/BLUEPRINT.log"
+    },
+    {
+      "id": "SCOPE",
+      "name": "Inventory/traceability check",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-006/SCOPE.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261011-MB-006/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-106",
+      "status": "PASS",
+      "observed": "MigrationIntegrationTest on Testcontainers PostgreSQL 16 (server_version_num asserted): blank database migrated by Flyway to version 1 with app_user and idempotency_record; duplicate issuer+subject and duplicate actor+command+key raise DuplicateKeyException while other actor/command succeed; locale, E.164 phone, phone-verified-without-phone, status, idempotency hash and <24h retention CHECKs and actor FK reject invalid rows. ModuleBoundaryTest: all nine modules declared and imported; production code passes api-only, acyclic, layering rules; the same rules report the fixture's finance.internal -> orders.internal dependency and its api-level cycle. ApiErrorIntegrationTest: 404/400/415/405/422/409/500 return the standard body with request ID and no internal detail."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-006/P01-CHECK-1.log",
+    "verification/runs/20261011-MB-006/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261011-MB-006/BLUEPRINT.log",
+    "verification/runs/20261011-MB-006/SCOPE.log",
+    "verification/runs/20261011-MB-006/GUARDRAIL-TESTS.log",
+    "verification/runs/20261011-MB-006/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Initial run: module presence test failed because documentation-only package-info files produce no class files and the jar import filter excluded reactor module jars; repaired with @DomainModule package annotations and package-based import (assertions unchanged, strengthened to require annotation name = package).",
+      "Catch-all exception handler will need explicit Spring Security mappings (401/403) in MB-009 so authentication failures are not reported as 500.",
+      "app_user/idempotency_record schemas follow docs/engineering/02-data-model.md; UUIDs assigned by the application (version selected when identity/orders services are written).",
+      "Domain modules contain only declarations and api packages so far; no behavior is claimed for them."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

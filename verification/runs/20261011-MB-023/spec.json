@@ -1,0 +1,93 @@
+{
+  "run_id": "20261011-MB-023",
+  "story_id": "MB-023",
+  "phase": "P05",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. ModerationIntegrationTest and identity step-up (PostgreSQL, Keycloak)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Cook and staff browser workflow against the real local stack (Playwright, Chromium)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-123",
+      "observed": "ModerationIntegrationTest: hiding a published meal (content.moderate; cook and cook.review 403; reason required 422; stale version 409; repeat 409) removes it from discovery, public detail (404) and quotes; the cook's content and status are unchanged, the cook sees HIDDEN with the reason, and pause/republish does not lift it; the catalogue lists it without private kitchen data; restore makes it discoverable and orderable again; two audit events. Suspension (cook.review with MFA) reports activeOrders PENDING_ACCEPTANCE 1 and removes the kitchen's meals from discovery, detail and checkout; restore re-enables them. Identity: stepUp=true sends acr_values and max_age=0 with PKCE. Browser workflow (scripts/dev.sh e2e): ops-a without grants sees no staff sections; with synthetic content.moderate and cook.review grants sees reviews and catalogue but not cook tabs; hides the meal (public detail 404, customer quote refused) and restores it (detail 200); opens the approved application with private location and the kitchen panel with impact; a suspension attempt without MFA shows the step-up link (stepUp=true) and the kitchen stays ACTIVE; the cook gets 403 on the catalogue. Operations web component tests: reviewer queue, signed document link, decision body and step-up prompt; moderation needs a reason. Private documents: never in public responses (MediaIntegrationTest/CookWorkflowIntegrationTest within backend verify). Approval reflection: no kitchen means no workspace and no selling (cook workflow tests, browser onboarding state). Mutations dropping the discovery or quote filter failed the tests."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-023/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Moderation enforced in discovery, detail and quotes; mutations detected.",
+      "Impact summary via cooks.api port implemented by orders (acyclic modules).",
+      "Not done: review moderation (API-073) needs reviews from MB-028; carried there, not claimed.",
+      "Residual: MFA step-up actions cannot complete on local Keycloak (UI prompt verified; decisions covered by backend MFA tests); synthetic SQL grants in the browser workflow."
+    ]
+  },
+  "open_defects": []
+}

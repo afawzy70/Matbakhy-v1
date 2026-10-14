@@ -1,0 +1,89 @@
+{
+  "run_id": "20261011-MB-004",
+  "story_id": "MB-004",
+  "phase": "P00",
+  "checks": [
+    {
+      "id": "P00-CHECK-2",
+      "name": "Brand and UX artifacts: token tests, specimens, all prototype journeys ar/en x 390/1280",
+      "command": [
+        "scripts/check_design.sh",
+        "verification/runs/20261011-MB-004"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    },
+    {
+      "id": "P00-CHECK-1",
+      "name": "Scope and traceability review",
+      "command": [
+        "python3",
+        "scripts/check_scope.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "LINT",
+      "name": "Workspace lint incl. prototype",
+      "command": [
+        "pnpm",
+        "lint"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    },
+    {
+      "id": "BLUEPRINT",
+      "name": "Blueprint structure validation",
+      "command": [
+        "python3",
+        "scripts/validate_blueprint.py"
+      ],
+      "required": true,
+      "timeout_seconds": 120
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-104",
+      "observed": "prototype-journeys.mjs completed all 8 journeys (discovery and empty zone; sold-out meal; delivery checkout through placement, uncertain-response message, pending acceptance and every order state to completion with customer-only handover code; pickup checkout without delivery fee; stock-changed warning blocking submission; cook accept and reject; ops kitchen approval and cash-discrepancy case) in Arabic RTL and English LTR at 390 px and 1280 px with no page errors and no horizontal overflow; 56 screenshots captured. The visual approval record (docs/design/approval.md) is PENDING with no reviewer or decision, so approval is recorded separately and not fabricated."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-004/review.md",
+    "verification/runs/20261011-MB-004/ux/journey-results.json",
+    "verification/runs/20261011-MB-004/specimen/specimen-results.json",
+    "docs/design/README.md",
+    "docs/design/approval.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Journey automation found a real prototype defect: the 'checking your order' status was always visible because the flex class overrode the hidden attribute; fixed with a [hidden] rule.",
+      "Navigation lag between URL hash and rendered screen; prototype now navigates and renders synchronously and the runner waits for expected screens instead of one-shot visibility checks.",
+      "Harness artifact: a full-page screenshot between input and click made the next click get lost in English desktop (Chromium headless); screenshot moved before the interaction, assertions unchanged.",
+      "Visual self-review fixes: styled 44px language toggle, Arabic-Indic quantity digits, larger policy checkbox.",
+      "This is a web prototype with synthetic data; it does not verify native mobile screens or real backend rules. Owner visual approval is PENDING (O05)."
+    ]
+  },
+  "open_defects": []
+}

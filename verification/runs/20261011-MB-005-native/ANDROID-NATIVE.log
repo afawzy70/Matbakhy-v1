@@ -1,0 +1,14 @@
+GitHub Actions run 38128068345, job 114436521000 "Android debug APK (Gradle)", head_sha 34be845bc5ab5b283c3c62998b090eff71a80f19
+Runner: ubuntu-24.04 (GitHub-hosted), JAVA_HOME /usr/lib/jvm/temurin-17-jdk-amd64, preinstalled Android SDK. Conclusion: success.
+Steps: checkout, Node 24.21.0 (checksum verified), pnpm install --frozen-lockfile, expo prebuild --platform android --clean, ./gradlew --no-daemon assembleDebug, artifact identity.
+Excerpt (retrieved via GitHub API job logs):
+2026-10-11T09:26:43.2395999Z -rw-r--r-- 1 runner runner 135728775 Oct 11 09:26 app/build/outputs/apk/debug/app-debug.apk
+2026-10-11T09:26:43.3310552Z ef7dfcc2aeb2349ca247d2903061e530a7c929f42b00879599e81c2f17d27789  app/build/outputs/apk/debug/app-debug.apk
+2026-10-11T09:26:43.6355016Z package: name='com.matbakhy.customer.dev' versionCode='1' versionName='0.1.0' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
+2026-10-11T09:26:43.6356003Z sdkVersion:'24'
+2026-10-11T09:26:43.6356304Z targetSdkVersion:'36'
+2026-10-11T09:26:43.6626105Z openjdk version "17.0.20.1" 2026-08-18
+2026-10-11T09:26:44.1149484Z Gradle 9.3.1
+2026-10-11T09:26:44.1149892Z Kotlin:        2.2.21
+Earlier independent pass: run 38127355259 at 2f3dc2d (APK sha256 5610175b7d63bcc2e3aef40bd48d0ac75287b2bb9ef000d12f95c680e481aa05).
+Scope: debug APK compilation only. No emulator or device install/test.

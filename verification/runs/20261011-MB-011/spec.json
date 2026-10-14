@@ -1,0 +1,91 @@
+{
+  "run_id": "20261011-MB-011",
+  "story_id": "MB-011",
+  "phase": "P02",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify incl. StaffAccessIntegrationTest and Keycloak revoked-token test",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "TC-006",
+      "observed": "StaffAccessIntegrationTest.kitchen_scope_matrix: a kitchen-owned resource of cook A is readable by cook A; cook B, a customer and staff without cook.review get 404 with no data; staff with cook.review get 200 and an ALLOWED audit event; cook.review does not confer staff.grant. ContactIntegrationTest (MB-010) covers cross-customer addresses and challenges. Real kitchen/order/case resources apply the same AccessPolicy as they are built (MB-012 onward) and will be re-tested there."
+    },
+    {
+      "id": "TC-007",
+      "observed": "A customer granting themselves staff.grant gets 403 FORBIDDEN, no grant row, and a DENIED audit event; a role field in a customer request is rejected (400); an admin without recent MFA gets 403 STEP_UP_REQUIRED (audited); after revocation the same identity's next request (MockMvc) and the same unexpired Keycloak JWT (IdentityIntegrationTest) get 403 with a DENIED audit event; self-escalation and last-admin revocation are refused and audited (a mutation removing noRollbackFor made the audit assertion fail)."
+    },
+    {
+      "id": "TC-111",
+      "observed": "Deny-by-default AccessPolicy, server-side grants with expiry/revocation, step-up for grant changes, last-admin protection, expired grants conferring nothing, append-only audit (UPDATE/DELETE rejected by trigger) and redaction (phone and email removed from stored reason; token/code keys masked) all verified on PostgreSQL; audit read API returns redacted entries."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261011-MB-011/review.md"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Self-review defect fixed before tests: denial audits inside transactional grant/revoke would be rolled back with the thrown exception; noRollbackFor added (no other writes precede the denial) and proven by mutation.",
+      "Replaced a string coupling to the app's request-ID attribute with a shared constant.",
+      "Residual: kitchen/order/case scope exercised through a test resource only until those modules exist; audit CSV export (API-095) not implemented; separation of duties for a solo pilot not enforced beyond self-escalation refusal (documented in permissions doc).",
+      "Residual: grant changes require MFA assurance from the provider; local Keycloak has no MFA flow configured yet, so step-up success is covered by unit test and synthetic claims, not a real OTP login."
+    ]
+  },
+  "open_defects": []
+}

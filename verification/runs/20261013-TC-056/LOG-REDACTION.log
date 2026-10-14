@@ -1,0 +1,438 @@
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=38723 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Matbakhy backend                                                   [pom]
+[INFO] Matbakhy shared primitives                                         [jar]
+[INFO] Matbakhy operations module                                         [jar]
+[INFO] Matbakhy identity module                                           [jar]
+[INFO] Matbakhy availability module                                       [jar]
+[INFO] Matbakhy catalog module                                            [jar]
+[INFO] Matbakhy cooks module                                              [jar]
+[INFO] Matbakhy orders module                                             [jar]
+[INFO] Matbakhy finance module                                            [jar]
+[INFO] Matbakhy support module                                            [jar]
+[INFO] Matbakhy notifications module                                      [jar]
+[INFO] Matbakhy application                                               [jar]
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-backend >--------------------
+[INFO] Building Matbakhy backend 0.1.0-SNAPSHOT                          [1/12]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-backend ---
+[INFO] Rule 0: org.apache.maven.enforcer.rules.version.RequireJavaVersion passed
+[INFO] Rule 1: org.apache.maven.enforcer.rules.version.RequireMavenVersion passed
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-shared >--------------------
+[INFO] Building Matbakhy shared primitives 0.1.0-SNAPSHOT                [2/12]
+[INFO]   from shared/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-shared ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-shared ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/shared/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/shared/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-shared ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-shared ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/shared/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-shared ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-shared ---
+[INFO] 
+[INFO] ------------------< com.matbakhy:matbakhy-operations >------------------
+[INFO] Building Matbakhy operations module 0.1.0-SNAPSHOT                [3/12]
+[INFO]   from modules/operations/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-operations ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-operations ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/operations/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/operations/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-operations ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-operations ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/operations/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-operations ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-operations ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-identity >-------------------
+[INFO] Building Matbakhy identity module 0.1.0-SNAPSHOT                  [4/12]
+[INFO]   from modules/identity/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-identity ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-identity ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/identity/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/identity/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-identity ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-identity ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/identity/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-identity ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-identity ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] -----------------< com.matbakhy:matbakhy-availability >-----------------
+[INFO] Building Matbakhy availability module 0.1.0-SNAPSHOT              [5/12]
+[INFO]   from modules/availability/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-availability ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-availability ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/availability/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/availability/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-availability ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-availability ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/availability/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-availability ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-availability ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-catalog >--------------------
+[INFO] Building Matbakhy catalog module 0.1.0-SNAPSHOT                   [6/12]
+[INFO]   from modules/catalog/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-catalog ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-catalog ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/catalog/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/catalog/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-catalog ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-catalog ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/catalog/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-catalog ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-catalog ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-cooks >---------------------
+[INFO] Building Matbakhy cooks module 0.1.0-SNAPSHOT                     [7/12]
+[INFO]   from modules/cooks/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-cooks ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-cooks ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/cooks/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/cooks/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-cooks ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-cooks ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/cooks/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-cooks ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-cooks ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] --------------------< com.matbakhy:matbakhy-orders >--------------------
+[INFO] Building Matbakhy orders module 0.1.0-SNAPSHOT                    [8/12]
+[INFO]   from modules/orders/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-orders ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-orders ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/orders/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/orders/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-orders ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-orders ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/orders/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-orders ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-orders ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-finance >--------------------
+[INFO] Building Matbakhy finance module 0.1.0-SNAPSHOT                   [9/12]
+[INFO]   from modules/finance/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-finance ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-finance ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/finance/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/finance/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-finance ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-finance ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/finance/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-finance ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-finance ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] -------------------< com.matbakhy:matbakhy-support >--------------------
+[INFO] Building Matbakhy support module 0.1.0-SNAPSHOT                  [10/12]
+[INFO]   from modules/support/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-support ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-support ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/support/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/support/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-support ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-support ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/support/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-support ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-support ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] ----------------< com.matbakhy:matbakhy-notifications >-----------------
+[INFO] Building Matbakhy notifications module 0.1.0-SNAPSHOT            [11/12]
+[INFO]   from modules/notifications/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-notifications ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-notifications ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/notifications/src/main/resources
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/notifications/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-notifications ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-notifications ---
+[INFO] skip non existing resourceDirectory /home/user/mb-evidence/backend/modules/notifications/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-notifications ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-notifications ---
+[INFO] No tests to run.
+[INFO] 
+[INFO] ---------------------< com.matbakhy:matbakhy-app >----------------------
+[INFO] Building Matbakhy application 0.1.0-SNAPSHOT                     [12/12]
+[INFO]   from app/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- enforcer:3.6.3:enforce (enforce-toolchain) @ matbakhy-app ---
+[INFO] Rule 2: org.apache.maven.enforcer.rules.dependency.DependencyConvergence passed
+[INFO] Rule 3: org.apache.maven.enforcer.rules.BanDuplicatePomDependencyVersions passed
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ matbakhy-app ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 30 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ matbakhy-app ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ matbakhy-app ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ matbakhy-app ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 65 source files with javac [debug parameters release 21] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ matbakhy-app ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=38723 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+[INFO] Running com.matbakhy.app.privacy.LogRedactionIntegrationTest
+15:30:06.897 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.privacy.LogRedactionIntegrationTest
+15:30:07.005 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.matbakhy.app.MatbakhyApplication for test class com.matbakhy.app.privacy.LogRedactionIntegrationTest
+{"@timestamp":"2026-10-13T15:30:07.582253430Z","log":{"level":"INFO","logger":"com.matbakhy.app.privacy.LogRedactionIntegrationTest"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Starting LogRedactionIntegrationTest using Java 21.0.12.1 with PID 3800 (started by root in /home/user/mb-evidence/backend/app)","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:07.599139901Z","log":{"level":"INFO","logger":"com.matbakhy.app.privacy.LogRedactionIntegrationTest"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"No active profile set, falling back to 1 default profile: \"default\"","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.253496067Z","log":{"level":"INFO","logger":"org.springframework.boot.tomcat.TomcatWebServer"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Tomcat initialized with port 0 (http)","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.270360500Z","log":{"level":"INFO","logger":"org.apache.catalina.core.StandardService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Starting service [Tomcat]","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.271339280Z","log":{"level":"INFO","logger":"org.apache.catalina.core.StandardEngine"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Starting Servlet engine: [Apache Tomcat/11.0.24]","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.316436291Z","log":{"level":"INFO","logger":"org.springframework.boot.web.context.servlet.WebApplicationContextInitializer"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Root WebApplicationContext: initialization completed in 2676 ms","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.611308065Z","log":{"level":"INFO","logger":"org.testcontainers.images.PullPolicy"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Image pull policy will be performed by: DefaultPullPolicy()","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.613943625Z","log":{"level":"INFO","logger":"org.testcontainers.utility.ImageNameSubstitutor"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Image name substitution will be performed by: DefaultImageNameSubstitutor (composite of 'ConfigurationFileImageNameSubstitutor' and 'PrefixingImageNameSubstitutor')","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.624903349Z","log":{"level":"INFO","logger":"org.testcontainers.DockerClientFactory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Testcontainers version: 2.0.5","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:10.796593931Z","log":{"level":"INFO","logger":"org.testcontainers.dockerclient.DockerClientProviderStrategy"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Loaded org.testcontainers.dockerclient.UnixSocketClientProviderStrategy from ~/.testcontainers.properties, will try it first","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:11.312934752Z","log":{"level":"INFO","logger":"org.testcontainers.dockerclient.DockerClientProviderStrategy"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Found Docker environment with local Unix socket (unix:///var/run/docker.sock)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:11.314937478Z","log":{"level":"INFO","logger":"org.testcontainers.DockerClientFactory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Docker host IP address is localhost","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:11.338833606Z","log":{"level":"INFO","logger":"org.testcontainers.DockerClientFactory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Connected to docker: \n  Server Version: 29.8.2\n  API Version: 1.56\n  Operating System: Ubuntu 24.04.5 LTS (containerized)\n  Total Memory: 16093 MB","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.258882502Z","log":{"level":"INFO","logger":"tc.testcontainers/ryuk:0.14.0"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Creating container for image: testcontainers/ryuk:0.14.0","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.267116780Z","log":{"level":"INFO","logger":"org.testcontainers.utility.RegistryAuthLocator"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Failure when attempting to lookup auth config. Please ignore if you don't have images in an authenticated registry. Details: (dockerImageName: testcontainers/ryuk:0.14.0, configFile: /root/.docker/config.json, configEnv: DOCKER_AUTH_CONFIG). Falling back to docker-java default behaviour. Exception message: Status 404: No config supplied. Checked in order: /root/.docker/config.json (file not found), DOCKER_AUTH_CONFIG (not set)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.423921896Z","log":{"level":"INFO","logger":"tc.testcontainers/ryuk:0.14.0"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container testcontainers/ryuk:0.14.0 is starting: eb7248ec734dcc3d63e62a6c9e87faf0d09d44e9536a82257c604a9b9a9415d0","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.836461426Z","log":{"level":"INFO","logger":"tc.testcontainers/ryuk:0.14.0"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container testcontainers/ryuk:0.14.0 started in PT0.577535383S","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.846041414Z","log":{"level":"INFO","logger":"org.testcontainers.utility.RyukResourceReaper"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Ryuk started - will monitor and terminate Testcontainers containers on JVM exit","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.846742155Z","log":{"level":"INFO","logger":"org.testcontainers.DockerClientFactory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Checking the system...","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.847743626Z","log":{"level":"INFO","logger":"org.testcontainers.DockerClientFactory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"✔︎ Docker server version should be at least 1.6.0","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.931443639Z","log":{"level":"INFO","logger":"tc.adobe/s3mock:5.2.3@sha256:ab01a6..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Creating container for image: adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:12.999211732Z","log":{"level":"INFO","logger":"tc.adobe/s3mock:5.2.3@sha256:ab01a6..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92 is starting: 16791530a1c7f60094c915dc86651bc98a4e6f76a5d3b85fdf5b05e782919ed4","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:13.337128680Z","log":{"level":"INFO","logger":"org.testcontainers.containers.wait.strategy.HttpWaitStrategy"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"/bold_meninsky: Waiting for 60 seconds for URL: http://localhost:32778/ (where port 32778 maps to container port 9090)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:20.392121597Z","log":{"level":"INFO","logger":"tc.adobe/s3mock:5.2.3@sha256:ab01a6..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92 started in PT7.460660717S","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:20.508789054Z","log":{"level":"INFO","logger":"tc.postgres:16.15-alpine@sha256:721873..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Creating container for image: postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:20.588058857Z","log":{"level":"INFO","logger":"tc.postgres:16.15-alpine@sha256:721873..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea is starting: e41b65bfbdbeb7346b85b6754d10ee254be3266c69a635bb93219ebfc4771a7c","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:22.466351001Z","log":{"level":"INFO","logger":"tc.postgres:16.15-alpine@sha256:721873..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea started in PT1.957547791S","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:22.467665181Z","log":{"level":"INFO","logger":"tc.postgres:16.15-alpine@sha256:721873..."},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Container is started (JDBC URL: jdbc:postgresql://localhost:32779/test?loggerLevel=OFF)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.061286217Z","log":{"level":"INFO","logger":"org.flywaydb.core.FlywayExecutor"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Database: jdbc:postgresql://localhost:32779/test?loggerLevel=OFF (PostgreSQL 16.15)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.142364878Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Schema history table \"public\".\"flyway_schema_history\" does not exist yet","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.147772954Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbValidate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Successfully validated 26 migrations (execution time 00:00.028s)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.175593571Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.schemahistory.JdbcTableSchemaHistory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Creating Schema History table \"public\".\"flyway_schema_history\" ...","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.294218250Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Current version of schema \"public\": << Empty Schema >>","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.310814812Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"1 - baseline identity and idempotency\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.366597832Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"2 - web sessions\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.397211994Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"3 - zones addresses phone verification\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.464811536Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"4 - grants and audit\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.517190926Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"5 - cook applications and kitchens\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.585991490Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"6 - media assets\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.615717707Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"7 - meals\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.666812526Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"8 - slots\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.705652368Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"9 - discovery\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.744343108Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"10 - quotes\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.814516681Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"11 - orders\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.928617470Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"12 - order lifecycle\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:23.964556499Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"13 - cash and ledger\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.016041754Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"14 - notifications\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.065531653Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"15 - cook workspace\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.081065911Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"16 - moderation\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.103405833Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"17 - support\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.148723099Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"18 - finance operations\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.225316409Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"19 - configuration\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.251756076Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"20 - favorites and reviews\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.302499782Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"21 - personal data erasure\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.324050052Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"22 - outbox request id\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.338469477Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"23 - launch commission\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.356278828Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"24 - deposit payments\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.398942669Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"25 - payment reconciliation\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.411661468Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Migrating schema \"public\" to version \"26 - organic activity\"","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.434387656Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.command.DbMigrate"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Successfully applied 26 migrations to schema \"public\", now at version v26 (execution time 00:00.800s)","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:24.464034350Z","log":{"level":"INFO","logger":"org.flywaydb.core.internal.callback.SqlScriptCallbackFactory"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Executing SQL callback: afterMigrate - ","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:26.869702311Z","log":{"level":"INFO","logger":"org.apache.catalina.core.ContainerBase.[Tomcat].[localhost].[/]"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Initializing Spring TestDispatcherServlet ''","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:26.871407911Z","log":{"level":"INFO","logger":"org.springframework.test.web.servlet.TestDispatcherServlet"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Initializing Servlet ''","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:26.893353191Z","log":{"level":"INFO","logger":"org.springframework.boot.actuate.endpoint.web.EndpointLinksResolver"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Exposing 1 endpoint beneath base path '/actuator'","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:26.912587381Z","log":{"level":"INFO","logger":"org.springframework.test.web.servlet.TestDispatcherServlet"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Completed initialization in 41 ms","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:27.150369405Z","log":{"level":"INFO","logger":"com.zaxxer.hikari.HikariDataSource"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"HikariPool-1 - Starting...","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:27.186344970Z","log":{"level":"INFO","logger":"com.zaxxer.hikari.pool.HikariPool"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@69aecbba","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:27.188761592Z","log":{"level":"INFO","logger":"com.zaxxer.hikari.HikariDataSource"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"HikariPool-1 - Start completed.","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:27.330598866Z","log":{"level":"INFO","logger":"org.springframework.boot.tomcat.TomcatWebServer"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Tomcat started on port 44423 (http) with context path '/'","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:27.351308878Z","log":{"level":"INFO","logger":"com.matbakhy.app.privacy.LogRedactionIntegrationTest"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Started LogRedactionIntegrationTest in 20.266 seconds (process running for 21.957)","tags":["COMMONS-LOGGING"],"ecs":{"version":"8.11"}}
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/root/.m2/repository/net/bytebuddy/byte-buddy-agent/1.18.11/byte-buddy-agent-1.18.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+{"@timestamp":"2026-10-13T15:30:28.577778103Z","log":{"level":"INFO","logger":"com.matbakhy.identity.internal.PhoneVerificationService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Phone verification challenge 21cafc3a-a151-4ff8-83b3-b158760acce2 issued","requestId":"32f0679f-f7fa-4ea6-ab7a-adc4f88b7217","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:28.695265716Z","log":{"level":"INFO","logger":"com.matbakhy.identity.internal.PhoneVerificationService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Phone verification failed for challenge 21cafc3a-a151-4ff8-83b3-b158760acce2","requestId":"b05ab406-cd5e-42e0-8d64-265601730265","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:28.701500584Z","log":{"level":"INFO","logger":"com.matbakhy.app.web.ApiExceptionHandler"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"API failure VERIFICATION_FAILED: verification failed 21cafc3a-a151-4ff8-83b3-b158760acce2","requestId":"b05ab406-cd5e-42e0-8d64-265601730265","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:28.735028642Z","log":{"level":"INFO","logger":"com.matbakhy.identity.internal.PhoneVerificationService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Phone verified via challenge 21cafc3a-a151-4ff8-83b3-b158760acce2","requestId":"f55ce57c-9b11-483f-b817-e143133caf78","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.032051680Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order cd7d53a9-5e79-4f5a-8b20-f1efe6863025 recorded in its placement transaction","requestId":"trace-leak-0001","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.092344437Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderLifecycleService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order cd7d53a9-5e79-4f5a-8b20-f1efe6863025 PENDING_ACCEPTANCE -> ACCEPTED by COOK","requestId":"63f047a4-3e91-4aaa-bfed-5e7a5b26ecb4","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.152227163Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderLifecycleService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order cd7d53a9-5e79-4f5a-8b20-f1efe6863025 ACCEPTED -> PREPARING by COOK","requestId":"5083582f-8b0f-4e18-acfe-62f4edc4cada","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.188345344Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderLifecycleService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order cd7d53a9-5e79-4f5a-8b20-f1efe6863025 PREPARING -> READY by COOK","requestId":"a19d0ba5-6bf2-4bea-a6a9-f37e7055d4ca","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.227330393Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderLifecycleService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order cd7d53a9-5e79-4f5a-8b20-f1efe6863025 READY -> OUT_FOR_DELIVERY by COOK","requestId":"00ac3fbd-865e-4939-9b7f-0c8c6053e181","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.282450747Z","log":{"level":"INFO","logger":"com.matbakhy.app.web.ApiExceptionHandler"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"API failure VERIFICATION_FAILED: wrong handover code","requestId":"91b6b659-5636-426b-b569-7a7fda02fc14","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.308556619Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderLifecycleService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order cd7d53a9-5e79-4f5a-8b20-f1efe6863025 OUT_FOR_DELIVERY -> COMPLETED by COOK","requestId":"eb4bafc9-49dd-443e-95cc-83691042dd6e","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.380923550Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery 16a521a6-b1cc-4dc4-b07c-756a928c0a33 failed on attempt 1: IllegalStateException (now PENDING)","requestId":"trace-leak-0001","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.386399359Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery d1da4e5c-6684-43db-bf60-8e06325a55d9 failed on attempt 1: IllegalStateException (now PENDING)","requestId":"63f047a4-3e91-4aaa-bfed-5e7a5b26ecb4","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.391382655Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery e3ec51d3-3076-4217-b694-b043a785e1d2 failed on attempt 1: PROVIDER_ERROR (now PENDING)","requestId":"63f047a4-3e91-4aaa-bfed-5e7a5b26ecb4","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.395204959Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery ec333d0c-0cc2-4b1f-968b-3893fc22163f failed on attempt 1: IllegalStateException (now PENDING)","requestId":"5083582f-8b0f-4e18-acfe-62f4edc4cada","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.399863962Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery 7555f2aa-a4c3-4f2c-ada0-86e4dbda1f00 failed on attempt 1: PROVIDER_ERROR (now PENDING)","requestId":"5083582f-8b0f-4e18-acfe-62f4edc4cada","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.403304383Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery b1934f2f-7a0d-41d5-af80-f4111a6db967 failed on attempt 1: IllegalStateException (now PENDING)","requestId":"a19d0ba5-6bf2-4bea-a6a9-f37e7055d4ca","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.407401493Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery 98216606-a612-4d67-be15-ecbed45f37ea failed on attempt 1: PROVIDER_ERROR (now PENDING)","requestId":"a19d0ba5-6bf2-4bea-a6a9-f37e7055d4ca","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.411153535Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery aa6eb1b3-a13a-4971-9e17-80051d417fd4 failed on attempt 1: IllegalStateException (now PENDING)","requestId":"00ac3fbd-865e-4939-9b7f-0c8c6053e181","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.420602782Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery 2385fc98-bc74-44ee-a4fd-3a18c3b56e14 failed on attempt 1: PROVIDER_ERROR (now PENDING)","requestId":"00ac3fbd-865e-4939-9b7f-0c8c6053e181","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.426191100Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery ac48a507-8590-436c-9c31-da1fbb0072c1 failed on attempt 1: IllegalStateException (now PENDING)","requestId":"eb4bafc9-49dd-443e-95cc-83691042dd6e","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.430963549Z","log":{"level":"WARN","logger":"com.matbakhy.notifications.internal.DeliveryWorker"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"notification delivery 1aebcfd4-8e6b-4200-86d5-295db6707989 failed on attempt 1: PROVIDER_ERROR (now PENDING)","requestId":"eb4bafc9-49dd-443e-95cc-83691042dd6e","ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:29.440643985Z","log":{"level":"ERROR","logger":"com.matbakhy.app.web.ApiExceptionHandler"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"Unhandled failure","requestId":"trace-leak-0002","error":{"type":"com.matbakhy.app.web.RedactedThrowable","message":"java.lang.IllegalStateException (message redacted)","stack_trace":"java.lang.IllegalStateException (message redacted)\n\tat com.matbakhy.app.privacy.LogRedactionIntegrationTest$Beans$FailingProbe.leaky(LogRedactionIntegrationTest.java:99)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:252)\n\tat org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:184)\n\tat org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:117)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:934)\n\tat org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:853)\n\tat org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:86)\n\tat org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:963)\n\tat org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:866)\n\tat org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1000)\n\tat org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:892)\n\tat jakarta.servlet.http.HttpServlet.service(HttpServlet.java:622)\n\tat org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:874)\n\tat org.springframework.test.web.servlet.TestDispatcherServlet.service(TestDispatcherServlet.java:72)\n\tat jakarta.servlet.http.HttpServlet.service(HttpServlet.java:710)\n\tat org.springframework.mock.web.MockFilterChain$ServletFilterProxy.doFilter(MockFilterChain.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)\n\tat org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$2(FilterChainProxy.java:235)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:491)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:353)\n\tat org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:84)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:131)\n\tat org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat com.matbakhy.app.security.WebAccountFilter.doFilterInternal(WebAccountFilter.java:37)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:126)\n\tat org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:120)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:181)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:245)\n\tat org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:239)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.doFilterInternal(OAuth2AuthorizationRequestRedirectFilter.java:195)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:110)\n\tat org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:96)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.csrf.CsrfFilter.doFilterInternal(CsrfFilter.java:118)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)\n\tat org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)\n\tat org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:230)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:243)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:336)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:227)\n\tat org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:140)\n\tat org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:237)\n\tat org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:195)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)\n\tat org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)\n\tat org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)\n\tat org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)\n\tat org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:317)\n\tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)\n\tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.session.web.http.SessionRepositoryFilter.doFilterInternal(SessionRepositoryFilter.java:143)\n\tat org.springframework.session.web.http.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:82)\n\tat org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:355)\n\tat org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:272)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:199)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat com.matbakhy.app.web.RequestIdFilter.doFilterInternal(RequestIdFilter.java:38)\n\tat org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)\n\tat org.springframework.test.web.servlet.setup.MockMvcFilterDecorator.doFilter(MockMvcFilterDecorator.java:160)\n\tat org.springframework.mock.web.MockFilterChain.doFilter(MockFilterChain.java:127)\n\tat org.springframework.test.web.servlet.MockMvc.perform(MockMvc.java:199)\n\tat com.matbakhy.app.privacy.LogRedactionIntegrationTest.call(LogRedactionIntegrationTest.java:304)\n\tat com.matbakhy.app.privacy.LogRedactionIntegrationTest.captured_logs_hold_no_personal_data_or_secrets_and_one_request_id_traces_order_to_provider_failure(LogRedactionIntegrationTest.java:170)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:701)\n\tat org.junit.platform.commons.support.ReflectionSupport.invokeMethod(ReflectionSupport.java:502)\n\tat org.junit.jupiter.engine.support.MethodReflectionUtils.invoke(MethodReflectionUtils.java:45)\n\tat org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:61)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:124)\n\tat org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:163)\n\tat org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:148)\n\tat org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:86)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(InterceptingExecutableInvoker.java:123)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.lambda$invoke$0(InterceptingExecutableInvoker.java:105)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:99)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain.proceed(InvocationInterceptorChain.java:66)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain.chainAndInvoke(InvocationInterceptorChain.java:47)\n\tat org.junit.jupiter.engine.execution.InvocationInterceptorChain.invoke(InvocationInterceptorChain.java:39)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:104)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:98)\n\tat org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$invokeTestMethod$0(TestMethodTestDescriptor.java:219)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.invokeTestMethod(TestMethodTestDescriptor.java:215)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:157)\n\tat org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.execute(TestMethodTestDescriptor.java:70)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:176)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)\n\tat org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)\n\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)\n\tat org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)\n\tat org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)\n\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)\n\tat org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)\n\tat org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)\n\tat org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)\n\tat org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)\n\tat org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)\n\tat org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52)\n\tat org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157)\n\tat org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65)\n\tat org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125)\n\tat org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)\n\tat org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58)\n\tat org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$2(InterceptingLauncher.java:57)\n\tat org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)\n\tat org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:56)\n\tat org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:58)\n\tat java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)\n\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n\tat org.apache.maven.surefire.api.util.ReflectionUtils.invokeMethodWithArray(ReflectionUtils.java:125)\n\tat org.apache.maven.surefire.junitplatform.LauncherAdapter.executeWithCancellationToken(LauncherAdapter.java:68)\n\tat org.apache.maven.surefire.junitplatform.LauncherAdapter.execute(LauncherAdapter.java:54)\n\tat org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:203)\n\tat org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:168)\n\tat org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:136)\n\tat org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385)\n\tat org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162)\n\tat org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507)\n\tat org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495)\nCaused by: java.lang.RuntimeException (message redacted)\n\t... 223 common frames omitted\n"},"ecs":{"version":"8.11"}}
+{"@timestamp":"2026-10-13T15:30:30.603845841Z","log":{"level":"INFO","logger":"com.matbakhy.orders.internal.OrderService"},"process":{"pid":3800,"thread":{"name":"main"}},"service":{"name":"matbakhy-api","version":"unknown","environment":"LOCAL","node":{}},"message":"order 1dd45537-b9e1-4180-8059-6c4915896191 recorded in its placement transaction","requestId":"f99cc531-cad5-43a2-a7ad-0e3d47004c74","ecs":{"version":"8.11"}}
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 24.23 s -- in com.matbakhy.app.privacy.LogRedactionIntegrationTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for Matbakhy backend 0.1.0-SNAPSHOT:
+[INFO] 
+[INFO] Matbakhy backend ................................... SUCCESS [  0.403 s]
+[INFO] Matbakhy shared primitives ......................... SUCCESS [  1.071 s]
+[INFO] Matbakhy operations module ......................... SUCCESS [  0.105 s]
+[INFO] Matbakhy identity module ........................... SUCCESS [  0.088 s]
+[INFO] Matbakhy availability module ....................... SUCCESS [  0.072 s]
+[INFO] Matbakhy catalog module ............................ SUCCESS [  0.130 s]
+[INFO] Matbakhy cooks module .............................. SUCCESS [  0.173 s]
+[INFO] Matbakhy orders module ............................. SUCCESS [  0.085 s]
+[INFO] Matbakhy finance module ............................ SUCCESS [  0.255 s]
+[INFO] Matbakhy support module ............................ SUCCESS [  0.070 s]
+[INFO] Matbakhy notifications module ...................... SUCCESS [  0.061 s]
+[INFO] Matbakhy application ............................... SUCCESS [ 33.442 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  36.432 s
+[INFO] Finished at: 2026-10-13T15:30:32Z
+[INFO] ------------------------------------------------------------------------

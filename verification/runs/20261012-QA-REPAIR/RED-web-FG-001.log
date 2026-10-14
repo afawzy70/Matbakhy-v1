@@ -1,0 +1,263 @@
+# Red phase: FG-001 (CW05) tests against unchanged product code (HEAD e2c6ebc1843dcfc93925c4c2a1fd2485bdbcc9e5, tests uncommitted)
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/customer-web
+
+ ❯ src/App.test.tsx (24 tests | 4 failed | 20 skipped) 975ms
+   ❯ QA repair FG-001: the basket can be edited and shows an estimate (CW05) (4)
+     × edits quantities and removes lines with correct integer arithmetic, then shows the empty state 537ms
+     × keeps each line's quantity between 1 and the portions that were available, up to 20 163ms
+     × all four replacement paths keep or replace the basket and its estimate exactly (TC-147) 208ms
+     × an edit discards a quote already shown, so only a fresh server quote can be accepted; a pending order locks the basket 65ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > QA repair FG-001: the basket can be edited and shows an estimate (CW05) > edits quantities and removes lines with correct integer arithmetic, then shows the empty state
+TestingLibraryElementError: Unable to find an element with the text: Kitchen A. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<section
+  aria-labelledby="cart-heading"
+  class="card"
+>
+  <h2
+    id="cart-heading"
+  >
+    Cart
+  </h2>
+  <ul
+    class="line-items"
+  >
+    <li>
+      2
+       × 
+      QA Meal A1
+    </li>
+    <li>
+      2
+       × 
+      QA Meal A2
+    </li>
+  </ul>
+  <p>
+    <span
+      class="pill slot-pill"
+    >
+      13 Oct 2026, 13:00
+    </span>
+  </p>
+  <button
+    class="secondary"
+    type="button"
+  >
+    Empty cart
+  </button>
+</section>
+ ❯ Object.getElementError ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:732:25
+    730|     await go("#/checkout");
+    731|     const cart = await cartSection();
+    732|     expect(within(cart).getByText("Kitchen A")).toBeTruthy();
+       |                         ^
+    733|     expect(await estimate()).toMatch(/336\.00/); // 2 × 120.25 + 95.50
+    734|     expect(within(cart).getByText(/estimate/i, { selector: "p" }).text…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/App.test.tsx > QA repair FG-001: the basket can be edited and shows an estimate (CW05) > keeps each line's quantity between 1 and the portions that were available, up to 20
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Decrease quantity: QA Meal A1"
+
+Here are the accessible roles:
+
+  heading:
+
+  Name "Cart":
+  <h2
+    id="cart-heading"
+  />
+
+  --------------------------------------------------list:
+
+  Name "":
+  <ul
+    class="line-items"
+  />
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  <li />
+
+  --------------------------------------------------paragraph:
+
+  Name "":
+  <p />
+
+  --------------------------------------------------button:
+
+  Name "Empty cart":
+  <button
+    class="secondary"
+    type="button"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<section
+  aria-labelledby="cart-heading"
+  class="card"
+>
+  <h2
+    id="cart-heading"
+  >
+    Cart
+  </h2>
+  <ul
+    class="line-items"
+  >
+    <li>
+      1
+       × 
+      QA Meal A1
+    </li>
+  </ul>
+  <p>
+    <span
+      class="pill slot-pill"
+    >
+      13 Oct 2026, 13:00
+    </span>
+  </p>
+  <button
+    class="secondary"
+    type="button"
+  >
+    Empty cart
+  </button>
+</section>
+ ❯ Object.getElementError ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/App.test.tsx:761:32
+    759|     await go("#/checkout");
+    760|     const cart = await cartSection();
+    761|     const minus = within(cart).getByRole("button", { name: "Decrease q…
+       |                                ^
+    762|     const plus = within(cart).getByRole("button", { name: "Increase qu…
+    763|     expect(minus.disabled).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/App.test.tsx > QA repair FG-001: the basket can be edited and shows an estimate (CW05) > all four replacement paths keep or replace the basket and its estimate exactly (TC-147)
+TestingLibraryElementError: Unable to find an element with the text: Kitchen A. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<section
+  aria-labelledby="cart-heading"
+  class="card"
+>
+  <h2
+    id="cart-heading"
+  >
+    Cart
+  </h2>
+  <ul
+    class="line-items"
+  >
+    <li>
+      2
+       × 
+      QA Meal A1
+    </li>
+  </ul>
+  <p>
+    <span
+      class="pill slot-pill"
+    >
+      13 Oct 2026, 13:00
+    </span>
+  </p>
+  <button
+    class="secondary"
+    type="button"
+  >
+    Empty cart
+  </button>
+</section>
+ ❯ Object.getElementError ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ expectCart src/App.test.tsx:780:42
+    778|     const expectCart = async (kitchen: string, lines: (string | number…
+    779|       await go("#/checkout");
+    780|       expect(within(await cartSection()).getByText(kitchen)).toBeTruth…
+       |                                          ^
+    781|       expect(await estimate()).toMatch(amount);
+    782|       expect(savedLines()).toEqual(lines);
+ ❯ src/App.test.tsx:789:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/App.test.tsx > QA repair FG-001: the basket can be edited and shows an estimate (CW05) > an edit discards a quote already shown, so only a fresh server quote can be accepted; a pending order locks the basket
+TestingLibraryElementError: Unable to find an element with the text: Estimated subtotal. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<section
+  aria-labelledby="cart-heading"
+  class="card"
+>
+  <h2
+    id="cart-heading"
+  >
+    Cart
+  </h2>
+  <ul
+    class="line-items"
+  >
+    <li>
+      1
+       × 
+      QA Meal A1
+    </li>
+  </ul>
+  <p>
+    <span
+      class="pill slot-pill"
+    >
+      13 Oct 2026, 13:00
+    </span>
+  </p>
+  <button
+    class="secondary"
+    type="button"
+  >
+    Empty cart
+  </button>
+</section>
+ ❯ Object.getElementError ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ ../../node_modules/.pnpm/@testing-library+dom@10.4.2/node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ estimate src/App.test.tsx:718:60
+    716|
+    717|   const cartSection = async () => (await screen.findByRole("heading", …
+    718|   const estimate = async () => within(await cartSection()).getByText("…
+       |                                                            ^
+    719|   const saved = () => JSON.parse(window.localStorage.getItem("matbakhy…
+    720|   const savedLines = () => saved()?.lines.map((l) => [l.mealId, l.quan…
+ ❯ src/App.test.tsx:827:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 20 skipped (24)
+   Start at  11:50:04
+   Duration  2.91s (tests 35%, environment 29%, transform 28%, import 7%)
+

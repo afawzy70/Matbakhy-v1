@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.observability.AuditAndCorrelationReadinessIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 25.05 s -- in com.matbakhy.app.observability.AuditAndCorrelationReadinessIntegrationTest

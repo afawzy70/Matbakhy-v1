@@ -1,0 +1,40 @@
+# MB-039 (OPS-01): single-node log store on the preview host. Bounded by retention (compactor). The periods are the
+# owner's proposed STAGING defaults of 2026-10-14 (application logs 30 days, debug logs 7 days). They are not an approved
+# production or customer-data retention policy: O06 (legal and business retention) is decided separately.
+auth_enabled: false
+server:
+  http_listen_port: 3100
+  log_level: warn
+common:
+  path_prefix: /loki
+  replication_factor: 1
+  ring:
+    kvstore: {store: inmemory}
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+schema_config:
+  configs:
+    - from: 2026-01-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index: {prefix: index_, period: 24h}
+limits_config:
+  retention_period: ${LOG_RETENTION:-720h}
+  # Debug lines are kept for a shorter time than the rest. The level label comes from the ECS "log.level" field (upper case).
+  retention_stream:
+    - selector: '{level="DEBUG"}'
+      priority: 1
+      period: ${DEBUG_LOG_RETENTION:-168h}
+  ingestion_rate_mb: 4
+  ingestion_burst_size_mb: 8
+  max_query_lookback: ${LOG_RETENTION:-720h}
+compactor:
+  working_directory: /loki/compactor
+  retention_enabled: true
+  delete_request_store: filesystem
+  compaction_interval: 10m
+analytics:
+  reporting_enabled: false

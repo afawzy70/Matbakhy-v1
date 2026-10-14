@@ -1,0 +1,36 @@
+
+ RUN  v5.0.3 /home/user/Matbakhy-v1/apps/operations-web
+
+ ❯ src/App.test.tsx (17 tests | 1 failed | 16 skipped) 402ms
+   ❯ operations-web cook workspace (17)
+     × offers only the slot transitions the server allows: no Close for a draft (MBQA-005) 399ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/App.test.tsx > operations-web cook workspace > offers only the slot transitions the server allows: no Close for a draft (MBQA-005)
+AssertionError: expected [ 'فتح', 'إغلاق' ] to deeply equal [ 'فتح' ]
+
+- Expected
++ Received
+
+  [
+    "فتح",
++   "إغلاق",
+  ]
+
+ ❯ src/App.test.tsx:237:24
+    235|     const actions = (i: number) => within(cards[i]).queryAllByRole("bu…
+    236|     expect(cards).toHaveLength(4);
+    237|     expect(actions(0)).toEqual(["فتح"]);
+       |                        ^
+    238|     expect(actions(1)).toEqual(["إيقاف مؤقت", "إغلاق"]);
+    239|     expect(actions(2)).toEqual(["فتح", "إغلاق"]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 skipped (17)
+   Start at  18:51:39
+   Duration  2.64s (environment 41%, transform 33%, tests 17%, import 9%)
+

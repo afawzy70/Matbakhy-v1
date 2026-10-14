@@ -1,0 +1,57 @@
+{
+  "run_id": "20261013-MB-050",
+  "story_id": "MB-050",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (ZeroCommissionIntegrationTest and regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "OPS-WEB-TESTS",
+      "name": "Cook statement and ops finance/configuration component tests",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/operations-web test"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "CUSTOMER-APPS-NO-FEE",
+      "name": "Customer web and mobile sources contain no commission or service-fee wording",
+      "command": [
+        "bash",
+        "-c",
+        "! grep -rniE 'commission|service fee|عمولة|رسوم الخدمة' apps/customer-web/src apps/customer-mobile/src --include=*.ts --include=*.tsx"
+      ],
+      "required": true,
+      "timeout_seconds": 60
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-157",
+      "observed": "ZeroCommissionIntegrationTest on PostgreSQL: a launch order (2 x 12000 + delivery 3000) quotes 27000 with no platform fee, stores commission snapshot 0|0, completes through the real cook commands and posts a ledger group whose entries sum to 0; the cook statement shows commissionPosted and commissionOutstanding 0. A policy change with commissionRateBps 1000 is refused 422 (value.commissionRateBps RANGE_0_0) while 0 is accepted; a direct insert of a live (non-synthetic) policy with commission 1000 is refused by the database check. The development policy is 0%. Cook statement and ops finance show 'لا توجد عمولة للمنصة' and no commission rows or column when nothing is owed; the configuration view says 'no platform commission'. Customer web and mobile have no commission or service-fee wording. Native apps were not re-run for this story: they never displayed commission (source check above)."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "D10 zero commission at 07d7236. Self-review, not independent review. The dormant commission arithmetic stays covered only by synthetic test fixtures."
+    ]
+  },
+  "open_defects": []
+}

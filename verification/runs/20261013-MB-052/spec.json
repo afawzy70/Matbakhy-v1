@@ -1,0 +1,61 @@
+{
+  "run_id": "20261013-MB-052",
+  "story_id": "MB-052",
+  "phase": "P07",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (PaymentReconciliationIntegrationTest and regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "CONTRACT-CHECK",
+      "name": "Contract lint and generated-client drift",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm run contract:check"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "WORKSPACE-TESTS",
+      "name": "Workspace component tests (cook and finance payment screens)",
+      "command": [
+        "bash",
+        "-c",
+        "pnpm -r test"
+      ],
+      "required": true,
+      "timeout_seconds": 900
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-161",
+      "observed": "PaymentReconciliationIntegrationTest on PostgreSQL: deposits are not offered until finance staff with recent MFA approve the kitchen's recipient (cook 403, finance without recent MFA 403; audit payment.recipient_approve); a changed recipient returns to NONE and needs a new approval. A mismatch report without the amount seen is refused 422; another kitchen's cook gets 404; NOT_RECEIVED moves the payment to DISPUTED and it appears in the finance queue (cook 403 on the queue); staff cannot record RECEIVED (refused) and cannot decide while the order is active (409). Ops-web tests: the cook reports receipt or a problem and the screen never says bank confirmation; finance approves an account and decides an ended order with no 'received' option."
+    },
+    {
+      "id": "TC-162",
+      "observed": "After the kitchen reports receipt of 13500 and then rejects the order, the payment is RECONCILE_PENDING; a decision without a reason is refused; finance records REFUND_OWED with a reason (audit payment.decision) and the customer's order view shows REFUND_OWED; a refund report without a reference is refused; with a reference the kitchen's report moves it to REFUNDED; the append-only payment timeline ends REFUND_OWED then REFUNDED and the order stays REJECTED. Limits: no automatic support case or customer notification on a dispute or refund obligation yet (recorded follow-up)."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "MB-052 server part and screens (9e3ed88), evidence at the commit below. Self-review, not independent review. Follow-ups: automatic support case and customer notification for DISPUTED/REFUND_OWED. Live money remains blocked by D16 gates."
+    ]
+  },
+  "open_defects": []
+}

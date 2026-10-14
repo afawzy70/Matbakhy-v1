@@ -1,0 +1,319 @@
+import { expect, test, type APIRequestContext, type BrowserContext, type Page } from "@playwright/test";
+import { strings } from "../src/i18n";
+import { account, axe, cairoDate, env, fixture, idpLogin, png } from "./fixtures";
+
+/**
+ * TC-122 against the real local stack: a cook signs in through the identity provider, waits for approval, creates and
+ * publishes a meal with an uploaded photo, opens a slot, and fulfils one pickup and one delivery order placed by a
+ * synthetic customer through the real API; then reports cash, reads the statement and pauses sales. A non-cook sees
+ * no kitchen data. Approval itself is a staff step that needs MFA, which the local identity provider does not offer,
+ * so this test inserts the approved application directly (synthetic setup; the review workflow has its own tests).
+ */
+const t = strings.ar;
+const API = env("E2E_API_URL");
+const ZONE = "00000000-0000-4000-8000-00000000a001";
+
+async function xsrf(context: BrowserContext): Promise<string> {
+  const cookie = (await context.cookies(API)).find((c) => c.name === "XSRF-TOKEN");
+  if (!cookie) {
+    throw new Error("no XSRF-TOKEN cookie");
+  }
+  return decodeURIComponent(cookie.value);
+}
+
+async function customerCall(context: BrowserContext, request: APIRequestContext, method: "GET" | "POST", path: string, data?: unknown, key = false) {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (method !== "GET") {
+    headers["X-XSRF-TOKEN"] = await xsrf(context);
+  }
+  if (key) {
+    headers["Idempotency-Key"] = `e2e-${crypto.randomUUID()}`;
+  }
+  const r = await request.fetch(`${API}${path}`, { method, headers, ...(data === undefined ? {} : { data }) });
+  const body = await r.text();
+  return { status: r.status(), body: body ? (JSON.parse(body) as Record<string, unknown>) : {} };
+}
+
+/** Label lookup that fails loudly instead of matching "undefined". */
+function label(v: string | undefined): string {
+  if (v === undefined) {
+    throw new Error("missing label");
+  }
+  return v;
+}
+
+function card(page: Page, name: string) {
+  return page.getByRole("article", { name });
+}
+
+test("cook fulfils pickup and delivery orders through the real API", async ({ browser }) => {
+  // ---- cook signs in; no kitchen yet ----
+  const cookContext = await browser.newContext();
+  const cook = await cookContext.newPage();
+  await cook.goto("/");
+  await expect(cook.locator("html")).toHaveAttribute("dir", "rtl");
+  await cook.getByRole("link", { name: t.signIn }).click();
+  await idpLogin(cook, "cook-a");
+  await expect(cook.getByText(t.noKitchen)).toBeVisible();
+  await expect(cook.getByText(t.noApplication)).toBeVisible();
+
+  // ---- synthetic approval (staff MFA step not available locally) ----
+  fixture("cook_approved_with_kitchen", { cook_subject: account("cook-a").subject });
+  await cook.reload();
+  await expect(cook.getByRole("heading", { name: "مطبخ تجريبي" })).toBeVisible();
+
+  // ---- meal with an uploaded photo, published ----
+  await cook.getByRole("button", { name: t.tabs.meals }).click();
+  await cook.getByLabel(t.titleAr).fill("كشري تجريبي");
+  await cook.getByLabel(t.titleEn).fill("Synthetic koshary");
+  await cook.getByLabel(t.description).fill("وصف تجريبي");
+  await cook.getByLabel(t.portion).fill("طبق واحد");
+  await cook.getByLabel(t.ingredients).fill("أرز، عدس، مكرونة");
+  await cook.getByLabel(t.price).fill("120");
+  await cook.getByLabel(t.photo).setInputFiles({ name: "koshary.png", mimeType: "image/png", buffer: png(640, 480) });
+  await cook.getByRole("button", { name: t.create }).click();
+  const meal = card(cook, "كشري تجريبي");
+  await expect(meal.getByText(label(t.mealStatus.DRAFT))).toBeVisible();
+  await meal.getByRole("button", { name: t.publish }).click();
+  await expect(meal.getByText(label(t.mealStatus.PUBLISHED))).toBeVisible();
+
+  // ---- slot tomorrow, opened ----
+  await cook.getByRole("button", { name: t.tabs.slots }).click();
+  await cook.getByLabel(t.date).fill(cairoDate(1));
+  await cook.getByLabel(t.start).fill("13:00");
+  await cook.getByLabel(t.end).fill("15:00");
+  await cook.getByLabel(t.maxPortions).fill("10");
+  await cook.getByLabel("كشري تجريبي").fill("10");
+  await cook.getByRole("button", { name: t.create }).click();
+  const slotCard = cook.getByRole("article").filter({ hasText: label(t.slotState.DRAFT) });
+  await slotCard.getByRole("button", { name: t.open }).click();
+  await expect(cook.getByRole("article").filter({ hasText: label(t.slotState.OPEN) })).toBeVisible();
+
+  // ---- customer: sign in (no kitchen data visible), verified contact, address, two orders ----
+  const customerContext = await browser.newContext();
+  const customer = await customerContext.newPage();
+  await customer.goto(`${API}/oauth2/authorization/keycloak?returnTo=${encodeURIComponent(new URL("/", cook.url()).toString())}`);
+  await idpLogin(customer, "customer-a");
+  await expect(customer.getByText(t.noKitchen)).toBeVisible();
+  fixture("customer_phone_verified", { subject: account("customer-a").subject, phone: "+201001112223" });
+  const req = customer.request;
+  expect((await customerCall(customerContext, req, "GET", "/api/v1/cook/dashboard")).status, "a customer has no kitchen data").toBe(403);
+  const address = await customerCall(customerContext, req, "POST", "/api/v1/me/addresses", {
+    label: "Home",
+    recipientName: "Customer A",
+    phone: "+201001112223",
+    governorate: "Cairo",
+    city: "Test city",
+    zoneId: ZONE,
+    street: "Synthetic street 1",
+    building: "7",
+  });
+  expect(address.status, JSON.stringify(address.body)).toBe(201);
+  const mealId = fixture("kitchen_meal_id");
+  const slotId = fixture("kitchen_slot_id");
+  const policy = JSON.parse(fixture("active_policy_versions")) as {
+    terms: string;
+    cancellation: string;
+  };
+
+  async function place(mode: "PICKUP" | "DELIVERY"): Promise<{ id: string; number: string }> {
+    const quote = await customerCall(customerContext, req, "POST", "/api/v1/quotes", {
+      items: [{ mealId, quantity: 2 }],
+      slotId,
+      fulfillmentMode: mode,
+      ...(mode === "DELIVERY" ? { addressId: address.body.id } : {}),
+    });
+    expect(quote.status, JSON.stringify(quote.body)).toBe(201);
+    const order = await customerCall(
+      customerContext,
+      req,
+      "POST",
+      "/api/v1/orders",
+      { quoteId: quote.body.quoteId, clientRequestId: crypto.randomUUID(), acceptedPolicyVersions: policy },
+      true,
+    );
+    expect(order.status, JSON.stringify(order.body)).toBe(201);
+    return { id: order.body.id as string, number: order.body.publicNumber as string };
+  }
+  const pickup = await place("PICKUP");
+  const delivery = await place("DELIVERY");
+
+  // ---- cook: dashboard deadlines, then fulfil both orders ----
+  await cook.getByRole("button", { name: t.tabs.dashboard }).click();
+  await expect(cook.getByRole("button", { name: pickup.number })).toBeVisible();
+  await expect(cook.getByText(/باقي \d+ دقيقة/).first()).toBeVisible();
+  await axe(cook, "cook dashboard");
+  await cook.getByRole("button", { name: t.tabs.orders }).click();
+  await axe(cook, "cook orders");
+
+  async function act(order: { number: string }, action: string) {
+    const c = card(cook, order.number);
+    await c.getByRole("button", { name: label(t.action[action]) }).click();
+  }
+  async function expectState(order: { number: string }, state: string) {
+    await expect(card(cook, order.number).getByText(label(t.state[state]), { exact: true })).toBeVisible();
+  }
+  async function handoverCode(orderId: string): Promise<string> {
+    const o = await customerCall(customerContext, req, "GET", `/api/v1/orders/${orderId}`);
+    return o.body.handoverCode as string;
+  }
+
+  for (const o of [pickup, delivery]) {
+    await act(o, "ACCEPT");
+    await expectState(o, "ACCEPTED");
+    await act(o, "PREPARE");
+    await expectState(o, "PREPARING");
+    await act(o, "READY");
+    await expectState(o, "READY");
+  }
+  // Customer contact is visible to the cook while fulfilling the delivery order.
+  await expect(card(cook, delivery.number).getByText("+201001112223")).toBeVisible();
+  await expect(card(cook, delivery.number).getByText(/Synthetic street 1/)).toBeVisible();
+
+  // Pickup: wrong code refused, real code completes.
+  await card(cook, pickup.number).getByLabel(t.handoverCode).fill("000000");
+  await act(pickup, "HANDOVER");
+  await expect(card(cook, pickup.number).getByText(label(t.errors.VERIFICATION_FAILED))).toBeVisible();
+  await card(cook, pickup.number).getByLabel(t.handoverCode).fill(await handoverCode(pickup.id));
+  await act(pickup, "HANDOVER");
+  await expect(card(cook, pickup.number)).toHaveCount(0);
+
+  // Delivery: dispatch with a reference, then hand over with the customer's code.
+  await card(cook, delivery.number).getByLabel(t.deliveryReference).fill("Synthetic courier");
+  await act(delivery, "DISPATCH");
+  await expectState(delivery, "OUT_FOR_DELIVERY");
+  await card(cook, delivery.number).getByLabel(t.handoverCode).fill(await handoverCode(delivery.id));
+  await act(delivery, "HANDOVER");
+  await expect(card(cook, delivery.number)).toHaveCount(0);
+
+  // ---- cash report on the completed pickup order ----
+  await cook.getByRole("button", { name: t.filter.COMPLETED }).click();
+  const done = card(cook, pickup.number);
+  await expect(done.getByText(label(t.cash.DUE))).toBeVisible();
+  await done.getByRole("button", { name: t.submit }).click();
+  await expect(done.getByText(label(t.cash.REPORTED))).toBeVisible();
+  const customerView = await customerCall(customerContext, req, "GET", `/api/v1/orders/${pickup.id}`);
+  expect(customerView.body.state).toBe("COMPLETED");
+  expect(customerView.body.cashState).toBe("REPORTED");
+
+  // ---- statement ----
+  await cook.getByRole("button", { name: t.tabs.statement }).click();
+  await expect(cook.getByRole("cell", { name: pickup.number })).toBeVisible();
+  await expect(cook.getByRole("cell", { name: delivery.number })).toBeVisible();
+  // MB-050 (D10): the launch policy has no platform commission, so the statement says so instead of the commission note.
+  await expect(cook.getByText(t.statementNoteNoCommission)).toBeVisible();
+  await expect(cook.getByText(t.noCommission)).toBeVisible();
+  await expect(cook.getByText(t.statementNote)).toHaveCount(0);
+  await axe(cook, "cook statement");
+
+  // ---- pause stops new sales; resume restores them ----
+  await cook.getByRole("button", { name: t.tabs.settings }).click();
+  await cook.getByRole("button", { name: t.pauseKitchen }).click();
+  await expect(cook.getByRole("button", { name: t.resumeKitchen })).toBeVisible();
+  const blocked = await customerCall(customerContext, req, "POST", "/api/v1/quotes", { items: [{ mealId, quantity: 1 }], slotId, fulfillmentMode: "PICKUP" });
+  expect(blocked.status, "paused kitchen does not sell").not.toBe(201);
+  await cook.getByRole("button", { name: t.resumeKitchen }).click();
+  await expect(cook.getByRole("button", { name: t.pauseKitchen })).toBeVisible();
+  const allowed = await customerCall(customerContext, req, "POST", "/api/v1/quotes", { items: [{ mealId, quantity: 1 }], slotId, fulfillmentMode: "PICKUP" });
+  expect(allowed.status, JSON.stringify(allowed.body)).toBe(201);
+
+  // ---- operations staff: moderation and kitchen review (MB-023) ----
+  const opsContext = await browser.newContext();
+  const ops = await opsContext.newPage();
+  await ops.goto("/");
+  await ops.getByRole("link", { name: t.signIn }).click();
+  await idpLogin(ops, "ops-a");
+  await expect(ops.getByText(t.noKitchen)).toBeVisible();
+  fixture("staff_review_grants", { subject: account("ops-a").subject });
+  await ops.reload();
+  await expect(ops.getByRole("button", { name: t.ops.reviews })).toBeVisible();
+  await expect(ops.getByRole("button", { name: t.tabs.orders, exact: true })).toHaveCount(0);
+
+  // Hide the meal: no longer sold or shown; restore: sold again.
+  await ops.getByRole("button", { name: t.ops.catalogue }).click();
+  const modCard = ops.getByRole("article", { name: "كشري تجريبي" });
+  await expect(modCard).toBeVisible();
+  await axe(ops, "ops catalogue and review queue");
+  await modCard.getByLabel(t.reason).fill("e2e moderation check");
+  await modCard.getByRole("button", { name: t.ops.hide }).click();
+  await expect(modCard.getByText(t.ops.hidden, { exact: true })).toBeVisible();
+  expect((await req.get(`${API}/api/v1/meals/${mealId}`)).status(), "hidden meal not public").toBe(404);
+  const hiddenQuote = await customerCall(customerContext, req, "POST", "/api/v1/quotes", { items: [{ mealId, quantity: 1 }], slotId, fulfillmentMode: "PICKUP" });
+  expect(hiddenQuote.status, "hidden meal not sold").not.toBe(201);
+  await modCard.getByLabel(t.reason).fill("e2e restore");
+  await modCard.getByRole("button", { name: t.ops.restore }).click();
+  await expect(modCard.getByText(t.ops.visible, { exact: true })).toBeVisible();
+  expect((await req.get(`${API}/api/v1/meals/${mealId}`)).status()).toBe(200);
+
+  // Review queue: the approved application with its kitchen and active-order impact; suspension needs MFA step-up,
+  // which the local identity provider cannot satisfy, so the UI must offer the step-up login instead of acting.
+  await ops.getByRole("button", { name: t.ops.reviews }).click();
+  await ops.getByRole("button", { name: label(t.ops.appState.APPROVED) }).click();
+  await ops.getByRole("button", { name: "مطبخ تجريبي" }).click();
+  await expect(ops.getByText("Synthetic location")).toBeVisible();
+  const kitchenPanel = ops.getByLabel(t.ops.kitchen);
+  await expect(kitchenPanel.getByText(new RegExp(t.ops.impact))).toBeVisible();
+  await kitchenPanel.getByLabel(t.reason).fill("e2e suspension attempt");
+  await kitchenPanel.getByRole("button", { name: label(t.ops.kitchenAction.SUSPEND), exact: true }).click();
+  await expect(kitchenPanel.getByRole("link", { name: t.ops.stepUpLink })).toHaveAttribute("href", /stepUp=true/);
+  expect(fixture("kitchen_operating_state")).toBe("ACTIVE");
+  // A cook never sees staff sections or private application data of others.
+  expect((await cook.request.get(`${API}/api/v1/ops/catalogue`)).status()).toBe(403);
+
+  // ---- support cases and a cancellation request after acceptance (MB-024) ----
+  const third = await place("PICKUP");
+  await cook.getByRole("button", { name: t.tabs.orders }).click();
+  await cook.getByRole("button", { name: t.filter.ACTIVE }).click();
+  await act(third, "ACCEPT");
+  await expectState(third, "ACCEPTED");
+  const thirdView = await customerCall(customerContext, req, "GET", `/api/v1/orders/${third.id}`);
+  expect(thirdView.body.allowedActions).toEqual(["REQUEST_CANCELLATION"]);
+  const request = await customerCall(customerContext, req, "POST", `/api/v1/orders/${third.id}/cancellation-requests`,
+    { expectedVersion: thirdView.body.version, reasonCode: "CHANGED_MIND", note: "Plans changed, sorry" }, true);
+  expect(request.status, JSON.stringify(request.body)).toBe(201);
+  expect((await customerCall(customerContext, req, "GET", `/api/v1/orders/${third.id}`)).body.state, "request does not cancel").toBe("ACCEPTED");
+  const safety = await customerCall(customerContext, req, "POST", "/api/v1/support/cases",
+    { orderId: pickup.id, category: "FOOD_SAFETY", description: "Felt unwell after eating the synthetic meal" });
+  expect(safety.status, JSON.stringify(safety.body)).toBe(201);
+
+  await ops.reload();
+  await ops.getByRole("button", { name: t.ops.cases }).click();
+  const firstRow = ops.getByRole("listitem").filter({ hasText: safety.body.reference as string });
+  await expect(firstRow.getByText(label(t.ops.severity.CRITICAL))).toBeVisible();
+  await axe(ops, "ops support cases");
+  await firstRow.getByRole("button", { name: safety.body.reference as string }).click();
+  await ops.getByRole("textbox", { name: t.ops.staffOnly }).fill("Synthetic internal note: check kitchen hygiene record");
+  await ops.getByRole("button", { name: t.ops.send }).click();
+  await expect(ops.getByText("Synthetic internal note: check kitchen hygiene record")).toBeVisible();
+  const customerCase = await customerCall(customerContext, req, "GET", `/api/v1/support/cases/${safety.body.id as string}`);
+  expect(JSON.stringify(customerCase.body), "staff notes never reach the customer").not.toContain("internal note");
+
+  // The order shows up flagged; once in preparation operations cancel it with the case reference, then resolve the case.
+  await ops.getByRole("button", { name: t.ops.orders }).click();
+  await ops.getByRole("button", { name: label(t.ops.exception.OPEN_CASE) }).click();
+  await expect(ops.getByRole("button", { name: third.number })).toBeVisible();
+  await act(third, "PREPARE");
+  await expectState(third, "PREPARING");
+  await ops.getByRole("button", { name: third.number }).click();
+  const cancelForm = ops.getByRole("form", { name: t.ops.exceptionCancel });
+  await cancelForm.getByLabel(t.ops.caseReference).fill(request.body.reference as string);
+  await cancelForm.getByRole("button", { name: t.ops.exceptionCancel }).click();
+  await expect(ops.getByRole("heading", { name: new RegExp(`${third.number} · ${label(t.state.CANCELLED)}`) })).toBeVisible();
+  await ops.getByRole("button", { name: t.ops.cases }).click();
+  await ops.getByRole("button", { name: request.body.reference as string }).click();
+  await ops.getByLabel(t.ops.setState).selectOption("RESOLVED");
+  await ops.getByLabel(t.ops.resolution).selectOption("ORDER_CANCELLED");
+  await ops.getByLabel(t.reason, { exact: true }).fill("Cancelled on the customer's request");
+  await ops.getByRole("button", { name: t.save }).click();
+  await expect(ops.getByRole("heading", { name: new RegExp(label(t.ops.caseState.RESOLVED)) })).toBeVisible();
+  expect((await customerCall(customerContext, req, "GET", `/api/v1/support/cases/${request.body.id as string}`)).body.state).toBe("RESOLVED");
+  await opsContext.close();
+
+  // ---- English left-to-right ----
+  await cook.getByRole("button", { name: t.language }).click();
+  await expect(cook.locator("html")).toHaveAttribute("dir", "ltr");
+  await expect(cook.getByRole("button", { name: strings.en.tabs.orders })).toBeVisible();
+
+  await cookContext.close();
+  await customerContext.close();
+});

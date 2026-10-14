@@ -12,5 +12,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
       - name: Validate planning structure
         run: python3 scripts/validate_blueprint.py
+      - name: Check scope, inventory and traceability (P00-CHECK-1)
+        run: python3 scripts/check_scope.py
       - name: Verify planning guardrails
         run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
