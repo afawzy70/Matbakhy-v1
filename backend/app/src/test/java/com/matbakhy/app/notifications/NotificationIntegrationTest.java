@@ -55,6 +55,7 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @IntegrationTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.TestPropertySource(properties = "matbakhy.notifications.push-enabled=true")
 @Import({TestLogins.class, NotificationIntegrationTest.Beans.class})
 class NotificationIntegrationTest {
 

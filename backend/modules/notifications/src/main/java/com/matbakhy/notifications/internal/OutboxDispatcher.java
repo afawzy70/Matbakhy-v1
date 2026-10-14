@@ -121,8 +121,10 @@ public class OutboxDispatcher {
             jdbc.update("""
                     INSERT INTO notification_delivery (id, notification_id, channel, target, next_attempt_at)
                     VALUES (?, ?, 'EMAIL', 'account', ?) ON CONFLICT DO NOTHING""", UUID.randomUUID(), notification, Timestamp.from(now));
-            for (String installation : jdbc.queryForList("SELECT installation_id FROM device_registration WHERE user_id = ? AND revoked_at IS NULL",
-                    String.class, recipient)) {
+            // O07: while push delivery is switched off, registered devices are kept but no PUSH delivery is created.
+            List<String> installations = props.pushEnabled() ? jdbc.queryForList(
+                    "SELECT installation_id FROM device_registration WHERE user_id = ? AND revoked_at IS NULL", String.class, recipient) : List.of();
+            for (String installation : installations) {
                 jdbc.update("""
                         INSERT INTO notification_delivery (id, notification_id, channel, target, next_attempt_at)
                         VALUES (?, ?, 'PUSH', ?, ?) ON CONFLICT DO NOTHING""", UUID.randomUUID(), notification, installation, Timestamp.from(now));

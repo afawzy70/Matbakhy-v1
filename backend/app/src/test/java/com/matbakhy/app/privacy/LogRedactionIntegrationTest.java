@@ -59,6 +59,7 @@ import tools.jackson.databind.json.JsonMapper;
  */
 @IntegrationTest
 @AutoConfigureMockMvc
+@org.springframework.test.context.TestPropertySource(properties = "matbakhy.notifications.push-enabled=true")
 @ExtendWith(OutputCaptureExtension.class)
 @TestPropertySource(properties = "logging.structured.format.console=ecs")
 @Import({TestLogins.class, LogRedactionIntegrationTest.Beans.class})
