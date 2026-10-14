@@ -299,6 +299,28 @@ public class SupportService implements OrderCases {
         return new HashSet<>(jdbc.queryForList("SELECT DISTINCT order_id FROM support_case WHERE state NOT IN ('RESOLVED', 'CLOSED')", UUID.class));
     }
 
+    /**
+     * The description is system text: no recipient account, transfer reference or amount (those stay in the payment
+     * history, visible to the parties and finance). The customer sees it in their own case list.
+     */
+    @Override
+    public UUID openPaymentCase(UUID orderId, String paymentState) {
+        Status order = orders.status(orderId).orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "order not found"));
+        String description = "Deposit needs reconciliation (" + paymentState + "). Staff will follow up with you and the kitchen. "
+                + "العربون يحتاج مراجعة، وسيتواصل فريق الدعم معك ومع المطبخ.";
+        Instant now = clock.instant();
+        byte[] ref = new byte[4];
+        RANDOM.nextBytes(ref);
+        jdbc.update("""
+                INSERT INTO support_case (id, reference, order_id, customer_id, category, severity, description, sla_due_at, created_at, updated_at)
+                VALUES (?, ?, ?, ?, 'PAYMENT', 'HIGH', ?, ?, ?, ?)
+                ON CONFLICT (order_id) WHERE category = 'PAYMENT' AND state NOT IN ('RESOLVED', 'CLOSED') DO NOTHING""",
+                UUID.randomUUID(), "CS-" + HexFormat.of().withUpperCase().formatHex(ref), order.orderId(), order.customerId(), description,
+                Timestamp.from(now.plus(Duration.ofHours(2))), Timestamp.from(now), Timestamp.from(now));
+        return jdbc.queryForObject("SELECT id FROM support_case WHERE order_id = ? AND category = 'PAYMENT' AND state NOT IN ('RESOLVED', 'CLOSED')",
+                UUID.class, orderId);
+    }
+
     // ---- internals ----
 
     private record Row(UUID id, String reference, UUID orderId, String orderNumber, UUID customerId, String category, String severity, String state,

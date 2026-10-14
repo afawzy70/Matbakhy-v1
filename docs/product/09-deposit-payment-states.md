@@ -38,11 +38,11 @@ MB-052 also adds the kitchen's own payment profile (API-102/103). A new or chang
 - The kitchen's report needs the exact deposit amount and the current version. It is recorded as the kitchen's statement, never as a bank confirmation. "Not received", a different amount and disputes are MB-052.
 - **Preparation** of a deposit order is refused (`DEPOSIT_NOT_RECEIVED`) until the kitchen has reported receipt. Acceptance stays a separate kitchen action.
 - Every change is written to the append-only `payment_event` (actor, amount, reference, reason, request ID).
+- **Notifications (MB-052 follow-up, `b8006db`):** the kitchen is notified in-app when the customer reports a transfer. The customer is notified when the kitchen reports receipt, a problem, a refund owed or a refund sent. Channels beyond in-app depend on O07.
+- **Support case (MB-052 follow-up, V28):** moving to DISPUTED, RECONCILE_PENDING or REFUND_OWED opens a HIGH `PAYMENT` support case for the order in the same transaction. There is at most one open PAYMENT case per order (partial unique index), so retries and concurrent transitions never create a second one. The case description is system text with no recipient account, transfer reference or amount. The customer sees the case in their own cases; staff work it in the case queue and resolve it by hand. Customers cannot open a PAYMENT case themselves.
 
 ## Known limits (proposals; owner review)
 
 - The deposit is due by the order's acceptance deadline (at most 15 minutes, synthetic policy). A longer deposit window for orders far in the future is a proposal, not implemented.
 - If the kitchen accepts before the deposit arrives and it never arrives, nothing expires the order automatically. The kitchen can cancel it, and the payment then goes to EXPIRED or RECONCILE_PENDING. An automatic deposit timeout for accepted orders is a proposal.
 - The amount of the deposit (`deposit_bps`) and the COD cap are kitchen settings without approved values. The tests use 50% and EGP 200.00 as synthetic data.
-- A dispute or refund obligation does not yet open a support case automatically. Ops see it in the payment queue, and the customer can open a case from the order.
-- No customer notification is sent for payment state changes yet. The order view shows the state.

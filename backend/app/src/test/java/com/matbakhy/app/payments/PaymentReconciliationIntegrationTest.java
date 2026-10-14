@@ -260,4 +260,49 @@ class PaymentReconciliationIntegrationTest {
         JsonNode inbox = ok(call(get("/api/v1/notifications"), as(customerSubject)), 200);
         assertThat(inbox.toString()).contains("PAYMENT_DISPUTED").doesNotContain("instapay", "13500");
     }
+
+    private String paymentCases(UUID order) {
+        return String.join(",", jdbc.queryForList(
+                "SELECT category || '/' || severity || '/' || state FROM support_case WHERE order_id = ? AND category = 'PAYMENT' ORDER BY created_at",
+                String.class, order));
+    }
+
+    /**
+     * Owner direction (mvp-direct-deposit-payment): a kitchen's problem report or a refund obligation opens a support case,
+     * once per order, in the same transaction as the payment change; the customer sees it among their cases, staff in the
+     * queue, another customer never. The case holds no account or amount details.
+     */
+    @Test
+    void a_dispute_or_refund_obligation_opens_one_payment_support_case_for_the_order() throws Exception {
+        approvedRecipient();
+        UUID order = depositOrder();
+        ok(call(post("/api/v1/orders/" + order + "/payment/transfer-report").content("{\"reference\":\"SYN-REF-1\"}"), as(customerSubject)), 200);
+        assertThat(paymentCases(order)).as("no case before a problem").isEmpty();
+        long v = paymentVersion(order);
+        ok(call(post("/api/v1/cook/orders/" + order + "/payment/problem").content(
+                "{\"expectedVersion\":" + v + ",\"kind\":\"NOT_RECEIVED\"}"), as(cookSubject)), 200);
+        assertThat(paymentCases(order)).isEqualTo("PAYMENT/HIGH/OPEN");
+        // A retry with the same (now stale) version changes nothing and opens nothing.
+        assertThat(call(post("/api/v1/cook/orders/" + order + "/payment/problem").content(
+                "{\"expectedVersion\":" + v + ",\"kind\":\"NOT_RECEIVED\"}"), as(cookSubject)).getStatus()).isIn(409, 422);
+        assertThat(paymentCases(order)).isEqualTo("PAYMENT/HIGH/OPEN");
+
+        // The order ends, staff record a refund obligation: still one open payment case for the order.
+        long ov = jdbc.queryForObject("SELECT version FROM customer_order WHERE id = ?", Long.class, order);
+        ok(call(post("/api/v1/cook/orders/" + order + "/reject").header("Idempotency-Key", "rec-" + UUID.randomUUID())
+                .content("{\"expectedVersion\":" + ov + ",\"reasonCode\":\"INGREDIENT_UNAVAILABLE\"}"), as(cookSubject)), 200);
+        ok(call(post("/api/v1/ops/orders/" + order + "/payment/decision").content("{\"expectedVersion\":" + paymentVersion(order)
+                + ",\"outcome\":\"REFUND_OWED\",\"reason\":\"kitchen rejected after the transfer report\"}"), logins.loginWithMfa(financeSubject, "Finance")), 200);
+        assertThat(paymentCases(order)).as("one open payment case per order").isEqualTo("PAYMENT/HIGH/OPEN");
+
+        String description = jdbc.queryForObject("SELECT description FROM support_case WHERE order_id = ? AND category = 'PAYMENT'", String.class, order);
+        assertThat(description).doesNotContain("SYN-REF-1", "synthetic.kitchen@instapay", "13500", "135.00");
+        JsonNode mine = ok(call(get("/api/v1/support/cases"), as(customerSubject)), 200);
+        assertThat(mine.toString()).contains("PAYMENT");
+        String stranger = UUID.randomUUID().toString();
+        logins.login(stranger, "Stranger");
+        assertThat(ok(call(get("/api/v1/support/cases"), as(stranger)), 200).toString()).doesNotContain("PAYMENT");
+        String agent = staff("support.case");
+        assertThat(ok(call(get("/api/v1/ops/cases"), logins.login(agent, "Agent")), 200).toString()).contains(order.toString());
+    }
 }

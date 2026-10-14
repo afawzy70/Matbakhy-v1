@@ -2,6 +2,7 @@ package com.matbakhy.orders.internal;
 
 import com.matbakhy.cooks.api.KitchenDirectory;
 import com.matbakhy.operations.api.AuditLog;
+import com.matbakhy.orders.api.OrderCases;
 import com.matbakhy.shared.error.ApiException;
 import com.matbakhy.shared.error.ApiException.FieldError;
 import com.matbakhy.shared.error.ErrorCode;
@@ -65,12 +66,14 @@ public class PaymentService {
     private final KitchenDirectory kitchens;
     private final AuditLog audit;
     private final Clock clock;
+    private final OrderCases cases;
 
-    PaymentService(JdbcTemplate jdbc, KitchenDirectory kitchens, AuditLog audit, Clock clock) {
+    PaymentService(JdbcTemplate jdbc, KitchenDirectory kitchens, AuditLog audit, Clock clock, OrderCases cases) {
         this.jdbc = jdbc;
         this.kitchens = kitchens;
         this.audit = audit;
         this.clock = clock;
+        this.cases = cases;
     }
 
     private static final Set<String> ENDED = Set.of("COMPLETED", "REJECTED", "EXPIRED", "CANCELLED", "DELIVERY_FAILED");
@@ -416,7 +419,13 @@ public class PaymentService {
             throw new ApiException(ErrorCode.VERSION_CONFLICT, "payment changed concurrently");
         }
         event(orderId, from, to, actorType, actorId, amount, reference, reasonCode, now);
+        if (NEEDS_CASE.contains(to)) {
+            cases.openPaymentCase(orderId, to);
+        }
     }
+
+    /** Payment states that need a human: staff own them through one open PAYMENT support case per order (MB-052). */
+    static final Set<String> NEEDS_CASE = Set.of("DISPUTED", "RECONCILE_PENDING", "REFUND_OWED");
 
     private void event(UUID orderId, String from, String to, String actorType, UUID actorId, Long amount, String reference, String reasonCode,
                        Instant at) {

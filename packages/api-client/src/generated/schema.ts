@@ -2175,10 +2175,10 @@ export interface components {
             createdAt: string;
         };
         /**
-         * @description CANCELLATION_REQUEST cases are created only through API-028. FOOD_SAFETY cases are CRITICAL and escalated at creation.
+         * @description CANCELLATION_REQUEST cases are created only through API-028. PAYMENT cases are opened by the system (HIGH, one open per order) when a deposit is disputed, awaits reconciliation or a refund is owed; customers cannot open them. FOOD_SAFETY cases are CRITICAL and escalated at creation.
          * @enum {string}
          */
-        CaseCategory: "LATE" | "MISSING_ITEM" | "QUALITY" | "FOOD_SAFETY" | "CASH" | "HANDOVER" | "OTHER" | "CANCELLATION_REQUEST";
+        CaseCategory: "LATE" | "MISSING_ITEM" | "QUALITY" | "FOOD_SAFETY" | "CASH" | "HANDOVER" | "OTHER" | "CANCELLATION_REQUEST" | "PAYMENT";
         /** @enum {string} */
         CaseState: "OPEN" | "IN_PROGRESS" | "WAITING_ON_CUSTOMER" | "RESOLVED" | "CLOSED";
         /**
