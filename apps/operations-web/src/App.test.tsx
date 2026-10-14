@@ -1,6 +1,6 @@
 import { brand } from "@matbakhy/design-tokens";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { App, title } from "./App";
 
 afterEach(() => {
@@ -731,3 +731,34 @@ describe("operations-web cook workspace", () => {
   });
 });
 
+/** Owner decision 2026-10-14: a demo/test environment is labelled on every screen, also in the operations web. */
+describe("demo environment notice", () => {
+  const config = (name: string, demo: boolean) => ({
+    status: 200,
+    body: { orderingAvailable: true, orderLimits: null, environment: { name, demo } },
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("shows a persistent note in Arabic and in English when the API reports a demo environment", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => config("PREVIEW", true) });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const note = await screen.findByRole("note", { name: "Demo environment" });
+    expect(note.textContent).toContain("no real notification is sent");
+  });
+
+  it("shows nothing in production", async () => {
+    const { fetchImpl, calls } = server({ "GET /api/v1/configuration/public": () => config("PRODUCTION", false) });
+    render(<App fetchImpl={fetchImpl} />);
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/configuration/public")).toBe(true));
+    expect(screen.queryByRole("note")).toBeNull();
+  });
+
+  it("is still there when this build was made for a demo environment and the API cannot be reached", async () => {
+    vi.stubEnv("VITE_DEMO_NOTICE", "true");
+    const { fetchImpl } = server({});
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+  });
+});

@@ -1415,3 +1415,36 @@ describe("MB-054: organic activity", () => {
     expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").lines).toHaveLength(1);
   });
 });
+
+/** Owner decision 2026-10-14: a demo/test environment is labelled on every screen. */
+describe("demo environment notice", () => {
+  const config = (name: string, demo: boolean) => ({
+    status: 200,
+    body: { orderingAvailable: true, orderLimits: { maxQuantityPerLine: 10, maxLinesPerOrder: 20, policyVersion: 1 }, environment: { name, demo } },
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("shows a persistent note in Arabic and in English when the API reports a demo environment", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => config("PREVIEW", true) });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+    expect(screen.getByRole("note").textContent).toContain("الطلبات والعربون والمدفوعات هنا محاكاة");
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const note = await screen.findByRole("note", { name: "Demo environment" });
+    expect(note.textContent).toContain("Orders, deposits and payments here are simulated");
+  });
+
+  it("shows nothing in production", async () => {
+    const { fetchImpl, calls } = server({ "GET /api/v1/configuration/public": () => config("PRODUCTION", false) });
+    render(<App fetchImpl={fetchImpl} />);
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/configuration/public")).toBe(true));
+    expect(screen.queryByRole("note")).toBeNull();
+  });
+
+  it("is still there when this build was made for a demo environment and the API cannot be reached", async () => {
+    vi.stubEnv("VITE_DEMO_NOTICE", "true");
+    const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => "NETWORK_ERROR" });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+  });
+});

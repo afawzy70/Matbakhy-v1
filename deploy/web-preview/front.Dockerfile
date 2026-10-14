@@ -3,12 +3,14 @@
 #   docker build -f deploy/web-preview/front.Dockerfile --build-arg PREVIEW_DOMAIN=example.org .
 FROM node:24.21.0-alpine AS build
 ARG PREVIEW_DOMAIN
+# The demo/test notice is part of this build (it also shows when the API cannot be reached); the API reports it too.
+ARG DEMO_NOTICE=true
 RUN test -n "$PREVIEW_DOMAIN"
 WORKDIR /src
 COPY . .
 RUN corepack enable && pnpm install --frozen-lockfile \
- && VITE_API_BASE_URL="https://api.${PREVIEW_DOMAIN}" pnpm --filter @matbakhy/customer-web build \
- && VITE_API_BASE_URL="https://api.${PREVIEW_DOMAIN}" pnpm --filter @matbakhy/operations-web build
+ && VITE_DEMO_NOTICE="${DEMO_NOTICE}" VITE_API_BASE_URL="https://api.${PREVIEW_DOMAIN}" pnpm --filter @matbakhy/customer-web build \
+ && VITE_DEMO_NOTICE="${DEMO_NOTICE}" VITE_API_BASE_URL="https://api.${PREVIEW_DOMAIN}" pnpm --filter @matbakhy/operations-web build
 
 FROM caddy:2.10.2-alpine
 COPY deploy/web-preview/Caddyfile /etc/caddy/Caddyfile

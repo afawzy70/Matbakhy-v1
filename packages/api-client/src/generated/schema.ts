@@ -3394,6 +3394,14 @@ export interface components {
             /** @description False while ordering is paused or no usable commerce policy is active; orderLimits is then null. */
             orderingAvailable: boolean;
             orderLimits: components["schemas"]["OrderLimits"] | null;
+            environment: components["schemas"]["RuntimeEnvironment"];
+        };
+        /** @description The deployment the API runs in. Clients show a persistent notice when demo is true. */
+        RuntimeEnvironment: {
+            /** @enum {string} */
+            name: "LOCAL" | "CI" | "PREVIEW" | "STAGING" | "PRODUCTION";
+            /** @description True in every environment except PRODUCTION. Data is synthetic or test data, deposits and payments are simulated, and nothing real is sent. */
+            demo: boolean;
         };
         OrderLimits: {
             /** @description The active commerce policy's per-line quantity limit; quotes above it are refused. */

@@ -2,6 +2,7 @@ import { brand, direction, type Locale } from "@matbakhy/design-tokens";
 import { useEffect, useMemo, useState } from "react";
 import { API_BASE, createApi, loginUrl, type Api } from "./api";
 import { Dashboard } from "./cook/Dashboard";
+import { builtForDemo, EnvironmentNotice } from "./EnvironmentNotice";
 import { Meals } from "./cook/Meals";
 import { Onboarding } from "./cook/Onboarding";
 import { Orders } from "./cook/Orders";
@@ -91,6 +92,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
   const t = strings[locale];
   const api = useMemo(() => createApi(fetchImpl), [fetchImpl]);
   const [probe, setProbe] = useState(0);
+  const [demoByApi, setDemoByApi] = useState(false);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -109,6 +111,22 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
       active = false;
     };
   }, [api, probe]);
+
+  // Demo/test environments are labelled on every screen (owner decision 2026-10-14); a failed read keeps the build-time flag only.
+  useEffect(() => {
+    let active = true;
+    api
+      .GET("/api/v1/configuration/public")
+      .then((r) => {
+        if (active && r.data) {
+          setDemoByApi(r.data.environment?.demo === true);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [api]);
 
   // The first allowed section is shown until the user picks another one.
   const current: Tab | null =
@@ -137,6 +155,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
 
   return (
     <div className="app">
+      <EnvironmentNotice show={demoByApi || builtForDemo()} title={t.demoNoticeTitle} text={t.demoNotice} />
       <header className="topbar">
         <h1>{title(locale)}</h1>
         <div className="topbar-actions">

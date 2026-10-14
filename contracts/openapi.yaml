@@ -7140,7 +7140,7 @@ components:
       type: object
       additionalProperties: false
       description: Response for API-001.
-      required: [orderingAvailable, orderLimits]
+      required: [orderingAvailable, orderLimits, environment]
       properties:
         orderingAvailable:
           type: boolean
@@ -7149,6 +7149,20 @@ components:
           oneOf:
             - $ref: "#/components/schemas/OrderLimits"
             - type: "null"
+        environment:
+          $ref: "#/components/schemas/RuntimeEnvironment"
+    RuntimeEnvironment:
+      type: object
+      additionalProperties: false
+      required: [name, demo]
+      description: The deployment the API runs in. Clients show a persistent notice when demo is true.
+      properties:
+        name:
+          type: string
+          enum: [LOCAL, CI, PREVIEW, STAGING, PRODUCTION]
+        demo:
+          type: boolean
+          description: True in every environment except PRODUCTION. Data is synthetic or test data, deposits and payments are simulated, and nothing real is sent.
     OrderLimits:
       type: object
       additionalProperties: false

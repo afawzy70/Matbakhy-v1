@@ -72,6 +72,14 @@ class PublicConfigurationIntegrationTest {
     }
 
     @Test
+    void the_environment_is_published_so_every_client_can_label_a_test_environment() throws Exception {
+        JsonNode environment = publicConfiguration().get("environment");
+        assertThat(environment.get("name").asString()).isEqualTo("CI");
+        assertThat(environment.get("demo").asBoolean()).isTrue();
+        assertThat(environment.size()).as("only the name and the demo flag").isEqualTo(2);
+    }
+
+    @Test
     void while_ordering_is_paused_no_limits_are_offered() throws Exception {
         fx.activatePolicy(0);
         jdbc.update("UPDATE feature_flag SET enabled = false WHERE key = 'ordering-enabled'");

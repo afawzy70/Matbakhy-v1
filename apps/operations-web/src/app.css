@@ -330,3 +330,15 @@ body {
 fieldset {
   min-inline-size: 0;
 }
+
+/* Persistent demo/test environment notice (owner decision 2026-10-14). */
+.env-notice {
+  padding-block: var(--mb-space-sm);
+  padding-inline: var(--mb-space-lg);
+  background: var(--mb-color-warning-surface);
+  color: var(--mb-color-foreground);
+  border-block-end: 1px solid var(--mb-color-border-strong);
+  font-size: var(--mb-font-size-sm, 0.875rem);
+  text-align: center;
+  text-wrap: balance;
+}

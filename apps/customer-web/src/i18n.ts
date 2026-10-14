@@ -32,6 +32,8 @@ const ar = {
   supportCases: "حالات الدعم لهذا الطلب",
   signOut: "تسجيل الخروج",
   loading: "جارٍ التحميل…",
+  demoNoticeTitle: "بيئة تجريبية",
+  demoNotice: "بيانات تجريبية فقط. الطلبات والعربون والمدفوعات هنا محاكاة، ولا يُرسل أي إشعار حقيقي.",
   retry: "إعادة المحاولة",
   offline: "لا يوجد اتصال بالإنترنت. سنحاول عند عودة الاتصال.",
   home: {
@@ -285,6 +287,8 @@ const en: Strings = {
   supportCases: "Support cases for this order",
   signOut: "Sign out",
   loading: "Loading…",
+  demoNoticeTitle: "Demo environment",
+  demoNotice: "Test data only. Orders, deposits and payments here are simulated, and no real notification is sent.",
   retry: "Retry",
   offline: "You are offline. We will try again when you are back online.",
   home: {
