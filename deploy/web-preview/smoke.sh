@@ -9,7 +9,8 @@ d="${1:?usage: smoke.sh <preview-domain>}"
 opts="${SMOKE_CURL_OPTS:-}"
 fail() { echo "FAIL: $*" >&2; exit 1; }
 check() { echo "ok: $*"; }
-get() { curl -fsS $opts "$@"; }
+# Retries cover the seconds after a start, when the proxy or the identity provider may still be settling.
+get() { curl -fsS --retry 6 --retry-delay 5 --retry-all-errors $opts "$@"; }
 code() { curl -s $opts -o /dev/null -w '%{http_code}' "$@"; }
 unauthenticated() { c=$(code "$1"); case "$c" in 401|403) ;; *) fail "$1 answered $c without a session (expected 401 or 403)";; esac; }
 

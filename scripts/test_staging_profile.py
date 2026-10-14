@@ -65,6 +65,14 @@ class StagingProfileTest(unittest.TestCase):
             percent = int(value.split("MaxRAMPercentage=")[1].split()[0])
             self.assertLessEqual(percent, limit, f"{name}: {value}")
 
+    def test_the_identity_container_is_healthy_only_once_the_realm_exists(self):
+        # Found in the local rehearsal: Keycloak's management readiness is UP about 1.5 minutes before --import-realm has finished, so the
+        # first sign-in (and the first smoke) raced the import. The API waits for this health check.
+        for files in (("compose.yaml",), ("compose.yaml", "compose.4gb.yaml")):
+            test = " ".join(compose_config(*files)["services"]["identity"]["healthcheck"]["test"])
+            self.assertIn("/realms/matbakhy/.well-known/openid-configuration", test)
+            self.assertIn("issuer", test)
+
     def test_push_delivery_is_off_by_default_in_the_deployment(self):
         for files in (("compose.yaml",), ("compose.yaml", "compose.4gb.yaml")):
             env = compose_config(*files)["services"]["api"]["environment"]

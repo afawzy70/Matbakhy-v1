@@ -92,7 +92,8 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      # Healthy only when the matbakhy realm answers: management readiness is UP well before --import-realm has finished.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /realms/matbakhy/.well-known/openid-configuration HTTP/1.1\\r\\nHost: localhost\\r\\nX-Forwarded-Proto: https\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"issuer\"' <&3"]
       interval: 10s
       timeout: 5s
       retries: 60
