@@ -18,7 +18,7 @@ class StaffAssuranceTest {
 
     private static final Instant NOW = Instant.parse("2026-10-11T10:00:00Z");
     private final IdentityProperties properties = new IdentityProperties("https://idp.test.invalid/realms/x", null, "matbakhy-api",
-            "web", "s", List.of("http://localhost:5173"), "http://localhost:5173/", List.of("mfa", "2"), Duration.ofMinutes(10), null);
+            "web", "s", List.of("http://localhost:5173"), "http://localhost:5173/", List.of("mfa", "2"), Duration.ofMinutes(10), null, null);
     private final StaffAssurance assurance = new StaffAssurance(properties, Clock.fixed(NOW, ZoneOffset.UTC));
 
     private static AccountAuthentication auth(AccountStatus status, Map<String, Object> claims) {

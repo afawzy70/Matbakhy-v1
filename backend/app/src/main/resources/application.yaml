@@ -68,6 +68,8 @@ matbakhy:
     step-up-max-age: ${OIDC_STEP_UP_MAX_AGE:10m}
     # Provider subject that receives staff.grant + audit.read on first login while no administrator exists.
     bootstrap-admin-subject: ${STAFF_BOOTSTRAP_SUBJECT:}
+    # Parent domain of a deployment with sibling hosts (app., ops., api.); the readable XSRF-TOKEN cookie is set for it. Blank locally.
+    web-cookie-domain: ${WEB_COOKIE_DOMAIN:}
   phone-verification:
     # The default pepper is accepted only in LOCAL/CI; deployed environments must provide PHONE_CODE_PEPPER.
     code-pepper: ${PHONE_CODE_PEPPER:local-dev-only-pepper-not-a-secret-000000}

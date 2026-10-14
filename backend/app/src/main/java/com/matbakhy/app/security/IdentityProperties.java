@@ -8,7 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * OIDC and web-session settings. Endpoints follow Keycloak's path layout under the issuer (the local
+ * OIDC and web-session settings. {@code webCookieDomain} (WEB_COOKIE_DOMAIN) is the parent domain of a deployment whose web apps and
+ * API live on sibling hosts (app., ops., api.): the CSRF cookie is set for it so the web apps can read it. Blank in local development.
+ * Endpoints follow Keycloak's path layout under the issuer (the local
  * reference provider, D08); the production provider is an open decision (O07).
  */
 @Validated
@@ -23,7 +25,8 @@ public record IdentityProperties(
         @NotBlank String postLoginRedirect,
         @NotEmpty List<String> mfaAcrValues,
         Duration stepUpMaxAge,
-        String bootstrapAdminSubject) {
+        String bootstrapAdminSubject,
+        String webCookieDomain) {
 
     public IdentityProperties {
         if (backchannelIssuer == null || backchannelIssuer.isBlank()) {

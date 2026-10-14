@@ -73,6 +73,11 @@ class StagingProfileTest(unittest.TestCase):
             self.assertIn("/realms/matbakhy/.well-known/openid-configuration", test)
             self.assertIn("issuer", test)
 
+    def test_the_api_sets_the_csrf_cookie_for_the_parent_domain_so_the_sibling_web_apps_can_read_it(self):
+        for files in (("compose.yaml",), ("compose.yaml", "compose.4gb.yaml")):
+            env = compose_config(*files)["services"]["api"]["environment"]
+            self.assertEqual(env.get("WEB_COOKIE_DOMAIN"), "preview.example.invalid")  # the PREVIEW_DOMAIN of .env.example
+
     def test_push_delivery_is_off_by_default_in_the_deployment(self):
         for files in (("compose.yaml",), ("compose.yaml", "compose.4gb.yaml")):
             env = compose_config(*files)["services"]["api"]["environment"]

@@ -165,6 +165,20 @@ class SecurityConfiguration {
         return http.build();
     }
 
+    /**
+     * The readable XSRF-TOKEN cookie (the web apps copy it into X-XSRF-TOKEN). On a deployment with sibling hosts it is set for the
+     * parent domain (WEB_COOKIE_DOMAIN), otherwise only the API host could read it and every browser mutation would be refused.
+     */
+    static org.springframework.security.web.csrf.CookieCsrfTokenRepository csrfTokenRepository(IdentityProperties properties) {
+        org.springframework.security.web.csrf.CookieCsrfTokenRepository repository =
+                org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse();
+        String domain = properties.webCookieDomain();
+        if (domain != null && !domain.isBlank()) {
+            repository.setCookieCustomizer(cookie -> cookie.domain(domain.strip()));
+        }
+        return repository;
+    }
+
     @Bean
     @Order(2)
     SecurityFilterChain webChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors,
@@ -172,7 +186,11 @@ class SecurityConfiguration {
         http.cors(cors -> { })
                 // MB-054: the activity endpoint acts for nobody and ignores identity, so a signed-out phone (no cookie, no CSRF token)
                 // can send it; every other browser request keeps CSRF protection.
-                .csrf(csrf -> csrf.spa().ignoringRequestMatchers(ACTIVITY))
+                .csrf(csrf -> {
+                    csrf.spa();
+                    csrf.csrfTokenRepository(csrfTokenRepository(properties));
+                    csrf.ignoringRequestMatchers(ACTIVITY);
+                })
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/error").permitAll()
                         .requestMatchers(SecurityConfiguration::managementScrape).permitAll()
