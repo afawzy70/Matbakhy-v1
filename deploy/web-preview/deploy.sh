@@ -49,7 +49,8 @@ init_secrets() {
 
 check() {
   load
-  grep -q 'REPLACE_ME\|REPLACE_WITH_DIGEST\|example.invalid' "$ENV_FILE" && die "$ENV_FILE still has placeholders"
+  # Comment lines are skipped: the example's own comments mention the REPLACE_ME marker.
+  grep -v '^[[:space:]]*#' "$ENV_FILE" | grep -q 'REPLACE_ME\|REPLACE_WITH_DIGEST\|example.invalid' && die "$ENV_FILE still has placeholders"
   case "$API_IMAGE" in *@sha256:*) ;; *) die "API_IMAGE must be pinned by digest (built at RELEASE_COMMIT)";; esac
   case "$FRONT_IMAGE" in *@sha256:*) ;; *) die "FRONT_IMAGE must be pinned by digest (built at RELEASE_COMMIT)";; esac
   echo "$RELEASE_COMMIT" | grep -Eq '^[0-9a-f]{40}$' || die "RELEASE_COMMIT must be a full commit SHA"

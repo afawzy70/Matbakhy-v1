@@ -1,7 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["node"]
+    "types": [
+      "node"
+    ]
   },
-  "include": ["e2e", "playwright.config.ts", "src/i18n.ts", "../customer-web/src/i18n.ts"]
+  "include": [
+    "e2e",
+    "e2e-staging",
+    "playwright.config.ts",
+    "playwright.staging.config.ts",
+    "src/i18n.ts",
+    "../customer-web/src/i18n.ts"
+  ]
 }

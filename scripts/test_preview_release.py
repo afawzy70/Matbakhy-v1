@@ -67,7 +67,9 @@ class PreviewReleaseTest(unittest.TestCase):
             key = raw.split("=", 1)[0]
             if key in values:
                 lines.append(f'{key}="{values.pop(key)}"')
-            elif "=" in raw and not raw.startswith("#"):
+            elif raw.startswith("#"):
+                lines.append(raw)  # the comments stay, as in a real .env created from the example (one mentions REPLACE_ME)
+            elif "=" in raw:
                 lines.append(raw.replace("REPLACE_ME", "x"))
         lines += [f'{k}="{v}"' for k, v in values.items()]
         (self.preview / ".env").write_text("\n".join(lines) + "\n")
@@ -89,6 +91,13 @@ class PreviewReleaseTest(unittest.TestCase):
         self.assertNotEqual(r.returncode, 0)
         self.assertIn("pinned by digest", r.stderr)
         self.assertFalse(any(" up -d" in c for c in self.calls()))
+
+    def test_up_refuses_a_value_that_is_still_a_placeholder(self):
+        env = self.preview / ".env"
+        env.write_text(env.read_text().replace("POSTGRES_PASSWORD=x", "POSTGRES_PASSWORD=REPLACE_ME"))
+        r = self.deploy("up")
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("placeholders", r.stderr)
 
     def test_up_backs_up_first_pulls_only_missing_images_and_records_the_release(self):
         self.seq.write_text("27\n28\n28\n")

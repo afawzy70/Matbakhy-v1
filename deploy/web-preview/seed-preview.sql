@@ -45,4 +45,12 @@ FROM (VALUES ('00000000-0000-4000-8000-0000000bd001'::uuid), ('00000000-0000-400
 INSERT INTO meal_slot (id, cook_slot_id, meal_id, capacity)
 SELECT gen_random_uuid(), cs.id, m.id, 10 FROM cook_slot cs JOIN meal m ON m.kitchen_id = cs.kitchen_id
 WHERE m.id IN ('00000000-0000-4000-8000-0000000bb001', '00000000-0000-4000-8000-0000000bb002', '00000000-0000-4000-8000-0000000bb003');
+-- Simulated deposits (D16): the first kitchen takes a 50% deposit to a clearly fake recipient. The recipient is marked approved by the
+-- seeded reviewer row; real approval needs staff MFA and is covered by the integration tests. Nothing is ever transferred in the preview:
+-- the customer "reports" a transfer, the kitchen "reports" receipt, and the screens say so. Cash on receipt stays available for any total.
+INSERT INTO kitchen_payment_profile (kitchen_id, deposit_bps, cod_max_total_minor, recipient_method, recipient_identifier, recipient_name,
+                                     recipient_status, approved_by, approved_at)
+VALUES ('00000000-0000-4000-8000-0000000bd001', 5000, NULL, 'INSTAPAY', 'demo-kitchen@instapay.invalid', 'Demo kitchen (not a real account)',
+        'APPROVED', '00000000-0000-4000-8000-0000000b00e1', now())
+ON CONFLICT (kitchen_id) DO NOTHING;
 COMMIT;
