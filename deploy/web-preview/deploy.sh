@@ -7,11 +7,13 @@
 #   ./deploy.sh smoke          HTTPS smoke test from the server
 #   ./deploy.sh backup         PostgreSQL dump (checksum + manifest), verified by a restore into a scratch database, and an image-storage archive
 #   ./deploy.sh restore-db F   restore a dump into an empty database and reconcile it (scripts/db-restore.sh)
+#   ./deploy.sh prune-qa [--apply]   list (or, with --apply, delete) QA artifacts older than QA_ARTIFACT_RETENTION_DAYS
 # Nothing here builds images, creates cloud resources or changes DNS.
 set -eu
 cd "$(dirname "$0")"
 ENV_FILE=.env
-compose() { docker compose --env-file "$ENV_FILE" -f compose.yaml "$@"; }
+# COMPOSE_OVERRIDE (from .env) adds a sizing file such as compose.4gb.yaml.
+compose() { docker compose --env-file "$ENV_FILE" -f compose.yaml ${COMPOSE_OVERRIDE:+-f "$COMPOSE_OVERRIDE"} "$@"; }
 die() { echo "deploy: $*" >&2; exit 1; }
 load() {
   [ -f "$ENV_FILE" ] || die "$ENV_FILE missing; run ./deploy.sh init-secrets and fill in the owner inputs"
@@ -140,5 +142,6 @@ case "${1:-}" in
   smoke) load; sh ./smoke.sh "$PREVIEW_DOMAIN" ;;
   backup) backup ;;
   restore-db) shift; restore_db "${1:-}" ;;
-  *) sed -n '2,11p' "$0"; exit 2 ;;
+  prune-qa) shift; load; sh ./prune-qa-artifacts.sh "$@" ;;
+  *) sed -n '2,12p' "$0"; exit 2 ;;
 esac

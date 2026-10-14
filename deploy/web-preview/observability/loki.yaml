@@ -1,5 +1,6 @@
-# MB-039 (OPS-01): single-node log store on the preview host. Bounded by retention (compactor); the period is a
-# REHEARSAL value pending O06, not an approved retention policy.
+# MB-039 (OPS-01): single-node log store on the preview host. Bounded by retention (compactor). The periods are the
+# owner's proposed STAGING defaults of 2026-10-14 (application logs 30 days, debug logs 7 days). They are not an approved
+# production or customer-data retention policy: O06 (legal and business retention) is decided separately.
 auth_enabled: false
 server:
   http_listen_port: 3100
@@ -21,10 +22,15 @@ schema_config:
       schema: v13
       index: {prefix: index_, period: 24h}
 limits_config:
-  retention_period: ${LOG_RETENTION:-168h}
+  retention_period: ${LOG_RETENTION:-720h}
+  # Debug lines are kept for a shorter time than the rest. The level label comes from the ECS "log.level" field (upper case).
+  retention_stream:
+    - selector: '{level="DEBUG"}'
+      priority: 1
+      period: ${DEBUG_LOG_RETENTION:-168h}
   ingestion_rate_mb: 4
   ingestion_burst_size_mb: 8
-  max_query_lookback: ${LOG_RETENTION:-168h}
+  max_query_lookback: ${LOG_RETENTION:-720h}
 compactor:
   working_directory: /loki/compactor
   retention_enabled: true

@@ -96,7 +96,7 @@ The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Builds and 
 | Proxy | 256 MiB | — | 10 MB × 3 |
 | Observability (Loki 384, Alloy 256, Prometheus 512, Alertmanager 128, Grafana 256, node-exporter 64, sink 64) | about 1.6 GiB | about 2 | 10 MB × 3 each |
 
-- 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside.
+- 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside. The owner selected a 2 vCPU / 4 GB Hetzner server on 2026-10-14; the lowered ceilings, retention defaults and push flag for it are in [09-staging-hetzner-preparation.md](09-staging-hetzner-preparation.md) (`compose.4gb.yaml`). Peak use is unmeasured.
 
 ### Bounded load and smoke plan (prepared, NOT_RUN)
 

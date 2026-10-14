@@ -1,0 +1,32 @@
+# Memory ceilings for a 2 vCPU / 4 GB host (owner-selected Hetzner staging server, 2026-10-14). Use together with compose.yaml:
+#   COMPOSE_OVERRIDE=compose.4gb.yaml in .env (deploy.sh adds it to every compose call).
+# The ceilings add up to about 3.3 GiB (3.45 GiB with Grafana) and are NOT measured use. Idle use of the whole stack in the
+# local rehearsal was about 1.2 GiB; peaks are unmeasured until the staging run (MB-038). A 2 GiB swap file on the host is
+# recommended (owner server configuration). If the API or Keycloak are OOM-killed, raise that service, not the others.
+# Grafana is optional here: start it with COMPOSE_PROFILES=tools when someone needs the dashboards.
+services:
+  proxy:
+    mem_limit: 128m
+  postgres:
+    mem_limit: 512m
+  identity:
+    mem_limit: 768m
+  storage:
+    mem_limit: 192m
+  api:
+    mem_limit: 1g
+  loki:
+    mem_limit: 256m
+  alloy:
+    mem_limit: 128m
+  prometheus:
+    mem_limit: 192m
+  alertmanager:
+    mem_limit: 64m
+  alert-sink:
+    mem_limit: 32m
+  node-exporter:
+    mem_limit: 48m
+  grafana:
+    profiles: ["tools"]
+    mem_limit: 192m

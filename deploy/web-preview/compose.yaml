@@ -143,6 +143,8 @@ services:
       HANDOVER_HASH_KEY: ${HANDOVER_HASH_KEY:?set HANDOVER_HASH_KEY}
       ACTIVITY_HASH_KEY: ${ACTIVITY_HASH_KEY:?set ACTIVITY_HASH_KEY}
       HANDOVER_ENCRYPTION_KEY: ${HANDOVER_ENCRYPTION_KEY:?set HANDOVER_ENCRYPTION_KEY}
+      # O07: external push delivery stays off until approved, credentialed and tested on devices (in-app notifications are unaffected).
+      PUSH_DELIVERY_ENABLED: ${PUSH_DELIVERY_ENABLED:-false}
       PUSH_TOKEN_HASH_KEY: ${PUSH_TOKEN_HASH_KEY:?set PUSH_TOKEN_HASH_KEY}
       PUSH_TOKEN_ENCRYPTION_KEY: ${PUSH_TOKEN_ENCRYPTION_KEY:?set PUSH_TOKEN_ENCRYPTION_KEY}
       OBJECT_STORAGE_ENDPOINT: http://storage:8333
@@ -168,13 +170,14 @@ services:
     cpus: 1.5
 
   # --- MB-039 observability (OPS-01/OPS-02). Internal network only; Grafana is published on the host loopback and
-  # reached through an SSH tunnel. Retention values are rehearsal values pending O06. ---
+  # reached through an SSH tunnel. Retention values are the proposed staging defaults, not approved policies (O06). ---
   loki:
     image: grafana/loki:3.5.3@sha256:3165cecce301ce5b9b6e3530284b080934a05cd5cafac3d3d82edcb887b45ecd
     restart: unless-stopped
     command: ["-config.file=/etc/loki/loki.yaml", "-config.expand-env=true"]
     environment:
-      LOG_RETENTION: ${LOG_RETENTION:-168h}
+      LOG_RETENTION: ${LOG_RETENTION:-720h}
+      DEBUG_LOG_RETENTION: ${DEBUG_LOG_RETENTION:-168h}
     volumes:
       - ./observability/loki.yaml:/etc/loki/loki.yaml:ro
       - loki-data:/loki

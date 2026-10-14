@@ -58,7 +58,7 @@ Alerts go only to the local test sink (`docker compose logs alert-sink`) until t
 
 - **Configuration:** `deploy/web-preview/.env` (mode 600, never committed): `RELEASE_COMMIT`, image digests, domain, access list.
 - **Operator access:** SSH key to the host. The private network (recommended in [06](06-web-preview.md)) is not set up.
-- **Retention:** log retention and audit archival periods are owner decisions (O06). Rehearsal values in `.env`: `LOG_RETENTION=168h` (Loki), `METRICS_RETENTION=15d` (Prometheus, also capped at 2 GB); Docker keeps 30 MB per container.
+- **Retention:** log retention and audit archival periods are owner decisions (O06). Proposed staging defaults in `.env` (2026-10-14, not approved policies): `LOG_RETENTION=720h` (Loki, 30 days), `DEBUG_LOG_RETENTION=168h` (debug level, 7 days), `METRICS_RETENTION=15d` (Prometheus, also capped at 2 GB), `QA_ARTIFACT_RETENTION_DAYS=90`; Docker keeps 30 MB per container. See [09](09-staging-hetzner-preparation.md).
 - **Storage budget:** see "Sizing" in [06](06-web-preview.md). Backups live in `deploy/web-preview/backups` until copied off the host.
 - **Restore dependency:** `./deploy.sh restore-db <dump>` restores into an empty database and runs the reconciliation query. Audit rows restore with the database. Logs and metrics are not part of the backup.
 
