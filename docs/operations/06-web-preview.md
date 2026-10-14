@@ -33,17 +33,20 @@ This is intended, and it is unchanged.
 | File | Purpose |
 |---|---|
 | `compose.yaml` | Services, internal network, health checks, resource limits, bounded logs |
-| `Caddyfile` | HTTPS, IP allow-list, security headers |
+| `Caddyfile` | HTTPS, two access classes (customer, staff; deny by default), security headers. Tested by running the real Caddy (`scripts/test_proxy_access.py`) |
+| `compose.4gb.yaml` | Memory ceilings and JVM heap shares for a 2 vCPU / 4 GB host; Grafana optional |
 | `front.Dockerfile` | Proxy plus both web builds |
 | `.env.example` | Placeholders only |
-| `deploy.sh` | Commands: `init-secrets`, `render`, `up`, `seed`, `smoke`, `backup`, `restore-db` |
+| `deploy.sh` | Commands: `init-secrets`, `render`, `up`, `seed`, `smoke`, `backup`, `restore-db`, `status`, `rollback-plan`, `prune-qa`, `e2e-reset` |
+| `e2e-fixture.sh`, `e2e-fixtures/` | Staging-only test setup channel for the browser E2E suite: named, allow-listed SQL fixtures behind a marker file ([11](11-staging-deployment-and-rollback.md)) |
+| `prune-qa-artifacts.sh` | Lists (or with `--apply` deletes) QA artifacts older than the retention |
 | `identity/matbakhy-realm.preview.json` | Realm template |
 | `storage/s3.json.template` | Storage identities and access |
 | `postgres/10-keycloak.sh` | Creates the Keycloak database on first start |
 | `observability/` | Log collection (Alloy → Loki), metrics and alert rules (Prometheus, `promtool` tests), Alertmanager to a local test sink, Grafana data sources (MB-039) |
 | `postgres/20-runtime-role.sh` | Creates the API's least-privilege runtime role `matbakhy_app` on first start (MB-039) |
 | `seed-preview.sql` | Synthetic catalogue and accounts |
-| `smoke.sh` | Read-only HTTPS smoke test |
+| `smoke.sh` | Read-only HTTPS smoke test (customer web, operations web, API, authentication, boundary of privileged operations) |
 
 ## Verified locally (self-review, 2026-10-12)
 
@@ -128,6 +131,8 @@ Neither price is a prepaid promotional price. The script's own backups are free,
 **Recommendation:** Hetzner CX33 if it is available in an EU location, otherwise the fallback. Both have EU regions close enough to Egypt for a preview. Expected total: about €10–12 per month with IPv4 and provider backups, or about US$58 per month on the fallback, plus the domain. Unverified.
 
 ## Tester access (recommendation; owner decision needed)
+
+> **Update 2026-10-14:** the owner approved the first Internet-accessible staging on the PREVIEW profile. The proxy now has two classes: customer hosts (`CUSTOMER_ALLOWED_IPS`, public only by the owner's explicit setting) and the kitchen/staff side (`STAFF_ALLOWED_IPS`). See [09](09-staging-hetzner-preparation.md) and [12](12-owner-server-setup.md). The comparison below still applies to the staff side and to a restricted preview.
 
 The preview must stay **deny-by-default**: nothing reachable for a client that has not been let in. The current package does this with an IP allow-list (`ALLOWED_CLIENT_IPS` in Caddy). That works for fixed office or home lines but not for testers on mobile data or moving between Wi-Fi networks, whose public address changes; Egyptian mobile carriers also use carrier-grade NAT, so one allowed address can be shared with strangers.
 

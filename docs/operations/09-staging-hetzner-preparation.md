@@ -17,7 +17,7 @@ The package in `deploy/web-preview` starts the API with `APP_ENV=PREVIEW`: synth
 
 `APP_ENV=STAGING` cannot start today **by design**. `ProviderConfiguration` refuses it without real SMS, e-mail, push and malware-scan providers and object-storage credentials (O07: no provider is chosen). Sandbox providers do not exist yet.
 
-So the first public staging on the Hetzner server runs the PREVIEW profile, with synthetic customers and kitchens. **Owner decision to confirm:** that this is what "staging" means for the first runs. Real-provider staging needs O07 provider decisions first.
+So the first public staging on the Hetzner server runs the PREVIEW profile, with synthetic customers and kitchens. **Owner decision (2026-10-14, later): approved.** The first Internet-accessible staging runs the PREVIEW profile: synthetic data, simulated deposits and payments, real external notifications disabled, and a persistent notice on every screen saying it is a demo/test environment (customer web, operations web; the API reports `environment: PREVIEW, demo: true`). Privileged operations are not exposed publicly: `ops.`, `/api/v1/ops/*` and `/api/v1/cook/*` follow a separate staff allow-list; only the customer hosts can be made public, by the owner's explicit setting. Real-provider staging still needs O07 provider decisions.
 
 ## 3. The 2 vCPU / 4 GB profile
 
@@ -94,10 +94,14 @@ Deployment, DNS, purchases and tester access need the owner's explicit go; ownin
 | OPS-02 | Metrics and alerts to the approved operator route | Alerts go to the local test sink until the owner names a route |
 | OPS-03 | Operator follows `08-troubleshooting-runbook.md` | Includes the outbox retry |
 | TC-057 | Restore of a staging backup with measured RPO and RTO | `./deploy.sh backup` already verifies a restore into a scratch database; the timings still need measuring |
-| Real-API regression | The six browser journeys and the API integration scenarios against the deployed stack | **Not ready:** the browser suite prepares its data with direct database access (`E2E_PSQL`, a `docker exec` into the stack) and starts its own local stack. Running it against the server needs a target switch and a way to reach the database from the server's shell; neither is built or tested |
+| Real-API regression | The six browser journeys and the API integration scenarios against the deployed stack | **Prepared, not run on a server.** The suite no longer touches the database: it sends fixture names to a restricted server-side script (marker file, allow-listed SQL files, parameters as `psql` variables) and needs an empty database, so it runs in a guarded window with `./deploy.sh e2e-reset` ([11](11-staging-deployment-and-rollback.md), section 5). Rehearsed against a local https stack, not against Hetzner |
 
 External testers stay blocked until AUD-01, LOG-01 and OPS-01..03 pass on the actual environment.
 
-## 8. Still open
+## 8. Further documents
+
+[11 Deployment, smoke tests, rollback and the E2E window](11-staging-deployment-and-rollback.md) · [12 What the owner does on the server](12-owner-server-setup.md) · [10 Network allowlist request](10-agent-network-allowlist.md)
+
+## 9. Still open
 
 BLK-003 (screen readers), BLK-004 (physical devices), O06 (retention and privacy policy), O07 (providers, push, budget, domain), O04 (commercial limits), live money (D16 gates).
