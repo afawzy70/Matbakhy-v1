@@ -112,6 +112,22 @@
           "temporary": false
         }
       ]
+    },
+    {
+      "id": "7d3f0a52-1c0e-4b8e-9a3e-0000000000f2",
+      "username": "preview-ops-2",
+      "email": "preview-ops-2@preview.matbakhy.invalid",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Preview Ops 2",
+      "lastName": "Synthetic",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PREVIEW_USER_PASSWORD}",
+          "temporary": false
+        }
+      ]
     }
   ]
 }

@@ -168,7 +168,7 @@ e2e() {
   local prefix="docker compose --env-file $D/.env -f $D/compose.yaml -f $D/compose.4gb.yaml exec -T postgres psql -U matbakhy -d matbakhy"
   local password users
   password="$(env_value PREVIEW_USER_PASSWORD)"
-  users='{"cook-a":{"username":"preview-cook-1","subject":"7d3f0a52-1c0e-4b8e-9a3e-0000000000a1"},"customer-a":{"username":"preview-customer-1","subject":"7d3f0a52-1c0e-4b8e-9a3e-000000000c01"},"customer-b":{"username":"preview-customer-2","subject":"7d3f0a52-1c0e-4b8e-9a3e-000000000c02"},"ops-a":{"username":"preview-ops-1","subject":"7d3f0a52-1c0e-4b8e-9a3e-0000000000f1"}}'
+  users='{"cook-a":{"username":"preview-cook-1","subject":"7d3f0a52-1c0e-4b8e-9a3e-0000000000a1"},"customer-a":{"username":"preview-customer-1","subject":"7d3f0a52-1c0e-4b8e-9a3e-000000000c01"},"customer-b":{"username":"preview-customer-2","subject":"7d3f0a52-1c0e-4b8e-9a3e-000000000c02"},"ops-a":{"username":"preview-ops-2","subject":"'"${REHEARSAL_OPS2_SUBJECT:-7d3f0a52-1c0e-4b8e-9a3e-0000000000f2}"'"}}'
   local rc=0
   (cd "$ROOT/apps/operations-web" && E2E_API_URL="https://api.$DOMAIN" E2E_OPS_URL="https://ops.$DOMAIN" E2E_CUSTOMER_URL="https://app.$DOMAIN" \
      E2E_USER_PASSWORD="$password" E2E_USERS="$users" E2E_IGNORE_HTTPS_ERRORS=1 E2E_CHROMIUM="$(chromium)" E2E_OUTPUT_DIR="$OUT/e2e-results" \

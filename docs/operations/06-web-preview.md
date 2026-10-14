@@ -185,7 +185,8 @@ The access method must work for: browser sign-in and the OIDC redirects between 
 6. **Test accounts** (realm `matbakhy`, password `PREVIEW_USER_PASSWORD` from `.env`):
    - `preview-customer-1` and `preview-customer-2` (phones pre-verified);
    - `preview-cook-1` (owns "مطبخ المعاينة"; pickup, and delivery to Test zone A);
-   - `preview-ops-1` (first staff administrator through `STAFF_BOOTSTRAP_SUBJECT`).
+   - `preview-ops-1` (first staff administrator through `STAFF_BOOTSTRAP_SUBJECT`);
+   - `preview-ops-2` (staff-style account without grants).
 7. **Keycloak administration:** `docker compose exec identity /opt/keycloak/bin/kcadm.sh …`. The console is not published.
 
 ## Migrations, rollback and recovery
