@@ -3,8 +3,8 @@
   "project": "Matbakhy-v1",
   "status": "IN_PROGRESS",
   "current_phase": "P07",
-  "current_story": "MB-039",
-  "last_tested_commit": "1850f7b8ba8e19315753b0776ee3c0be5d21035b",
+  "current_story": "MB-033",
+  "last_tested_commit": "be33bc2de0d30366f50767dfe1ee35af2737d434",
   "last_completed_story": "MB-053",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
@@ -42,8 +42,8 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Window until 2026-10-14 00:00 Kuwait. MB-053 DONE (native run 48 PASS on Android and iOS). MB-039 local: TC-055 and TC-056 PASS, erasure defect fixed (V27), preview backups count only after a restore check. Remaining MB-039: TC-057 staging restore and deployed AUD-01/LOG-01/OPS-01..03 (MB-040, needs authorization). MB-033: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots.",
-  "updated_at": "2026-10-13T16:29:17Z",
+  "next_action": "Window until 2026-10-15 00:00 Kuwait. Done today: MB-052 PAYMENT support case (863edf0, TC-161/162 re-run PASS), MB-039 staff outbox retry over HTTP (22b5f73), TC-139 coverage review, candidate I six checks PASS at be33bc2. Next: read EDGE-REPORT lines from native run 50 (d9b0873) and fix any critical clipping; MB-033 stays IN_PROGRESS (O07, BLK-003, BLK-004; visual screenshot review blocked by the network policy on artifact downloads). MB-039 remaining: TC-057/TC-139 staging and deployed AUD-01/LOG-01/OPS-01..03 (MB-040, needs authorization and access). MB-029 BLOCKED, so MB-030 and later are not eligible.",
+  "updated_at": "2026-10-14T04:17:03Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
@@ -68,8 +68,10 @@
   ],
   "work_window": {
     "policy": "opens with the owner's first start/continue prompt of the day; ends at the next 00:00 Asia/Kuwait (owner decision 2026-10-13)",
-    "start": "2026-10-13T09:47:28+03:00",
-    "deadline": "2026-10-14T00:00:00+03:00",
-    "planned_final_checkpoint": "2026-10-13T23:00:00+03:00"
+    "start": "2026-10-14T06:35:02+03:00",
+    "session_start": "2026-10-14T06:38:54+03:00",
+    "deadline": "2026-10-15T00:00:00+03:00",
+    "no_new_story_after": "2026-10-14T23:00:00+03:00",
+    "final_wrap_up": "2026-10-14T23:30:00+03:00"
   }
 }

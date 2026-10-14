@@ -25,7 +25,6 @@ Implementation-agent handoff. Every result below is self-review by the implement
    - Use a deposit order with a synthetic approved recipient. The customer reports the transfer, and the kitchen reports "not received".
    - Expected: the customer's support list shows one case «مراجعة العربون» / "Deposit review". Support staff see it in the case queue. Another customer does not.
    - Then the kitchen rejects the order, and finance records "refund owed". Expected: still one open case for that order.
-   - Resolve the case as staff. A later dispute on the same order opens a new one.
 2. Everything in the handoffs for [H](12-qa-candidate-h-erasure-native.md), [G](11-qa-candidate-g-insights-followups.md) and [F](10-qa-candidate-f-deposit-payments.md).
 
 ## Known gaps
