@@ -7,7 +7,7 @@
 #   scripts/rehearse-preview.sh up         copy the package, create .env, start the 4 GB stack, buckets, seed, status
 #   scripts/rehearse-preview.sh smoke      read-only smoke (deploy.sh smoke) and the browser smoke with a simulated deposit order
 #   scripts/rehearse-preview.sh load       60 s of read traffic from 10 clients with a backup running at the same time; peak memory
-#   scripts/rehearse-preview.sh persist    down (volumes kept), up, API killed: data, buckets and sign-in survive
+#   scripts/rehearse-preview.sh persist    down (volumes kept), up, API process crashed: data, buckets and sign-in survive
 #   scripts/rehearse-preview.sh rollback   an older API image on the newer schema, then back
 #   scripts/rehearse-preview.sh e2e        E2E window: guarded reset to an empty database, the six browser workflows through the fixture
 #                                          channel against the https stack, then the catalogue is seeded again
@@ -134,8 +134,10 @@ persist() {
   [ "$before" = "$after" ] || die "orders did not survive"
   dc exec -T storage sh -c 'echo s3.bucket.list | weed shell' 2>/dev/null | grep -E "matbakhy-(public|private)" | tee -a "$OUT/persist.txt"
   (cd "$D" && set -a && . ./.env && set +a && SMOKE_CURL_OPTS=-k sh smoke.sh "$DOMAIN") 2>&1 | tail -2 | tee -a "$OUT/persist.txt"
-  info "kill the API container; the restart policy must bring it back"
-  t0=$SECONDS; docker kill "$(dc ps -q api)" >/dev/null; sleep 5; healthy_api
+  info "crash the API process; the restart policy must bring the container back"
+  # Not `docker kill`: Docker treats it as a manual stop and never restarts the container. SIGKILL of the main process from the
+  # host is what a crash or an out-of-memory kill looks like to the daemon.
+  t0=$SECONDS; kill -9 "$(docker inspect -f '{{.State.Pid}}' "$(dc ps -q api)")"; sleep 8; healthy_api
   echo "api killed and healthy again after $((SECONDS - t0)) s" | tee -a "$OUT/persist.txt"
 }
 
