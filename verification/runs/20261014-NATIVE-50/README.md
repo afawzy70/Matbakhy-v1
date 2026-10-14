@@ -15,3 +15,14 @@ Implementation-agent review of the CI job logs. This is not human approval and n
 Limits:
 - The edge report finds labelled elements outside the screen width. It does not find text truncated inside an element or overlapping elements.
 - The screenshots themselves are not reviewed: the artifact host is blocked by this environment's network policy.
+
+## Run 51 (after the harness fix)
+
+- Run: [38513847516](https://github.com/afawzy70/Matbakhy-v1/actions/runs/38513847516) at `ef2dfd1` (same app source; test code only changed).
+- **Android** (job 115688114943) and **iOS** (job 115688115025): **every phase PASS**.
+  - iOS phase J PASS (`MB033-ALERTS-DENIED-SAFE`).
+  - iOS phase K (MB-053 deposit) PASS: order MB-100004 is DEPOSIT|CUSTOMER_TRANSFER_REPORTED; the terms showed "Deposit now: EGP 65.00".
+- **iOS `EDGE-REPORT`** for all 16 large-text screens (8 areas × English and Arabic): screen width 390 pt, **0 labelled elements past the edge** on every screen.
+- **Combined with Android run 50:** 32 large-text screens on two platforms in two languages, no labelled element past the screen edge.
+  - Implementation-agent review of the logs. It is not a visual review and not human approval.
+  - Truncation inside elements is not checked.
