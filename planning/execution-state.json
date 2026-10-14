@@ -42,8 +42,8 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Window until 2026-10-15 00:00 Kuwait. Done today: MB-052 PAYMENT support case (863edf0, TC-161/162 re-run PASS), MB-039 staff outbox retry over HTTP (22b5f73), TC-139 coverage review, candidate I six checks PASS at be33bc2. Next: read EDGE-REPORT lines from native run 50 (d9b0873) and fix any critical clipping; MB-033 stays IN_PROGRESS (O07, BLK-003, BLK-004; visual screenshot review blocked by the network policy on artifact downloads). MB-039 remaining: TC-057/TC-139 staging and deployed AUD-01/LOG-01/OPS-01..03 (MB-040, needs authorization and access). MB-029 BLOCKED, so MB-030 and later are not eligible.",
-  "updated_at": "2026-10-14T04:17:03Z",
+  "next_action": "Done 2026-10-14: MB-052 PAYMENT support case (863edf0), MB-039 outbox retry over HTTP (22b5f73) and TC-139 review, candidate I six checks PASS at be33bc2, native run 51 every phase PASS on Android and iOS with the large-text edge report 0 on 32 screens. No further eligible story: MB-033 waits on O07, BLK-003, BLK-004 (and a visual screenshot review: artifact host blocked by the session network policy); MB-039 remainder needs an authorized preview/staging (MB-040); MB-029 BLOCKED (BLK-003) gates MB-030 and later. Owner inputs needed: preview/staging authorization and access, O06 retention, O07 push, screen-reader and physical-device verification, network allowance for artifact downloads.",
+  "updated_at": "2026-10-14T05:38:45Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
