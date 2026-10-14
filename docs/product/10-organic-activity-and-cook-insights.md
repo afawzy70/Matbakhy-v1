@@ -19,7 +19,7 @@ Measurement only. It ranks, targets, charges and promotes nothing. Sponsored pla
   - unknown or archived subjects;
   - events beyond 300 per visitor per day.
   The response is always `202`, so nobody learns whether an event counted.
-- **Not instrumented:** the native apps do not send activity yet, and search terms and filters are not recorded.
+- **Native apps** send `MEAL_IMPRESSION`, `MEAL_VIEW` and `ADD_TO_CART` (`d83d4b3`; no kitchen page, so no `KITCHEN_VIEW`; component tests only, no device run checks the stored rows). Search terms and filters are not recorded.
 
 ## The cook's report (operations web → "Insights" / «الأداء»)
 

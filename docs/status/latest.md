@@ -2,6 +2,17 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
+## 2026-10-14 (work window authorized 06:35:02 Kuwait; deadline 2026-10-15 00:00)
+
+- **New QA candidate I (immutable): `be33bc2de0d30366f50767dfe1ee35af2737d434`** ([handoff](../quality/13-qa-candidate-i-payment-case.md)). Six local checks PASS from a clean worktree with fresh synthetic data; the secret scan covered 356 commits ([evidence](../../verification/runs/20261014-CANDIDATE-I/evidence.json)).
+- **MB-052 follow-up done** (`863edf0`, red first): a disputed, unreconciled or refund-owed deposit opens one PAYMENT support case per order (V28; retries and concurrent transitions cannot duplicate it). TC-161/162 re-run PASS ([evidence](../../verification/runs/20261014-MB-052-CASE/evidence.json)). In-app payment notifications were already implemented in `b8006db`.
+- **MB-039:** staff outbox retry rehearsed over HTTP: authorized, denied, replayed and second retry; response, audit row and log line share the request ID (`22b5f73`, red first). TC-139 coverage review added; TC-139 and TC-057 stay NOT_RUN (need staging). No preview deployed: no authorization or access found.
+- **MB-033:** the run-48 screenshot artifacts cannot be downloaded here (network policy denies the blob storage host). Report-only EDGE-REPORT lines were added to the native large-text pass (`d9b0873`); native run 50 checks them. MB-033 stays IN_PROGRESS (O07, BLK-003, BLK-004).
+- MBQA-007/MBQA-008: not found in any branch. MBQA-003/004/005/006 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST.
+- Daily report: [2026-10-14](daily/2026-10-14.md).
+
+## 2026-10-13
+
 - Observed: 2026-10-13 ~19:35 Asia/Kuwait. **Work window (D15):** opened by the owner's prompt at 09:47:28; deadline 2026-10-14 00:00 Kuwait; planned final checkpoint 23:00.
 - Active branch: `implementation/mvp`; draft PR [#1](https://github.com/afawzy70/Matbakhy-v1/pull/1), not for merge. The owner's `main` commits of 11:05–11:59 were merged into the branch at `39856f6` (no rebase, no force-push), which cleared the conflict. The PR is not merged (draft).
 - **New QA candidate E (immutable): `bc305c642442f1bdeaf0f1c92f30bc9976dcddc5`** ([handoff](../quality/09-qa-candidate-e-pricing-history.md)).
@@ -31,9 +42,9 @@ Implementation-agent report (self-reported, not an independent review certificat
     - AUD-01/LOG-01/OPS-01..03 deployed: NOT_RUN (MB-040).
   - **MB-050 DONE** (TC-157): launch policy 0% commission; server and database refuse non-zero outside synthetic fixtures; screens show no platform commission.
   - **MB-051 DONE** (TC-158/159/160): deposit terms in quotes, immutable payment snapshot, payment state separate from the order, no preparation before the kitchen reports receipt.
-  - **MB-052 DONE** (TC-161/162): staff-approved recipients (recent MFA), not-received and wrong-amount reports, disputes in the finance queue, refund obligation and refund report; cook and finance screens. DONE at `49a55f1` ([evidence](../../verification/runs/20261013-MB-052/evidence.json)). Follow-up done in `b8006db`: payment changes notify the other party in-app (the transfer report to the kitchen; receipt, dispute, refund owed and refund sent to the customer), red first. Still open: an automatic support case for a dispute.
+  - **MB-052 DONE** (TC-161/162): staff-approved recipients (recent MFA), not-received and wrong-amount reports, disputes in the finance queue, refund obligation and refund report; cook and finance screens. DONE at `49a55f1` ([evidence](../../verification/runs/20261013-MB-052/evidence.json)). Follow-up done in `b8006db`: payment changes notify the other party in-app (the transfer report to the kitchen; receipt, dispute, refund owed and refund sent to the customer), red first. The automatic support case followed on 2026-10-14 (`863edf0`).
   - **MB-053 DONE** (TC-163) ([evidence](../../verification/runs/20261013-MB-053/evidence.json) at `6b7741f`): deposit checkout and honest status on web, Android and iOS; native run 48 passed the full deposit journey on both platforms.
-  - **MB-054 DONE** (TC-164) at `a89151f`: organic activity counted once per visitor and day without identity; the cook's free Insights report (gross, paid refunds, known net, not profit); no ranking, campaign or billing ([note](../product/10-organic-activity-and-cook-insights.md), [evidence](../../verification/runs/20261013-MB-054/evidence.json)). Real-stack check: anonymous browsing activity is stored. Limits: native apps not instrumented; retention under O06.
+  - **MB-054 DONE** (TC-164) at `a89151f`: organic activity counted once per visitor and day without identity; the cook's free Insights report (gross, paid refunds, known net, not profit); no ranking, campaign or billing ([note](../product/10-organic-activity-and-cook-insights.md), [evidence](../../verification/runs/20261013-MB-054/evidence.json)). Real-stack check: anonymous browsing activity is stored. Native instrumentation followed in `d83d4b3`; retention under O06.
   - Live money: not approved (D16 gates).
   - MB-029 BLOCKED (BLK-003); MB-030 waits on MB-029.
 - **Secret scan:** the worktree history-scan correction from the morning stands. Fail-on-zero is kept. Narrow fingerprint exceptions: 20 QA-branch nonces plus 1 runbook command, each reviewed.
@@ -54,7 +65,7 @@ Implementation-agent report (self-reported, not an independent review certificat
 | MB-007 Contract toolchain | DONE (self-review) | Re-verified at `34be845` ([run](../../verification/runs/20261011-P01-local-34be845/evidence.json)); original [run](../../verification/runs/20261011-MB-007/evidence.json) |
 | MB-054 Privacy-safe organic activity and kitchen performance (D17) | DONE (self-review) | [run](../../verification/runs/20261013-MB-054/evidence.json) at `a89151f`: TC-164 PASS; real-stack activity check |
 | MB-053 Deposit checkout and honest status on web, Android and iOS (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-053/evidence.json) at `6b7741f`: TC-163 PASS; native run 48 Android and iOS |
-| MB-052 Kitchen acknowledgement, disputes and refunds (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-052/evidence.json) at `49a55f1`: TC-161/162 PASS; follow-ups: automatic support case and customer notification |
+| MB-052 Kitchen acknowledgement, disputes and refunds (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-052/evidence.json) at `49a55f1`: TC-161/162 PASS; follow-ups done: notifications `b8006db`, PAYMENT support case `863edf0` ([run](../../verification/runs/20261014-MB-052-CASE/evidence.json)) |
 | MB-051 Deposit quote, snapshot and payment states (D16) | DONE (self-review) | [run](../../verification/runs/20261013-MB-051/evidence.json) at `61d8dd5` |
 | MB-050 Zero commission at launch (D10) | DONE (self-review) | [run](../../verification/runs/20261013-MB-050/evidence.json) |
 | MB-049 Informed reconfirmation of changed prices (D13) | DONE (self-review) | [run](../../verification/runs/20261013-MB-049/evidence.json) at `bc305c6`: TC-154 web, Android emulator, iOS simulator; TC-155/156 on PostgreSQL |
