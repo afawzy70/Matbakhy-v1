@@ -42,8 +42,8 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Done 2026-10-14: MB-052 PAYMENT support case (863edf0), MB-039 outbox retry over HTTP (22b5f73) and TC-139 review, candidate I six checks PASS at be33bc2, native run 51 every phase PASS on Android and iOS with the large-text edge report 0 on 32 screens. No further eligible story: MB-033 waits on O07, BLK-003, BLK-004 (and a visual screenshot review: artifact host blocked by the session network policy); MB-039 remainder needs an authorized preview/staging (MB-040); MB-029 BLOCKED (BLK-003) gates MB-030 and later. Owner inputs needed: preview/staging authorization and access, O06 retention, O07 push, screen-reader and physical-device verification, network allowance for artifact downloads.",
-  "updated_at": "2026-10-14T05:38:45Z",
+  "next_action": "Window until 2026-10-15 00:00 Kuwait. Hetzner staging: PREPARED, NOT DEPLOYED, access not ready (docs/operations/09). Candidate J six checks at 52e4e21 (see verification/runs/20261014-CANDIDATE-J). When the owner reports a reachable staging server: run AUD-01, LOG-01, OPS-01..03, TC-057 first, then the real-API regression suite (needs a remote-target adaptation of the browser suite). Push (O07) stays behind PUSH_DELIVERY_ENABLED=false; BLK-003 and BLK-004 stay open; MB-033 not DONE; MB-029 BLOCKED; do not merge the draft PR.",
+  "updated_at": "2026-10-14T06:40:02Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
