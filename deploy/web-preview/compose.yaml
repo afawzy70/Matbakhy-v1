@@ -26,6 +26,10 @@ services:
       PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:?set PREVIEW_DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
       ALLOWED_CLIENT_IPS: ${ALLOWED_CLIENT_IPS:?set ALLOWED_CLIENT_IPS}
+      # Two access classes (Caddyfile). Both default to ALLOWED_CLIENT_IPS; making the customer hosts public is the owner's
+      # explicit step: CUSTOMER_ALLOWED_IPS="0.0.0.0/0 ::/0". Kitchen and staff access never follows it.
+      CUSTOMER_ALLOWED_IPS: ${CUSTOMER_ALLOWED_IPS:-${ALLOWED_CLIENT_IPS}}
+      STAFF_ALLOWED_IPS: ${STAFF_ALLOWED_IPS:-${ALLOWED_CLIENT_IPS}}
     volumes:
       - caddy-data:/data
       - caddy-config:/config

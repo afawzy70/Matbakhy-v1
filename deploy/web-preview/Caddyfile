@@ -1,13 +1,17 @@
-# Reverse proxy for the Matbakhy web preview. Every host is HTTPS (automatic certificates) and answers only the
-# allow-listed client addresses: a network allow-list keeps sign-in redirects and API calls working, unlike a
-# password prompt in front of the identity provider. Access logs are off; container logs are size-bounded.
+# Reverse proxy for the Matbakhy web preview. Every host is HTTPS (automatic certificates). Access is deny-by-default and
+# has two classes (owner decision 2026-10-14):
+#   customer class  CUSTOMER_ALLOWED_IPS  app., the customer API, id. (the matbakhy realm) and media.
+#   staff class     STAFF_ALLOWED_IPS     ops. and the kitchen and staff APIs (/api/v1/ops, /api/v1/cook)
+# Both default to ALLOWED_CLIENT_IPS, so nothing is public until the owner sets CUSTOMER_ALLOWED_IPS="0.0.0.0/0 ::/0".
+# Privileged operations never follow the customer class. A network allow-list keeps sign-in redirects and API calls
+# working, unlike a password prompt in front of the identity provider. Access logs are off; container logs are size-bounded.
+# Caddy orders directives by type, not by position (an unconditional "respond" runs before "reverse_proxy"), so every site
+# wraps its directives in route { }, which keeps the written order. scripts/test_proxy_access.py runs this file.
 {
 	email {$ACME_EMAIL}
 }
 
-(restricted) {
-	@outsider not remote_ip {$ALLOWED_CLIENT_IPS}
-	respond @outsider "Not available" 403
+(headers) {
 	header {
 		Strict-Transport-Security "max-age=31536000"
 		X-Content-Type-Options nosniff
@@ -17,41 +21,73 @@
 	}
 }
 
-(spa) {
-	import restricted
-	header X-Frame-Options DENY
-	encode zstd gzip
-	try_files {path} /index.html
-	file_server
+(customer_access) {
+	@customer_outsider not remote_ip {$CUSTOMER_ALLOWED_IPS}
+	respond @customer_outsider "Not available" 403
+}
+
+(staff_access) {
+	@staff_outsider not remote_ip {$STAFF_ALLOWED_IPS}
+	respond @staff_outsider "Not available" 403
 }
 
 app.{$PREVIEW_DOMAIN} {
-	root * /srv/customer-web
-	import spa
+	route {
+		import headers
+		import customer_access
+		header X-Frame-Options DENY
+		encode zstd gzip
+		root * /srv/customer-web
+		try_files {path} /index.html
+		file_server
+	}
 }
 
 ops.{$PREVIEW_DOMAIN} {
-	root * /srv/operations-web
-	import spa
+	route {
+		import headers
+		import staff_access
+		header X-Frame-Options DENY
+		encode zstd gzip
+		root * /srv/operations-web
+		try_files {path} /index.html
+		file_server
+	}
 }
 
 api.{$PREVIEW_DOMAIN} {
-	import restricted
-	# Only the API and the OIDC login endpoints are exposed; actuator stays internal.
-	@public path /api/* /oauth2/* /login/oauth2/* /logout
-	reverse_proxy @public api:8080
-	respond 404
+	route {
+		import headers
+		# Kitchen and staff APIs answer the staff class only, whatever the customer class allows.
+		@staff_api_outsider {
+			path /api/v1/ops /api/v1/ops/* /api/v1/cook /api/v1/cook/*
+			not remote_ip {$STAFF_ALLOWED_IPS}
+		}
+		respond @staff_api_outsider "Not available" 403
+		import customer_access
+		# Only the API and the OIDC login endpoints are exposed; actuator stays internal.
+		@public path /api/* /oauth2/* /login/oauth2/* /logout
+		reverse_proxy @public api:8080
+		respond 404
+	}
 }
 
 id.{$PREVIEW_DOMAIN} {
-	import restricted
-	# Keycloak's admin console is not published; administer it through an SSH tunnel (see docs/operations/06-web-preview.md).
-	@admin path /admin /admin/*
-	respond @admin 404
-	reverse_proxy identity:8080
+	route {
+		import headers
+		import customer_access
+		# Keycloak's admin console and the master realm are never published; administer Keycloak through an SSH tunnel
+		# (see docs/operations/06-web-preview.md).
+		@admin path /admin /admin/* /realms/master /realms/master/*
+		respond @admin 404
+		reverse_proxy identity:8080
+	}
 }
 
 media.{$PREVIEW_DOMAIN} {
-	import restricted
-	reverse_proxy storage:8333
+	route {
+		import headers
+		import customer_access
+		reverse_proxy storage:8333
+	}
 }
