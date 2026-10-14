@@ -52,6 +52,19 @@ class StagingProfileTest(unittest.TestCase):
         self.assertIn("grafana", cfg)
         self.assertEqual(int(cfg["api"]["mem_limit"]), 2 * GIB)
 
+    def test_the_jvm_heap_fits_inside_each_memory_ceiling_of_the_four_gb_profile(self):
+        # A flag on the java command line beats JAVA_TOOL_OPTIONS, so the image must not hard-code one (found in the local rehearsal:
+        # 75% of a 1 GiB ceiling left too little room for metaspace, threads and buffers).
+        dockerfile = (ROOT / "backend" / "Dockerfile").read_text()
+        entrypoint = next(line for line in dockerfile.splitlines() if line.startswith("ENTRYPOINT"))
+        self.assertNotIn("MaxRAMPercentage", entrypoint)
+        self.assertIn('ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=75"', dockerfile)
+        services = compose_config("compose.yaml", "compose.4gb.yaml")["services"]
+        for name, key, limit in (("api", "JAVA_TOOL_OPTIONS", 60), ("identity", "JAVA_OPTS_KC_HEAP", 70)):
+            value = services[name]["environment"][key]
+            percent = int(value.split("MaxRAMPercentage=")[1].split()[0])
+            self.assertLessEqual(percent, limit, f"{name}: {value}")
+
     def test_push_delivery_is_off_by_default_in_the_deployment(self):
         for files in (("compose.yaml",), ("compose.yaml", "compose.4gb.yaml")):
             env = compose_config(*files)["services"]["api"]["environment"]

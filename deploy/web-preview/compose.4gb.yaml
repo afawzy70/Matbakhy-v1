@@ -11,10 +11,15 @@ services:
     mem_limit: 512m
   identity:
     mem_limit: 768m
+    environment:
+      JAVA_OPTS_KC_HEAP: "-XX:MaxRAMPercentage=65"
   storage:
     mem_limit: 192m
   api:
     mem_limit: 1g
+    environment:
+      # About 560 MiB of heap in a 1 GiB ceiling; the rest is for metaspace, threads, buffers and the code cache.
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=55"
   loki:
     mem_limit: 256m
   alloy:
