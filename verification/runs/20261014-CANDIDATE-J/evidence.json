@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-039",
+  "phase": "P08",
+  "source_commit": "52e4e21cd3788e0429855ded44e52ca3041d03c5",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-14T06:39:46.760078+00:00",
+  "finished_at": "2026-10-14T07:02:21.934973+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-J/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-J/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-J/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-J/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-J/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-J/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-056",
+      "status": "PASS",
+      "observed": "LogRedactionIntegrationTest (BACKEND-VERIFY) with the push delivery flag on: no tokens, OTPs, contact, address, document content, deposit recipient, transfer reference or activity visitor id in ECS logs or metric names and tags. PushFlagIntegrationTest and ProviderConfigurationTest (same run) cover the flag off: no PUSH delivery is created, the in-app notification exists, and no provider is needed."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261014-CANDIDATE-J/BACKEND-VERIFY.log",
+    "verification/runs/20261014-CANDIDATE-J/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261014-CANDIDATE-J/LOCAL-STACK.log",
+    "verification/runs/20261014-CANDIDATE-J/BROWSER-E2E.log",
+    "verification/runs/20261014-CANDIDATE-J/SECRET-SCAN.log",
+    "verification/runs/20261014-CANDIDATE-J/GUARDRAIL-TESTS.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Local regression checks for QA candidate J. Since candidate I (be33bc2): push delivery behind a feature flag that is off by default (O07, 9e9364f); staging preparation for the 2 vCPU / 4 GB Hetzner server: lowered memory ceilings, proposed retention defaults, QA-artifact prune, docs (ec9b54f). Nothing was deployed.",
+      "Self-review, not independent review. MBQA-003/004/005/006 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

@@ -5,7 +5,8 @@ Implementation-agent handoff. Every result below is self-review by the implement
 ## Candidate
 
 - **Immutable candidate: `52e4e21cd3788e0429855ded44e52ca3041d03c5`** on `implementation/mvp`.
-- The six local checks are running at this SHA from a clean worktree with fresh synthetic data; the result is NOT recorded yet (evidence: `verification/runs/20261014-CANDIDATE-J/evidence.json`, pending until the run finishes).
+- The six local checks ran at this SHA from a clean worktree with fresh synthetic data ([evidence](../../verification/runs/20261014-CANDIDATE-J/evidence.json)).
+  - BACKEND-VERIFY, WORKSPACE-CLEAN-CHECKOUT, LOCAL-STACK, BROWSER-E2E (6/6), SECRET-SCAN (368 commits plus the committable tree) and GUARDRAIL-TESTS: all PASS.
 - Candidate J includes everything in candidate I. The app source (web and native) is unchanged since candidate I; only the backend, deployment files and documents changed.
 - MBQA-003, MBQA-004, MBQA-005, MBQA-006 and OBS-001 stay **FIXED_PENDING_INDEPENDENT_RETEST**.
 

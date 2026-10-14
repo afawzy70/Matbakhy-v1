@@ -4,7 +4,7 @@
   "status": "IN_PROGRESS",
   "current_phase": "P07",
   "current_story": "MB-033",
-  "last_tested_commit": "be33bc2de0d30366f50767dfe1ee35af2737d434",
+  "last_tested_commit": "52e4e21cd3788e0429855ded44e52ca3041d03c5",
   "last_completed_story": "MB-053",
   "last_successful_gate": "P05 at 6736a860de134b7dd62f291b4c3013d62ac10356 (self-reviewed evidence)",
   "working_branch": "implementation/mvp",
@@ -42,8 +42,8 @@
       "next_action": "Provide a physical Android and iOS device for a tester, or decide on a device-farm service (spend needs authorization)"
     }
   ],
-  "next_action": "Window until 2026-10-15 00:00 Kuwait. Hetzner staging: PREPARED, NOT DEPLOYED, access not ready (docs/operations/09). Candidate J six checks at 52e4e21 (see verification/runs/20261014-CANDIDATE-J). When the owner reports a reachable staging server: run AUD-01, LOG-01, OPS-01..03, TC-057 first, then the real-API regression suite (needs a remote-target adaptation of the browser suite). Push (O07) stays behind PUSH_DELIVERY_ENABLED=false; BLK-003 and BLK-004 stay open; MB-033 not DONE; MB-029 BLOCKED; do not merge the draft PR.",
-  "updated_at": "2026-10-14T06:40:02Z",
+  "next_action": "Window until 2026-10-15 00:00 Kuwait. Hetzner staging: PREPARED, NOT DEPLOYED, access not ready (docs/operations/09). Candidate J six checks PASS at 52e4e21 (verification/runs/20261014-CANDIDATE-J). When the owner reports a reachable staging server: run AUD-01, LOG-01, OPS-01..03, TC-057 first, then the real-API regression suite (needs a remote-target adaptation of the browser suite). Push (O07) stays behind PUSH_DELIVERY_ENABLED=false; BLK-003 and BLK-004 stay open; MB-033 not DONE; MB-029 BLOCKED; do not merge the draft PR.",
+  "updated_at": "2026-10-14T07:02:36Z",
   "heartbeat": null,
   "runtime_note": "No continuously running supervisor is installed or active.",
   "resolved_blockers": [
