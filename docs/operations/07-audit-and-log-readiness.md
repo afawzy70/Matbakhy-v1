@@ -20,7 +20,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 | Configuration | policy, zones, feature flags | `config.change` | staff / config key | reason required; approval reference for a real policy | ConfigurationIntegrationTest |
 | Finance | refunds; settlements; cash verification; own report refused | `refund.*`, `settlement.*`, `cash.verify` | staff / refund, batch, report | reason or evidence depending on action | FinanceOperationsIntegrationTest, CashAndLedgerIntegrationTest |
 | Audit | audit trail read | `audit.read` | staff / looked-up object or actor | ALLOWED, filter in details | StaffAccessIntegrationTest |
-| Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest |
+| Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest; AuditAndCorrelationReadinessIntegrationTest (HTTP: authorized, denied by a staff member without `integration.ops`, replay, second retry 409; response, audit and log share the request ID; 2026-10-14) |
 | Orders (protected data) | staff view disclosing customer contact | `access.order_contact` | staff / order | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support (protected data) | staff view of a case | `access.support_case` | staff / case | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support | staff message, case update | `case.message`, `case.update` | staff / case | reason for some transitions | SupportIntegrationTest |

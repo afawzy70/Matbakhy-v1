@@ -33,6 +33,8 @@ Business history is the order's timeline (`order_event`, append-only). Diagnosti
 2. Read the event's `last_error` code (never provider text) and its request ID, then search the logs for that request ID (section 1).
 3. Fix the cause, then retry: `POST /api/v1/ops/outbox/{eventId}/retry` with the current version and a reason.
    - The retry is idempotent and audited (`outbox.retry`).
+   - Find it afterwards by request ID: the response header `X-Request-Id`, the audit row's `request_id` and the log line `outbox event <id> reset for retry by staff <id>` carry the same value. The reason is in the audit row only, not in the log.
+   - Without `integration.ops` the call returns 403 and the denial is audited (`DENIED`, same request ID). A second retry of an event that is no longer FAILED returns 409; a replay with the same `Idempotency-Key` returns the first result and writes nothing.
    - In the preview, providers are fakes: nothing is sent.
 
 ## 4. Missing or suspicious telemetry

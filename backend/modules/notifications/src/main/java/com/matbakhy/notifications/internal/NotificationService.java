@@ -27,6 +27,8 @@ import tools.jackson.databind.json.JsonMapper;
 @Service
 public class NotificationService {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(NotificationService.class);
+
     public record Notification(UUID id, String type, UUID orderId, Map<String, String> params, Instant createdAt, Instant readAt) {
     }
 
@@ -187,6 +189,8 @@ public class NotificationService {
                     Timestamp.from(clock.instant()), eventId);
             audit.record(new Entry(staffId, "outbox.retry", "integration.ops", "outbox_event", eventId.toString(), Outcome.ALLOWED, reason.strip(),
                     requestId, Map.of()));
+            // Runbook step 5: the operator finds the retry by request ID; the reason stays in the audit row only.
+            log.info("outbox event {} reset for retry by staff {} (audit outbox.retry)", eventId, staffId);
             return eventId;
         });
         return jdbc.query("SELECT id, event_type, status, attempts, available_at, version FROM outbox_event WHERE id = ?",
