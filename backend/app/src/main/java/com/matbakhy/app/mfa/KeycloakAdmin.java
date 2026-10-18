@@ -28,7 +28,7 @@ import tools.jackson.databind.json.JsonMapper;
  * them and this class never asks for them. Error bodies are not logged (they can echo identifiers).
  */
 @Component
-public class KeycloakAdmin {
+public class KeycloakAdmin implements IdentityProviderAdmin {
 
     private static final Logger log = LoggerFactory.getLogger(KeycloakAdmin.class);
 
@@ -47,6 +47,7 @@ public class KeycloakAdmin {
         this.clock = clock;
     }
 
+    @Override
     public boolean configured() {
         return props.adminConfigured();
     }
@@ -119,6 +120,7 @@ public class KeycloakAdmin {
     }
 
     /** Ids of the user's OTP credentials (type "otp"); nothing else about them is read. */
+    @Override
     public List<String> otpCredentialIds(String subject) {
         HttpResponse<String> response = call("GET", "/users/" + enc(subject) + "/credentials", null);
         if (response.statusCode() == 404) {
@@ -137,6 +139,7 @@ public class KeycloakAdmin {
         return ids;
     }
 
+    @Override
     public void deleteCredential(String subject, String credentialId) {
         HttpResponse<String> response = call("DELETE", "/users/" + enc(subject) + "/credentials/" + enc(credentialId), null);
         if (response.statusCode() != 204 && response.statusCode() != 404) {
@@ -146,6 +149,7 @@ public class KeycloakAdmin {
     }
 
     /** Ends every session of the user at the provider (refresh tokens stop working; access tokens expire within minutes). */
+    @Override
     public void logout(String subject) {
         HttpResponse<String> response = call("POST", "/users/" + enc(subject) + "/logout", "{}");
         if (response.statusCode() != 204 && response.statusCode() != 404) {

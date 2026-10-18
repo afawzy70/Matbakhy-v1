@@ -14,6 +14,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -26,7 +27,7 @@ import tools.jackson.databind.json.JsonMapper;
  * session without the second factor, accepts one that passed step-up, and the audited administrative reset removes a user's
  * OTP credential at the provider without ever returning a secret.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "matbakhy.environment=CI")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = "matbakhy.environment=CI")
 @Import({PostgresTestConfiguration.class})
 class MfaResetIntegrationTest {
 
@@ -36,9 +37,15 @@ class MfaResetIntegrationTest {
 
     @DynamicPropertySource
     static void identity(DynamicPropertyRegistry registry) {
-        KeycloakTestServer.springProperties().forEach((k, v) -> registry.add(k, () -> v));
+        // Not server.port: IdentityIntegrationTest owns the fixed port its redirect URIs need; this context picks a free one.
+        KeycloakTestServer.springProperties().forEach((k, v) -> {
+            if (!k.equals("server.port")) {
+                registry.add(k, () -> v);
+            }
+        });
     }
 
+    @LocalServerPort int port;
     @Autowired JdbcTemplate jdbc;
 
     @AfterEach
@@ -46,8 +53,8 @@ class MfaResetIntegrationTest {
         jdbc.update("UPDATE mfa_policy SET mode = 'OPTIONAL', version = version + 1");
     }
 
-    private static String api(String path) {
-        return "http://localhost:" + KeycloakTestServer.APP_PORT + path;
+    private String api(String path) {
+        return "http://localhost:" + port + path;
     }
 
     private HttpResponse<String> send(String method, String path, String token, String body) throws Exception {
@@ -79,7 +86,8 @@ class MfaResetIntegrationTest {
     }
 
     private void grant(UUID account, String permission) {
-        jdbc.update("INSERT INTO user_grant (id, user_id, permission, grant_reason) VALUES (?, ?, ?, 'mfa integration test')", UUID.randomUUID(), account, permission);
+        jdbc.update("INSERT INTO user_grant (id, user_id, permission, grant_reason) VALUES (?, ?, ?, 'mfa integration test') ON CONFLICT DO NOTHING",
+                UUID.randomUUID(), account, permission);
     }
 
     @Test
@@ -106,7 +114,10 @@ class MfaResetIntegrationTest {
         String admin = mfaToken("otp-admin");
         UUID adminId = accountId(admin);
         grant(adminId, "security.mfa_reset");
-        String targetPlain = plainToken("otp-reset");
+        Outcome targetLogin = MfaBrowser.login("otp-reset", PW, null, false);
+        assertThat(targetLogin.issuedCode()).isTrue();
+        MfaBrowser.Tokens targetTokens = MfaBrowser.tokens(targetLogin);
+        String targetPlain = targetTokens.access();
         UUID target = accountId(targetPlain);
 
         assertThat(send("POST", "/api/v1/ops/accounts/" + adminId + "/mfa-reset", admin, "{\"reason\":\"trying my own account\"}").statusCode())
@@ -122,6 +133,7 @@ class MfaResetIntegrationTest {
         assertThat(result.get("sessionsEnded").asBoolean()).isTrue();
         assertThat(reset.body().toLowerCase()).doesNotContain("secret", "totp");
 
+        assertThat(MfaBrowser.refreshStatus(targetTokens.refresh())).as("the provider session was ended: the old refresh token no longer works").isEqualTo(400);
         // The factor is gone at the provider: step-up now leads to enrolment instead of an OTP prompt.
         Outcome after = MfaBrowser.login("otp-reset", PW, null, true);
         assertThat(after.issuedCode()).isFalse();

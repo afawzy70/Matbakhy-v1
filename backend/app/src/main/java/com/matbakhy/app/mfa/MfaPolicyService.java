@@ -1,5 +1,6 @@
 package com.matbakhy.app.mfa;
 
+import com.matbakhy.app.security.StaffAssurance;
 import com.matbakhy.operations.api.AuditLog;
 import com.matbakhy.operations.api.AuditLog.Entry;
 import com.matbakhy.operations.api.AuditLog.Outcome;
@@ -43,7 +44,22 @@ public class MfaPolicyService {
      * @param available enrolment and use are offered (false only when every applicable category is DISABLED)
      */
     public record Decision(Set<Category> categories, Map<Category, Mode> modes, Mode effectiveMode, boolean preference,
-                           boolean required, boolean available) {
+                           boolean required, boolean available, Instant resetAt) {
+
+        /**
+         * The session/token passed MFA <em>and</em> did so after the account's last administrative reset; an assertion
+         * older than the reset no longer counts (a reset invalidates earlier proofs, not only the provider sessions).
+         */
+        public boolean satisfiedBy(Map<String, Object> claims, List<String> mfaAcrValues) {
+            if (!StaffAssurance.assertsMfa(claims, mfaAcrValues)) {
+                return false;
+            }
+            if (resetAt == null) {
+                return true;
+            }
+            Instant authTime = StaffAssurance.authTime(claims);
+            return authTime != null && !authTime.isBefore(resetAt);
+        }
     }
 
     private final JdbcTemplate jdbc;
@@ -70,8 +86,9 @@ public class MfaPolicyService {
                 SELECT EXISTS (SELECT 1 FROM kitchen WHERE owner_id = ?) AS kitchen,
                        EXISTS (SELECT 1 FROM user_grant WHERE user_id = ? AND revoked_at IS NULL
                                                            AND (expires_at IS NULL OR expires_at > now())) AS staff,
-                       coalesce((SELECT enabled FROM user_mfa_preference WHERE user_id = ?), false) AS preference""",
-                accountId, accountId, accountId);
+                       coalesce((SELECT enabled FROM user_mfa_preference WHERE user_id = ?), false) AS preference,
+                       (SELECT reset_at FROM user_mfa_reset WHERE user_id = ?) AS reset_at""",
+                accountId, accountId, accountId, accountId);
         Set<Category> categories = EnumSet.of(Category.CUSTOMER);
         if (Boolean.TRUE.equals(facts.get("kitchen"))) {
             categories.add(Category.KITCHEN);
@@ -81,7 +98,26 @@ public class MfaPolicyService {
         }
         Map<Category, Mode> all = new EnumMap<>(Category.class);
         policies().forEach(p -> all.put(p.category(), p.mode()));
-        return resolve(categories, all, Boolean.TRUE.equals(facts.get("preference")));
+        Timestamp resetAt = (Timestamp) facts.get("reset_at");
+        Decision base = resolve(categories, all, Boolean.TRUE.equals(facts.get("preference")));
+        return new Decision(base.categories(), base.modes(), base.effectiveMode(), base.preference(), base.required(), base.available(),
+                resetAt == null ? null : resetAt.toInstant());
+    }
+
+    /** The decision for the account bound to a provider subject, if one exists (used before a session is mapped). */
+    @Transactional(readOnly = true)
+    public java.util.Optional<Decision> decideForSubject(String issuer, String subject) {
+        return jdbc.query("SELECT id FROM app_user WHERE issuer = ? AND subject = ?", (rs, n) -> rs.getObject(1, UUID.class), issuer, subject)
+                .stream().findFirst().map(this::decide);
+    }
+
+    /** Records an administrative reset: earlier MFA assertions of this account stop counting. */
+    @Transactional
+    public void recordReset(UUID accountId, UUID byAdmin) {
+        jdbc.update("""
+                INSERT INTO user_mfa_reset (user_id, reset_at, reset_by) VALUES (?, ?, ?)
+                ON CONFLICT (user_id) DO UPDATE SET reset_at = EXCLUDED.reset_at, reset_by = EXCLUDED.reset_by""",
+                accountId, Timestamp.from(clock.instant()), byAdmin);
     }
 
     /** Pure precedence rules; unit-tested without a database. */
@@ -97,7 +133,7 @@ public class MfaPolicyService {
             }
         }
         boolean required = effective == Mode.REQUIRED || (effective == Mode.OPTIONAL && preference);
-        return new Decision(Set.copyOf(categories), Map.copyOf(applicable), effective, preference, required, effective != Mode.DISABLED);
+        return new Decision(Set.copyOf(categories), Map.copyOf(applicable), effective, preference, required, effective != Mode.DISABLED, null);
     }
 
     @Transactional

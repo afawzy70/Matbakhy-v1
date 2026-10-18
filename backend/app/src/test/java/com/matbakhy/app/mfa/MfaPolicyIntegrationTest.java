@@ -50,7 +50,6 @@ class MfaPolicyIntegrationTest {
     void setUp() {
         adminSubject = UUID.randomUUID().toString();
         admin = logins.login(adminSubject, "Admin").getPrincipal().id();
-        resetPolicies();
         jdbc.update("INSERT INTO user_grant (id, user_id, permission, grant_reason) VALUES (?, ?, 'security.mfa_policy', 'test'), (?, ?, 'security.mfa_reset', 'test')",
                 UUID.randomUUID(), admin, UUID.randomUUID(), admin);
     }
@@ -92,6 +91,15 @@ class MfaPolicyIntegrationTest {
 
     private int protectedStatus(AccountAuthentication who) throws Exception {
         return call(get(PROTECTED), who).getStatus();
+    }
+
+    @Test
+    void the_migration_seeds_optional_for_every_category_and_the_live_state_matches_it() throws Exception {
+        String migration = java.nio.file.Files.readString(java.nio.file.Path.of("src/main/resources/db/migration/V31__mfa_policy.sql"));
+        assertThat(migration).contains("INSERT INTO mfa_policy (category, mode) VALUES ('CUSTOMER', 'OPTIONAL'), ('KITCHEN', 'OPTIONAL'), ('STAFF', 'OPTIONAL')");
+        // Every test restores OPTIONAL after itself, so the live rows are still the seeded ones here.
+        assertThat(jdbc.queryForList("SELECT category || '=' || mode FROM mfa_policy ORDER BY category", String.class))
+                .containsExactly("CUSTOMER=OPTIONAL", "KITCHEN=OPTIONAL", "STAFF=OPTIONAL");
     }
 
     @Test
@@ -239,6 +247,65 @@ class MfaPolicyIntegrationTest {
         assertThat(unavailable.getStatus()).as("no provider admin access in this context").isEqualTo(503);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'mfa.reset' AND actor_id = ? AND outcome = 'DENIED'", Integer.class, admin))
                 .isEqualTo(1);
+    }
+
+    @Test
+    void under_required_the_profile_can_be_read_but_not_changed_without_the_second_factor() throws Exception {
+        String user = UUID.randomUUID().toString();
+        ok(setPolicy("CUSTOMER", "REQUIRED"), 200);
+        assertThat(call(get("/api/v1/me"), plain(user)).getStatus()).as("reading stays reachable").isEqualTo(200);
+        MockHttpServletResponse write = call(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/v1/me")
+                .content("{\"expectedVersion\":0,\"displayName\":\"Changed\"}"), plain(user));
+        assertThat(write.getStatus()).as("a profile write is a protected function").isEqualTo(403);
+        assertThat(write.getContentAsString()).contains("STEP_UP_REQUIRED");
+        assertThat(call(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch("/api/v1/me")
+                .content("{\"expectedVersion\":0,\"displayName\":\"Changed\"}"), mfa(user)).getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    void an_administrative_reset_invalidates_assertions_made_before_it() throws Exception {
+        String user = UUID.randomUUID().toString();
+        UUID account = plain(user).getPrincipal().id();
+        ok(setPolicy("CUSTOMER", "REQUIRED"), 200);
+        Instant before = Instant.now().minusSeconds(30);
+        AccountAuthentication oldProof = logins.loginWithMfaAt(user, "User", before);
+        assertThat(protectedStatus(oldProof)).isEqualTo(200);
+
+        jdbc.update("INSERT INTO user_mfa_reset (user_id, reset_at, reset_by) VALUES (?, now(), ?)", account, admin);
+        assertThat(protectedStatus(oldProof)).as("a proof older than the reset no longer counts").isEqualTo(403);
+        assertThat(ok(call(get("/api/v1/me/security"), oldProof), 200).get("verifiedInSession").asBoolean()).isFalse();
+        assertThat(protectedStatus(logins.loginWithMfaAt(user, "User", Instant.now().plusSeconds(5)))).as("a proof made after the reset does").isEqualTo(200);
+    }
+
+    @Test
+    void the_web_step_up_asks_the_provider_for_a_second_factor_unless_the_category_is_disabled() throws Exception {
+        String user = UUID.randomUUID().toString();
+        String location = mvc.perform(get("/oauth2/authorization/keycloak?stepUp=true").with(authentication(plain(user)))).andReturn().getResponse().getHeader("Location");
+        assertThat(location).contains("acr_values=").contains("max_age=0");
+
+        ok(setPolicy("CUSTOMER", "DISABLED"), 200);
+        String disabled = mvc.perform(get("/oauth2/authorization/keycloak?stepUp=true").with(authentication(plain(user)))).andReturn().getResponse().getHeader("Location");
+        assertThat(disabled).as("no second factor is requested for a DISABLED category").isNotNull().doesNotContain("acr_values=").doesNotContain("max_age=0");
+    }
+
+    @Test
+    void turning_mfa_off_ends_the_application_web_sessions_of_the_account() throws Exception {
+        String user = UUID.randomUUID().toString();
+        ok(setPreference(mfa(user), true), 200);
+        jdbc.update("INSERT INTO spring_session (primary_id, session_id, creation_time, last_access_time, max_inactive_interval, expiry_time, principal_name) "
+                + "VALUES (?, ?, 1, 1, 1800, 99999999999999, ?)", UUID.randomUUID().toString(), UUID.randomUUID().toString(), user);
+        ok(setPreference(mfa(user), false), 200);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM spring_session WHERE principal_name = ?", Integer.class, user)).isZero();
+    }
+
+    @Test
+    void the_settings_report_which_security_administration_the_account_may_do() throws Exception {
+        JsonNode admins = ok(call(get("/api/v1/me/security"), plain(adminSubject)), 200);
+        assertThat(admins.get("canManagePolicy").asBoolean()).isTrue();
+        assertThat(admins.get("canResetMfa").asBoolean()).isTrue();
+        JsonNode user = ok(call(get("/api/v1/me/security"), plain(UUID.randomUUID().toString())), 200);
+        assertThat(user.get("canManagePolicy").asBoolean()).isFalse();
+        assertThat(user.get("canResetMfa").asBoolean()).isFalse();
     }
 
     @Test

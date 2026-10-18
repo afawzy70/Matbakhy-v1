@@ -139,6 +139,27 @@ public final class MfaBrowser {
         return accessToken(o.browser(), o.location(), o.verifier());
     }
 
+    public record Tokens(String access, String refresh) {
+    }
+
+    /** Access and refresh token of a finished login. */
+    public static Tokens tokens(Outcome o) throws Exception {
+        String form = "grant_type=authorization_code&client_id=" + CLIENT + "&redirect_uri=" + OidcBrowser.enc(REDIRECT)
+                + "&code=" + OidcBrowser.enc(OidcBrowser.queryParam(o.location(), "code")) + "&code_verifier=" + o.verifier();
+        HttpResponse<String> token = post(o.browser(), KeycloakTestServer.issuer() + "/protocol/openid-connect/token", form);
+        assertThat(token.statusCode()).as(token.body()).isEqualTo(200);
+        Matcher a = ACCESS_TOKEN.matcher(token.body());
+        Matcher r = Pattern.compile("\"refresh_token\"\\s*:\\s*\"([^\"]+)\"").matcher(token.body());
+        assertThat(a.find() && r.find()).isTrue();
+        return new Tokens(a.group(1), r.group(1));
+    }
+
+    /** HTTP status of a refresh-token exchange: 200 while the provider session lives, 400 once it was ended. */
+    public static int refreshStatus(String refreshToken) throws Exception {
+        return post(new OidcBrowser(), KeycloakTestServer.issuer() + "/protocol/openid-connect/token",
+                "grant_type=refresh_token&client_id=" + CLIENT + "&refresh_token=" + OidcBrowser.enc(refreshToken)).statusCode();
+    }
+
     public static String accessToken(OidcBrowser browser, String location, String verifier) throws Exception {
         String form = "grant_type=authorization_code&client_id=" + CLIENT + "&redirect_uri=" + OidcBrowser.enc(REDIRECT)
                 + "&code=" + OidcBrowser.enc(OidcBrowser.queryParam(location, "code")) + "&code_verifier=" + verifier;

@@ -69,4 +69,19 @@ class MfaPolicyResolveTest {
         assertThat(d.effectiveMode()).isEqualTo(Mode.REQUIRED);
         assertThat(d.required()).isTrue();
     }
+
+    @Test
+    void an_assertion_older_than_the_last_reset_does_not_satisfy_the_policy() {
+        java.time.Instant reset = java.time.Instant.parse("2026-10-18T12:00:00Z");
+        Decision base = MfaPolicyService.resolve(EnumSet.of(Category.CUSTOMER), policy(Mode.REQUIRED, Mode.OPTIONAL, Mode.OPTIONAL), false);
+        Decision afterReset = new Decision(base.categories(), base.modes(), base.effectiveMode(), base.preference(), base.required(), base.available(), reset);
+        java.util.List<String> acr = java.util.List.of("mfa", "2");
+        Map<String, Object> before = Map.of("acr", "2", "auth_time", reset.minusSeconds(1).getEpochSecond());
+        Map<String, Object> after = Map.of("acr", "2", "auth_time", reset.getEpochSecond());
+        assertThat(base.satisfiedBy(before, acr)).as("no reset recorded").isTrue();
+        assertThat(afterReset.satisfiedBy(before, acr)).isFalse();
+        assertThat(afterReset.satisfiedBy(after, acr)).isTrue();
+        assertThat(afterReset.satisfiedBy(Map.of("acr", "2"), acr)).as("no auth_time, cannot prove it is newer").isFalse();
+        assertThat(afterReset.satisfiedBy(Map.of("acr", "1", "auth_time", reset.plusSeconds(60).getEpochSecond()), acr)).isFalse();
+    }
 }

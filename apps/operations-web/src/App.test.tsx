@@ -775,6 +775,8 @@ describe("two-step verification policy (D18)", () => {
     verifiedInSession: false,
     stepUpPath: "/oauth2/authorization/keycloak?stepUp=true",
     accountManagementUrl: "https://id.example.test/realms/matbakhy/account/#/security/signingin",
+    canManagePolicy: true,
+    canResetMfa: true,
     ...over,
   });
   const policies = () => ({
@@ -837,6 +839,20 @@ describe("two-step verification policy (D18)", () => {
     fireEvent.click(reset);
     await within(section).findByText("تم حذف 1 من وسائل التحقق وإنهاء الجلسات.");
     expect(calls.find((c) => c.method === "POST")?.body).toEqual({ reason: "lost phone verified by support" });
+  });
+
+  it("shows each security administration panel only to the account that holds its own permission", async () => {
+    const onlyReset = server(adminRoutes({ "GET /api/v1/me/security": () => ({ status: 200, body: security({ canManagePolicy: false, canResetMfa: true }) }) }));
+    render(<App fetchImpl={onlyReset.fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    expect(await screen.findByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "سياسة التحقق بخطوتين لكل فئة" })).toBeNull();
+    cleanup();
+    const onlyPolicy = server(adminRoutes({ "GET /api/v1/me/security": () => ({ status: 200, body: security({ canManagePolicy: true, canResetMfa: false }) }) }));
+    render(<App fetchImpl={onlyPolicy.fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    expect(await screen.findByRole("heading", { name: "سياسة التحقق بخطوتين لكل فئة" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).toBeNull();
   });
 
   it("explains a required policy that this session has not satisfied instead of showing an empty workspace", async () => {

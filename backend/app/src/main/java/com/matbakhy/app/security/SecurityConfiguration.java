@@ -204,7 +204,7 @@ class SecurityConfiguration {
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
                 .oauth2Login(login -> login
-                        .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(stepUpResolver(registrations, properties)))
+                        .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(stepUpResolver(registrations, properties, mfa)))
                         .successHandler(WebReturnTo.successHandler(properties.postLoginRedirect())))
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
@@ -238,7 +238,7 @@ class SecurityConfiguration {
      * only lets staff obtain such a token from the web app.
      */
     private static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver stepUpResolver(
-            ClientRegistrationRepository registrations, IdentityProperties properties) {
+            ClientRegistrationRepository registrations, IdentityProperties properties, com.matbakhy.app.mfa.MfaPolicyService mfa) {
         var defaults = new org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver(registrations,
                 "/oauth2/authorization");
         return new org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver() {
@@ -256,6 +256,18 @@ class SecurityConfiguration {
             private org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest stepUp(jakarta.servlet.http.HttpServletRequest request,
                     org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest resolved) {
                 if (resolved == null || !"true".equals(request.getParameter("stepUp"))) {
+                    return resolved;
+                }
+                // DISABLED for this account's categories: no second factor is requested (enrolment/use unavailable, D18).
+                // An anonymous request has no account yet and is left as asked; nothing is required of it afterwards.
+                org.springframework.security.core.Authentication current = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                java.util.Optional<com.matbakhy.app.mfa.MfaPolicyService.Decision> decision = java.util.Optional.empty();
+                if (current instanceof AccountAuthentication account) {
+                    decision = java.util.Optional.of(mfa.decide(account.getPrincipal().id()));
+                } else if (current instanceof OAuth2AuthenticationToken token && token.getPrincipal() instanceof OidcUser user) {
+                    decision = mfa.decideForSubject(user.getIssuer().toString(), user.getSubject());
+                }
+                if (decision.isPresent() && !decision.get().available()) {
                     return resolved;
                 }
                 return org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.from(resolved)

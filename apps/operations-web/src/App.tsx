@@ -34,7 +34,7 @@ type Session =
   | { kind: "signedOut" }
   | { kind: "error" }
   | { kind: "stepUp" }
-  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean; mfaPolicy: boolean };
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean; mfaPolicy: boolean; mfaReset: boolean };
 
 function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
   const sections: Tab[] = [
@@ -46,7 +46,7 @@ function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
     ...(s.finance ? (["finance"] as const) : []),
     ...(s.configuration ? (["configuration"] as const) : []),
     ...(s.staff ? (["staff"] as const) : []),
-    ...(s.mfaPolicy ? (["security"] as const) : []),
+    ...(s.mfaPolicy || s.mfaReset ? (["security"] as const) : []),
   ];
   // Account security (D18) is shown beside the other sections; an applicant with none keeps the onboarding screen.
   return sections.length > 0 && !sections.includes("security") ? [...sections, "security"] : sections;
@@ -59,7 +59,7 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff, mfaPolicy] = await Promise.all([
+    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff, security] = await Promise.all([
       api.GET("/api/v1/cook/dashboard"),
       api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
@@ -69,7 +69,8 @@ async function checkSession(api: Api): Promise<Session> {
       api.GET("/api/v1/ops/finance/statements", { params: { query: { kitchenId: "00000000-0000-0000-0000-000000000000" } } }),
       api.GET("/api/v1/ops/configuration"),
       api.GET("/api/v1/ops/staff"),
-      api.GET("/api/v1/ops/security/mfa-policy"),
+      // Which security administration this account may do (from its own grants); every account may use its own settings.
+      api.GET("/api/v1/me/security"),
     ]);
     // The administrator's policy requires a second factor this session has not passed: nothing else will load, so say so.
     if ([d, reviews, catalogue, cases, opsOrders, configuration, staff].some((r) => errorCode(r.error) === "STEP_UP_REQUIRED")) {
@@ -89,7 +90,8 @@ async function checkSession(api: Api): Promise<Session> {
       finance: finance.response.status === 404,
       configuration: configuration.response.ok,
       staff: staff.response.ok,
-      mfaPolicy: mfaPolicy.response.ok,
+      mfaPolicy: security.data?.canManagePolicy === true,
+      mfaReset: security.data?.canResetMfa === true,
     };
   } catch {
     return { kind: "error" };
@@ -254,7 +256,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "finance" ? <Finance ctx={ctx} /> : null}
             {current === "configuration" ? <Configuration ctx={ctx} /> : null}
             {current === "staff" ? <Staff ctx={ctx} /> : null}
-            {current === "security" ? <SecurityTab ctx={ctx} policyAdmin={session.mfaPolicy} resetAllowed={session.mfaPolicy || session.staff} /> : null}
+            {current === "security" ? <SecurityTab ctx={ctx} policyAdmin={session.mfaPolicy} resetAllowed={session.mfaReset} /> : null}
           </>
         ) : null}
       </main>

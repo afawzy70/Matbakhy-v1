@@ -2693,6 +2693,10 @@ export interface components {
             stepUpPath: string;
             /** @description Keycloak account console page for enrolling or removing the authenticator */
             accountManagementUrl: string;
+            /** @description The account holds security.mfa_policy */
+            canManagePolicy: boolean;
+            /** @description The account holds security.mfa_reset */
+            canResetMfa: boolean;
         };
         MfaPreferenceRequest: {
             enabled: boolean;

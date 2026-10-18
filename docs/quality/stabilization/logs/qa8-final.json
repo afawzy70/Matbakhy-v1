@@ -1,0 +1,103 @@
+{
+  "agent": "QA Engineer",
+  "commit": "c139bdf3c03705f042388ad5d8bd0c1ccf945a1d",
+  "summary": "HEAD verified. Requirement 1–12 traceability matrix, execution report and findings saved under docs/quality/stabilization/qa7/. Passed: 219 JS tests, all package typechecks, ESLint and 23 offline backend tests. Python: 73 tests, one failure caused by host .aws/.codex fixture copying, one skip. Container tests NOT_RUN; exact-SHA CI results were unavailable offline. Three static test-quality findings; no application source changed.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Matched requested SHA before and after verification."
+    },
+    {
+      "command": "python3 scripts/validate_blueprint.py",
+      "exit_code": 0,
+      "note": "PASS, planning validation only."
+    },
+    {
+      "command": "python3 scripts/check_scope.py",
+      "exit_code": 0
+    ,
+      "note": "PASS."
+    },
+    {
+      "command": "python3 scripts/check_migration_compat.py",
+      "exit_code": 0,
+      "note": "PASS, static check."
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts",
+      "exit_code": 1,
+      "note": "73 tests; one failure from copied host .aws/.codex directories; one skip."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false run test",
+      "exit_code": 0,
+      "note": "Executed separately in customer-mobile, customer-web, operations-web, api-client and design-tokens: 55/53/30/34/47 passing tests."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false run typecheck",
+      "exit_code": 0,
+      "note": "Executed separately in all five packages; all passed."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false exec eslint .",
+      "exit_code": 0,
+      "note": "PASS."
+    },
+    {
+      "command": "./mvnw -o -B -pl app -am test -Dtest='MfaPolicyResolveTest,StaffAssuranceTest,ModuleBoundaryTest,MediaInspectorPdfTest,OrderFingerprintTest' -Dsurefire.failIfNoSpecifiedTests=false",
+      "exit_code": 0,
+      "note": "JDK supplied by owner; 23 tests, zero failures/errors/skips."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    ,
+      "note": "PASS."
+    }
+  ],
+  "findings": [
+    {
+      "id": "QA7-001",
+      "severity": "Medium",
+      "component": "Reset integration test fixtures",
+      "file": "backend/app/src/test/java/com/matbakhy/app/identity/MfaResetIntegrationTest.java",
+      "line": 143,
+      "title": "Reset methods insert the same unique active grant",
+      "scenario": "Run both reset methods in the same Spring context, in either order.",
+      "expected": "Both methods reach their security assertions independently.",
+      "actual": "Both grant security.mfa_reset to persistent otp-admin; the second insertion violates the active-grant unique index.",
+      "evidence": "Insert helper at lines 81–82 is called at 108 and 143. AfterEach restores policies only. V4__grants_and_audit.sql:22 enforces unique active (user_id, permission). Static finding; container execution NOT_RUN.",
+      "suggested_fix": "Use separate administrators or restore grant fixtures after each method.",
+      "repro_test": "Execute both methods in MfaResetIntegrationTest against CI containers."
+    },
+    {
+      "id": "QA7-002",
+      "severity": "Medium",
+      "component": "PREVIEW default test coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java",
+      "line": 53,
+      "title": "Default test overwrites migration defaults before asserting them",
+      "scenario": "A migration accidentally seeds STAFF or KITCHEN as REQUIRED.",
+      "expected": "The default-policy test detects the incorrect seed.",
+      "actual": "BeforeEach rewrites all policies to OPTIONAL before checking their defaults.",
+      "evidence": "Setup at lines 49–60 precedes assertions at 98–107; production seeds are in V31__mfa_policy.sql:14.",
+      "suggested_fix": "Assert all three defaults against a fresh migrated database before fixture mutation.",
+      "repro_test": "In a disposable checkout, mutate only STAFF's seed to REQUIRED and verify the defaults test fails."
+    },
+    {
+      "id": "QA7-003",
+      "severity": "Medium",
+      "component": "Session invalidation coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/identity/MfaResetIntegrationTest.java",
+      "line": 123,
+      "title": "Response flag does not verify session invalidation",
+      "scenario": "Provider logout becomes a no-op while reset still returns sessionsEnded=true.",
+      "expected": "Tests detect continued refresh-token or existing SSO-session use after reset or disable.",
+      "actual": "Reset checks the response flag and starts a fresh browser; preference-disable tests never verify provider session termination.",
+      "evidence": "Reset lines 109–127 retain no refresh token or target browser. MfaPolicyIntegrationTest:158–179 checks preference behavior without session reuse. Static coverage finding, not an observed logout failure.",
+      "suggested_fix": "Retain refresh tokens and SSO browsers before reset/disable and assert invalidation afterward.",
+      "repro_test": "A no-op logout mutation must fail real-provider invalidation tests, allowing the documented access-token expiry window."
+    }
+  ]
+}

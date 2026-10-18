@@ -19,6 +19,14 @@ CREATE TABLE user_mfa_preference (
     updated_at timestamptz NOT NULL DEFAULT now()
 );
 
+-- An audited reset invalidates every earlier MFA assertion of the account: a token or web session whose authentication
+-- happened before reset_at no longer counts as having passed MFA.
+CREATE TABLE user_mfa_reset (
+    user_id  uuid        PRIMARY KEY REFERENCES app_user (id),
+    reset_at timestamptz NOT NULL,
+    reset_by uuid        REFERENCES app_user (id)
+);
+
 ALTER TABLE user_grant DROP CONSTRAINT user_grant_permission_check;
 ALTER TABLE user_grant ADD CONSTRAINT user_grant_permission_check CHECK (permission IN (
     'staff.grant', 'audit.read', 'cook.review', 'content.moderate', 'order.ops', 'order.exception_cancel',

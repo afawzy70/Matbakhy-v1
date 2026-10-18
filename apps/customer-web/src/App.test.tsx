@@ -42,6 +42,8 @@ const security = (over: Record<string, unknown> = {}) => ({
   verifiedInSession: false,
   stepUpPath: "/oauth2/authorization/keycloak?stepUp=true",
   accountManagementUrl: "https://id.example.test/realms/matbakhy/account/#/security/signingin",
+  canManagePolicy: false,
+  canResetMfa: false,
   ...over,
 });
 const me = { id: "u1", displayName: "Mona", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: ["BROWSE", "ORDER"] };

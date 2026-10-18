@@ -46,42 +46,51 @@ class MfaController {
     private final StaffAssurance assurance;
     private final IdentityProperties identity;
     private final MfaProperties props;
-    private final KeycloakAdmin admin;
+    private final IdentityProviderAdmin admin;
+    private final ApplicationSessions sessions;
     private final AuditLog audit;
     private final JdbcTemplate jdbc;
 
     MfaController(MfaPolicyService policy, StaffAssurance assurance, IdentityProperties identity, MfaProperties props,
-                  KeycloakAdmin admin, AuditLog audit, JdbcTemplate jdbc) {
+                  IdentityProviderAdmin admin, ApplicationSessions sessions, AuditLog audit, JdbcTemplate jdbc) {
         this.policy = policy;
         this.assurance = assurance;
         this.identity = identity;
         this.props = props;
         this.admin = admin;
+        this.sessions = sessions;
         this.audit = audit;
         this.jdbc = jdbc;
     }
 
     record Security(List<Category> categories, Map<Category, Mode> policy, Mode effectiveMode, boolean enabled, boolean required,
-                    boolean available, boolean verifiedInSession, String stepUpPath, String accountManagementUrl) {
+                    boolean available, boolean verifiedInSession, String stepUpPath, String accountManagementUrl,
+                    boolean canManagePolicy, boolean canResetMfa) {
     }
 
     record PreferenceBody(@NotNull Boolean enabled) {
     }
 
-    private Security view(Decision d, boolean verified) {
+    private Security view(Decision d, boolean verified, Authentication authentication) {
         String console = props.accountConsoleUrl() != null && !props.accountConsoleUrl().isBlank()
                 ? props.accountConsoleUrl() : identity.issuer() + "/account/#/security/signingin";
         return new Security(List.copyOf(d.categories()), d.modes(), d.effectiveMode(), d.preference(), d.required(), d.available(), verified,
-                "/oauth2/authorization/keycloak?stepUp=true", console);
+                "/oauth2/authorization/keycloak?stepUp=true", console, has(authentication, "PERM_security.mfa_policy"),
+                has(authentication, "PERM_security.mfa_reset"));
     }
 
-    private boolean verified(AccountAuthentication a) {
-        return StaffAssurance.assertsMfa(a.identityClaims(), identity.mfaAcrValues());
+    private static boolean has(Authentication authentication, String authority) {
+        return authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(authority));
+    }
+
+    private boolean verified(AccountAuthentication a, Decision d) {
+        return d.satisfiedBy(a.identityClaims(), identity.mfaAcrValues());
     }
 
     @GetMapping("/api/v1/me/security")
     Security security(@AuthenticationPrincipal CurrentAccount actor, Authentication authentication) {
-        return view(policy.decide(actor.id()), authentication instanceof AccountAuthentication a && verified(a));
+        Decision d = policy.decide(actor.id());
+        return view(d, authentication instanceof AccountAuthentication a && verified(a, d), authentication);
     }
 
     @PutMapping("/api/v1/me/security/mfa")
@@ -97,7 +106,7 @@ class MfaController {
                         List.of(new FieldError("enabled", "MFA_UNAVAILABLE")));
             }
             // Enabling is only accepted on a session that has just proved a second factor, so nobody locks themselves out.
-            if (!verified(account)) {
+            if (!verified(account, before)) {
                 throw new StepUpRequiredException();
             }
         } else if (before.preference() || before.required()) {
@@ -105,7 +114,11 @@ class MfaController {
                 throw new ApiException(ErrorCode.STATE_CONFLICT, "MFA is required by policy and cannot be turned off",
                         List.of(new FieldError("enabled", "MFA_REQUIRED_BY_POLICY")));
             }
-            assurance.recentMfa(authentication); // recent second factor before weakening the account (throws step-up otherwise)
+            // A recent second factor before weakening the account (throws step-up otherwise), and not one older than a reset.
+            if (!before.satisfiedBy(account.identityClaims(), identity.mfaAcrValues())) {
+                throw new StepUpRequiredException();
+            }
+            assurance.recentMfa(authentication);
         }
         if (before.preference() != enable) {
             policy.setPreference(actor.id(), enable);
@@ -115,17 +128,20 @@ class MfaController {
                 endSessions(actor.id());
             }
         }
-        return view(policy.decide(actor.id()), verified(account));
+        Decision after = policy.decide(actor.id());
+        return view(after, verified(account, after), authentication);
     }
 
     /** Turning MFA off weakens the account: end its sessions at the provider so the next sign-in starts clean. */
     private void endSessions(UUID accountId) {
+        String subject = subjectOf(accountId);
+        sessions.endAllFor(subject); // the application's own web sessions always end
         if (!admin.configured()) {
-            log.info("MFA turned off; provider admin access not configured, sessions were not ended");
+            log.info("MFA turned off; provider admin access not configured, provider sessions were not ended");
             return;
         }
         try {
-            admin.logout(subjectOf(accountId));
+            admin.logout(subject);
         } catch (RuntimeException e) {
             log.warn("MFA turned off; ending provider sessions failed ({})", e.getClass().getSimpleName());
         }

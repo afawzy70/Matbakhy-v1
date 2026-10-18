@@ -45,6 +45,11 @@ public class StaffAssurance {
         return true;
     }
 
+    /** The provider-asserted authentication time, if present and well formed. */
+    public static Instant authTime(java.util.Map<String, Object> claims) {
+        return toInstant(claims.get("auth_time"));
+    }
+
     private static Instant toInstant(Object value) {
         if (value instanceof Instant instant) {
             return instant;

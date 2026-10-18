@@ -18,13 +18,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * (REQUIRED, or OPTIONAL with the user's own preference on), every protected API call must carry the identity provider's
  * MFA assertion (acr/amr on the token or session); otherwise the call is refused with STEP_UP_REQUIRED and the client
  * performs a Keycloak step-up. The user's preference can only add this requirement, never remove an administrator's.
- * Public reads, the security-settings endpoints (needed to enrol), the profile read and logout stay reachable.
+ * Public reads, the security-settings endpoints (needed to enrol), the profile READ and logout stay reachable; profile writes do not.
  */
 public class MfaEnforcementFilter extends OncePerRequestFilter {
 
     private static final AntPathMatcher MATCHER = new AntPathMatcher();
     /** Reachable without MFA: needed to learn the state, enrol, and sign out. */
-    static final List<String> OPEN = List.of("/api/v1/me", "/api/v1/me/security", "/api/v1/me/security/**", "/api/v1/auth/logout");
+    static final List<String> OPEN = List.of("/api/v1/me/security", "/api/v1/me/security/**", "/api/v1/auth/logout");
 
     private final MfaPolicyService policy;
     private final IdentityProperties properties;
@@ -40,7 +40,7 @@ public class MfaEnforcementFilter extends OncePerRequestFilter {
         Authentication current = SecurityContextHolder.getContext().getAuthentication();
         if (current instanceof AccountAuthentication account && account.getPrincipal().active() && applies(request)) {
             MfaPolicyService.Decision decision = policy.decide(account.getPrincipal().id());
-            if (decision.required() && !StaffAssurance.assertsMfa(account.identityClaims(), properties.mfaAcrValues())) {
+            if (decision.required() && !decision.satisfiedBy(account.identityClaims(), properties.mfaAcrValues())) {
                 throw new StepUpRequiredException();
             }
         }
@@ -56,6 +56,10 @@ public class MfaEnforcementFilter extends OncePerRequestFilter {
             if (MATCHER.match(open, path)) {
                 return false;
             }
+        }
+        // Reading one's own profile stays reachable (the client learns who is signed in); changing it needs the assertion.
+        if ("/api/v1/me".equals(path) && HttpMethod.GET.matches(request.getMethod())) {
+            return false;
         }
         if (HttpMethod.GET.matches(request.getMethod())) {
             for (String pub : SecurityConfiguration.PUBLIC_GET) {

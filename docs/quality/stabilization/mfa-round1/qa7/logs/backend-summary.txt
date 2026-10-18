@@ -1,0 +1,8 @@
+Source SHA: c139bdf3c03705f042388ad5d8bd0c1ccf945a1d
+Maven process exit 0; BUILD SUCCESS (observed command output).
+Selected Surefire counts extracted from report XML; no environment/property values retained.
+MfaPolicyResolveTest: tests=5, failures=0, errors=0, skipped=0
+StaffAssuranceTest: tests=3, failures=0, errors=0, skipped=0
+ModuleBoundaryTest: tests=7, failures=0, errors=0, skipped=0
+MediaInspectorPdfTest: tests=5, failures=0, errors=0, skipped=0
+OrderFingerprintTest: tests=3, failures=0, errors=0, skipped=0

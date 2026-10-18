@@ -38,13 +38,15 @@ import org.springframework.web.bind.annotation.RestController;
 class MfaAdminController {
 
     private final MfaPolicyService policy;
-    private final KeycloakAdmin keycloak;
+    private final IdentityProviderAdmin keycloak;
+    private final ApplicationSessions sessions;
     private final AuditLog audit;
     private final JdbcTemplate jdbc;
 
-    MfaAdminController(MfaPolicyService policy, KeycloakAdmin keycloak, AuditLog audit, JdbcTemplate jdbc) {
+    MfaAdminController(MfaPolicyService policy, IdentityProviderAdmin keycloak, ApplicationSessions sessions, AuditLog audit, JdbcTemplate jdbc) {
         this.policy = policy;
         this.keycloak = keycloak;
+        this.sessions = sessions;
         this.audit = audit;
         this.jdbc = jdbc;
     }
@@ -94,11 +96,24 @@ class MfaAdminController {
         }
         String subject = subjects.getFirst();
         int removed = 0;
-        for (String credentialId : keycloak.otpCredentialIds(subject)) {
-            keycloak.deleteCredential(subject, credentialId);
-            removed++;
+        try {
+            // First: every earlier MFA assertion of the account stops counting, whatever else fails below.
+            policy.recordReset(accountId, actor.id());
+            for (String credentialId : keycloak.otpCredentialIds(subject)) {
+                keycloak.deleteCredential(subject, credentialId);
+                removed++;
+            }
+            keycloak.logout(subject);
+            sessions.endAllFor(subject);
+        } catch (RuntimeException failure) {
+            // A reset that stops half way is still an administrative act on the account: it is audited with what was done.
+            Map<String, Object> partial = new LinkedHashMap<>();
+            partial.put("removedFactors", removed);
+            partial.put("completed", false);
+            audit.record(new Entry(actor.id(), "mfa.reset", "security.mfa_reset", "account", accountId.toString(), Outcome.DENIED,
+                    "reset incomplete: " + failure.getClass().getSimpleName() + "; " + body.reason().strip(), requestId, partial));
+            throw failure;
         }
-        keycloak.logout(subject);
         Map<String, Object> details = new LinkedHashMap<>();
         details.put("removedFactors", removed);
         details.put("sessionsEnded", true);

@@ -5366,7 +5366,7 @@ components:
     SecuritySettings:
       type: object
       additionalProperties: false
-      required: [categories, policy, effectiveMode, enabled, required, available, verifiedInSession, stepUpPath, accountManagementUrl]
+      required: [categories, policy, effectiveMode, enabled, required, available, verifiedInSession, stepUpPath, accountManagementUrl, canManagePolicy, canResetMfa]
       properties:
         categories:
           type: array
@@ -5382,6 +5382,8 @@ components:
         verifiedInSession: {type: boolean, description: The current token/session carries the identity provider's MFA assertion}
         stepUpPath: {type: string, description: Web path that starts a Keycloak step-up (acr mfa)}
         accountManagementUrl: {type: string, description: Keycloak account console page for enrolling or removing the authenticator}
+        canManagePolicy: {type: boolean, description: The account holds security.mfa_policy}
+        canResetMfa: {type: boolean, description: The account holds security.mfa_reset}
     MfaPreferenceRequest:
       type: object
       additionalProperties: false
