@@ -20,7 +20,7 @@ Jest/vitest: customer-web 53, operations-web 31, api-client 34, design-tokens 47
 |---|---|---|
 | Stabilization code review + QA + security | 6 rounds on `b7ec0e9` … `4650f5c` | All High findings fixed (cash after deposit, sealed approved documents, replay, idempotency fingerprint, durable cleanup race, in-flight approval); final pass: 0 findings |
 | D18 configurable MFA | 4 rounds (`c139bdf`, `9ff290f`, `7e61db7`, `240cf0c`) | Round 1: 4 High (profile writes bypass, reset left app sessions, DISABLED, unaudited partial reset); round 2: 2 High + 1 Medium; round 3: 1 High; final `240cf0c`: reviewer, security and QA all **0 findings** |
-| Mobile step-up + Keycloak migration (`fef0010`) | 1 round | 1 High (step-up as another person) and 1 Medium (rollback baseline) — fixed in `ff64f32`; not re-reviewed after the fix beyond CI and its new tests |
+| Mobile step-up + Keycloak migration (`fef0010`) | 1 round | 1 High (step-up as another person) and 1 Medium (rollback baseline) — fixed in `ff64f32`; re-reviewed in section 7 |
 | iOS beta preparation (PR #11) | 1 round | 2 Medium — fixed (submit bound to one build id, ASC app id variable) |
 Reports: `code-review-report.md`, `qa-*`, `round3/`, `mfa-round1..3/`, `mfa-final/`, `gates/`, raw outputs in `logs/*-final.json`. Reviews are independent agent reviews, not a human audit; Docker/Testcontainers tests were never run by the agents (CI is that evidence).
 
@@ -50,3 +50,17 @@ Reports: `code-review-report.md`, `qa-*`, `round3/`, `mfa-round1..3/`, `mfa-fina
 3. Keep every MFA policy OPTIONAL; do not set CUSTOMER or KITCHEN to REQUIRED before the device test plan passes.
 4. Do not start the TestFlight build until the realm migration, the mobile client registration and the allow-list decision are done.
 Not recommended yet: promotion to `main`, production deployment, enforcing CSP, or any statement that MFA works on a phone.
+
+## 7. Remediation after owner approval of 2026-10-18 (mobile step-up and migration)
+**Final source commit: `a746e6d`** (supersedes `ff64f32` as the tested source; the report commit that adds this section changes only `docs/quality/`).
+The independent Codex review of `ff64f32` (read-only, Codex CLI 0.163.0) found four issues: High cross-account state after an account switch during step-up; Medium step-up recovery; Medium unsafe sourcing of the rollback state; Medium verification that did not prove assurance. Five further review rounds (on `5c7d912`, `89ec820`, `10cfe77`, `a746e6d`) found deeper variants (cleanup failures, restart, late answers, guest-basket migration, fixture cleanup reliability, `apply` exit status); all were fixed. **Last mobile review on `a746e6d`: 0 findings.** The shell-script fixes (fixture cleanup, exit 3) were last reviewed on `89ec820` ("correct by inspection") and are unchanged since; they are not covered by a Codex pass on `a746e6d`.
+| Check on `a746e6d` | Result |
+|---|---|
+| Product CI (push run 39155515728 / PR run 39155512069): 339 backend tests + 4-test module, 0 failures, 0 skipped; customer-mobile 71, customer-web 53, operations-web 31, api-client 34, design-tokens 47; local stack smoke; secret scan | success |
+| Blueprint integrity (push / PR) | success |
+| Native builds, run 39155515697: Android debug APK (Gradle), iOS simulator build (Xcode, unsigned) | success |
+| Local: `scripts/test_keycloak_mfa_migration.py` (13 tests incl. hostile flow names, tampered state, fixture cleanup with a stub kcadm), jest 71/71, `tsc` | pass |
+| Assurance verification rehearsed on throwaway Keycloak 26.8.0 (stand-in for the API's MFA contract) | PASS; INCOMPLETE (exit 3) without fixture; FAIL with the `amr` mapper removed |
+| Assurance verification against the **real API and the live realm** | **NOT_RUN** |
+| Mobile step-up on a physical device | **NOT_RUN** (D18-RESIDUAL-2) |
+Accepted limitation: a guest basket can be lost (never shared) if storage fails while it moves to the signing-in person. Before PR #9 is merged nothing has been deployed and the live Keycloak realm is unchanged.
