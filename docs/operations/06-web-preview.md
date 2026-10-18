@@ -170,7 +170,7 @@ The access method must work for: browser sign-in and the OIDC redirects between 
    - synthetic data only;
    - no real SMS, e-mail, push or malware scanning;
    - a synthetic commerce policy (O04 open);
-   - staff actions that need MFA are not available, because no OTP is configured in the preview realm.
+   - staff actions that need MFA are not available until the staff MFA flow is applied to the running preview realm (see docs/security/staff-mfa-enforcement.md); the repo realm now defines it, but `--import-realm` does not change an existing realm.
 
 ## Procedure (after the inputs exist)
 

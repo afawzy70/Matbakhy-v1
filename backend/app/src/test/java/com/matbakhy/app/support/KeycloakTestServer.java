@@ -24,6 +24,9 @@ public final class KeycloakTestServer {
     public static final String WEB_SECRET = random();
     public static final String PASSWORD_A = random();
     public static final String PASSWORD_B = random();
+    public static final String STAFF_PASSWORD = random();
+    /** Per-run synthetic TOTP secret for the dedicated test staff account; never committed. */
+    public static final String STAFF_TOTP_SECRET = random().replace("t-", "").substring(0, 20);
     public static final int APP_PORT = freePort();
 
     private static final GenericContainer<?> CONTAINER = start();
@@ -52,7 +55,8 @@ public final class KeycloakTestServer {
         try (var in = KeycloakTestServer.class.getResourceAsStream("/keycloak/test-realm.json")) {
             realm = new String(in.readAllBytes(), StandardCharsets.UTF_8)
                     .replace("${WEB_SECRET}", WEB_SECRET).replace("${PASSWORD_A}", PASSWORD_A)
-                    .replace("${PASSWORD_B}", PASSWORD_B).replace("${APP_PORT}", Integer.toString(APP_PORT));
+                    .replace("${PASSWORD_B}", PASSWORD_B).replace("${STAFF_PASSWORD}", STAFF_PASSWORD)
+                    .replace("${STAFF_TOTP_SECRET}", STAFF_TOTP_SECRET).replace("${APP_PORT}", Integer.toString(APP_PORT));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

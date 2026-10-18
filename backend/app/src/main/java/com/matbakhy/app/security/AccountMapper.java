@@ -26,7 +26,12 @@ class AccountMapper {
     private final GrantDirectory grants;
     private final IdentityProperties properties;
 
-    AccountMapper(AccountDirectory accounts, GrantDirectory grants, IdentityProperties properties) {
+    /** Defense in depth behind the identity provider's own MFA (BR-007): off until the provider enforces MFA for every grant holder. */
+    private final boolean requireStaffMfa;
+
+    AccountMapper(AccountDirectory accounts, GrantDirectory grants, IdentityProperties properties,
+                  @org.springframework.beans.factory.annotation.Value("${matbakhy.identity.require-staff-mfa:false}") boolean requireStaffMfa) {
+        this.requireStaffMfa = requireStaffMfa;
         this.accounts = accounts;
         this.grants = grants;
         this.properties = properties;
@@ -46,8 +51,11 @@ class AccountMapper {
             case ACTIVE -> {
                 authorities.add(new SimpleGrantedAuthority(ACTIVE));
                 // Staff permissions come only from current server-side grants, re-read on every request.
-                for (Permission p : grants.activePermissions(account.id())) {
-                    authorities.add(new SimpleGrantedAuthority(p.authority()));
+                // With require-staff-mfa a staff authority needs the provider's MFA assertion on this very token.
+                if (!requireStaffMfa || StaffAssurance.assertsMfa(claims, properties.mfaAcrValues())) {
+                    for (Permission p : grants.activePermissions(account.id())) {
+                        authorities.add(new SimpleGrantedAuthority(p.authority()));
+                    }
                 }
             }
             case DELETION_REQUESTED -> authorities.add(new SimpleGrantedAuthority(DELETION_REQUESTED));

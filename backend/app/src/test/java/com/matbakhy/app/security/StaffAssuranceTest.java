@@ -41,4 +41,14 @@ class StaffAssuranceTest {
         assertThatThrownBy(() -> assurance.recentMfa(auth(AccountStatus.ACTIVE, Map.of("acr", "2")))).isInstanceOf(StepUpRequiredException.class);
         assertThat(assurance.recentMfa(auth(AccountStatus.SUSPENDED, Map.of("acr", "2", "auth_time", NOW.getEpochSecond())))).isFalse();
     }
+
+    @Test
+    void asserts_mfa_reads_the_same_claims_without_recency() {
+        List<String> values = List.of("mfa", "2");
+        assertThat(StaffAssurance.assertsMfa(Map.of("acr", "2"), values)).isTrue();
+        assertThat(StaffAssurance.assertsMfa(Map.of("acr", "1", "amr", List.of("pwd", "otp")), values)).isTrue();
+        assertThat(StaffAssurance.assertsMfa(Map.of("acr", "1", "amr", List.of("pwd")), values)).isFalse();
+        assertThat(StaffAssurance.assertsMfa(Map.of("amr", List.of()), values)).isFalse();
+        assertThat(StaffAssurance.assertsMfa(Map.of(), values)).isFalse();
+    }
 }

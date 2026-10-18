@@ -5,7 +5,18 @@
   "registrationAllowed": false,
   "loginWithEmailAllowed": true,
   "accessTokenLifespan": 300,
-  "roles": { "realm": [ { "name": "admin", "description": "Synthetic role used to prove token roles grant nothing" } ] },
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Synthetic role used to prove token roles grant nothing"
+      },
+      {
+        "name": "matbakhy-staff",
+        "description": "Accounts holding staff grants; the identity provider requires OTP for every login (BR-007)"
+      }
+    ]
+  },
   "clients": [
     {
       "clientId": "matbakhy-web",
@@ -14,10 +25,33 @@
       "secret": "${WEB_SECRET}",
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
-      "redirectUris": ["http://localhost:${APP_PORT}/login/oauth2/code/keycloak"],
-      "attributes": { "post.logout.redirect.uris": "http://localhost:5173/" },
-      "protocolMappers": [ { "name": "api-audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
-        "config": { "included.custom.audience": "matbakhy-api", "access.token.claim": "true", "id.token.claim": "false" } } ]
+      "redirectUris": [
+        "http://localhost:${APP_PORT}/login/oauth2/code/keycloak"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:5173/"
+      },
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "matbakhy-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "amr",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-amr-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
     },
     {
       "clientId": "matbakhy-mobile",
@@ -25,10 +59,33 @@
       "publicClient": true,
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
-      "redirectUris": ["matbakhy-dev://auth/callback"],
-      "attributes": { "pkce.code.challenge.method": "S256" },
-      "protocolMappers": [ { "name": "api-audience", "protocol": "openid-connect", "protocolMapper": "oidc-audience-mapper",
-        "config": { "included.custom.audience": "matbakhy-api", "access.token.claim": "true", "id.token.claim": "false" } } ]
+      "redirectUris": [
+        "matbakhy-dev://auth/callback"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "matbakhy-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "amr",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-amr-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
     },
     {
       "clientId": "unrelated-app",
@@ -36,16 +93,184 @@
       "publicClient": true,
       "standardFlowEnabled": true,
       "directAccessGrantsEnabled": false,
-      "redirectUris": ["unrelated-app://callback"],
-      "attributes": { "pkce.code.challenge.method": "S256" }
+      "redirectUris": [
+        "unrelated-app://callback"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      }
     }
   ],
   "users": [
-    { "username": "customer-a", "email": "customer-a@matbakhy.test", "emailVerified": true, "enabled": true,
-      "firstName": "Customer", "lastName": "SyntheticA", "realmRoles": ["admin"],
-      "credentials": [ { "type": "password", "value": "${PASSWORD_A}", "temporary": false } ] },
-    { "username": "customer-b", "email": "customer-b@matbakhy.test", "emailVerified": true, "enabled": true,
-      "firstName": "Customer", "lastName": "SyntheticB",
-      "credentials": [ { "type": "password", "value": "${PASSWORD_B}", "temporary": false } ] }
+    {
+      "username": "customer-a",
+      "email": "customer-a@matbakhy.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Customer",
+      "lastName": "SyntheticA",
+      "realmRoles": [
+        "admin"
+      ],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PASSWORD_A}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "username": "customer-b",
+      "email": "customer-b@matbakhy.test",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Customer",
+      "lastName": "SyntheticB",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${PASSWORD_B}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "realmRoles": [
+        "matbakhy-staff"
+      ],
+      "username": "staff-mfa",
+      "email": "staff-mfa@matbakhy.test",
+      "lastName": "WithOtp",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${STAFF_PASSWORD}",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "secretData": "{\"value\":\"${STAFF_TOTP_SECRET}\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "realmRoles": [
+        "matbakhy-staff"
+      ],
+      "username": "staff-no-otp",
+      "email": "staff-no-otp@matbakhy.test",
+      "lastName": "NoOtp",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${STAFF_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    }
+  ],
+  "browserFlow": "matbakhy browser",
+  "authenticationFlows": [
+    {
+      "alias": "matbakhy browser",
+      "description": "Browser flow; staff accounts (realm role matbakhy-staff) must also pass OTP",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy browser forms",
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy browser forms",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorConfig": "matbakhy-pwd-amr",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy staff mfa",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy staff mfa",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-role",
+          "authenticatorConfig": "matbakhy-staff-role",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorConfig": "matbakhy-otp-amr",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "matbakhy-staff-role",
+      "config": {
+        "condUserRole": "matbakhy-staff",
+        "negate": "false"
+      }
+    },
+    {
+      "alias": "matbakhy-pwd-amr",
+      "config": {
+        "default.reference.value": "pwd",
+        "default.reference.maxAge": "0"
+      }
+    },
+    {
+      "alias": "matbakhy-otp-amr",
+      "config": {
+        "default.reference.value": "otp",
+        "default.reference.maxAge": "0"
+      }
+    }
   ]
 }
