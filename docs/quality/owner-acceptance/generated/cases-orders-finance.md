@@ -2,6 +2,36 @@
 
 Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Every case is NOT_RUN or BLOCKED until a run records evidence.
 
+## Shared conventions used by the cases below
+
+```json
+{
+ "api_helper": "const api=async(m,p,b,k)=>{const x=document.cookie.match(/XSRF-TOKEN=([^;]+)/);const r=await fetch('https://api.<PREVIEW_DOMAIN>'+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(x?{'X-XSRF-TOKEN':decodeURIComponent(x[1])}:{}),...(k?{'Idempotency-Key':k}:{})},body:b?JSON.stringify(b):undefined});return {status:r.status,body:await r.json().catch(()=>null)}};",
+ "api_helper_usage": "Paste once into the DevTools Console of a tab that is signed in as the stated actor: customer/cook-as-customer on https://app.<PREVIEW_DOMAIN>, cook and staff on https://ops.<PREVIEW_DOMAIN>. The helper copies the readable XSRF-TOKEN cookie into X-XSRF-TOKEN exactly like the web apps do (apps/customer-web/src/api.ts) and calls https://api.<PREVIEW_DOMAIN>. If no XSRF-TOKEN cookie exists yet, run `await api('GET','/api/v1/me')` first. Mutating commands need a fresh `Idempotency-Key` (crypto.randomUUID(); allowed pattern [A-Za-z0-9-]{8,128}). VALIDATION_FAILED is HTTP 422, MALFORMED_REQUEST 400 (backend ErrorCode).",
+ "recipes": {
+  "place_pickup_cod_x2": "const sl=(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items[0];const q=(await api('POST','/api/v1/quotes',{items:[{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:2}],slotId:sl.id,fulfillmentMode:'PICKUP',paymentMethod:'COD'})).body;const o=await api('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},crypto.randomUUID());// o.status must be 201; o.body.id = order id, o.body.version = expectedVersion for the next command"
+ },
+ "ids": {
+  "kitchen_A": "00000000-0000-4000-8000-0000000bd001",
+  "kitchen_B": "00000000-0000-4000-8000-0000000bd002",
+  "meal_koshari_7500": "00000000-0000-4000-8000-0000000bb001",
+  "meal_mahshi_18000": "00000000-0000-4000-8000-0000000bb002",
+  "meal_molokhia_12025_kitchen_B": "00000000-0000-4000-8000-0000000bb003",
+  "zone_test_A_fee_3000": "00000000-0000-4000-8000-00000000a001",
+  "zone_test_B_fee_4500": "00000000-0000-4000-8000-00000000a002"
+ },
+ "seed_money_facts": "Prices are integer piastres: koshari 7500, mahshi 18000, molokhia 12025; zone A delivery fee 3000; synthetic policy tax 0 bps, commission 0 bps; kitchen A deposit 5000 bps (50%), no COD cap; slot 13:00 Africa/Cairo, cutoff 11:00, 20 portions per slot, 10 per meal.",
+ "sql_note": "Database checks are read-only SELECTs run through the operator's approved psql channel (never with write credentials, except the isolated-stack immutability case). :'order' is a psql variable holding the order UUID. Column names are from backend/app/src/main/resources/db/migration (V11 customer_order/order_item/stock_allocation/order_event, V12 handover_*, V13 cash_report/ledger_*, V14 notification, V17 support_case, V18 refund/settlement, V24-V25-V28 order_payment/payment_event, V29 request_fingerprint).",
+ "data_hygiene": "Cases that place orders leave data behind. Cancel pending orders when finished so capacity returns, and use the 2nd/3rd seeded slot for capacity-sensitive cases. Cases marked destructive change shared kitchen/catalogue settings and state their restore step. Always run the deposit journeys on a PR #9 deployment.",
+ "staff_fixture_note": "Staff fixtures (deploy/web-preview/seed-owner-e2e.sql, fixtures.json): FX-STAFF-ADMIN (preview-ops-1) holds only staff.grant + audit.read and cannot self-grant. FX-STAFF-ADMIN-B: staff.grant, audit.read, config.read, config.write, security.mfa_policy, security.mfa_reset (no finance or order permissions). FX-STAFF-OPS: cook.review, content.moderate, order.ops, order.exception_cancel, order.handover_override. FX-STAFF-FINANCE: finance.read, finance.verify, finance.refund_approve, finance.settlement, config.read. FX-STAFF-SUPPORT and FX-MULTIROLE: support.case. A second finance.refund_approve holder (FIN-044) or finance.verify for FX-MULTIROLE (FIN-114) needs a temporary grant by FX-STAFF-ADMIN-B, which requires recent MFA.",
+ "mfa_note": "origin/develop's Keycloak realm (infra/identity/matbakhy-realm.json) contains no OTP/acr flow, so every step that requires a recent MFA proof (payment recipient approval, payment decision, handover override, staff grants) returns 403 STEP_UP_REQUIRED there. They are runnable only on a PR #9 deployment after the realm step-up flow is applied (docs/security/mfa-policy.md, Migration and rollout).",
+ "ui_language_note": "Customer web, ops web and native default language differs (ops web starts in Arabic). Key assertions give the English label; the Arabic mirror is in apps/*/src/i18n.ts. Run each P0 journey once in Arabic (RTL) and once in English (LTR).",
+ "browser_profiles": "Use one separate browser profile (cookie store) per actor: all web surfaces share the API session cookie, so a second sign-in in the same profile replaces the first. Run GET /api/v1/me before each actor's steps to confirm identity.",
+ "slot_capacity_rules": "Seeded slots (days 1-3) have 20 portions each and 10 per meal; preparation consumes capacity permanently. Default assignment: ORDER-101 and FIN-101 day 1, ORDER-102, FIN-039 and FIN-106 day 2, ORDER-114/115 day 3. Day 1 = Cairo today+1, day 2 = today+2, day 3 = today+3. Before each case read the aggregate availablePortions from GET /api/v1/kitchens/<id>/slots (aggregate only) and the meal-specific availablePortions from the meal's nextSlots (GET /api/v1/meals/<mealId>); switch day if short.",
+ "statement_definitions": "Statement 'Cash verified' = SUM(cash_obligation.amount_minor) WHERE state VERIFIED for the kitchen's orders whose COMPLETED event is inside the Cairo date range (default: current Cairo calendar month through today); assert increases, not absolutes. Banner text: 'No platform commission: the whole order amount is yours.' ('(owner decision D10)' appears only on the operating-configuration screen)."
+}
+```
+
 ### E2E-ORDER-021 — Placement stores an immutable snapshot, locked prices and reserves capacity in one transaction (pickup, COD)
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now

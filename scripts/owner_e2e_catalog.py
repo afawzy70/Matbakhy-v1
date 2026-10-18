@@ -253,6 +253,9 @@ def build(cases, scenarios, rules, suite):
         domains[c["_domain"]].append(c)
     for d, cs in domains.items():
         body = [f"# Owner E2E cases — {d}", "", "Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Every case is NOT_RUN or BLOCKED until a run records evidence.", ""]
+        conv = next((load_json(f).get("conventions") for f in sorted(CASES_DIR.glob("*.json")) if load_json(f).get("domain", f.stem) == d and load_json(f).get("conventions")), None)
+        if conv:
+            body += ["## Shared conventions used by the cases below", "", "```json", json.dumps(conv, indent=1, ensure_ascii=False), "```", ""]
         body += [render_case(c) for c in cs]
         files[f"cases-{d}.md"] = "\n".join(body)
     # core suite

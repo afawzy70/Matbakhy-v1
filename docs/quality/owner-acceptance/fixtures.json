@@ -60,7 +60,7 @@
    "exists": false,
    "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000b2",
    "app": "00000000-0000-4000-8000-0000000b01b2",
-   "note": "Cook application SUBMITTED, awaiting ops review (consumed by approval cases; re-run the seed to reset)."
+   "note": "Cook application SUBMITTED, awaiting ops review (consumed by approval cases; it is single-use: a consumed fixture is not reset by re-seeding; use a fresh isolated stack)."
   },
   {
    "key": "FX-STAFF-SUPPORT",
