@@ -40,6 +40,8 @@ export interface PendingPlacement {
   quoteId: string;
   terms: string;
   cancellation: string;
+  /** The server asked for a second factor (D18) when this was sent: it is re-sent only by the customer's explicit retry, never on focus or restart. */
+  awaitingExplicitRetry?: boolean;
 }
 
 const BASKET = "matbakhy.basket.v1";

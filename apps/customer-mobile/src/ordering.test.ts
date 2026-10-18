@@ -91,13 +91,28 @@ describe("placement that cannot duplicate an order (BR-023, TC-049)", () => {
     await savePending(pending);
     const stepUp = server(() => json(403, { code: "STEP_UP_REQUIRED" }));
     expect(await place(apiFor(stepUp.fetchImpl), pending)).toEqual({ kind: "stepUp" });
-    expect(await loadPending()).toEqual(pending);
+    expect(await loadPending()).toEqual({ ...pending, awaitingExplicitRetry: true });
     expect(await loadBasket()).not.toBeNull();
     // Nothing is replayed by itself: the retry is the customer's explicit action and reuses the very same keys.
     const ok = server(() => json(201, { id: "order-1" }));
     expect(await place(apiFor(ok.fetchImpl), pending)).toEqual({ kind: "placed", orderId: "order-1" });
     expect(ok.calls[0]?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
     expect(JSON.parse(ok.calls[0]?.body ?? "{}")).toMatchObject({ clientRequestId: pending.clientRequestId });
+  });
+
+  it("a refused placement is never re-sent by a focus or restart check, only by the explicit retry, with the same keys", async () => {
+    await savePending({ ...pending, awaitingExplicitRetry: true });
+    const quiet = server(() => {
+      throw new Error("no request may be sent without the explicit retry");
+    });
+    expect(await recover(apiFor(quiet.fetchImpl))).toEqual({ kind: "stepUp" });
+    expect(quiet.calls).toHaveLength(0);
+    const answers = server((req) => (req.method === "GET" ? json(404, { code: "NOT_FOUND" }) : json(201, { id: "order-7" })));
+    expect(await recover(apiFor(answers.fetchImpl), true)).toEqual({ kind: "placed", orderId: "order-7" });
+    const post = answers.calls.find((c) => c.method === "POST");
+    expect(post?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
+    expect(JSON.parse(post?.body ?? "{}")).toMatchObject({ clientRequestId: pending.clientRequestId });
+    expect(await loadPending()).toBeNull();
   });
 
   it("after a restart finds the order by client request id, or re-sends with the same keys, and stays uncertain offline", async () => {

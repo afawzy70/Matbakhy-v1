@@ -44,10 +44,10 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
   // One recovery check at a time: a second press (or the check on focus) while one is running waits for it instead of
   // sending another lookup and possibly a second re-send (MB-033 retry review; the server's idempotency stays the backstop).
   const inFlight = useRef<Promise<void> | null>(null);
-  const recheck = useCallback(() => {
+  const recheck = useCallback((explicit = false) => {
     if (!inFlight.current) {
       setChecking(true);
-      inFlight.current = recover(api)
+      inFlight.current = recover(api, explicit)
         .then(settleOutcome)
         .finally(() => {
           inFlight.current = null;
@@ -135,7 +135,7 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
       {pending ? (
         <View accessibilityRole="alert" testID="pending-order" style={{ gap: 8 }}>
           <Notice locale={locale}>{outcome?.kind === "uncertain" && outcome.offline ? t.pendingOffline : t.pendingUncertain}</Notice>
-          <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck()} />
+          <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck(true)} />
         </View>
       ) : null}
       {/* A refused stale price is explained by the order form's price-change notice instead (D13). */}

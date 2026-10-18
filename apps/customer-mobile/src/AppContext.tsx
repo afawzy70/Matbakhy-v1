@@ -108,6 +108,8 @@ export function AppProvider({
   }, [config, session, fetchImpl, locale, refresh]);
 
   const reloadProfile = useCallback(async () => {
+    // An answer that arrives after the signed-in person changed belongs to the previous person and is dropped.
+    const subject = session.subject;
     try {
       const cached = session.cache<Profile>("me");
       if (cached) {
@@ -115,6 +117,9 @@ export function AppProvider({
         return;
       }
       const r = await api.GET("/api/v1/me");
+      if (session.subject !== subject) {
+        return;
+      }
       if (r.data) {
         session.cache("me", r.data);
         setAuth({ kind: "signedIn", profile: r.data });
@@ -174,10 +179,18 @@ export function AppProvider({
         // The person signed in as somebody else in the browser: this is an account switch, so nothing of the previous account may remain (TC-048).
         // Order matters: hide the old profile, drop the persisted basket and pending placement, then remount every screen (navigation and
         // screen state) before the new person's profile is read; the session already cleared its private caches when the subject changed.
+        // Hide and unmount first, so the previous account's screens go away even if the storage cleanup below fails.
         setAuth({ kind: "loading" });
         setStepUpRequired(false);
-        await clearShopping();
         setAccountEpoch((n) => n + 1);
+        try {
+          await clearShopping();
+        } catch {
+          // The previous account's basket could not be removed: do not continue as the new person on top of it; end this session.
+          await session.signOut();
+          setAuth({ kind: "signedOut", message: t.signInFailed });
+          return;
+        }
         await reloadProfile();
       } else {
         setStepUpRequired(false);
@@ -191,7 +204,7 @@ export function AppProvider({
     } finally {
       setBusy(false);
     }
-  }, [config, session, signIn, reloadProfile]);
+  }, [config, session, signIn, reloadProfile, t]);
 
   const endSession = useCallback(async () => {
     setBusy(true);

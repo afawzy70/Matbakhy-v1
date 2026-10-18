@@ -192,6 +192,49 @@ describe("two-step verification step-up (D18)", () => {
     expect(session.cache<{ displayName: string }>("me")?.displayName).toBe("Account B");
   });
 
+  it("if the previous account's storage cannot be cleared during an account switch, the new session is ended instead of continuing on top of it", async () => {
+    const session = await signedInSession();
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    const store = jest.requireMock("expo-secure-store") as { deleteItemAsync: jest.Mock };
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => refusedUntil(signIn)() })} />);
+    await fireEvent.press(await screen.findByTestId("tab-orders"));
+    const failing = store.deleteItemAsync.getMockImplementation();
+    store.deleteItemAsync.mockImplementation(async (k: string) => {
+      if (k === "matbakhy.basket.v1") throw new Error("keychain unavailable");
+      mockStore.delete(k);
+    });
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(session.accessToken).toBeNull());
+    store.deleteItemAsync.mockImplementation(failing);
+    expect(screen.queryByTestId("orders")).toBeNull();
+    expect(screen.queryByText(t.stepUp.message)).toBeNull();
+  });
+
+  it("an answer for the previous person's profile that arrives after the switch is dropped", async () => {
+    const session = await signedInSession();
+    let release: (r: Response) => void = () => undefined;
+    const slowA = new Promise<Response>((resolve) => (release = resolve));
+    let calls = 0;
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    const fetchImpl = jest.fn(async (input: Request | string) => {
+      const req = typeof input === "string" ? new Request(input) : input;
+      const path = new URL(req.url).pathname;
+      if (path === "/api/v1/me") {
+        calls += 1;
+        return calls === 1 ? slowA : json(200, { ...profile, displayName: "Account B" });
+      }
+      if (path === "/api/v1/meals") return refusedUntil(signIn)();
+      if (path === "/api/v1/configuration/public") return json(200, {});
+      throw new Error(`unrouted ${path}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(calls).toBeGreaterThanOrEqual(2));
+    await act(async () => release(json(200, { ...profile, displayName: "Account A" })));
+    await waitFor(() => expect(session.cache<{ displayName: string }>("me")?.displayName).toBe("Account B"));
+  });
+
   it("after a step-up for the same person the refused reads load again without a manual action", async () => {
     const session = await signedInSession();
     let verified = false;

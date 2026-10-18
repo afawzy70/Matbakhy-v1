@@ -30,6 +30,7 @@ export async function place(api: MobileApi, p: PendingPlacement): Promise<Placem
       return { kind: "uncertain", offline: false };
     }
     if (r.response.status === 403 && errorCode(r.error) === "STEP_UP_REQUIRED") {
+      await savePending({ ...p, awaitingExplicitRetry: true });
       return { kind: "stepUp" };
     }
     await savePending(null);
@@ -44,10 +45,13 @@ export async function place(api: MobileApi, p: PendingPlacement): Promise<Placem
  * means placed; a definite "not found" re-sends with the same keys; anything else stays uncertain and nothing is
  * claimed about the order or about stock.
  */
-export async function recover(api: MobileApi): Promise<PlacementOutcome | null> {
+export async function recover(api: MobileApi, explicit = false): Promise<PlacementOutcome | null> {
   const p = await loadPending();
   if (!p) {
     return null;
+  }
+  if (p.awaitingExplicitRetry && !explicit) {
+    return { kind: "stepUp" };
   }
   try {
     const r = await api.GET("/api/v1/orders/by-request/{clientRequestId}", { params: { path: { clientRequestId: p.clientRequestId } } });
@@ -55,7 +59,7 @@ export async function recover(api: MobileApi): Promise<PlacementOutcome | null> 
       return settle(r.data.id);
     }
     if (r.response.status === 404) {
-      return place(api, p);
+      return place(api, { clientRequestId: p.clientRequestId, idempotencyKey: p.idempotencyKey, quoteId: p.quoteId, terms: p.terms, cancellation: p.cancellation });
     }
     return { kind: "uncertain", offline: false };
   } catch {

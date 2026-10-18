@@ -83,6 +83,47 @@ class KeycloakMfaMigrationTest(unittest.TestCase):
             self.assertNotEqual(r.returncode, 0)
             self.assertFalse((Path(d) / "PWNED").exists())
 
+    def _fake_kcadm(self, directory):
+        fake = Path(directory) / "kcadm.sh"
+        fake.write_text(
+            "#!/bin/sh\n"
+            'case "$1 $2" in\n'
+            '  "config credentials") exit 0 ;;\n'
+            '  "get realms/matbakhy") echo matbakhy; exit 0 ;;\n'
+            '  "get users") [ -z "$FAKE_FAIL_LIST" ] || exit 1; printf "%s\\n" "$FAKE_ROWS"; exit 0 ;;\n'
+            '  "delete users/"*) cat >/dev/null; echo "$2" >> "$FAKE_LOG"; case "$2" in "users/$FAKE_FAIL_ID") exit 1 ;; esac; exit 0 ;;\n'
+            "esac\nexit 0\n"
+        )
+        fake.chmod(0o755)
+        return fake
+
+    def _fixture_delete(self, d, rows, **extra):
+        env = {"PATH": "/usr/bin:/bin", "ADMIN_USER": "a", "ADMIN_PASSWORD": "b", "KCADM": str(self._fake_kcadm(d)), "KCADM_CONFIG": f"{d}/cfg",
+               "FAKE_ROWS": rows, "FAKE_LOG": f"{d}/log", **extra}
+        r = subprocess.run(["sh", str(MIGRATION), "fixture-delete"], capture_output=True, text=True, env=env, cwd=d)
+        log = Path(d, "log")
+        return r, (log.read_text().split() if log.exists() else [])
+
+    def test_fixture_cleanup_deletes_only_prefixed_users_and_reports_every_failure(self):
+        rows = "id1,verify-mfa-aaaa\nid2,preview-customer-1\nid3,verify-mfa-bbbb\nid4,verify-mfa-cccc"
+        with tempfile.TemporaryDirectory() as d:
+            r, deleted = self._fixture_delete(d, rows)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            self.assertEqual(deleted, ["users/id1", "users/id3", "users/id4"])
+        with tempfile.TemporaryDirectory() as d:
+            r, deleted = self._fixture_delete(d, rows, FAKE_FAIL_ID="id1")
+            self.assertNotEqual(r.returncode, 0, "a failed delete must not look like a clean cleanup")
+            self.assertEqual(deleted, ["users/id1", "users/id3", "users/id4"], "the loop must go on after one failure")
+        with tempfile.TemporaryDirectory() as d:
+            r, deleted = self._fixture_delete(d, rows, FAKE_FAIL_LIST="1")
+            self.assertNotEqual(r.returncode, 0, "a failed listing must not look like a clean cleanup")
+            self.assertEqual(deleted, [])
+
+    def test_apply_keeps_the_incomplete_verification_exit_status(self):
+        text = OPERATOR.read_text()
+        self.assertIn("exit 3", text)
+        self.assertIn("cleanup_rc", text)
+
     def test_nothing_deletes_users_or_credentials(self):
         text = MIGRATION.read_text()
         for forbidden in ("delete users", "delete realms", "credentials/", "reset-password"):
@@ -102,7 +143,7 @@ class KeycloakMfaMigrationTest(unittest.TestCase):
     def test_only_the_synthetic_fixture_user_can_be_removed_and_an_otp_is_only_ever_submitted_for_it(self):
         migration = MIGRATION.read_text()
         self.assertIn('FIXTURE_PREFIX="verify-mfa-"', migration)
-        self.assertIn('case "$name" in "$FIXTURE_PREFIX"*)', migration)
+        self.assertIn('"$FIXTURE_PREFIX"*)', migration)
         text = VERIFY.read_text()
         self.assertEqual(text.count('{"otp": totp(otp_secret)'), 1)
         self.assertIn("if otp_action and otp_secret:", text)
