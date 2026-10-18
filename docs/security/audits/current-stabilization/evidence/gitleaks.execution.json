@@ -1,0 +1,15 @@
+{
+  "command": [
+    "/tmp/matbakhy-security-downloads/gitleaks",
+    "dir",
+    "--redact=100",
+    "--report-format",
+    "json",
+    "--report-path",
+    "/home/aiagent/workspaces/agents/security/docs/security/audits/current-stabilization/evidence/gitleaks.json",
+    "--no-banner",
+    "/home/aiagent/workspaces/agents/security"
+  ],
+  "exit_code": 0,
+  "timestamp": "2026-10-18T09:41:47.014753+00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "hostname": "vmi3673442",
+  "audited_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "integration_head_observed": "890bc872468085747c938dd3cb27b77ba036c713",
+  "timestamp": "2026-10-18T09:53:57.785434+00:00",
+  "docker_socket_access": "DENIED; no sudo or service changes attempted",
+  "environment_status_tool": "NOT AVAILABLE",
+  "network_policy_snapshot": "/etc/codex/network-policy.json absent; inherited networking retained"
+}

@@ -1,0 +1,36 @@
+{
+  "source_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "semgrep": {
+    "version": "1.181.0",
+    "rules": 418,
+    "targets": 471,
+    "alerts": 6,
+    "errors": 14
+  },
+  "pnpm_audit": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 2,
+      "high": 2,
+      "critical": 0
+    },
+    "dependencies": 934,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 934
+  },
+  "java_unique_advisories": 10,
+  "confirmed_counts": {
+    "Medium": 1,
+    "High": 1,
+    "Low": 2
+  },
+  "dast_initial_requests": 29,
+  "dast_followup_requests": 5,
+  "gate": "INCOMPLETE_NOT_APPROVED",
+  "history_commits_scanned": 336,
+  "history_secret_detections": 0,
+  "publication_secret_detections": 0,
+  "followup_source": "1a7d6a9da2af2acfa4accfdcc8133ece276817ca"
+}

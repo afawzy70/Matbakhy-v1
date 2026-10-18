@@ -1,0 +1,21 @@
+{
+  "command": [
+    "/tmp/matbakhy-security-downloads/trivy",
+    "fs",
+    "--scanners",
+    "vuln,misconfig",
+    "--cache-dir",
+    "/tmp/matbakhy-security-downloads/trivy-cache",
+    "--format",
+    "json",
+    "--output",
+    "/home/aiagent/workspaces/agents/security/docs/security/audits/current-stabilization/evidence/trivy.json",
+    "--skip-dirs",
+    "docs,verification,.git",
+    "--timeout",
+    "8m",
+    "/home/aiagent/workspaces/agents/security"
+  ],
+  "exit_code": 1,
+  "timestamp": "2026-10-18T09:42:10.746470+00:00"
+}
