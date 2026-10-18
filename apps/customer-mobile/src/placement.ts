@@ -1,4 +1,4 @@
-import { loadPending, savePending, saveBasket, shoppingOwner, type PendingPlacement } from "./basket";
+import { currentShopping, type PendingPlacement, type Shopping } from "./basket";
 import { errorCode, type MobileApi } from "./mobileApi";
 
 export type PlacementOutcome =
@@ -10,40 +10,31 @@ export type PlacementOutcome =
   /** The server wants a second factor first (D18). Nothing was ordered and the stored keys are kept; the customer retries explicitly after verifying. */
   | { kind: "stepUp" };
 
-/** Storage is only touched on behalf of the person who started the request: a late answer after an account switch must not change the next person's data. */
-const unchanged = (owner: string | null) => shoppingOwner() === owner;
-
-async function settle(orderId: string, owner: string | null): Promise<PlacementOutcome> {
-  if (unchanged(owner)) {
-    await savePending(null);
-    await saveBasket(null);
-  }
+/** Storage is touched through the handle taken when the request started, so a late answer after an account switch can only change that person's own keys. */
+async function settle(orderId: string, shop: Shopping): Promise<PlacementOutcome> {
+  await shop.savePending(null);
+  await shop.saveBasket(null);
   return { kind: "placed", orderId };
 }
 
 /** Sends the stored placement with its fixed idempotency key and client request id. */
-export async function place(api: MobileApi, p: PendingPlacement): Promise<PlacementOutcome> {
-  const owner = shoppingOwner();
+export async function place(api: MobileApi, p: PendingPlacement, shop: Shopping = currentShopping()): Promise<PlacementOutcome> {
   try {
     const r = await api.POST("/api/v1/orders", {
       params: { header: { "Idempotency-Key": p.idempotencyKey } },
       body: { quoteId: p.quoteId, clientRequestId: p.clientRequestId, acceptedPolicyVersions: { terms: p.terms, cancellation: p.cancellation } },
     });
     if (r.data) {
-      return settle(r.data.id, owner);
+      return settle(r.data.id, shop);
     }
     if (r.response.status >= 500 || r.response.status === 401) {
       return { kind: "uncertain", offline: false };
     }
     if (r.response.status === 403 && errorCode(r.error) === "STEP_UP_REQUIRED") {
-      if (unchanged(owner)) {
-        await savePending({ ...p, awaitingExplicitRetry: true });
-      }
+      await shop.savePending({ ...p, awaitingExplicitRetry: true });
       return { kind: "stepUp" };
     }
-    if (unchanged(owner)) {
-      await savePending(null);
-    }
+    await shop.savePending(null);
     return { kind: "rejected", code: errorCode(r.error) };
   } catch {
     return { kind: "uncertain", offline: true };
@@ -56,8 +47,8 @@ export async function place(api: MobileApi, p: PendingPlacement): Promise<Placem
  * claimed about the order or about stock.
  */
 export async function recover(api: MobileApi, explicit = false): Promise<PlacementOutcome | null> {
-  const owner = shoppingOwner();
-  const p = await loadPending();
+  const shop = currentShopping();
+  const p = await shop.loadPending();
   if (!p) {
     return null;
   }
@@ -67,10 +58,10 @@ export async function recover(api: MobileApi, explicit = false): Promise<Placeme
   try {
     const r = await api.GET("/api/v1/orders/by-request/{clientRequestId}", { params: { path: { clientRequestId: p.clientRequestId } } });
     if (r.data) {
-      return settle(r.data.id, owner);
+      return settle(r.data.id, shop);
     }
     if (r.response.status === 404) {
-      return place(api, { clientRequestId: p.clientRequestId, idempotencyKey: p.idempotencyKey, quoteId: p.quoteId, terms: p.terms, cancellation: p.cancellation });
+      return place(api, { clientRequestId: p.clientRequestId, idempotencyKey: p.idempotencyKey, quoteId: p.quoteId, terms: p.terms, cancellation: p.cancellation }, shop);
     }
     return { kind: "uncertain", offline: false };
   } catch {

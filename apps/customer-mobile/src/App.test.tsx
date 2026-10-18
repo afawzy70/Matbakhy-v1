@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-
 import { Alert, Linking } from "react-native";
 import { App } from "./App";
 import type { AppConfig } from "./config";
+import { bindShopping } from "./basket";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { strings } from "./i18n";
 import { Session } from "./session";
@@ -20,9 +21,14 @@ jest.mock("expo-crypto", () => ({ randomUUID: () => jest.requireActual<{ randomU
 jest.mock("./auth", () => ({ signIn: jest.fn(), signOut: jest.fn(), SignInCancelled: class extends Error {} }));
 jest.mock("react-native-safe-area-context", () => jest.requireActual("react-native-safe-area-context/jest/mock").default);
 
-beforeEach(() => mockStore.clear());
+beforeEach(async () => {
+  mockStore.clear();
+  await bindShopping(null);
+});
 
 const t = strings.en;
+/** True when any stored basket / pending placement key exists, whoever owns it (keys are per person). */
+const stores = (base: string) => [...mockStore.keys()].some((k) => k === base || k.startsWith(`${base}.`));
 const config: AppConfig = { environment: "development", apiBaseUrl: "http://api", issuer: "http://id", clientId: "matbakhy-mobile", redirectUri: "matbakhy-dev://auth/callback" };
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
@@ -143,7 +149,7 @@ describe("two-step verification step-up (D18)", () => {
     await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
     expect(signIn).toHaveBeenCalledWith(config, session, { stepUp: true });
     expect(session.accessToken).toBe(fakeJwt("customer-a"));
-    expect(mockStore.get("matbakhy.basket.v1")).toBeTruthy();
+    expect(mockStore.get("matbakhy.basket.v1.customer-a")).toBeTruthy();
   });
 
   it("treats a step-up that signs in as another person as an account switch: basket cleared, profile re-read", async () => {
@@ -192,28 +198,31 @@ describe("two-step verification step-up (D18)", () => {
     expect(session.cache<{ displayName: string }>("me")?.displayName).toBe("Account B");
   });
 
-  it("if the previous account's storage cannot be cleared during an account switch, the new session is ended instead of continuing on top of it", async () => {
+  it("if the previous account's storage cannot be cleared during an account switch, the new person still starts empty and can never read it", async () => {
     const session = await signedInSession();
     const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
     mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify({ clientRequestId: "c", idempotencyKey: "k", quoteId: "q", terms: "t", cancellation: "c" }));
     const store = jest.requireMock("expo-secure-store") as { deleteItemAsync: jest.Mock };
     await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => refusedUntil(signIn)() })} />);
     await fireEvent.press(await screen.findByTestId("tab-orders"));
-    const failing = store.deleteItemAsync.getMockImplementation();
-    store.deleteItemAsync.mockImplementation(async (k: string) => {
-      if (k === "matbakhy.basket.v1") throw new Error("keychain unavailable");
-      mockStore.delete(k);
+    const working = store.deleteItemAsync.getMockImplementation();
+    store.deleteItemAsync.mockImplementation(async () => {
+      throw new Error("keychain unavailable");
     });
     await fireEvent.press(await screen.findByTestId("step-up-verify"));
-    await waitFor(() => expect(session.accessToken).toBeNull());
-    store.deleteItemAsync.mockImplementation(failing);
-    // The previous person's basket is still in storage (the cleanup failed) but unreadable for anybody else.
-    expect(mockStore.get("matbakhy.basket.v1")).toBeTruthy();
-    const { loadBasket, loadPending } = jest.requireActual<typeof import("./basket")>("./basket");
-    expect(await loadBasket()).toBeNull();
-    expect(await loadPending()).toBeNull();
-    expect(screen.queryByTestId("orders")).toBeNull();
-    expect(screen.queryByText(t.stepUp.message)).toBeNull();
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    store.deleteItemAsync.mockImplementation(working);
+    // Account A's data is still in storage (cleanup failed) under A's own keys; B reads empty and writing as B changes nothing of A's.
+    expect(mockStore.get("matbakhy.basket.v1.customer-a")).toBeTruthy();
+    expect(mockStore.get("matbakhy.pendingPlacement.v1.customer-a")).toBeTruthy();
+    const basket = jest.requireActual<typeof import("./basket")>("./basket");
+    expect(basket.currentShopping().owner).toBe("customer-b");
+    expect(await basket.loadBasket()).toBeNull();
+    expect(await basket.loadPending()).toBeNull();
+    await basket.saveBasket({ kitchenId: "k9", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] });
+    expect(await basket.loadPending()).toBeNull();
+    expect(session.accessToken).toBe(fakeJwt("customer-b"));
   });
 
   it("an answer for the previous person's profile that arrives after the switch is dropped", async () => {
@@ -358,8 +367,8 @@ describe("native discovery and ordering (MB-032)", () => {
     expect(screen.getByText(`${t.total}: ${new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(270)}`)).toBeTruthy();
     const posts = (offlineFetch as jest.Mock).mock.calls.filter((c) => (c[0] as Request).method === "POST");
     expect(posts).toHaveLength(0);
-    expect(mockStore.has("matbakhy.pendingPlacement.v1")).toBe(false);
-    expect(mockStore.has("matbakhy.basket.v1")).toBe(false);
+    expect(stores("matbakhy.pendingPlacement.v1")).toBe(false);
+    expect(stores("matbakhy.basket.v1")).toBe(false);
   });
 });
 
@@ -568,7 +577,7 @@ describe("native basket editing (CW05, MB-032; parity with QA finding FG-001)", 
     expect(await estimate()).toMatch(/180\.00/);
     await fireEvent.press(screen.getByTestId("remove-m3"));
     expect(await screen.findByText(t.cartEmpty)).toBeTruthy();
-    await waitFor(() => expect(mockStore.has("matbakhy.basket.v1")).toBe(false));
+    await waitFor(() => expect(stores("matbakhy.basket.v1")).toBe(false));
   });
 
   it("keeps quantity between 1 and the line's limit, and locks the basket while an order is unconfirmed", async () => {
@@ -780,7 +789,7 @@ describe("D13 on native: changed prices need informed reconfirmation", () => {
     await fireEvent.press(screen.getByTestId("place-order"));
     expect(await screen.findByText("We couldn't calculate the new total. Calculate the total again.")).toBeTruthy();
     expect(screen.queryByTestId("place-order")).toBeNull();
-    expect(mockStore.has("matbakhy.basket.v1")).toBe(true);
+    expect(stores("matbakhy.basket.v1")).toBe(true);
     expect(posts).toHaveLength(2);
   });
 

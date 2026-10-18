@@ -84,58 +84,85 @@ async function write(key: string, value: unknown) {
 }
 
 /**
- * The stored basket and pending placement belong to one signed-in person (TC-048). The owner is recorded next to them; while the
- * signed-in person is someone else, both read as empty and are never written over silently, so a storage cleanup that failed during
- * an account switch cannot hand the previous person's basket or unconfirmed order to the next one.
+ * The stored basket and pending placement belong to one signed-in person (TC-048). Each person has their own storage keys
+ * ("<key>.<subject>"); signed out, the keys have no suffix (a guest's basket). Reads and writes go through a {@link Shopping}
+ * handle that is bound to its owner when it is taken, so an answer that arrives after the person changed can only touch the
+ * previous person's keys, never the next person's, and a cleanup that fails leaves data nobody else can read.
  */
-const OWNER = "matbakhy.shoppingOwner.v1";
-let activeOwner: string | null = null;
+export interface Shopping {
+  readonly owner: string | null;
+  loadBasket(): Promise<Basket | null>;
+  saveBasket(basket: Basket | null): Promise<void>;
+  loadPending(): Promise<PendingPlacement | null>;
+  savePending(pending: PendingPlacement | null): Promise<void>;
+  /** Removes this owner's basket and pending placement; throws when storage refuses. */
+  clear(): Promise<void>;
+}
 
-export const shoppingOwner = () => activeOwner;
+/** The guest-to-person move of a basket (see bindShopping); every storage operation waits for it, so a cleanup cannot overtake it. */
+let migration: Promise<void> = Promise.resolve();
 
-/** Makes {@code subject} the person the stored shopping data is read for (null: nobody is bound). Claims unowned data for them. */
-export async function bindShopping(subject: string | null) {
-  activeOwner = subject;
-  if (subject && (await read<string>(OWNER)) === null) {
-    await write(OWNER, subject);
+function shoppingFor(owner: string | null): Shopping {
+  const key = (base: string) => (owner ? `${base}.${owner}` : base);
+  return {
+    owner,
+    loadBasket: async () => (await migration, read<Basket>(key(BASKET))),
+    saveBasket: async (basket) => (await migration, write(key(BASKET), basket)),
+    loadPending: async () => (await migration, read<PendingPlacement>(key(PENDING))),
+    savePending: async (pending) => (await migration, write(key(PENDING), pending)),
+    async clear() {
+      await migration;
+      await write(key(BASKET), null);
+      await write(key(PENDING), null);
+    },
+  };
+}
+
+let current: Shopping = shoppingFor(null);
+
+/** The handle for whoever is signed in now. Long operations take it once at their start and use it to the end. */
+export const currentShopping = (): Shopping => current;
+
+/**
+ * Switches the storage to {@code subject} (null: signed out). A basket built as a guest follows the person who signs in, unless
+ * they already have one of their own; nothing of another signed-in person is ever adopted.
+ */
+export async function bindShopping(subject: string | null): Promise<void> {
+  if (current.owner === subject) {
+    return;
+  }
+  const previous = current;
+  current = shoppingFor(subject);
+  if (previous.owner === null && subject !== null) {
+    const move = (async () => {
+      try {
+        const [guestBasket, guestPending, ownBasket, ownPending] = await Promise.all([read<Basket>(BASKET), read<PendingPlacement>(PENDING), read<Basket>(`${BASKET}.${subject}`), read<PendingPlacement>(`${PENDING}.${subject}`)]);
+        if ((guestBasket || guestPending) && !ownBasket && !ownPending) {
+          if (guestBasket) {
+            await write(`${BASKET}.${subject}`, guestBasket);
+          }
+          if (guestPending) {
+            await write(`${PENDING}.${subject}`, guestPending);
+          }
+          await write(BASKET, null);
+          await write(PENDING, null);
+        }
+      } catch {
+        // The guest data stays where it is; the signed-in person simply starts with their own.
+      }
+    })();
+    migration = move;
+    await move;
   }
 }
 
-async function foreign(): Promise<boolean> {
-  if (!activeOwner) {
-    return false;
-  }
-  const stored = await read<string>(OWNER);
-  return stored !== null && stored !== activeOwner;
-}
+export const loadBasket = () => current.loadBasket();
+export const saveBasket = (basket: Basket | null) => current.saveBasket(basket);
+export const loadPending = () => current.loadPending();
+export const savePending = (pending: PendingPlacement | null) => current.savePending(pending);
 
-async function claim() {
-  if (activeOwner && (await read<string>(OWNER)) !== activeOwner) {
-    await write(OWNER, activeOwner);
-  }
-}
-
-export const loadBasket = async () => ((await foreign()) ? null : read<Basket>(BASKET));
-export const saveBasket = async (basket: Basket | null) => {
-  if (basket !== null) {
-    await claim();
-  }
-  return write(BASKET, basket);
-};
-export const loadPending = async () => ((await foreign()) ? null : read<PendingPlacement>(PENDING));
-export const savePending = async (pending: PendingPlacement | null) => {
-  if (pending !== null) {
-    await claim();
-  }
-  return write(PENDING, pending);
-};
-
-/** Removes the basket, the pending placement and the owner record. Throws when storage refuses; callers must not continue as if it worked. */
-export async function clearShopping() {
-  await saveBasket(null);
-  await savePending(null);
-  await write(OWNER, null);
-}
+/** Removes the current owner's basket and pending placement. Throws when storage refuses. */
+export const clearShopping = () => current.clear();
 
 export type AddOutcome =
   | { kind: "added"; basket: Basket }

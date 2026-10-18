@@ -1,7 +1,7 @@
 import type { Locale } from "@matbakhy/design-tokens";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { refresh as systemRefresh, signIn as systemSignIn, signOut as systemSignOut, SignInCancelled } from "./auth";
-import { bindShopping, clearShopping } from "./basket";
+import { bindShopping, currentShopping } from "./basket";
 import type { AppConfig } from "./config";
 import { strings, type Strings } from "./i18n";
 import { createMobileApi, type MobileApi, type Schemas } from "./mobileApi";
@@ -99,7 +99,8 @@ export function AppProvider({
           locale,
           onStepUpRequired: () => setStepUpRequired(true),
           onSignedOut: () => {
-            void clearShopping();
+            void currentShopping().clear().catch(() => undefined);
+            void bindShopping(null);
             setAuth({ kind: "signedOut", message: strings[locale].sessionEnded });
           },
         },
@@ -180,21 +181,14 @@ export function AppProvider({
         // The person signed in as somebody else in the browser: this is an account switch, so nothing of the previous account may remain (TC-048).
         // Order matters: hide the old profile, drop the persisted basket and pending placement, then remount every screen (navigation and
         // screen state) before the new person's profile is read; the session already cleared its private caches when the subject changed.
-        // Hide and unmount first, so the previous account's screens go away even if the storage cleanup below fails.
+        // Hide and unmount first; then the storage switches to the new person's own keys, so nothing of the previous account can be
+        // read whatever happens to its cleanup, and a late answer for it can only reach its own keys.
+        const previous = currentShopping();
         setAuth({ kind: "loading" });
         setStepUpRequired(false);
         setAccountEpoch((n) => n + 1);
-        // From now on the stored basket and pending order read as empty for the new person, whatever the cleanup does.
-        await bindShopping(after).catch(() => undefined);
-        try {
-          await clearShopping();
-          await bindShopping(after);
-        } catch {
-          // The previous account's basket could not be removed: it stays unreadable (owner mismatch) and this session ends.
-          await session.signOut();
-          setAuth({ kind: "signedOut", message: t.signInFailed });
-          return;
-        }
+        await bindShopping(after);
+        await previous.clear().catch(() => undefined);
         await reloadProfile();
       } else {
         setStepUpRequired(false);
@@ -208,15 +202,17 @@ export function AppProvider({
     } finally {
       setBusy(false);
     }
-  }, [config, session, signIn, reloadProfile, t]);
+  }, [config, session, signIn, reloadProfile]);
 
   const endSession = useCallback(async () => {
     setBusy(true);
     try {
       const stored = await session.restore();
-      await clearShopping();
+      // A storage failure must never keep the person signed in; their keys stay unreadable for anybody else.
+      await currentShopping().clear().catch(() => undefined);
       await signOut(config, session, stored?.refreshToken ?? null);
     } finally {
+      await bindShopping(null);
       setStepUpRequired(false);
       setAuth({ kind: "signedOut" });
       setBusy(false);
