@@ -104,6 +104,9 @@ class PriceChangeIntegrationTest {
     /** QA-006: the same guarantees through the production cook edit (PATCH), not the SQL stand-in used by the lock-order tests. */
     @Test
     void the_real_cook_price_edit_refuses_a_stale_quote_and_never_touches_a_committed_order() throws Exception {
+        // A published meal needs an approved photo to be edited through the real cook endpoint.
+        UUID photo = com.matbakhy.app.support.TestUploads.approvedMealPhoto(mvc, json, logins.login(cookSubject, "Cook"));
+        jdbc.update("INSERT INTO meal_media (meal_id, media_id, position) VALUES (?, ?, 0)", mealA, photo);
         UUID stale = quote(item(mealA, 2), false);
         patchPrice(mealA, 13000);
         MockHttpServletResponse refused = place(stale, UUID.randomUUID(), key());

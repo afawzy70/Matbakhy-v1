@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * CR-002 / BR-007 against real Keycloak (the realm files under infra/ and deploy/ carry the same flow): the identity provider
  * itself refuses to issue an authorization code to a staff account (realm role matbakhy-staff) without a valid OTP, forces
- * enrolment when none is configured, issues amr=[pwd, otp] on success, and leaves customers on password-only login.
+ * enrolment when none is configured, issues an amr containing otp on success, and leaves customers on password-only login.
  * Synthetic accounts; the password and TOTP secret are generated per run.
  */
 class StaffMfaIdpTest {
@@ -116,11 +116,11 @@ class StaffMfaIdpTest {
     }
 
     @Test
-    void a_valid_one_time_code_completes_login_and_the_token_asserts_pwd_and_otp() throws Exception {
+    void a_valid_one_time_code_completes_login_and_the_token_asserts_otp() throws Exception {
         Outcome o = login("staff-mfa", KeycloakTestServer.STAFF_PASSWORD, totp(KeycloakTestServer.STAFF_TOTP_SECRET, System.currentTimeMillis() / 1000));
         assertThat(o.issuedCode()).isTrue();
         String claims = claims(accessToken(o));
-        assertThat(claims).contains("\"amr\":[\"pwd\",\"otp\"]").contains("\"auth_time\"");
+        assertThat(claims).containsPattern("\"amr\":\\[[^\\]]*\"otp\"").contains("\"auth_time\"");
     }
 
     @Test

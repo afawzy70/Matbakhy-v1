@@ -22,7 +22,7 @@
   "line": 49,
   "title": "Staff grants become usable without MFA",
   "status": "OPEN_DEPLOYMENT_VERIFICATION",
-  "triage": "Round-2 independent review: not a code defect (docs/product/06-permissions.md:26 assigns staff-session MFA to the IdP; API enforces recent MFA on high-risk actions). Residual: obtain evidence that the staging/production Keycloak policy requires MFA for staff before inviting testers. Severity downgraded High->Medium with that rationale; API-side defense-in-depth remains an owner decision.",
+  "triage": "Realm flow as code + StaffMfaIdpTest (real Keycloak) + optional require-staff-mfa; live preview/staging realm NOT changed or verified (no Docker/SSH for the agent). See docs/security/staff-mfa-enforcement.md",
   "evidence": "AccountMapper.java:49-50 unconditionally adds active permission authorities; assurance claims are merely copied at lines 56-62. SecurityConfiguration's API chains require ACCOUNT_ACTIVE without a staff MFA guard. StaffCaseController.java:31 requires only PERM_support.case. CashController.java:70 requires only PERM_finance.verify. StaffAssurance is invoked only by selected endpoint annotations.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -63,8 +63,8 @@
   "file": "backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java",
   "line": 142,
   "title": "Permanent request recovery accepts a changed payload when its quote is unchanged",
-  "status": "OPEN",
-  "triage": "Medium; durable request fingerprint required (migration). Plan: add column fingerprint to order request reference",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "V29 request_fingerprint on customer_order; OrderService compares it on recovery; legacy rows (null) keep quote-only check. Tests: a_reused_request_reference_with_a_changed_field_conflicts_even_after_the_cache_is_gone, orders_placed_before_the_fingerprint_migration_keep_quote_only_recovery",
   "evidence": "OrderService.java:139-146 selects only id and quote_id and returns before policy or note checks. JdbcIdempotentCommands.java:54-59 creates a new request hash when no cache record remains. OrderPlacementIntegrationTest.java:268-271 tests retention with an identical body; :284-299 tests changed quote IDs, not changed fields on the same quote. docs/product/03-business-rules.md:68 specifies payload conflict.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -77,8 +77,8 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java",
   "line": 244,
   "title": "Deposit expiry coverage does not exercise transfer/receipt races",
-  "status": "OPEN",
-  "triage": "test-coverage/not yet triaged",
+  "status": "TEST_ADDED_PENDING_CI",
+  "triage": "a_transfer_report_racing_expiry_is_reconciled_or_refused_never_lost (6 rounds, invariant based)",
   "evidence": "DepositPaymentIntegrationTest.java:205-223 races two transfer reports; :245-256 reports before advancing the clock and expiring. OrderLifecycleIntegrationTest.java:428 names the acceptance/cancellation/expiry race. docs/delivery/07-owner-decisions-implementation-sequence.md:20 requires expiry and capacity claims to be race-safe.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -91,8 +91,8 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java",
   "line": 231,
   "title": "Receipt authorization test uses a non-cook instead of a foreign kitchen owner",
-  "status": "OPEN",
-  "triage": "test-coverage/not yet triaged",
+  "status": "TEST_ADDED_PENDING_CI",
+  "triage": "another_approved_kitchen_cannot_receipt_report_a_problem_or_refund_a_foreign_deposit",
   "evidence": "DepositPaymentIntegrationTest.java:231 calls receipt with UUID.randomUUID().toString(). PaymentService.java:81-83 rejects actors lacking a kitchen before :267-270 checks order ownership. PaymentReconciliationIntegrationTest.java:176-179 correctly creates a second approved kitchen for the problem endpoint, demonstrating the stronger fixture pattern.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -105,8 +105,8 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/identity/StaffAccessIntegrationTest.java",
   "line": 167,
   "title": "Revocation test reauthenticates instead of reusing the existing authentication",
-  "status": "OPEN",
-  "triage": "test-coverage/not yet triaged",
+  "status": "WITHDRAWN_ALREADY_COVERED",
+  "triage": "IdentityIntegrationTest.reused_token_loses_staff_access_once_the_grant_is_revoked reuses one real Keycloak token across revocation through the real security chain; the reviewed test file was not the only coverage. Residual: revocation via the admin API on the same token is not combined (Low).",
   "evidence": "StaffAccessIntegrationTest.java:97-99 defines as() as logins.login(...). The revocation test invokes as(staffSubject) at :162 and again at :167. docs/product/06-permissions.md:26 explicitly requires current grants to be checked for sensitive commands.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -119,8 +119,8 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/orders/PriceChangeIntegrationTest.java",
   "line": 209,
   "title": "Price-race tests replace the production price-update command with handwritten SQL",
-  "status": "OPEN",
-  "triage": "test-coverage/not yet triaged",
+  "status": "TEST_ADDED_PENDING_CI",
+  "triage": "the_real_cook_price_edit_refuses_a_stale_quote_and_never_touches_a_committed_order (production PATCH path). True interleaving of the production update with placement is still covered only by the SQL stand-in lock-order tests: residual Medium risk, recorded.",
   "evidence": "PriceChangeIntegrationTest.java:118-120 and :150 call the helper; :204-215 explicitly describe and implement a SQL imitation of MealService.update. The existing real browser price-change journey supplies useful sequential integration, but not this concurrent production-command boundary.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -147,8 +147,8 @@
   "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
   "line": 210,
   "title": "Upload cleanup failure cannot be recovered by re-completion",
-  "status": "MITIGATED_FOLLOWUP",
-  "triage": "Post-commit delete failures are now caught and logged so approval does not surface as an error. The orphan upload object is unreferenced. Follow-up: durable cleanup job (not done; Medium, tracked).",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "V30 media_cleanup (durable, idempotent, bounded retries=6 with exponential back-off, FAILED state + metrics matbakhy.media.cleanup.*, referenced-object guard). Tests: MediaCleanupIntegrationTest, referenced guard + replay in MediaIntegrationTest",
   "evidence": "round-2 review",
   "found_at_commit": "890bc87",
   "fix_commit": null
@@ -201,6 +201,83 @@
   "status": "DOCUMENTED",
   "triage": "Environment limit, not a product defect (see qa-execution-report.md)",
   "found_at_commit": "890bc87",
+  "fix_commit": null
+ },
+ {
+  "id": "SEC-001",
+  "source": "security-audit (PR #10)",
+  "severity": "Medium",
+  "component": "Media/PDF",
+  "title": "PDF active-content validation bypass via escaped names",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "Structural PDFBox 3.0.8 inspection (object streams + decoded names); MediaInspectorPdfTest 5/5 pass locally incl. escaped-name and compressed-object cases; test fixtures now valid PDFs",
+  "found_at_commit": "b7ec0e9",
+  "fix_commit": null
+ },
+ {
+  "id": "SEC-002",
+  "source": "security-audit (PR #10)",
+  "severity": "High",
+  "component": "Media",
+  "title": "Approved private document mutable through outstanding upload ticket (= CR-003)",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "Sealed key + replay-after-approval runtime test replaying_the_upload_ticket_after_approval_does_not_change_the_approved_document; independent runtime retest pending",
+  "found_at_commit": "b7ec0e9",
+  "fix_commit": null
+ },
+ {
+  "id": "SEC-003",
+  "source": "security-audit (PR #10)",
+  "severity": "Low",
+  "component": "scripts/rehearsal/load.py",
+  "title": "Rehearsal helper disables TLS verification",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "Verification on by default; scoped *.localhost opt-in; scripts/test_rehearsal_tls.py",
+  "found_at_commit": "b7ec0e9",
+  "fix_commit": null
+ },
+ {
+  "id": "SEC-004",
+  "source": "security-audit (PR #10)",
+  "severity": "Low",
+  "component": "deploy/web-preview/Caddyfile",
+  "title": "No CSP on web HTML",
+  "status": "MITIGATED_REPORT_ONLY",
+  "triage": "Report-Only CSP on app./ops.; enforcement needs browser validation (docs/security/csp-rollout.md)",
+  "found_at_commit": "b7ec0e9",
+  "fix_commit": null
+ },
+ {
+  "id": "DEP-TOMCAT",
+  "source": "security-audit (PR #10)",
+  "severity": "High (scanner label Critical)",
+  "component": "backend deps",
+  "title": "tomcat-embed-core 11.0.24 advisories",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "Overridden to 11.0.26 (fixed in 11.0.25); resolved with dependency:tree",
+  "found_at_commit": "b7ec0e9",
+  "fix_commit": null
+ },
+ {
+  "id": "DEP-JACKSON",
+  "source": "security-audit (PR #10)",
+  "severity": "High (scanner label)",
+  "component": "backend deps",
+  "title": "jackson 3.1.5 advisories",
+  "status": "FIXED_PENDING_RETEST",
+  "triage": "Overridden to 3.1.7 (fixes all listed); jackson-2 annotations unchanged",
+  "found_at_commit": "b7ec0e9",
+  "fix_commit": null
+ },
+ {
+  "id": "DEP-NODE",
+  "source": "security-audit (PR #10)",
+  "severity": "High/Moderate",
+  "component": "mobile tooling",
+  "title": "node-forge, braces, uuid, sprintf-js transitive dev-tool advisories",
+  "status": "OPEN_DOCUMENTED",
+  "triage": "Expo/Jest build-time tooling, not shipped in runtime bundles; reachability not established; update planned with Expo SDK bump (not done: risk to native build)",
+  "found_at_commit": "b7ec0e9",
   "fix_commit": null
  }
 ]
