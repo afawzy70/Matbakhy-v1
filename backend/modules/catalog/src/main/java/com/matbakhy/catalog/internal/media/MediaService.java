@@ -31,8 +31,6 @@ import java.util.regex.Pattern;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Media lifecycle (BR-010): PENDING_UPLOAD → QUARANTINED → APPROVED / REJECTED, plus DELETED. Clients upload
@@ -196,17 +194,19 @@ public class MediaService implements MediaLibrary {
                 return reject(lockOwned(ownerId, mediaId), r.reason);
             }
             publicKey = "media/" + mediaId + ".jpg";
-            String written = publicKey;
+            // If this transaction rolls back the object stays behind; a durable job removes it later unless a committed
+            // approval references it (a concurrent retry may have approved the same key).
+            cleanup.enqueueUnlessApproved(Bucket.PUBLIC, publicKey, "UNAPPROVED_PUBLIC_VARIANT", Duration.ofMinutes(5));
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', public_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     publicKey, Timestamp.from(clock.instant()), mediaId);
             storage.write(Bucket.PUBLIC, publicKey, variant, MediaInspector.JPEG);
-            onRollback(() -> storage.delete(Bucket.PUBLIC, written));
         } else {
             // The upload ticket stays valid for its TTL, so approved bytes move to a key no ticket can write (CR-003).
             String sealed = "documents/" + mediaId;
             String uploadKey = row.privateKey();
             // Idempotent, deterministic key: a retry after a rollback rewrites the same verified bytes. It is deliberately not
             // deleted on rollback, because a concurrent retry may already have approved the same key (SECR-003).
+            cleanup.enqueueUnlessApproved(Bucket.PRIVATE, sealed, "UNAPPROVED_SEALED_DOCUMENT", Duration.ofMinutes(5));
             storage.write(Bucket.PRIVATE, sealed, content, sniffed);
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', private_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     sealed, Timestamp.from(clock.instant()), mediaId);
@@ -300,19 +300,6 @@ public class MediaService implements MediaLibrary {
     private Row lockOwned(UUID ownerId, UUID mediaId) {
         return jdbc.query("SELECT * FROM media_asset WHERE id = ? AND owner_id = ? AND state <> 'DELETED' FOR UPDATE", MediaService::map,
                 mediaId, ownerId).stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "media not found"));
-    }
-
-    private static void onRollback(Runnable action) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCompletion(int status) {
-                    if (status == STATUS_ROLLED_BACK) {
-                        action.run();
-                    }
-                }
-            });
-        }
     }
 
     static String sanitize(String filename) {

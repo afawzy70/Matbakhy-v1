@@ -124,4 +124,23 @@ class MediaCleanupIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM media_cleanup WHERE state = 'FAILED'", Integer.class)).isGreaterThanOrEqualTo(1);
         assertThat(storage.size(Bucket.PRIVATE, key)).as("failure is reported, bytes are not silently assumed gone").isPresent();
     }
+
+    @Test
+    void a_repeated_request_never_shortens_a_pending_deadline_and_rearms_a_finished_row() {
+        MutableClock clock = new MutableClock();
+        MediaCleanup cleanup = new MediaCleanup(jdbc, storage, clock);
+        String key = orphan();
+        cleanup.enqueue(Bucket.PRIVATE, key, "TEST", clock.now.plus(Duration.ofMinutes(10)));
+        cleanup.enqueue(Bucket.PRIVATE, key, "TEST", clock.now); // earlier deadline must not win
+        assertThat(cleanup.runDue()).as("deadline kept at +10 minutes").isZero();
+        clock.now = clock.now.plus(Duration.ofMinutes(11));
+        assertThat(cleanup.runDue()).isEqualTo(1);
+        assertThat(state(key)).isEqualTo("DONE");
+
+        storage.write(Bucket.PRIVATE, key, "again".getBytes(StandardCharsets.UTF_8), "application/pdf");
+        cleanup.enqueue(Bucket.PRIVATE, key, "TEST");
+        assertThat(state(key)).as("a finished row is re-armed by a new request").isEqualTo("PENDING");
+        assertThat(cleanup.runDue()).isEqualTo(1);
+        assertThat(storage.size(Bucket.PRIVATE, key)).isEmpty();
+    }
 }

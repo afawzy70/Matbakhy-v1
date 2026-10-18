@@ -1,0 +1,30 @@
+[
+  {
+    "id": "QA3-001",
+    "severity": "Low",
+    "component": "Python test isolation",
+    "file": "scripts/test_scope.py",
+    "line": 18,
+    "title": "Scope fixture copies environment-only directories",
+    "scenario": "Run unittest discovery in this worktree containing ignored .aws and .codex directories.",
+    "expected": "The baseline fixture excludes environment-only directories and passes inventory validation.",
+    "actual": "test_current_repository_passes fails with unlisted top-level entries .aws and .codex; standalone check_scope.py passes.",
+    "evidence": "python3 -m unittest discover -s scripts -p 'test_*.py': exit 1; Ran 73 tests; failures=1, skipped=1. scripts/test_scope.py:11,18,33 copies the tree without Git metadata, triggering filesystem inventory fallback.",
+    "suggested_fix": "Build the fixture from tracked/non-ignored repository files, excluding environment directories without reading their contents.",
+    "repro_test": "python3 -m unittest discover -s scripts -p 'test_*.py'"
+  },
+  {
+    "id": "QA3-002",
+    "severity": "Medium",
+    "component": "Media cleanup test isolation",
+    "file": "backend/app/src/test/java/com/matbakhy/app/media/MediaCleanupIntegrationTest.java",
+    "line": 84,
+    "title": "Cleanup retry assertions compete with the enabled cleanup scheduler",
+    "scenario": "A cleanup scheduler tick occurs after the test enqueues its orphan and before its manually invoked failing cleanup processes it.",
+    "expected": "Only the test-controlled failing storage and clock process this cleanup row.",
+    "actual": "The integration context enables scheduling and does not disable the default-enabled cleanup job; its real-storage cleanup can mark the row DONE before assertions expecting PENDING/attempts=1. This is a source-confirmed timing dependency, not an observed local failure.",
+    "evidence": "MediaCleanupIntegrationTest.java:84-95 constructs a separate cleanup with failing storage; support/IntegrationTest.java:17-20 disables other jobs but not cleanup; PlatformConfiguration.java:17 enables scheduling; MediaCleanupJob.java:9,18-20 defaults enabled and runs every 30s.",
+    "suggested_fix": "Disable matbakhy.media.cleanup-job.enabled for this test context; isolate due rows for exact global runDue counts.",
+    "repro_test": "Docker required: enqueue the orphan, invoke the application MediaCleanup bean before the test-controlled runDue, and observe DONE instead of PENDING. NOT_RUN locally."
+  }
+]

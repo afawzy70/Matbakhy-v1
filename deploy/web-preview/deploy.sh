@@ -58,7 +58,10 @@ check() {
 
 render() {
   # Secrets go only into files under GENERATED_DIR (outside Git), readable by the container users.
+  # Private before anything secret is written: owner-only directory and a restrictive umask for the files (SECR4-003).
   mkdir -p "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
+  chmod 700 "$GENERATED_DIR"
+  umask 077
   sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|$OIDC_WEB_CLIENT_SECRET|" -e "s|\${PREVIEW_DOMAIN}|$PREVIEW_DOMAIN|g" \
       -e "s|\${PREVIEW_USER_PASSWORD}|$PREVIEW_USER_PASSWORD|g" identity/matbakhy-realm.preview.json > "$GENERATED_DIR/identity/matbakhy-realm.json"
   sed -e "s|\${STORAGE_ACCESS_KEY}|$STORAGE_ACCESS_KEY|" -e "s|\${STORAGE_SECRET_KEY}|$STORAGE_SECRET_KEY|" \

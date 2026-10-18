@@ -1,0 +1,142 @@
+[
+  {
+    "command": "git rev-parse HEAD",
+    "exit_code": 0,
+    "note": "Matched 164a831fe3f38236801103582cf0c5b76a6c470d at start and end."
+  },
+  {
+    "command": "python3 scripts/validate_blueprint.py",
+    "exit_code": 0,
+    "note": "PASS: 1 check, 0 failures; planning/schema validation only."
+  },
+  {
+    "command": "python3 scripts/check_scope.py",
+    "exit_code": 0,
+    "note": "PASS: 1 check, 0 failures; planning/schema validation only."
+  },
+  {
+    "command": "python3 scripts/check_migration_compat.py",
+    "exit_code": 0,
+    "note": "PASS: 1 check, 0 failures; planning/schema validation only."
+  },
+  {
+    "command": "python3 -m unittest discover -s scripts -p 'test_*.py'",
+    "exit_code": 1,
+    "note": "73 tests run, 72 passed, 1 failure (test_scope.ScopeGuards.test_current_repository_passes); 1 additional class-level skip: test_proxy_access.ProxyAccessTest, Docker is not available. Expected negative-fixture migration FAIL output is not a suite failure. ResourceWarning in test_rehearsal_tls.py:17."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false lint",
+    "exit_code": 0,
+    "note": "PASS: 1 lint check, 0 failures."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false test",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false build",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false contract:check",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false typecheck",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false lint",
+    "exit_code": 0,
+    "note": "PASS: 1 lint check, 0 failures."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false test",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false build",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false contract:check",
+    "exit_code": 1,
+    "note": "BLOCKED at nested pnpm engine validation: ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3. Underlying tasks executed via expanded commands below."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run typecheck",
+    "exit_code": 0,
+    "note": "PASS: 5 projects passed, 0 failed"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run test",
+    "exit_code": 0,
+    "note": "PASS: 5 workspace test projects passed, 0 failed; counts in QA report"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run build",
+    "exit_code": 0,
+    "note": "PASS: 2 web builds passed, 0 failed; mobile native build NOT_RUN"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --reporter=append-only -r --if-present run test",
+    "exit_code": 0,
+    "note": "PASS repeated test run; package completion only, no test counts printed."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run lint:contract",
+    "exit_code": 0,
+    "note": "PASS: 1 check, 0 failures. Four ambiguous-path warnings; generated client matches contract."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run check:drift",
+    "exit_code": 0,
+    "note": "PASS: 1 check, 0 failures. Four ambiguous-path warnings; generated client matches contract."
+  },
+  {
+    "command": "JAVA_HOME=/home/aiagent/tools/jdk-21.0.12.1+1 PATH=/home/aiagent/tools/jdk-21.0.12.1+1/bin:$PATH ./mvnw -o -B -pl app -am test -Dtest='StaffAssuranceTest,AccountMapperStaffMfaTest,MediaInspectorPdfTest' -Dsurefire.failIfNoSpecifiedTests=false",
+    "exit_code": 0,
+    "note": "cwd=backend; PASS: 11 tests, 0 failures, 0 errors, 0 skipped: AccountMapperStaffMfaTest 3, StaffAssuranceTest 3, MediaInspectorPdfTest 5. Offline, no sandbox block."
+  },
+  {
+    "command": "(cd packages/api-client && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-api.json)",
+    "exit_code": 0,
+    "note": "PASS: 34 passed, 0 failed, 0 pending. Repeat for exact counts, not added to unique totals."
+  },
+  {
+    "command": "(cd packages/design-tokens && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-tokens.json)",
+    "exit_code": 0,
+    "note": "PASS: 47 passed, 0 failed, 0 pending. Repeat for exact counts, not added to unique totals."
+  },
+  {
+    "command": "(cd apps/customer-web && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-customer.json)",
+    "exit_code": 0,
+    "note": "PASS: 48 passed, 0 failed, 0 pending. Repeat for exact counts, not added to unique totals."
+  },
+  {
+    "command": "(cd apps/operations-web && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-ops.json)",
+    "exit_code": 0,
+    "note": "PASS: 26 passed, 0 failed, 0 pending. Repeat for exact counts, not added to unique totals."
+  },
+  {
+    "command": "(cd apps/customer-mobile && ../../node_modules/.bin/jest --ci --json --outputFile=/tmp/qa3-mobile.json)",
+    "exit_code": 127,
+    "note": "Reporting attempt failed: /bin/sh: 1: ../../node_modules/.bin/jest: not found. Retried with package-local executable."
+  },
+  {
+    "command": "(cd apps/customer-mobile && ./node_modules/.bin/jest --ci --json --outputFile=/tmp/qa3-mobile.json)",
+    "exit_code": 0,
+    "note": "55 passed, 0 failed, 0 skipped; 4 suites passed. React overlapping act() warnings."
+  }
+]

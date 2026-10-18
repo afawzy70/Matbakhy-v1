@@ -45,14 +45,38 @@ public class MediaCleanup {
         enqueue(bucket, key, reason, clock.instant());
     }
 
-    /** As above, but the object is not touched before {@code notBefore} (e.g. until an outstanding upload ticket has expired). */
+    /**
+     * As above, but the object is not touched before {@code notBefore} (e.g. until an outstanding upload ticket has expired).
+     * A repeated request never shortens a pending deadline (the later one wins) and re-arms a finished or skipped row; a
+     * row that exhausted its retries stays FAILED and visible.
+     */
     @Transactional
     public void enqueue(Bucket bucket, String key, String reason, Instant notBefore) {
+        upsert(bucket, key, reason, notBefore);
+    }
+
+    /**
+     * Commits its own row even if the caller's transaction later rolls back: used before writing an object that only a
+     * committed approval may keep. The job deletes it later only if no active asset references it by then, so a
+     * concurrent retry that did commit is never harmed (SECR4-002).
+     */
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    public void enqueueUnlessApproved(Bucket bucket, String key, String reason, Duration after) {
+        upsert(bucket, key, reason, clock.instant().plus(after));
+    }
+
+    private void upsert(Bucket bucket, String key, String reason, Instant notBefore) {
         Timestamp now = Timestamp.from(clock.instant());
         Instant due = notBefore.isAfter(clock.instant()) ? notBefore : clock.instant();
         jdbc.update("""
                 INSERT INTO media_cleanup (id, bucket, object_key, reason, next_attempt_at, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (bucket, object_key) DO NOTHING""",
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT (bucket, object_key) DO UPDATE SET
+                    state = CASE WHEN media_cleanup.state = 'FAILED' THEN 'FAILED' ELSE 'PENDING' END,
+                    attempts = CASE WHEN media_cleanup.state = 'PENDING' THEN media_cleanup.attempts ELSE 0 END,
+                    next_attempt_at = CASE WHEN media_cleanup.state = 'FAILED' THEN media_cleanup.next_attempt_at
+                                           ELSE GREATEST(media_cleanup.next_attempt_at, EXCLUDED.next_attempt_at) END,
+                    reason = EXCLUDED.reason, updated_at = EXCLUDED.updated_at""",
                 UUID.randomUUID(), bucket.name(), key, reason, Timestamp.from(due), now, now);
     }
 

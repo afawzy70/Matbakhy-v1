@@ -322,6 +322,7 @@ class MediaIntegrationTest {
         assertThat(storage.size(Bucket.PRIVATE, "uploads/" + docId)).as("upload-ticket key no longer holds the document").isEmpty();
         assertThat(storage.size(Bucket.PRIVATE, privateKey(docId))).as("the approved document itself is never cleaned up").isPresent();
         cleanup.enqueue(Bucket.PRIVATE, privateKey(docId), "MISTAKE");
+        jdbc.update("UPDATE media_cleanup SET next_attempt_at = now() WHERE object_key = ?", privateKey(docId)); // deadline elapsed
         cleanup.runDue();
         assertThat(storage.size(Bucket.PRIVATE, privateKey(docId))).as("referenced objects are never deleted by cleanup").isPresent();
         assertThat(jdbc.queryForObject("SELECT state FROM media_cleanup WHERE object_key = ?", String.class, privateKey(docId)))
