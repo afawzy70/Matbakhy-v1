@@ -21,8 +21,8 @@ modified or deleted. No downtime; the identity container is not restarted.
 ## Order
 1. Deploy the release that contains migration V31 (the CD workflow does it). Until the secret below exists the API starts and everything
    works, but the MFA reset and "end sessions" return 503 / are skipped.
-2. On the server, in `deploy/web-preview`: `./deploy.sh render` — adds `OIDC_ADMIN_CLIENT_SECRET` to `.env` if missing (mode 600 kept) and
-   re-renders the (ignored-on-existing-realm) realm file; then `docker compose up -d api` (or the next deploy) so the API receives it.
+2. The same deploy does this: `deploy.sh up` runs `render` first, which adds `OIDC_ADMIN_CLIENT_SECRET` to `.env` if missing (mode 600 kept) and
+   re-renders the (ignored-on-existing-realm) realm file, and compose passes it to the API. Check with `./migrate-mfa.sh status` that `.env` has the secret before step 4.
 3. `./migrate-mfa.sh status` — read-only; expect `flows=absent`, `browserFlow=browser`.
 4. `./migrate-mfa.sh apply` — runs, in this order: verified database backup (`deploy.sh backup`), a Keycloak database dump and a realm
    export (no users) under `$BACKUP_DIR/keycloak/` (mode 600) plus a state file with the previous browser flow, the migration, and
