@@ -61,6 +61,7 @@ class MediaIntegrationTest {
     @Autowired JsonMapper json;
     @Autowired ObjectStorage storage;
     @Autowired MediaService media;
+    @Autowired com.matbakhy.catalog.internal.media.MediaCleanup cleanup;
 
     final HttpClient http = HttpClient.newHttpClient();
     String ownerSubject;
@@ -280,6 +281,27 @@ class MediaIntegrationTest {
 
     // ---- private verification documents ----
 
+    /** SEC-002 / CR-003 runtime replay: the still-valid upload ticket cannot change what an approved document serves. */
+    @Test
+    void replaying_the_upload_ticket_after_approval_does_not_change_the_approved_document() throws Exception {
+        byte[] doc = pdf("");
+        MockHttpServletResponse t = ticket(ownerSubject, "COOK_DOCUMENT", "application/pdf", doc.length, sha256(doc));
+        JsonNode ticket = body(t);
+        URI uploadUrl = URI.create(ticket.get("uploadUrl").asString());
+        UUID id = UUID.fromString(ticket.get("uploadId").asString());
+        assertThat(http.send(HttpRequest.newBuilder(uploadUrl).header("Content-Type", "application/pdf").PUT(HttpRequest.BodyPublishers.ofByteArray(doc)).build(),
+                HttpResponse.BodyHandlers.ofString()).statusCode()).isEqualTo(200);
+        String read = complete(ownerSubject, id).get("privateReadUrl").asString();
+
+        byte[] evil = doc.clone();
+        evil[evil.length - 2] ^= 0x01; // same length, same type, different bytes
+        http.send(HttpRequest.newBuilder(uploadUrl).header("Content-Type", "application/pdf").PUT(HttpRequest.BodyPublishers.ofByteArray(evil)).build(),
+                HttpResponse.BodyHandlers.ofString());
+        HttpResponse<byte[]> fetched = http.send(HttpRequest.newBuilder(URI.create(read)).GET().build(), HttpResponse.BodyHandlers.ofByteArray());
+        assertThat(fetched.statusCode()).isEqualTo(200);
+        assertThat(fetched.body()).as("approved bytes unchanged by the replayed ticket").isEqualTo(doc);
+    }
+
     @Test
     void private_documents_have_no_public_url_and_only_owner_or_scoped_reviewer_of_a_submitted_revision_can_read() throws Exception {
         byte[] doc = pdf("");
@@ -294,7 +316,14 @@ class MediaIntegrationTest {
         assertThat(fetched.body()).isEqualTo(doc);
         // CR-003: approved bytes are served from a key the (still valid) upload ticket cannot write.
         assertThat(privateKey(docId)).isEqualTo("documents/" + docId);
+        cleanup.runDue();
         assertThat(storage.size(Bucket.PRIVATE, "uploads/" + docId)).as("upload-ticket key no longer holds the document").isEmpty();
+        assertThat(storage.size(Bucket.PRIVATE, privateKey(docId))).as("the approved document itself is never cleaned up").isPresent();
+        cleanup.enqueue(Bucket.PRIVATE, privateKey(docId), "MISTAKE");
+        cleanup.runDue();
+        assertThat(storage.size(Bucket.PRIVATE, privateKey(docId))).as("referenced objects are never deleted by cleanup").isPresent();
+        assertThat(jdbc.queryForObject("SELECT state FROM media_cleanup WHERE object_key = ?", String.class, privateKey(docId)))
+                .isEqualTo("SKIPPED_REFERENCED");
 
         // Not attached to a submitted revision: invisible to other customers and to reviewers.
         assertThat(call(get("/api/v1/uploads/" + docId), as(otherSubject)).getStatus()).isEqualTo(404);

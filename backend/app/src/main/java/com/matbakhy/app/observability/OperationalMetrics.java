@@ -43,6 +43,12 @@ class OperationalMetrics {
         gauge(registry, reader, "matbakhy.orders.acceptance.overdue", "orders",
                 "Orders still pending acceptance after their deadline (expiry job lagging)",
                 "SELECT count(*) FROM customer_order WHERE state = 'PENDING_ACCEPTANCE' AND accept_by < now() - interval '2 minutes'");
+        gauge(registry, reader, "matbakhy.media.cleanup.failed", "objects",
+                "Storage cleanups that exhausted their retries (alert: > 0)",
+                "SELECT count(*) FROM media_cleanup WHERE state = 'FAILED'");
+        gauge(registry, reader, "matbakhy.media.cleanup.oldest.pending.age", "seconds",
+                "Age of the oldest storage cleanup waiting past its due time (storage outage indicator)",
+                "SELECT coalesce(extract(epoch FROM now() - min(next_attempt_at)), 0) FROM media_cleanup WHERE state = 'PENDING' AND next_attempt_at <= now()");
         return new MetricsBinder();
     }
 

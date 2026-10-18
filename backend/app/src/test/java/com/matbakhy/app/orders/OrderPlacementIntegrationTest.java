@@ -280,6 +280,41 @@ class OrderPlacementIntegrationTest {
         assertThat(call(get("/api/v1/orders/by-request/" + UUID.randomUUID()), customerSubject).getStatus()).isEqualTo(404);
     }
 
+    /** QA-002: after the temporary idempotency record is gone, the permanent reference still rejects a materially different request. */
+    @Test
+    void a_reused_request_reference_with_a_changed_field_conflicts_even_after_the_cache_is_gone() throws Exception {
+        UUID quoteId = quote(customerSubject, item(mealA, 1), false, null);
+        UUID requestId = UUID.randomUUID();
+        String k = key();
+        JsonNode first = body(place(customerSubject, k, placeBody(quoteId, requestId)));
+        jdbc.update("DELETE FROM idempotency_record WHERE actor_id = ?", customer);
+
+        String changedNote = placeBody(quoteId, requestId).replace("Ring twice", "Leave at the door");
+        MockHttpServletResponse changed = place(customerSubject, k, changedNote);
+        assertThat(changed.getStatus()).isEqualTo(409);
+        assertThat(changed.getContentAsString()).contains("IDEMPOTENCY_CONFLICT");
+        assertThat(place(customerSubject, key(), changedNote).getStatus()).as("new key, same reference, changed note").isEqualTo(409);
+        assertThat(jdbc.queryForObject("SELECT fulfillment_note FROM customer_order WHERE id = ?", String.class, UUID.fromString(first.get("id").asString())))
+                .isEqualTo("Ring twice");
+        assertThat(count("SELECT count(*) FROM customer_order WHERE customer_id = ?", customer)).isEqualTo(1);
+
+        // A safe retry of the identical request, and a whitespace-only difference in the note, still recover the same order.
+        assertThat(body(place(customerSubject, key(), placeBody(quoteId, requestId))).get("id")).isEqualTo(first.get("id"));
+        assertThat(body(place(customerSubject, key(), placeBody(quoteId, requestId).replace("Ring twice", "  Ring twice  "))).get("id"))
+                .isEqualTo(first.get("id"));
+    }
+
+    @Test
+    void orders_placed_before_the_fingerprint_migration_keep_quote_only_recovery() throws Exception {
+        UUID quoteId = quote(customerSubject, item(mealA, 1), false, null);
+        UUID requestId = UUID.randomUUID();
+        JsonNode first = body(place(customerSubject, key(), placeBody(quoteId, requestId)));
+        jdbc.update("DELETE FROM idempotency_record WHERE actor_id = ?", customer);
+        jdbc.update("UPDATE customer_order SET request_fingerprint = NULL WHERE customer_id = ? AND client_request_id = ?", customer, requestId);
+        assertThat(body(place(customerSubject, key(), placeBody(quoteId, requestId).replace("Ring twice", "Other"))).get("id"))
+                .as("legacy order: no stored fingerprint, same quote recovers").isEqualTo(first.get("id"));
+    }
+
     @Test
     void reusing_a_key_or_request_reference_with_another_body_conflicts_and_leaves_the_order_unchanged() throws Exception {
         UUID quoteA = quote(customerSubject, item(mealA, 1), false, null);

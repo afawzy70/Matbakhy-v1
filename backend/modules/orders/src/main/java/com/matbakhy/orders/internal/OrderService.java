@@ -133,16 +133,33 @@ public class OrderService {
         return view(customerId, orderId, english);
     }
 
+    /** Canonical, versioned digest of the placement request: the same logical request always yields the same value. */
+    static String fingerprint(PlaceRequest in) {
+        String note = in.fulfillmentNote() == null || in.fulfillmentNote().isBlank() ? "" : in.fulfillmentNote().strip();
+        String canonical = String.join("\n", "v1", String.valueOf(in.quoteId()), String.valueOf(in.clientRequestId()),
+                String.valueOf(in.termsVersion()), String.valueOf(in.cancellationPolicyVersion()), note);
+        try {
+            return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(canonical.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private UUID placeOnce(UUID customerId, PlaceRequest in) {
         // Serialize attempts carrying the same permanent request reference.
         jdbc.query("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", rs -> null, "order-request:" + customerId + ":" + in.clientRequestId());
-        Map<String, Object> existing = jdbc.queryForList("SELECT id, quote_id FROM customer_order WHERE customer_id = ? AND client_request_id = ?",
+        String fingerprint = fingerprint(in);
+        Map<String, Object> existing = jdbc.queryForList("SELECT id, quote_id, request_fingerprint FROM customer_order WHERE customer_id = ? AND client_request_id = ?",
                 customerId, in.clientRequestId()).stream().findFirst().orElse(null);
         if (existing != null) {
-            if (in.quoteId().equals(existing.get("quote_id"))) {
+            // Orders placed before V29 have no stored fingerprint and keep the quote-only check.
+            Object stored = existing.get("request_fingerprint");
+            boolean same = in.quoteId().equals(existing.get("quote_id")) && (stored == null || fingerprint.equals(stored));
+            if (same) {
                 return (UUID) existing.get("id");
             }
-            throw new ApiException(ErrorCode.IDEMPOTENCY_CONFLICT, "clientRequestId already used for another quote",
+            throw new ApiException(ErrorCode.IDEMPOTENCY_CONFLICT, "clientRequestId already used for a different request",
                     List.of(new FieldError("clientRequestId", "ALREADY_USED")));
         }
         ValidQuote q = quotes.requireValid(customerId, in.quoteId());
@@ -171,12 +188,12 @@ public class OrderService {
         long commission = Math.floorDiv(Math.addExact(Math.multiplyExact(q.subtotalMinor(), (long) q.commissionRateBps()), 5_000L), 10_000L);
         String note = in.fulfillmentNote() == null || in.fulfillmentNote().isBlank() ? null : in.fulfillmentNote().strip();
         jdbc.update("""
-                INSERT INTO customer_order (id, public_number, customer_id, client_request_id, quote_id, kitchen_id, slot_id, state, fulfillment_mode,
+                INSERT INTO customer_order (id, public_number, customer_id, client_request_id, request_fingerprint, quote_id, kitchen_id, slot_id, state, fulfillment_mode,
                                             address_snapshot, contact_snapshot, fulfillment_note, subtotal_minor, delivery_fee_minor, tax_minor,
                                             total_minor, policy_version, commission_bps_snapshot, commission_minor, cancellation_policy_version,
                                             terms_version, accept_by, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING_ACCEPTANCE', ?, ?::jsonb, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                orderId, "MB-" + number, customerId, in.clientRequestId(), in.quoteId(), q.kitchenId(), q.slotId(), q.fulfillmentMode(),
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING_ACCEPTANCE', ?, ?::jsonb, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                orderId, "MB-" + number, customerId, in.clientRequestId(), fingerprint, in.quoteId(), q.kitchenId(), q.slotId(), q.fulfillmentMode(),
                 addressSnapshot, json.writeValueAsString(who), note, q.subtotalMinor(), q.deliveryFeeMinor(), q.taxMinor(), q.totalMinor(),
                 q.policyVersion(), q.commissionRateBps(), commission, q.cancellationPolicyVersion(), q.termsVersion(), Timestamp.from(q.acceptBy()),
                 Timestamp.from(now), Timestamp.from(now));

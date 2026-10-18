@@ -71,16 +71,18 @@ public class MediaService implements MediaLibrary {
     private final List<PrivateMediaAccess> access;
     private final AccessPolicy accessPolicy;
     private final AuditLog audit;
+    private final MediaCleanup cleanup;
     private final Clock clock;
 
     MediaService(JdbcTemplate jdbc, ObjectStorage storage, MalwareScanner scanner, List<PrivateMediaAccess> access,
-                 AccessPolicy accessPolicy, AuditLog audit, Clock clock) {
+                 AccessPolicy accessPolicy, AuditLog audit, MediaCleanup cleanup, Clock clock) {
         this.jdbc = jdbc;
         this.storage = storage;
         this.scanner = scanner;
         this.access = access;
         this.accessPolicy = accessPolicy;
         this.audit = audit;
+        this.cleanup = cleanup;
         this.clock = clock;
     }
 
@@ -207,7 +209,7 @@ public class MediaService implements MediaLibrary {
             onRollback(() -> storage.delete(Bucket.PRIVATE, sealed));
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', private_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     sealed, Timestamp.from(clock.instant()), mediaId);
-            afterCommit(() -> storage.delete(Bucket.PRIVATE, uploadKey));
+            cleanup.enqueue(Bucket.PRIVATE, uploadKey, "SEALED_UPLOAD");
         }
         return view(lockOwned(ownerId, mediaId));
     }
@@ -262,8 +264,12 @@ public class MediaService implements MediaLibrary {
         jdbc.update("""
                 UPDATE media_asset SET state = 'REJECTED', rejection_reason = ?, public_key = NULL, updated_at = ?, version = version + 1
                 WHERE id = ?""", reason, Timestamp.from(clock.instant()), row.id());
-        // Rejected bytes are not retained.
-        storage.delete(Bucket.PRIVATE, row.privateKey());
+        // Rejected bytes are not retained: deleted now, or by the durable cleanup job if storage is unavailable.
+        try {
+            storage.delete(Bucket.PRIVATE, row.privateKey());
+        } catch (RuntimeException e) {
+            cleanup.enqueue(Bucket.PRIVATE, row.privateKey(), "REJECTED_UPLOAD");
+        }
         if (reason.equals("MALWARE") || reason.equals("ACTIVE_CONTENT") || reason.equals("TYPE_MISMATCH")) {
             audit.record(new Entry(row.ownerId(), "media.rejected", null, "media", row.id().toString(), Outcome.DENIED, reason, null,
                     Map.of("purpose", row.purpose().name())));
@@ -287,22 +293,6 @@ public class MediaService implements MediaLibrary {
     private Row lockOwned(UUID ownerId, UUID mediaId) {
         return jdbc.query("SELECT * FROM media_asset WHERE id = ? AND owner_id = ? AND state <> 'DELETED' FOR UPDATE", MediaService::map,
                 mediaId, ownerId).stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "media not found"));
-    }
-
-    private static void afterCommit(Runnable action) {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-                @Override
-                public void afterCommit() {
-                    try {
-                        action.run();
-                    } catch (RuntimeException e) {
-                        // Best effort: the committed approval must not turn into an error; the orphan is unreferenced (CR2-001).
-                        org.slf4j.LoggerFactory.getLogger(MediaService.class).warn("post-commit storage cleanup failed", e);
-                    }
-                }
-            });
-        }
     }
 
     private static void onRollback(Runnable action) {
