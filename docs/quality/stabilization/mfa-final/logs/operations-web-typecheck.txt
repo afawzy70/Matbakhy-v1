@@ -1,0 +1,4 @@
+
+> @matbakhy/operations-web@0.1.0 typecheck /home/aiagent/workspaces/agents/codex-qa/apps/operations-web
+> tsc -p tsconfig.json && tsc -p tsconfig.e2e.json
+

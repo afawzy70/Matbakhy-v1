@@ -123,6 +123,47 @@ describe("customer app shell (MB-031, kept in MB-032)", () => {
   });
 });
 
+describe("two-step verification step-up (D18)", () => {
+  async function signedInSession() {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    return session;
+  }
+
+  it("offers a step-up sign-in when the server asks for a second factor, instead of a broken screen", async () => {
+    const session = await signedInSession();
+    const stepUp = () => json(403, { code: "STEP_UP_REQUIRED" });
+    const signIn = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r2", expiresIn: 300 }));
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": stepUp })} />);
+    expect(await screen.findByText(t.stepUp.message)).toBeTruthy();
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    expect(signIn).toHaveBeenCalledWith(config, session, { stepUp: true });
+    expect(session.accessToken).toBe(fakeJwt("customer-a"));
+    expect(mockStore.get("matbakhy.basket.v1")).toBeTruthy();
+  });
+
+  it("keeps showing the request when the user cancels the verification, and never signs them out", async () => {
+    const session = await signedInSession();
+    const { SignInCancelled } = jest.requireMock("./auth") as { SignInCancelled: new () => Error };
+    const signIn = jest.fn(async () => {
+      throw new SignInCancelled();
+    });
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => json(403, { code: "STEP_UP_REQUIRED" }) })} />);
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    expect(await screen.findByText(t.stepUp.message)).toBeTruthy();
+    expect(session.accessToken).not.toBeNull();
+  });
+
+  it("does not show the request for other 403 answers", async () => {
+    const session = await signedInSession();
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => json(403, { code: "FORBIDDEN" }) })} />);
+    await screen.findByTestId("tab-discover");
+    expect(screen.queryByTestId("step-up-banner")).toBeNull();
+  });
+});
+
 describe("native discovery and ordering (MB-032)", () => {
   const routes = {
     ...discover,

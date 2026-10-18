@@ -14,6 +14,8 @@ export type Schemas = components["schemas"];
 export interface RequestContext {
   locale: string;
   onSignedOut: () => void;
+  /** The server wants a second factor (MFA policy, D18): the UI offers a step-up sign-in. */
+  onStepUpRequired?: () => void;
 }
 
 export function createMobileApi(config: AppConfig, session: Session, context: RequestContext, fetchImpl?: typeof fetch) {
@@ -37,6 +39,16 @@ export function createMobileApi(config: AppConfig, session: Session, context: Re
       if (response.status === 401 && request.headers.has("Authorization")) {
         await session.signOut();
         context.onSignedOut();
+      } else if (response.status === 403 && request.headers.has("Authorization")) {
+        // The body is read from a clone so the caller still receives the untouched response.
+        try {
+          const body = (await response.clone().json()) as { code?: unknown };
+          if (body.code === "STEP_UP_REQUIRED") {
+            context.onStepUpRequired?.();
+          }
+        } catch {
+          // Not a JSON error body: nothing to learn from it.
+        }
       }
     },
   });

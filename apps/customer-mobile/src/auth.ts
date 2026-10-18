@@ -15,8 +15,10 @@ export class SignInCancelled extends Error {}
  * The app keeps its own session, so an interactive sign-in only happens when the user is signed out or switching
  * account. It always asks the provider for a fresh login (`prompt=login`) and, on iOS, uses an ephemeral browser
  * session: otherwise the provider's browser cookie would silently sign the previous person back in (TC-048).
+ * With {@code stepUp} the same account verifies again with a second factor (or enrols one); the tokens are replaced and,
+ * being the same subject, the basket and private caches are kept.
  */
-export async function signIn(config: AppConfig, session: Session) {
+export async function signIn(config: AppConfig, session: Session, options: { stepUp?: boolean } = {}) {
   const discovery = await AuthSession.fetchDiscoveryAsync(config.issuer);
   const request = new AuthSession.AuthRequest({
     clientId: config.clientId,
@@ -25,6 +27,8 @@ export async function signIn(config: AppConfig, session: Session) {
     usePKCE: true,
     responseType: AuthSession.ResponseType.Code,
     prompt: AuthSession.Prompt.Login,
+    // D18 step-up: ask the provider for a second factor (acr "mfa", also accepted as level 2). The API decides from the token.
+    ...(options.stepUp ? { extraParams: { acr_values: "mfa 2" } } : {}),
   });
   await request.makeAuthUrlAsync(discovery);
   const result = await request.promptAsync(discovery, { preferEphemeralSession: true });

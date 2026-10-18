@@ -10,3 +10,8 @@ Promotion steps (needs a browser run against the preview, i.e. the E2E suite plu
 3. Rename the header to `Content-Security-Policy`; re-run the E2E and prove an injected inline script is blocked.
 
 Until step 3 SEC-004 is **mitigated in part (Report-Only), not closed**.
+
+## Follow-up (owner decision 2026-10-18: keep Report-Only for now)
+* **Stays Report-Only** on `app.` and `ops.`; nothing in the stabilization or beta work enforces it.
+* Follow-up task (not started, needs a browser run on the preview): run the browser E2E (customer, cook, staff) with violation reporting, fix or narrowly allow each legitimate violation, rename the header to `Content-Security-Policy`, prove an injected inline script is blocked, then remove this section. Owner: platform engineering; target: before any public (non-allow-listed) exposure of the web apps.
+* Until then SEC-004 is recorded as *mitigated in part, open*.

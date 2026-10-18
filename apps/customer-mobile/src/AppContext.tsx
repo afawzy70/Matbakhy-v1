@@ -27,6 +27,10 @@ export interface AppContextValue {
   auth: AuthPhase;
   busy: boolean;
   startSignIn: () => Promise<void>;
+  /** The server asked for a second factor (D18) and the user has not answered yet. */
+  stepUpRequired: boolean;
+  /** Verifies again with a second factor (same account, fresh login); clears the request when it succeeds. */
+  startStepUp: () => Promise<void>;
   endSession: () => Promise<void>;
   switchAccount: () => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -77,6 +81,7 @@ export function AppProvider({
   const [locale, setLocale] = useState<Locale>(initialLocale);
   const [auth, setAuth] = useState<AuthPhase>({ kind: "loading" });
   const [busy, setBusy] = useState(false);
+  const [stepUpRequired, setStepUpRequired] = useState(false);
   const t = strings[locale];
   // A new client per language: requests carry the current Accept-Language; a 401 ends the session everywhere.
   const api = useMemo(() => {
@@ -86,6 +91,7 @@ export function AppProvider({
         session,
         {
           locale,
+          onStepUpRequired: () => setStepUpRequired(true),
           onSignedOut: () => {
             void clearShopping();
             setAuth({ kind: "signedOut", message: strings[locale].sessionEnded });
@@ -152,6 +158,21 @@ export function AppProvider({
     }
   }, [config, session, signIn, reloadProfile, t]);
 
+  const startStepUp = useCallback(async () => {
+    setBusy(true);
+    try {
+      await signIn(config, session, { stepUp: true });
+      setStepUpRequired(false);
+    } catch (e) {
+      // Cancelling keeps the account signed in with the notice still showing; a real failure says so.
+      if (!(e instanceof SignInCancelled)) {
+        setStepUpRequired(true);
+      }
+    } finally {
+      setBusy(false);
+    }
+  }, [config, session, signIn]);
+
   const endSession = useCallback(async () => {
     setBusy(true);
     try {
@@ -159,6 +180,7 @@ export function AppProvider({
       await clearShopping();
       await signOut(config, session, stored?.refreshToken ?? null);
     } finally {
+      setStepUpRequired(false);
       setAuth({ kind: "signedOut" });
       setBusy(false);
     }
@@ -200,6 +222,8 @@ export function AppProvider({
     auth,
     busy,
     startSignIn,
+    stepUpRequired,
+    startStepUp,
     endSession,
     switchAccount,
     reloadProfile,

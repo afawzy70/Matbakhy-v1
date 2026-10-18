@@ -56,6 +56,14 @@ describe("interactive sign-in never reuses the previous person's browser login (
     expect(mockRequests[0]?.promptOptions).toEqual({ preferEphemeralSession: true });
   });
 
+  it("asks the provider for a second factor only when a step-up is requested (D18)", async () => {
+    await signIn(config, new Session());
+    expect(mockRequests[0]?.config).not.toHaveProperty("extraParams");
+    mockRequests.length = 0;
+    await signIn(config, new Session(), { stepUp: true });
+    expect(mockRequests[0]?.config).toMatchObject({ prompt: "login", usePKCE: true, extraParams: { acr_values: "mfa 2" } });
+  });
+
   it("reports a dismissed browser as cancelled and stores nothing", async () => {
     mockResult = { type: "dismiss" };
     const session = new Session();

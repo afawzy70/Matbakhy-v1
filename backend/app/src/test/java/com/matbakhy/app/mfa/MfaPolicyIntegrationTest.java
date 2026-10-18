@@ -327,4 +327,21 @@ class MfaPolicyIntegrationTest {
         String customer = mvc.perform(get("/oauth2/authorization/keycloak?stepUp=true").with(authentication(plain(UUID.randomUUID().toString())))).andReturn().getResponse().getHeader("Location");
         assertThat(customer).doesNotContain("acr_values=");
     }
+
+    @Test
+    void after_a_reset_a_still_valid_pre_reset_token_cannot_perform_a_sensitive_operation() throws Exception {
+        // The administrator holds security.mfa_policy; the sensitive operation is a policy change (recent MFA required).
+        Instant beforeReset = Instant.now().minusSeconds(60);
+        AccountAuthentication oldProof = logins.loginWithMfaAt(adminSubject, "Admin", beforeReset);
+        String body = "{\"mode\":\"OPTIONAL\",\"expectedVersion\":" + version("STAFF") + ",\"reason\":\"owner decision test\"}";
+        assertThat(call(put("/api/v1/ops/security/mfa-policy/STAFF").content(body), oldProof).getStatus()).as("fresh proof works before the reset").isEqualTo(200);
+
+        jdbc.update("INSERT INTO user_mfa_reset (user_id, reset_at, reset_by) VALUES (?, now(), ?) ON CONFLICT (user_id) DO UPDATE SET reset_at = now()", admin, admin);
+        String again = "{\"mode\":\"OPTIONAL\",\"expectedVersion\":" + version("STAFF") + ",\"reason\":\"owner decision test\"}";
+        MockHttpServletResponse refused = call(put("/api/v1/ops/security/mfa-policy/STAFF").content(again), oldProof);
+        assertThat(refused.getStatus()).as("the token is still within its lifetime and its recency window, yet it no longer counts").isEqualTo(403);
+        assertThat(refused.getContentAsString()).contains("STEP_UP_REQUIRED");
+        assertThat(call(put("/api/v1/ops/security/mfa-policy/STAFF").content(again), logins.loginWithMfaAt(adminSubject, "Admin", Instant.now().plusSeconds(5))).getStatus())
+                .as("a proof made after the reset works").isEqualTo(200);
+    }
 }
