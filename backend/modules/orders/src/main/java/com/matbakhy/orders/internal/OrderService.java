@@ -133,14 +133,20 @@ public class OrderService {
         return view(customerId, orderId, english);
     }
 
-    /** Canonical, versioned digest of the placement request: the same logical request always yields the same value. */
+    /**
+     * Canonical, versioned digest of the placement request: the same logical request always yields the same value and
+     * different requests never share one (every field is length-prefixed, so no value can imitate a delimiter).
+     */
     static String fingerprint(PlaceRequest in) {
         String note = in.fulfillmentNote() == null || in.fulfillmentNote().isBlank() ? "" : in.fulfillmentNote().strip();
-        String canonical = String.join("\n", "v1", String.valueOf(in.quoteId()), String.valueOf(in.clientRequestId()),
-                String.valueOf(in.termsVersion()), String.valueOf(in.cancellationPolicyVersion()), note);
+        StringBuilder canonical = new StringBuilder("v1");
+        for (String field : new String[] {String.valueOf(in.quoteId()), String.valueOf(in.clientRequestId()), String.valueOf(in.termsVersion()),
+                String.valueOf(in.cancellationPolicyVersion()), note}) {
+            canonical.append('|').append(field.length()).append(':').append(field);
+        }
         try {
             return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
-                    .digest(canonical.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+                    .digest(canonical.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
         } catch (java.security.NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }

@@ -63,7 +63,10 @@ render() {
       -e "s|\${PREVIEW_USER_PASSWORD}|$PREVIEW_USER_PASSWORD|g" identity/matbakhy-realm.preview.json > "$GENERATED_DIR/identity/matbakhy-realm.json"
   sed -e "s|\${STORAGE_ACCESS_KEY}|$STORAGE_ACCESS_KEY|" -e "s|\${STORAGE_SECRET_KEY}|$STORAGE_SECRET_KEY|" \
       storage/s3.json.template > "$GENERATED_DIR/storage/s3.json"
-  chmod 755 "$GENERATED_DIR" "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
+  # The files must be readable by the container users (mounted read-only), but the parent directory is owner-only so no
+  # other host user can reach them by path (SECR-004). Docker bind mounts are resolved by the daemon as root.
+  chmod 700 "$GENERATED_DIR"
+  chmod 755 "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
   chmod 644 "$GENERATED_DIR/identity/matbakhy-realm.json" "$GENERATED_DIR/storage/s3.json"
 }
 

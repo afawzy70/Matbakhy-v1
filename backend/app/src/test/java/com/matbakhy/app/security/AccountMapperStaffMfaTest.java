@@ -55,4 +55,10 @@ class AccountMapperStaffMfaTest {
     void with_the_flag_an_mfa_token_keeps_its_permissions() {
         assertThat(hasAudit(mapper(true).map("https://idp.test.invalid/realms/x", "sub", Map.of("acr", "1", "amr", List.of("pwd", "otp"))))).isTrue();
     }
+
+    @Test
+    void the_documented_environment_variable_is_bound_to_the_property() throws Exception {
+        String yaml = new String(AccountMapperStaffMfaTest.class.getResourceAsStream("/application.yaml").readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        assertThat(yaml).contains("require-staff-mfa: ${IDENTITY_REQUIRE_STAFF_MFA:false}");
+    }
 }

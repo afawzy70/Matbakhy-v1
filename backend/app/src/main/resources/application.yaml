@@ -66,6 +66,9 @@ matbakhy:
     post-login-redirect: ${WEB_POST_LOGIN_REDIRECT:http://localhost:5173/}
     mfa-acr-values: ${OIDC_MFA_ACR_VALUES:mfa,2}
     step-up-max-age: ${OIDC_STEP_UP_MAX_AGE:10m}
+    # Defense in depth behind the identity provider's staff MFA (BR-007): staff permissions need an MFA assertion on the token.
+    # Off until every grant holder signs in through the provider's MFA flow (docs/security/staff-mfa-enforcement.md).
+    require-staff-mfa: ${IDENTITY_REQUIRE_STAFF_MFA:false}
     # Provider subject that receives staff.grant + audit.read on first login while no administrator exists.
     bootstrap-admin-subject: ${STAFF_BOOTSTRAP_SUBJECT:}
     # Parent domain of a deployment with sibling hosts (app., ops., api.); the readable XSRF-TOKEN cookie is set for it. Blank locally.

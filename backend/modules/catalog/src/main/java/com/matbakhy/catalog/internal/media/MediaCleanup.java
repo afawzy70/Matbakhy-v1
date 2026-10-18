@@ -42,11 +42,18 @@ public class MediaCleanup {
     /** Idempotent: a second request for the same object is a no-op. */
     @Transactional
     public void enqueue(Bucket bucket, String key, String reason) {
+        enqueue(bucket, key, reason, clock.instant());
+    }
+
+    /** As above, but the object is not touched before {@code notBefore} (e.g. until an outstanding upload ticket has expired). */
+    @Transactional
+    public void enqueue(Bucket bucket, String key, String reason, Instant notBefore) {
         Timestamp now = Timestamp.from(clock.instant());
+        Instant due = notBefore.isAfter(clock.instant()) ? notBefore : clock.instant();
         jdbc.update("""
                 INSERT INTO media_cleanup (id, bucket, object_key, reason, next_attempt_at, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT (bucket, object_key) DO NOTHING""",
-                UUID.randomUUID(), bucket.name(), key, reason, now, now, now);
+                UUID.randomUUID(), bucket.name(), key, reason, Timestamp.from(due), now, now);
     }
 
     /** Processes due rows once; returns how many objects were deleted. */

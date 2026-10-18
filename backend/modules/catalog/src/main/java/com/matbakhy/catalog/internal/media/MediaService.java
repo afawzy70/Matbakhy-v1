@@ -205,11 +205,14 @@ public class MediaService implements MediaLibrary {
             // The upload ticket stays valid for its TTL, so approved bytes move to a key no ticket can write (CR-003).
             String sealed = "documents/" + mediaId;
             String uploadKey = row.privateKey();
+            // Idempotent, deterministic key: a retry after a rollback rewrites the same verified bytes. It is deliberately not
+            // deleted on rollback, because a concurrent retry may already have approved the same key (SECR-003).
             storage.write(Bucket.PRIVATE, sealed, content, sniffed);
-            onRollback(() -> storage.delete(Bucket.PRIVATE, sealed));
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', private_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     sealed, Timestamp.from(clock.instant()), mediaId);
-            cleanup.enqueue(Bucket.PRIVATE, uploadKey, "SEALED_UPLOAD");
+            // The upload ticket may still be valid: clean the upload key only after it has expired, or a replayed PUT would
+            // recreate it after the cleanup (CR3-002).
+            cleanup.enqueue(Bucket.PRIVATE, uploadKey, "SEALED_UPLOAD", row.ticketExpiresAt().plus(Duration.ofMinutes(1)));
         }
         return view(lockOwned(ownerId, mediaId));
     }
@@ -242,6 +245,10 @@ public class MediaService implements MediaLibrary {
                 UPDATE media_asset SET state = 'DELETED', public_key = NULL, rejection_reason = NULL, updated_at = ?, version = version + 1
                 WHERE id = ?""", Timestamp.from(clock.instant()), mediaId);
         storage.delete(Bucket.PRIVATE, row.privateKey());
+        if (row.purpose() == Purpose.COOK_DOCUMENT) {
+            // A sealed copy may exist under its deterministic key even if approval never committed.
+            cleanup.enqueue(Bucket.PRIVATE, "documents/" + mediaId, "DELETED_DOCUMENT");
+        }
         if (row.publicKey() != null) {
             storage.delete(Bucket.PUBLIC, row.publicKey());
         }

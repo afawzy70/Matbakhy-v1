@@ -124,6 +124,29 @@ class StaffMfaIdpTest {
     }
 
     @Test
+    void an_existing_sso_session_does_not_let_a_staff_account_skip_the_otp() throws Exception {
+        Outcome first = login("staff-mfa", KeycloakTestServer.STAFF_PASSWORD, totp(KeycloakTestServer.STAFF_TOTP_SECRET, System.currentTimeMillis() / 1000));
+        assertThat(first.issuedCode()).isTrue();
+        // Same browser, SSO cookie present: a new authorization must ask for the OTP again (SECR-002).
+        String authorize = KeycloakTestServer.issuer() + "/protocol/openid-connect/auth?response_type=code&scope=openid&client_id=" + CLIENT
+                + "&redirect_uri=" + OidcBrowser.enc(REDIRECT) + "&state=" + UUID.randomUUID()
+                + "&code_challenge=" + OidcBrowser.challenge(OidcBrowser.randomVerifier()) + "&code_challenge_method=S256";
+        HttpResponse<String> again = first.browser().get(authorize);
+        assertThat(again.headers().firstValue("Location").orElse("")).as("no code from the SSO cookie alone").doesNotContain("code=");
+        assertThat(again.body()).contains("name=\"otp\"");
+    }
+
+    @Test
+    void customers_keep_sso_without_extra_prompts() throws Exception {
+        Outcome first = login("customer-a", KeycloakTestServer.PASSWORD_A, null);
+        assertThat(first.issuedCode()).isTrue();
+        String authorize = KeycloakTestServer.issuer() + "/protocol/openid-connect/auth?response_type=code&scope=openid&client_id=" + CLIENT
+                + "&redirect_uri=" + OidcBrowser.enc(REDIRECT) + "&state=" + UUID.randomUUID()
+                + "&code_challenge=" + OidcBrowser.challenge(OidcBrowser.randomVerifier()) + "&code_challenge_method=S256";
+        assertThat(first.browser().get(authorize).headers().firstValue("Location").orElse("")).contains("code=");
+    }
+
+    @Test
     void customers_keep_password_only_login() throws Exception {
         Outcome o = login("customer-a", KeycloakTestServer.PASSWORD_A, null);
         assertThat(o.issuedCode()).isTrue();

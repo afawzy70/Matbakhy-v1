@@ -143,9 +143,31 @@
   "authenticationFlows": [
     {
       "alias": "matbakhy browser",
-      "description": "Browser flow; staff accounts (realm role matbakhy-staff) must also pass OTP",
+      "description": "Browser flow; staff accounts (realm role matbakhy-staff) must pass OTP on every authorization, including SSO-cookie logins",
       "providerId": "basic-flow",
       "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy browser login",
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy staff mfa",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy browser login",
+      "providerId": "basic-flow",
+      "topLevel": false,
       "builtIn": false,
       "authenticationExecutions": [
         {
@@ -176,13 +198,6 @@
           "authenticatorFlow": false,
           "requirement": "REQUIRED",
           "priority": 10,
-          "userSetupAllowed": false
-        },
-        {
-          "authenticatorFlow": true,
-          "flowAlias": "matbakhy staff mfa",
-          "requirement": "CONDITIONAL",
-          "priority": 20,
           "userSetupAllowed": false
         }
       ]

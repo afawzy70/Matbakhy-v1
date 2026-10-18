@@ -56,7 +56,8 @@ class MediaCleanupIntegrationTest {
     }
 
     static final class MutableClock extends Clock {
-        Instant now = Instant.now();
+        // A day ahead of the real clock: the scheduled cleanup job (real clock) never sees these rows as due (QA3-002).
+        Instant now = Instant.now().plus(Duration.ofDays(1));
 
         @Override public ZoneOffset getZone() { return ZoneOffset.UTC; }
         @Override public Clock withZone(java.time.ZoneId zone) { return this; }

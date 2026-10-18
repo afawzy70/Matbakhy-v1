@@ -316,6 +316,9 @@ class MediaIntegrationTest {
         // CR-003: approved bytes are served from a key the (still valid) upload ticket cannot write.
         assertThat(privateKey(docId)).isEqualTo("documents/" + docId);
         cleanup.runDue();
+        assertThat(storage.size(Bucket.PRIVATE, "uploads/" + docId)).as("not cleaned while the upload ticket can still write").isPresent();
+        jdbc.update("UPDATE media_cleanup SET next_attempt_at = now() WHERE object_key = ?", "uploads/" + docId); // ticket expiry elapsed
+        cleanup.runDue();
         assertThat(storage.size(Bucket.PRIVATE, "uploads/" + docId)).as("upload-ticket key no longer holds the document").isEmpty();
         assertThat(storage.size(Bucket.PRIVATE, privateKey(docId))).as("the approved document itself is never cleaned up").isPresent();
         cleanup.enqueue(Bucket.PRIVATE, privateKey(docId), "MISTAKE");
