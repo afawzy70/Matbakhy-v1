@@ -69,7 +69,7 @@ jobs:
           echo "front=$(docker image inspect --format '{{index .RepoDigests 0}}' "$front")" >> "$GITHUB_OUTPUT"
 
   deploy:
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/chore/contabo-auto-cd'
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 30
