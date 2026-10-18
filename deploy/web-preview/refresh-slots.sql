@@ -8,9 +8,12 @@ SELECT gen_random_uuid(), k.id, d::date, (d::date + time '13:00') AT TIME ZONE '
 FROM (VALUES ('00000000-0000-4000-8000-0000000bd001'::uuid), ('00000000-0000-4000-8000-0000000bd002'::uuid)) AS k(id),
      generate_series((now() AT TIME ZONE 'Africa/Cairo')::date + 1, (now() AT TIME ZONE 'Africa/Cairo')::date + 3, interval '1 day') AS d
 WHERE NOT EXISTS (SELECT 1 FROM cook_slot cs WHERE cs.kitchen_id = k.id AND cs.starts_at = (d::date + time '13:00') AT TIME ZONE 'Africa/Cairo' AND cs.state <> 'CANCELLED');
+-- Meals are attached only to the slots generated above (identified by the 13:00 Cairo start on the next three days), never to custom slots.
 INSERT INTO meal_slot (id, cook_slot_id, meal_id, capacity)
 SELECT gen_random_uuid(), cs.id, m.id, 10 FROM cook_slot cs JOIN meal m ON m.kitchen_id = cs.kitchen_id
 WHERE m.id IN ('00000000-0000-4000-8000-0000000bb001', '00000000-0000-4000-8000-0000000bb002', '00000000-0000-4000-8000-0000000bb003')
   AND cs.state = 'OPEN' AND cs.starts_at > now()
+  AND cs.local_date BETWEEN (now() AT TIME ZONE 'Africa/Cairo')::date + 1 AND (now() AT TIME ZONE 'Africa/Cairo')::date + 3
+  AND cs.starts_at = (cs.local_date + time '13:00') AT TIME ZONE 'Africa/Cairo' AND cs.lead_minutes = 120 AND cs.max_portions = 20
 ON CONFLICT (cook_slot_id, meal_id) DO NOTHING;
 COMMIT;

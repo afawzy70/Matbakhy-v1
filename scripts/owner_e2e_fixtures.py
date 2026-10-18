@@ -21,6 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "docs" / "quality" / "owner-acceptance" / "fixtures.json"
 SQL = ROOT / "deploy" / "web-preview" / "seed-owner-e2e.sql"
+SQL_MFA = ROOT / "deploy" / "web-preview" / "seed-owner-e2e-mfa.sql"
 CASES = ROOT / "docs" / "quality" / "owner-acceptance" / "cases"
 INVALID_DOMAIN = "owner-e2e.invalid"
 
@@ -46,7 +47,11 @@ def to_provision():
 
 def check():
     problems = []
-    sql = SQL.read_text(encoding="utf-8") if SQL.exists() else ""
+    sql = (SQL.read_text(encoding="utf-8") if SQL.exists() else "") + (SQL_MFA.read_text(encoding="utf-8") if SQL_MFA.exists() else "")
+    base_sql = SQL.read_text(encoding="utf-8") if SQL.exists() else ""
+    for code in ("security.mfa_policy", "security.mfa_reset"):
+        if f"'{code}'" in base_sql:
+            problems.append(f"{code} must only be granted by seed-owner-e2e-mfa.sql (V31+), not by the baseline-compatible seed")
     if not sql:
         problems.append(f"{SQL.relative_to(ROOT)} missing")
     keys = {a["key"] for a in actors()}

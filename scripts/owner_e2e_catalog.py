@@ -42,8 +42,32 @@ SECRET_PATTERNS = (
 )
 
 
-FORBIDDEN_KEYS = {"password", "passwd", "secret", "token", "access_token", "refresh_token", "id_token", "otp", "otp_seed", "totp_secret", "api_key", "client_secret", "cookie"}
-PASS_CLAIM = re.compile(r"(?i)\b(status|execution result|actual( result)?|observed|outcome|verdict)\b\s*[:=\-]+\s*\**pass(ed)?\b|\bpass(ed)?\s+on\s+\d{4}-")
+FORBIDDEN_KEY_PARTS = ("password", "passwd", "secret", "token", "otp", "apikey", "credential", "cookie", "bearer", "privatekey")
+RESULT_KEYS = {"result", "results", "outcome", "verdict", "actual", "actualresult", "observed", "executionresult", "testresult", "lastresult", "passed"}
+PASS_CLAIM = re.compile(r"(?i)\b(status|execution result|test result|actual( result)?|observed|outcome|verdict)\b\s*[:=\-]+\s*\**pass(ed)?\b|\bpass(ed)?\s+on\s+\d{4}-|\ball\s+(checks|tests|steps|cases|scenarios)\s+pass(ed)?\b|^\W*pass(ed)?\W*$")
+SHORT_ASSIGNMENT = re.compile(r"(?i)\b(access[_-]?token|refresh[_-]?token|id[_-]?token|client[_-]?secret|password|passwd|api[_-]?key)\b\s*[:=]\s*['\"]?[A-Za-z0-9+/_\-.]{6,}")
+
+
+def forbidden_key(key):
+    norm = re.sub(r"[^a-z0-9]", "", key.lower())
+    return any(part in norm for part in FORBIDDEN_KEY_PARTS)
+
+
+def suspicious(where, kind, text):
+    """Problems in one key or string value of a source document (credential-like or a recorded PASS)."""
+    out = []
+    if kind == "key":
+        if forbidden_key(text):
+            out.append(f"credential-bearing field {where}")
+        return out
+    parent = where.rsplit("/", 1)[-1].lower()
+    if re.sub(r"[^a-z]", "", parent) in RESULT_KEYS and re.match(r"(?i)^\W*pass(ed)?\b", text):
+        out.append(f"a result field claims PASS at {where}")
+    if PASS_CLAIM.search(text):
+        out.append(f"claims a PASS result at {where} (results live in run records, not in the catalog)")
+    if SHORT_ASSIGNMENT.search(text) or any(p.search(text) for p in SECRET_PATTERNS):
+        out.append(f"looks like a credential/secret/token at {where}")
+    return out
 
 
 def walk_strings(node, path=""):
@@ -64,10 +88,18 @@ def load_json(path):
         return json.load(f)
 
 
+SOURCE_PROBLEMS = []
+
+
 def load_cases():
     cases, files = [], sorted(CASES_DIR.glob("*.json"))
+    SOURCE_PROBLEMS.clear()
     for f in files:
         data = load_json(f)
+        # The whole document (conventions, findings, dispositions ... as well as the cases) is rendered or kept, so all of it is scanned.
+        for where, kind, text in walk_strings(data):
+            for problem in suspicious(where, kind, text):
+                SOURCE_PROBLEMS.append(f"{f.name}: {problem}")
         for c in data["cases"]:
             c["_domain"] = data.get("domain", f.stem)
             cases.append(c)
@@ -79,6 +111,7 @@ def validate(cases):
     scenarios = {s["id"]: s for s in load_json(ROOT / "planning" / "scenarios.json")["scenarios"]}
     rules = {r["id"] for r in load_json(ROOT / "planning" / "rules.json")["rules"]}
     seen = set()
+    errors.extend(SOURCE_PROBLEMS)
     for c in cases:
         cid = c.get("id", "<missing id>")
         if cid in seen:
@@ -122,15 +155,6 @@ def validate(cases):
             if br not in rules:
                 errors.append(f"{cid}: unknown rule {br}")
         blob = json.dumps(c, ensure_ascii=False)
-        for where, kind, text in walk_strings(c):
-            if kind == "key" and text.lower() in FORBIDDEN_KEYS:
-                errors.append(f"{cid}: credential-bearing field {where}")
-            if kind == "value" and PASS_CLAIM.search(text):
-                errors.append(f"{cid}: claims a PASS result at {where} (results live in run records, not in the catalog)")
-            if kind == "value":
-                for p in SECRET_PATTERNS:
-                    if p.search(text):
-                        errors.append(f"{cid}: looks like a credential/secret/token at {where}")
         for b in BOILERPLATE:
             if b in blob:
                 errors.append(f"{cid}: generic boilerplate step '{b[:40]}...'")
@@ -145,10 +169,7 @@ def validate_suite(cases):
         path = BASE / name
         if path.exists():
             for where, kind, text in walk_strings(load_json(path)):
-                if kind == "key" and text.lower() in FORBIDDEN_KEYS:
-                    errors.append(f"{name}: credential-bearing field {where}")
-                if kind == "value" and (PASS_CLAIM.search(text) or any(p.search(text) for p in SECRET_PATTERNS)):
-                    errors.append(f"{name}: PASS claim or credential-like text at {where}")
+                errors.extend(f"{name}: {p}" for p in suspicious(where, kind, text))
     suite_path = BASE / "core-suite.json"
     if not suite_path.exists():
         return ["core-suite.json missing"], None

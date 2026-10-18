@@ -38,7 +38,8 @@ INSERT INTO kitchen (id, owner_id, application_id, approved_revision, public_slu
   ('00000000-0000-4000-8000-0000000bd1c5', '00000000-0000-4000-8000-0000000b01c5', '00000000-0000-4000-8000-0000000ba1c5', 1, 'owner-e2e-multirole', 'مطبخ متعدد الأدوار', 'Synthetic multirole kitchen', 'ACTIVE', NULL, true, '+201000000205', 'Synthetic location 5')
 ON CONFLICT (id) DO NOTHING;
 
--- Staff grants (granted_by is the seeded reviewer row, as in seed-preview.sql). MFA permissions only for the second administrator.
+-- Staff grants (granted_by is the seeded reviewer row, as in seed-preview.sql). Baseline-compatible permission codes only: the two MFA
+-- permissions exist from migration V31 and are granted by seed-owner-e2e-mfa.sql (a V4 database rejects them and would roll this file back).
 INSERT INTO user_grant (id, user_id, permission, granted_by, grant_reason)
 SELECT gen_random_uuid(), g.user_id::uuid, g.permission, '00000000-0000-4000-8000-0000000b00e1', 'owner e2e fixture'
 FROM (VALUES
@@ -51,7 +52,6 @@ FROM (VALUES
   ('00000000-0000-4000-8000-0000000b01c3', 'config.read'),
   ('00000000-0000-4000-8000-0000000b01c4', 'staff.grant'), ('00000000-0000-4000-8000-0000000b01c4', 'audit.read'),
   ('00000000-0000-4000-8000-0000000b01c4', 'config.read'), ('00000000-0000-4000-8000-0000000b01c4', 'config.write'),
-  ('00000000-0000-4000-8000-0000000b01c4', 'security.mfa_policy'), ('00000000-0000-4000-8000-0000000b01c4', 'security.mfa_reset'),
   ('00000000-0000-4000-8000-0000000b01c5', 'support.case')
 ) AS g(user_id, permission)
 WHERE NOT EXISTS (SELECT 1 FROM user_grant ug WHERE ug.user_id = g.user_id::uuid AND ug.permission = g.permission AND ug.revoked_at IS NULL);

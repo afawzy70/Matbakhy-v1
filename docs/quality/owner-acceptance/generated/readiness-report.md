@@ -2,18 +2,16 @@
 
 200 cases. Counts by what the tester needs; a case appears in exactly one bucket (precedence: device, then updated deployment, then isolated stack, then fixtures), and every entry lists ALL its requirements.
 
-## Ready to run manually now (deployed preview, existing seed accounts only) — 93
+## Ready to run manually now (deployed preview, existing seed accounts only) — 91
 
 - CFG-001 (P0) Public realm discovery is served; Keycloak admin console and master realm are never published (absorbs CFG-035)
 - CFG-002 (P0) Customer web sign-in uses authorization code + PKCE S256 and a real logout ends the server session
 - CFG-003 (P0) Hostile OIDC inputs: unregistered redirect_uri, forged callback state/code, and returnTo open-redirect are all refused
-- CFG-005 (P0) Role boundary: customer, cook and unprivileged staff sessions cannot reach staff or other-owner APIs by URL, forged header or client-side role
 - CFG-006 (P1) Web account switch on a shared browser leaves no trace of the previous customer
 - CFG-034 (P0) Network classes: customer hosts follow CUSTOMER_ALLOWED_IPS, ops host and /api/v1/ops, /api/v1/cook follow STAFF_ALLOWED_IPS; unauthenticated staff API from an allowed IP is 401/403
 - CFG-036 (P0) CORS and CSRF for the web session API: only app./ops. origins are allowed with credentials; unsafe requests without a valid XSRF token are refused
 - CFG-037 (P1) Cookie attributes: session cookie is Secure, HttpOnly, SameSite=Lax; XSRF-TOKEN is readable and scoped to the parent domain
 - CFG-038 (P1) Content-Security-Policy is Report-Only (not enforced) on app. and ops.; baseline header set on every host
-- CFG-040 (P0) No secrets, tokens or OTP material in the repository history, API logs or deployment logs
 - CFG-041 (P1) Develop CD: push to develop runs build, digest-pinned deploy, health and smoke; record the deployed SHA and digests
 - CFG-044 (P2) Server reboot drill: services return in dependency order and the stack passes smoke (operator, change window)
 - CFG-045 (P0) Synthetic money guarantee: demo deposit and COD orders produce no outbound provider traffic and no real transfer or message
@@ -125,8 +123,9 @@
 - E2E-FIN-110 (P2) Settlements are dormant under zero commission: zero-amount entries cannot be batched — fixtures: FX-STAFF-FINANCE
 - E2E-FIN-112 (P0) Finance and payment endpoints are limited to the granted staff; Finance tab visibility follows the grants — fixtures: FX-STAFF-OPS, FX-STAFF-SUPPORT, FX-STAFF-FINANCE
 
-## Needs the updated application deployment (PR #9 / D18, and for MFA cases the owner-approved realm migration) — 51
+## Needs the updated application deployment (PR #9 / D18, and for MFA cases the owner-approved realm migration) — 55
 
+- CFG-005 (P0) Role boundary: customer, cook and unprivileged staff sessions cannot reach staff or other-owner APIs by URL, forged header or client-side role — needs: updated deploy
 - CFG-101 (P0) MFA decision table (ISOLATED STACK ONLY): effective mode, required and available for every category combination, user preference and missing row (replaces CFG-007, 009, 010, 012-matrix, 013) — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-MULTIROLE
 - CFG-102 (P0) Web step-up and first-time enrolment through Keycloak: level-1 sign-in never asks OTP; stepUp=true asks OTP or leads to TOTP enrolment — needs: updated deploy
 - CFG-008 (P0) Own two-step preference under OPTIONAL: enable only on a verified session; disable needs a recent factor, ends sessions, and is audited (absorbs CFG-017) — needs: updated deploy
@@ -141,6 +140,8 @@
 - CFG-021 (P0) After a reset a still-valid pre-reset token or session cannot perform a protected or staff high-risk action — needs: updated deploy, isolated stack
 - CFG-022 (P1) Invalid and reused TOTP codes at the Keycloak OTP prompt are rejected and Keycloak brute-force protection applies — needs: updated deploy, isolated stack
 - CFG-023 (P1) Reset and provider-session end return a safe 503 when the Keycloak admin client secret is not configured; policy and preference keep working — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B
+- CFG-104 (P0) Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts) — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
+- CFG-105 (P0) Staff grants: no self-escalation, no duplicate active grant, last staff.grant holder cannot be revoked — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B
 - CFG-106 (P1) Operator reference: staff and cook fixtures needed by the MFA cases are provisioned as in fixtures.md and carry the intended grants — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE, FX-MULTIROLE
 - CFG-027 (P0) Realm migration status is read-only and reports the real state (flow, browser binding, clients, admin client) without disclosing secrets — needs: updated deploy, isolated stack
 - CFG-028 (P0) Apply the MFA realm migration: verified backup first, flow bound last, verify gate prints RESULT (owner-gated, live-realm change) — needs: updated deploy, isolated stack
@@ -149,21 +150,22 @@
 - CFG-031 (P1) Rollback restores the previous browser flow even with unusual flow names; refuses an unreadable state file; PURGE removes admin client and mappers — needs: updated deploy, isolated stack
 - CFG-032 (P1) Interrupted migration leaves the old flow bound; rerun recovers; an incomplete bound flow is refused until rollback — needs: updated deploy, isolated stack
 - CFG-033 (P0) Default MFA state after deploy: all three categories OPTIONAL, nobody required, sign-in never asks OTP for customer, cook or staff — needs: updated deploy — fixtures: FX-STAFF-ADMIN-B
+- CFG-040 (P0) No secrets, tokens or OTP material in the repository history, API logs or deployment logs — needs: updated deploy
 - CFG-115 (P2) fixture-clean removes only leftover verify-mfa-* synthetic users — needs: updated deploy, isolated stack
 - CFG-118 (P1) Rollback plan is read-only and tells the truth about the schema: image-only vs restore — needs: updated deploy, isolated stack
 - CFG-120 (P2) Account console link and residual risk: Manage authenticator opens the Keycloak account console; DISABLED cannot stop adding an authenticator there — needs: updated deploy
 - CFG-122 (P0) Authorized MFA policy change by an administrator with recent MFA is applied, audited and restored to the exact previous mode — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B
-- E2E-COOK-049 (P0) Staff approval creates the kitchen; the applicant becomes a cook only after START_REVIEW and APPROVE with fresh MFA — needs: updated deploy — fixtures: FX-STAFF-OPS, FX-COOK-PENDING
-- E2E-COOK-050 (P0) Suspending a kitchen stops new sales and acceptance of pending orders but lets already accepted orders be fulfilled — needs: updated deploy — fixtures: FX-STAFF-OPS
+- E2E-COOK-049 (P0) Staff approval creates the kitchen; the applicant becomes a cook only after START_REVIEW and APPROVE with fresh MFA — needs: updated deploy, isolated stack — fixtures: FX-STAFF-OPS, FX-COOK-PENDING
+- E2E-COOK-050 (P0) Suspending a kitchen stops new sales and acceptance of pending orders but lets already accepted orders be fulfilled — needs: updated deploy, isolated stack — fixtures: FX-STAFF-OPS, FX-ISOLATED
 - E2E-COOK-053 (P1) A cook's onboarding document is private: only owner and the reviewing staff can read it, and replaying the upload ticket cannot change the approved copy — needs: updated deploy — fixtures: FX-CUST-NEW, FX-STAFF-OPS, FX-COOK-B
-- E2E-OPS-059 (P0) Granting a permission needs fresh MFA, a reason and is audited with actor, time, target and request id and no secrets — needs: updated deploy — fixtures: FX-STAFF-OPS
-- E2E-OPS-060 (P0) The last administrator's staff.grant cannot be revoked, even by themself — needs: updated deploy
+- E2E-OPS-059 (P0) Granting a permission needs fresh MFA, a reason and is audited with actor, time, target and request id and no secrets — needs: updated deploy — fixtures: FX-STAFF-OPS, FX-STAFF-ADMIN-B
+- E2E-OPS-060 (P0) The last administrator's staff.grant cannot be revoked, even by themself — needs: updated deploy, isolated stack — fixtures: FX-STAFF-ADMIN-B, FX-ISOLATED
 - E2E-OPS-061 (P1) Two sessions edit the same zone fee from the same version: the first saves, the second gets a version conflict and a refreshed form — needs: updated deploy — fixtures: FX-STAFF-ADMIN-B
-- E2E-COOK-107 (P1) Cook pause and resume work; a pause set by staff cannot be undone by the cook — needs: updated deploy — fixtures: FX-STAFF-OPS
-- E2E-COOK-108 (P0) A changed deposit recipient is hidden from customers until finance staff approve it (zero platform fee, direct kitchen account) — needs: updated deploy — fixtures: FX-STAFF-FINANCE, FX-STAFF-OPS
+- E2E-COOK-107 (P1) Cook pause and resume work; a pause set by staff cannot be undone by the cook — needs: updated deploy, isolated stack — fixtures: FX-STAFF-OPS, FX-ISOLATED
+- E2E-COOK-108 (P0) A changed deposit recipient is hidden from customers until finance staff approve it (zero platform fee, direct kitchen account) — needs: updated deploy, isolated stack — fixtures: FX-STAFF-FINANCE, FX-STAFF-OPS, FX-ISOLATED
 - E2E-COOK-111 (P1) Request changes, resubmit as revision 2, then reject: history is preserved and no kitchen is ever created — needs: updated deploy — fixtures: FX-STAFF-OPS, FX-CUST-NEW
-- E2E-OPS-101 (P0) An administrator cannot grant themselves a permission; unknown permissions, past expiry and duplicate grants are refused — needs: updated deploy — fixtures: FX-STAFF-OPS
-- E2E-OPS-102 (P1) A revoked or expired grant stops working on the very next request; revoking staff.grant is allowed while another administrator remains — needs: updated deploy — fixtures: FX-STAFF-ADMIN-B
+- E2E-OPS-101 (P0) An administrator cannot grant themselves a permission; unknown permissions, past expiry and duplicate grants are refused — needs: updated deploy — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-OPS
+- E2E-OPS-102 (P1) A revoked or expired grant stops working on the very next request; revoking staff.grant is allowed while another administrator remains — needs: updated deploy, isolated stack — fixtures: FX-ISOLATED, FX-STAFF-ADMIN-B
 - E2E-OPS-106 (P1) A delivery-fee change applies to new quotes only: a quote taken earlier is refused, the placed order keeps its fee, the new quote uses the new fee — needs: updated deploy — fixtures: FX-STAFF-ADMIN-B
 - E2E-OPS-107 (P1) Commerce policy versions: commission must stay zero, a real policy needs an approval reference, scheduled changes are refused, a synthetic version is appended — needs: updated deploy — fixtures: FX-STAFF-ADMIN-B
 - E2E-OPS-108 (P0) Separation of duties: a person who is both a cook and a reviewer cannot decide their own application, operate their own kitchen or approve their own payment account — needs: updated deploy — fixtures: FX-MULTIROLE, FX-COOK-B
@@ -195,11 +197,9 @@
 - E2E-ORDER-122 (P1) Native apps: place and track a pickup order with identical totals and states on iOS and Android — needs: device
 - E2E-FIN-113 (P1) Native apps: deposit checkout and honest payment wording on iOS and Android — needs: device
 
-## Isolated disposable stack only (races, fault injection, destructive) — 19
+## Isolated disposable stack only (races, fault injection, destructive) — 17
 
 - CFG-004 (P1) Web session expiry and server-side revocation: idle timeout and deleted session row both force re-authentication — needs: isolated stack
-- CFG-104 (P0) Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts) — needs: isolated stack — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
-- CFG-105 (P0) Staff grants: no self-escalation, no duplicate active grant, last staff.grant holder cannot be revoked — needs: isolated stack — fixtures: FX-STAFF-ADMIN-B
 - CFG-039 (P2) Brute-force and rate limiting: Keycloak lockout is the only login throttle; application-level rate limits for login/quote/order/search are not implemented — needs: isolated stack
 - CFG-042 (P1) Failed deploy handling: what the CD failure path really does and what the operator must do (backup preserved, no automatic DB rollback) — needs: isolated stack
 - CFG-043 (P1) Backup is accepted only after restore + reconcile: deploy.sh backup and restore-db on an isolated database — needs: isolated stack

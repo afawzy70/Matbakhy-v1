@@ -17,7 +17,7 @@ Actors are listed in `fixtures.json`; the cases reference them as `FX-*`. Seven 
    ./kcadm-in-container.sh cleanup /tmp/kcadm-e2e.cfg
    ```
    Users that already exist are skipped (their password is not changed).
-4. Apply the application rows and grants: `deploy/web-preview/seed-owner-e2e.sql` with the same `psql ... -v issuer=https://id.<PREVIEW_DOMAIN>/realms/matbakhy` call that `./deploy.sh seed` uses. It contains no secrets and does not change a row twice.
+4. Apply the application rows and grants: `deploy/web-preview/seed-owner-e2e.sql` with the same `psql ... -v issuer=https://id.<PREVIEW_DOMAIN>/realms/matbakhy` call that `./deploy.sh seed` uses. It contains no secrets, does not change a row twice and uses only permission codes that exist on the deployed baseline. After the release with migration V31 is deployed, also apply `deploy/web-preview/seed-owner-e2e-mfa.sql` (grants `security.mfa_policy` and `security.mfa_reset` to FX-STAFF-ADMIN-B); a pre-V31 database rejects those codes.
 5. Share the passwords over a private channel (a password manager); delete the private directory after the run. Never paste them into GitHub, tickets, screenshots or logs.
 6. Slots: seeded slots exist for three days after seeding. Run `deploy/web-preview/refresh-slots.sql` (additive, repeatable) before a run; do **not** re-run `./deploy.sh seed` (it is not repeatable, and after step 4 its first insert collides).
 
@@ -31,4 +31,4 @@ On the shared preview the provisioning is one-shot: a consumed fixture (FX-COOK-
 - Seeded meals have no photo, so price-change cases need a meal the cook publishes with a photo.
 
 ## Not run
-`seed-owner-e2e.sql`, `refresh-slots.sql` and the render script were checked for consistency with each other and with the migrations' column names; the SQL has **not** been executed against PostgreSQL (NOT_RUN) — run it on the isolated stack first.
+`seed-owner-e2e.sql`, `seed-owner-e2e-mfa.sql`, `refresh-slots.sql` and the render script were checked for consistency with each other and with the migrations' column names; the SQL has **not** been executed against PostgreSQL (NOT_RUN) — run it on the isolated stack first.

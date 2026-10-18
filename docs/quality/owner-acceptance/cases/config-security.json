@@ -455,7 +455,7 @@
     ]
    },
    "readiness": {
-    "needs_updated_deploy": false,
+    "needs_updated_deploy": true,
     "needs_device": false,
     "needs_isolated_stack": false,
     "needs_fixtures": []
@@ -1983,7 +1983,8 @@
    "prerequisites": [
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "ISOLATED STACK ONLY: uses separate synthetic staff accounts (fixtures.md), NOT the password-only preview-ops-* accounts, and changes grants. FX-STAFF-ADMIN-B holds staff.grant and has an enrolled authenticator; FX-STAFF-SUPPORT has no support.case grant yet",
-    "FX-ISOLATED exists and `./migrate-mfa.sh status` there prints flows=complete (the step-up half needs the migrated realm; the refusal half works on any build with StaffAssurance)"
+    "FX-ISOLATED exists and `./migrate-mfa.sh status` there prints flows=complete (the step-up half needs the migrated realm; the refusal half works on any build with StaffAssurance)",
+    "Fixture variant (ordinary fixtures.json grants differ): FX-STAFF-SUPPORT normally holds support.case, so BEFORE the case revoke its support.case grant (POST /api/v1/ops/staff/<id>/grant-revocations) so the probe grant can be added; FX-STAFF-ADMIN-B keeps its ordinary grants (staff.grant, audit.read, config.read, config.write, security.mfa_policy, security.mfa_reset) and is not changed. AFTER the case, restore: re-grant support.case to FX-STAFF-SUPPORT (it must end with exactly its ordinary grant list ['support.case'], verify via GET /api/v1/ops/staff)"
    ],
    "steps": [
     {
@@ -2007,8 +2008,8 @@
     {
      "n": 4,
      "actor": "FX-STAFF-ADMIN-B",
-     "action": "Cleanup: POST /api/v1/ops/staff/<FX-STAFF-SUPPORT id>/grant-revocations for the new grant, then GET /api/v1/ops/staff",
-     "data": "Grant must show revoked; restore FX-STAFF-SUPPORT to its fixture state"
+     "action": "Cleanup/restore: revoke the probe support.case grant if still active, then ensure FX-STAFF-SUPPORT holds exactly one active support.case grant again (re-grant with step-up if needed), then GET /api/v1/ops/staff",
+     "data": "End state equals fixtures.json: FX-STAFF-SUPPORT grants = [support.case]"
     }
    ],
    "expected": {
@@ -2041,7 +2042,7 @@
     ]
    },
    "readiness": {
-    "needs_updated_deploy": false,
+    "needs_updated_deploy": true,
     "needs_device": false,
     "needs_isolated_stack": true,
     "needs_fixtures": [
@@ -2057,7 +2058,8 @@
    "automated_coverage": [
     "StaffAssuranceTest",
     "StaffAccessIntegrationTest"
-   ]
+   ],
+   "requires_migrated_realm": true
   },
   {
    "id": "CFG-105",
@@ -2075,7 +2077,8 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "Isolated stack with exactly one holder of staff.grant (preview-ops-1 bootstrap), another account FX-STAFF-ADMIN-B present, and step-up done for each admin before its calls"
+    "Isolated stack with exactly one holder of staff.grant (preview-ops-1 bootstrap), another account FX-STAFF-ADMIN-B present, and step-up done for each admin before its calls",
+    "Fixture variant: needs exactly ONE active staff.grant holder. FX-STAFF-ADMIN-B (ordinary: staff.grant, audit.read, config.read, config.write, security.mfa_policy, security.mfa_reset) is NOT used as the second holder initially; use preview-ops-1/FX-STAFF-ADMIN as the sole staff.grant holder: if ADMIN-B exists on the stack, revoke its staff.grant first (needs another holder, so do this before revoking anyone else) and RESTORE it at the end. Step 2 grants security.mfa_policy to ADMIN-B, which ordinarily already holds it: duplicate-grant 409 is then the expected first answer, or revoke that grant before and restore after. Step 4 adds staff.grant to ADMIN-B and revokes the original holder's: re-grant the original holder's staff.grant at the end. Final state must equal fixtures.json grants for both accounts"
    ],
    "steps": [
     {
@@ -2136,7 +2139,7 @@
     ]
    },
    "readiness": {
-    "needs_updated_deploy": false,
+    "needs_updated_deploy": true,
     "needs_device": false,
     "needs_isolated_stack": true,
     "needs_fixtures": [
@@ -2151,7 +2154,8 @@
    "automated_coverage": [
     "StaffAccessIntegrationTest",
     "StaffAssuranceTest"
-   ]
+   ],
+   "requires_pr9_permission": "security.mfa_policy exists only from V31 (PR #9)"
   },
   {
    "id": "CFG-106",
@@ -3878,7 +3882,7 @@
     ]
    },
    "readiness": {
-    "needs_updated_deploy": false,
+    "needs_updated_deploy": true,
     "needs_device": false,
     "needs_isolated_stack": false,
     "needs_fixtures": []

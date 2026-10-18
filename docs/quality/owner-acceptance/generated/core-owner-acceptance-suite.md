@@ -89,7 +89,7 @@ Optional MFA end to end on the web: enrol, step up, policy authorization, staff 
 | 1 | CFG-102 | Web step-up and first-time enrolment through Keycloak: level-1 sign-in never asks OTP; stepUp=true asks OTP or leads to TOTP enrolment | Needs the updated application deployment | NOT_RUN |
 | 2 | CFG-008 | Own two-step preference under OPTIONAL: enable only on a verified session; disable needs a recent factor, ends sessions, and is audited (absorbs CFG-017) | Needs the updated application deployment | NOT_RUN |
 | 3 | CFG-016 | Policy mutation authorization ladder (refusals only): guest, customer, ungranted staff, bootstrap admin, and granted staff without recent MFA; no state change | Needs the updated application deployment | NOT_RUN |
-| 4 | CFG-104 | Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts) | Isolated disposable stack only | NOT_RUN |
+| 4 | CFG-104 | Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts) | Needs the updated application deployment | NOT_RUN |
 
 ## J8 — Physical devices
 

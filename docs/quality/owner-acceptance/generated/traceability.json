@@ -10,11 +10,11 @@
     "P2": 18
   },
   "by_readiness": {
-    "A1_NOW": 93,
+    "A1_NOW": 91,
     "A2_FIXTURES": 24,
-    "B_UPDATED_DEPLOY": 51,
+    "B_UPDATED_DEPLOY": 55,
     "C_DEVICE": 13,
-    "D_ISOLATED": 19
+    "D_ISOLATED": 17
   },
   "scenarios_total": 128,
   "scenarios_manual": 33,

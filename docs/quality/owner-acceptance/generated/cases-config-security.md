@@ -101,8 +101,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 ### CFG-005 — Role boundary: customer, cook and unprivileged staff sessions cannot reach staff or other-owner APIs by URL, forged header or client-side role
 
-- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
-- **Surface:** api, operations-web, customer-web · **Actors:** FX-GUEST, FX-CUST-A, FX-COOK-A, FX-STAFF-NOGRANT
+- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
+- **Surface:** api, operations-web, customer-web · **Actors:** FX-GUEST, FX-CUST-A, FX-COOK-A, FX-STAFF-NOGRANT · **Needs:** updated deploy
 - **Traces to:** rules: BR-001, BR-006, BR-007; operations: getOpsStaff, getOpsSecurityMfaPolicy; partial: TC-001, TC-006, TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
@@ -558,19 +558,20 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 ### CFG-104 — Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts)
 
-- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
-- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT · **Needs:** isolated stack · **Destructive**
+- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
+- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
 - **Traces to:** rules: BR-007, BR-043; operations: postOpsStaffGrants, getOpsStaff; partial: TC-007, TC-111
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - ISOLATED STACK ONLY: uses separate synthetic staff accounts (fixtures.md), NOT the password-only preview-ops-* accounts, and changes grants. FX-STAFF-ADMIN-B holds staff.grant and has an enrolled authenticator; FX-STAFF-SUPPORT has no support.case grant yet
   - FX-ISOLATED exists and `./migrate-mfa.sh status` there prints flows=complete (the step-up half needs the migrated realm; the refusal half works on any build with StaffAssurance)
+  - Fixture variant (ordinary fixtures.json grants differ): FX-STAFF-SUPPORT normally holds support.case, so BEFORE the case revoke its support.case grant (POST /api/v1/ops/staff/<id>/grant-revocations) so the probe grant can be added; FX-STAFF-ADMIN-B keeps its ordinary grants (staff.grant, audit.read, config.read, config.write, security.mfa_policy, security.mfa_reset) and is not changed. AFTER the case, restore: re-grant support.case to FX-STAFF-SUPPORT (it must end with exactly its ordinary grant list ['support.case'], verify via GET /api/v1/ops/staff)
 - **Steps:**
   1. (FX-STAFF-ADMIN-B) Sign in at ops.<PREVIEW_DOMAIN> password-only; open the Staff tab
   2. (FX-STAFF-ADMIN-B) POST /api/v1/ops/staff/<FX-STAFF-SUPPORT account id>/grants {"permission":"support.case","reason":"E2E grant probe"} with the password-only session — data: Confirm body field names in contracts/openapi.yaml postOpsStaffGrants first
   3. (FX-STAFF-ADMIN-B) Open https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://ops.<PREVIEW_DOMAIN>/, enter the TOTP, repeat step 2
-  4. (FX-STAFF-ADMIN-B) Cleanup: POST /api/v1/ops/staff/<FX-STAFF-SUPPORT id>/grant-revocations for the new grant, then GET /api/v1/ops/staff — data: Grant must show revoked; restore FX-STAFF-SUPPORT to its fixture state
+  4. (FX-STAFF-ADMIN-B) Cleanup/restore: revoke the probe support.case grant if still active, then ensure FX-STAFF-SUPPORT holds exactly one active support.case grant again (re-grant with step-up if needed), then GET /api/v1/ops/staff — data: End state equals fixtures.json: FX-STAFF-SUPPORT grants = [support.case]
 - **Expected:**
   - UI: Ops web shows 'This action needs additional verification (MFA).' with a step-up link /oauth2/authorization/keycloak?stepUp=true&returnTo=... for the refused action
   - API: Step 2: 403 STEP_UP_REQUIRED (token has no acr/amr MFA evidence or auth_time older than OIDC_STEP_UP_MAX_AGE)
@@ -582,8 +583,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 ### CFG-105 — Staff grants: no self-escalation, no duplicate active grant, last staff.grant holder cannot be revoked
 
-- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
-- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN, FX-STAFF-ADMIN-B · **Needs:** isolated stack · **Destructive**
+- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
+- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN, FX-STAFF-ADMIN-B · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
 - **Traces to:** scenarios: TC-043; rules: BR-007, BR-043; operations: postOpsStaffGrants, postOpsStaffGrantRevocations; partial: TC-007, TC-126
 - **Prerequisites:**
@@ -591,6 +592,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
   - Isolated stack with exactly one holder of staff.grant (preview-ops-1 bootstrap), another account FX-STAFF-ADMIN-B present, and step-up done for each admin before its calls
+  - Fixture variant: needs exactly ONE active staff.grant holder. FX-STAFF-ADMIN-B (ordinary: staff.grant, audit.read, config.read, config.write, security.mfa_policy, security.mfa_reset) is NOT used as the second holder initially; use preview-ops-1/FX-STAFF-ADMIN as the sole staff.grant holder: if ADMIN-B exists on the stack, revoke its staff.grant first (needs another holder, so do this before revoking anyone else) and RESTORE it at the end. Step 2 grants security.mfa_policy to ADMIN-B, which ordinarily already holds it: duplicate-grant 409 is then the expected first answer, or revoke that grant before and restore after. Step 4 adds staff.grant to ADMIN-B and revokes the original holder's: re-grant the original holder's staff.grant at the end. Final state must equal fixtures.json grants for both accounts
 - **Steps:**
   1. (FX-STAFF-ADMIN) POST /api/v1/ops/staff/<own id>/grants {"permission":"security.mfa_policy","reason":"E2E self"} — data: Self grant
   2. (FX-STAFF-ADMIN) POST /api/v1/ops/staff/<ADMIN-B id>/grants security.mfa_policy, then the identical request again
@@ -1053,8 +1055,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 ### CFG-040 — No secrets, tokens or OTP material in the repository history, API logs or deployment logs
 
-- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
-- **Surface:** deployment, api · **Actors:** FX-ISOLATED
+- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
+- **Surface:** deployment, api · **Actors:** FX-ISOLATED · **Needs:** updated deploy
 - **Traces to:** rules: BR-056, BR-060; operations: scripts/check_secrets.sh; partial: TC-056, TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
