@@ -71,7 +71,7 @@ async function openAccount() {
 describe("customer app shell (MB-031, kept in MB-032)", () => {
   it("signs in through the injected PKCE flow from the Account tab, shows the profile and switches language", async () => {
     const session = new Session();
-    const signIn = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 }));
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 }));
     const fetchImpl = api({ ...discover, "GET /api/v1/me": () => json(200, profile) });
     await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={fetchImpl} />);
     await openAccount();
@@ -123,6 +123,9 @@ describe("customer app shell (MB-031, kept in MB-032)", () => {
   });
 });
 
+/** Refuses with STEP_UP_REQUIRED until the injected sign-in has run, like the server after a verified second factor. */
+const refusedUntil = (signIn: jest.Mock) => () => (signIn.mock.calls.length > 0 ? json(200, { items: [meal("m1", "k1"), meal("m2", "k2")], nextCursor: null, hasMore: false }) : json(403, { code: "STEP_UP_REQUIRED" }));
+
 describe("two-step verification step-up (D18)", () => {
   async function signedInSession() {
     const session = new Session();
@@ -132,10 +135,9 @@ describe("two-step verification step-up (D18)", () => {
 
   it("offers a step-up sign-in when the server asks for a second factor, instead of a broken screen", async () => {
     const session = await signedInSession();
-    const stepUp = () => json(403, { code: "STEP_UP_REQUIRED" });
-    const signIn = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r2", expiresIn: 300 }));
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r2", expiresIn: 300 }));
     mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
-    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": stepUp })} />);
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": refusedUntil(signIn) })} />);
     expect(await screen.findByText(t.stepUp.message)).toBeTruthy();
     await fireEvent.press(await screen.findByTestId("step-up-verify"));
     await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
@@ -146,15 +148,63 @@ describe("two-step verification step-up (D18)", () => {
 
   it("treats a step-up that signs in as another person as an account switch: basket cleared, profile re-read", async () => {
     const session = await signedInSession();
-    const signIn = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
     mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
     let profileCalls = 0;
-    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => { profileCalls += 1; return json(200, profile); }, "GET /api/v1/meals": () => json(403, { code: "STEP_UP_REQUIRED" }) })} />);
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => { profileCalls += 1; return json(200, profile); }, "GET /api/v1/meals": refusedUntil(signIn) })} />);
     await fireEvent.press(await screen.findByTestId("step-up-verify"));
     await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
     expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
     expect(session.accessToken).toBe(fakeJwt("customer-b"));
     expect(profileCalls).toBeGreaterThanOrEqual(2);
+  });
+
+  it("an account switch during step-up leaves nothing of account A on any screen: orders, navigation, basket and pending order are gone", async () => {
+    const session = await signedInSession();
+    let who = "A";
+    const orderOf = (n: string) => ({ id: `o-${n}`, publicNumber: n, state: "PLACED", total: money(5000) });
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => {
+      who = "B";
+      return s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 });
+    });
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify({ clientRequestId: "c", idempotencyKey: "k", quoteId: "q", terms: "t", cancellation: "c" }));
+    const routes = {
+      ...discover,
+      "GET /api/v1/me": () => json(200, { ...profile, displayName: who === "A" ? "Account A" : "Account B" }),
+      "GET /api/v1/orders": () => json(200, { items: [orderOf(`${who}-1`)], nextCursor: null, hasMore: false }),
+      "GET /api/v1/meals": () => refusedUntil(signIn)(),
+    };
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api(routes)} />);
+    await fireEvent.press(await screen.findByTestId("tab-orders"));
+    expect(await screen.findByTestId("order-A-1")).toBeTruthy();
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    // Navigation was reset to the first tab and A's order list was unmounted; B's data is never mixed with A's.
+    await waitFor(() => expect(screen.queryByTestId("order-A-1")).toBeNull());
+    expect(screen.queryByTestId("orders")).toBeNull();
+    await fireEvent.press(await screen.findByTestId("tab-orders"));
+    expect(await screen.findByTestId("order-B-1")).toBeTruthy();
+    expect(screen.queryByTestId("order-A-1")).toBeNull();
+    expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
+    expect(mockStore.get("matbakhy.pendingPlacement.v1")).toBeUndefined();
+    expect(session.cachedKeys.filter((k) => k !== "me")).toEqual([]);
+    expect(session.cache<{ displayName: string }>("me")?.displayName).toBe("Account B");
+  });
+
+  it("after a step-up for the same person the refused reads load again without a manual action", async () => {
+    const session = await signedInSession();
+    let verified = false;
+    const signIn = jest.fn(async (_c: AppConfig, s: Session) => {
+      verified = true;
+      return s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r2", expiresIn: 300 });
+    });
+    const meals = () => (verified ? discover["GET /api/v1/meals"]() : json(403, { code: "STEP_UP_REQUIRED" }));
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": meals })} />);
+    expect(screen.queryByTestId("meal-m1")).toBeNull();
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    expect(await screen.findByTestId("meal-m1")).toBeTruthy();
+    expect(screen.queryByTestId("step-up-banner")).toBeNull();
   });
 
   it("keeps showing the request when the user cancels the verification, and never signs them out", async () => {

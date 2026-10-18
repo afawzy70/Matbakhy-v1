@@ -31,6 +31,10 @@ export interface AppContextValue {
   stepUpRequired: boolean;
   /** Verifies again with a second factor (same account, fresh login); clears the request when it succeeds. */
   startStepUp: () => Promise<void>;
+  /** Changes when the signed-in person changes: everything below it is remounted, so no screen state of the previous account survives. */
+  accountEpoch: number;
+  /** Changes after a successful step-up for the same person: server reads that were refused are loaded again (writes are never replayed). */
+  dataEpoch: number;
   endSession: () => Promise<void>;
   switchAccount: () => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -82,6 +86,8 @@ export function AppProvider({
   const [auth, setAuth] = useState<AuthPhase>({ kind: "loading" });
   const [busy, setBusy] = useState(false);
   const [stepUpRequired, setStepUpRequired] = useState(false);
+  const [accountEpoch, setAccountEpoch] = useState(0);
+  const [dataEpoch, setDataEpoch] = useState(0);
   const t = strings[locale];
   // A new client per language: requests carry the current Accept-Language; a 401 ends the session everywhere.
   const api = useMemo(() => {
@@ -166,10 +172,17 @@ export function AppProvider({
       const after = (await session.restore())?.subject ?? null;
       if (before !== after) {
         // The person signed in as somebody else in the browser: this is an account switch, so nothing of the previous account may remain (TC-048).
+        // Order matters: hide the old profile, drop the persisted basket and pending placement, then remount every screen (navigation and
+        // screen state) before the new person's profile is read; the session already cleared its private caches when the subject changed.
+        setAuth({ kind: "loading" });
+        setStepUpRequired(false);
         await clearShopping();
+        setAccountEpoch((n) => n + 1);
         await reloadProfile();
+      } else {
+        setStepUpRequired(false);
+        setDataEpoch((n) => n + 1);
       }
-      setStepUpRequired(false);
     } catch (e) {
       // Cancelling keeps the account signed in with the notice still showing; a real failure says so.
       if (!(e instanceof SignInCancelled)) {
@@ -231,6 +244,8 @@ export function AppProvider({
     startSignIn,
     stepUpRequired,
     startStepUp,
+    accountEpoch,
+    dataEpoch,
     endSession,
     switchAccount,
     reloadProfile,

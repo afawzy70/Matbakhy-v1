@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useApp } from "./AppContext";
 import { errorCode } from "./mobileApi";
 
 export type Loaded<T> = { status: "loading" } | { status: "error"; code: string } | { status: "ok"; data: T };
@@ -9,8 +10,10 @@ export type Loaded<T> = { status: "loading" } | { status: "error"; code: string 
  * showing stale data as current.
  */
 export function useServer<T>(load: () => Promise<{ data?: T; error?: unknown; response: Response }>, key: string = "") {
+  const { dataEpoch } = useApp();
   const [nonce, setNonce] = useState(0);
-  const token = `${key}#${nonce}`;
+  // dataEpoch: a successful step-up reloads reads that were refused with STEP_UP_REQUIRED.
+  const token = `${key}#${nonce}#${dataEpoch}`;
   const [result, setResult] = useState<{ token: string; state: Loaded<T> } | null>(null);
   const loadRef = useRef(load);
   useEffect(() => {

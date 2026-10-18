@@ -6,7 +6,9 @@ export type PlacementOutcome =
   /** No definitive answer (offline, unreachable, server error): the keys are kept; retrying cannot duplicate. */
   | { kind: "uncertain"; offline: boolean }
   /** The server answered definitively; these keys can never succeed. */
-  | { kind: "rejected"; code: string };
+  | { kind: "rejected"; code: string }
+  /** The server wants a second factor first (D18). Nothing was ordered and the stored keys are kept; the customer retries explicitly after verifying. */
+  | { kind: "stepUp" };
 
 async function settle(orderId: string): Promise<PlacementOutcome> {
   await savePending(null);
@@ -26,6 +28,9 @@ export async function place(api: MobileApi, p: PendingPlacement): Promise<Placem
     }
     if (r.response.status >= 500 || r.response.status === 401) {
       return { kind: "uncertain", offline: false };
+    }
+    if (r.response.status === 403 && errorCode(r.error) === "STEP_UP_REQUIRED") {
+      return { kind: "stepUp" };
     }
     await savePending(null);
     return { kind: "rejected", code: errorCode(r.error) };

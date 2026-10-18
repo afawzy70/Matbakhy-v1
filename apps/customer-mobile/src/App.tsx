@@ -84,13 +84,13 @@ function StepUpBanner() {
 }
 
 function Navigation() {
-  const { t, config } = useApp();
+  const { t, config, accountEpoch } = useApp();
   const linking = useMemo(() => linkingFor(config.redirectUri), [config.redirectUri]);
   return (
     <View style={{ flex: 1 }}>
       <StepUpBanner />
       <View style={{ flex: 1 }}>
-        <NavigationContainer theme={theme} linking={linking}>
+        <NavigationContainer key={accountEpoch} theme={theme} linking={linking}>
           <Stack.Navigator screenOptions={{ headerBackTitle: t.back }}>
             <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
             <Stack.Screen name="Meal" component={MealScreen} options={{ title: "" }} />

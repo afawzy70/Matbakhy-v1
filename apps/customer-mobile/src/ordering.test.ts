@@ -86,6 +86,20 @@ describe("placement that cannot duplicate an order (BR-023, TC-049)", () => {
     expect(await loadPending()).toBeNull();
   });
 
+  it("keeps the stored keys when the server asks for a second factor and sends the same keys on the explicit retry", async () => {
+    await saveBasket({ ...target, lines: [line("m1")] });
+    await savePending(pending);
+    const stepUp = server(() => json(403, { code: "STEP_UP_REQUIRED" }));
+    expect(await place(apiFor(stepUp.fetchImpl), pending)).toEqual({ kind: "stepUp" });
+    expect(await loadPending()).toEqual(pending);
+    expect(await loadBasket()).not.toBeNull();
+    // Nothing is replayed by itself: the retry is the customer's explicit action and reuses the very same keys.
+    const ok = server(() => json(201, { id: "order-1" }));
+    expect(await place(apiFor(ok.fetchImpl), pending)).toEqual({ kind: "placed", orderId: "order-1" });
+    expect(ok.calls[0]?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
+    expect(JSON.parse(ok.calls[0]?.body ?? "{}")).toMatchObject({ clientRequestId: pending.clientRequestId });
+  });
+
   it("after a restart finds the order by client request id, or re-sends with the same keys, and stays uncertain offline", async () => {
     await savePending(pending);
     const offline = server(() => {

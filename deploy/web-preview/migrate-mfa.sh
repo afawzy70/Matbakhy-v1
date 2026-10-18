@@ -24,6 +24,7 @@ BACKUP_DIR="${BACKUP_DIR:-/srv/matbakhy-backups}"
 KCDIR="$BACKUP_DIR/keycloak"
 STATE="$KCDIR/mfa-migration-state.env"
 MIGRATION=identity/mfa-migration.kcadm.sh
+. ./identity/mfa-state.sh
 REALM=matbakhy
 
 run_migration() { # $1 = status | apply | rollback
@@ -47,12 +48,13 @@ backup() {
     > "$KCDIR/realm-before-$stamp.json" 2>/dev/null
   [ -s "$KCDIR/realm-before-$stamp.json" ] || die "empty realm export"
   prev="$(run_migration status 2>/dev/null | sed -n 's/^browserFlow=//p')"
+  [ -n "$prev" ] || die "cannot read the currently bound browser flow"
   # The rollback baseline is the flow bound BEFORE the first apply. A repeated apply (when the matbakhy flow is already bound) keeps it.
   if [ "$prev" = "matbakhy browser" ] && [ -f "$STATE" ]; then
-    old="$(sed -n "s/^PREVIOUS_BROWSER_FLOW='\(.*\)'$/\1/p" "$STATE" | head -1)"
+    old="$(state_flow "$STATE" 2>/dev/null || true)"
     [ -z "$old" ] || prev="$old"
   fi
-  printf "STAMP='%s'\nPREVIOUS_BROWSER_FLOW='%s'\nDB_DUMP='keycloak-db-%s.dump'\nREALM_EXPORT='realm-before-%s.json'\n" "$stamp" "$prev" "$stamp" "$stamp" > "$STATE"
+  state_write "$STATE" "$stamp" "$prev" || die "cannot write the migration state (unexpected flow name or stamp)"
   echo "backup written under $KCDIR (state: $STATE)"
 }
 
@@ -74,8 +76,12 @@ case "${1:-}" in
     ;;
   verify) verify ;;
   rollback)
-    [ -f "$STATE" ] && . "$STATE" || true
-    PREVIOUS_FLOW="${PREVIOUS_FLOW:-${PREVIOUS_BROWSER_FLOW:-browser}}" run_migration rollback
+    # The state file is parsed as data (never sourced); an explicit PREVIOUS_FLOW from the operator wins, an unreadable file is refused.
+    if [ -z "${PREVIOUS_FLOW:-}" ]; then
+      [ -f "$STATE" ] || die "no state file $STATE: pass PREVIOUS_FLOW='<flow name>' explicitly (the built-in flow is 'browser')"
+      PREVIOUS_FLOW="$(state_flow "$STATE")" || die "state file $STATE is not valid; pass PREVIOUS_FLOW explicitly"
+    fi
+    PREVIOUS_FLOW="$PREVIOUS_FLOW" run_migration rollback
     echo "Rolled back the browser flow. A full restore of the identity store, if ever needed, uses the dump named in $STATE (pg_restore into an empty keycloak database while identity is stopped)."
     ;;
   *) die "usage: ./migrate-mfa.sh backup | status | apply | verify | rollback" ;;

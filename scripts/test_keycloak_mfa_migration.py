@@ -6,6 +6,7 @@ public verification never submits an enrolment or an OTP.
 """
 import ast
 import subprocess
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -14,12 +15,13 @@ WP = ROOT / "deploy" / "web-preview"
 MIGRATION = WP / "identity" / "mfa-migration.kcadm.sh"
 WRAPPER = WP / "kcadm-in-container.sh"
 OPERATOR = WP / "migrate-mfa.sh"
+STATE_LIB = WP / "identity" / "mfa-state.sh"
 VERIFY = WP / "identity" / "verify-mfa-flow.py"
 
 
 class KeycloakMfaMigrationTest(unittest.TestCase):
     def test_shell_scripts_are_valid_posix_sh(self):
-        for script in (MIGRATION, WRAPPER, OPERATOR):
+        for script in (MIGRATION, WRAPPER, OPERATOR, STATE_LIB):
             result = subprocess.run(["sh", "-n", str(script)], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, f"{script.name}: {result.stderr}")
 
@@ -41,10 +43,45 @@ class KeycloakMfaMigrationTest(unittest.TestCase):
         self.assertIn('--password "$ADMIN_PASSWORD"', wrapper)  # expanded inside the container shell (single-quoted here)
         self.assertIn("-e ADMIN_USER -e ADMIN_PASSWORD", wrapper)  # forwarded by name, not by value
 
-    def test_the_rollback_baseline_survives_a_repeated_apply_and_the_state_file_can_be_sourced(self):
+    def test_the_rollback_baseline_survives_a_repeated_apply_and_the_state_is_never_sourced(self):
         text = OPERATOR.read_text()
         self.assertIn('[ "$prev" = "matbakhy browser" ] && [ -f "$STATE" ]', text)
-        self.assertIn("PREVIOUS_BROWSER_FLOW='%s'", text, "values with spaces must be quoted so the state file can be sourced")
+        self.assertIn("state_flow", text)
+        self.assertNotRegex(text, r'(?m)^\s*\.\s+"?\$STATE', "the state file must be parsed as data, not sourced")
+        self.assertNotIn("PREVIOUS_BROWSER_FLOW='%s'", text)
+
+    def test_unusual_flow_names_round_trip_without_executing_anything(self):
+        names = ["browser", "matbakhy browser", "owner's browser", 'say "hi" $(touch PWNED) `touch PWNED2` ; touch PWNED3', "عربي flow", "a\\b $HOME *"]
+        with tempfile.TemporaryDirectory() as d:
+            for i, name in enumerate(names):
+                f = Path(d) / f"state{i}.env"
+                # pass the name through the environment so the test itself never builds shell text from it
+                w = subprocess.run(["sh", "-c", f". '{STATE_LIB}'; state_write '{f}' 20261018T101010Z \"$FLOW\""], capture_output=True, text=True, env={"FLOW": name, "PATH": "/usr/bin:/bin"}, cwd=d)
+                self.assertEqual(w.returncode, 0, w.stderr)
+                r = subprocess.run(["sh", "-c", f". '{STATE_LIB}'; state_flow '{f}'"], capture_output=True, text=True, env={"PATH": "/usr/bin:/bin"}, cwd=d)
+                self.assertEqual((r.returncode, r.stdout), (0, name), r.stderr)
+            self.assertEqual(sorted(p.name for p in Path(d).iterdir() if p.name.startswith("PWNED")), [])
+
+    def test_a_tampered_state_file_is_refused_and_nothing_runs(self):
+        with tempfile.TemporaryDirectory() as d:
+            f = Path(d) / "state.env"
+            for body in (
+                "STAMP=20261018T101010Z\nPREVIOUS_BROWSER_FLOW_B64=$(touch PWNED)\n",
+                "PREVIOUS_BROWSER_FLOW_B64='x'; touch PWNED\n",
+                "PREVIOUS_BROWSER_FLOW_B64=YQpi\n",  # decodes to "a\nb": a flow name is a single line
+                "PREVIOUS_BROWSER_FLOW_B64=\n",
+                "STAMP=x; touch PWNED\n",
+            ):
+                f.write_text(body)
+                r = subprocess.run(["sh", "-c", f". '{STATE_LIB}'; state_flow '{f}' && state_read '{f}' STAMP"], capture_output=True, text=True, env={"PATH": "/usr/bin:/bin"}, cwd=d)
+                self.assertNotEqual(r.returncode, 0, body)
+                self.assertFalse((Path(d) / "PWNED").exists(), body)
+
+    def test_state_write_refuses_an_unexpected_stamp(self):
+        with tempfile.TemporaryDirectory() as d:
+            r = subprocess.run(["sh", "-c", f". '{STATE_LIB}'; state_write '{d}/s.env' 'x;touch PWNED' browser"], capture_output=True, text=True, env={"PATH": "/usr/bin:/bin"}, cwd=d)
+            self.assertNotEqual(r.returncode, 0)
+            self.assertFalse((Path(d) / "PWNED").exists())
 
     def test_nothing_deletes_users_or_credentials(self):
         text = MIGRATION.read_text()
