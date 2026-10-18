@@ -1,4 +1,4 @@
-import { decideAdd, loadBasket, loadPending, saveBasket, savePending, type Basket, type PendingPlacement } from "./basket";
+import { bindShopping, clearShopping, decideAdd, loadBasket, loadPending, saveBasket, savePending, type Basket, type PendingPlacement } from "./basket";
 import { createMobileApi } from "./mobileApi";
 import { place, recover } from "./placement";
 import { Session } from "./session";
@@ -113,6 +113,41 @@ describe("placement that cannot duplicate an order (BR-023, TC-049)", () => {
     expect(post?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
     expect(JSON.parse(post?.body ?? "{}")).toMatchObject({ clientRequestId: pending.clientRequestId });
     expect(await loadPending()).toBeNull();
+  });
+
+  it("a late answer after an account switch never touches the next person's stored basket or pending order", async () => {
+    await bindShopping("subject-a");
+    await savePending(pending);
+    const otherPending: PendingPlacement = { ...pending, clientRequestId: "other-request", idempotencyKey: "other-key" };
+    // Account A's request is still in flight when B signs in; B starts a pending order of their own before A's answer arrives.
+    const late = server(async () => {
+      await clearShopping();
+      await bindShopping("subject-b");
+      await savePending(otherPending);
+      return json(403, { code: "STEP_UP_REQUIRED" });
+    });
+    expect(await place(apiFor(late.fetchImpl), pending)).toEqual({ kind: "stepUp" });
+    expect(await loadPending()).toEqual(otherPending);
+    const placed = server(async () => {
+      await clearShopping();
+      await bindShopping("subject-b");
+      await savePending(otherPending);
+      return json(201, { id: "order-a" });
+    });
+    await bindShopping("subject-a");
+    expect(await place(apiFor(placed.fetchImpl), pending)).toEqual({ kind: "placed", orderId: "order-a" });
+    expect(await loadPending()).toEqual(otherPending);
+  });
+
+  it("while a cleanup of the previous person's data has failed, their basket and pending order read as empty for the next person", async () => {
+    await bindShopping("subject-a");
+    await saveBasket({ ...target, lines: [line("m1")] });
+    await savePending(pending);
+    await bindShopping("subject-b");
+    expect(await loadBasket()).toBeNull();
+    expect(await loadPending()).toBeNull();
+    await bindShopping("subject-a");
+    expect(await loadPending()).toEqual(pending);
   });
 
   it("after a restart finds the order by client request id, or re-sends with the same keys, and stays uncertain offline", async () => {

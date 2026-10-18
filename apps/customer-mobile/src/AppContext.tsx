@@ -1,7 +1,7 @@
 import type { Locale } from "@matbakhy/design-tokens";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { refresh as systemRefresh, signIn as systemSignIn, signOut as systemSignOut, SignInCancelled } from "./auth";
-import { clearShopping } from "./basket";
+import { bindShopping, clearShopping } from "./basket";
 import type { AppConfig } from "./config";
 import { strings, type Strings } from "./i18n";
 import { createMobileApi, type MobileApi, type Schemas } from "./mobileApi";
@@ -111,6 +111,7 @@ export function AppProvider({
     // An answer that arrives after the signed-in person changed belongs to the previous person and is dropped.
     const subject = session.subject;
     try {
+      await bindShopping(subject);
       const cached = session.cache<Profile>("me");
       if (cached) {
         setAuth({ kind: "signedIn", profile: cached });
@@ -183,10 +184,13 @@ export function AppProvider({
         setAuth({ kind: "loading" });
         setStepUpRequired(false);
         setAccountEpoch((n) => n + 1);
+        // From now on the stored basket and pending order read as empty for the new person, whatever the cleanup does.
+        await bindShopping(after).catch(() => undefined);
         try {
           await clearShopping();
+          await bindShopping(after);
         } catch {
-          // The previous account's basket could not be removed: do not continue as the new person on top of it; end this session.
+          // The previous account's basket could not be removed: it stays unreadable (owner mismatch) and this session ends.
           await session.signOut();
           setAuth({ kind: "signedOut", message: t.signInFailed });
           return;

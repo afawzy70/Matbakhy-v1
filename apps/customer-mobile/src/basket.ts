@@ -83,14 +83,58 @@ async function write(key: string, value: unknown) {
   }
 }
 
-export const loadBasket = () => read<Basket>(BASKET);
-export const saveBasket = (basket: Basket | null) => write(BASKET, basket);
-export const loadPending = () => read<PendingPlacement>(PENDING);
-export const savePending = (pending: PendingPlacement | null) => write(PENDING, pending);
+/**
+ * The stored basket and pending placement belong to one signed-in person (TC-048). The owner is recorded next to them; while the
+ * signed-in person is someone else, both read as empty and are never written over silently, so a storage cleanup that failed during
+ * an account switch cannot hand the previous person's basket or unconfirmed order to the next one.
+ */
+const OWNER = "matbakhy.shoppingOwner.v1";
+let activeOwner: string | null = null;
 
+export const shoppingOwner = () => activeOwner;
+
+/** Makes {@code subject} the person the stored shopping data is read for (null: nobody is bound). Claims unowned data for them. */
+export async function bindShopping(subject: string | null) {
+  activeOwner = subject;
+  if (subject && (await read<string>(OWNER)) === null) {
+    await write(OWNER, subject);
+  }
+}
+
+async function foreign(): Promise<boolean> {
+  if (!activeOwner) {
+    return false;
+  }
+  const stored = await read<string>(OWNER);
+  return stored !== null && stored !== activeOwner;
+}
+
+async function claim() {
+  if (activeOwner && (await read<string>(OWNER)) !== activeOwner) {
+    await write(OWNER, activeOwner);
+  }
+}
+
+export const loadBasket = async () => ((await foreign()) ? null : read<Basket>(BASKET));
+export const saveBasket = async (basket: Basket | null) => {
+  if (basket !== null) {
+    await claim();
+  }
+  return write(BASKET, basket);
+};
+export const loadPending = async () => ((await foreign()) ? null : read<PendingPlacement>(PENDING));
+export const savePending = async (pending: PendingPlacement | null) => {
+  if (pending !== null) {
+    await claim();
+  }
+  return write(PENDING, pending);
+};
+
+/** Removes the basket, the pending placement and the owner record. Throws when storage refuses; callers must not continue as if it worked. */
 export async function clearShopping() {
   await saveBasket(null);
   await savePending(null);
+  await write(OWNER, null);
 }
 
 export type AddOutcome =

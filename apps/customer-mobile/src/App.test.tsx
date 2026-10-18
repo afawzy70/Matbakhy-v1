@@ -207,6 +207,11 @@ describe("two-step verification step-up (D18)", () => {
     await fireEvent.press(await screen.findByTestId("step-up-verify"));
     await waitFor(() => expect(session.accessToken).toBeNull());
     store.deleteItemAsync.mockImplementation(failing);
+    // The previous person's basket is still in storage (the cleanup failed) but unreadable for anybody else.
+    expect(mockStore.get("matbakhy.basket.v1")).toBeTruthy();
+    const { loadBasket, loadPending } = jest.requireActual<typeof import("./basket")>("./basket");
+    expect(await loadBasket()).toBeNull();
+    expect(await loadPending()).toBeNull();
     expect(screen.queryByTestId("orders")).toBeNull();
     expect(screen.queryByText(t.stepUp.message)).toBeNull();
   });
