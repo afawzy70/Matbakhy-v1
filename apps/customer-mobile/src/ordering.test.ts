@@ -186,6 +186,23 @@ describe("placement that cannot duplicate an order (BR-023, TC-049)", () => {
     expect((await loadBasket())?.lines[0]?.mealId).toBe("m1");
   });
 
+  it("a guest basket is never left behind for the next person: it moves to the first person only when they have none, and is dropped otherwise", async () => {
+    await bindShopping("subject-a");
+    await saveBasket({ ...target, lines: [line("own")] });
+    await bindShopping(null);
+    await saveBasket({ ...target, lines: [line("guest")] });
+    await savePending(pending);
+    await bindShopping("subject-a"); // A already has a basket: A's wins, the guest keys are removed
+    expect((await loadBasket())?.lines[0]?.mealId).toBe("own");
+    expect(await loadPending()).toBeNull();
+    await bindShopping(null);
+    expect(await loadBasket()).toBeNull();
+    expect(await loadPending()).toBeNull();
+    await bindShopping("subject-b"); // nothing of the earlier guest basket can reach B
+    expect(await loadBasket()).toBeNull();
+    expect(await loadPending()).toBeNull();
+  });
+
   it("after a restart finds the order by client request id, or re-sends with the same keys, and stays uncertain offline", async () => {
     await savePending(pending);
     const offline = server(() => {

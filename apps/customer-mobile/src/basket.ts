@@ -137,18 +137,22 @@ export async function bindShopping(subject: string | null): Promise<void> {
     const move = (async () => {
       try {
         const [guestBasket, guestPending, ownBasket, ownPending] = await Promise.all([read<Basket>(BASKET), read<PendingPlacement>(PENDING), read<Basket>(`${BASKET}.${subject}`), read<PendingPlacement>(`${PENDING}.${subject}`)]);
-        if ((guestBasket || guestPending) && !ownBasket && !ownPending) {
-          if (guestBasket) {
-            await write(`${BASKET}.${subject}`, guestBasket);
-          }
-          if (guestPending) {
-            await write(`${PENDING}.${subject}`, guestPending);
-          }
+        if (guestBasket || guestPending) {
+          // The guest's keys are removed FIRST, so the same basket can never end up with two people; only then is it written for this
+          // person, and only when they have nothing of their own (their own basket wins; the guest basket is dropped).
           await write(BASKET, null);
           await write(PENDING, null);
+          if (!ownBasket && !ownPending) {
+            if (guestBasket) {
+              await write(`${BASKET}.${subject}`, guestBasket);
+            }
+            if (guestPending) {
+              await write(`${PENDING}.${subject}`, guestPending);
+            }
+          }
         }
       } catch {
-        // The guest data stays where it is; the signed-in person simply starts with their own.
+        // Nothing was copied before the guest keys were removed, so a failure can lose a guest basket but never share it.
       }
     })();
     migration = move;
