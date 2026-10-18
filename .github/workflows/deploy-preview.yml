@@ -1,0 +1,148 @@
+name: Deploy Matbakhy preview to Contabo
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  actions: read
+
+concurrency:
+  group: matbakhy-preview-deploy
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    outputs:
+      api: ${{ steps.images.outputs.api }}
+      front: ${{ steps.images.outputs.front }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Wait for passing Product CI at this exact commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            state=$(gh api "repos/$REPO/actions/workflows/ci.yml/runs?head_sha=$SHA&per_page=30" \
+              --jq '[.workflow_runs[] | select(.head_sha == env.SHA and .event == "push")] | if length == 0 then "pending" elif any(.conclusion == "success") then "success" elif any(.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out") then "failed" else "pending" end')
+            case "$state" in
+              success) echo "Product CI passed"; exit 0 ;;
+              failed) echo "::error::Product CI failed"; exit 1 ;;
+              *) sleep 30 ;;
+            esac
+          done
+          echo "::error::Timed out waiting for Product CI"; exit 1
+      - name: Build API jar
+        working-directory: backend
+        run: |
+          export JAVA_HOME="$JAVA_HOME_21_X64"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          ./mvnw -B -ntp -DskipTests package
+      - name: Build and publish immutable images
+        id: images
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          OWNER: ${{ github.repository_owner }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner=$(printf '%s' "$OWNER" | tr '[:upper:]' '[:lower:]')
+          api="ghcr.io/$owner/matbakhy-api:$SHA"
+          front="ghcr.io/$owner/matbakhy-preview-front:$SHA"
+          printf '%s' "$GH_TOKEN" | docker login ghcr.io -u "$OWNER" --password-stdin
+          docker build -t "$api" --label "org.opencontainers.image.revision=$SHA" backend
+          docker build -t "$front" --label "org.opencontainers.image.revision=$SHA" \
+            --build-arg PREVIEW_DOMAIN=167-86-90-174.sslip.io \
+            -f deploy/web-preview/front.Dockerfile .
+          docker push "$api"
+          docker push "$front"
+          echo "api=$(docker image inspect --format '{{index .RepoDigests 0}}' "$api")" >> "$GITHUB_OUTPUT"
+          echo "front=$(docker image inspect --format '{{index .RepoDigests 0}}' "$front")" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: preview
+    env:
+      HOST: ${{ secrets.STAGING_SSH_HOST }}
+      USER: ${{ secrets.STAGING_SSH_USER }}
+      SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      HOST_PUBKEY: ${{ secrets.STAGING_SSH_HOST_PUBKEY }}
+      GHCR_TOKEN: ${{ github.token }}
+      API_IMAGE: ${{ needs.build.outputs.api }}
+      FRONT_IMAGE: ${{ needs.build.outputs.front }}
+      SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Configure verified SSH host
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in HOST USER SSH_KEY HOST_PUBKEY API_IMAGE FRONT_IMAGE; do
+            [[ -n "${!v}" ]] || { echo "::error::Missing $v"; exit 1; }
+          done
+          install -d -m 700 ~/.ssh
+          (umask 077; printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519)
+          printf '%s %s\n' "$HOST" "$HOST_PUBKEY" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Transfer versioned deployment files (preserve server .env and data)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 "$USER@$HOST" \
+            'test -f /srv/matbakhy-staging/deploy/web-preview/.env && test -w /srv/matbakhy-staging'
+          tar -cf - deploy infra scripts | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -i ~/.ssh/id_ed25519 "$USER@$HOST" 'tar -xf - -C /srv/matbakhy-staging'
+      - name: Deploy digest-pinned images, wait for health, HTTPS smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/remote-deploy.sh" <<'REMOTE'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          sha="$1"; api="$2"; front="$3"
+          dir=/srv/matbakhy-staging/deploy/web-preview
+          cd "$dir"
+          [ -f .env ] || { echo "Missing server .env"; exit 1; }
+          cfg=$(mktemp -d)
+          old=$(mktemp)
+          chmod 600 "$old"
+          cp .env "$old"
+          cleanup() { rm -rf "$cfg"; rm -f "$old"; }
+          trap cleanup EXIT
+          export DOCKER_CONFIG="$cfg"
+          IFS= read -r token
+          printf '%s' "$token" | docker login ghcr.io -u afawzy70 --password-stdin >/dev/null
+          unset token
+          python3 - "$sha" "$api" "$front" <<'PY'
+          import sys
+          from pathlib import Path
+          p = Path(".env")
+          values = {"RELEASE_COMMIT": sys.argv[1], "API_IMAGE": sys.argv[2], "FRONT_IMAGE": sys.argv[3]}
+          rows = [r for r in p.read_text().splitlines() if not any(r.startswith(k + "=") for k in values)]
+          p.write_text("\n".join(rows + [f"{k}={v}" for k, v in values.items()]) + "\n")
+          p.chmod(0o600)
+          PY
+          if ! ./deploy.sh up || ! ./deploy.sh smoke; then
+            echo "Deployment failed. Restoring prior configuration; no automatic DB rollback."
+            cp "$old" .env
+            exit 1
+          fi
+          echo "DEPLOYED $sha"
+          REMOTE
+          chmod 600 "$RUNNER_TEMP/remote-deploy.sh"
+          scp -q -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 \
+            "$RUNNER_TEMP/remote-deploy.sh" "$USER@$HOST:/tmp/matbakhy-cd-${SHA}.sh"
+          printf '%s\n' "$GHCR_TOKEN" | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -i ~/.ssh/id_ed25519 "$USER@$HOST" \
+            "bash /tmp/matbakhy-cd-${SHA}.sh '$SHA' '$API_IMAGE' '$FRONT_IMAGE'; rc=\$?; rm -f /tmp/matbakhy-cd-${SHA}.sh; exit \$rc"
