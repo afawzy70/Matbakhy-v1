@@ -115,3 +115,12 @@ for f in ['planning/decisions.json','planning/executi` | 0 | Read-only parsing a
 - Suggested fix: Validate captured real HTTP responses against OpenAPI and add a browser deposit workflow driven through customer/cook controls. Preserve the existing component and API tests with their current, accurate labels.
 - Repro test: Schema-validate real quote, placed order and payment-transition responses, including null/legacy payment cases. In Playwright, select deposit, review terms, place, report transfer and acknowledge receipt through UI controls in Arabic and English. NOT_RUN.
 - Claude triage: OPEN — 
+
+
+## Phase 2 execution — 2026-10-18
+
+Tested source: `890bc872468085747c938dd3cb27b77ba036c713`. Scope authorized: execute existing planning, migration, Python, secret, TypeScript, lint, JavaScript, build and contract checks in this isolated worktree. No product changes or new behavior tests. Only synthetic checked-in fixtures. No network or backend/native execution.
+
+Use individual `python3 -m unittest` invocations; modules importing sibling scripts require `discover -s scripts -p <filename> -v`. Execute the five pnpm commands verbatim first, then expand workspace commands with `--config.engine-strict=false` for the owner-authorized Node 22 environment. Capture direct Vitest/Jest JSON reports for exact counts because recursive pnpm logs omit runner summaries. Backend Maven/Testcontainers verification is NOT_RUN: no JDK or Docker. Docker proxy tests and secret scanner must remain BLOCKED when unavailable. Existing Phase 1 findings remain historical and are not revalidated by these checks.
+
+See `qa-execution-report.md` and `phase2-evidence/commands.json` for actual results, commands, exit codes and logs. Passing frontend tests do not prove PostgreSQL concurrency, server authorization, live identity, native behavior or release readiness. Recommendations: repeat the blocked checks on a clean runner with Docker/JDK and supported Node.

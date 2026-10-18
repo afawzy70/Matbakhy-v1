@@ -294,7 +294,12 @@ public class MediaService implements MediaLibrary {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    action.run();
+                    try {
+                        action.run();
+                    } catch (RuntimeException e) {
+                        // Best effort: the committed approval must not turn into an error; the orphan is unreferenced (CR2-001).
+                        org.slf4j.LoggerFactory.getLogger(MediaService.class).warn("post-commit storage cleanup failed", e);
+                    }
                 }
             });
         }

@@ -16,13 +16,13 @@
  {
   "id": "CR-002",
   "source": "code-review",
-  "severity": "High",
+  "severity": "Medium",
   "component": "Staff authentication",
   "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
   "line": 49,
   "title": "Staff grants become usable without MFA",
-  "status": "OPEN_OWNER_DECISION",
-  "triage": "Docs (06-permissions.md:26) place staff MFA at the identity provider; API only enforces step-up on selected endpoints. Defense-in-depth gap is real but enforcement in the API changes behaviour for preview staff accounts and many tests; needs owner decision + IdP verification",
+  "status": "OPEN_DEPLOYMENT_VERIFICATION",
+  "triage": "Round-2 independent review: not a code defect (docs/product/06-permissions.md:26 assigns staff-session MFA to the IdP; API enforces recent MFA on high-risk actions). Residual: obtain evidence that the staging/production Keycloak policy requires MFA for staff before inviting testers. Severity downgraded High->Medium with that rationale; API-side defense-in-depth remains an owner decision.",
   "evidence": "AccountMapper.java:49-50 unconditionally adds active permission authorities; assurance claims are merely copied at lines 56-62. SecurityConfiguration's API chains require ACCOUNT_ACTIVE without a staff MFA guard. StaffCaseController.java:31 requires only PERM_support.case. CashController.java:70 requires only PERM_finance.verify. StaffAssurance is invoked only by selected endpoint annotations.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -137,6 +137,70 @@
   "triage": "test-coverage/not yet triaged",
   "evidence": "ContractRoutesTest.java:34-52 compares registry and served routes. packages/api-client/test/registry.test.ts:23-55 checks metadata and schema compilation. apps/customer-web/src/App.test.tsx:15-18 and apps/operations-web/src/App.test.tsx:13-28 explicitly use fake APIs. apps/operations-web/e2e-staging/smoke.staging.ts:108-131 and :158-168 issue payment API calls directly.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "fix_commit": null
+ },
+ {
+  "id": "CR2-001",
+  "source": "code-review",
+  "severity": "Medium",
+  "component": "Media storage",
+  "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
+  "line": 210,
+  "title": "Upload cleanup failure cannot be recovered by re-completion",
+  "status": "MITIGATED_FOLLOWUP",
+  "triage": "Post-commit delete failures are now caught and logged so approval does not surface as an error. The orphan upload object is unreferenced. Follow-up: durable cleanup job (not done; Medium, tracked).",
+  "evidence": "round-2 review",
+  "found_at_commit": "890bc87",
+  "fix_commit": null
+ },
+ {
+  "id": "QA2-001",
+  "source": "qa",
+  "severity": "Informational",
+  "component": "tooling/environment",
+  "status": "DOCUMENTED",
+  "triage": "Environment limit, not a product defect (see qa-execution-report.md)",
+  "found_at_commit": "890bc87",
+  "fix_commit": null
+ },
+ {
+  "id": "QA2-002",
+  "source": "qa",
+  "severity": "Informational",
+  "component": "tooling/environment",
+  "status": "DOCUMENTED",
+  "triage": "Environment limit, not a product defect (see qa-execution-report.md)",
+  "found_at_commit": "890bc87",
+  "fix_commit": null
+ },
+ {
+  "id": "QA2-003",
+  "source": "qa",
+  "severity": "Informational",
+  "component": "tooling/environment",
+  "status": "DOCUMENTED",
+  "triage": "Environment limit, not a product defect (see qa-execution-report.md)",
+  "found_at_commit": "890bc87",
+  "fix_commit": null
+ },
+ {
+  "id": "QA2-004",
+  "source": "qa",
+  "severity": "Informational",
+  "component": "tooling/environment",
+  "status": "DOCUMENTED",
+  "triage": "Environment limit, not a product defect (see qa-execution-report.md)",
+  "found_at_commit": "890bc87",
+  "fix_commit": null
+ },
+ {
+  "id": "QA2-005",
+  "source": "qa",
+  "severity": "Informational",
+  "component": "tooling/environment",
+  "status": "DOCUMENTED",
+  "triage": "Environment limit, not a product defect (see qa-execution-report.md)",
+  "found_at_commit": "890bc87",
   "fix_commit": null
  }
 ]

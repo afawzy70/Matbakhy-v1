@@ -1,0 +1,32 @@
+{
+  "customer-web": {
+    "numTotalTests": 48,
+    "numPassedTests": 48,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "operations-web": {
+    "numTotalTests": 26,
+    "numPassedTests": 26,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "api-client": {
+    "numTotalTests": 34,
+    "numPassedTests": 34,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "customer-mobile": {
+    "numTotalTests": 55,
+    "numPassedTests": 55,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "design-tokens": {
+    "numTotalTests": 47,
+    "numPassedTests": 47,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  }
+}

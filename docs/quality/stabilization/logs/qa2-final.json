@@ -1,0 +1,219 @@
+{
+  "agent": "Independent QA engineer",
+  "commit": "890bc872468085747c938dd3cb27b77ba036c713",
+  "summary": "Phase 2 completed with environment blockers. JavaScript: 210 passed, 0 failed. Python corrected invocations: 69 passed, 1 environment-related failure, 1 skipped class. Typecheck, lint, both web builds and contract checks passed with engine enforcement disabled; contract validation emitted 4 warnings. Backend Maven/Testcontainers: NOT_RUN—no JDK or Docker. No product code changed. Report: docs/quality/stabilization/qa-execution-report.md. All 45 execution commands, exit codes and logs: docs/quality/stabilization/phase2-evidence/commands.json.",
+  "commands": [
+    {
+      "command": "python3 scripts/validate_blueprint.py",
+      "exit_code": 0,
+      "note": "PASS: 1 planning check."
+    },
+    {
+      "command": "python3 scripts/check_scope.py",
+      "exit_code": 0,
+      "note": "PASS: 1 planning check."
+    },
+    {
+      "command": "python3 scripts/check_migration_compat.py",
+      "exit_code": 0,
+      "note": "PASS: 1 migration check."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_dev_bootstrap -v",
+      "exit_code": 0,
+      "note": "PASS: 5 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_e2e_fixtures -v",
+      "exit_code": 0,
+      "note": "PASS: 7 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_guardrails -v",
+      "exit_code": 1,
+      "note": "Invocation error: 1 loader error; no real tests executed. Corrected with discovery."
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p test_guardrails.py -v",
+      "exit_code": 0,
+      "note": "PASS: 15 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_migration_compat -v",
+      "exit_code": 0,
+      "note": "PASS: 8 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_preview_backup -v",
+      "exit_code": 0,
+      "note": "PASS: 2 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_preview_release -v",
+      "exit_code": 0,
+      "note": "PASS: 8 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_proxy_access -v",
+      "exit_code": 0,
+      "note": "BLOCKED: 0 tests run, 1 class skipped; Docker unavailable."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_record_evidence -v",
+      "exit_code": 0,
+      "note": "PASS: 2 passed, 0 failed."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_scope -v",
+      "exit_code": 1,
+      "note": "Invocation error: 1 loader error; no real tests executed. Corrected with discovery."
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p test_scope.py -v",
+      "exit_code": 1,
+      "note": "BLOCKED: 11 passed, 1 failed due to workspace-injected .aws/.codex directories."
+    },
+    {
+      "command": "python3 -m unittest scripts.test_staging_profile -v",
+      "exit_code": 0,
+      "note": "PASS: 11 passed, 0 failed."
+    },
+    {
+      "command": "bash scripts/check_secrets.sh",
+      "exit_code": 2,
+      "note": "BLOCKED: Docker daemon unavailable; scan did not run."
+    },
+    {
+      "command": "pnpm typecheck",
+      "exit_code": 1,
+      "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; no checks executed."
+    },
+    {
+      "command": "pnpm lint",
+      "exit_code": 1,
+      "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; no checks executed."
+    },
+    {
+      "command": "pnpm test",
+      "exit_code": 1,
+      "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; no tests executed."
+    },
+    {
+      "command": "pnpm build",
+      "exit_code": 1,
+      "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; no builds executed."
+    },
+    {
+      "command": "pnpm contract:check",
+      "exit_code": 1,
+      "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; no checks executed."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false -r --if-present run typecheck",
+      "exit_code": 0,
+      "note": "PASS: 5 projects, 0 failures."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm lint",
+      "exit_code": 0,
+      "note": "PASS: 1 lint check, 0 failures."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false -r --if-present run test",
+      "exit_code": 0,
+      "note": "PASS: 5 projects. Direct JSON-report runs confirmed 210 passed, 0 failed, 0 pending: API client 34, design tokens 47, customer web 48, operations web 26, mobile JavaScript 55."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false -r --if-present run build",
+      "exit_code": 0,
+      "note": "PASS: 2 web builds, 0 failures."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run lint:contract",
+      "exit_code": 0,
+      "note": "PASS: contract valid, 0 errors, 4 ambiguous-path warnings."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run check:drift",
+      "exit_code": 0,
+      "note": "PASS: generated client matches contract."
+    },
+    {
+      "command": "(cd backend && ./mvnw -B -ntp verify)",
+      "exit_code": 0,
+      "note": "NOT_RUN: no JDK or Docker/Testcontainers. Exit code is not applicable; schema integer field does not represent an execution result. Pass/fail counts unavailable."
+    }
+  ],
+  "findings": [
+    {
+      "id": "QA2-001",
+      "severity": "Informational",
+      "component": "Execution environment",
+      "file": ".npmrc",
+      "line": 1,
+      "title": "BLOCKED: engine enforcement rejects Node 22",
+      "scenario": "Run the five requested pnpm commands without overrides.",
+      "expected": "Execute checks using the owner-authorized Node 22 environment.",
+      "actual": "All five exit 1 before executing checks.",
+      "evidence": "ERR_PNPM_UNSUPPORTED_ENGINE; Expected version: >=24.21.0 <25; Got: v22.23.3.",
+      "suggested_fix": "Use the recorded expanded commands with --config.engine-strict=false. Their underlying checks passed.",
+      "repro_test": "pnpm typecheck"
+    },
+    {
+      "id": "QA2-002",
+      "severity": "Informational",
+      "component": "QA invocation",
+      "file": "scripts/test_guardrails.py",
+      "line": 9,
+      "title": "Initial unittest module invocations cannot resolve sibling imports",
+      "scenario": "Invoke test_guardrails and test_scope as scripts package modules.",
+      "expected": "Load and execute test cases.",
+      "actual": "Each invocation exits 1 with one loader error.",
+      "evidence": "ModuleNotFoundError: No module named 'validate_blueprint'; scope similarly reports No module named 'check_scope'.",
+      "suggested_fix": "Use unittest discovery with -s scripts. Guardrails then passes all 15 tests; scope result is recorded separately.",
+      "repro_test": "python3 -m unittest scripts.test_guardrails -v"
+    },
+    {
+      "id": "QA2-003",
+      "severity": "Informational",
+      "component": "Execution environment",
+      "file": "scripts/test_scope.py",
+      "line": 33,
+      "title": "BLOCKED: host directories invalidate copied scope fixture",
+      "scenario": "Run scope tests in this worktree containing injected .aws and .codex directories.",
+      "expected": "Copied repository passes its inventory assertion.",
+      "actual": "11 tests pass; test_current_repository_passes fails. The original repository scope check passes.",
+      "evidence": "AssertionError: ['inventory: unlisted top-level entry .aws', 'inventory: unlisted top-level entry .codex'] != [].",
+      "suggested_fix": "Rerun on a clean checkout without injected host directories; consider excluding ignored host directories from fixture copies.",
+      "repro_test": "python3 -m unittest discover -s scripts -p test_scope.py -v"
+    },
+    {
+      "id": "QA2-004",
+      "severity": "Informational",
+      "component": "Execution environment",
+      "file": "scripts/check_secrets.sh",
+      "line": 1,
+      "title": "BLOCKED: secret scanner requires Docker",
+      "scenario": "Execute the secret scanner in this sandbox.",
+      "expected": "Execute the secret scan.",
+      "actual": "Exit 2; scan does not run.",
+      "evidence": "ERROR: Docker daemon not available; secret scan cannot run",
+      "suggested_fix": "Run on a Docker-enabled runner.",
+      "repro_test": "bash scripts/check_secrets.sh"
+    },
+    {
+      "id": "QA2-005",
+      "severity": "Informational",
+      "component": "Execution environment",
+      "file": "scripts/test_proxy_access.py",
+      "line": 64,
+      "title": "BLOCKED: proxy suite skips without Docker",
+      "scenario": "Execute the proxy-access suite in this sandbox.",
+      "expected": "Execute proxy-access tests.",
+      "actual": "Exit 0, but 0 tests run and one class skips; this is not PASS.",
+      "evidence": "setUpClass skipped 'Docker is not available'; Ran 0 tests; OK (skipped=1).",
+      "suggested_fix": "Run with Docker and the required local images.",
+      "repro_test": "python3 -m unittest scripts.test_proxy_access -v"
+    }
+  ]
+}
