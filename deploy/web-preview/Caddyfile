@@ -21,6 +21,12 @@
 	}
 }
 
+(web_csp) {
+	# SEC-004: Report-Only first, so it cannot break sign-in, checkout, staff or image flows while it is validated in the
+	# browser E2E; promote to Content-Security-Policy once those flows run clean under it (docs/security/csp-rollout.md).
+	header Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data: https://media.{$PREVIEW_DOMAIN}; font-src 'self'; connect-src 'self' https://api.{$PREVIEW_DOMAIN}; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+}
+
 (customer_access) {
 	@customer_outsider not remote_ip {$CUSTOMER_ALLOWED_IPS}
 	respond @customer_outsider "Not available" 403
@@ -35,6 +41,7 @@ app.{$PREVIEW_DOMAIN} {
 	route {
 		import headers
 		import customer_access
+		import web_csp
 		header X-Frame-Options DENY
 		encode zstd gzip
 		root * /srv/customer-web
@@ -47,6 +54,7 @@ ops.{$PREVIEW_DOMAIN} {
 	route {
 		import headers
 		import staff_access
+		import web_csp
 		header X-Frame-Options DENY
 		encode zstd gzip
 		root * /srv/operations-web

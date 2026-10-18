@@ -113,7 +113,7 @@ load() {
   sample_stats "$OUT/stats.csv" & local sampler=$!
   (deploy backup > "$OUT/backup-during-load.txt" 2>&1; echo "backup exit $?" >> "$OUT/backup-during-load.txt") &
   local backup=$!
-  python3 "$ROOT/scripts/rehearsal/load.py" "$DOMAIN" 60 10 | tee "$OUT/load.json" || echo "load reported errors" | tee -a "$OUT/load.json"
+  REHEARSAL_INSECURE_LOCAL_TLS=1 python3 "$ROOT/scripts/rehearsal/load.py" "$DOMAIN" 60 10 | tee "$OUT/load.json" || echo "load reported errors" | tee -a "$OUT/load.json"
   wait "$backup" || true
   sleep 4; kill "$sampler" 2>/dev/null || true
   python3 "$ROOT/scripts/rehearsal/peaks.py" "$OUT/stats.csv" | tee "$OUT/peaks.txt"
