@@ -179,7 +179,7 @@ function OrderCard({ ctx, order, refresh }: { ctx: Ctx; order: Order; refresh: (
 
 function CashReport({ ctx, order, refresh }: { ctx: Ctx; order: Order; refresh: () => unknown }) {
   const { t } = ctx;
-  const [amount, setAmount] = useState((order.total.amountMinor / 100).toFixed(2));
+  const [amount, setAmount] = useState((((order.payment?.remainder.amountMinor ?? order.total.amountMinor)) / 100).toFixed(2));
   const [reference, setReference] = useState("");
   const { run, error, busy } = useMutation(ctx, refresh);
   const minor = egpToMinor(amount);

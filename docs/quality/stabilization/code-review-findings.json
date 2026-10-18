@@ -1,0 +1,44 @@
+[
+ {
+  "id": "CR-001",
+  "severity": "High",
+  "component": "Deposit and cash accounting",
+  "file": "backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java",
+  "line": 96,
+  "title": "Cash reporting and verification demand the full total after a deposit",
+  "scenario": "A completed EGP 200 order has an acknowledged EGP 100 deposit and EGP 100 cash remainder. The cook reports the correctly collected EGP 100 cash.",
+  "expected": "The cash report has zero discrepancy and finance can verify EGP 100 against the immutable cash obligation.",
+  "actual": "The report records a negative EGP 100 discrepancy and marks the obligation DISPUTED. Verification rejects EGP 100 because it also requires the full EGP 200 total. The cook form defaults to that full total.",
+  "evidence": "OrderService.placeOnce inserts cash_obligation.amount_minor as q.totalMinor() - q.depositMinor(). CashService.java:96-106 instead calculates discrepancy against customer_order.total_minor; lines 127-150 use that total again for verification. apps/operations-web/src/cook/Orders.tsx:182 initializes the report amount from order.total.",
+  "suggested_fix": "Use cash_obligation.amount_minor for reporting and verification, and payment.remainder for the cook form default. Handle zero-remainder orders explicitly.",
+  "repro_test": "Add an integration scenario placing a 50% deposit order, acknowledging receipt, completing it, reporting the remainder, and verifying that remainder. Assert zero discrepancy and VERIFIED cash state. Not executed."
+ },
+ {
+  "id": "CR-002",
+  "severity": "High",
+  "component": "Staff authentication",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
+  "line": 49,
+  "title": "Staff grants become usable without MFA",
+  "scenario": "An active account with finance.verify or support.case authenticates using a password-only session or bearer token with no MFA claims, then accesses its staff endpoints.",
+  "expected": "BR-007 and the permission specification require MFA for staff sessions, with recent step-up additionally required for high-risk actions.",
+  "actual": "AccountMapper grants every active database permission without checking assurance. Most staff controllers check only those permissions, so password-only authentication can read support conversations and verify cash reports.",
+  "evidence": "AccountMapper.java:49-50 unconditionally adds active permission authorities; assurance claims are merely copied at lines 56-62. SecurityConfiguration's API chains require ACCOUNT_ACTIVE without a staff MFA guard. StaffCaseController.java:31 requires only PERM_support.case. CashController.java:70 requires only PERM_finance.verify. StaffAssurance is invoked only by selected endpoint annotations.",
+  "suggested_fix": "Require a validated MFA assertion before granting or exercising any staff authority. Keep recent authentication age checks as an additional requirement for sensitive actions.",
+  "repro_test": "Authenticate an account holding support.case and finance.verify with claims lacking MFA. Assert denial for staff case reads and cash verification; assert access with valid MFA and appropriate grants. Cover both web and bearer chains. Not executed."
+ },
+ {
+  "id": "CR-003",
+  "severity": "High",
+  "component": "Private document upload integrity",
+  "file": "backend/app/src/main/java/com/matbakhy/app/providers/S3ObjectStorage.java",
+  "line": 49,
+  "title": "Reusable upload URL can replace an approved private document",
+  "scenario": "A cook uploads a clean document and completes scanning, then reuses the still-valid ten-minute PUT URL to replace it with different bytes of the same length and content type.",
+  "expected": "Approved document reads return exactly the bytes that passed checksum, content inspection, and malware scanning.",
+  "actual": "The PUT signature binds the key, type, and length but no content checksum or create-only condition. Approval retains the upload key, and private reads sign that same mutable key. Completion returns immediately for an APPROVED row, so replacement bytes are served without inspection.",
+  "evidence": "S3ObjectStorage.java:48-50 signs PUT without checksum or overwrite protection. MediaService.java:121 issues the upload URL; lines 132-133 skip verification for approved media; lines 273-274 generate approved document read URLs using row.privateKey().",
+  "suggested_fix": "Bind uploads to the declared checksum and ensure approved reads reference immutable verified bytes, using a separate protected object or a verified immutable object version. Prevent upload tickets from overwriting approved content.",
+  "repro_test": "Against the configured S3-compatible storage, upload and approve a clean synthetic document, overwrite it through the original ticket before expiry, then read it as a reviewer. Assert overwrite rejection or retrieval of the original verified bytes. Not executed."
+ }
+]

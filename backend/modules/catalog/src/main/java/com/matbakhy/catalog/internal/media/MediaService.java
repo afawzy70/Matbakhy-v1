@@ -200,8 +200,14 @@ public class MediaService implements MediaLibrary {
             storage.write(Bucket.PUBLIC, publicKey, variant, MediaInspector.JPEG);
             onRollback(() -> storage.delete(Bucket.PUBLIC, written));
         } else {
-            jdbc.update("UPDATE media_asset SET state = 'APPROVED', updated_at = ?, version = version + 1 WHERE id = ?",
-                    Timestamp.from(clock.instant()), mediaId);
+            // The upload ticket stays valid for its TTL, so approved bytes move to a key no ticket can write (CR-003).
+            String sealed = "documents/" + mediaId;
+            String uploadKey = row.privateKey();
+            storage.write(Bucket.PRIVATE, sealed, content, sniffed);
+            onRollback(() -> storage.delete(Bucket.PRIVATE, sealed));
+            jdbc.update("UPDATE media_asset SET state = 'APPROVED', private_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
+                    sealed, Timestamp.from(clock.instant()), mediaId);
+            afterCommit(() -> storage.delete(Bucket.PRIVATE, uploadKey));
         }
         return view(lockOwned(ownerId, mediaId));
     }
@@ -281,6 +287,17 @@ public class MediaService implements MediaLibrary {
     private Row lockOwned(UUID ownerId, UUID mediaId) {
         return jdbc.query("SELECT * FROM media_asset WHERE id = ? AND owner_id = ? AND state <> 'DELETED' FOR UPDATE", MediaService::map,
                 mediaId, ownerId).stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "media not found"));
+    }
+
+    private static void afterCommit(Runnable action) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    action.run();
+                }
+            });
+        }
     }
 
     private static void onRollback(Runnable action) {

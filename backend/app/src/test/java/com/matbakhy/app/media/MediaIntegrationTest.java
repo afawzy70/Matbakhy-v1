@@ -292,6 +292,9 @@ class MediaIntegrationTest {
         HttpResponse<byte[]> fetched = http.send(HttpRequest.newBuilder(URI.create(read)).GET().build(), HttpResponse.BodyHandlers.ofByteArray());
         assertThat(fetched.statusCode()).isEqualTo(200);
         assertThat(fetched.body()).isEqualTo(doc);
+        // CR-003: approved bytes are served from a key the (still valid) upload ticket cannot write.
+        assertThat(privateKey(docId)).isEqualTo("documents/" + docId);
+        assertThat(storage.size(Bucket.PRIVATE, "uploads/" + docId)).as("upload-ticket key no longer holds the document").isEmpty();
 
         // Not attached to a submitted revision: invisible to other customers and to reviewers.
         assertThat(call(get("/api/v1/uploads/" + docId), as(otherSubject)).getStatus()).isEqualTo(404);
