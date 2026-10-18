@@ -232,8 +232,7 @@ class LogRedactionIntegrationTest {
             UUID slot = fx.slot(kitchen, 300, 20, meal, 10);
 
             // A private document with a marker in its content and a telling file name, uploaded through a signed URL.
-            byte[] doc = ("%PDF-1.4\n1 0 obj << /Type /Catalog /Title (" + DOC_MARKER + ") >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n")
-                    .getBytes(StandardCharsets.ISO_8859_1);
+            byte[] doc = com.matbakhy.app.support.SyntheticPdf.minimal("/Title (" + DOC_MARKER + ")");
             String sha = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(doc));
             JsonNode ticket = ok(call(post("/api/v1/uploads").content("""
                     {"purpose":"COOK_DOCUMENT","filename":"%s","contentType":"application/pdf","bytes":%d,"sha256":"%s"}"""

@@ -114,7 +114,7 @@ smoke() {
   info "signed private upload round trip (synthetic PDF): ticket, direct PUT, server verification, signed read"
   local doc xsrf sha ticket upload_url upload_id done read_url
   doc="$(mktemp)"
-  printf '%%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%%%EOF\n' > "$doc"
+  printf '%%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R  >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000059 00000 n \n0000000116 00000 n \ntrailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n187\n%%%%EOF\n' > "$doc"
   sha="$(openssl dgst -sha256 -r "$doc" | cut -d' ' -f1)"
   xsrf="$(awk '$6 == "XSRF-TOKEN" { print $7 }' "$jar" | tail -1)"
   [ -n "$xsrf" ] || { rm -f "$jar" "$doc"; die "no CSRF token cookie after login"; }

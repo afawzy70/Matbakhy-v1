@@ -97,7 +97,16 @@ final class MediaInspector {
         }
     }
 
-    /** Conservative static check; PDFs with scripting, launch actions or embedded files are refused. */
+    /** Name objects that make a PDF active (scripts, launches, embedded files, forms that submit). Compared after PDF name decoding. */
+    private static final java.util.Set<String> PDF_ACTIVE_NAMES = java.util.Set.of("JavaScript", "JS", "Launch", "EmbeddedFile",
+            "EmbeddedFiles", "RichMedia", "XFA", "AA", "SubmitForm", "ImportData", "OpenAction", "GoToE", "GoToR", "Encrypt");
+    private static final int PDF_MAX_OBJECTS = 100_000;
+
+    /**
+     * PDFs are parsed structurally (SEC-001): every object, including those inside compressed object streams, is walked and
+     * name escapes such as {@code /J#61vaScript} are decoded by the parser before comparison. Unparseable, encrypted or
+     * active documents are refused. The raw-byte scan stays as a first, cheap line.
+     */
     static void inspectPdf(byte[] content) throws Rejected {
         String text = new String(content, StandardCharsets.ISO_8859_1);
         if (!text.contains("%%EOF")) {
@@ -107,6 +116,48 @@ final class MediaInspector {
             if (text.contains(marker)) {
                 throw new Rejected("ACTIVE_CONTENT");
             }
+        }
+        try (org.apache.pdfbox.pdmodel.PDDocument doc = org.apache.pdfbox.Loader.loadPDF(content)) {
+            if (doc.isEncrypted()) {
+                throw new Rejected("UNREADABLE");
+            }
+            org.apache.pdfbox.cos.COSDocument cos = doc.getDocument();
+            java.util.Set<org.apache.pdfbox.cos.COSBase> seen = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+            java.util.ArrayDeque<org.apache.pdfbox.cos.COSBase> work = new java.util.ArrayDeque<>();
+            work.add(cos.getTrailer());
+            for (org.apache.pdfbox.cos.COSObjectKey key : cos.getXrefTable().keySet()) {
+                work.add(cos.getObjectFromPool(key));
+            }
+            while (!work.isEmpty()) {
+                org.apache.pdfbox.cos.COSBase node = work.poll();
+                if (node instanceof org.apache.pdfbox.cos.COSObject ref) {
+                    node = ref.getObject();
+                }
+                if (node == null || !seen.add(node)) {
+                    continue;
+                }
+                if (seen.size() > PDF_MAX_OBJECTS) {
+                    throw new Rejected("UNREADABLE");
+                }
+                if (node instanceof org.apache.pdfbox.cos.COSName name) {
+                    if (PDF_ACTIVE_NAMES.contains(name.getName())) {
+                        throw new Rejected("ACTIVE_CONTENT");
+                    }
+                } else if (node instanceof org.apache.pdfbox.cos.COSDictionary dict) {
+                    for (java.util.Map.Entry<org.apache.pdfbox.cos.COSName, org.apache.pdfbox.cos.COSBase> e : dict.entrySet()) {
+                        work.add(e.getKey());
+                        work.add(e.getValue());
+                    }
+                } else if (node instanceof org.apache.pdfbox.cos.COSArray array) {
+                    for (org.apache.pdfbox.cos.COSBase item : array) {
+                        work.add(item);
+                    }
+                }
+            }
+        } catch (Rejected r) {
+            throw r;
+        } catch (IOException | RuntimeException e) {
+            throw new Rejected("UNREADABLE");
         }
     }
 

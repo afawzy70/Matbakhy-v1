@@ -115,8 +115,7 @@ class MediaIntegrationTest {
     }
 
     static byte[] pdf(String extra) {
-        return ("%PDF-1.4\n1 0 obj << /Type /Catalog " + extra + " >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n")
-                .getBytes(StandardCharsets.ISO_8859_1);
+        return com.matbakhy.app.support.SyntheticPdf.minimal(extra);
     }
 
     static String sha256(byte[] b) throws Exception {
