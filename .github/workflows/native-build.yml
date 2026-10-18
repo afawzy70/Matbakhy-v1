@@ -2,6 +2,8 @@ name: Native builds (MB-005 compilation, MB-031/MB-032 checks on emulator/simula
 # Compiles the minimal customer-mobile shell natively on GitHub-hosted runners (no signing, no
 # store upload, no device). Android and iOS are separate jobs and produce separate evidence.
 on:
+  pull_request:
+    branches: [develop]
   push:
     branches: [implementation/mvp]
     paths:
