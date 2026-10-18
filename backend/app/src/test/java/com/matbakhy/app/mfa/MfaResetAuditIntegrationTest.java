@@ -38,9 +38,22 @@ class MfaResetAuditIntegrationTest {
         final List<String> removed = new ArrayList<>();
         boolean failSecond = true;
         boolean loggedOut;
+        final JdbcTemplate jdbc;
+        int attemptRowsAtFirstProviderCall = -1;
+
+        FlakyAdmin(JdbcTemplate jdbc) {
+            this.jdbc = jdbc;
+        }
 
         @Override public boolean configured() { return true; }
-        @Override public List<String> otpCredentialIds(String subject) { return List.of("c1", "c2"); }
+
+        @Override
+        public List<String> otpCredentialIds(String subject) {
+            if (attemptRowsAtFirstProviderCall < 0) {
+                attemptRowsAtFirstProviderCall = jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'mfa.reset.attempt'", Integer.class);
+            }
+            return List.of("c1", "c2");
+        }
 
         @Override
         public void deleteCredential(String subject, String credentialId) {
@@ -57,8 +70,8 @@ class MfaResetAuditIntegrationTest {
     static class Doubles {
         @Bean
         @Primary
-        FlakyAdmin flakyAdmin() {
-            return new FlakyAdmin();
+        FlakyAdmin flakyAdmin(JdbcTemplate jdbc) {
+            return new FlakyAdmin(jdbc);
         }
     }
 
@@ -78,6 +91,7 @@ class MfaResetAuditIntegrationTest {
         provider.removed.clear();
         provider.loggedOut = false;
         provider.failSecond = true;
+        provider.attemptRowsAtFirstProviderCall = -1;
     }
 
     private MockHttpServletResponse reset(UUID target) throws Exception {
@@ -97,6 +111,9 @@ class MfaResetAuditIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'mfa.reset.attempt' AND object_id = ?", Integer.class, target.toString()))
                 .as("the attempt is on record before anything destructive is done").isEqualTo(1);
         assertThat(provider.removed).containsExactly("c1");
+        assertThat(provider.attemptRowsAtFirstProviderCall).as("the attempt audit existed before the first provider call").isGreaterThanOrEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM spring_session WHERE principal_name = ?", Integer.class, targetSubject))
+                .as("application sessions end even though the provider failed").isZero();
         assertThat(jdbc.queryForObject("SELECT count(*) FROM user_mfa_reset WHERE user_id = ?", Integer.class, target))
                 .as("earlier proofs stop counting even though the reset did not finish").isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'mfa.reset' AND object_id = ? AND outcome = 'DENIED' AND reason LIKE 'reset incomplete%'",

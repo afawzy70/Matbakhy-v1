@@ -1,0 +1,16 @@
+[
+  {
+    "id": "QA9-001",
+    "severity": "Low",
+    "component": "D18 reset audit test coverage",
+    "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaResetAuditIntegrationTest.java",
+    "line": 97,
+    "title": "Attempt-audit assertion does not verify ordering before destructive work",
+    "scenario": "Move the reset-attempt audit write after the first provider credential deletion but before the second deletion throws. The current assertions still observe one attempt row and one removed factor after the request.",
+    "expected": "The test verifies a durable attempt row already exists when the first destructive provider call starts.",
+    "actual": "The provider double only records deleted IDs; the attempt row is queried after reset(target) returns. No assertion is made at the destructive-call boundary.",
+    "evidence": "Static coverage review at 7e61db71e8a089e52d3bae9ffacdf7022907b2cd: MfaResetAuditIntegrationTest.java:45-50 records deletion only; :95-99 queries audit after failure. Production MfaAdminController.java:100-106 currently has correct ordering. This is a test gap, not an observed production ordering failure. Container test NOT_RUN locally.",
+    "suggested_fix": "Query audit persistence from the provider double before its first deleteCredential call, preferably through an independent connection/transaction, and assert the target-specific attempt exists. Retain partial-failure assertions.",
+    "repro_test": "A disposable mutation moving the attempt write after the first delete must fail the strengthened integration test; mutation was not executed locally because the test requires PostgreSQL containers."
+  }
+]

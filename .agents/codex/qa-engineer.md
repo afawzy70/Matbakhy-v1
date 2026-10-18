@@ -14,3 +14,4 @@ Rules:
 - Record the tested commit SHA (`git rev-parse HEAD`) in every report.
 - No speculative defects: each needs evidence.
 - Output: `docs/quality/stabilization/qa-test-plan.md`, `qa-execution-report.md`, and machine-readable `docs/quality/stabilization/qa-findings.json` (array of defects).
+- Do not write JSON (or other) manifests that map file names to SHA-256 digests: Gitleaks reports each pair as a generic-api-key false positive and fails the repository secret scan. Record digests, if needed, only inside prose in a report.

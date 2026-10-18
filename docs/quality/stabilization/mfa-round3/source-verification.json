@@ -1,0 +1,7 @@
+{
+  "source_commit": "7e61db71e8a089e52d3bae9ffacdf7022907b2cd",
+  "head_after_execution": "7e61db71e8a089e52d3bae9ffacdf7022907b2cd",
+  "recorded_at": "2026-10-18T13:01:41.893999+00:00",
+  "application_or_test_source_modified": false,
+  "container_tests": "NOT_RUN locally; exact-SHA CI evidence required; result not available offline"
+}

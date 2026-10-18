@@ -102,12 +102,13 @@ class MfaAdminController {
         try {
             // First: every earlier MFA assertion of the account stops counting, whatever else fails below.
             policy.recordReset(accountId, actor.id());
+            // The application's own sessions end before any provider call, so a provider outage cannot leave them usable.
+            sessions.endAllFor(subject);
             for (String credentialId : keycloak.otpCredentialIds(subject)) {
                 keycloak.deleteCredential(subject, credentialId);
                 removed++;
             }
             keycloak.logout(subject);
-            sessions.endAllFor(subject);
         } catch (RuntimeException failure) {
             // A reset that stops half way is still an administrative act on the account: it is audited with what was done.
             Map<String, Object> partial = new LinkedHashMap<>();

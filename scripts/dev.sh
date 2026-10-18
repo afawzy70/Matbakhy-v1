@@ -35,12 +35,12 @@ doctor() {
 ensure_env() {
   if [ ! -f "$ENV_FILE" ]; then
     info "creating $ENV_FILE with random local passwords"
-    sed -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
+    (umask 077; sed -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
         -e "s/^KEYCLOAK_ADMIN_PASSWORD=.*/KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -hex 16)/" \
         -e "s/^OIDC_WEB_CLIENT_SECRET=.*/OIDC_WEB_CLIENT_SECRET=$(openssl rand -hex 24)/" \
         -e "s/^OIDC_ADMIN_CLIENT_SECRET=.*/OIDC_ADMIN_CLIENT_SECRET=$(openssl rand -hex 24)/" \
         -e "s/^DEV_USER_PASSWORD=.*/DEV_USER_PASSWORD=$(openssl rand -hex 12)/" \
-        "$INFRA/.env.example" > "$ENV_FILE"
+        "$INFRA/.env.example" > "$ENV_FILE")
     chmod 600 "$ENV_FILE"
   fi
   grep -q '^MATBAKHY_ENV_MARKER=local$' "$ENV_FILE" || die "$ENV_FILE is not marked MATBAKHY_ENV_MARKER=local; refusing"
