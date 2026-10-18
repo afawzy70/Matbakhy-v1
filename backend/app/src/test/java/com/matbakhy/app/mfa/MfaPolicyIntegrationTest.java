@@ -312,4 +312,19 @@ class MfaPolicyIntegrationTest {
     void enforcement_and_settings_are_for_signed_in_accounts_only() throws Exception {
         assertThat(mvc.perform(get("/api/v1/me/security")).andReturn().getResponse().getStatus()).isEqualTo(401);
     }
+
+    @Test
+    void disabled_never_removes_the_staff_high_risk_step_up_and_keeps_the_stepup_available_to_staff() throws Exception {
+        ok(setPolicy("STAFF", "DISABLED"), 200);
+        ok(setPolicy("CUSTOMER", "DISABLED"), 200);
+        ok(setPolicy("KITCHEN", "DISABLED"), 200);
+        MockHttpServletResponse weak = call(put("/api/v1/ops/security/mfa-policy/STAFF").content("{\"mode\":\"OPTIONAL\",\"expectedVersion\":" + version("STAFF")
+                + ",\"reason\":\"owner decision test\"}"), plain(adminSubject));
+        assertThat(weak.getStatus()).as("high-risk staff actions still need a recent second factor").isEqualTo(403);
+        assertThat(weak.getContentAsString()).contains("STEP_UP_REQUIRED");
+        String location = mvc.perform(get("/oauth2/authorization/keycloak?stepUp=true").with(authentication(plain(adminSubject)))).andReturn().getResponse().getHeader("Location");
+        assertThat(location).as("staff can still obtain the step-up their high-risk actions need").contains("acr_values=");
+        String customer = mvc.perform(get("/oauth2/authorization/keycloak?stepUp=true").with(authentication(plain(UUID.randomUUID().toString())))).andReturn().getResponse().getHeader("Location");
+        assertThat(customer).doesNotContain("acr_values=");
+    }
 }

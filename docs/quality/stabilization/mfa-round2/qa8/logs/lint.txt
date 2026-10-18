@@ -1,0 +1,5 @@
+ WARN  Unsupported engine: wanted: {"node":">=24.21.0 <25"} (current: {"node":"v22.23.3","pnpm":"10.34.6"})
+
+> matbakhy-workspace@ lint /home/aiagent/workspaces/agents/codex-qa
+> eslint .
+

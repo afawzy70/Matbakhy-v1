@@ -1,0 +1,90 @@
+{
+  "agent": "Independent Senior Application Security Reviewer — D18 round 2, read-only/offline",
+  "commit": "9ff290f732872c637b64132a3deeb52970148336",
+  "summary": "Disposition: changes required. HEAD equals the requested SHA; working tree unchanged. All conclusions are static-only; no application, database, browser, Keycloak or integration tests were executed. Existing tests were inspected, not counted as execution evidence.\n\nD18 risk disposition table:\nRisk | Disposition | Evidence / limitation\nSECR7-001: successful reset leaves application sessions authorized | closed | MfaAdminController.java:101-107 records reset epoch and deletes Spring sessions; MfaPolicyService.java:53-61 rejects earlier proofs under REQUIRED. Partial-reset and OPTIONAL staff assurance remain open separately.\nSECR7-002: DISABLED enrolment/use | open | Authenticated application step-up is mitigated, but direct provider enrolment and anonymous step-up remain possible; SECR8-001.\nSECR7-003: partial-reset audit | mitigated | Runtime failures now produce partial audit, but no durable attempt precedes destructive operations; SECR8-002.\nREQUIRED category precedence / preference override | closed | MfaPolicyService.java:124-136 uses strongest mode and fails missing policy rows to REQUIRED.\nREQUIRED endpoint bypass | mitigated | Both security chains apply enforcement; only public GETs, own profile GET, security settings, logout and anonymous activity are exempt. Current security mutation independently checks policy and assurance. No concrete protected mutation bypass identified; future routes under the broad security/** exemption need review.\nClaims confusion | mitigated | Signature, issuer, audience and token timestamps validated; authorities originate from database. No demonstrated client-controlled ACR/AMR forgery. Actual provider claim issuance, cross-client SSO and account-console behavior require runtime verification.\nReset epoch / staff auth_time | open | REQUIRED rejects pre-reset proofs, but separate recent staff assurance ignores reset epoch under OPTIONAL/DISABLED; SECR8-003. Future auth_time lacks an upper bound, but no attacker-controlled signed-claim scenario established.\nDowngrade / reset authorization | mitigated | Dedicated permissions, recent MFA, policy version checks, reasons, self-reset denial and audits exist. Reset-epoch exception remains SECR8-003.\nLock-out / recovery availability | open | Mobile lacks step-up handling; documented rollout guidance does not enforce category restrictions. DISABLED suppresses application step-up even for independent privileged assurance. Operational recovery and live realm migration remain unverified.\nAdmin service-account scope | mitigated | Application uses credential listing/deletion and logout only; realm manage-users remains broader than those operations. Preview proxy blocks /admin; local identity binds loopback. Stolen credentials retain broad realm-user management capability; network restriction is containment, not least privilege.\nSecrets in local generated configuration | open | SECR8-004.\nPreview compose/.env/deploy.sh/realm templates and logging | mitigated | Templates reference generated secrets; preview generated parent directory is mode 700; .env/generated paths ignored; admin client logs status/class rather than bodies or tokens. Bounded tracked-file scan found no private-key blocks or JWT-shaped strings. This is not exhaustive secret detection or live filesystem/log verification.\nProvider-only factors / no application OTP storage | mitigated | Application stores policy, preference and reset time; admin client consumes credential identifiers/types. Actual provider response secrecy remains static-only.\nPREVIEW defaults | closed | V31__mfa_policy.sql:14 seeds OPTIONAL for all categories.\n\nStill static-only: successful and partial reset behavior against running Spring Session/Keycloak, session-save races, audit outage/crash recovery, token refresh/SSO ACR and auth_time semantics, unrelated-client escalation attempts, provider enrolment/removal controls, mobile recovery, deployed realm migration, actual service-account permissions, host file permissions and deployed log contents.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD; git status --short; git diff --quiet",
+      "exit_code": 0,
+      "note": "Requested SHA confirmed; working tree clean and unchanged."
+    },
+    {
+      "command": "Targeted rg, cat and nl inspection of repository guidance, D18 policy, prior findings, security chains, controllers, persistence, tests and deployment configuration",
+      "exit_code": 0,
+      "note": "Static inspection. One initial operations-module search used a nonexistent path; corrected to backend/modules/operations."
+    },
+    {
+      "command": "python3 -B: inspect selected realm client/flow metadata and service-account roles without printing secret values",
+      "exit_code": 0,
+      "note": "Confirmed MFA flow configuration, disabled direct grants, placeholder secrets and view-users/manage-users roles."
+    },
+    {
+      "command": "bash -n scripts/dev.sh; sh -n deploy/web-preview/deploy.sh",
+      "exit_code": 0,
+      "note": "Syntax checks only; scripts not executed."
+    },
+    {
+      "command": "python3 -B: bounded tracked configuration/script/log scan for private-key blocks and JWT-shaped strings, reporting locations only",
+      "exit_code": 0,
+      "note": "No matches. No secret values printed; not an exhaustive credential scan."
+    }
+  ],
+  "findings": [
+    {
+      "id": "SECR8-001",
+      "severity": "Medium",
+      "component": "DISABLED policy enforcement",
+      "file": "backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java",
+      "line": 263,
+      "title": "SECR7-002 remains open for provider enrolment and anonymous step-up",
+      "scenario": "An account whose applicable categories are all DISABLED visits Keycloak account management directly, or signs out of the application and starts stepUp=true before the account is known.",
+      "expected": "D18 DISABLED makes enrolment and policy MFA use unavailable while preserving existing factors and independent privileged assurance.",
+      "actual": "The resolver suppresses MFA only for a known DISABLED account. Anonymous step-up still requests MFA, and provider account-console enrolment has no category-policy guard.",
+      "evidence": "SecurityConfiguration.java:263-277 permits anonymous MFA requests; MfaController.java:75-79 always returns the provider account-management URL. docs/security/mfa-policy.md explicitly records direct provider enrolment and anonymous step-up as residual limitations.",
+      "suggested_fix": "Enforce availability in provider enrolment/authentication entry points, preserving independent privileged step-up, or obtain an explicit owner-approved change to the DISABLED requirement.",
+      "repro_test": "With all applicable categories DISABLED, verify direct account-console enrolment and anonymous application step-up cannot enrol or use policy MFA; separately verify privileged step-up remains available."
+    },
+    {
+      "id": "SECR8-002",
+      "severity": "Medium",
+      "component": "Reset audit durability",
+      "file": "backend/app/src/main/java/com/matbakhy/app/mfa/MfaAdminController.java",
+      "line": 101,
+      "title": "SECR7-003 is mitigated but destructive reset still precedes durable audit",
+      "scenario": "OTP deletion succeeds, then the process terminates before audit insertion, or the audit insert fails after provider changes.",
+      "expected": "Every destructive reset has a durable attempt record that survives partial failure and supports reconciliation.",
+      "actual": "The reset timestamp is committed first, but it is an overwritten per-user marker without attempt reason or progress. Partial and successful audit records are inserted only after remote side effects; the catch-path audit can itself fail.",
+      "evidence": "MfaAdminController.java:101-120 performs deletion before either audit record. MfaPolicyService.java:116-120 upserts only the latest reset time/admin. JdbcAuditLog.java:21-27 directly inserts the event. MfaResetAuditIntegrationTest.java:88-110 covers provider failure with a healthy audit store, not audit failure or process termination.",
+      "suggested_fix": "Persist a reset attempt and reason before remote mutation, then update completion/progress with durable reconciliation for interrupted operations.",
+      "repro_test": "Inject failure into audit persistence after successful credential deletion and terminate a reset between deletion and final audit; verify a durable attempt remains discoverable."
+    },
+    {
+      "id": "SECR8-003",
+      "severity": "High",
+      "component": "Reset revocation and privileged assurance",
+      "file": "backend/app/src/main/java/com/matbakhy/app/security/StaffAssurance.java",
+      "line": 39,
+      "title": "Pre-reset bearer proofs still authorize privileged actions under OPTIONAL policy",
+      "scenario": "An attacker holds a recently stepped-up bearer token for a staff account with security.mfa_policy or security.mfa_reset. Another administrator resets that account. STAFF remains OPTIONAL and the victim's preference is off, as allowed by preview defaults. The attacker reuses the unexpired token to downgrade policy or reset another account.",
+      "expected": "Administrative recovery invalidates the victim's earlier MFA proofs for privileged assurance as well as category-policy enforcement.",
+      "actual": "The policy filter checks the reset epoch only when decision.required() is true. StaffAssurance checks MFA claims and recency without consulting reset_at, so the token still satisfies privileged method authorization until token expiry or the recency window ends. A partial reset can also leave application sessions intact because session deletion follows provider logout.",
+      "evidence": "MfaEnforcementFilter.java:42-44 gates epoch validation on required(). StaffAssurance.java:38-45 ignores reset state. MfaAdminController.java:73,80 uses that assurance for policy changes and resets; :102-107 can fail before application-session deletion. docs/security/mfa-policy.md acknowledges pre-reset tokens still count for separate staff assurance.",
+      "suggested_fix": "Make privileged assurance validate the account reset epoch regardless of category policy. Attempt local session invalidation independently of provider failure.",
+      "repro_test": "Under OPTIONAL with preference off, reset a privileged account and replay its earlier MFA bearer token against policy update and another-account reset; both must require fresh post-reset MFA. Repeat with provider deletion/logout failure and an existing web session."
+    },
+    {
+      "id": "SECR8-004",
+      "severity": "Medium",
+      "component": "Local development secret handling",
+      "file": "scripts/dev.sh",
+      "line": 63,
+      "title": "Generated local realm exposes the new user-management client secret to other host users",
+      "scenario": "On a shared development host with traversable workspace ancestors, another local user reads infra/.generated/identity/matbakhy-realm.json after dev.sh renders it, then uses the service-account credential against the loopback Keycloak endpoint.",
+      "expected": "Generated admin credentials remain inaccessible to unrelated host users.",
+      "actual": "The generated directory and identity subdirectory are explicitly mode 755 and the realm is mode 644. The realm contains the rendered admin client secret, whose service account has manage-users. Initial .env creation also writes before chmod 600 without first establishing a restrictive umask.",
+      "evidence": "scripts/dev.sh:38-44 writes .env before chmod; :59-64 renders secrets and applies publicly readable permissions. infra/identity/matbakhy-realm.json:182-187 grants view-users/manage-users. infra/compose.yaml:33-36 exposes Keycloak on host loopback and mounts the generated directory. Preview deploy.sh:64-79 has an owner-only parent safeguard absent locally.",
+      "suggested_fix": "Set umask 077 before secret creation and keep an owner-only generated parent directory, using the preview bind-mount pattern or an equivalent container-readable arrangement.",
+      "repro_test": "On a synthetic shared-host fixture, run rendering and assert an unrelated UID cannot traverse/read generated secret files; check permissions without printing contents."
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+[
+ {
+  "id": "CR8-001",
+  "severity": "High",
+  "component": "Reset invalidation and staff assurance",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/StaffAssurance.java",
+  "line": 39,
+  "title": "Pre-reset MFA tokens still authorize high-risk staff actions",
+  "scenario": "A staff account with OPTIONAL policy and preference off has a recently issued MFA bearer token. Another administrator resets that account. Before the token expires, its holder submits a policy change or staff grant using the old token.",
+  "expected": "A reset invalidates the previous MFA proof for high-risk authorization as well as policy enforcement.",
+  "actual": "The enforcement filter skips satisfiedBy when decision.required() is false. StaffAssurance checks only MFA claims and recency, so the pre-reset token still authorizes the command.",
+  "evidence": "MfaEnforcementFilter.java:43 gates epoch validation on decision.required(). StaffAssurance.java:38-42 never reads the reset epoch. MfaAdminController.java:73 and :80 use this assurance check for policy changes and resets; StaffController uses it for grants. Provider logout does not revoke already issued bearer tokens.",
+  "suggested_fix": "Apply the account reset epoch to every MFA assurance decision, independently of the effective policy.",
+  "repro_test": "Under OPTIONAL with preference off, retain a recent MFA token for a staff administrator, reset that account through another administrator, and assert that the retained token receives STEP_UP_REQUIRED on a high-risk command."
+ },
+ {
+  "id": "CR8-002",
+  "severity": "High",
+  "component": "Administrative recovery audit",
+  "file": "backend/app/src/main/java/com/matbakhy/app/mfa/MfaAdminController.java",
+  "line": 101,
+  "title": "Reset still performs destructive work before persisting audit evidence",
+  "scenario": "The reset epoch commits and Keycloak credential removal succeeds, but the final audit insertion fails. Alternatively, provider work fails partially and the failure-audit insertion also fails.",
+  "expected": "A durable audited intent exists before external mutations; audit-storage failure prevents unaudited destructive work.",
+  "actual": "The operation exits with an error after destructive work, without any reset audit event. Recording the epoch first preserves invalidation but does not preserve the reason, request ID or reset attempt audit.",
+  "evidence": "Lines 101-107 commit the epoch and perform provider/session mutations before audit.record. The partial-failure audit is at lines 113-114; the success audit is outside the try block at lines 120-121. JdbcAuditLog.record directly inserts into audit_event; no initial intent is recorded.",
+  "suggested_fix": "Commit a reset intent audit before provider work, atomically with the epoch where practical, then append completion or partial-failure evidence.",
+  "repro_test": "Inject audit-storage failure before reset starts and assert no provider deletion occurs. Separately fail the completion audit and verify the committed intent remains available."
+ },
+ {
+  "id": "CR8-003",
+  "severity": "Medium",
+  "component": "Web step-up resolver",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java",
+  "line": 270,
+  "title": "DISABLED policy prevents required staff step-up",
+  "scenario": "All applicable categories for a policy administrator are DISABLED. After password login, or after an existing MFA proof becomes stale, the administrator attempts a policy update and follows the displayed step-up link.",
+  "expected": "The administrator can obtain the independent recent assurance required for high-risk staff actions.",
+  "actual": "The resolver removes both the MFA request and fresh-authentication request. The normal provider flow returns password-level authentication, and the protected action again returns STEP_UP_REQUIRED.",
+  "evidence": "SecurityConfiguration.java:270-271 returns the default authorization request whenever MFA is unavailable. MfaAdminController.java:73 still requires recentMfa regardless of policy. apps/operations-web/src/ops/Security.tsx uses the same stepUpUrl for policy/reset errors. docs/product/06-permissions.md requires recent step-up for high-risk changes independently of category policy.",
+  "suggested_fix": "Provide a server-controlled step-up flow for authorized high-risk staff actions that preserves their independent assurance requirement under DISABLED, while retaining the ordinary policy-controlled behavior.",
+  "repro_test": "With CUSTOMER and STAFF DISABLED, use a password-authenticated policy administrator, follow the actual web step-up flow, and verify that a subsequent policy update can obtain fresh MFA and succeed."
+ }
+]

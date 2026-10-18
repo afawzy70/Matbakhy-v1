@@ -1,0 +1,1 @@
+PASS: inventory, decision register, traceability and dependency order consistent (planning scope only)

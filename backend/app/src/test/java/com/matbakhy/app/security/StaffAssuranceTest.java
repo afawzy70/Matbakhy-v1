@@ -51,4 +51,18 @@ class StaffAssuranceTest {
         assertThat(StaffAssurance.assertsMfa(Map.of("amr", List.of()), values)).isFalse();
         assertThat(StaffAssurance.assertsMfa(Map.of(), values)).isFalse();
     }
+
+    @Test
+    void a_proof_older_than_the_accounts_last_mfa_reset_does_not_count_for_high_risk_actions() {
+        Instant reset = NOW.minusSeconds(30);
+        UUID account = UUID.randomUUID();
+        StaffAssurance afterReset = new StaffAssurance(properties, Clock.fixed(NOW, ZoneOffset.UTC), id -> id.equals(account) ? reset : null);
+        AccountAuthentication stale = new AccountAuthentication(new CurrentAccount(account, AccountStatus.ACTIVE, "Staff", "ar", true, false, 0),
+                Map.of("acr", "2", "auth_time", reset.minusSeconds(5).getEpochSecond()), List.of());
+        AccountAuthentication fresh = new AccountAuthentication(new CurrentAccount(account, AccountStatus.ACTIVE, "Staff", "ar", true, false, 0),
+                Map.of("acr", "2", "auth_time", reset.plusSeconds(5).getEpochSecond()), List.of());
+        assertThatThrownBy(() -> afterReset.recentMfa(stale)).isInstanceOf(StepUpRequiredException.class);
+        assertThat(afterReset.recentMfa(fresh)).isTrue();
+        assertThat(assurance.recentMfa(stale)).as("no reset recorded for the default collaborator").isTrue();
+    }
 }

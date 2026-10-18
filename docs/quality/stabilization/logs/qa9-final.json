@@ -1,0 +1,48 @@
+{
+  "agent": "QA8",
+  "commit": "9ff290f732872c637b64132a3deeb52970148336",
+  "summary": "HEAD verified. Validators, 220 JS tests, five typechecks, lint and 24 backend unit tests passed. Python: 71 passed, one host .aws/.codex fixture failure, one Docker skip. Container tests NOT_RUN. Updated requirement 1–12 matrix, determinism review and evidence under docs/quality/stabilization/mfa-round2/qa8/. No application source changed.",
+  "commands": [
+    {
+      "command": "16 verification commands recorded in docs/quality/stabilization/mfa-round2/qa8/commands.json",
+      "exit_code": 0,
+      "note": "15 passed; Python discovery exited 1 for the documented host-fixture failure."
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    ,
+      "note": "Reports remain uncommitted; HEAD equals the requested source SHA."
+    }
+  ],
+  "findings": [
+    {
+      "id": "QA8-001",
+      "severity": "Medium",
+      "component": "Requirement 5 test coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java",
+      "line": 191,
+      "title": "DISABLED coverage omits provider-factor preservation and high-risk controls",
+      "scenario": "Switching to DISABLED accidentally deletes provider factors or relaxes high-risk assurance.",
+      "expected": "Automated tests detect both regressions.",
+      "actual": "Tests preserve a database preference and check API/UI availability, without testing provider credentials or high-risk commands under DISABLED.",
+      "evidence": "Static assertions at lines 191–206 and 281–288. Container execution NOT_RUN; this is a coverage gap.",
+      "suggested_fix": "Add real-provider credential-preservation and high-risk denial scenarios under DISABLED.",
+      "repro_test": "Verify that credential-deletion and DISABLED-only assurance-bypass mutations fail the added tests."
+    },
+    {
+      "id": "QA8-002",
+      "severity": "Medium",
+      "component": "Requirement 8 test coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java",
+      "line": 292,
+      "title": "Preference-disable tests cannot detect omitted provider logout",
+      "scenario": "Provider logout becomes a no-op when OPTIONAL MFA is disabled.",
+      "expected": "An existing provider refresh token is rejected after disable.",
+      "actual": "The disable test checks synthetic application-session row deletion with provider administration unconfigured. Real refresh rejection covers administrative reset only.",
+      "evidence": "MfaPolicyIntegrationTest.java:292–298; MfaResetIntegrationTest.java:136. Static coverage finding, not an observed logout failure.",
+      "suggested_fix": "Disable MFA with configured provider administration, then reuse the old refresh token and application cookie.",
+      "repro_test": "A no-op mutation of preference-disable provider logout must fail the integration test."
+    }
+  ]
+}

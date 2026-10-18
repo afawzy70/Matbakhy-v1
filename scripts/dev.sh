@@ -56,11 +56,13 @@ render_realm() {
   local out="${MATBAKHY_GENERATED_DIR:-$INFRA/.generated}"
   export MATBAKHY_GENERATED_DIR="$out"
   mkdir -p "$out/identity"
+  chmod 700 "$out"   # private before secrets are written; Docker bind mounts are resolved by the daemon
+  umask 077
   sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|${OIDC_WEB_CLIENT_SECRET}|" -e "s|\${OIDC_ADMIN_CLIENT_SECRET}|${OIDC_ADMIN_CLIENT_SECRET}|" -e "s|\${API_PORT}|${API_PORT}|" \
       -e "s|\${DEV_USER_PASSWORD}|${DEV_USER_PASSWORD}|g" \
       "$INFRA/identity/matbakhy-realm.json" > "$out/identity/matbakhy-realm.json"
   # Readable by the non-root Keycloak user in the container; holds generated local-only values.
-  chmod 755 "$out" "$out/identity"
+  chmod 755 "$out/identity"
   chmod 644 "$out/identity/matbakhy-realm.json"
 }
 

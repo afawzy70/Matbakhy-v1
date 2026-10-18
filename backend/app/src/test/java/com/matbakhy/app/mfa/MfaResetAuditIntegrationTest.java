@@ -94,6 +94,8 @@ class MfaResetAuditIntegrationTest {
 
         MockHttpServletResponse failed = reset(target);
         assertThat(failed.getStatus()).isGreaterThanOrEqualTo(500);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'mfa.reset.attempt' AND object_id = ?", Integer.class, target.toString()))
+                .as("the attempt is on record before anything destructive is done").isEqualTo(1);
         assertThat(provider.removed).containsExactly("c1");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM user_mfa_reset WHERE user_id = ?", Integer.class, target))
                 .as("earlier proofs stop counting even though the reset did not finish").isEqualTo(1);
@@ -108,5 +110,30 @@ class MfaResetAuditIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT count(*) FROM spring_session WHERE principal_name = ?", Integer.class, targetSubject)).as("application sessions ended").isZero();
         assertThat(jdbc.queryForObject("SELECT count(*) FROM audit_event WHERE action = 'mfa.reset' AND object_id = ? AND outcome = 'ALLOWED'",
                 Integer.class, target.toString())).isEqualTo(1);
+    }
+
+    @Test
+    void turning_mfa_off_ends_the_provider_sessions_and_disabled_never_touches_the_providers_factors() throws Exception {
+        String subject = UUID.randomUUID().toString();
+        UUID account = logins.login(subject, "User").getPrincipal().id();
+        MockHttpServletResponse on = mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/me/security/mfa")
+                .content("{\"enabled\":true}").with(authentication(logins.loginWithMfa(subject, "User"))).with(csrf()).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertThat(on.getStatus()).isEqualTo(200);
+        assertThat(provider.loggedOut).as("turning it on ends nothing").isFalse();
+
+        jdbc.update("UPDATE mfa_policy SET mode = 'DISABLED', version = version + 1 WHERE category = 'CUSTOMER'");
+        try {
+            mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/api/v1/me/addresses").with(authentication(logins.login(subject, "User")))).andReturn();
+            assertThat(provider.removed).as("DISABLED must not silently remove enrolled factors").isEmpty();
+            assertThat(provider.loggedOut).isFalse();
+        } finally {
+            jdbc.update("UPDATE mfa_policy SET mode = 'OPTIONAL', version = version + 1 WHERE category = 'CUSTOMER'");
+        }
+
+        MockHttpServletResponse off = mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put("/api/v1/me/security/mfa")
+                .content("{\"enabled\":false}").with(authentication(logins.loginWithMfa(subject, "User"))).with(csrf()).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertThat(off.getStatus()).isEqualTo(200);
+        assertThat(provider.loggedOut).as("turning it off ends the provider sessions").isTrue();
+        assertThat(jdbc.queryForObject("SELECT enabled FROM user_mfa_preference WHERE user_id = ?", Boolean.class, account)).isFalse();
     }
 }

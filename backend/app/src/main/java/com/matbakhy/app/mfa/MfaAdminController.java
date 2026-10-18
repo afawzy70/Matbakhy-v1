@@ -96,6 +96,9 @@ class MfaAdminController {
         }
         String subject = subjects.getFirst();
         int removed = 0;
+        // Durable evidence of the attempt exists before anything destructive is done.
+        audit.record(new Entry(actor.id(), "mfa.reset.attempt", "security.mfa_reset", "account", accountId.toString(), Outcome.ALLOWED,
+                body.reason().strip(), requestId, Map.of()));
         try {
             // First: every earlier MFA assertion of the account stops counting, whatever else fails below.
             policy.recordReset(accountId, actor.id());

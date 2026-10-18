@@ -16,10 +16,23 @@ public class StaffAssurance {
 
     private final IdentityProperties properties;
     private final Clock clock;
+    /** When an administrative MFA reset last happened for the account (D18); proofs older than that do not count. */
+    private final java.util.function.Function<java.util.UUID, Instant> resetAt;
 
-    StaffAssurance(IdentityProperties properties, Clock clock) {
+    @org.springframework.beans.factory.annotation.Autowired
+    StaffAssurance(IdentityProperties properties, Clock clock, org.springframework.jdbc.core.JdbcTemplate jdbc) {
+        this(properties, clock, id -> jdbc.query("SELECT reset_at FROM user_mfa_reset WHERE user_id = ?",
+                (rs, n) -> rs.getTimestamp(1).toInstant(), id).stream().findFirst().orElse(null));
+    }
+
+    StaffAssurance(IdentityProperties properties, Clock clock, java.util.function.Function<java.util.UUID, Instant> resetAt) {
         this.properties = properties;
         this.clock = clock;
+        this.resetAt = resetAt;
+    }
+
+    StaffAssurance(IdentityProperties properties, Clock clock) {
+        this(properties, clock, id -> null);
     }
 
     /** True when the provider asserted an MFA-level ACR or an MFA method in amr (no recency check). */
@@ -39,7 +52,10 @@ public class StaffAssurance {
         boolean mfa = assertsMfa(claims, properties.mfaAcrValues());
         Instant authTime = toInstant(claims.get("auth_time"));
         boolean recent = authTime != null && !authTime.isBefore(clock.instant().minus(properties.stepUpMaxAge()));
-        if (!(mfa && recent)) {
+        // A proof made before the account's last administrative MFA reset no longer counts, for any policy mode.
+        Instant reset = mfa && recent ? resetAt.apply(account.getPrincipal().id()) : null;
+        boolean afterReset = reset == null || !authTime.isBefore(reset);
+        if (!(mfa && recent && afterReset)) {
             throw new StepUpRequiredException();
         }
         return true;

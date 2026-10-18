@@ -267,7 +267,9 @@ class SecurityConfiguration {
                 } else if (current instanceof OAuth2AuthenticationToken token && token.getPrincipal() instanceof OidcUser user) {
                     decision = mfa.decideForSubject(user.getIssuer().toString(), user.getSubject());
                 }
-                if (decision.isPresent() && !decision.get().available()) {
+                // Staff keep the step-up their high-risk actions always need (a separate required control), whatever the policy mode.
+                if (decision.isPresent() && !decision.get().available()
+                        && !decision.get().categories().contains(com.matbakhy.app.mfa.MfaPolicyService.Category.STAFF)) {
                     return resolved;
                 }
                 return org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.from(resolved)
