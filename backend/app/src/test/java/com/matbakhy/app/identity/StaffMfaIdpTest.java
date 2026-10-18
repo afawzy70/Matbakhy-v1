@@ -125,7 +125,8 @@ class StaffMfaIdpTest {
 
     @Test
     void an_existing_sso_session_does_not_let_a_staff_account_skip_the_otp() throws Exception {
-        Outcome first = login("staff-mfa", KeycloakTestServer.STAFF_PASSWORD, totp(KeycloakTestServer.STAFF_TOTP_SECRET, System.currentTimeMillis() / 1000));
+        // Its own account: Keycloak refuses to accept one TOTP code twice in a period, so tests must not share an OTP credential.
+        Outcome first = login("staff-mfa-sso", KeycloakTestServer.STAFF_PASSWORD, totp(KeycloakTestServer.STAFF_TOTP_SECRET, System.currentTimeMillis() / 1000));
         assertThat(first.issuedCode()).isTrue();
         // Same browser, SSO cookie present: a new authorization must ask for the OTP again (SECR-002).
         String authorize = KeycloakTestServer.issuer() + "/protocol/openid-connect/auth?response_type=code&scope=openid&client_id=" + CLIENT
