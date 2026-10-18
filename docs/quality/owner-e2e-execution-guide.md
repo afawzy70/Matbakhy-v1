@@ -3,50 +3,31 @@
 **Status: PLAN / NOT_RUN.** This catalog is a test design only. No outcome may be marked PASS without executing and retaining evidence.
 
 ## Start here
-- [Functional customer/cook/ops journeys](owner-e2e-functional-cases.md)
-- [Keycloak, MFA, security and deployment configurations](owner-e2e-configuration-security-cases.md)
-- Existing [scenario acceptance catalog](../../planning/scenarios.json), [role matrix](../product/06-permissions.md), [state machines](../product/04-state-machines.md), [MFA policy](../security/mfa-policy.md), [preview deployment](../operations/06-web-preview.md).
+- Catalog: [owner-acceptance/README.md](owner-acceptance/README.md) → `generated/core-owner-acceptance-suite.md` (run first), `generated/readiness-report.md` (what can be run now), `generated/traceability-matrix.md`.
+- Fixtures: [owner-acceptance/fixtures.md](owner-acceptance/fixtures.md).
+- Existing sources: [scenario catalog](../../planning/scenarios.json), [roles](../product/06-permissions.md), [state machines](../product/04-state-machines.md), [MFA policy](../security/mfa-policy.md), [preview deployment](../operations/06-web-preview.md).
 
 ## Test environments
-| Environment | URL/location | Permitted scope |
+| Environment | Location | Scope |
 |---|---|---|
-| Public customer | https://app.167-86-90-174.sslip.io | Read-only browsing, synthetic account UI tests and approved non-destructive demo orders |
-| Public operations | https://ops.167-86-90-174.sslip.io | Public login surface; only authenticated authorized staff can mutate business state |
-| Public API | https://api.167-86-90-174.sslip.io | API contract/auth checks, conservative traffic |
-| Public realm | https://id.167-86-90-174.sslip.io/realms/matbakhy | OIDC login, discovery, step-up, permitted account actions |
-| Keycloak administration | Restricted; authenticated SSH tunnel to operator endpoint | **Never publish** /admin or master realm to public Internet |
-| Isolated test stack | CI or dedicated disposable Docker Compose namespace | Race conditions, destructive rollback, outage injection, MFA policy matrices, synthetic state reset |
-| iOS/Android devices | Signed device build only | Physical-device testing; CI simulator evidence is not equivalent |
+| Preview web/API/identity | `https://{app,ops,api,id}.<PREVIEW_DOMAIN>` (the current host is in the server `.env`; do not copy it into reports) | Deny-by-default: only the allow-listed customer/staff IPs reach it. Synthetic data only. Non-destructive cases. |
+| Keycloak administration | Not published; only through the container (`kcadm-in-container.sh`) or an authenticated SSH tunnel | **Never** expose `/admin` or the master realm. |
+| Isolated stack | Disposable Docker Compose namespace | Races, fault injection, REQUIRED/DISABLED policy changes, MFA resets, destructive and reboot drills. |
+| Physical iPhone/Android | Signed build | Native step-up, account switch, background/return. CI simulator runs are not equivalent. |
 
-Do not assume the stabilization PR or its MFA realm migration is deployed. Read the deployed release SHA from `deploy.sh status` and verify Keycloak with `migrate-mfa.sh status` before attempting MFA tests.
+The preview may be older than the repository: read the deployed release with `./deploy.sh status`, and run `./migrate-mfa.sh status` before any MFA case. Cases flagged *needs updated deploy* require the PR #9 release **and** the owner-approved realm migration.
 
-## Synthetic fixture matrix
-| Actor | Data needed | Permissions |
-|---|---|---|
-| Guest | No session | Public discovery only |
-| Customer A / Customer B | Different baskets, orders, delivery zones | Own records only |
-| Cook A / Cook B | Two separately approved kitchens, slots, meals | Own kitchen only |
-| Pending and suspended cook | Distinct applications, existing accepted orders | Must not gain new commerce permissions |
-| Support | Assigned/unassigned cases | Case-scoped support |
-| Operations | Moderation/cook approval | Only explicitly granted ops permissions |
-| Finance | Synthetic cash/deposit/refund cases | Finance grants, no implicit admin |
-| Admin A / Admin B | Distinct grants and TOTP factors | Policy management/reset permissions and recent MFA |
-| Multi-role identity | Customer + cook + staff grants | Strongest applicable MFA policy |
-
-Never put fixture passwords, OTP seeds, cookies, tokens or private financial data into GitHub. An operator should share test credentials by a secure private channel.
-
-## Five-pass recommended manual test order
-1. **Read-only baseline:** Record deployed SHA and successful HTTPS access; exercise guest browsing and role boundaries (no mutations).
-2. **Primary happy path:** Sign in Customer A → browse and quote → place synthetic pickup/delivery order → Cook A accepts/prepares/completes → Customer sees final order → Finance/Admin inspects synthetic reconciliation.
-3. **Business invariants:** Stale quote after repricing, immutable placed price, quantity/capacity limits, cancel/reject/expire, deposit remaining cash, same request ID retry.
-4. **Identity/configuration matrix:** OPTIONAL/DISABLED/REQUIRED across customer/kitchen/staff, own MFA on/off, cross-role priority, recent step-up, admin reset, identity switching; **run configuration mutations in isolated environment first**.
-5. **Reliability and real devices:** Browser sessions (mobile Safari + desktop Chrome), native iOS/Android physical builds when available; network interruption, state recovery, safe retry; staging release/backup drills.
+## Order of execution
+1. Provision fixtures; run J0 (records the source SHA and image digest used everywhere else).
+2. Run J1–J4 (the order journeys) and J5–J6, then the remaining cases by readiness bucket.
+3. After the updated deployment and migration: J7 (MFA). Isolated-stack cases on the isolated stack only.
+4. Physical devices: J8.
 
 ## Single test execution template
 Record one result per case in `verification/runs/<run-id>/owner-results.md` or your QA tracking system. Example:
 
 ```text
-TEST_ID=E2E-ORDER-001
+TEST_ID=E2E-ORDER-101
 STATUS=NOT_RUN|PASS|FAIL|BLOCKED
 SOURCE_SHA=<40-hex SHA>
 DEPLOYED_IMAGE_DIGEST=<sha256>

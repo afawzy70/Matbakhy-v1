@@ -1,0 +1,217 @@
+# Readiness report
+
+199 cases. Counts by what the tester needs; a case appears in exactly one bucket (the most restrictive).
+
+## Ready to run manually now (deployed preview, existing seed accounts only) — 94
+
+- CFG-001 (P0) Public realm discovery is served; Keycloak admin console and master realm are never published (absorbs CFG-035)
+- CFG-002 (P0) Customer web sign-in uses authorization code + PKCE S256 and a real logout ends the server session
+- CFG-003 (P0) Hostile OIDC inputs: unregistered redirect_uri, forged callback state/code, and returnTo open-redirect are all refused
+- CFG-005 (P0) Role boundary: customer, cook and unprivileged staff sessions cannot reach staff or other-owner APIs by URL, forged header or client-side role
+- CFG-006 (P1) Web account switch on a shared browser leaves no trace of the previous customer
+- CFG-104 (P0) Staff high-risk actions require recent MFA regardless of policy mode; password-only preview-ops accounts are refused
+- CFG-034 (P0) Network classes: customer hosts follow CUSTOMER_ALLOWED_IPS, ops host and /api/v1/ops, /api/v1/cook follow STAFF_ALLOWED_IPS; unauthenticated staff API from an allowed IP is 401/403
+- CFG-036 (P0) CORS and CSRF for the web session API: only app./ops. origins are allowed with credentials; unsafe requests without a valid XSRF token are refused
+- CFG-037 (P1) Cookie attributes: session cookie is Secure, HttpOnly, SameSite=Lax; XSRF-TOKEN is readable and scoped to the parent domain
+- CFG-038 (P1) Content-Security-Policy is Report-Only (not enforced) on app. and ops.; baseline header set on every host
+- CFG-040 (P0) No secrets, tokens or OTP material in the repository history, API logs or deployment logs
+- CFG-041 (P1) Develop CD: push to develop runs build, digest-pinned deploy, health and smoke; record the deployed SHA and digests
+- CFG-044 (P2) Server reboot drill: services return in dependency order and the stack passes smoke (operator, change window)
+- CFG-045 (P0) Synthetic money guarantee: demo deposit and COD orders produce no outbound provider traffic and no real transfer or message
+- CFG-121 (P1) Smoke and release read-only gate: ./deploy.sh smoke covers headers, boundary, issuer, admin console 404, unauthenticated refusals
+- E2E-COOK-051 (P0) Cook creates a meal draft with an uploaded photo and publishes it; customers see it only after publication
+- E2E-COOK-052 (P0) Cook creates a slot in the ops web, opens it, and it becomes orderable for customers
+- E2E-OPS-058 (P0) A customer cannot make themselves staff: role fields, staff endpoints, forged tokens and grant requests are all refused server-side
+- E2E-OPS-062 (P0) The public operations URL serves only the sign-in page; every protected call without a session is refused and writes no data
+- E2E-COOK-101 (P0) A meal cannot be published without a complete allergen declaration, price, and approved photo; each missing field is named
+- E2E-COOK-102 (P1) Meal photo upload tickets refuse wrong types, oversize files and spoofed content
+- E2E-COOK-104 (P2) Pausing or archiving a meal removes it from sale without touching history
+- E2E-COOK-105 (P1) Slot creation refuses a passed cutoff, overlap, out-of-range numbers and negative or oversized meal capacity
+- E2E-COOK-106 (P0) A slot's capacity cannot be reduced below portions already held by orders
+- E2E-COOK-109 (P1) The cook's free insights count one visit per visitor and day, ignore crawlers, show only the own kitchen and never claim profit
+- E2E-COOK-112 (P2) Kitchen settings keep the kitchen serviceable and refuse unapproved zones and stale edits
+- E2E-OPS-110 (P1) Audit trail reading: permission, filters, cursor paging, clamped limit; reading is itself audited; only the API offers it
+- E2E-OPS-112 (P2) Operations dashboard metrics and audit CSV export are in the contract but not implemented
+- E2E-DISC-001 (P0) Anonymous visitor discovers published meals and kitchens in Arabic and English without signing in
+- E2E-DISC-002 (P1) New customer self-registration through the identity provider
+- E2E-DISC-003 (P0) Customer signs in and out; private data and the session are gone after sign-out
+- E2E-DISC-004 (P0) Switching from customer A to customer B leaves no trace of A's basket, orders or profile
+- E2E-DISC-005 (P1) Draft meal and paused kitchen are not browsable or purchasable by customers
+- E2E-DISC-006 (P1) Search, price ceiling, sort and reset return server-side results that match the seed prices
+- E2E-DISC-101 (P1) Zone filter shows only kitchens that deliver to the chosen zone, in dishes and kitchens views
+- E2E-DISC-103 (P2) Meal listing paginates with a cursor and rejects out-of-range limits
+- E2E-DISC-007 (P1) Delivery to a zone the kitchen does not serve is refused at quote time; pickup still works
+- E2E-DISC-008 (P1) Language toggle switches content, direction and numerals and sends the chosen language with every request
+- E2E-DISC-113 (P2) Keyboard-only path: browse, choose slot, add to basket, and the replacement dialog returns focus
+- E2E-DISC-106 (P0) Addresses are private to their owner; invalid input is rejected; deletion archives
+- E2E-DISC-107 (P1) Favorites are per customer, idempotent, and flagged unavailable instead of disappearing
+- E2E-DISC-108 (P1) Customer inbox lists order updates once, marks read, and is private
+- E2E-DISC-109 (P2) Profile update uses optimistic concurrency and rejects privileged fields
+- E2E-DISC-110 (P1) Only the owner of a COMPLETED order can review it, once; the rating shows on the meal page
+- E2E-DISC-111 (P2) A signed-in customer can report a visible review once, with a reason
+- E2E-DISC-112 (P1) Organic browsing activity is counted once per visitor per day without any identity
+- E2E-DISC-117 (P2) A persistent demo-environment notice is visible in both languages on the preview
+- E2E-BASKET-009 (P0) Basket lines can be added, edited and removed; estimates use integer piastres and survive reload
+- E2E-BASKET-010 (P0) A second kitchen or slot never merges silently: the customer must confirm replacing the basket
+- E2E-BASKET-021 (P0) The server refuses quotes that mix kitchens, slots, duplicate lines or meals not offered in the slot
+- E2E-BASKET-011 (P0) Per-line quantity limit comes from the server (10 on the preview) and is enforced at the quote
+- E2E-BASKET-029 (P1) A quote reserves no stock and is immutable; only a placed order reserves portions
+- E2E-BASKET-012 (P1) A sold-out slot cannot be added or quoted while other slots stay orderable
+- E2E-BASKET-023 (P1) Near and after the slot cutoff the server refuses new quotes and the slot disappears from the meal page
+- E2E-BASKET-013 (P1) An unplaced quote expires after 5 minutes and cannot be placed
+- E2E-BASKET-014 (P0) A price changed by the kitchen after the quote is shown, explained and must be accepted before placing
+- E2E-BASKET-015 (P0) A placed order keeps its agreed prices after the kitchen changes the price
+- E2E-BASKET-018 (P0) A two-line order where one line no longer fits places nothing (all or nothing)
+- E2E-BASKET-019 (P0) Changing fulfilment, address or payment method discards the shown total and the server recalculates
+- E2E-BASKET-020 (P0) Client-supplied prices, totals and identities are rejected; the order total equals the server quote
+- E2E-BASKET-028 (P1) One quote can create at most one order, even with a new request reference
+- E2E-BASKET-030 (P0) A guest keeps the basket through sign-in and returns to checkout
+- E2E-ORDER-021 (P0) Placement stores an immutable snapshot, locked prices and reserves capacity in one transaction (pickup, COD)
+- E2E-ORDER-022 (P0) Replaying the same placement request with the same Idempotency-Key returns the same order and does not reserve twice
+- E2E-ORDER-023 (P1) Reusing an Idempotency-Key with a different request is refused; keys are scoped to actor + command
+- E2E-ORDER-024 (P1) After an unknown outcome (offline during submit), retrying creates exactly one order
+- E2E-ORDER-025 (P0) Cook accepts a pending order once: reservation becomes allocation, customer gets contact and a notification
+- E2E-ORDER-026 (P1) Cook rejection releases the reservation exactly once and ends the order
+- E2E-ORDER-027 (P1) Customer cancels a pending order directly; capacity is released once
+- E2E-ORDER-029 (P1) An order not accepted by its deadline expires by server time and cannot be accepted afterwards
+- E2E-ORDER-030 (P0) Preparation consumes stock; READY issues the handover code, visible only to the order owner
+- E2E-ORDER-031 (P0) Pickup handover with the customer's code completes the order once and consumes the code
+- E2E-ORDER-032 (P1) Delivery mode: dispatch needs a courier reference, handover works only from OUT_FOR_DELIVERY, wrong-mode commands are refused
+- E2E-ORDER-033 (P1) Five wrong handover codes lock the challenge; the correct code is then refused and the customer's code disappears
+- E2E-ORDER-036 (P1) Out-of-order, stale and replayed commands are refused without changing history
+- E2E-ORDER-037 (P0) A cook cannot read or command another kitchen's order; customers and unprivileged staff cannot call cook/ops endpoints
+- E2E-ORDER-105 (P1) A reused clientRequestId with a different quote is a conflict even with a fresh Idempotency-Key
+- E2E-ORDER-110 (P1) Cook cancels an ACCEPTED order before preparation: allocation released once; cancel is unavailable once PREPARING
+- E2E-ORDER-111 (P1) An expired quote (older than 5 minutes) cannot be placed and holds no capacity
+- E2E-ORDER-112 (P1) A kitchen price change after quoting forces explicit re-acceptance; a committed order keeps its original price
+- E2E-ORDER-113 (P1) The server rejects forged amounts, mixed baskets, illegal quantities and un-serviceable delivery
+- E2E-ORDER-114 (P1) Capacity is bounded per meal-slot and per kitchen-slot, and released portions become orderable again
+- E2E-ORDER-117 (P1) Every order transition produces exactly one in-app notification for the right recipient, in order and deduplicated
+- E2E-ORDER-120 (P0) One customer cannot read, cancel, pay-report or review another customer's order
+- E2E-FIN-041 (P1) Clients cannot dictate payment amounts; the kitchen receipt must equal the server-computed deposit
+- E2E-FIN-042 (P1) Repeated customer transfer reports are idempotent and are information only
+- E2E-FIN-047 (P1) No real money or notification leaves the preview: only simulated bookkeeping and fake recipients
+- E2E-FIN-102 (P1) Duplicate or invalid cash reports are refused; one report per order
+- E2E-FIN-104 (P1) Cash-on-receipt eligibility: a kitchen's COD cap refuses higher totals exactly above the cap
+- E2E-FIN-105 (P1) A kitchen without an approved deposit account does not offer deposits; cash on receipt still works
+- E2E-FIN-106 (P0) A deposit order cannot move to PREPARING until the kitchen reports receipt (acceptance stays separate)
+- E2E-FIN-108 (P2) A disputed deposit on an active order can still be settled when the kitchen finds the money
+- E2E-FIN-109 (P2) Kitchen reports a different amount arrived: DISPUTED with the observed amount recorded
+- E2E-FIN-111 (P1) Cook statement shows completed orders, cash states and no commission; only the owner kitchen's data
+
+## Ready after the extra synthetic fixtures are provisioned (deployed app is enough) — 26
+
+- E2E-COOK-048 (P1) Applicant saves a draft, is told what is missing, submits revision 1 and stays a non-cook until staff decide — fixtures: FX-CUST-NEW
+- E2E-COOK-054 (P0) A cook cannot read or change another cook's meals, slots, orders or uploads; the other kitchen's data stays unchanged — fixtures: FX-COOK-B
+- E2E-OPS-055 (P0) Each staff account sees and can call exactly its granted sections; the administrator is not a superuser; denials are audited — fixtures: FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE
+- E2E-OPS-056 (P1) Operations hide a meal with a reason; it leaves customer sale at once but the cook's draft/publication state is untouched; restore brings it back — fixtures: FX-STAFF-OPS
+- E2E-OPS-057 (P0) Support staff work a customer's case: internal notes stay hidden from the customer, public replies reach them, and every staff view is audited — fixtures: FX-STAFF-SUPPORT, FX-STAFF-FINANCE
+- E2E-COOK-103 (P1) Changing a meal price records price history; description-only edits add no entry; another cook gets 404 — fixtures: FX-COOK-B
+- E2E-OPS-103 (P0) Journey end: after a customer's order is completed by the kitchen, operations and finance inspect it - totals, timeline, cash state, zero platform commission and masked contact — fixtures: FX-STAFF-OPS, FX-STAFF-FINANCE
+- E2E-OPS-104 (P1) A reported customer review is hidden with a reason, leaves the public kitchen page, and can be restored — fixtures: FX-STAFF-OPS
+- E2E-OPS-105 (P1) Case closing rules: resolution needs a code and a reason, only resolved cases close, a closed case is final, and a customer reply reopens a resolved case — fixtures: FX-STAFF-SUPPORT
+- E2E-DISC-104 (P1) A suspended or not-yet-approved cook's kitchen is invisible and unquotable — fixtures: FX-COOK-B, FX-COOK-PENDING, FX-STAFF-OPS
+- E2E-ORDER-034 (P1) Failed delivery ends the order as DELIVERY_FAILED without automatic refund, payment or commission — fixtures: FX-STAFF-OPS
+- E2E-ORDER-035 (P1) After acceptance the customer can only request cancellation; the order itself does not change — fixtures: FX-STAFF-SUPPORT
+- E2E-ORDER-101 (P0) Core journey 1: pickup + cash on receipt, from placement to completion and operations inspection — fixtures: FX-STAFF-OPS
+- E2E-ORDER-102 (P0) Core journey 2: delivery + cash on receipt, from placement through courier dispatch to completion — fixtures: FX-STAFF-OPS
+- E2E-ORDER-109 (P1) Operations exception-cancel of a PREPARING order keeps consumed capacity and links the support case — fixtures: FX-STAFF-OPS, FX-STAFF-SUPPORT
+- E2E-ORDER-118 (P1) A customer opens a support case from an order; staff reply publicly and privately; the customer sees only public messages — fixtures: FX-STAFF-SUPPORT
+- E2E-ORDER-119 (P1) Operations order monitoring shows exceptions and the timeline; opening customer contact is audited; no handover code is exposed — fixtures: FX-STAFF-OPS
+- E2E-FIN-038 (P0) Cash on receipt: completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-040 (P0) Kitchen reports 'Not received': payment becomes DISPUTED, a PAYMENT support case opens, the order is not changed — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-043 (P1) A cash shortfall becomes a dispute for finance; the original order snapshot is untouched — fixtures: FX-STAFF-FINANCE, FX-STAFF-OPS
+- E2E-FIN-044 (P1) Platform refund of verified cash: only finance.refund_approve, full amount only, requester and approver differ — fixtures: FX-STAFF-FINANCE, FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
+- E2E-FIN-045 (P0) Reconciliation invariants hold: balanced ledger, one cash obligation per order, payments match history, deposit never in ledger — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-046 (P0) Zero platform charges: no commission, service fee or tax on any quote, order, ledger or statement — fixtures: FX-STAFF-OPS
+- E2E-FIN-110 (P2) Settlements are dormant under zero commission: zero-amount entries cannot be batched — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-112 (P0) Finance and payment endpoints are limited to the granted staff; Finance tab visibility follows the grants — fixtures: FX-STAFF-OPS, FX-STAFF-SUPPORT, FX-STAFF-FINANCE
+- E2E-FIN-114 (P2) A person who reported cash can never verify it (separation of duties), and the denial is audited — fixtures: FX-MULTIROLE, FX-STAFF-FINANCE
+
+## Needs the updated application deployment (PR #9 / D18, and for MFA cases the owner-approved realm migration) — 48
+
+- CFG-101 (P0) MFA decision table: effective mode, required and available for every category combination, user preference and missing row (replaces CFG-007, 009, 010, 012-matrix, 013) — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-MULTIROLE
+- CFG-102 (P0) Web step-up and first-time enrolment through Keycloak: level-1 sign-in never asks OTP; stepUp=true asks OTP or leads to TOTP enrolment
+- CFG-008 (P0) Own two-step preference under OPTIONAL: enable only on a verified session; disable needs a recent factor, ends sessions, and is audited (absorbs CFG-017)
+- CFG-011 (P0) Category set to REQUIRED: enforcement reaches the next request, the user cannot turn it off, open endpoints stay reachable, policy change is audited — fixtures: FX-STAFF-ADMIN-B
+- CFG-012 (P1) Category DISABLED: enrolment is refused, existing preference and authenticator are not silently removed, staff high-risk step-up still applies — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-CUST-NEW
+- CFG-014 (P1) Missing mfa_policy row fails safe to REQUIRED (isolated database only)
+- CFG-015 (P1) Policy update uses optimistic versioning and a mandatory reason — fixtures: FX-STAFF-ADMIN-B
+- CFG-016 (P0) Policy mutation authorization ladder: guest, customer, ungranted staff, granted staff without recent MFA, and read vs write — fixtures: FX-STAFF-ADMIN-B
+- CFG-018 (P0) MFA reset guard ladder: permission, recent MFA, reason length, self-reset, unknown account — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
+- CFG-019 (P0) Authorized MFA reset removes the OTP credential, ends sessions, forces re-enrolment and is audited without exposing any secret — fixtures: FX-STAFF-ADMIN-B
+- CFG-020 (P1) MFA reset while Keycloak admin access fails midway: attempt audited first, partial reset recorded, retry converges — fixtures: FX-STAFF-ADMIN-B
+- CFG-021 (P0) After a reset a still-valid pre-reset token or session cannot perform a protected or staff high-risk action
+- CFG-022 (P1) Invalid and reused TOTP codes at the Keycloak OTP prompt are rejected and Keycloak brute-force protection applies
+- CFG-023 (P1) Reset and provider-session end return a safe 503 when the Keycloak admin client secret is not configured; policy and preference keep working — fixtures: FX-STAFF-ADMIN-B
+- CFG-106 (P1) Operator runbook: provision the staff and cook fixtures the MFA cases need (grants for FX-STAFF-ADMIN-B, SUPPORT, OPS, FINANCE, MULTIROLE) — fixtures: FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE, FX-MULTIROLE
+- CFG-027 (P0) Realm migration status is read-only and reports the real state (flow, browser binding, clients, admin client) without disclosing secrets
+- CFG-028 (P0) Apply the MFA realm migration: verified backup first, flow bound last, verify gate prints RESULT (owner-gated, live-realm change)
+- CFG-029 (P1) Re-running apply on a complete realm changes nothing (idempotent) and does not alter policy or users
+- CFG-030 (P0) Assurance proof: verify-mfa-flow.py issues real tokens and proves level-1 has no MFA evidence while step-up carries acr/amr and the API accepts/rejects accordingly
+- CFG-031 (P1) Rollback restores the previous browser flow even with unusual flow names; refuses an unreadable state file; PURGE removes admin client and mappers
+- CFG-032 (P1) Interrupted migration leaves the old flow bound; rerun recovers; an incomplete bound flow is refused until rollback
+- CFG-033 (P0) Default MFA state after deploy: all three categories OPTIONAL, nobody required, sign-in never asks OTP for customer, cook or staff — fixtures: FX-STAFF-ADMIN-B
+- CFG-115 (P2) fixture-clean removes only leftover verify-mfa-* synthetic users
+- CFG-118 (P1) Rollback plan is read-only and tells the truth about the schema: image-only vs restore
+- CFG-120 (P2) Account console link and residual risk: Manage authenticator opens the Keycloak account console; DISABLED cannot stop adding an authenticator there
+- E2E-COOK-049 (P0) Staff approval creates the kitchen; the applicant becomes a cook only after START_REVIEW and APPROVE with fresh MFA — fixtures: FX-STAFF-OPS, FX-COOK-PENDING
+- E2E-COOK-050 (P0) Suspending a kitchen stops new sales and acceptance of pending orders but lets already accepted orders be fulfilled — fixtures: FX-STAFF-OPS
+- E2E-COOK-053 (P1) A cook's onboarding document is private: only owner and the reviewing staff can read it, and replaying the upload ticket cannot change the approved copy — fixtures: FX-CUST-NEW, FX-STAFF-OPS, FX-COOK-B
+- E2E-OPS-059 (P0) Granting a permission needs fresh MFA, a reason and is audited with actor, time, target and request id and no secrets — fixtures: FX-STAFF-OPS
+- E2E-OPS-060 (P0) The last administrator's staff.grant cannot be revoked, even by themself
+- E2E-OPS-061 (P1) Two sessions edit the same zone fee from the same version: the first saves, the second gets a version conflict and a refreshed form — fixtures: FX-STAFF-ADMIN-B
+- E2E-COOK-107 (P1) Cook pause and resume work; a pause set by staff cannot be undone by the cook — fixtures: FX-STAFF-OPS
+- E2E-COOK-108 (P0) A changed deposit recipient is hidden from customers until finance staff approve it (zero platform fee, direct kitchen account) — fixtures: FX-STAFF-FINANCE, FX-STAFF-OPS
+- E2E-COOK-111 (P1) Request changes, resubmit as revision 2, then reject: history is preserved and no kitchen is ever created — fixtures: FX-STAFF-OPS, FX-CUST-NEW
+- E2E-OPS-101 (P0) An administrator cannot grant themselves a permission; unknown permissions, past expiry and duplicate grants are refused — fixtures: FX-STAFF-OPS
+- E2E-OPS-102 (P1) A revoked or expired grant stops working on the very next request; revoking staff.grant is allowed while another administrator remains — fixtures: FX-STAFF-ADMIN-B
+- E2E-OPS-106 (P1) A delivery-fee change applies to new quotes only: a quote taken earlier is refused, the placed order keeps its fee, the new quote uses the new fee — fixtures: FX-STAFF-ADMIN-B
+- E2E-OPS-107 (P1) Commerce policy versions: commission must stay zero, a real policy needs an approval reference, scheduled changes are refused, a synthetic version is appended — fixtures: FX-STAFF-ADMIN-B
+- E2E-OPS-108 (P0) Separation of duties: a person who is both a cook and a reviewer cannot decide their own application, operate their own kitchen or approve their own payment account — fixtures: FX-MULTIROLE, FX-COOK-B
+- E2E-OPS-109 (P1) Application decisions are guarded: START_REVIEW first, current revision and version, reason required, one effect per idempotency key — fixtures: FX-STAFF-OPS, FX-CUST-NEW
+- E2E-OPS-111 (P1) Without security.mfa_policy / security.mfa_reset, MFA policy and reset endpoints are refused; own security status is visible to everyone
+- E2E-ORDER-106 (P1) A reused clientRequestId with the same quote but a changed note/terms is a conflict (request fingerprint)
+- E2E-ORDER-108 (P1) Operations handover override completes a locked order with fresh MFA, reason and evidence, fully audited — fixtures: FX-STAFF-OPS
+- E2E-FIN-039 (P0) Core journey 3: pickup + 50% deposit, from deposit report to verified remaining cash — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-101 (P0) Core journey 4: delivery + 50% deposit with a courier, to verified remaining cash — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-103 (P1) A changed kitchen payment account is hidden from customers until staff approve it, and stale quotes are re-priced — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-107 (P0) Order ends after a reported transfer: reconciliation, staff decision 'kitchen owes a refund', kitchen reports the refund it sent — fixtures: FX-STAFF-FINANCE
+- E2E-FIN-115 (P1) Deposit orders that end without a reported transfer expire without a case; a disputed deposit can be closed without funds — fixtures: FX-STAFF-FINANCE
+
+## Needs a physical iOS/Android build — 13
+
+- CFG-024 (P0) iPhone step-up for the same customer: banner, system-browser verification, tokens replaced, refused order placement re-sent only by explicit retry with the same idempotency key (device plan C2, C3)
+- CFG-025 (P0) iPhone step-up that signs in as a DIFFERENT person is an account switch: previous profile, basket, orders and caches are gone before the new person is shown (device plan B5/C3)
+- CFG-026 (P1) iPhone returns from the system browser, background/kill/airplane cases around sign-in and step-up recover without stale loading or duplicate order (device plan B2, B3, B6, B7)
+- CFG-108 (P1) iPhone with MFA turned on later by the user: C2 banner appears on the next protected screen and nothing is broken; C4 cancel keeps banner and sign-in
+- CFG-109 (P0) iPhone after an administrator reset and after CUSTOMER=REQUIRED: next protected call asks for verification again (device plan C5, C6) — fixtures: FX-STAFF-ADMIN-B
+- CFG-046 (P0) Physical iPhone build identity and baseline: install from TestFlight, record build/version, reach the API, sign in and out (device plan A1, A2, B1, B4, B5, D2)
+- CFG-112 (P1) Android physical device sign-in and MFA step-up (no plan in repository yet)
+- E2E-DISC-115 (P1) Native app lists meals from the server, searches, and says plainly when it is offline
+- E2E-BASKET-026 (P1) Native app confirms replacing the basket and shows the price-change notice before placing
+- E2E-BASKET-027 (P0) Native account switch clears the previous person's basket, pending order and screens
+- E2E-ORDER-107 (P1) Native app: killing the app during order submit and relaunching recovers the same order
+- E2E-ORDER-122 (P1) Native apps: place and track a pickup order with identical totals and states on iOS and Android
+- E2E-FIN-113 (P1) Native apps: deposit checkout and honest payment wording on iOS and Android
+
+## Isolated disposable stack only (races, fault injection, destructive) — 18
+
+- CFG-004 (P1) Web session expiry and server-side revocation: idle timeout and deleted session row both force re-authentication
+- CFG-105 (P0) Staff grants: no self-escalation, no duplicate active grant, last staff.grant holder cannot be revoked — fixtures: FX-STAFF-ADMIN-B
+- CFG-039 (P2) Brute-force and rate limiting: Keycloak lockout is the only login throttle; application-level rate limits for login/quote/order/search are not implemented
+- CFG-042 (P1) Failed deploy handling: what the CD failure path really does and what the operator must do (backup preserved, no automatic DB rollback)
+- CFG-043 (P1) Backup is accepted only after restore + reconcile: deploy.sh backup and restore-db on an isolated database
+- CFG-119 (P1) E2E reset guard: ./deploy.sh e2e-reset refuses without the marker, with public customer hosts, or without typed confirmation (no data is wiped)
+- E2E-COOK-110 (P2) A cook account that asks for deletion is disabled at once and then held for staff review instead of being erased — fixtures: FX-COOK-B, FX-ISOLATED
+- E2E-DISC-102 (P2) Category chips filter by the meal's category; meals without a category match no chip
+- E2E-DISC-105 (P0) Unverified phone blocks quoting; wrong or repeated codes never verify and are rate limited
+- E2E-DISC-114 (P1) Account deletion request disables the account immediately and is idempotent
+- E2E-BASKET-016 (P0) Two customers race for the last portion: exactly one order, no oversell
+- E2E-BASKET-017 (P0) The cook-slot total caps two different meals placed at the same time
+- E2E-BASKET-022 (P1) A delivery-fee change after the quote is attributed to the fee, not the kitchen
+- E2E-BASKET-024 (P1) A basket line above a lowered per-line limit blocks the quote until reduced
+- E2E-ORDER-028 (P1) Accept racing customer cancel (and expiry): exactly one transition wins, release happens at most once
+- E2E-ORDER-115 (P1) Two customers racing for the last portion: exactly one order, no oversell
+- E2E-ORDER-121 (P1) Order, payment and ledger history cannot be altered or deleted, even by the application database role — fixtures: FX-ISOLATED
+- E2E-ORDER-123 (P1) Parallel duplicate submit of the same placement creates exactly one order and one reservation
