@@ -47,7 +47,12 @@ backup() {
     > "$KCDIR/realm-before-$stamp.json" 2>/dev/null
   [ -s "$KCDIR/realm-before-$stamp.json" ] || die "empty realm export"
   prev="$(run_migration status 2>/dev/null | sed -n 's/^browserFlow=//p')"
-  printf 'STAMP=%s\nPREVIOUS_BROWSER_FLOW=%s\nDB_DUMP=keycloak-db-%s.dump\nREALM_EXPORT=realm-before-%s.json\n' "$stamp" "$prev" "$stamp" "$stamp" > "$STATE"
+  # The rollback baseline is the flow bound BEFORE the first apply. A repeated apply (when the matbakhy flow is already bound) keeps it.
+  if [ "$prev" = "matbakhy browser" ] && [ -f "$STATE" ]; then
+    old="$(sed -n "s/^PREVIOUS_BROWSER_FLOW='\(.*\)'$/\1/p" "$STATE" | head -1)"
+    [ -z "$old" ] || prev="$old"
+  fi
+  printf "STAMP='%s'\nPREVIOUS_BROWSER_FLOW='%s'\nDB_DUMP='keycloak-db-%s.dump'\nREALM_EXPORT='realm-before-%s.json'\n" "$stamp" "$prev" "$stamp" "$stamp" > "$STATE"
   echo "backup written under $KCDIR (state: $STATE)"
 }
 

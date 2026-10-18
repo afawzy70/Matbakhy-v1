@@ -161,7 +161,14 @@ export function AppProvider({
   const startStepUp = useCallback(async () => {
     setBusy(true);
     try {
+      const before = (await session.restore())?.subject ?? null;
       await signIn(config, session, { stepUp: true });
+      const after = (await session.restore())?.subject ?? null;
+      if (before !== after) {
+        // The person signed in as somebody else in the browser: this is an account switch, so nothing of the previous account may remain (TC-048).
+        await clearShopping();
+        await reloadProfile();
+      }
       setStepUpRequired(false);
     } catch (e) {
       // Cancelling keeps the account signed in with the notice still showing; a real failure says so.
@@ -171,7 +178,7 @@ export function AppProvider({
     } finally {
       setBusy(false);
     }
-  }, [config, session, signIn]);
+  }, [config, session, signIn, reloadProfile]);
 
   const endSession = useCallback(async () => {
     setBusy(true);

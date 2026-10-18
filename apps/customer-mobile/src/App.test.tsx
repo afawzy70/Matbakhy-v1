@@ -144,6 +144,19 @@ describe("two-step verification step-up (D18)", () => {
     expect(mockStore.get("matbakhy.basket.v1")).toBeTruthy();
   });
 
+  it("treats a step-up that signs in as another person as an account switch: basket cleared, profile re-read", async () => {
+    const session = await signedInSession();
+    const signIn = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    let profileCalls = 0;
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => { profileCalls += 1; return json(200, profile); }, "GET /api/v1/meals": () => json(403, { code: "STEP_UP_REQUIRED" }) })} />);
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
+    expect(session.accessToken).toBe(fakeJwt("customer-b"));
+    expect(profileCalls).toBeGreaterThanOrEqual(2);
+  });
+
   it("keeps showing the request when the user cancels the verification, and never signs them out", async () => {
     const session = await signedInSession();
     const { SignInCancelled } = jest.requireMock("./auth") as { SignInCancelled: new () => Error };

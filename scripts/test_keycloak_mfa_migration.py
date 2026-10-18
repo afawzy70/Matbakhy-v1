@@ -41,6 +41,11 @@ class KeycloakMfaMigrationTest(unittest.TestCase):
         self.assertIn('--password "$ADMIN_PASSWORD"', wrapper)  # expanded inside the container shell (single-quoted here)
         self.assertIn("-e ADMIN_USER -e ADMIN_PASSWORD", wrapper)  # forwarded by name, not by value
 
+    def test_the_rollback_baseline_survives_a_repeated_apply_and_the_state_file_can_be_sourced(self):
+        text = OPERATOR.read_text()
+        self.assertIn('[ "$prev" = "matbakhy browser" ] && [ -f "$STATE" ]', text)
+        self.assertIn("PREVIOUS_BROWSER_FLOW='%s'", text, "values with spaces must be quoted so the state file can be sourced")
+
     def test_nothing_deletes_users_or_credentials(self):
         text = MIGRATION.read_text()
         for forbidden in ("delete users", "delete realms", "credentials/", "reset-password"):
