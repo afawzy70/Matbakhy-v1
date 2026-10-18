@@ -1,0 +1,109 @@
+name: iOS beta (EAS Build and TestFlight; manual, owner-gated)
+# Release engineering for the physical-iPhone beta (docs/mobile/ios-testflight-beta.md). Nothing here runs on push or on a schedule.
+#  * config-check   runs on pull requests that touch the mobile app: resolves the preview Expo config, no secrets, no Apple, no EAS.
+#  * build          manual; needs the "ios-beta" environment (owner approval) and the EXPO_TOKEN secret; starts an EAS cloud build
+#                   of the "testflight" profile. Signing credentials live in EAS (created interactively once by the owner), never in Git.
+#  * submit         manual; needs the "ios-beta-submit" environment (owner approval) and the exact confirmation text; uploads the
+#                   latest finished build to App Store Connect / TestFlight. No upload happens without an explicit run of this job.
+on:
+  pull_request:
+    paths:
+      - apps/customer-mobile/**
+      - .github/workflows/ios-beta.yml
+      - deploy/web-preview/identity/matbakhy-realm.preview.json
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "What to run"
+        type: choice
+        options: [config-check, build, submit]
+        default: config-check
+      confirm:
+        description: "build: type BUILD-IOS-BETA. submit: type SUBMIT-TO-TESTFLIGHT. Ignored for config-check."
+        type: string
+        default: ""
+permissions:
+  contents: read
+concurrency:
+  group: ios-beta-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  NODE_VERSION: "24.21.0"
+  # SHA-256 of node-v24.21.0-linux-x64.tar.xz from https://nodejs.org/dist/v24.21.0/SHASUMS256.txt
+  NODE_SHA256: "fd8e59d5a511510f6a298afb548f18c7d2b1be404d8b4a27d94fbe49f56cb2d6"
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
+  EAS_CLI: "eas-cli@24.10.0"
+jobs:
+  config-check:
+    if: github.event_name == 'pull_request' || inputs.action == 'config-check'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - name: Beta identity, endpoints and registration guards
+        run: python3 -m unittest scripts.test_ios_beta_config -v
+      - name: Resolve the preview Expo config (what EAS would build)
+        working-directory: apps/customer-mobile
+        env:
+          APP_VARIANT: preview
+          EXPO_NO_TELEMETRY: "1"
+        run: pnpm exec expo config --type public
+
+  build:
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'build'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: ios-beta
+    steps:
+      - name: Require the explicit confirmation text
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: '[ "$CONFIRM" = "BUILD-IOS-BETA" ] || { echo "::error::type BUILD-IOS-BETA to start an EAS build"; exit 1; }'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - name: Start the EAS iOS build (profile testflight; signing credentials are held by EAS)
+        working-directory: apps/customer-mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          [ -n "$EXPO_TOKEN" ] || { echo "::error::EXPO_TOKEN is not configured in the ios-beta environment"; exit 1; }
+          pnpm dlx "$EAS_CLI" build --platform ios --profile testflight --non-interactive --no-wait
+
+  submit:
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'submit'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: ios-beta-submit
+    steps:
+      - name: Require the explicit confirmation text
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+        run: '[ "$CONFIRM" = "SUBMIT-TO-TESTFLIGHT" ] || { echo "::error::type SUBMIT-TO-TESTFLIGHT to upload to TestFlight"; exit 1; }'
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install pinned Node.js (checksum verified)
+        run: |
+          curl -fsSLO "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz"
+          echo "${NODE_SHA256}  node-v${NODE_VERSION}-linux-x64.tar.xz" | sha256sum -c -
+          mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
+          echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
+      - run: corepack enable && pnpm install --frozen-lockfile
+      - name: Upload the latest finished testflight build to App Store Connect (App Store Connect API key is held by EAS)
+        working-directory: apps/customer-mobile
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          [ -n "$EXPO_TOKEN" ] || { echo "::error::EXPO_TOKEN is not configured in the ios-beta-submit environment"; exit 1; }
+          pnpm dlx "$EAS_CLI" submit --platform ios --profile testflight --latest --non-interactive

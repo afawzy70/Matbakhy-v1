@@ -37,3 +37,12 @@ apps/customer-mobile/e2e-ios/*.xcodeproj/
 # Web preview secrets and generated configuration (deploy/web-preview)
 deploy/web-preview/.env
 deploy/web-preview/generated/
+# Apple/Google signing and distribution material never belongs in Git (iOS beta, docs/mobile/ios-testflight-beta.md)
+*.p8
+*.cer
+*.certSigningRequest
+*.jks
+*.ipa
+*.aab
+google-services.json
+GoogleService-Info.plist

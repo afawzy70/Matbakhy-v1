@@ -1,0 +1,26 @@
+{
+  "cli": {
+    "version": ">= 24.10.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "testflight": {
+      "distribution": "store",
+      "autoIncrement": true,
+      "ios": { "resourceClass": "m-medium" },
+      "env": {
+        "APP_VARIANT": "preview",
+        "EXPO_PUBLIC_ENVIRONMENT": "staging",
+        "EXPO_PUBLIC_API_URL": "https://api.167-86-90-174.sslip.io",
+        "EXPO_PUBLIC_OIDC_ISSUER": "https://id.167-86-90-174.sslip.io/realms/matbakhy",
+        "EXPO_PUBLIC_OIDC_CLIENT_ID": "matbakhy-mobile",
+        "EXPO_PUBLIC_NOTIFICATION_PROMPT": "false"
+      }
+    }
+  },
+  "submit": {
+    "testflight": {
+      "ios": {}
+    }
+  }
+}
