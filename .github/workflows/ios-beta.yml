@@ -3,8 +3,9 @@ name: iOS beta (EAS Build and TestFlight; manual, owner-gated)
 #  * config-check   runs on pull requests that touch the mobile app: resolves the preview Expo config, no secrets, no Apple, no EAS.
 #  * build          manual; needs the "ios-beta" environment (owner approval) and the EXPO_TOKEN secret; starts an EAS cloud build
 #                   of the "testflight" profile. Signing credentials live in EAS (created interactively once by the owner), never in Git.
-#  * submit         manual; needs the "ios-beta-submit" environment (owner approval) and the exact confirmation text; uploads the
-#                   latest finished build to App Store Connect / TestFlight. No upload happens without an explicit run of this job.
+#  * submit         manual; needs the "ios-beta-submit" environment (owner approval), the exact confirmation text and the EAS build id
+#                   to upload (the reviewer approves that build), plus the non-secret variable ASC_APP_ID; uploads to App Store Connect /
+#                   TestFlight. No upload happens without an explicit run of this job.
 on:
   pull_request:
     paths:
@@ -20,6 +21,10 @@ on:
         default: config-check
       confirm:
         description: "build: type BUILD-IOS-BETA. submit: type SUBMIT-TO-TESTFLIGHT. Ignored for config-check."
+        type: string
+        default: ""
+      build_id:
+        description: "submit only: the EAS build id (UUID) printed by the build run. The reviewer approves exactly this build."
         type: string
         default: ""
 permissions:
@@ -88,10 +93,15 @@ jobs:
     timeout-minutes: 30
     environment: ios-beta-submit
     steps:
-      - name: Require the explicit confirmation text
+      - name: Require the explicit confirmation text and a build id
         env:
           CONFIRM: ${{ inputs.confirm }}
-        run: '[ "$CONFIRM" = "SUBMIT-TO-TESTFLIGHT" ] || { echo "::error::type SUBMIT-TO-TESTFLIGHT to upload to TestFlight"; exit 1; }'
+          BUILD_ID: ${{ inputs.build_id }}
+          ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+        run: |
+          [ "$CONFIRM" = "SUBMIT-TO-TESTFLIGHT" ] || { echo "::error::type SUBMIT-TO-TESTFLIGHT to upload to TestFlight"; exit 1; }
+          printf '%s' "$BUILD_ID" | grep -Eq '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' || { echo "::error::build_id must be the EAS build UUID to upload"; exit 1; }
+          printf '%s' "$ASC_APP_ID" | grep -Eq '^[0-9]{6,12}$' || { echo "::error::set the environment variable ASC_APP_ID to the numeric App Store Connect app id (not a secret)"; exit 1; }
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
       - name: Install pinned Node.js (checksum verified)
         run: |
@@ -100,10 +110,12 @@ jobs:
           mkdir -p "$RUNNER_TEMP/node" && tar xJf "node-v${NODE_VERSION}-linux-x64.tar.xz" -C "$RUNNER_TEMP/node" --strip-components=1
           echo "$RUNNER_TEMP/node/bin" >> "$GITHUB_PATH"
       - run: corepack enable && pnpm install --frozen-lockfile
-      - name: Upload the latest finished testflight build to App Store Connect (App Store Connect API key is held by EAS)
+      - name: Upload exactly the approved build to App Store Connect (App Store Connect API key is held by EAS)
         working-directory: apps/customer-mobile
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          BUILD_ID: ${{ inputs.build_id }}
+          ASC_APP_ID: ${{ vars.ASC_APP_ID }}
         run: |
           [ -n "$EXPO_TOKEN" ] || { echo "::error::EXPO_TOKEN is not configured in the ios-beta-submit environment"; exit 1; }
-          pnpm dlx "$EAS_CLI" submit --platform ios --profile testflight --latest --non-interactive
+          pnpm dlx "$EAS_CLI" submit --platform ios --profile testflight --id "$BUILD_ID" --asc-app-id "$ASC_APP_ID" --non-interactive

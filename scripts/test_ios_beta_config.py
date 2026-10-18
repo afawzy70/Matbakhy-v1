@@ -95,6 +95,9 @@ class IosBetaConfigTest(unittest.TestCase):
         self.assertIn("BUILD-IOS-BETA", build)
         self.assertIn("SUBMIT-TO-TESTFLIGHT", submit)
         self.assertIn("--non-interactive", build + submit)
+        self.assertIn('--id "$BUILD_ID"', submit)
+        self.assertNotIn("--latest", submit, "the reviewer must approve one named build, not whatever is newest")
+        self.assertIn("vars.ASC_APP_ID", submit)
         for line in text.splitlines():
             if "inputs.confirm" in line and not line.lstrip().startswith(("#", "description:")):
                 self.assertRegex(line, r"^\s+CONFIRM: \$\{\{ inputs\.confirm \}\}$", "the confirmation text must reach the shell through env, not interpolation")
