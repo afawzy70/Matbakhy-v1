@@ -8,4 +8,7 @@
 | CR-002 staff MFA | none (reclassified) | round 2: not a code defect | — | OPEN: needs IdP evidence |
 | QA-002 idempotency payload fingerprint after cache retention | none yet | — | — | OPEN (Medium) |
 
-Honesty note: backend integration tests (Testcontainers) cannot run on this VPS; no backend test is claimed PASS from local execution.
+CI evidence @890bc87 (GitHub Actions run 39116868141, job `Workspace from clean checkout`, runs `./mvnw verify` with Testcontainers): reactor `Tests run: 282, Failures: 0, Errors: 0, Skipped: 0` plus a 4-test module; `CashAndLedgerIntegrationTest` 8/8 (includes the new CR-001 regression) and `MediaIntegrationTest` 10/10 PASS. The fix for CR2-001 (log-only) is covered by the run on the next commit.
+Secret scan on 1a7d6a9 flagged 2 generic-api-key false positives in a file-hash manifest (`phase2-evidence/sha256.json`); file removed and the two historical fingerprints recorded in `.gitleaksignore` (verified with gitleaks 8.30.1 locally: no leaks).
+
+Honesty note (local execution): backend integration tests (Testcontainers) cannot run on this VPS; no backend test is claimed PASS from local execution.

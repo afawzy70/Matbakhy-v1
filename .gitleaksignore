@@ -28,3 +28,6 @@
 # matched generic-api-key ("api" followed by a host:port path). No credential; the line was reworded in the next
 # commit so the working tree no longer matches. Reviewed by the implementation agent; this one historical finding only.
 a8b206e608464952064b127d0bed5993b8c70799:docs/operations/08-troubleshooting-runbook.md:generic-api-key:46
+# Reviewed false positives: file-hash manifest (sha256 of test-result JSON) in QA phase-2 evidence, removed from tree
+1a7d6a9da2af2acfa4accfdcc8133ece276817ca:docs/quality/stabilization/phase2-evidence/sha256.json:generic-api-key:21
+1a7d6a9da2af2acfa4accfdcc8133ece276817ca:docs/quality/stabilization/phase2-evidence/sha256.json:generic-api-key:27
