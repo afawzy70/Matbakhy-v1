@@ -88,11 +88,27 @@ class KeycloakMfaMigrationTest(unittest.TestCase):
         for forbidden in ("delete users", "delete realms", "credentials/", "reset-password"):
             self.assertNotIn(forbidden, text)
 
-    def test_public_verification_never_submits_an_enrolment_or_otp(self):
+    def test_verification_proves_assurance_with_real_tokens_and_never_passes_without_them(self):
         text = VERIFY.read_text()
-        self.assertNotIn('"otp":', text)
-        self.assertNotIn("totpSecret\":", text)
+        self.assertIn("RESULT: INCOMPLETE", text)
+        self.assertIn("sys.exit(3)", text)
+        for needle in ('"STEP_UP_REQUIRED"', '"otp" in amr2', "MFA_ACR", "exchange(code)", "grant_type"):
+            self.assertIn(needle, text)
+        operator = OPERATOR.read_text()
+        self.assertIn("VERIFY_FIXTURE_FILE", operator)
+        self.assertIn("fixture-delete", operator)
+        self.assertIn("NOT proven", operator, "apply must say plainly when assurance was not proven")
+
+    def test_only_the_synthetic_fixture_user_can_be_removed_and_an_otp_is_only_ever_submitted_for_it(self):
+        migration = MIGRATION.read_text()
+        self.assertIn('FIXTURE_PREFIX="verify-mfa-"', migration)
+        self.assertIn('case "$name" in "$FIXTURE_PREFIX"*)', migration)
+        text = VERIFY.read_text()
+        self.assertEqual(text.count('{"otp": totp(otp_secret)'), 1)
+        self.assertIn("if otp_action and otp_secret:", text)
+        self.assertIn("sign_in(\"matbakhy-web\"", text)  # the public part still never answers an OTP form
         self.assertIn("SKIP mobile checks", text)
+
 
 
 if __name__ == "__main__":

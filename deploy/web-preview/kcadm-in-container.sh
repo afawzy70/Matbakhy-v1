@@ -12,9 +12,9 @@ KCADM_BIN=/opt/keycloak/bin/kcadm.sh
 if [ "${1:-}" = config ] && [ "${2:-}" = credentials ]; then
   shift 2
   [ "${1:-}" = --config ] || { echo "kcadm-in-container: --config is required" >&2; exit 2; }
-  exec_in -e ADMIN_USER -e ADMIN_PASSWORD identity sh -c 'exec "$0" config credentials --config "$1" --server http://localhost:8080 --realm master --user "$ADMIN_USER" --password "$ADMIN_PASSWORD"' "$KCADM_BIN" "$2"
+  exec_in -e ADMIN_USER -e ADMIN_PASSWORD identity sh -c 'exec "$0" config credentials --config "$1" --server http://localhost:8080 --realm master --user "$ADMIN_USER" --password "$ADMIN_PASSWORD"' "$KCADM_BIN" "$2" </dev/null
 elif [ "${1:-}" = cleanup ]; then
-  exec_in identity rm -f "$2"
+  exec_in identity rm -f "$2" </dev/null
 else
   exec_in identity "$KCADM_BIN" "$@"
 fi

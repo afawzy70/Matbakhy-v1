@@ -28,8 +28,15 @@ modified or deleted. No downtime; the identity container is not restarted.
    export (no users) under `$BACKUP_DIR/keycloak/` (mode 600) plus a state file with the previous browser flow, the migration, and
    `verify`. It takes 3–5 minutes (kcadm starts a JVM per call).
 5. `./migrate-mfa.sh status` again — expect `flows=complete`, `browserFlow=matbakhy browser`, `client.matbakhy-admin=present`.
-6. `./migrate-mfa.sh verify` can be repeated at any time. It must print only `PASS` (and `SKIP mobile checks` until the beta client is registered; set
-   `VERIFY_MOBILE=1` after `docs/mobile/ios-testflight-beta.md` step "register the mobile client").
+6. `./migrate-mfa.sh verify` can be repeated at any time. It creates a **synthetic user** (`verify-mfa-<random>`, random password and TOTP secret held in a
+   mode-600 temp file) through kcadm, signs in with real Keycloak flows, exchanges the codes for tokens and calls the real API through the public proxy:
+   a level-1 token must carry the API audience and **no** MFA evidence; a step-up answered with the user's real OTP must carry `acr` in the API's MFA values
+   and `amr` `otp`; the API must accept that token when the user turns two-step verification on, **reject** the level-1 token with `STEP_UP_REQUIRED`
+   afterwards, and accept the elevated token for the same call; the fixture's preference is switched back off and the user is deleted (only names starting
+   `verify-mfa-` are ever removed; `./migrate-mfa.sh fixture-clean` removes leftovers). The final line is `RESULT: PASS`, `RESULT: FAIL` (exit 1) or
+   `RESULT: INCOMPLETE` (exit 3, assurance NOT_RUN, never a PASS). `apply` treats exit 3 as "applied, not proven" and prints a warning. The mobile checks stay
+   `SKIP` until the beta client is registered (`VERIFY_MOBILE=1` after `docs/mobile/ios-testflight-beta.md` step "register the mobile client"). A first API call by the
+   fixture provisions an application account for it; it is a synthetic, inactive-by-use customer record in the preview database (no orders).
 7. Manual acceptance with synthetic accounts: a normal customer sign-in on the web app works; Account → Security → turn on two-step verification
    enrols an authenticator through Keycloak; with an administrator account holding `security.mfa_policy`, switching a category to REQUIRED is
    **not** done in this step (policies stay OPTIONAL).
@@ -41,7 +48,7 @@ modified or deleted. No downtime; the identity container is not restarted.
   and asks for `rollback` first.
 
 ## Rollback
-`./migrate-mfa.sh rollback` rebinds the previous browser flow (from the state file; `browser` by default) and deletes the `matbakhy` flows.
+`./migrate-mfa.sh rollback` rebinds the previous browser flow (read from the state file, which is parsed as validated data and never sourced; the flow name is stored base64-encoded; an unreadable file is refused and you pass `PREVIOUS_FLOW='<name>'` explicitly) and deletes the `matbakhy` flows.
 `PURGE=1 ./migrate-mfa.sh rollback` also removes the `matbakhy-admin` client, the `amr` mappers and the `acr.loa.map` attributes.
 Users and credentials are untouched either way (an authenticator someone enrolled stays in Keycloak but is unused by the previous flow).
 If the identity store itself ever has to be restored: stop `identity`, restore `keycloak-db-<stamp>.dump` from the state file into an empty `keycloak`
@@ -61,4 +68,4 @@ database with `pg_restore`, start `identity`. This loses sign-ins and enrolments
 Apply on a realm imported from the pre-D18 preview file, `status` → `flows=complete`, second `apply` → "already complete", normal sign-in of
 `preview-customer-1` and `preview-ops-1` still issue a code, a step-up request leads to enrolment, `verify` all PASS, `PURGE=1 rollback`
 restores `browserFlow=browser` and removes the admin client and mappers; also run through the `kcadm-in-container.sh` wrapper with a
-test double for `docker compose exec`. The Docker-specific parts (`docker compose exec`, `pg_dump`, `deploy.sh backup`) are exercised only on the server.
+test double for `docker compose exec`. After the review of `ff64f32`: the assurance verification was run against the same throwaway Keycloak 26.8.0 with a stand-in for the API's MFA contract (the real API needs PostgreSQL and could not be started without Docker), giving `RESULT: PASS`; with no fixture `RESULT: INCOMPLETE` (exit 3); with the `amr` mapper deleted `RESULT: FAIL` on the OTP step-up token. The real API acceptance is exercised only by the live run. The Docker-specific parts (`docker compose exec`, `pg_dump`, `deploy.sh backup`) are exercised only on the server.

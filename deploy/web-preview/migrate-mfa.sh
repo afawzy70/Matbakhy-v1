@@ -60,8 +60,26 @@ backup() {
 
 verify() {
   # Shell + python3 (stdlib) from this host through the public proxy, like a browser; no secret is printed.
+  # A synthetic user with a random password and TOTP secret is created for the run and always removed (fixture-delete only ever
+  # removes names starting "verify-mfa-"); with it the check obtains real tokens and calls the real API. Without it the assurance part
+  # is reported NOT_RUN and the exit code is 3, never PASS.
+  fxdir="$(mktemp -d)"
+  chmod 700 "$fxdir"
+  fx_cleanup() { run_migration fixture-delete >/dev/null 2>&1 || echo "WARNING: remove users named verify-mfa-* by hand (./migrate-mfa.sh fixture-clean)" >&2; rm -rf "$fxdir"; }
+  trap fx_cleanup EXIT
+  trap 'exit 130' INT TERM
+  fixture=""
+  if python3 identity/verify-mfa-flow.py fixture-body "$fxdir" | run_migration fixture-create >/dev/null; then
+    fixture="$fxdir/fixture.json"
+  else
+    echo "WARNING: the synthetic verification user could not be created; assurance checks will be NOT_RUN" >&2
+  fi
+  rc=0
   PREVIEW_DOMAIN="$PREVIEW_DOMAIN" PREVIEW_USER_PASSWORD="${PREVIEW_USER_PASSWORD:-}" OIDC_ADMIN_CLIENT_SECRET="${OIDC_ADMIN_CLIENT_SECRET:-}" \
-    python3 identity/verify-mfa-flow.py
+    OIDC_WEB_CLIENT_SECRET="${OIDC_WEB_CLIENT_SECRET:-}" VERIFY_FIXTURE_FILE="$fixture" python3 identity/verify-mfa-flow.py || rc=$?
+  fx_cleanup
+  trap - EXIT INT TERM
+  return "$rc"
 }
 
 case "${1:-}" in
@@ -72,9 +90,13 @@ case "${1:-}" in
     backup
     run_migration apply
     echo "== verification"
-    verify
+    rc=0
+    verify || rc=$?
+    [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ] || die "verification FAILED (exit $rc): consider ./migrate-mfa.sh rollback"
+    [ "$rc" -ne 3 ] || echo "WARNING: applied, but authentication assurance is NOT proven (verification incomplete). Do not treat this as PASS."
     ;;
   verify) verify ;;
+  fixture-clean) run_migration fixture-delete ;;
   rollback)
     # The state file is parsed as data (never sourced); an explicit PREVIOUS_FLOW from the operator wins, an unreadable file is refused.
     if [ -z "${PREVIOUS_FLOW:-}" ]; then
@@ -84,5 +106,5 @@ case "${1:-}" in
     PREVIOUS_FLOW="$PREVIOUS_FLOW" run_migration rollback
     echo "Rolled back the browser flow. A full restore of the identity store, if ever needed, uses the dump named in $STATE (pg_restore into an empty keycloak database while identity is stopped)."
     ;;
-  *) die "usage: ./migrate-mfa.sh backup | status | apply | verify | rollback" ;;
+  *) die "usage: ./migrate-mfa.sh backup | status | apply | verify | rollback | fixture-clean" ;;
 esac
