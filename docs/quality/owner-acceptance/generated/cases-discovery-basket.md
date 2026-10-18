@@ -6,20 +6,22 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-016, TC-017, TC-046, TC-116; rules: BR-016, BR-017, BR-046; decisions: D12; operations: getMeals, getKitchensById, getConfigurationPublic
+- **Traces to:** scenarios: TC-150; rules: BR-016, BR-017, BR-046; decisions: D12; operations: getMeals, getKitchensById, getConfigurationPublic; partial: TC-016, TC-017, TC-046, TC-116
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
   - Use a private/incognito window with no cookies for https://app.<PREVIEW_DOMAIN> (no session).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-GUEST) Open https://app.<PREVIEW_DOMAIN>/#/ in the private window. — data: Default language is Arabic.
   2. (FX-GUEST) Read the page chrome: the note banner, the document direction, the list heading and the cards. — data: Banner (role=note) title 'بيئة تجريبية'. Heading 'أكلات بيتية متاحة للحجز'. Top bar buttons: السلة (link), English, تسجيل الدخول. Bottom nav shows only 'الرئيسية' (no orders/account without a session).
   3. (FX-GUEST) Read the three food cards (title, price, kitchen link, portion pill, time pill, action). — data: كشري تجريبي / ٧٥٫٠٠ ج.م / مطبخ المعاينة / 'علبة كبيرة'; محشي تجريبي / ١٨٠٫٠٠ ج.م / مطبخ المعاينة / 'طبق لشخصين'; ملوخية تجريبية / ١٢٠٫٢٥ ج.م / مطبخ تجريبي تاني / 'طبق لشخص'. Each time pill = 13:00 Cairo on the first seeded day; each card has the button 'عرض التفاصيل'.
   4. (FX-GUEST) Press the mode button 'المطابخ'. — data: Heading becomes 'مطابخ بيتية'; two kitchen cards: 'مطبخ المعاينة' with text '2 أكلة في النتائج' and 'مطبخ تجريبي تاني' with '1 أكلة في النتائج'.
   5. (FX-GUEST) Press 'عرض المطبخ' on 'مطبخ المعاينة'. — data: Route becomes #/kitchen/preview-kitchen. Shows the description 'أكل بيتي تجريبي للمعاينة', the line 'المطبخ متراجع تشغيليًا من فريق مطبخي؛ ده مش شهادة سلامة غذاء.' and the heading 'أكلات متاحة للحجز' with the two meals of that kitchen only.
-  6. (FX-GUEST) Press the top-bar button 'English'. — data: Page switches to LTR English without reload: heading 'Home-cooked meals to preorder'; card titles 'Preview koshari', 'Preview mahshi', 'Preview molokhia'.
-  7. (FX-GUEST) Open DevTools console and run: await (await fetch('https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50')).json() — data: No cookies, no headers.
+  6. (FX-GUEST) While still on the kitchen page (#/kitchen/preview-kitchen), press the top-bar button 'English'. — data: Kitchen page in English: heading 'Meals to preorder' listing only 'Preview koshari' and 'Preview mahshi' (kitchen A's meals); document is LTR (lang=en dir=ltr).
+  7. (FX-GUEST) Press the bottom-nav link 'Home' (English), then read the heading and cards. — data: Heading 'Home-cooked meals to preorder' with all three cards: 'Preview koshari', 'Preview mahshi', 'Preview molokhia'.
+  8. (FX-GUEST) Open DevTools console and run: await (await fetch('https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50')).json() — data: No cookies, no headers.
 - **Expected:**
   - UI: Arabic: <html lang=ar dir=rtl>; English: lang=en dir=ltr. Every price is shown with currency EGP (ج.م in Arabic).
   - UI: Only the three published seeded meals (plus any meal other testers published) are listed; no draft, paused, archived or hidden meal appears.
@@ -35,7 +37,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** BLOCKED — deploy/web-preview/identity/matbakhy-realm.preview.json:6 and infra/identity/matbakhy-realm.json:6 set registrationAllowed=false; verifyEmail=true (line 9) with no SMTP server in the preview realm, and the phone code is only kept in memory by FakePhoneVerificationSender.java:14-18 (never logged or returned). Self-sign-up cannot be exercised by a tester in any current environment. The verification gate itself is covered by E2E-DISC-105. · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web · **Actors:** FX-CUST-NEW
-- **Traces to:** scenarios: TC-003, TC-109, TC-110; rules: BR-001, BR-003; operations: getMe
+- **Traces to:** rules: BR-001, BR-003; operations: getMe; partial: TC-003, TC-109, TC-110
 - **Prerequisites:**
   - BLOCKED: neither the preview realm nor the local realm allows self-registration, and a new account could not complete the e-mail or phone verification afterwards.
 - **Steps:**
@@ -50,7 +52,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-001, TC-002, TC-109; rules: BR-001, BR-002, BR-045; operations: getMe, getOrders, getMeFavorites
+- **Traces to:** scenarios: TC-109; rules: BR-001, BR-002, BR-045; operations: getMe, getOrders, getMeFavorites; partial: TC-001, TC-002
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
@@ -79,7 +81,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-006, TC-044, TC-109; rules: BR-006, BR-044, BR-001; operations: getOrdersById, getOrdersByRequestById, postQuotes, postOrders, postOrdersCancel
+- **Traces to:** rules: BR-006, BR-044, BR-001; operations: getOrdersById, getOrdersByRequestById, postQuotes, postOrders, postOrdersCancel; partial: TC-006, TC-109
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -88,6 +90,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - FX-CUST-A (preview-customer-1) and FX-CUST-B (preview-customer-2) both phone-verified. Same browser profile for both (that is the point).
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Cook FX-COOK-A will be needed afterwards only to release stock: A cancels its own order in step 6 so no cook action is required.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Sign in as preview-customer-1. Open meal 'كشري تجريبي', pick the first slot radio, quantity 1, press 'أضف إلى السلة' (label shows the line total). — data: Message 'تمت الإضافة إلى السلة.'
   2. (FX-CUST-A) Open السلة (#/checkout). Choose 'استلام من المطبخ', leave 'الدفع عند الاستلام', press 'احسب الإجمالي', tick 'أوافق على الشروط وسياسة الإلغاء', press 'تأكيد الطلب'. — data: Browser moves to #/orders/<A-order-id>. Note the order number MB-1xxxxx and id.
@@ -110,7 +114,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-GUEST, FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-009, TC-017, TC-116; rules: BR-009, BR-017; operations: getMealsById, getMeals, getKitchensById, postQuotes, patchCookSettings, postCookMeals
+- **Traces to:** scenarios: TC-009; rules: BR-009, BR-017; operations: getMealsById, getMeals, getKitchensById, postQuotes, patchCookSettings, postCookMeals; partial: TC-017, TC-116
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -119,6 +123,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - FX-COOK-A = 'preview-cook-1' (kitchen 'مطبخ المعاينة'). Pausing the kitchen blocks every tester of kitchen 1: announce a 10 minute window and resume at the end.
   - A tiny PNG file on the tester machine to upload as a photo if a published test meal is wanted (not needed for this case).
   - Before pausing, capture the koshari slot id: GET https://api.<PREVIEW_DOMAIN>/api/v1/meals/00000000-0000-4000-8000-0000000bb001 -> nextSlots[0].id (needed by step 6).
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-COOK-A) Open https://ops.<PREVIEW_DOMAIN>, sign in as preview-cook-1, tab 'الأطباق' (Meals), form 'طبق جديد (مسودة)': Arabic name 'مسودة اختبار DR1', English name 'Draft test DR1', price (EGP) 50, portion/ingredients filled, allergens 'لا يوجد ما يُعلن عنه'; press 'إنشاء'. Do NOT press 'نشر'. — data: Meal appears with status badge 'مسودة'. Copy its id from the page/network tab (POST /api/v1/cook/meals response id).
   2. (FX-GUEST) In a private window open https://app.<PREVIEW_DOMAIN>/#/ and search (field 'ابحث عن طبق أو مطبخ') for 'DR1'; then open https://app.<PREVIEW_DOMAIN>/#/meal/<draft-id> directly.
@@ -143,13 +149,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-B, FX-COOK-PENDING, FX-STAFF-OPS, FX-GUEST, FX-CUST-A
 - **Fixtures to provision:** FX-COOK-B, FX-COOK-PENDING, FX-STAFF-OPS
-- **Traces to:** scenarios: TC-008, TC-017, TC-112, TC-123; rules: BR-008, BR-009, BR-017; operations: postOpsKitchensOperatingState, getKitchensById, getMeals, postQuotes
+- **Traces to:** scenarios: TC-017; rules: BR-008, BR-009, BR-017; operations: postOpsKitchensOperatingState, getKitchensById, getMeals, postQuotes; partial: TC-008, TC-112, TC-123
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - FX-COOK-B has an APPROVED kitchen with one published meal and an OPEN slot (PROVISION: not in the seed; the seed's second kitchen 'مطبخ تجريبي تاني' has no login).
   - FX-COOK-PENDING has a submitted but undecided cook application (no kitchen row).
   - FX-STAFF-OPS holds the kitchen operating-state permission; staff actions need recent MFA step-up (see the MFA domain cases).
   - Never suspend FX-COOK-A (shared kitchen).
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-GUEST) Record FX-COOK-B's meal id, kitchen slug and a slot id: GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?q=<COOK-B meal title> and the item's nextSlots[0].id.
   2. (FX-STAFF-OPS) In the operations web catalogue/kitchen view open FX-COOK-B's kitchen and use the kitchen action 'إيقاف' (Suspend, in the operations web ops catalogue) with reason 'E2E suspend test' (API: POST /api/v1/ops/kitchens/<kitchenId>/operating-state {action:'SUSPEND',reason:'E2E suspend test',expectedVersion:<current>}).
@@ -171,7 +178,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-016, TC-116; rules: BR-016; decisions: D11; operations: getMeals
+- **Traces to:** rules: BR-016; decisions: D11; operations: getMeals; partial: TC-016, TC-116
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -202,7 +209,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-016, TC-116, TC-021; rules: BR-016, BR-021; operations: getZones, getMeals
+- **Traces to:** rules: BR-016, BR-021; operations: getZones, getMeals; partial: TC-016, TC-021, TC-116
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -228,7 +235,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Isolated disposable stack only
 - **Surface:** customer-web, api · **Actors:** FX-GUEST · **Needs:** isolated stack
-- **Traces to:** scenarios: TC-016, TC-116; rules: BR-016; operations: getMeals
+- **Traces to:** rules: BR-016; operations: getMeals; partial: TC-016, TC-116
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - FX-ISOLATED disposable stack with the same seed. The preview seed leaves meal.category NULL for all three meals (seed-preview.sql INSERT has no category column) and the cook UI has no category control, so on the shared preview every chip returns nothing.
@@ -251,7 +258,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-016; rules: BR-016; operations: getMeals
+- **Traces to:** rules: BR-016; operations: getMeals; partial: TC-016
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -274,7 +281,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-021, TC-117, TC-005; rules: BR-021, BR-005; operations: postQuotes, postMeAddresses, deleteMeAddressesById, getZones
+- **Traces to:** scenarios: TC-021; rules: BR-021, BR-005; operations: postQuotes, postMeAddresses, deleteMeAddressesById, getZones; partial: TC-117, TC-005
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -282,6 +289,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - FX-CUST-A signed in with a non-empty basket: koshari x1, first slot (do E2E-BASKET-009 steps 1-4 first). Kitchen 'مطبخ المعاينة' delivers only to Test zone A.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Open #/checkout, keep 'توصيل' selected, press 'عنوان جديد', fill: اسم العنوان = Zone B test; اسم المستلم = Test Recipient; المحافظة = Cairo; المدينة = Test city; الشارع = Test street 1; رقم المبنى = 7; رقم الموبايل المصري = +201000000101; منطقتك = 'منطقة تجريبية ب'; press 'حفظ العنوان'. — data: Address saved: it appears as a radio 'Zone B test · Test street 1 7'.
   2. (FX-CUST-A) Select that address radio and press 'احسب الإجمالي'.
@@ -303,7 +311,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-GUEST, FX-CUST-A
-- **Traces to:** scenarios: TC-046, TC-150, TC-128; rules: BR-046; operations: getMealsById, getKitchensById, patchMe, postQuotes
+- **Traces to:** scenarios: TC-150; rules: BR-046; operations: getMealsById, getKitchensById, patchMe, postQuotes; partial: TC-046, TC-128
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -330,12 +338,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-047, TC-129; rules: BR-047
+- **Traces to:** rules: BR-047; partial: TC-047, TC-129
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
   - Desktop Chrome or Firefox, mouse not used. Screen reader optional (VoiceOver/NVDA).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-GUEST) From the home page press Tab repeatedly and note focus order; reach the 'عرض التفاصيل' link of 'كشري تجريبي' and press Enter. — data: Visible focus ring on every stop.
   2. (FX-GUEST) On the meal page Tab to the slot radios, select the first with Space/arrow keys, Tab to the quantity group (decrease, number input, increase), press the 'أضف إلى السلة' button with Enter. — data: Message 'تمت الإضافة إلى السلة.' is announced (role=status).
@@ -354,7 +363,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
 - **Surface:** customer-web, api · **Actors:** FX-CUST-B · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-003, TC-004, TC-054, TC-110; rules: BR-003, BR-004, BR-054; operations: postMePhoneChallenges, postMePhoneChallengesVerify, postQuotes
+- **Traces to:** rules: BR-003, BR-004, BR-054; operations: postMePhoneChallenges, postMePhoneChallengesVerify, postQuotes; partial: TC-003, TC-004, TC-054, TC-110
 - **Prerequisites:**
   - FX-ISOLATED stack (destructive to the fixture account). In the shared preview the seeded customers are already verified and a changed number could never be re-verified (the SMS code is not retrievable by testers).
   - Fixture: make FX-CUST-B unverified in the isolated database: UPDATE app_user SET phone_verified_at=NULL WHERE id='00000000-0000-4000-8000-0000000b0002'; (or use the staging fixture channel deploy/web-preview/e2e-fixtures/customer_phone_verified.sql in reverse). Basket has koshari x1.
@@ -384,12 +393,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-005, TC-006, TC-110; rules: BR-005, BR-006; operations: postMeAddresses, getMeAddresses, patchMeAddressesById, deleteMeAddressesById
+- **Traces to:** scenarios: TC-005; rules: BR-005, BR-006; operations: postMeAddresses, getMeAddresses, patchMeAddressesById, deleteMeAddressesById; partial: TC-006, TC-110
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Both customers phone-verified. Keep two browser profiles (A and B) so the helper is defined once in each.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Console (A): const r=await call('POST','/api/v1/me/addresses',{label:'E2E home',recipientName:'E2E Recipient',phone:'01012345678',governorate:'Cairo',city:'Test city',zoneId:'00000000-0000-4000-8000-00000000a001',street:'E2E street 1',building:'4',latitude:30.04442,longitude:31.235712}); r — data: Keep r.body.id as ADDR.
   2. (FX-CUST-B) Console (B): await call('GET','/api/v1/me/addresses'); await call('PATCH','/api/v1/me/addresses/<ADDR>',{expectedVersion:0,street:'hijack'}); await call('DELETE','/api/v1/me/addresses/<ADDR>')
@@ -412,7 +422,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B, FX-GUEST, FX-COOK-A
-- **Traces to:** scenarios: TC-040, TC-128, TC-017; rules: BR-040, BR-017; operations: getMeFavorites, putMeFavoritesById, deleteMeFavoritesById
+- **Traces to:** scenarios: TC-040; rules: BR-040, BR-017; operations: getMeFavorites, putMeFavoritesById, deleteMeFavoritesById; partial: TC-128, TC-017
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -420,6 +430,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Neither customer has favorites at the start (account page section 'المفضلة' empty).
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-GUEST) Open meal 'كشري تجريبي' while signed out and look for a favorite button. Console: fetch('https://api.<PREVIEW_DOMAIN>/api/v1/me/favorites').
   2. (FX-CUST-A) Sign in, open the same meal, press 'أضف للمفضلة'. — data: Button becomes pressed with text 'إزالة من المفضلة'.
@@ -445,7 +457,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-CUST-B, FX-COOK-A
-- **Traces to:** scenarios: TC-037, TC-038, TC-121, TC-128; rules: BR-037, BR-038; operations: getNotifications, putNotificationsRead
+- **Traces to:** rules: BR-037, BR-038; operations: getNotifications, putNotificationsRead; partial: TC-037, TC-038, TC-121, TC-128
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -453,6 +465,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - FX-CUST-A has one PENDING_ACCEPTANCE pickup order (koshari x1, COD) placed in this case's step 1. The notification dispatcher runs in the API (outbox poll); allow up to a minute for inbox rows.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+2 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Place a pickup COD order for koshari x1 (see E2E-BASKET-009 steps 1-4 then #/checkout: 'استلام من المطبخ' > 'احسب الإجمالي' > terms checkbox > 'تأكيد الطلب'). Note the order number MB-1xxxxx.
   2. (FX-COOK-A) Operations web, tab 'الطلبات': open the order and press 'قبول'. — data: Order moves to ACCEPTED.
@@ -474,7 +488,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-110, TC-128; rules: BR-003, BR-006; operations: getMe, patchMe
+- **Traces to:** rules: BR-003, BR-006; operations: getMe, patchMe; partial: TC-110, TC-128
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
@@ -497,12 +511,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B, FX-COOK-A
-- **Traces to:** scenarios: TC-039, TC-128; rules: BR-039; operations: postOrdersReviews, getKitchensReviews
+- **Traces to:** scenarios: TC-039; rules: BR-039; operations: postOrdersReviews, getKitchensReviews; partial: TC-128
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - A COMPLETED pickup order of FX-CUST-A at kitchen 'مطبخ المعاينة' exists (cook accepted, prepared, marked ready and confirmed handover with the customer's handover code: follow the cook-workflow cases) and has no review yet. Record its id as ORDER.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-B) Console (B): await call('POST','/api/v1/orders/<ORDER>/reviews',{rating:5}) — data: Not the owner.
   2. (FX-CUST-A) Open #/orders/<ORDER>. In 'قيّم طلبك' choose التقييم = 4, comment 'E2E review text', press 'إرسال التقييم'.
@@ -522,7 +537,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-B, FX-GUEST
-- **Traces to:** scenarios: TC-039, TC-128; rules: BR-039; operations: postReviewsReports, getKitchensReviews
+- **Traces to:** rules: BR-039; operations: postReviewsReports, getKitchensReviews; partial: TC-039, TC-128
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
@@ -569,7 +584,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-055, TC-128, TC-139; rules: BR-055, BR-001; operations: postMeDeletionRequests, getMe
+- **Traces to:** rules: BR-055, BR-001; operations: postMeDeletionRequests, getMe; partial: TC-055, TC-128, TC-139
 - **Prerequisites:**
   - FX-ISOLATED stack only; consumes the fixture account (restore with a fresh stack or UPDATE app_user SET status='ACTIVE' and delete the deletion_request row).
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
@@ -589,7 +604,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-157; rules: BR-045; decisions: D10; operations: getConfigurationPublic
+- **Traces to:** rules: BR-045; decisions: D10; operations: getConfigurationPublic; partial: TC-157
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
 - **Steps:**
@@ -607,9 +622,10 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-DEVICE-ANDROID, FX-DEVICE-IOS, FX-GUEST · **Needs:** physical device
-- **Traces to:** scenarios: TC-049, TC-051, TC-052, TC-132, TC-134, TC-135; rules: BR-049, BR-051, BR-052; operations: getMeals, getMealsById
+- **Traces to:** rules: BR-049, BR-051, BR-052; operations: getMeals, getMealsById; partial: TC-049, TC-132, TC-134, TC-135, TC-051, TC-052
 - **Prerequisites:**
   - A signed device build pointing at the preview API (physical device; CI simulator evidence is not equivalent). Seed as in the web cases. Test once on each platform. Device language set to Arabic, then English.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-DEVICE-ANDROID) Launch the app (signed out). Read the Discover tab ('اكتشف'). — data: testID discover, search field label 'ابحث عن أكلة أو مطبخ'.
   2. (FX-DEVICE-ANDROID) Search for كشري and press the search button. — data: Search testID 'search'.
@@ -629,13 +645,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-149, TC-147, TC-151, TC-018; rules: BR-018, BR-019; operations: getMealsById, postActivity
+- **Traces to:** scenarios: TC-149; rules: BR-018, BR-019; operations: getMealsById, postActivity; partial: TC-018, TC-147, TC-151
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - FX-CUST-A signed in with an empty basket (matbakhy.cart absent in Local Storage; page '#/checkout' shows 'السلة فارغة.').
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Open https://app.<PREVIEW_DOMAIN>/#/meal/00000000-0000-4000-8000-0000000bb001. Without choosing a slot, read the add button. — data: Button 'أضف إلى السلة · ٧٥٫٠٠ ج.م' is disabled.
   2. (FX-CUST-A) Select the first slot radio (earliest 13:00 slot). Press 'زوّد' once so the quantity input shows 2. Press 'أضف إلى السلة'. — data: Button label now ends with ١٥٠٫٠٠ ج.م before pressing.
@@ -648,9 +665,9 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Expected:**
   - UI: Step 3: 'المطبخ: مطبخ المعاينة'; one line 'كشري تجريبي' with quantity 2 and line amount ١٥٠٫٠٠ ج.م; 'الإجمالي التقديري للأطباق' = ١٥٠٫٠٠ ج.م; note 'ده تقدير من الأسعار اللي ظهرت وقت الإضافة. الإجمالي النهائي بالسعر الحالي بيظهر لما تضغط "احسب الإجمالي".'
   - UI: Step 4: quantity 3 -> line ٢٢٥٫٠٠ and estimate ٢٢٥٫٠٠; back to 2 -> ١٥٠٫٠٠. The 'زيادة' button is disabled at the limit (min(10, portions left)); 'تقليل' disabled at 1.
-  - UI: Step 5: two lines; estimate = 150.00 + 180.00 = ٣٣٠٫٠٠ (with koshari at quantity 2).
-  - UI: Step 6: the same two lines and estimate after reload (state kept in Local Storage key matbakhy.cart).
-  - UI: Step 7: koshari line is REPLACED, not summed: quantity 1, line ٧٥٫٠٠, estimate ٢٥٥٫٠٠.
+  - UI: Step 5: two lines; estimate = 225.00 (koshari at quantity 3, left by step 4) + 180.00 = ٤٠٥٫٠٠ ج.م.
+  - UI: Step 6: the same two lines and estimate ٤٠٥٫٠٠ ج.م after reload (state kept in Local Storage key matbakhy.cart).
+  - UI: Step 7: koshari line is REPLACED, not summed: quantity 1, line ٧٥٫٠٠, estimate = 75.00 + 180.00 = ٢٥٥٫٠٠ ج.م.
   - UI: Step 8: after removing both lines the page shows 'السلة فارغة.' and a button 'الرئيسية'.
   - API: No POST /api/v1/quotes and no POST /api/v1/orders is sent during steps 1-8 (Network tab): the basket is client-side only. Allowed requests: GET /api/v1/meals/{id}, GET /api/v1/configuration/public, POST /api/v1/activity (ADD_TO_CART).
   - DB: Read-only: SELECT count(*) FROM quote WHERE customer_id='00000000-0000-4000-8000-0000000b0001' AND created_at > '<case start>' -> 0; SELECT reserved, allocated FROM meal_slot WHERE meal_id IN ('00000000-0000-4000-8000-0000000bb001','00000000-0000-4000-8000-0000000bb002') -> unchanged from the start of the case (basket reserves no stock).
@@ -661,13 +678,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-147, TC-018; rules: BR-018; operations: getMealsById
+- **Traces to:** scenarios: TC-147; rules: BR-018; operations: getMealsById; partial: TC-018
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - At least two seeded slots for kitchen 'مطبخ المعاينة' (day +1 and day +2) and one for 'مطبخ تجريبي تاني'. FX-CUST-A basket empty.
+  - Slot day for this case: seeded day+1 and 2 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Add 'كشري تجريبي' x1 in the day+1 slot to the basket (as in E2E-BASKET-009).
   2. (FX-CUST-A) Open 'ملوخية تجريبية' (other kitchen), select its slot, press 'أضف إلى السلة'. — data: A dialog opens.
@@ -690,7 +708,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-018, TC-117; rules: BR-018, BR-019; operations: postQuotes
+- **Traces to:** scenarios: TC-018; rules: BR-018, BR-019; operations: postQuotes; partial: TC-117
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -700,6 +718,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - Console variables: const K=(await call('GET','/api/v1/meals/00000000-0000-4000-8000-0000000bb001')).body.nextSlots[0].id (kitchen 1 slot), const M=(await call('GET','/api/v1/meals/00000000-0000-4000-8000-0000000bb003')).body.nextSlots[0].id (kitchen 2 slot).
   - For step 4 FX-COOK-A creates a slot of kitchen 1 that offers ONLY 'محشي تجريبي' (capacity for koshari left empty).
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}], M) — data: Meal of kitchen 1 with the slot of kitchen 2.
   2. (FX-CUST-A) await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1},{mealId:'00000000-0000-4000-8000-0000000bb003',quantity:1}], K) — data: Two kitchens in one request.
@@ -719,7 +739,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-152, TC-117, TC-019; rules: BR-019, BR-020; operations: getConfigurationPublic, postQuotes
+- **Traces to:** scenarios: TC-152; rules: BR-019, BR-020; operations: getConfigurationPublic, postQuotes; partial: TC-117, TC-019
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -729,6 +749,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - Limit check: GET /api/v1/configuration/public -> orderLimits.maxQuantityPerLine = 10.
   - Seed slots give koshari exactly 10 portions, so the limit and the stock coincide. To prove the limit is independent of stock, FX-COOK-A creates a slot with koshari capacity 15 (max portions 15).
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Meal page of koshari, select the seeded first slot. Press 'زوّد' until it stops; then type 99 into 'الكمية' and press Tab.
   2. (FX-CUST-A) Press 'أضف إلى السلة', open السلة and press 'احسب الإجمالي' (pickup). — data: Quantity 10.
@@ -748,7 +770,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-020, TC-025, TC-118; rules: BR-020, BR-025; operations: postQuotes, postOrders, postOrdersCancel
+- **Traces to:** rules: BR-020, BR-025; operations: postQuotes, postOrders, postOrdersCancel; partial: TC-020, TC-025, TC-118
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -756,6 +778,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+2 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Note remaining portions of koshari in the first slot (meal page 'متبقٍ ١٠'). Console: const q=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:10}], K)).body; q.total — data: K = first slot id of koshari.
   2. (FX-CUST-B) Reload the koshari meal page; read the first slot's remaining portions; console quote for B of 10 portions. — data: Both customers can hold quotes for the same last portions.
@@ -773,7 +797,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-013, TC-151, TC-025, TC-029; rules: BR-013, BR-017, BR-029; operations: getMealsById, postQuotes, postOrders, postOrdersCancel
+- **Traces to:** scenarios: TC-151; rules: BR-013, BR-017, BR-029; operations: getMealsById, postQuotes, postOrders, postOrdersCancel; partial: TC-013, TC-025, TC-029
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -782,6 +806,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - Two browser profiles: A and B. A places and later cancels a real pickup COD order (the stock is released on cancellation while the order is 'بانتظار قبول المطبخ').
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Add 'كشري تجريبي' x10 in the day+1 slot to the basket; السلة > 'استلام من المطبخ' > 'احسب الإجمالي' > tick terms > 'تأكيد الطلب'. — data: Order total ٧٥٠٫٠٠ ج.م.
   2. (FX-CUST-B) Open the koshari meal page. Read the first slot label. Select its radio.
@@ -803,7 +829,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-014, TC-015, TC-115, TC-020; rules: BR-014, BR-015, BR-020, BR-027; operations: postCookSlots, patchCookSlotsById, postQuotes, postOrders, getMealsById
+- **Traces to:** rules: BR-014, BR-015, BR-020, BR-027; operations: postCookSlots, patchCookSlotsById, postQuotes, postOrders, getMealsById; partial: TC-014, TC-015, TC-115, TC-020
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -813,6 +839,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - Plan 25 minutes. Cutoff = slot start minus lead minutes (cook_slot_cutoff_ck). Use clock of the server: compare with the Date response header of GET /api/v1/configuration/public.
   - Policy facts (synthetic policy v1): quote lifetime 300 s; acceptance window = min(now+15 min, cutoff); a quote needs at least 5 minutes before cutoff.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-COOK-A) Create a slot for TODAY (Cairo) starting about 45 minutes from now: date today, البداية = now+45 min rounded to the minute, النهاية = start+60 min, أقصى عدد حصص 5, مهلة الطلب = 30, 'كشري تجريبي' capacity 5; press 'إنشاء' and 'فتح'. Write CUTOFF = start - 30 min. — data: Cutoff is 15 minutes from creation.
   2. (FX-CUST-A) More than 6 minutes before CUTOFF: console quote 1 koshari for the new slot id (GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001, nextSlots[0] is the earliest). — data: Note acceptanceDeadlinePreview.
@@ -833,7 +860,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-020, TC-044, TC-117; rules: BR-020, BR-044; operations: postQuotes, postOrders
+- **Traces to:** rules: BR-020; operations: postQuotes, postOrders; partial: TC-020, TC-117
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -841,6 +868,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Basket with 'كشري تجريبي' x1 (day+1 slot). Policy quote lifetime: 300 s (commerce_policy.quote_ttl_seconds). No test clock exists on the preview: the tester waits in real time.
+  - Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) السلة > 'استلام من المطبخ' > 'احسب الإجمالي'. Note the clock time T0 and, in Network, the response field expiresAt of POST /api/v1/quotes.
   2. (FX-CUST-A) Leave the page open and untouched for 5 minutes 10 seconds. — data: Do not reload.
@@ -858,7 +886,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-154, TC-155, TC-020, TC-153; rules: BR-019, BR-020, BR-012; decisions: D13, D14; operations: postQuotes, postOrders, patchCookMealsById, getCookMealsPriceHistory
+- **Traces to:** scenarios: TC-154; rules: BR-019, BR-020, BR-012; decisions: D13, D14; operations: postQuotes, postOrders, patchCookMealsById, getCookMealsPriceHistory; partial: TC-155, TC-020, TC-153
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -866,6 +894,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - FX-COOK-A publishes a test meal 'اختبار سعر PX1' (English 'Price test PX1') in the operations web: tab 'الأطباق' > form 'طبق جديد (مسودة)': Arabic and English names, السعر (جنيه) = 40, portion, ingredients, allergens 'لا يوجد ما يُعلن عنه', attach any small PNG in 'صورة الطبق', press 'إنشاء', then 'نشر'. A photo is mandatory: the seeded meals have no photo, so editing their price through the cook UI is refused (MealService.update validates published meals as complete: photos APPROVED_PHOTO_REQUIRED). Then create a slot (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.) on day+4 at 17:00 with PX1 capacity 5.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Add 'اختبار سعر PX1' x2 (day+4 17:00 slot) to the basket; السلة > 'استلام من المطبخ' > 'احسب الإجمالي'. Read the total. Keep the tab open. — data: Total ٨٠٫٠٠ ج.م (8000).
   2. (FX-COOK-A) Operations web 'الأطباق' > PX1 > section 'تغيير السعر' > 'السعر الجديد (جنيه)' = 50 > press 'تغيير السعر'. — data: Price history shows 'السعر الحالي' 50 and previous 40.
@@ -887,7 +916,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-156, TC-153, TC-022; rules: BR-012, BR-022; decisions: D13; operations: getOrdersById, patchCookMealsById
+- **Traces to:** rules: BR-012, BR-022; decisions: D13; operations: getOrdersById, patchCookMealsById; partial: TC-156, TC-153, TC-022
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -896,6 +925,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - FX-COOK-A publishes a test meal 'اختبار سعر PX1' (English 'Price test PX1') in the operations web: tab 'الأطباق' > form 'طبق جديد (مسودة)': Arabic and English names, السعر (جنيه) = 40, portion, ingredients, allergens 'لا يوجد ما يُعلن عنه', attach any small PNG in 'صورة الطبق', press 'إنشاء', then 'نشر'. A photo is mandatory: the seeded meals have no photo, so editing their price through the cook UI is refused (MealService.update validates published meals as complete: photos APPROVED_PHOTO_REQUIRED). Then create a slot (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.) on day+4 at 17:00 with PX1 capacity 5.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Output of E2E-BASKET-014: FX-CUST-A has one order of 2 x PX1 at 50.00 (total 100.00), state 'بانتظار قبول المطبخ' or later. Record its id as ORDER.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Open #/orders/<ORDER>; read the line and total. Console: const before=(await call('GET','/api/v1/orders/<ORDER>')).body
   2. (FX-COOK-A) Change PX1's price to 60 ('تغيير السعر').
@@ -913,7 +943,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
 - **Surface:** api, customer-web · **Actors:** FX-CUST-A, FX-CUST-B, FX-COOK-A · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-025, TC-137, TC-118; rules: BR-025, BR-013; operations: postQuotes, postOrders
+- **Traces to:** scenarios: TC-025; rules: BR-025, BR-013; operations: postQuotes, postOrders; partial: TC-137, TC-118
 - **Prerequisites:**
   - FX-ISOLATED disposable stack (race test; do not run on the shared preview).
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
@@ -921,6 +951,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - Race technique: in each customer's DevTools console define a timer so both fire in the same second: const T=<same epoch milliseconds ~30 s ahead>; setTimeout(async()=>console.log(await place(q)), T-Date.now()). Run it in both consoles before T. Repeat the whole case 3 times with a fresh slot each time.
   - FX-COOK-A creates slot LAST1: tomorrow 18:00, أقصى عدد حصص 1, 'كشري تجريبي' capacity 1, then 'فتح'. Copy its id.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Console (profile A): const qa=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}], LAST1)).body
   2. (FX-CUST-B) Console (profile B): const qb=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}], LAST1)).body — data: Both quotes are accepted because quotes hold no stock.
@@ -939,7 +970,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
 - **Surface:** api · **Actors:** FX-CUST-A, FX-CUST-B, FX-COOK-A · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-013, TC-025, TC-137; rules: BR-013, BR-025; operations: postQuotes, postOrders
+- **Traces to:** scenarios: TC-025; rules: BR-013, BR-025; operations: postQuotes, postOrders; partial: TC-013, TC-137
 - **Prerequisites:**
   - FX-ISOLATED disposable stack.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
@@ -947,6 +978,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - Race technique: in each customer's DevTools console define a timer so both fire in the same second: const T=<same epoch milliseconds ~30 s ahead>; setTimeout(async()=>console.log(await place(q)), T-Date.now()). Run it in both consoles before T. Repeat the whole case 3 times with a fresh slot each time.
   - FX-COOK-A creates slot AGG1: tomorrow 19:00, أقصى عدد حصص 1, capacity 1 for BOTH 'كشري تجريبي' and 'محشي تجريبي', then 'فتح'.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Console (A): await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1},{mealId:'00000000-0000-4000-8000-0000000bb002',quantity:1}], AGG1) — data: Two portions in a one-portion slot.
   2. (FX-CUST-A) Console (A): const qa=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}], AGG1)).body
@@ -964,7 +996,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B, FX-COOK-A
-- **Traces to:** scenarios: TC-022, TC-025, TC-118; rules: BR-022, BR-025; operations: postQuotes, postOrders
+- **Traces to:** rules: BR-022, BR-025; operations: postQuotes, postOrders; partial: TC-022, TC-025, TC-118
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -973,6 +1005,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - FX-COOK-A creates slot LIM: day+4 at 20:00, أقصى عدد حصص 6, capacity 'كشري تجريبي' 5 and 'محشي تجريبي' 1, then 'فتح' (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.). Copy its id.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Add 'كشري تجريبي' x1 and 'محشي تجريبي' x1, both in slot LIM, to the web basket; السلة > 'استلام من المطبخ' > 'احسب الإجمالي'. — data: Total ٢٥٥٫٠٠ ج.م (75.00 + 180.00).
   2. (FX-CUST-B) Console (B): const qb=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb002',quantity:1}], LIM)).body; await place(qb) — data: B takes the last mahshi portion.
@@ -991,7 +1024,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-117, TC-019, TC-157, TC-163; rules: BR-019, BR-021, BR-020; decisions: D10, D16; operations: postQuotes, postMeAddresses
+- **Traces to:** rules: BR-019, BR-021, BR-020; decisions: D10, D16; operations: postQuotes, postMeAddresses; partial: TC-117, TC-019, TC-157, TC-163
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -999,6 +1032,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Kitchen 'مطبخ المعاينة' offers pickup, delivery to 'Test zone A' (fee 3000) and a 50 % deposit profile (INSTAPAY, demo recipient). FX-CUST-A has no address yet or an old one in Test zone A. Basket: 'كشري تجريبي' x2 (day+1 slot).
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) السلة > 'استلام من المطبخ' > 'احسب الإجمالي'. Read the summary.
   2. (FX-CUST-A) Press 'توصيل'. Read what happened to the previous summary. Press 'عنوان جديد', fill اسم العنوان = Zone A home, اسم المستلم = Test Recipient, المحافظة = Cairo, المدينة = Test city, الشارع = Test street 2, رقم المبنى = 9, رقم الموبايل المصري = +201000000101, منطقتك = 'منطقة تجريبية أ', 'حفظ العنوان'; select the new address radio; 'احسب الإجمالي'.
@@ -1019,7 +1053,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-019, TC-053, TC-136; rules: BR-019, BR-053; operations: postQuotes, postOrders
+- **Traces to:** scenarios: TC-019; rules: BR-019, BR-053; operations: postQuotes, postOrders; partial: TC-053, TC-136
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -1028,6 +1062,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
   - K = a seeded kitchen-1 slot id.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
+  - Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) Forged quote fields, one request each: await call('POST','/api/v1/quotes',{total:{amountMinor:1,currency:'EGP'},items:[{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}],slotId:K,fulfillmentMode:'PICKUP'}); the same with deliveryFee:0; with unitPriceMinor:1; and with an item {mealId,quantity:1,unitPrice:1}.
   2. (FX-CUST-A) const q=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}], K)).body — data: Valid quote; total 7500.
@@ -1047,7 +1083,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-022, TC-024; rules: BR-022, BR-024; operations: postOrders
+- **Traces to:** rules: BR-022, BR-024; operations: postOrders; partial: TC-022, TC-024
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
@@ -1055,6 +1091,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});
+  - Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-CUST-A) const q=(await quote([{mealId:'00000000-0000-4000-8000-0000000bb001',quantity:1}], K)).body; const o=await place(q); o.status
   2. (FX-CUST-A) await place(q) — data: New clientRequestId and new Idempotency-Key, same quote.
@@ -1069,13 +1106,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web · **Actors:** FX-GUEST, FX-CUST-A
-- **Traces to:** scenarios: TC-109, TC-127, TC-044; rules: BR-001, BR-018; operations: getMe
+- **Traces to:** rules: BR-001, BR-018; operations: getMe; partial: TC-109, TC-127
 - **Prerequisites:**
   - Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Private window, no session.
+  - Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days.
 - **Steps:**
   1. (FX-GUEST) Add 'كشري تجريبي' x2 (day+1 slot) to the basket signed out; press 'السلة'.
   2. (FX-GUEST) Read the section below the basket and press its 'تسجيل الدخول' button.
@@ -1092,12 +1130,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-STAFF-ADMIN · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-154, TC-042, TC-126; rules: BR-019, BR-020, BR-042; decisions: D13; operations: postOpsConfigurationVersions, postQuotes, postOrders
+- **Traces to:** scenarios: TC-154; rules: BR-019, BR-020, BR-042; decisions: D13; operations: postOpsConfigurationVersions, postQuotes, postOrders; partial: TC-042, TC-126
 - **Prerequisites:**
   - FX-ISOLATED stack (changes the shared zone fee).
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - FX-STAFF-ADMIN has config.write and a fresh MFA step-up (staff configuration changes need recent MFA). Current fee of Test zone A = 3000 (service_zone.delivery_fee_minor). A has a saved address in Test zone A and a basket of koshari x1 for delivery.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) السلة > 'توصيل' > select the address > 'احسب الإجمالي'. Read the total. — data: Total ١٠٥٫٠٠ ج.م (7500 + 3000).
   2. (FX-STAFF-ADMIN) POST /api/v1/ops/configuration/zone:00000000-0000-4000-8000-00000000a001/versions {value:{active:true,deliveryFeeMinor:3500},reason:'E2E fee change',expectedVersion:<zone version>} from the operations web console session (zone version: SELECT version FROM service_zone WHERE id='00000000-0000-4000-8000-00000000a001').
@@ -1116,12 +1155,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-STAFF-ADMIN · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-152, TC-042, TC-020; rules: BR-019, BR-042, BR-020; operations: postOpsConfigurationVersions, getConfigurationPublic, postQuotes
+- **Traces to:** scenarios: TC-152; rules: BR-019, BR-042, BR-020; operations: postOpsConfigurationVersions, getConfigurationPublic, postQuotes; partial: TC-042, TC-020
 - **Prerequisites:**
   - FX-ISOLATED stack (a new commerce policy applies to every user).
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
   - Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.
   - FX-STAFF-ADMIN has config.write and recent MFA. Current active commerce policy version = 1 (maxItemQuantity 10). The synthetic flag is allowed only in LOCAL/CI profiles. A's basket: 'كشري تجريبي' x8.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-CUST-A) Open السلة with koshari x8 and keep the tab open.
   2. (FX-STAFF-ADMIN) POST /api/v1/ops/configuration/commerce-policy/versions {value:{label:'E2E limit 5',synthetic:true,taxRateBps:0,commissionRateBps:0,maxItemQuantity:5,quoteTtlSeconds:300,acceptanceWindowMinutes:15,minAcceptanceMinutes:5,cancellationPolicyVersion:'synthetic-cancel-v1',termsVersion:'synthetic-terms-v1'},reason:'E2E limit test',expectedVersion:1}
@@ -1141,11 +1181,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-DEVICE-ANDROID, FX-DEVICE-IOS, FX-CUST-A, FX-COOK-A · **Needs:** physical device
-- **Traces to:** scenarios: TC-148, TC-132, TC-134, TC-135, TC-154; rules: BR-018, BR-049, BR-051, BR-052; decisions: D13; operations: postQuotes, postOrders
+- **Traces to:** scenarios: TC-148; rules: BR-018, BR-049, BR-051, BR-052; decisions: D13; operations: postQuotes, postOrders; partial: TC-154, TC-132, TC-134, TC-135
 - **Prerequisites:**
   - Signed device build pointing at the preview; FX-CUST-A signed in on the device (system-browser sign-in). PX1 test meal and slot as in E2E-BASKET-014.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-DEVICE-ANDROID) Discover > open 'كشري تجريبي' (testID meal-<id>) > select a slot (testID slot-0) > 'أضف للسلة' (testID add-to-cart). — data: Message 'تمت الإضافة إلى السلة.'
   2. (FX-DEVICE-ANDROID) Open 'ملوخية تجريبية' > slot > 'أضف للسلة'.
@@ -1165,12 +1206,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-DEVICE-ANDROID, FX-DEVICE-IOS, FX-CUST-A, FX-CUST-B · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-148, TC-131, TC-048, TC-006; rules: BR-048, BR-006, BR-049; operations: getMe, getOrders, getMeFavorites
+- **Traces to:** rules: BR-048, BR-006, BR-049; operations: getMe, getOrders, getMeFavorites; partial: TC-048, TC-131, TC-006, TC-148
 - **Prerequisites:**
   - Signed device build of PR #9 (the epoch/ownership guards of accountEpoch and bindShopping exist only there: commits 5e0ce79, 89ec820). Both customers phone-verified.
   - Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.
   - Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.
   - Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.
+  - Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).
 - **Steps:**
   1. (FX-DEVICE-ANDROID) Sign in as FX-CUST-A. Add 'كشري تجريبي' x1 to the cart; open Orders and Favorites tabs so they load.
   2. (FX-DEVICE-ANDROID) Account tab > 'تبديل الحساب' (Switch account); in the system browser sign in as FX-CUST-B.

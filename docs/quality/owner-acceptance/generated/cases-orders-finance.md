@@ -6,7 +6,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-022, TC-117, TC-118, TC-157; rules: BR-019, BR-020, BR-022, BR-027; decisions: D05, D10; operations: postQuotes, postOrders, getOrdersById, getOrdersEvents
+- **Traces to:** rules: BR-019, BR-020, BR-022, BR-027; decisions: D05, D10; operations: postQuotes, postOrders, getOrdersById, getOrdersEvents; partial: TC-022, TC-117, TC-118, TC-157
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -34,7 +34,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-023, TC-024, TC-044, TC-118; rules: BR-023, BR-024; decisions: D05; operations: postOrders, getOrdersByRequestById, getOrders
+- **Traces to:** rules: BR-023, BR-024; decisions: D05; operations: postOrders, getOrdersByRequestById, getOrders; partial: TC-023, TC-024, TC-044, TC-118
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -86,7 +86,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-044, TC-023; rules: BR-044, BR-023; decisions: D13; operations: postOrders, getOrdersByRequestById
+- **Traces to:** rules: BR-044, BR-023; decisions: D13; operations: postOrders, getOrdersByRequestById; partial: TC-023, TC-044
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -113,7 +113,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-119, TC-121, TC-006; rules: BR-026, BR-027, BR-029; decisions: D05; operations: postCookOrdersAccept, getCookOrdersById, getNotifications
+- **Traces to:** rules: BR-026, BR-027, BR-029; decisions: D05; operations: postCookOrdersAccept, getCookOrdersById, getNotifications; partial: TC-006, TC-119, TC-121
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
@@ -121,6 +121,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).
   - Acceptance deadline not passed (placed less than 15 minutes ago).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Ops web > 'Orders' > 'Active': locate O1. Before accepting note that no customer name/phone is shown. Press 'Accept'.
   2. (FX-CUST-A) Reload the order page of O1.
@@ -138,13 +139,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-029, TC-119; rules: BR-029, BR-026; decisions: D05, D10; operations: postCookOrdersReject
+- **Traces to:** rules: BR-029, BR-026; decisions: D05, D10; operations: postCookOrdersReject; partial: TC-029, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Orders > 'Active': on O1 choose Reason 'Kitchen busy' (default) and press 'Reject'.
   2. (FX-CUST-A) Reload the order page.
@@ -162,7 +164,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-028, TC-029; rules: BR-028, BR-029; decisions: D05; operations: postOrdersCancel
+- **Traces to:** rules: BR-028, BR-029; decisions: D05; operations: postOrdersCancel; partial: TC-028, TC-029
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -170,6 +172,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Open the order page of O1 and press 'Cancel order' (ar: إلغاء الطلب). — data: UI sends reasonCode CHANGED_MIND
   2. (FX-COOK-A) Reload Orders > 'Active'.
@@ -188,12 +191,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** api · **Actors:** FX-CUST-A, FX-COOK-A · **Needs:** isolated stack
-- **Traces to:** scenarios: TC-119, TC-029; rules: BR-026, BR-029, BR-027; decisions: D05; operations: postCookOrdersAccept, postOrdersCancel
+- **Traces to:** rules: BR-026, BR-029, BR-027; decisions: D05; operations: postCookOrdersAccept, postOrdersCancel; partial: TC-029, TC-119
 - **Prerequisites:**
   - FX-ISOLATED disposable stack (parallel writes). Never on the shared preview.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - Run 20 iterations; each iteration needs a fresh pending order O (recipe) and its version v.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A / FX-COOK-A) For each iteration fire POST /api/v1/cook/orders/<O>/accept {expectedVersion:v} (cook session) and POST /api/v1/orders/<O>/cancel {expectedVersion:v, reasonCode:'CHANGED_MIND'} (customer session) at the same instant (two consoles synchronised by a shared start time or a script with two sessions). — data: same version v
   2. (operator) After all iterations run infra/db/reconcile.sql and the SQL for each order.
@@ -207,7 +211,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-119, TC-029, TC-027; rules: BR-027, BR-029; decisions: D05; operations: postCookOrdersAccept
+- **Traces to:** rules: BR-027, BR-029; decisions: D05; operations: postCookOrdersAccept; partial: TC-029, TC-119, TC-027
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
@@ -215,6 +219,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).
   - No clock control is available on the preview: the test waits the real acceptance window (about 15 minutes after placement, plus up to 30 s for the expiry job, matbakhy.orders.expiry-job.interval=30s). The disposable stack may shorten it.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Open Orders > 'Active' and note on O1 'Accept by <time> (N min left)'. Do not act.
   2. (FX-COOK-A) After the deadline press 'Accept' if the card is still shown, and in the console POST /api/v1/cook/orders/<O1>/accept with current version.
@@ -233,13 +238,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-031, TC-119, TC-006; rules: BR-029, BR-031, BR-026; decisions: D05; operations: postCookOrdersPrepare, postCookOrdersReady, getCookOrdersById, getOrdersById
+- **Traces to:** rules: BR-029, BR-031, BR-026; decisions: D05; operations: postCookOrdersPrepare, postCookOrdersReady, getCookOrdersById, getOrdersById; partial: TC-006, TC-031, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - An ACCEPTED pickup/COD order O1 of FX-CUST-A (place per recipe, then FX-COOK-A presses 'Accept').
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) On the card press 'Start preparing'. Then press 'Ready'.
   2. (FX-CUST-A) Reload the order page after each press and read the state/code line.
@@ -258,13 +264,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-031, TC-032, TC-033, TC-157, TC-030; rules: BR-031, BR-032, BR-033; decisions: D10; operations: postCookOrdersHandover
+- **Traces to:** rules: BR-031, BR-032, BR-033; decisions: D10; operations: postCookOrdersHandover; partial: TC-031, TC-032, TC-157, TC-030
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A READY pickup/COD order O1 (per E2E-ORDER-030). Record the customer's 6-digit code from the order page.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) On the card verify the button 'Confirm handover' is disabled until 6 digits are typed; type the code and press it.
   2. (FX-COOK-A) Console: POST /api/v1/cook/orders/<O1>/handover again with a NEW key and the correct code. — data: code = same digits
@@ -284,13 +291,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-119, TC-031; rules: BR-030, BR-031; decisions: D05; operations: postCookOrdersDispatch, postCookOrdersHandover
+- **Traces to:** rules: BR-030, BR-031; decisions: D05; operations: postCookOrdersDispatch, postCookOrdersHandover; partial: TC-031, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - Two READY orders of FX-CUST-A: D1 DELIVERY (address in Test zone A, total includes fee 30.00) and P1 PICKUP.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Console: POST /api/v1/cook/orders/<D1>/handover {expectedVersion:v, code:'123456'} while D1 is READY.
   2. (FX-COOK-A) Console: POST /api/v1/cook/orders/<P1>/dispatch {expectedVersion:v, deliveryReference:'COURIER-TEST-01'}.
@@ -306,13 +314,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-031, TC-119; rules: BR-031; decisions: D05; operations: postCookOrdersHandover
+- **Traces to:** rules: BR-031; decisions: D05; operations: postCookOrdersHandover; partial: TC-031, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A READY pickup/COD order O1 (E2E-ORDER-030). Note the true code X from the customer page and choose a wrong code W that differs from X (e.g. 000000).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Type W in 'Customer handover code' and press 'Confirm handover'. Repeat until five attempts were made (watch the response each time in the Network tab). — data: W=000000
   2. (FX-COOK-A) Now enter the CORRECT code X and press 'Confirm handover'.
@@ -331,12 +340,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A, FX-STAFF-OPS
 - **Fixtures to provision:** FX-STAFF-OPS
-- **Traces to:** scenarios: TC-119, TC-124; rules: BR-029, BR-032; decisions: D05; operations: postCookOrdersDeliveryFailure, getCookOrders, getOpsOrders
+- **Traces to:** rules: BR-029, BR-032; decisions: D05; operations: postCookOrdersDeliveryFailure, getCookOrders, getOpsOrders; partial: TC-119, TC-124
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A delivery/COD order O1 in OUT_FOR_DELIVERY (E2E-ORDER-102 up to the courier step). FX-STAFF-OPS holds order.ops.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) On the card (OUT_FOR_DELIVERY) choose Reason 'Customer unreachable' and press 'Delivery failed'.
   2. (FX-CUST-A) Reload the order page.
@@ -357,13 +367,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-SUPPORT
 - **Fixtures to provision:** FX-STAFF-SUPPORT
-- **Traces to:** scenarios: TC-028, TC-041, TC-124; rules: BR-028, BR-041; decisions: D05; operations: postOrdersCancellationRequests, postOrdersCancel, getOpsCases
+- **Traces to:** rules: BR-028, BR-041; decisions: D05; operations: postOrdersCancellationRequests, postOrdersCancel, getOpsCases; partial: TC-028, TC-041, TC-124
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - An ACCEPTED pickup/COD order O1 of FX-CUST-A and a PENDING one P1. FX-STAFF-SUPPORT holds support.case (PROVISION).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Open O1: the only cancel-related control is 'Request cancellation (reviewed by support)'. Press it. — data: UI sends reasonCode CHANGED_MIND
   2. (FX-CUST-A) Console: POST /api/v1/orders/<O1>/cancel {expectedVersion:v, reasonCode:'CHANGED_MIND'}; POST /api/v1/orders/<O1>/cancellation-requests again; POST /api/v1/orders/<P1>/cancellation-requests.
@@ -380,12 +391,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-119, TC-022, TC-026; rules: BR-026; decisions: D05; operations: postCookOrdersPrepare, postCookOrdersAccept, postCookOrdersReady, postOrdersCancel
+- **Traces to:** rules: BR-026; decisions: D05; operations: postCookOrdersPrepare, postCookOrdersAccept, postCookOrdersReady, postOrdersCancel; partial: TC-119, TC-026
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - Four orders of FX-CUST-A at kitchen A: P PENDING, A ACCEPTED, R READY pickup, Z COMPLETED. Record order_event counts and customer_order.version for each before starting.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Send as cook (current version each time, fresh key): prepare on P; ready on A; accept on A; prepare on Z; accept on Z.
   2. (FX-COOK-A) Send accept on P with a stale expectedVersion (v-1) and with expectedVersion omitted; send accept without any Idempotency-Key header.
@@ -402,12 +414,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api, operations-web · **Actors:** FX-COOK-A, FX-CUST-A, FX-STAFF-NOGRANT
-- **Traces to:** scenarios: TC-006, TC-001; rules: BR-006, BR-001; decisions: D05; operations: getCookOrdersById, postCookOrdersAccept, postCookOrdersPaymentReceipt, getOpsOrders
+- **Traces to:** rules: BR-006, BR-001; decisions: D05; operations: getCookOrdersById, postCookOrdersAccept, postCookOrdersPaymentReceipt, getOpsOrders; partial: TC-001, TC-006
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - Order OK2 of FX-CUST-A at kitchen B (seed kitchen 'مطبخ تجريبي تاني', 1 × 'Preview molokhia', slot from GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd002/slots; kitchen B's owner has no login, so FX-COOK-B is not needed) and order OK1 at kitchen A. Both PENDING.
   - FX-COOK-A is a cook of kitchen A only.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Ops web > 'Orders': confirm OK1 is listed and OK2 is not. In the console: GET /api/v1/cook/orders/<OK2>; POST accept, reject and handover on OK2; POST /api/v1/cook/orders/<OK2>/payment/receipt {expectedVersion:0, amountMinor:1}.
   2. (FX-CUST-A) Console: GET /api/v1/cook/orders and POST /api/v1/cook/orders/<OK1>/accept as the customer.
@@ -425,7 +438,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** customer-web, operations-web · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-OPS
 - **Fixtures to provision:** FX-STAFF-OPS
-- **Traces to:** scenarios: TC-022, TC-028, TC-031, TC-032, TC-119, TC-124; rules: BR-022, BR-026, BR-030, BR-031, BR-032; decisions: D05, D10; operations: postQuotes, postOrders, getOrdersById, postCookOrdersAccept, postCookOrdersPrepare, postCookOrdersReady, postCookOrdersHandover, getOpsOrdersById
+- **Traces to:** scenarios: TC-032; rules: BR-022, BR-026, BR-030, BR-031, BR-032; decisions: D05, D10; operations: postQuotes, postOrders, getOrdersById, postCookOrdersAccept, postCookOrdersPrepare, postCookOrdersReady, postCookOrdersHandover, getOpsOrdersById; partial: TC-022, TC-031, TC-117, TC-119, TC-124
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -433,8 +446,10 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).
   - FX-STAFF-OPS holds the active grant order.ops (verify: it sees the 'Order monitoring' tab at ops.<PREVIEW_DOMAIN>).
   - FX-CUST-A basket is empty (the 'Cart' page shows 'Your cart is empty.').
+  - Slot assignment: use the seeded slot of day 1 (items[0]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
-  1. (FX-CUST-A) Open https://app.<PREVIEW_DOMAIN>, sign in, press the language button until labels are English. Open meal 'Preview koshari', under 'Cooking slots' pick the first slot (13:00, tomorrow), set quantity 2, press 'Add to cart'. — data: quantity=2
+  1. (FX-CUST-A) Open https://app.<PREVIEW_DOMAIN>, sign in, press the language button until labels are English. Open meal 'Preview koshari', under 'Cooking slots' pick the day-1 slot (13:00, tomorrow), set quantity 2, press 'Add to cart'. — data: quantity=2
   2. (FX-CUST-A) Open nav 'Cart'. Select the 'Pickup from the kitchen' button, leave payment radio 'Cash on receipt', press 'Calculate total'. Tick 'I accept the terms and the cancellation policy' and press 'Place order' once. — data: mode=Pickup, payment=Cash on receipt
   3. (FX-CUST-A) On the order page note the order number (MB-…) and the heading state. Then open 'My orders' and confirm the order is listed.
   4. (FX-COOK-A) At https://ops.<PREVIEW_DOMAIN> open tab 'Orders', filter 'Active'. Find the card with the same MB- number: it shows badge 'Waiting for acceptance', 'Pickup', 'Accept by <time> (N min left)'. Press 'Accept'.
@@ -450,7 +465,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - UI: Step 6: customer page shows 'Ready', a 6-digit handover code, 'Kitchen contact: مطبخ المعاينة · +201000000201 · Pickup location: Synthetic location 1'.
   - UI: Step 8: customer page heading '<MB-number> · Delivered' (English label for COMPLETED, also for pickup), the code line is gone, the 'Rate your order' form is shown; the timeline has 5 lines in order: Waiting for the kitchen, Accepted, Preparing, Ready, Delivered. Notifications list contains (newest first) Delivered, Ready, Preparing, Accepted, each with the MB- link and 'Mark read'.
   - UI: Step 9: completion did not mark cash paid: the card shows 'Cash due'.
-  - UI: Step 10: operations timeline lists 'Pending → Accepted → …' transitions with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere.
+  - UI: Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere.
   - API: POST /api/v1/orders 201 (OrderView state PENDING_ACCEPTANCE, total.amountMinor 15000, payment.method COD, cashState DUE, allowedActions ['CANCEL']).
   - API: Cook commands 200 CookOrderView with version +1 each; final GET /api/v1/orders/{id} state COMPLETED, handoverCode null, cashState DUE, events length 5.
   - API: GET /api/v1/ops/orders/{id} 200 with order.handoverCode null and customerContact null.
@@ -467,7 +482,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** customer-web, operations-web · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-OPS
 - **Fixtures to provision:** FX-STAFF-OPS
-- **Traces to:** scenarios: TC-021, TC-031, TC-119, TC-117; rules: BR-021, BR-030, BR-031; decisions: D05, D10; operations: postQuotes, postOrders, postCookOrdersDispatch, postCookOrdersHandover
+- **Traces to:** rules: BR-021, BR-030, BR-031; decisions: D05, D10; operations: postQuotes, postOrders, postCookOrdersDispatch, postCookOrdersHandover; partial: TC-021, TC-031, TC-117, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -475,6 +490,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).
   - FX-CUST-A has NO saved address yet or has one in 'Test zone A' (check: nav 'My account' > addresses). Kitchen A delivers only to 'Test zone A' (fee EGP 30.00).
   - FX-STAFF-OPS holds order.ops.
+  - Slot assignment: use the seeded slot of day 2 (items[1]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Meal 'Preview koshari' (qty 1) then 'Preview mahshi' (qty 1) from the same 13:00 tomorrow slot: press 'Add to cart' on each. — data: koshari x1 (75.00) + mahshi x1 (180.00)
   2. (FX-CUST-A) Open 'Cart'. Default mode is 'Delivery'. Under 'New address' fill: Address name 'Home test', Recipient 'Preview Customer 1', Governorate 'Test governorate', City 'Test city', Street 'Test street 1', Building '1', phone '+201000000101', Your area 'Test zone A'; press 'Save address' and select the new address radio.
@@ -502,7 +519,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-023, TC-044; rules: BR-023, BR-044; decisions: D05; operations: postOrders, getOrdersByRequestById
+- **Traces to:** rules: BR-023, BR-044; decisions: D05; operations: postOrders, getOrdersByRequestById; partial: TC-023, TC-044
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -525,7 +542,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api · **Actors:** FX-CUST-A · **Needs:** updated deploy
-- **Traces to:** scenarios: TC-023, TC-044; rules: BR-023, BR-044; decisions: D13; operations: postOrders
+- **Traces to:** rules: BR-023, BR-044; decisions: D13; operations: postOrders; partial: TC-023, TC-044
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -549,11 +566,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** BLOCKED — No signed iOS/Android build pointing at the preview is confirmed; native store setup is deferred (docs/operations/06-web-preview.md). · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-CUST-A, FX-DEVICE-IOS, FX-DEVICE-ANDROID · **Needs:** physical device
-- **Traces to:** scenarios: TC-049, TC-132; rules: BR-049, BR-044; decisions: D13; operations: postOrders, getOrdersByRequestById
+- **Traces to:** rules: BR-049, BR-044; decisions: D13; operations: postOrders, getOrdersByRequestById; partial: TC-049, TC-132
 - **Prerequisites:**
   - Signed iOS and Android builds pointing at the preview API (docs/operations/06-web-preview.md says Apple/Google setup is deferred); FX-CUST-A signed in on the device.
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) On the device open Discover > 'Preview koshari' > slot 13:00 tomorrow > add 1; open the basket, 'Calculate total', accept terms.
   2. (FX-CUST-A) Turn on airplane mode, press 'Place order', then force-quit the app, turn airplane mode off and relaunch.
@@ -570,12 +588,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** operations-web, api · **Actors:** FX-STAFF-OPS, FX-COOK-A, FX-STAFF-NOGRANT · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-OPS
-- **Traces to:** scenarios: TC-031, TC-119; rules: BR-031; decisions: D05, D18; operations: postOpsOrdersHandoverOverride
+- **Traces to:** rules: BR-031; decisions: D05, D18; operations: postOpsOrdersHandoverOverride; partial: TC-031, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
   - FX-STAFF-OPS holds order.ops and order.handover_override and can complete a Keycloak MFA step-up (PR #9 realm flow applied; on origin/develop the realm has no OTP/acr flow, so this step ends in 403 STEP_UP_REQUIRED).
   - A READY order O1 whose challenge is locked (result of E2E-ORDER-033). PRE_DB.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-STAFF-OPS) Ops web > 'Order monitoring' > open O1. In the form 'Handover override' leave Reason empty and press the button: note it is disabled. Type a Reason of 5 characters: still disabled.
   2. (FX-STAFF-OPS) Without a fresh step-up press the button with Reason 'Challenge locked after 5 wrong codes; customer verified by phone' and Evidence reference 'TEST-EVID-001'.
@@ -595,13 +614,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, api · **Actors:** FX-STAFF-OPS, FX-STAFF-SUPPORT, FX-CUST-A
 - **Fixtures to provision:** FX-STAFF-OPS, FX-STAFF-SUPPORT
-- **Traces to:** scenarios: TC-028, TC-029, TC-041; rules: BR-028, BR-029, BR-041; decisions: D05; operations: postOpsOrdersExceptionCancel, patchOpsCasesById
+- **Traces to:** rules: BR-028, BR-029, BR-041; decisions: D05; operations: postOpsOrdersExceptionCancel, patchOpsCasesById; partial: TC-028, TC-029, TC-041
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A PREPARING pickup/COD order O1 with an open CANCELLATION_REQUEST case reference CS-XXXXXXXX (E2E-ORDER-035). FX-STAFF-OPS holds order.ops + order.exception_cancel; FX-STAFF-SUPPORT holds support.case.
   - Note: the exception-cancel endpoint requires the permission only (no step-up in OpsOrderController); the UI still renders a step-up hint.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-STAFF-SUPPORT) In 'Support' try to resolve the case with resolution 'Order cancelled' BEFORE the order is cancelled (reason text >= 3 characters).
   2. (FX-STAFF-OPS) Order monitoring > O1 > form 'Exception cancellation': Reason OPERATIONAL, 'Case reference' = CS-XXXXXXXX, Note 'Ingredient shortage'; press 'Exception cancellation'.
@@ -621,13 +641,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-029, TC-119; rules: BR-029, BR-028; decisions: D05; operations: postCookOrdersCancel
+- **Traces to:** rules: BR-029, BR-028; decisions: D05; operations: postCookOrdersCancel; partial: TC-029, TC-119
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - ACCEPTED order A1 and PREPARING order B1 (both pickup/COD of FX-CUST-A).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) On A1 choose Reason 'Ingredient unavailable' (default) and press 'Cancel'.
   2. (FX-COOK-A) On B1 look at the buttons; then console POST /api/v1/cook/orders/<B1>/cancel {expectedVersion:v, reasonCode:'OTHER'}.
@@ -645,7 +666,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-020, TC-117; rules: BR-020; decisions: D13; operations: postQuotes, postOrders
+- **Traces to:** rules: BR-020; decisions: D13; operations: postQuotes, postOrders; partial: TC-020, TC-117
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -669,13 +690,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web · **Actors:** FX-CUST-A, FX-COOK-A · **Destructive**
-- **Traces to:** scenarios: TC-020, TC-156, TC-042; rules: BR-012, BR-020; decisions: D13, D14; operations: postQuotes, postOrders, getCookMealsPriceHistory
+- **Traces to:** scenarios: TC-020; rules: BR-012, BR-020; decisions: D13, D14; operations: postQuotes, postOrders, getCookMealsPriceHistory; partial: TC-042, TC-156
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).
   - SHARED DATA WARNING: this case changes the price of 'Preview koshari' in the shared preview catalogue and MUST restore EGP 75.00 at the end (steps 7-8).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Add 2 × 'Preview koshari' (pickup, cash), press 'Calculate total' (total 150.00). Do NOT place.
   2. (FX-COOK-A) Ops web > tab 'Meals' > 'Preview koshari' > 'Price history' > field 'New price (EGP)' = 80.00 > 'Change price'. — data: 80.00
@@ -698,7 +720,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-117, TC-018, TC-006; rules: BR-018, BR-019, BR-021; decisions: D05; operations: postQuotes, postOrders
+- **Traces to:** scenarios: TC-018; rules: BR-018, BR-019, BR-021; decisions: D05; operations: postQuotes, postOrders; partial: TC-006, TC-021, TC-117
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -706,6 +728,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - FX-CUST-A has an address in 'Test zone A' (addrA) and one in 'Test zone B' (addrB, create with POST /api/v1/me/addresses {label, recipientName, governorate, city, street, building, zoneId:'00000000-0000-4000-8000-00000000a002', phone:'+201000000101'}). Kitchen A serves only zone A.
   - FX-CUST-B signs in in a second browser profile.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) POST /api/v1/quotes with a forged extra field: {items:[{mealId:koshari,quantity:1}], slotId, fulfillmentMode:'PICKUP', totalMinor:1}. — data: totalMinor=1
   2. (FX-CUST-A) Quote with quantity 11, then with quantity 0. — data: 11 and 0
@@ -725,7 +748,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-013, TC-115, TC-029; rules: BR-013, BR-025, BR-029; decisions: D05; operations: postQuotes, postOrders, postOrdersCancel
+- **Traces to:** rules: BR-013, BR-025, BR-029; decisions: D05; operations: postQuotes, postOrders, postOrdersCancel; partial: TC-013, TC-029, TC-115
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -734,6 +757,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - FX-CUST-B signs in in a second browser profile; use the THIRD seeded slot (items[2], day+3) so the case does not collide with other cases. Its free portions are untouched: meal_slot capacity 10 koshari, 10 mahshi; cook_slot max_portions 20.
   - Sequential case only; the parallel last-portion race is E2E-ORDER-115 (isolated stack).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Place an order for 10 × koshari (the per-line limit is 10) in slot items[2], PICKUP/COD. — data: quantity 10
   2. (FX-CUST-B) Quote 1 × koshari in the same slot.
@@ -754,12 +778,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** api · **Actors:** FX-CUST-A, FX-CUST-B · **Needs:** isolated stack
-- **Traces to:** scenarios: TC-118, TC-013, TC-138; rules: BR-025, BR-013; decisions: D05; operations: postOrders
+- **Traces to:** rules: BR-025, BR-013; decisions: D05; operations: postOrders; partial: TC-013, TC-118, TC-138
 - **Prerequisites:**
   - FX-ISOLATED disposable stack (seed-preview.sql + dev policy). Destructive/race case: never on the shared preview.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - Reduce the target slot so that exactly 1 koshari portion remains (order 9 first with FX-CUST-A, or edit capacity in the disposable DB).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Create quote qa (1 × koshari). In the second browser profile FX-CUST-B creates quote qb (1 × koshari). Both quotes succeed because quotes hold no stock.
   2. (FX-CUST-A) Release both placements simultaneously (two consoles, countdown or a script) with distinct clientRequestIds and keys.
@@ -774,7 +799,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-037, TC-038, TC-121; rules: BR-037, BR-038; decisions: D05; operations: getNotifications, putNotificationsRead
+- **Traces to:** rules: BR-037, BR-038; decisions: D05; operations: getNotifications, putNotificationsRead; partial: TC-037, TC-038, TC-121
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -782,6 +807,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A pickup/COD order O1 driven through placement, accept, prepare, ready, handover (E2E-ORDER-101). Wait 10 s after the last step (outbox dispatch every 5 s).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Customer web > nav 'My account' > section 'Notifications': read the list. Press 'Mark read' on the newest entry.
   2. (FX-CUST-A) Console: GET /api/v1/notifications?limit=20, then GET /api/v1/notifications?unreadOnly=true&limit=20.
@@ -800,13 +826,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-CUST-B, FX-STAFF-SUPPORT
 - **Fixtures to provision:** FX-STAFF-SUPPORT
-- **Traces to:** scenarios: TC-041, TC-124, TC-006; rules: BR-041; decisions: D05; operations: postSupportCases, getSupportCases, getOpsCases, postOpsCasesMessages
+- **Traces to:** rules: BR-041; decisions: D05; operations: postSupportCases, getSupportCases, getOpsCases, postOpsCasesMessages; partial: TC-006, TC-041, TC-124
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - A completed or active order O1 of FX-CUST-A; FX-STAFF-SUPPORT holds support.case (PROVISION).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Customer web > 'My account' > 'Get help with an order': Order = O1's MB- number, Problem type 'Late', 'Describe the problem' = 'The order is late by test', press the button 'Get help with an order'.
   2. (FX-CUST-A) Open O1: link 'Support cases for this order'.
@@ -826,12 +853,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, api · **Actors:** FX-STAFF-OPS, FX-STAFF-NOGRANT
 - **Fixtures to provision:** FX-STAFF-OPS
-- **Traces to:** scenarios: TC-006, TC-124; rules: BR-006, BR-041; decisions: D05; operations: getOpsOrders, getOpsOrdersById
+- **Traces to:** rules: BR-006, BR-041; decisions: D05; operations: getOpsOrders, getOpsOrdersById; partial: TC-006, TC-124
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - One active order O1 (ACCEPTED) and one terminal order T1 exist; FX-STAFF-OPS holds order.ops.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-STAFF-OPS) Ops web > 'Order monitoring': press each filter ('All', 'Acceptance deadline near or past', 'Delivery failed', 'Cash disputed', 'Open support case').
   2. (FX-STAFF-OPS) Open O1 then T1 (click the MB- number).
@@ -847,11 +875,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api, customer-web · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-006, TC-001; rules: BR-006, BR-001; decisions: D05; operations: getOrdersById, getOrdersEvents, postOrdersCancel, postOrdersPaymentTransferReport, postSupportCases
+- **Traces to:** scenarios: TC-001, TC-006; rules: BR-006, BR-001; decisions: D05; operations: getOrdersById, getOrdersEvents, postOrdersCancel, postOrdersPaymentTransferReport, postSupportCases
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - Order OA (pending, COD) and deposit order OD (pending) of FX-CUST-A; FX-CUST-B signs in in a separate browser profile; a guest tab without session.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-B) Console: GET /api/v1/orders/<OA>; GET /api/v1/orders/<OA>/events; GET /api/v1/orders/by-request/<clientRequestId of OA>; POST /api/v1/orders/<OA>/cancel {expectedVersion:0, reasonCode:'OTHER'}; POST /api/v1/orders/<OD>/payment/transfer-report {}; POST /api/v1/orders/<OA>/cancellation-requests; POST /api/v1/support/cases {orderId:<OA>, category:'OTHER', description:'cross access attempt test'}.
   2. (FX-CUST-B) Browser: open https://app.<PREVIEW_DOMAIN>/#/orders/<OA>.
@@ -868,7 +897,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** api · **Actors:** FX-ISOLATED · **Needs:** isolated stack · **Destructive**
 - **Fixtures to provision:** FX-ISOLATED
-- **Traces to:** scenarios: TC-022, TC-033, TC-156; rules: BR-012, BR-026, BR-033; decisions: D05
+- **Traces to:** rules: BR-012, BR-026, BR-033; decisions: D05; partial: TC-156
 - **Prerequisites:**
   - FX-ISOLATED disposable stack with the runtime role (matbakhy_app) credentials known to the operator; at least one COMPLETED order O1 with ledger group, one deposit order with payment events.
   - These statements are attempted writes: never on the shared preview.
@@ -886,10 +915,11 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** BLOCKED — No signed iOS/Android build pointing at the preview is confirmed; native verification is required by project rules but store setup is deferred. · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-CUST-A, FX-DEVICE-IOS, FX-DEVICE-ANDROID, FX-COOK-A · **Needs:** physical device
-- **Traces to:** scenarios: TC-132, TC-163; rules: BR-049, BR-019; decisions: D05; operations: postQuotes, postOrders
+- **Traces to:** rules: BR-049, BR-019; decisions: D05; operations: postQuotes, postOrders; partial: TC-132, TC-163
 - **Prerequisites:**
   - Signed iOS and Android builds pointing at the preview API; FX-CUST-A signed in; Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) On each device: Discover > 'Preview koshari' > slot 13:00 tomorrow > add 2 > basket > 'Calculate total' > accept terms > 'Place order'.
   2. (FX-COOK-A) Accept, 'Start preparing' and 'Ready' on the web workspace.
@@ -905,7 +935,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** api · **Actors:** FX-CUST-A · **Needs:** isolated stack
-- **Traces to:** scenarios: TC-023, TC-118, TC-058; rules: BR-023, BR-024, BR-025; decisions: D05; operations: postOrders
+- **Traces to:** rules: BR-023, BR-024, BR-025; decisions: D05; operations: postOrders; partial: TC-023, TC-058, TC-118
 - **Prerequisites:**
   - FX-ISOLATED disposable stack with synthetic data (do NOT run on the shared preview: it fires parallel writes).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -924,41 +954,45 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Also covered by automated tests:** OrderPlacementIntegrationTest
 - **Unverified against code (confirm while executing):** Exact status mix of the losing parallel requests (the code serialises on a pg advisory lock and replays; asserting 'no second order' is the contract).
 
-### E2E-FIN-038 — Cash on receipt: completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount
+### E2E-FIN-038 — Cash on receipt (delivery order): completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, api · **Actors:** FX-COOK-A, FX-STAFF-FINANCE
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-032, TC-120, TC-157; rules: BR-032, BR-033; decisions: D05, D10; operations: postCookOrdersCashReports, getOpsFinanceCashReports, postOpsFinanceCashReportsVerification, getOpsFinanceStatements, getCookStatements
+- **Traces to:** rules: BR-032, BR-033; decisions: D05, D10; operations: postCookOrdersCashReports, getOpsFinanceCashReports, postOpsFinanceCashReportsVerification, getOpsFinanceStatements, getCookStatements; partial: TC-032, TC-120
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.
-  - A COMPLETED pickup/COD order O1 (total 15000) of FX-CUST-A at kitchen A whose cash is still DUE (E2E-ORDER-101). The cash-verification call has no ops UI; use the console on https://ops.<PREVIEW_DOMAIN> with the helper `api` (conventions.api_helper, pointing at the API origin).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
+  - A COMPLETED delivery/COD order O2 (total 28500 = 25500 meals + 3000 delivery) from E2E-ORDER-102 whose cash is still DUE. Cash verification has no ops UI: use the console on https://ops.<PREVIEW_DOMAIN> with the helper `api` (conventions.api_helper).
 - **Steps:**
-  1. (operator) Right after completion read SQL_CASH for O1.
-  2. (FX-COOK-A) Ops web > 'Orders' > 'Completed': on O1 the card says 'Cash due' and shows 'Report cash collected'. Amount (EGP) is pre-filled 150.00; Reference 'TEST-CASH-001'; press 'Submit'. — data: 15000, EGP, CASH
-  3. (FX-STAFF-FINANCE) Console: GET /api/v1/ops/finance/cash-reports?state=REPORTED&limit=20; pick the item of O1 (publicNumber) and its report {id, version}.
-  4. (FX-STAFF-FINANCE) POST /api/v1/ops/finance/cash-reports/<report id>/verification with a fresh Idempotency-Key and {decision:'VERIFY', verifiedAmountMinor:15000, reference:'TEST-VER-1', expectedVersion:<report.version>}.
-  5. (FX-STAFF-FINANCE) Repeat step 4 with the same key, then with a new key.
-  6. (FX-STAFF-FINANCE) Ops web > 'Finance': kitchen id 00000000-0000-4000-8000-0000000bd001 > 'Show'.
-  7. (FX-COOK-A) Ops web > tab 'Statement'.
+  1. (operator) Right after completion read SQL_CASH for O2: cash_obligation. — data: SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order';
+  2. (FX-STAFF-FINANCE) Ops web > 'Finance': kitchen id 00000000-0000-4000-8000-0000000bd001 > 'Show'. Record the statement value 'Cash verified' as S0 (it sums ALL verified cash of the kitchen in the Cairo month-to-date period, not only this order). — data: S0
+  3. (FX-COOK-A) Ops web > 'Orders' > 'Completed': on O2 the card says 'Cash due' and shows 'Report cash collected'. Amount (EGP) is pre-filled 285.00; Reference 'TEST-CASH-001'; press 'Submit'. — data: 28500, EGP, CASH
+  4. (FX-STAFF-FINANCE) Console: GET /api/v1/ops/finance/cash-reports?state=REPORTED&limit=20; pick the item of O2 (publicNumber) and its report {id, version}.
+  5. (FX-STAFF-FINANCE) POST /api/v1/ops/finance/cash-reports/<report id>/verification with a fresh Idempotency-Key K and {decision:'VERIFY', verifiedAmountMinor:28500, reference:'TEST-VER-1', expectedVersion:<report.version>}.
+  6. (FX-STAFF-FINANCE) Repeat the call (a) with the same key K and same body; (b) with a NEW key and the ORIGINAL expectedVersion; (c) with a NEW key and the CURRENT version (original + 1).
+  7. (FX-STAFF-FINANCE) Ops web > 'Finance' > 'Show' again (reload) and read 'Cash verified' (S1) and the row of O2.
+  8. (FX-COOK-A) Ops web > tab 'Statement' and read the same figures.
 - **Expected:**
-  - UI: Step 2: after Submit the card text reads 'Reported' and the form disappears. Step 6: statement lists '<MB-number> · 150.00 · Verified', 'Cash verified' = 150.00, banner 'No platform commission (owner decision D10)'. Step 7: 'Cash verified' 150.00 and 'No platform commission: the whole order amount is yours.'; no commission rows.
-  - API: Report 201: amount 15000 EGP, discrepancy 0, state REPORTED, version 0. Verification 200: state VERIFIED, verifiedAmount 15000. Same key replay 200 identical; new key 409 STATE_CONFLICT fieldErrors [{state,'VERIFIED'}].
-  - DB: Before step 2: cash_obligation 15000 state DUE although the order is COMPLETED (BR-032).
-  - DB: SELECT amount_minor, discrepancy_minor, state, verified_amount_minor, verified_by, reporter_id FROM cash_report WHERE order_id = :'order'; -> 15000, 0, VERIFIED, 15000; verified_by is the finance user and differs from reporter_id (DB check cash_report_separation_ck).
-  - DB: SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> VERIFIED.  SELECT action, outcome, details FROM audit_event WHERE action = 'cash.verify' AND object_id = '<report id>'; -> one ALLOWED row, details {decision:'VERIFY', verifiedAmountMinor:15000}.
+  - UI: Step 3: after Submit the card text reads 'Reported' and the form disappears.
+  - UI: Step 7: statement lists '<MB-number> · 285.00 · Verified'; 'Cash verified' S1 = S0 + 285.00 (increase asserted, not an absolute value); banner 'No platform commission: the whole order amount is yours.' (the text '(owner decision D10)' belongs to the operating-configuration screen only).
+  - UI: Step 8: cook statement shows the same row and the same banner; no commission column.
+  - API: Report 201: amount 28500 EGP, discrepancy 0, state REPORTED, version 0. Verification 200: state VERIFIED, verifiedAmount 28500. 6a: same key and body -> 200 identical. 6b: 409 VERSION_CONFLICT (the version check precedes the state check, CashService.verify). 6c: 409 STATE_CONFLICT fieldErrors [{state,'VERIFIED'}].
+  - DB: Before step 3: cash_obligation 28500 state DUE although the order is COMPLETED (BR-032).
+  - DB: SELECT amount_minor, discrepancy_minor, state, verified_amount_minor, verified_by, reporter_id FROM cash_report WHERE order_id = :'order'; -> 28500, 0, VERIFIED, 28500; verified_by is the finance user and differs from reporter_id (cash_report_separation_ck).
+  - DB: cash_obligation -> VERIFIED. SELECT action, outcome, details FROM audit_event WHERE action = 'cash.verify' AND object_id = '<report id>'; -> one ALLOWED row, details {decision:'VERIFY', verifiedAmountMinor:28500}.
 - **Also covered by automated tests:** CashAndLedgerIntegrationTest; FinanceOperationsIntegrationTest
-- **Unverified against code (confirm while executing):** The cook can still read 'Reported' as the cash text; the English label for REPORTED is 'Reported' (ar 'تم الإبلاغ').; Whether the finance staff browser session can call the API from the ops origin console (XSRF cookie scope).
+- **Unverified against code (confirm while executing):** Whether the finance staff browser session can call the API from the ops origin console (XSRF cookie scope).; Statement cashVerified = SUM(cash_obligation.amount_minor) of VERIFIED obligations whose COMPLETED event falls in the Cairo date range (StatementService); other orders verified in the same month change S0.
 
 ### E2E-FIN-039 — Core journey 3: pickup + 50% deposit, from deposit report to verified remaining cash
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-158, TC-159, TC-163, TC-032, TC-157; rules: BR-019, BR-022, BR-026, BR-032; decisions: D16, D10, D05; operations: postQuotes, postOrders, postOrdersPaymentTransferReport, postCookOrdersPaymentReceipt, postCookOrdersCashReports, postOpsFinanceCashReportsVerification, getOpsFinanceStatements
+- **Traces to:** rules: BR-019, BR-022, BR-026, BR-032; decisions: D16, D10, D05; operations: postQuotes, postOrders, postOrdersPaymentTransferReport, postCookOrdersPaymentReceipt, postCookOrdersCashReports, postOpsFinanceCashReportsVerification, getOpsFinanceStatements; partial: TC-032, TC-157, TC-158, TC-159, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -969,6 +1003,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.
   - On origin/develop the cash-report step produces a false DISPUTED (discrepancy = -deposit) because CashService compared the report with the order total; PR #9 compares with the cash obligation. Run this case against a PR #9 deployment.
+  - Slot assignment: use the seeded slot of day 2 (items[1]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Customer web: add 2 × 'Preview koshari' (13:00 tomorrow), open 'Cart', mode 'Pickup from the kitchen', pick the radio 'Deposit sent straight to the kitchen', press 'Calculate total'. Read the quote including the box data-testid="deposit-terms".
   2. (FX-CUST-A) Tick the terms box and press 'Place order'. On the order page read the box data-testid="payment-status".
@@ -986,23 +1022,23 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - UI: Step 1 box: 'Deposit now: 75.00 · Rest on receipt: 75.00', 'InstaPay: demo-kitchen@instapay.invalid · Demo kitchen (not a real account)', 'Send the deposit before <acceptBy time>.', 'You pay the kitchen's account directly; the platform never receives or holds the money. The kitchen confirms after checking its own account; your report alone is not proof.'
   - UI: Step 2: 'Payment: Waiting for your deposit' + the reference field and 'I sent the deposit'. Step 3: 'Payment: You reported the transfer; waiting for the kitchen to confirm' and 'Preparation starts only after the kitchen confirms the deposit reached its account.' (no bank-verified wording anywhere).
   - UI: Step 4: cook panel 'Deposit: 75.00 · rest on hand-over 75.00 · Customer reported a transfer' and the notice 'Check your own account before reporting; what you record is your statement, not a bank confirmation.' Step 5: badge 'Kitchen reported receipt'.
-  - UI: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; no commission lines; 'No platform commission (owner decision D10)'.
+  - UI: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'
   - API: Quote 201: total 15000, payment {method DEPOSIT, depositBps 5000, deposit 7500, remainder 7500, recipient INSTAPAY …}. Order payment {state WAITING_FOR_DEPOSIT, version 0, depositExpiresAt = acceptBy}; after the customer report CUSTOMER_TRANSFER_REPORTED; after the kitchen report KITCHEN_RECEIPT_REPORTED.
   - API: POST /api/v1/cook/orders/<id>/cash-reports 201: amount 7500, discrepancy 0, state REPORTED. Verification 200 state VERIFIED verifiedAmount 7500.
   - DB: SELECT method, state, total_minor, deposit_minor, remainder_minor, deposit_expires_at, version FROM order_payment WHERE order_id = :'order'; -> DEPOSIT, KITCHEN_RECEIPT_REPORTED, total 15000, deposit 7500, remainder 7500 (terms immutable).
-  - DB: SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> NULL→WAITING_FOR_DEPOSIT (CUSTOMER, 7500), →CUSTOMER_TRANSFER_REPORTED (CUSTOMER, reference TEST-REF-0001), →KITCHEN_RECEIPT_REPORTED (COOK, 7500).
+  - DB: SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> NULL→WAITING_FOR_DEPOSIT (CUSTOMER, amount 7500), →CUSTOMER_TRANSFER_REPORTED (CUSTOMER, amount NULL, reference TEST-REF-0001), →KITCHEN_RECEIPT_REPORTED (COOK, amount 7500).
   - DB: SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> amount_minor 7500; SELECT amount_minor, discrepancy_minor, state, verified_amount_minor, verified_by, reporter_id FROM cash_report WHERE order_id = :'order'; -> 7500, 0, VERIFIED, 7500, verified_by <> reporter_id.
   - DB: SELECT count(*) FROM support_case WHERE order_id = :'order' AND category = 'PAYMENT'; -> 0 (nothing disputed). SELECT count(*) FROM refund WHERE order_id = :'order'; -> 0.
-  - DB: SELECT g.kind, g.rate_bps, g.base_minor, e.account, e.direction, e.amount_minor FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id WHERE g.order_id = :'order' ORDER BY g.posted_at, e.direction; -> a COMMISSION group with both entries 0: deposits never enter the ledger.
+  - DB: SELECT g.kind, g.rate_bps, g.base_minor, e.account, e.direction, e.amount_minor FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id WHERE g.order_id = :'order' ORDER BY g.posted_at, e.direction; -> poll (bounded, up to 90 s; LedgerPostingJob runs every 30 s, asynchronously) until the COMPLETED event has its kind COMMISSION group, then assert exactly two entries (COOK_COMMISSION_RECEIVABLE DEBIT and PLATFORM_COMMISSION_REVENUE CREDIT), both amount_minor 0, balanced: deposits never enter the ledger.
 - **Also covered by automated tests:** DepositPaymentIntegrationTest; CashAndLedgerIntegrationTest
-- **Unverified against code (confirm while executing):** Statement 'Cash verified' for a deposit order may show the cash obligation (75.00) rather than the order value; confirm which amount the statement reports (StatementService.cash_minor) and adjust the figure.; Exact format of the deposit button label amount ('EGP 75.00') depends on Intl en-EG.; There is no ops UI to verify a cash report; the API call needs a session with the finance staff cookies (console on the ops origin).
+- **Unverified against code (confirm while executing):** Exact format of the deposit button label amount ('EGP 75.00') depends on Intl en-EG.; There is no ops UI to verify a cash report; the API call needs a session with the finance staff cookies (console on the ops origin).; Record 'Cash verified' before step 10 to assert the +75.00 increase; absolute values depend on other verified orders in the month.
 
 ### E2E-FIN-040 — Kitchen reports 'Not received': payment becomes DISPUTED, a PAYMENT support case opens, the order is not changed
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-161, TC-159, TC-041; rules: BR-026, BR-041; decisions: D16; operations: postCookOrdersPaymentProblem, getOpsPayments, postSupportCases
+- **Traces to:** rules: BR-026, BR-041; decisions: D16; operations: postCookOrdersPaymentProblem, getOpsPayments, postSupportCases; partial: TC-041, TC-159, TC-161
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
@@ -1011,6 +1047,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.
   - An ACCEPTED deposit order D1 (pickup, total 15000) whose customer transfer is reported (CUSTOMER_TRANSFER_REPORTED).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Check your own account (nothing arrived in the preview). In the Deposit panel of D1 press 'Not received'.
   2. (FX-CUST-A) Reload the order page and 'My account' > 'Notifications'.
@@ -1032,13 +1069,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-158, TC-117, TC-161; rules: BR-019; decisions: D16; operations: postQuotes, postCookOrdersPaymentReceipt, putCookPaymentProfile
+- **Traces to:** rules: BR-019; decisions: D16; operations: postQuotes, postCookOrdersPaymentReceipt, putCookPaymentProfile; partial: TC-117, TC-158, TC-161
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
   - A pending deposit order D1 (total 15000, deposit 7500) with the customer's transfer reported; cook session on ops origin; D1 payment version v from GET /api/v1/cook/orders/<D1> (payment.version).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) POST /api/v1/quotes with an extra field {…, depositMinor: 20000} and another with {…, paymentMethod:'DEPOSIT', totalMinor: 1}.
   2. (FX-COOK-A) POST /api/v1/cook/orders/<D1>/payment/receipt {expectedVersion:v, amountMinor:15000}; then 7000; then 0. — data: amounts above, below, zero
@@ -1055,7 +1093,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B, FX-COOK-A
-- **Traces to:** scenarios: TC-159, TC-163; rules: BR-024, BR-019; decisions: D16; operations: postOrdersPaymentTransferReport
+- **Traces to:** rules: BR-024, BR-019; decisions: D16; operations: postOrdersPaymentTransferReport; partial: TC-159, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -1063,6 +1101,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
   - A pending deposit order D1 and a pending COD order P1 of FX-CUST-A.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) On D1 press 'I sent the deposit' once; in the console POST /api/v1/orders/<D1>/payment/transfer-report {reference:'TEST-REF-0002'} twice more. (The payment endpoints take no Idempotency-Key header.)
   2. (FX-CUST-A) POST the report with a 65-character reference; with an extra field {amountMinor:1}; on the COD order P1.
@@ -1080,13 +1119,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, api · **Actors:** FX-COOK-A, FX-STAFF-FINANCE, FX-STAFF-OPS
 - **Fixtures to provision:** FX-STAFF-FINANCE, FX-STAFF-OPS
-- **Traces to:** scenarios: TC-032, TC-120, TC-061; rules: BR-032; decisions: D05; operations: postCookOrdersCashReports, postOpsFinanceCashReportsVerification, getOpsOrders
+- **Traces to:** rules: BR-032; decisions: D05; operations: postCookOrdersCashReports, postOpsFinanceCashReportsVerification, getOpsOrders; partial: TC-032, TC-061, TC-120
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.
   - A COMPLETED pickup/COD order O1 (total 15000, cash DUE). FX-STAFF-OPS holds order.ops.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Orders > 'Completed' > O1: set Amount (EGP) to 140.00, Reference 'short-test', press 'Submit'. — data: 14000
   2. (FX-STAFF-FINANCE) Console: GET /api/v1/ops/finance/cash-reports?state=DISPUTED; take the report {id, version}.
@@ -1106,22 +1146,23 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 ### E2E-FIN-044 — Platform refund of verified cash: only finance.refund_approve, full amount only, requester and approver differ
 
-- **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
-- **Surface:** api · **Actors:** FX-STAFF-FINANCE, FX-STAFF-ADMIN-B, FX-STAFF-NOGRANT, FX-STAFF-SUPPORT, FX-CUST-A
-- **Fixtures to provision:** FX-STAFF-FINANCE, FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
-- **Traces to:** scenarios: TC-035, TC-006; rules: BR-035, BR-006; decisions: D05, D10; operations: postOpsFinanceRefunds, postOpsFinanceRefundsAction
+- **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
+- **Surface:** api · **Actors:** FX-STAFF-FINANCE, FX-STAFF-OPS, FX-STAFF-ADMIN-B, FX-STAFF-NOGRANT, FX-STAFF-SUPPORT, FX-CUST-A · **Needs:** updated deploy
+- **Fixtures to provision:** FX-STAFF-FINANCE, FX-STAFF-OPS, FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
+- **Traces to:** rules: BR-035, BR-006; decisions: D05, D10; operations: postOpsFinanceRefunds, postOpsFinanceRefundsAction; partial: TC-006, TC-035
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
-  - A COMPLETED COD order O1 with a VERIFIED cash report of 15000 (E2E-FIN-038) whose COMMISSION ledger group exists (about 30 s after completion). FX-STAFF-FINANCE and FX-STAFF-ADMIN-B (PROVISION) both hold finance.refund_approve; FX-STAFF-SUPPORT holds only support.case.
   - Console on the ops origin. There is no customer refund request in the product: customers use a support case or cancellation request.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
+  - FX-STAFF-FINANCE holds finance.refund_approve. A second, different holder is needed (four-eyes): FX-STAFF-ADMIN-B (staff.grant, recent MFA, PR #9) temporarily grants finance.refund_approve to FX-STAFF-OPS (fixtures.json gives OPS order.* and ADMIN-B no finance permission) and revokes it at the end; FX-STAFF-SUPPORT holds only support.case.
 - **Steps:**
   1. (FX-STAFF-NOGRANT) POST /api/v1/ops/finance/refunds {orderId:O1, caseId:'CS-TEST-1', fullAmountMinor:15000, reason:'test refund'} (fresh key). Repeat as FX-STAFF-SUPPORT and as FX-CUST-A.
   2. (FX-STAFF-FINANCE) Same request with fullAmountMinor 10000, then 20000, then 15000.
   3. (FX-STAFF-FINANCE) POST /api/v1/ops/finance/refunds/<refundId>/action {action:'APPROVE', expectedVersion:0}.
-  4. (FX-STAFF-ADMIN-B) Same action APPROVE; then action VERIFY immediately; then PAYMENT_RECORDED with evidenceRef 'TEST-REF-PAY-1' and the new version.
-  5. (FX-STAFF-ADMIN-B) VERIFY (the same person recorded payment). Then FX-STAFF-FINANCE: VERIFY.
+  4. (FX-STAFF-OPS) Same action APPROVE; then action VERIFY immediately; then PAYMENT_RECORDED with evidenceRef 'TEST-REF-PAY-1' and the new version.
+  5. (FX-STAFF-OPS) VERIFY (the same person recorded payment). Then FX-STAFF-FINANCE: VERIFY.
   6. (FX-STAFF-FINANCE) Request a second refund for O1.
 - **Expected:**
   - UI: Not applicable (API only; the ops Finance statement offers 'Request full refund' and per-state buttons Approve/Reject/Record payment/Verify).
@@ -1137,47 +1178,49 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** api · **Actors:** FX-STAFF-FINANCE
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-120, TC-033, TC-034, TC-058, TC-157; rules: BR-032, BR-033, BR-034; decisions: D05, D10; operations: getOpsFinanceStatements
+- **Traces to:** rules: BR-032, BR-033, BR-034; decisions: D05, D10; operations: getOpsFinanceStatements; partial: TC-058, TC-120, TC-157
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
-  - After at least E2E-ORDER-101, E2E-FIN-039 and E2E-FIN-107 have run (orders in COMPLETED, CANCELLED, deposit states). A read-only SQL channel; the file infra/db/reconcile.sql from the release commit. There is no ledger export endpoint (getOpsAuditExport is x-implemented: false).
+  - At least one COMPLETED COD order (E2E-ORDER-101/102) and one COMPLETED deposit order (E2E-FIN-039/101) exist. E2E-FIN-107 is NOT required: run it separately for cancelled/disputed-deposit coverage. A read-only SQL channel; infra/db/reconcile.sql from the release commit. There is no ledger export endpoint (getOpsAuditExport is x-implemented: false).
 - **Steps:**
   1. (operator) Run infra/db/reconcile.sql read-only against the preview database. — data: psql -f infra/db/reconcile.sql
   2. (operator) Run the extra checks listed in expected.database.
-  3. (FX-STAFF-FINANCE) Open ops 'Finance' for kitchen 00000000-0000-4000-8000-0000000bd001 and compare 'Cash verified' with the SUM of verified cash_report amounts for completed orders in range.
+  3. (FX-STAFF-FINANCE) Open ops 'Finance' for kitchen 00000000-0000-4000-8000-0000000bd001 (default period = current Cairo calendar month through today) and compare 'Cash verified' with the SQL sum in expected.database.
 - **Expected:**
   - UI: Finance statement totals equal the SQL sums.
-  - API: GET /api/v1/ops/finance/statements?kitchenId=00000000-0000-4000-8000-0000000bd001 summary.cashVerified.amountMinor equals SUM(cash_report.verified_amount_minor) for VERIFIED reports in the period.
+  - API: GET /api/v1/ops/finance/statements?kitchenId=00000000-0000-4000-8000-0000000bd001 summary.cashVerified.amountMinor equals SUM(cash_obligation.amount_minor) WHERE state = 'VERIFIED' for the kitchen's orders whose COMPLETED event falls in the statement's Cairo date range (default: first day of the current Cairo month through today).
   - DB: reconcile.sql returns every check_name with violations = 0: meal_slot_counters_match_allocations, cook_slot_counters_match_meal_slots, terminal_orders_hold_no_live_stock, order_items_match_subtotal, order_state_matches_latest_event, one_cash_obligation_per_order, ledger_groups_balanced, ledger_only_for_completed_orders, migrations_all_successful, payment_state_matches_history.
   - DB: SELECT count(*) FROM (SELECT kind, source_event_id FROM ledger_group GROUP BY 1,2 HAVING count(*) > 1) d; -> 0. SELECT count(*) FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE p.deposit_minor + p.remainder_minor <> o.total_minor; -> 0.
   - DB: SELECT count(*) FROM ledger_entry WHERE account NOT IN ('COOK_COMMISSION_RECEIVABLE','PLATFORM_COMMISSION_REVENUE'); -> 0 (no entry for deposits or cash). SELECT count(*) FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id JOIN customer_order o ON o.id = g.order_id WHERE o.commission_bps_snapshot = 0 AND e.amount_minor <> 0; -> 0.
+  - DB: SELECT coalesce(sum(c.amount_minor),0) FROM cash_obligation c JOIN customer_order o ON o.id = c.order_id JOIN order_event e ON e.order_id = o.id AND e.to_state = 'COMPLETED' WHERE o.kitchen_id = '00000000-0000-4000-8000-0000000bd001' AND c.state = 'VERIFIED' AND e.occurred_at >= date_trunc('month', now() AT TIME ZONE 'Africa/Cairo') AT TIME ZONE 'Africa/Cairo' AND e.occurred_at < (date_trunc('day', now() AT TIME ZONE 'Africa/Cairo') + interval '1 day') AT TIME ZONE 'Africa/Cairo'; -> equals the statement 'Cash verified' (not SUM(cash_report.verified_amount_minor)).
 - **Also covered by automated tests:** CashAndLedgerIntegrationTest; BackupRestoreIntegrationTest (runs reconcile.sql); infra/db/reconcile.sql
-- **Unverified against code (confirm while executing):** Statement cashVerified definition for deposit orders (see E2E-FIN-039).
+- **Unverified against code (confirm while executing):** Run immediately after the finance statement read so no new verification changes the sum between the two reads.
 
 ### E2E-FIN-046 — Zero platform charges: no commission, service fee or tax on any quote, order, ledger or statement
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
-- **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-OPS
-- **Fixtures to provision:** FX-STAFF-OPS
-- **Traces to:** scenarios: TC-157, TC-034, TC-117; rules: BR-033, BR-019; decisions: D10, D05; operations: postQuotes, getOpsConfiguration, getCookStatements
+- **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE
+- **Fixtures to provision:** FX-STAFF-FINANCE
+- **Traces to:** rules: BR-033, BR-019; decisions: D10, D05; operations: postQuotes, getOpsConfiguration, getCookStatements; partial: TC-117, TC-157
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
   - Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
-  - FX-STAFF-OPS may hold config.read (to read the pricing policy screen); otherwise verify the policy by SQL.
+  - FX-STAFF-FINANCE holds config.read (see fixtures.json; FX-STAFF-OPS does not) - needed to open 'Operating configuration'; alternatively read the policy by SQL.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Create four quotes for the same kitchen A slot: pickup/COD (2 × koshari), pickup/DEPOSIT, delivery/COD and delivery/DEPOSIT (1 koshari + 1 mahshi, address Test zone A). Record the full JSON of each.
   2. (FX-CUST-A) Place any one and open it. In the customer web look for any charge line other than Meals, Delivery fee, Tax, Total.
-  3. (FX-STAFF-OPS) Ops web > 'Operating configuration': read 'Current pricing policy'.
+  3. (FX-STAFF-FINANCE) Ops web > 'Operating configuration': read 'Current pricing policy'.
   4. (FX-COOK-A) Ops web > 'Statement'.
   5. (operator) Run the SQL.
 - **Expected:**
   - UI: Quote panel shows only Meals, Delivery fee, Tax, Total. Policy screen reads 'no platform commission (owner decision D10)' and the synthetic-policy label. Cook statement: 'No platform commission: the whole order amount is yours.' and no commission column.
   - API: Every quote: tax.amountMinor 0; total = subtotal + deliveryFee (pickup deliveryFee 0, zone A 3000); JSON has no service-fee or commission property. Order JSON likewise.
-  - DB: SELECT policy_version, commission_bps_snapshot, commission_minor, tax_minor FROM customer_order; -> every row 0, 0, 0 for preview orders. SELECT version, commission_rate_bps, tax_rate_bps, synthetic FROM commerce_policy WHERE status = 'ACTIVE'; -> commission_rate_bps 0, tax_rate_bps 0. SELECT count(*) FROM ledger_entry WHERE amount_minor <> 0; -> 0.
+  - DB: SELECT policy_version, commission_bps_snapshot, commission_minor, tax_minor FROM customer_order; -> policy_version >= 1 (the active synthetic policy version, not 0) and commission_bps_snapshot, commission_minor and tax_minor all 0 on every preview order. SELECT version, commission_rate_bps, tax_rate_bps, synthetic FROM commerce_policy WHERE status = 'ACTIVE'; -> commission_rate_bps 0, tax_rate_bps 0. SELECT count(*) FROM ledger_entry WHERE amount_minor <> 0; -> 0.
 - **Also covered by automated tests:** ZeroCommissionIntegrationTest; ConfigurationIntegrationTest
 - **Unverified against code (confirm while executing):** Operation id of the configuration read (getOpsConfiguration) inferred from the route used by the ops UI.; The delivery fee is a kitchen/zone delivery arrangement fee, not a Matbakhy fee (owner rule); the product has no paid ads or growth billing in this scope.
 
@@ -1185,10 +1228,11 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-163, TC-157; rules: BR-019; decisions: D16, D10
+- **Traces to:** rules: BR-019; decisions: D16, D10; partial: TC-157, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - Browser DevTools Network panel with 'Preserve log' on; E2E-FIN-039 is executed while the log is recording.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) With the Network panel open execute the customer part of E2E-FIN-039 (quote, place, 'I sent the deposit').
   2. (FX-COOK-A) Execute the cook part (receipt, cash report) and finance verification.
@@ -1206,7 +1250,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** customer-web, operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-158, TC-159, TC-163, TC-119; rules: BR-019, BR-021, BR-030; decisions: D16, D10; operations: postQuotes, postOrders, postCookOrdersDispatch, postCookOrdersPaymentReceipt, postCookOrdersCashReports
+- **Traces to:** rules: BR-019, BR-021, BR-030; decisions: D16, D10; operations: postQuotes, postOrders, postCookOrdersDispatch, postCookOrdersPaymentReceipt, postCookOrdersCashReports; partial: TC-119, TC-158, TC-159, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -1217,6 +1261,8 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.
   - FX-CUST-A has an address in 'Test zone A' (see E2E-ORDER-102 step 2). PR #9 behaviour for the cash step as in E2E-FIN-039.
+  - Slot assignment: use the seeded slot of day 1 (items[0]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Add 1 × 'Preview koshari' and 1 × 'Preview mahshi' (same 13:00 slot), 'Cart', mode 'Delivery', select the Test-zone-A address, radio 'Deposit sent straight to the kitchen', 'Calculate total', terms, 'Place order'.
   2. (FX-CUST-A) On the order page press 'I sent the deposit' without a reference.
@@ -1229,7 +1275,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - API: Quote total.amountMinor 28500 (subtotal 25500 + deliveryFee 3000), payment.deposit.amountMinor 14250, remainder 14250. Cash report amount 14250 discrepancy 0 -> VERIFIED.
   - DB: SELECT method, state, total_minor, deposit_minor, remainder_minor, deposit_expires_at, version FROM order_payment WHERE order_id = :'order'; -> total 28500, deposit 14250, remainder 14250.
   - DB: SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> 14250 VERIFIED after step 6.
-  - DB: SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> three transitions as in E2E-FIN-039 with amount 14250 and reference NULL for the customer report.
+  - DB: SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> amounts in transition order: 14250 (WAITING_FOR_DEPOSIT), NULL (customer report, reference NULL), 14250 (kitchen receipt).
   - DB: customer_order.dispatch_reference = 'COURIER-TEST-02', delivery_fee_minor 3000; the delivery fee is part of the total the kitchen collects, no separate Matbakhy fee exists.
 - **Also covered by automated tests:** DepositPaymentIntegrationTest; CashAndLedgerIntegrationTest
 - **Unverified against code (confirm while executing):** The delivery fee (EGP 30.00 by zone) is shown as 'Delivery fee'; the product states it is an external delivery fee, not platform monetisation. No code path adds a platform share to it.
@@ -1238,12 +1284,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-032, TC-120, TC-058; rules: BR-032, BR-024; decisions: D05; operations: postCookOrdersCashReports
+- **Traces to:** rules: BR-032, BR-024; decisions: D05; operations: postCookOrdersCashReports; partial: TC-032, TC-058, TC-120
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - Two COMPLETED COD orders C1 and C2 (cash DUE, total 15000) at kitchen A, plus one PREPARING order P1; cook session on ops origin. Record customer_order.version of each (v).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) On C1 build `const body={amountMinor:15000,currency:'EGP',collectedAt:new Date().toISOString(),method:'CASH',externalReference:'TEST-CASH-002',expectedVersion:v}` and POST /api/v1/cook/orders/<C1>/cash-reports with key K.
   2. (FX-COOK-A) Repeat the same POST with the same key K and body; then with K and amountMinor 14000.
@@ -1262,7 +1309,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A, FX-STAFF-FINANCE · **Needs:** updated deploy · **Destructive**
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-158, TC-163, TC-042; rules: BR-019, BR-020; decisions: D16, D13, D18; operations: putCookPaymentProfile, getOpsPaymentRecipients, postOpsKitchensPaymentRecipientApproval, postQuotes, postOrders
+- **Traces to:** rules: BR-019, BR-020; decisions: D16, D13, D18; operations: putCookPaymentProfile, getOpsPaymentRecipients, postOpsKitchensPaymentRecipientApproval, postQuotes, postOrders; partial: TC-042, TC-158, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -1272,6 +1319,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
   - SHARED DATA WARNING: this changes kitchen A's recipient in the shared preview; steps 7-8 restore it. Run on a PR #9 deployment (MFA step-up).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) Customer web: cart 2 × koshari, Pickup, radio 'Deposit sent straight to the kitchen', 'Calculate total' (quote Q1). Do not place yet.
   2. (FX-COOK-A) Ops web > 'Settings' > section 'Payment': change 'Account address or number' to 'demo-kitchen-2@instapay.invalid', press 'Save'. Read the status line.
@@ -1293,7 +1341,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-COOK-A, FX-CUST-A · **Destructive**
-- **Traces to:** scenarios: TC-158, TC-163; rules: BR-019; decisions: D16, D05; operations: putCookPaymentProfile, postQuotes
+- **Traces to:** rules: BR-019; decisions: D16, D05; operations: putCookPaymentProfile, postQuotes; partial: TC-158, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -1302,6 +1350,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - SHARED DATA WARNING: changes the COD cap of kitchen A; step 6 restores 'no cap'. The recipient is not edited, so its APPROVED status is kept (PaymentService.updateProfile keeps the status for an identical recipient).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Settings > 'Payment': set 'Highest total for cash on delivery (EGP; leave empty for any total)' to 255.00, keep the recipient fields, 'Save'. — data: 25500
   2. (FX-CUST-A) Cart: 1 × koshari + 1 × mahshi (total 255.00), Pickup, 'Cash on receipt', 'Calculate total'. — data: total 25500 = cap
@@ -1321,7 +1370,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-158, TC-163; rules: BR-019; decisions: D16; operations: postQuotes
+- **Traces to:** rules: BR-019; decisions: D16; operations: postQuotes; partial: TC-158, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.
@@ -1340,14 +1389,16 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-159, TC-119; rules: BR-026; decisions: D16; operations: postCookOrdersPrepare, postCookOrdersPaymentReceipt, postOrdersPaymentTransferReport
+- **Traces to:** rules: BR-026; decisions: D16; operations: postCookOrdersPrepare, postCookOrdersPaymentReceipt, postOrdersPaymentTransferReport; partial: TC-119, TC-159
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
-  - A pending deposit order D1 (pickup, 2 × koshari, deposit 7500) of FX-CUST-A in payment state WAITING_FOR_DEPOSIT (E2E-FIN-039 steps 1-2).
+  - Slot assignment: use the seeded slot of day 2 (items[1]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
+  - A FRESH pending deposit order D1 (pickup, 2 × koshari, deposit 7500) in payment state WAITING_FOR_DEPOSIT, created by executing only E2E-FIN-039 steps 1-3 on the day-2 slot. Never reuse the order that E2E-FIN-039 completes.
 - **Steps:**
   1. (FX-COOK-A) Press 'Accept' on D1 (no deposit reported yet).
   2. (FX-COOK-A) Press 'Start preparing'.
@@ -1367,7 +1418,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-160, TC-162, TC-163; rules: BR-027, BR-029, BR-035; decisions: D16, D18; operations: postCookOrdersCancel, getOpsPayments, postOpsOrdersPaymentDecision, postCookOrdersPaymentRefund
+- **Traces to:** scenarios: TC-162; rules: BR-027, BR-029, BR-035; decisions: D16, D18; operations: postCookOrdersCancel, getOpsPayments, postOpsOrdersPaymentDecision, postCookOrdersPaymentRefund; partial: TC-160, TC-163
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
@@ -1377,6 +1428,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
   - Run on a PR #9 deployment with the Keycloak step-up flow applied (steps 5-6 need a recent MFA proof). A pending deposit order D1 with the customer's transfer reported.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) 'Accept' D1, press 'The deposit arrived (EGP 75.00)', then choose Reason 'Ingredient unavailable' and press 'Cancel'.
   2. (FX-CUST-A) Reload D1; 'My account' > 'Notifications'; open the case link.
@@ -1399,12 +1451,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, api · **Actors:** FX-COOK-A, FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-161, TC-159; rules: BR-026; decisions: D16; operations: postCookOrdersPaymentReceipt
+- **Traces to:** rules: BR-026; decisions: D16; operations: postCookOrdersPaymentReceipt; partial: TC-159, TC-161
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
   - D1 from E2E-FIN-040 (ACCEPTED, payment DISPUTED, one open PAYMENT case).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) In the Deposit panel of D1 press 'The deposit arrived (EGP 75.00)'.
   2. (FX-COOK-A) Press 'Start preparing'.
@@ -1421,7 +1474,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, api · **Actors:** FX-COOK-A
-- **Traces to:** scenarios: TC-161; rules: BR-026; decisions: D16; operations: postCookOrdersPaymentProblem
+- **Traces to:** rules: BR-026; decisions: D16; operations: postCookOrdersPaymentProblem; partial: TC-161
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
@@ -1444,7 +1497,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** api · **Actors:** FX-STAFF-FINANCE
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-036, TC-157; rules: BR-036, BR-033; decisions: D10; operations: postOpsFinanceSettlements
+- **Traces to:** rules: BR-036, BR-033; decisions: D10; operations: postOpsFinanceSettlements; partial: TC-036, TC-157
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
@@ -1464,12 +1517,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** operations-web, api · **Actors:** FX-COOK-A, FX-CUST-A
-- **Traces to:** scenarios: TC-120, TC-157; rules: BR-032, BR-033; decisions: D10; operations: getCookStatements
+- **Traces to:** rules: BR-032, BR-033; decisions: D10; operations: getCookStatements; partial: TC-120, TC-157
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
   - In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).
   - At least one completed order with cash REPORTED/VERIFIED and one with cash DUE at kitchen A today (Africa/Cairo).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Ops web > 'Statement': leave the default range (month to date), press 'Show'. Read the summary and the table.
   2. (FX-COOK-A) Set 'From' after today and press 'Show'.
@@ -1486,12 +1540,13 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
 - **Surface:** operations-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-NOGRANT, FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE
 - **Fixtures to provision:** FX-STAFF-OPS, FX-STAFF-SUPPORT, FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-006, TC-001, TC-125; rules: BR-006, BR-001; decisions: D05, D18; operations: getOpsPayments, getOpsPaymentRecipients, getOpsFinanceCashReports, getOpsFinanceStatements, postOpsOrdersPaymentDecision, postOpsFinanceRefunds, postOpsFinanceSettlements
+- **Traces to:** rules: BR-006, BR-001; decisions: D05, D18; operations: getOpsPayments, getOpsPaymentRecipients, getOpsFinanceCashReports, getOpsFinanceStatements, postOpsOrdersPaymentDecision, postOpsFinanceRefunds, postOpsFinanceSettlements; partial: TC-001, TC-006, TC-125
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.
   - Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.
   - A deposit order D1 in any payment state and a completed order O1; ids known.
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (guest) Without a session call: GET https://api.<PREVIEW_DOMAIN>/api/v1/ops/payments?state=DISPUTED.
   2. (FX-CUST-A) Console (any tab with the helper): GET /api/v1/ops/payments?state=DISPUTED; GET /api/v1/ops/payment-recipients; GET /api/v1/ops/finance/cash-reports; GET /api/v1/ops/finance/statements?kitchenId=00000000-0000-4000-8000-0000000bd001.
@@ -1509,10 +1564,11 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** BLOCKED — No signed iOS/Android build pointing at the preview is confirmed; native verification is mandatory but store/TestFlight setup is deferred. · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-CUST-A, FX-DEVICE-IOS, FX-DEVICE-ANDROID, FX-COOK-A · **Needs:** physical device
-- **Traces to:** scenarios: TC-163, TC-132; rules: BR-019, BR-049; decisions: D16; operations: postOrdersPaymentTransferReport
+- **Traces to:** rules: BR-019, BR-049; decisions: D16; operations: postOrdersPaymentTransferReport; partial: TC-132, TC-163
 - **Prerequisites:**
   - Signed iOS and Android builds pointing at the preview API; Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-CUST-A) On each device: add 2 × 'Preview koshari' (13:00 tomorrow), basket, choose 'Deposit sent straight to the kitchen', 'Calculate total'.
   2. (FX-CUST-A) Accept terms, 'Place order', open the order, type reference 'TEST-REF-0003', press 'I sent the deposit'. Press it a second time if the button is still visible.
@@ -1526,14 +1582,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 ### E2E-FIN-114 — A person who reported cash can never verify it (separation of duties), and the denial is audited
 
-- **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Ready after the extra synthetic fixtures are provisioned
-- **Surface:** api · **Actors:** FX-MULTIROLE
-- **Fixtures to provision:** FX-MULTIROLE, FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-006, TC-120; rules: BR-032, BR-006; decisions: D05; operations: postOpsFinanceCashReportsVerification
+- **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Needs the updated application deployment
+- **Surface:** api · **Actors:** FX-MULTIROLE · **Needs:** updated deploy
+- **Fixtures to provision:** FX-MULTIROLE, FX-STAFF-FINANCE, FX-STAFF-ADMIN-B
+- **Traces to:** rules: BR-032, BR-006; decisions: D05; operations: postOpsFinanceCashReportsVerification; partial: TC-006, TC-120
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.
-  - FX-MULTIROLE (PROVISION) is an approved cook of a kitchen AND holds finance.verify; a customer order at that kitchen is COMPLETED with cash DUE. This needs a second kitchen with meals/slots that is NOT in the seed (fixture_data).
+  - FX-MULTIROLE (seed-owner-e2e.sql: customer + approved cook of kitchen 'مطبخ متعدد الأدوار' + support.case). finance.verify is NOT granted by the fixture: FX-STAFF-ADMIN-B (staff.grant, recent MFA) grants it temporarily and revokes it afterwards. The seeded multirole kitchen has no meal or slot: the cook creates one, then FX-CUST-A orders and the order is completed so cash is DUE.
   - Console helper on the ops origin.
 - **Steps:**
   1. (FX-MULTIROLE) As cook: POST /api/v1/cook/orders/<O>/cash-reports with the exact amount.
@@ -1551,7 +1607,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** operations-web, customer-web, api · **Actors:** FX-CUST-A, FX-COOK-A, FX-STAFF-FINANCE · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-FINANCE
-- **Traces to:** scenarios: TC-160, TC-161, TC-162; rules: BR-027, BR-029; decisions: D16, D18; operations: postCookOrdersReject, postOpsOrdersPaymentDecision
+- **Traces to:** rules: BR-027, BR-029; decisions: D16, D18; operations: postCookOrdersReject, postOpsOrdersPaymentDecision; partial: TC-160, TC-161, TC-162
 - **Prerequisites:**
   - Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).
   - FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.
@@ -1560,6 +1616,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).
   - FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.
   - PR #9 realm step-up for step 4. Two deposit orders: E1 (pending, nothing reported) and E2 (ACCEPTED, customer transfer reported, kitchen already pressed 'Not received' so the payment is DISPUTED).
+  - Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.
 - **Steps:**
   1. (FX-COOK-A) Reject E1 with Reason 'Kitchen busy'.
   2. (FX-CUST-A) Reload E1.

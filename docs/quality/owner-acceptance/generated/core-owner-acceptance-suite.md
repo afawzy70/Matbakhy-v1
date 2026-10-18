@@ -32,7 +32,7 @@ Same journey with delivery to Test zone A: fee in the quote, courier hand-off, f
 | # | Case | Title | Readiness | Status |
 |---|---|---|---|---|
 | 1 | E2E-ORDER-102 | Core journey 2: delivery + cash on receipt, from placement through courier dispatch to completion | Ready after the extra synthetic fixtures are provisioned | NOT_RUN |
-| 2 | E2E-FIN-038 | Cash on receipt: completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount | Ready after the extra synthetic fixtures are provisioned | NOT_RUN |
+| 2 | E2E-FIN-038 | Cash on receipt (delivery order): completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount | Ready after the extra synthetic fixtures are provisioned | NOT_RUN |
 
 ## J3 — Pickup + 50% direct deposit
 
@@ -88,8 +88,8 @@ Optional MFA end to end on the web: enrol, step up, policy authorization, staff 
 |---|---|---|---|---|
 | 1 | CFG-102 | Web step-up and first-time enrolment through Keycloak: level-1 sign-in never asks OTP; stepUp=true asks OTP or leads to TOTP enrolment | Needs the updated application deployment | NOT_RUN |
 | 2 | CFG-008 | Own two-step preference under OPTIONAL: enable only on a verified session; disable needs a recent factor, ends sessions, and is audited (absorbs CFG-017) | Needs the updated application deployment | NOT_RUN |
-| 3 | CFG-016 | Policy mutation authorization ladder: guest, customer, ungranted staff, granted staff without recent MFA, and read vs write | Needs the updated application deployment | NOT_RUN |
-| 4 | CFG-104 | Staff high-risk actions require recent MFA regardless of policy mode; password-only preview-ops accounts are refused | Ready to run manually now | NOT_RUN |
+| 3 | CFG-016 | Policy mutation authorization ladder (refusals only): guest, customer, ungranted staff, bootstrap admin, and granted staff without recent MFA; no state change | Needs the updated application deployment | NOT_RUN |
+| 4 | CFG-104 | Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts) | Isolated disposable stack only | NOT_RUN |
 
 ## J8 — Physical devices
 

@@ -5,7 +5,7 @@
   python3 scripts/owner_e2e_fixtures.py check                consistency of the manifest, the SQL seed and the case files (CI)
   python3 scripts/owner_e2e_fixtures.py render --out DIR     writes the PRIVATE credential files for the actors to provision
 
-`render` generates a fresh random password per actor into DIR/credentials.private.json and DIR/keycloak-users.json (mode 600, DIR mode 700).
+`render` generates a fresh random password per actor into DIR/credentials.private.json and DIR/partial-import.json (mode 600, DIR mode 700).
 DIR must be outside this repository and must not exist yet. Passwords are never printed or committed. Nothing here talks to Keycloak or a
 database: applying the files is an operator step on the isolated stack, or on the shared preview only with the owner's approval
 (docs/quality/owner-acceptance/fixtures.md).
@@ -93,7 +93,9 @@ def render(out):
             "firstName": a["username"], "lastName": "Synthetic",
             "credentials": [{"type": "password", "value": password, "temporary": False}],
         })
-    for name, payload in (("credentials.private.json", creds), ("keycloak-users.json", users)):
+    # Keycloak's partial import keeps the given user ids (a plain "create users" call does not), so the fixed ids in the SQL seed match.
+    partial = {"ifResourceExists": "SKIP", "users": users}
+    for name, payload in (("credentials.private.json", creds), ("partial-import.json", partial)):
         fd = os.open(out / name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
         with os.fdopen(fd, "w") as f:
             json.dump(payload, f, indent=1)

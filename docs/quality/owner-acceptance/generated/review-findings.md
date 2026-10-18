@@ -25,6 +25,7 @@ Original: 108 case headings (62 functional + 46 configuration/security), not the
 - docs/security/mfa-policy.md says preview-ops-* must stay password-only for the E2E suite, yet enabling and testing admin policy/reset requires an enrolled administrator; use a separate FX-STAFF-ADMIN-B rather than enrolling preview-ops-1
 - Original catalog has no case for: staff grant self-escalation and last-administrator protection (TC-043), high-risk step-up independent of MFA mode (BR-007), admin client least privilege, fixture-clean, rollback-plan, e2e-reset guard, security headers per host, Android device; all added
 - Unsafe suggestions corrected: any test that changes CUSTOMER or KITCHEN to REQUIRED, resets a live user's authenticator, or deletes mfa_policy rows is now isolated-only (mfa-policy.md step 5: do not set CUSTOMER/KITCHEN REQUIRED until mobile is device-verified); no case publishes the Keycloak admin console (CFG-001 asserts 404; administration only through SSH tunnel/kcadm-in-container)
+- Review round 2: CFG-034 vantage points corrected (a staff-only IP gets proxy 403 not backend 401), customer order table is customer_order (not orders) and idempotency_record (not idempotency), account route is #/account, CFG-016/104 split so shared-preview checks are refusal-only, and refs.scenarios now lists only end-to-end TCs (CFG-043 etc. moved to refs.partial)
 
 ### Dispositions of the original cases
 
@@ -45,7 +46,6 @@ Original: 108 case headings (62 functional + 46 configuration/security), not the
 | CFG-013 | merged_into:CFG-101 | Rows R7-R12 cover cross-role precedence |
 | CFG-014 | rewritten | Isolated-only; exact SQL and expected REQUIRED for kitchen accounts only |
 | CFG-015 | rewritten | Single-admin stale-version proof instead of requiring two admins; adds reason validation |
-| CFG-016 | rewritten | Authorization ladder using real fixtures including preview-ops-1 who lacks security.mfa_policy |
 | CFG-017 | merged_into:CFG-008 | Disable safety is steps 4-6 of CFG-008 |
 | CFG-018 | rewritten | Guard ladder with exact statuses and audit rows; 'Support' fixture marked PROVISION |
 | CFG-019 | rewritten | Authorized reset with exact result fields, audit sequence and live-credential caution |
@@ -76,6 +76,7 @@ Original: 108 case headings (62 functional + 46 configuration/security), not the
 | CFG-044 | rewritten | Product-side reboot drill; development-agent text dropped; BLOCKED on change window |
 | CFG-045 | rewritten | Concrete UI/log evidence; egress capture flagged as best-effort |
 | CFG-046 | rewritten | Mapped to the iOS device plan rows; Android split to CFG-112 |
+| CFG-016 | split_into:[CFG-016,CFG-122] | Refusal-only checks stay shareable on the preview; the authorized mutation moved to an isolated, destructive case with explicit restore |
 
 ## cook-ops
 
@@ -146,6 +147,7 @@ Original: 108 case headings (62 functional + 46 configuration/security), not the
 - Customer-visible Arabic currency/time formatting is produced by Intl (apps/customer-web/src/api.ts formatMoney/formatTime); exact glyph sequences depend on the browser ICU and are not asserted verbatim in the cases (listed under unverified).
 - Staff-only parts (zone fee, commerce policy, kitchen suspension) require recent MFA step-up and, for commerce-policy, a profile that allows synthetic policies (ConfigurationService.newPolicy: synthetic only in LOCAL/CI); on the PREVIEW profile a policy change would need an approvalReference, so TC-152 and the fee-change case are isolated-stack only.
 - E2E-DISC-005/E2E-DISC-104 need FX-COOK-B, FX-COOK-PENDING and FX-STAFF-OPS which the seed does not contain (only preview-cook-1 and an unreachable 'preview-cook-2 (no login)' row exist).
+- Traceability corrected after QA review: refs.scenarios now lists only TCs a case exercises end to end; all other related TCs moved to refs.partial. TC-044 was removed from BASKET-013, BASKET-030 and DISC-004 (stable placement key is not exercised there); TC-018 server rejection belongs to BASKET-021 (BASKET-010 only partial).
 
 ### Dispositions of the original cases
 
@@ -187,7 +189,7 @@ Original: 108 case headings (62 functional + 46 configuration/security), not the
 - Wrong mechanism, E2E-FIN-042 (line 480): 'same event key'. Cash reports use Idempotency-Key plus UNIQUE(order_id); the customer transfer report takes no key and is idempotent by state (PaymentService.reportTransfer).
 - Wrong role, E2E-ORDER-029 (line 332): Role 'Clock/system' is not an actor a tester can sign in as.
 - Impossible expectation on the deployed baseline, E2E-FIN-039 (line 451): 'no dispute false positive'. On origin/develop CashService compares the cook's report with order.total_minor and the cook UI pre-fills the order total, so a correct remainder report is flagged DISPUTED (discrepancy = -deposit). Fixed only in PR #9 (CashService.java diff, apps/operations-web/src/cook/Orders.tsx diff). Case marked needs_updated_deploy.
-- Fixture gap: FX-STAFF-ADMIN (preview-ops-1) is granted only staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone) and cannot grant itself (self-escalation refused); it cannot read orders or finance. Every ops/finance/support case needs PROVISIONED staff with explicit grants, and granting needs recent MFA.
+- Fixture gap: FX-STAFF-ADMIN (preview-ops-1) holds only staff.grant and audit.read and cannot self-grant; it cannot read orders or finance. Order, support and finance cases rely on FX-STAFF-OPS/FINANCE/SUPPORT from seed-owner-e2e.sql (grants listed in conventions.staff_fixture_note). FX-STAFF-ADMIN-B has no finance permission, so a second refund approver or FX-MULTIROLE finance.verify needs a temporary grant (requires recent MFA).
 - MFA gate: payment recipient approval, payment decision and handover override require a recent MFA proof (@staffAssurance.recentMfa); origin/develop's Keycloak realm has no OTP/acr flow, so these steps are not runnable there (PR #9 realm migration needed). The original catalog does not mention this prerequisite.
 - Cash verification has no UI: apps/operations-web/src/ops/Finance.tsx exposes statements, refunds, settlements and payment decisions but no screen for POST /api/v1/ops/finance/cash-reports/{reportId}/verification, so E2E-FIN-038/043 finance steps are API-only through a browser console.
 - Finance tab visibility: the ops UI probes GET /api/v1/ops/finance/statements and shows 'Finance' only when it answers 404 (finance.read, refund_approve or settlement); an account with finance.verify alone cannot reach the payment recipient/decision panels through the UI (App.tsx probe).

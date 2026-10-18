@@ -42,6 +42,23 @@ SECRET_PATTERNS = (
 )
 
 
+FORBIDDEN_KEYS = {"password", "passwd", "secret", "token", "access_token", "refresh_token", "id_token", "otp", "otp_seed", "totp_secret", "api_key", "client_secret", "cookie"}
+PASS_CLAIM = re.compile(r"(?i)\b(status|execution result|actual( result)?|observed|outcome|verdict)\b\s*[:=\-]+\s*\**pass(ed)?\b|\bpass(ed)?\s+on\s+\d{4}-")
+
+
+def walk_strings(node, path=""):
+    """Every key and string value of a parsed JSON document, with its path."""
+    if isinstance(node, dict):
+        for k, v in node.items():
+            yield path + "/" + k, "key", k
+            yield from walk_strings(v, path + "/" + k)
+    elif isinstance(node, list):
+        for i, v in enumerate(node):
+            yield from walk_strings(v, f"{path}[{i}]")
+    elif isinstance(node, str):
+        yield path, "value", node
+
+
 def load_json(path):
     with open(path, encoding="utf-8") as f:
         return json.load(f)
@@ -96,21 +113,27 @@ def validate(cases):
         if "database" not in exp:
             errors.append(f"{cid}: expected.database missing (use ['none'] when not applicable)")
         refs = c.get("refs", {})
-        if not (refs.get("scenarios") or refs.get("rules") or refs.get("decisions")):
+        if not (refs.get("scenarios") or refs.get("partial") or refs.get("rules") or refs.get("decisions")):
             errors.append(f"{cid}: no traceability (scenarios/rules/decisions)")
-        for tc in refs.get("scenarios", []):
+        for tc in refs.get("scenarios", []) + refs.get("partial", []):
             if tc not in scenarios:
                 errors.append(f"{cid}: unknown scenario {tc}")
         for br in refs.get("rules", []):
             if br not in rules:
                 errors.append(f"{cid}: unknown rule {br}")
         blob = json.dumps(c, ensure_ascii=False)
+        for where, kind, text in walk_strings(c):
+            if kind == "key" and text.lower() in FORBIDDEN_KEYS:
+                errors.append(f"{cid}: credential-bearing field {where}")
+            if kind == "value" and PASS_CLAIM.search(text):
+                errors.append(f"{cid}: claims a PASS result at {where} (results live in run records, not in the catalog)")
+            if kind == "value":
+                for p in SECRET_PATTERNS:
+                    if p.search(text):
+                        errors.append(f"{cid}: looks like a credential/secret/token at {where}")
         for b in BOILERPLATE:
             if b in blob:
                 errors.append(f"{cid}: generic boilerplate step '{b[:40]}...'")
-        for p in SECRET_PATTERNS:
-            if p.search(blob):
-                errors.append(f"{cid}: looks like a credential/secret/token ({p.pattern[:30]})")
         if re.search(r"\bPASS(ED)?\b", json.dumps({k: v for k, v in c.items() if k in ('status',)})):
             errors.append(f"{cid}: PASS in status")
     return errors, scenarios, rules
@@ -118,6 +141,14 @@ def validate(cases):
 
 def validate_suite(cases):
     errors, ids = [], {c["id"] for c in cases}
+    for name in ("core-suite.json", "coverage-notes.json", "fixtures.json"):
+        path = BASE / name
+        if path.exists():
+            for where, kind, text in walk_strings(load_json(path)):
+                if kind == "key" and text.lower() in FORBIDDEN_KEYS:
+                    errors.append(f"{name}: credential-bearing field {where}")
+                if kind == "value" and (PASS_CLAIM.search(text) or any(p.search(text) for p in SECRET_PATTERNS)):
+                    errors.append(f"{name}: PASS claim or credential-like text at {where}")
     suite_path = BASE / "core-suite.json"
     if not suite_path.exists():
         return ["core-suite.json missing"], None
@@ -184,10 +215,12 @@ def render_case(c):
 
 
 def build(cases, scenarios, rules, suite):
-    by_tc, by_br = defaultdict(list), defaultdict(list)
+    by_tc, by_br, by_partial = defaultdict(list), defaultdict(list), defaultdict(list)
     for c in cases:
         for tc in c["refs"].get("scenarios", []):
             by_tc[tc].append(c["id"])
+        for tc in c["refs"].get("partial", []):
+            by_partial[tc].append(c["id"])
         for br in c["refs"].get("rules", []):
             by_br[br].append(c["id"])
     notes_path = BASE / "coverage-notes.json"
@@ -216,11 +249,14 @@ def build(cases, scenarios, rules, suite):
     buckets = defaultdict(list)
     for c in cases:
         buckets[readiness_bucket(c)].append(c)
-    rd = ["# Readiness report", "", f"{len(cases)} cases. Counts by what the tester needs; a case appears in exactly one bucket (the most restrictive).", ""]
+    rd = ["# Readiness report", "", f"{len(cases)} cases. Counts by what the tester needs; a case appears in exactly one bucket (precedence: device, then updated deployment, then isolated stack, then fixtures), and every entry lists ALL its requirements.", ""]
     for b in sorted(BUCKET_TITLES):
         cs = buckets.get(b, [])
         rd += [f"## {BUCKET_TITLES[b]} — {len(cs)}", ""]
-        rd += [f"- {c['id']} ({c['priority']}) {c['title']}" + (f" — fixtures: {', '.join(c['readiness']['needs_fixtures'])}" if c['readiness']['needs_fixtures'] else "") for c in cs]
+        def needs(c):
+            r = c["readiness"]
+            return ", ".join(x for x, f in (("updated deploy", r["needs_updated_deploy"]), ("device", r["needs_device"]), ("isolated stack", r["needs_isolated_stack"])) if f)
+        rd += [f"- {c['id']} ({c['priority']}) {c['title']}" + (f" — needs: {needs(c)}" if needs(c) else "") + (f" — fixtures: {', '.join(c['readiness']['needs_fixtures'])}" if c['readiness']['needs_fixtures'] else "") for c in cs]
         rd.append("")
     files["readiness-report.md"] = "\n".join(rd)
     # traceability
@@ -233,12 +269,15 @@ def build(cases, scenarios, rules, suite):
         note = notes.get(tc)
         if cs:
             cov = "MANUAL"
+        elif by_partial.get(tc):
+            cov = "PARTIAL"
+            cs = by_partial[tc]
         elif note:
             cov = note["classification"]
         else:
             cov = "UNCOVERED"
             uncovered.append(tc)
-        reason = f" — {note['reason']}" if (not cs and note) else ""
+        reason = f" — {note['reason']}" if (cov not in ("MANUAL", "PARTIAL") and note) else (" — a relevant part is exercised; the full given/when/then is not" if cov == "PARTIAL" else "")
         tr.append(f"| {tc} | {s['level']} | {', '.join(s['rule_ids'])} | {md_escape(s['title'])} | {', '.join(cs) or '—'} | {cov}{md_escape(reason)} |")
     tr += ["", "## Business rules", "", "| BR | Domain | Owner cases |", "|---|---|---|"]
     rule_rows = {r["id"]: r for r in load_json(ROOT / "planning" / "rules.json")["rules"]}
@@ -266,6 +305,7 @@ def build(cases, scenarios, rules, suite):
         "by_readiness": {b: len(buckets.get(b, [])) for b in sorted(BUCKET_TITLES)},
         "scenarios_total": len(scenarios),
         "scenarios_manual": sum(1 for tc in scenarios if by_tc.get(tc)),
+        "scenarios_partial_only": sum(1 for tc in scenarios if not by_tc.get(tc) and by_partial.get(tc)),
         "scenarios_uncovered": uncovered,
         "case_to_scenarios": {c["id"]: c["refs"].get("scenarios", []) for c in cases},
     }

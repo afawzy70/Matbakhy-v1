@@ -6,7 +6,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** identity, deployment · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-001, TC-060, TC-140; rules: BR-001, BR-060; operations: deploy.sh smoke, deploy/web-preview/Caddyfile id. site block
+- **Traces to:** rules: BR-001, BR-060; operations: deploy.sh smoke, deploy/web-preview/Caddyfile id. site block; partial: TC-001, TC-060, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -30,7 +30,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, identity, api · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-001, TC-002, TC-109; rules: BR-001, BR-002; operations: getMe, POST /api/v1/auth/logout, GET /oauth2/authorization/keycloak
+- **Traces to:** rules: BR-001, BR-002; operations: getMe, POST /api/v1/auth/logout, GET /oauth2/authorization/keycloak; partial: TC-001, TC-002, TC-109
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -42,7 +42,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   3. (FX-CUST-A) Sign in as preview-customer-1 with the fixture-sheet password. Do NOT expect or enter an OTP — data: Normal sign-in must not ask for a second factor under the default OPTIONAL policy
   4. (FX-CUST-A) Browser DevTools console on the signed-in app origin, using the session cookie: `fetch('https://api.<PREVIEW_DOMAIN>/api/v1/me',{credentials:'include',method:'GET',headers:{'Content-Type':'application/json','X-XSRF-TOKEN':document.cookie.match(/XSRF-TOKEN=([^;]+)/)[1]}})` (the XSRF-TOKEN cookie is set for the parent domain and readable; the session cookie MATBAKHY_SESSION is HttpOnly) — data: GET /api/v1/me
   5. (FX-CUST-A) In the app click Sign out (calls POST /api/v1/auth/logout with the X-XSRF-TOKEN header)
-  6. (FX-CUST-A) Repeat GET /api/v1/me from the same tab, then press Browser Back and open https://app.<PREVIEW_DOMAIN>/account — data: Also inspect DevTools > Application > Cookies for MATBAKHY_SESSION
+  6. (FX-CUST-A) Repeat GET /api/v1/me from the same tab, then press Browser Back and open https://app.<PREVIEW_DOMAIN>/#/account (the web app uses hash routes) — data: Also inspect DevTools > Application > Cookies for MATBAKHY_SESSION
 - **Expected:**
   - UI: Sign-in page is on id.<PREVIEW_DOMAIN> in the matbakhy realm and Arabic by default (defaultLocale ar)
   - UI: After sign-in the app shows the customer as signed in; no OTP screen appeared
@@ -58,7 +58,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** identity, api, customer-web · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-001, TC-002; rules: BR-001, BR-002; operations: GET /oauth2/authorization/{registrationId}, GET /login/oauth2/code/{registrationId}
+- **Traces to:** rules: BR-001, BR-002; operations: GET /oauth2/authorization/{registrationId}, GET /login/oauth2/code/{registrationId}; partial: TC-002, TC-109
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -81,7 +81,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** api, identity · **Actors:** FX-CUST-A · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-001, TC-109; rules: BR-001; operations: getMe
+- **Traces to:** rules: BR-001; operations: getMe; partial: TC-001, TC-109
 - **Prerequisites:**
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
   - The API container is started with WEB_SESSION_TIMEOUT=2m (default is 30m, application.yaml server.servlet.session.timeout) so the idle test is minutes, not half an hour
@@ -103,7 +103,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api, operations-web, customer-web · **Actors:** FX-GUEST, FX-CUST-A, FX-COOK-A, FX-STAFF-NOGRANT
-- **Traces to:** scenarios: TC-001, TC-006, TC-007; rules: BR-001, BR-006, BR-007; operations: getOpsStaff, getOpsSecurityMfaPolicy
+- **Traces to:** rules: BR-001, BR-006, BR-007; operations: getOpsStaff, getOpsSecurityMfaPolicy; partial: TC-001, TC-006, TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -128,7 +128,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api · **Actors:** FX-CUST-A, FX-CUST-B
-- **Traces to:** scenarios: TC-001, TC-006; rules: BR-001, BR-006; operations: getMe
+- **Traces to:** rules: BR-001, BR-006; operations: getMe; partial: TC-006
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -147,24 +147,25 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Also covered by automated tests:** customer-web unit tests (apps/customer-web/src)
 - **Unverified against code (confirm while executing):** Whether any basket state is intentionally kept in browser storage across accounts in the web app was not confirmed; if it is, record it as a defect against BR-006
 
-### CFG-101 — MFA decision table: effective mode, required and available for every category combination, user preference and missing row (replaces CFG-007, 009, 010, 012-matrix, 013)
+### CFG-101 — MFA decision table (ISOLATED STACK ONLY): effective mode, required and available for every category combination, user preference and missing row (replaces CFG-007, 009, 010, 012-matrix, 013)
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, customer-web, operations-web · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-A, FX-COOK-A, FX-STAFF-SUPPORT, FX-MULTIROLE · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-MULTIROLE
-- **Traces to:** scenarios: TC-001, TC-007, TC-042; rules: BR-001, BR-007, BR-042; decisions: D18; operations: getMeSecurity, putOpsSecurityMfaPolicyByCategory, getOpsSecurityMfaPolicy, patchMe
+- **Traces to:** rules: BR-001, BR-007, BR-042; decisions: D18; operations: getMeSecurity, putOpsSecurityMfaPolicyByCategory, getOpsSecurityMfaPolicy, patchMe; partial: TC-007
 - **Prerequisites:**
+  - ISOLATED STACK ONLY (needs_isolated_stack): every row changes policy for all users of a category and R13 deletes a policy row; never run on the shared preview
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - Four account shapes exist on the isolated stack: customer-only (FX-CUST-A: category CUSTOMER), cook (FX-COOK-A owns an approved kitchen: CUSTOMER+KITCHEN), staff (FX-STAFF-SUPPORT holds any active grant, no kitchen: CUSTOMER+STAFF), multi-role (FX-MULTIROLE: kitchen + active grant: all three). Every account is always in CUSTOMER (MfaPolicyService.decide)
   - Reset all policies first: three PUTs setting CUSTOMER, KITCHEN, STAFF to OPTIONAL and every fixture preference off (PUT /api/v1/me/security/mfa {"enabled":false})
 - **Steps:**
   1. (FX-STAFF-ADMIN-B) For each row of the table in `data` run the policy PUTs listed in the row, in order (GET /api/v1/ops/security/mfa-policy first for the versions). Each PUT needs an MFA-asserted session (step-up at https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://app.<PREVIEW_DOMAIN>/, ops host variant https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://ops.<PREVIEW_DOMAIN>/) — data: Row notation: C/K/S = CUSTOMER/KITCHEN/STAFF mode (D=DISABLED, O=OPTIONAL, R=REQUIRED); pref = the account's own preference; effective = most protective applicable mode (R>O>D)
   2. (FX-CUST-A) For the account shape in the row, set its preference as the row says (turning ON needs a step-up session; row with pref=on under D cannot be set via UI, so set the preference BEFORE switching the category to D), then GET /api/v1/me/security as that account — data: Compare JSON fields effectiveMode, enabled, required, available, categories, policy
   3. (FX-CUST-A) Rows marked 'enforce' additionally: with a level-1 (password-only) session call PATCH /api/v1/me body {"displayName":"E2E","expectedVersion":<current>}, then GET /api/v1/me — data: Profile write is protected, profile read is open
-  4. (FX-STAFF-ADMIN-B) Missing-row row only (run LAST, isolated DB): `DELETE FROM mfa_policy WHERE category='KITCHEN'` via psql, then repeat step 2 for FX-COOK-A and FX-CUST-A; afterwards restore with `INSERT INTO mfa_policy(category,mode) VALUES('KITCHEN','OPTIONAL')` — data: Fail-safe rule: a missing row counts as REQUIRED for categories the account belongs to
+  4. (FX-STAFF-ADMIN-B) Missing-row row only (run LAST, isolated DB): FIRST restore CUSTOMER, KITCHEN and STAFF to OPTIONAL (three PUTs) and set every fixture preference off (PUT /api/v1/me/security/mfa {"enabled":false} per account), because R12 left CUSTOMER=DISABLED. THEN `DELETE FROM mfa_policy WHERE category='KITCHEN'` via psql, repeat step 2 for FX-COOK-A and FX-CUST-A; afterwards restore with `INSERT INTO mfa_policy(category,mode) VALUES('KITCHEN','OPTIONAL')` — data: Fail-safe rule: a missing row counts as REQUIRED for categories the account belongs to
 - **Expected:**
   - UI: Customer web Account > Security and ops web Security tab labels follow `mode` : DISABLED='Not available', OPTIONAL='Optional', REQUIRED='Required'; when required=true and no MFA in session the text 'Two-step verification has not been completed in this session.' and the 'Complete two-step verification' link show; when available=false the text 'Two-step verification is not available for your account right now.' shows and there is no 'Turn on' button; when effective=REQUIRED the 'Turn off' button is absent/refused and 'required for your account and cannot be turned off' shows
   - API: TABLE (account | C K S | pref | => effectiveMode, enabled, required, available):
@@ -180,7 +181,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - API: R10 staff | D D R | off | REQUIRED, false, true, true
   - API: R11 multi-role | D D D | on | DISABLED, true, false, false
   - API: R12 multi-role | D D R | off | REQUIRED, false, true, true
-  - API: R13 missing KITCHEN row: cook => REQUIRED, required=true, available=true; customer-only unaffected (OPTIONAL, required=false)
+  - API: R13 (after resetting all three categories to OPTIONAL and all preferences off) missing KITCHEN row: cook => REQUIRED, required=true, available=true; customer-only => OPTIONAL, required=false (KITCHEN does not apply to it)
   - API: In every row `categories` lists exactly the account's applicable categories (customer-only: [CUSTOMER]; cook: [CUSTOMER, KITCHEN]; staff: [CUSTOMER, STAFF]; multi-role: all three) and `policy` maps only those
   - API: Recomputed on every request: after each PUT the next GET shows the new values without re-login
   - DB: Read-only: `SELECT category, mode, version FROM mfa_policy ORDER BY category` matches the row after each PUT; version increases by 1 per successful PUT
@@ -192,7 +193,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** customer-web, identity, api · **Actors:** FX-CUST-A, FX-CUST-NEW · **Needs:** updated deploy
-- **Traces to:** scenarios: TC-001, TC-002; rules: BR-001, BR-002, BR-007; decisions: D18; operations: getMeSecurity, GET /oauth2/authorization/keycloak?stepUp=true
+- **Traces to:** rules: BR-001, BR-002, BR-007; decisions: D18; operations: getMeSecurity, GET /oauth2/authorization/keycloak?stepUp=true; partial: TC-109
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -222,7 +223,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** customer-web, api, identity · **Actors:** FX-CUST-A · **Needs:** updated deploy
-- **Traces to:** scenarios: TC-001, TC-002; rules: BR-001, BR-002; decisions: D18; operations: putMeSecurityMfa, getMeSecurity
+- **Traces to:** rules: BR-001, BR-002; decisions: D18; operations: putMeSecurityMfa, getMeSecurity; partial: TC-002
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -258,12 +259,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, customer-web, operations-web · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-A, FX-COOK-A · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-001, TC-007, TC-042; rules: BR-001, BR-007, BR-042; decisions: D18; operations: putOpsSecurityMfaPolicyByCategory, putMeSecurityMfa, patchMe
+- **Traces to:** rules: BR-001, BR-007, BR-042; decisions: D18; operations: putOpsSecurityMfaPolicyByCategory, putMeSecurityMfa, patchMe; partial: TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - Policies are all OPTIONAL and all preferences off before starting; FX-CUST-A and FX-COOK-A are enrolled (CFG-102) so they can pass the step-up
   - Do not run on the shared preview: mfa-policy.md step 5 says REQUIRED starts with STAFF and CUSTOMER/KITCHEN must not be REQUIRED until the mobile app is verified (this case sets CUSTOMER and KITCHEN to REQUIRED on the isolated stack only)
 - **Steps:**
@@ -289,12 +290,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, customer-web, operations-web, identity · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-A, FX-CUST-NEW · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-CUST-NEW
-- **Traces to:** scenarios: TC-001, TC-007; rules: BR-001, BR-007; decisions: D18; operations: putMeSecurityMfa, putOpsSecurityMfaPolicyByCategory
+- **Traces to:** rules: BR-001, BR-007; decisions: D18; operations: putMeSecurityMfa, putOpsSecurityMfaPolicyByCategory; partial: TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - FX-CUST-A is enrolled with preference ON (CFG-008 step 2) before the category is changed
   - FX-STAFF-SUPPORT holds support.case
 - **Steps:**
@@ -319,7 +320,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api · **Actors:** FX-CUST-A, FX-COOK-A · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-001; rules: BR-001; decisions: D18; operations: getMeSecurity
+- **Traces to:** rules: BR-001; decisions: D18; operations: getMeSecurity; partial: TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -345,12 +346,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN-B · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-042; rules: BR-042; decisions: D18; operations: putOpsSecurityMfaPolicyByCategory
+- **Traces to:** rules: BR-042; decisions: D18; operations: putOpsSecurityMfaPolicyByCategory; partial: TC-042
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
 - **Steps:**
   1. (FX-STAFF-ADMIN-B) After step-up: GET /api/v1/ops/security/mfa-policy, note STAFF.version = v
   2. (FX-STAFF-ADMIN-B) PUT /api/v1/ops/security/mfa-policy/STAFF {"mode":"OPTIONAL","expectedVersion":v,"reason":"E2E first"}
@@ -367,31 +368,31 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Also covered by automated tests:** MfaPolicyIntegrationTest.only_the_policy_permission_with_a_recent_second_factor_can_change_a_policy
 - **Unverified against code (confirm while executing):** Original CFG-015 assumed two admins (Admin A/B) racing; one admin issuing the same stale version proves the same rule deterministically. Real concurrency is not needed
 
-### CFG-016 — Policy mutation authorization ladder: guest, customer, ungranted staff, granted staff without recent MFA, and read vs write
+### CFG-016 — Policy mutation authorization ladder (refusals only): guest, customer, ungranted staff, bootstrap admin, and granted staff without recent MFA; no state change
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, operations-web · **Actors:** FX-GUEST, FX-CUST-A, FX-STAFF-NOGRANT, FX-STAFF-ADMIN, FX-STAFF-ADMIN-B · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-001, TC-007, TC-043; rules: BR-001, BR-007, BR-043; decisions: D18; operations: getOpsSecurityMfaPolicy, putOpsSecurityMfaPolicyByCategory
+- **Traces to:** rules: BR-001, BR-007, BR-043; decisions: D18; operations: getOpsSecurityMfaPolicy, putOpsSecurityMfaPolicyByCategory; partial: TC-007, TC-043
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
-  - Use a copy of the policy states in the isolated stack or restore after step 5; requests below use mode OPTIONAL so nothing weakens even if they succeed unexpectedly
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
+  - Every PUT in this case is expected to be REFUSED; if any returns 2xx the case FAILS and the policy must be restored from the version/mode read in step 1 (GET /api/v1/ops/security/mfa-policy). Safe on the shared preview only because nothing is expected to change
 - **Steps:**
-  1. (FX-GUEST) curl -s -w ' %{http_code}\n' -X PUT -H 'Content-Type: application/json' -d '{"mode":"OPTIONAL","expectedVersion":0,"reason":"E2E guest"}' https://api.<PREVIEW_DOMAIN>/api/v1/ops/security/mfa-policy/STAFF — data: No credentials, no CSRF
+  1. (FX-GUEST) curl -s -w ' %{http_code}\n' -X PUT -H 'Content-Type: application/json' -d '{"mode":"OPTIONAL","expectedVersion":0,"reason":"E2E guest"}' https://api.<PREVIEW_DOMAIN>/api/v1/ops/security/mfa-policy/STAFF — data: Body mode value equals the current STAFF mode read beforehand; no CSRF, no credentials
   2. (FX-CUST-A) Same PUT from a customer session (use the console with X-XSRF-TOKEN)
   3. (FX-STAFF-NOGRANT) Same PUT from preview-ops-2 (no grants); also GET /api/v1/ops/security/mfa-policy
   4. (FX-STAFF-ADMIN) Same PUT and GET as preview-ops-1 (holds staff.grant, audit.read only) — data: The bootstrap admin does NOT hold security.mfa_policy
-  5. (FX-STAFF-ADMIN-B) GET /api/v1/ops/security/mfa-policy with a password-only session; then the PUT with a password-only session; then the PUT after step-up — data: Read needs the permission only; write also needs recent MFA
+  5. (FX-STAFF-ADMIN-B) With a PASSWORD-ONLY session: GET /api/v1/ops/security/mfa-policy (record all modes and versions), then PUT /api/v1/ops/security/mfa-policy/STAFF with the CURRENT mode and current expectedVersion — data: Read needs the permission only; write needs recent MFA, so this PUT must be refused
 - **Expected:**
   - UI: Ops web: only accounts holding security.mfa_policy or security.mfa_reset see the Security > policy controls (App.tsx adds the tab for those flags)
   - API: Guest: 401 (or 403 on missing CSRF token before authentication; record which)
   - API: Customer, NOGRANT, preview-ops-1: 403 FORBIDDEN
-  - API: FX-STAFF-ADMIN-B password-only: GET 200; PUT 403 STEP_UP_REQUIRED; PUT after step-up 200
+  - API: FX-STAFF-ADMIN-B password-only: GET 200; PUT 403 STEP_UP_REQUIRED
   - API: GET /api/v1/me/security canManagePolicy is true only for ADMIN-B
-  - DB: Read-only: mfa_policy unchanged for steps 1-4 (compare version)
+  - DB: Read-only: mfa_policy rows (mode, version) identical before and after; no new mfa.policy.update audit_event row
 - **Also covered by automated tests:** MfaPolicyIntegrationTest.only_the_policy_permission_with_a_recent_second_factor_can_change_a_policy; MfaPolicyIntegrationTest.enforcement_and_settings_are_for_signed_in_accounts_only; MfaPolicyIntegrationTest.the_settings_report_which_security_administration_the_account_may_do
 - **Unverified against code (confirm while executing):** Guest PUT order of CSRF vs authentication rejection not confirmed
 
@@ -400,11 +401,11 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, operations-web · **Actors:** FX-STAFF-SUPPORT, FX-STAFF-ADMIN-B, FX-CUST-B · **Needs:** updated deploy, isolated stack
 - **Fixtures to provision:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
-- **Traces to:** scenarios: TC-007, TC-043; rules: BR-007, BR-043; decisions: D18; operations: postOpsAccountsMfaReset
+- **Traces to:** rules: BR-007, BR-043; decisions: D18; operations: postOpsAccountsMfaReset; partial: TC-007, TC-043
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)
   - FX-CUST-B account id known (SELECT id FROM app_user WHERE subject=... on the isolated DB, or from the ops web account search)
 - **Steps:**
@@ -430,12 +431,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, operations-web, identity, customer-web · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-B · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-007, TC-043; rules: BR-007; decisions: D18; operations: postOpsAccountsMfaReset
+- **Traces to:** rules: BR-007; decisions: D18; operations: postOpsAccountsMfaReset; partial: TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - Live realm migrated (owner-gated): on the server `./migrate-mfa.sh status` prints flows=complete, browserFlow=matbakhy browser and client.matbakhy-admin=present (NOT true on the live realm today: migration has never been run there)
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)
   - FX-CUST-B enrolled an authenticator (CFG-102 for preview-customer-2) and has preference ON; FX-CUST-B is signed in in a separate browser window WB with an MFA session
   - This changes the live Keycloak credential of FX-CUST-B: run on FX-ISOLATED first; on the shared preview only after the owner agrees FX-CUST-B may lose its authenticator
@@ -462,12 +463,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, identity · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-B · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-007; rules: BR-007; decisions: D18; operations: postOpsAccountsMfaReset
+- **Traces to:** rules: BR-007; decisions: D18; operations: postOpsAccountsMfaReset; partial: TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)
   - Operator can stop/start the identity container of the ISOLATED stack
 - **Steps:**
@@ -487,12 +488,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, identity · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-B · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-007; rules: BR-007; decisions: D18; operations: postOpsAccountsMfaReset, patchMe
+- **Traces to:** rules: BR-007; decisions: D18; operations: postOpsAccountsMfaReset, patchMe; partial: TC-007
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - Live realm migrated (owner-gated): on the server `./migrate-mfa.sh status` prints flows=complete, browserFlow=matbakhy browser and client.matbakhy-admin=present (NOT true on the live realm today: migration has never been run there)
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)
   - FX-CUST-B has preference ON and an enrolled authenticator; a mobile or scripted client holds an access token issued before the reset (web sessions are ended by the reset, so only the isolated stack with a bearer harness or the iPhone can show the token case: see CFG-109)
 - **Steps:**
@@ -513,7 +514,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity · **Actors:** FX-CUST-A · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-054; rules: BR-054; decisions: D18; operations: GET /oauth2/authorization/keycloak?stepUp=true
+- **Traces to:** rules: BR-054; decisions: D18; operations: GET /oauth2/authorization/keycloak?stepUp=true; partial: TC-054
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Live realm migrated (owner-gated): on the server `./migrate-mfa.sh status` prints flows=complete, browserFlow=matbakhy browser and client.matbakhy-admin=present (NOT true on the live realm today: migration has never been run there)
@@ -536,12 +537,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-A · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-060; rules: BR-060; decisions: D18; operations: postOpsAccountsMfaReset, putMeSecurityMfa
+- **Traces to:** rules: BR-060; decisions: D18; operations: postOpsAccountsMfaReset, putMeSecurityMfa; partial: TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - Isolated API started with OIDC_ADMIN_CLIENT_SECRET blank (compose env override), nothing else changed
 - **Steps:**
   1. (FX-STAFF-ADMIN-B) After step-up: POST /api/v1/ops/accounts/<FX-CUST-A id>/mfa-reset {"reason":"E2E no secret"}
@@ -555,35 +556,36 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - DB: Read-only: no mfa.reset.attempt and no user_mfa_reset row for FX-CUST-A (the guard runs before the attempt is audited)
 - **Also covered by automated tests:** MfaPolicyIntegrationTest (reset guards); MfaResetAuditIntegrationTest
 
-### CFG-104 — Staff high-risk actions require recent MFA regardless of policy mode; password-only preview-ops accounts are refused
+### CFG-104 — Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts)
 
-- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
-- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN
-- **Traces to:** scenarios: TC-007, TC-043, TC-111; rules: BR-007, BR-043; operations: postOpsStaffGrants, getOpsStaff
+- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
+- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT · **Needs:** isolated stack · **Destructive**
+- **Fixtures to provision:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT
+- **Traces to:** rules: BR-007, BR-043; operations: postOpsStaffGrants, getOpsStaff; partial: TC-007, TC-111
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
-  - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
-  - Runs on the CURRENT deployed baseline for the refusal half (StaffAssurance exists on origin/develop); the 'allowed after step-up' half needs the realm migration
-  - Allow-listed for ops.<PREVIEW_DOMAIN>
+  - ISOLATED STACK ONLY: uses separate synthetic staff accounts (fixtures.md), NOT the password-only preview-ops-* accounts, and changes grants. FX-STAFF-ADMIN-B holds staff.grant and has an enrolled authenticator; FX-STAFF-SUPPORT has no support.case grant yet
+  - FX-ISOLATED exists and `./migrate-mfa.sh status` there prints flows=complete (the step-up half needs the migrated realm; the refusal half works on any build with StaffAssurance)
 - **Steps:**
-  1. (FX-STAFF-ADMIN) Sign in at https://ops.<PREVIEW_DOMAIN>/ as preview-ops-1 (password only). Open the Staff tab — data: Lists staff accounts (getOpsStaff)
-  2. (FX-STAFF-ADMIN) POST /api/v1/ops/staff/<preview-ops-2 account id>/grants body {"permission":"support.case","reason":"E2E grant probe"} with the password-only session — data: Body fields per GrantService.grant(permission, expiresAt, reason): confirm names in contracts/openapi.yaml postOpsStaffGrants first
-  3. (FX-STAFF-ADMIN) After migration only: open https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://ops.<PREVIEW_DOMAIN>/, authenticate with the enrolled TOTP, repeat step 2 — data: Revoke the probe grant afterwards with POST /api/v1/ops/staff/<id>/grant-revocations
+  1. (FX-STAFF-ADMIN-B) Sign in at ops.<PREVIEW_DOMAIN> password-only; open the Staff tab
+  2. (FX-STAFF-ADMIN-B) POST /api/v1/ops/staff/<FX-STAFF-SUPPORT account id>/grants {"permission":"support.case","reason":"E2E grant probe"} with the password-only session — data: Confirm body field names in contracts/openapi.yaml postOpsStaffGrants first
+  3. (FX-STAFF-ADMIN-B) Open https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://ops.<PREVIEW_DOMAIN>/, enter the TOTP, repeat step 2
+  4. (FX-STAFF-ADMIN-B) Cleanup: POST /api/v1/ops/staff/<FX-STAFF-SUPPORT id>/grant-revocations for the new grant, then GET /api/v1/ops/staff — data: Grant must show revoked; restore FX-STAFF-SUPPORT to its fixture state
 - **Expected:**
   - UI: Ops web shows 'This action needs additional verification (MFA).' with a step-up link /oauth2/authorization/keycloak?stepUp=true&returnTo=... for the refused action
   - API: Step 2: 403 STEP_UP_REQUIRED (token has no acr/amr MFA evidence or auth_time older than OIDC_STEP_UP_MAX_AGE)
   - API: Step 3: 201/200 with the new grant
   - API: GET /api/v1/ops/staff still 200 without MFA
-  - DB: Read-only: no user_grant row for preview-ops-2 after step 2; one active row after step 3 and an audit_event staff.grant ALLOWED
+  - DB: Read-only: no user_grant row for FX-STAFF-SUPPORT after step 2; one active support.case row after step 3 (audit_event staff.grant ALLOWED); revoked_at set after step 4 (audit_event staff.revoke ALLOWED)
 - **Also covered by automated tests:** StaffAssuranceTest; StaffAccessIntegrationTest
-- **Unverified against code (confirm while executing):** Request body field names for postOpsStaffGrants (permission, reason, expiresAt) taken from GrantService signature, schema not read; confirm in contracts/openapi.yaml before running; Step 3 changes preview-ops-2's grants (a fixture other cases rely on being grant-free): revoke it immediately
+- **Unverified against code (confirm while executing):** Request body field names for postOpsStaffGrants (permission, reason, expiresAt) taken from GrantService signature, schema not read; confirm in contracts/openapi.yaml before running
 
 ### CFG-105 — Staff grants: no self-escalation, no duplicate active grant, last staff.grant holder cannot be revoked
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Isolated disposable stack only
 - **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN, FX-STAFF-ADMIN-B · **Needs:** isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-007, TC-043, TC-126; rules: BR-007, BR-043; operations: postOpsStaffGrants, postOpsStaffGrantRevocations
+- **Traces to:** scenarios: TC-043; rules: BR-007, BR-043; operations: postOpsStaffGrants, postOpsStaffGrantRevocations; partial: TC-007, TC-126
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -604,24 +606,23 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Also covered by automated tests:** StaffAccessIntegrationTest; StaffAssuranceTest
 - **Unverified against code (confirm while executing):** Request body field names (grantId) not confirmed in the OpenAPI schema; read postOpsStaffGrantRevocations before running
 
-### CFG-106 — Operator runbook: provision the staff and cook fixtures the MFA cases need (grants for FX-STAFF-ADMIN-B, SUPPORT, OPS, FINANCE, MULTIROLE)
+### CFG-106 — Operator reference: staff and cook fixtures needed by the MFA cases are provisioned as in fixtures.md and carry the intended grants
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, deployment · **Actors:** FX-STAFF-ADMIN · **Needs:** updated deploy, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE, FX-MULTIROLE
-- **Traces to:** scenarios: TC-007, TC-126; rules: BR-007; operations: postOpsStaffGrants, getMeSecurity
+- **Traces to:** rules: BR-007; operations: postOpsStaffGrants, getMeSecurity
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
-  - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
-  - Keycloak users for the new fixtures exist in the isolated realm (kcadm create users, passwords in the private fixture sheet); each has signed in once so an application account exists
+  - FX-ISOLATED exists (see CFG-101 prerequisites); provisioning itself is described only in docs/quality/owner-acceptance/fixtures.md (Keycloak user ids are not preserved by `kcadm create users`; do not rely on fixed ids)
 - **Steps:**
-  1. (FX-STAFF-ADMIN) Step-up as preview-ops-1; for each new account id POST /api/v1/ops/staff/<id>/grants with: ADMIN-B => security.mfa_policy, security.mfa_reset, staff.grant; SUPPORT => support.case; OPS => order.ops, cook.review; FINANCE => finance.read, finance.verify; MULTIROLE => cook.review plus an approved kitchen (use the e2e fixture cook_approved_with_kitchen.sql through e2e-fixture.sh only on an isolated stack) — data: Permission codes are the Permission enum values in V31
-  2. (FX-STAFF-ADMIN-B) Enrol an authenticator for ADMIN-B (CFG-102) and call GET /api/v1/me/security — data: canManagePolicy and canResetMfa must be true
-  3. (FX-STAFF-ADMIN) GET /api/v1/ops/staff to list grants
+  1. (FX-STAFF-ADMIN) Provision FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE and FX-MULTIROLE exactly as docs/quality/owner-acceptance/fixtures.md says — data: No provisioning commands are duplicated here
+  2. (FX-STAFF-ADMIN-B) After enrolling an authenticator (CFG-102) call GET /api/v1/me/security — data: canManagePolicy and canResetMfa must be true
+  3. (FX-STAFF-ADMIN) GET /api/v1/ops/staff to list grants — data: Compare with the grant list in fixtures.md
 - **Expected:**
   - UI: Ops web Staff tab shows each account with the granted permissions
-  - API: Each grant POST succeeds; duplicate attempts 409
   - API: ADMIN-B settings report canManagePolicy=true, canResetMfa=true
+  - API: Staff list shows exactly the grants fixtures.md lists for each fixture
   - DB: Read-only: `SELECT user_id, permission FROM user_grant WHERE revoked_at IS NULL` lists exactly the intended rows
 - **Also covered by automated tests:** deploy/web-preview/e2e-fixtures (SQL fixtures for cook/staff grants); scripts/test_e2e_fixtures.py
 - **Unverified against code (confirm while executing):** Permission code strings finance.verify, order.ops, cook.review taken from the V31 CHECK list; role semantics per docs/product/06-permissions.md not re-read
@@ -630,7 +631,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile, identity, api · **Actors:** FX-CUST-A, FX-DEVICE-IOS · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-048, TC-052, TC-131; rules: BR-048, BR-052; decisions: D18; operations: putMeSecurityMfa, POST /api/v1/orders
+- **Traces to:** rules: BR-048, BR-052; decisions: D18; operations: putMeSecurityMfa, POST /api/v1/orders; partial: TC-048, TC-052, TC-131
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -645,14 +646,14 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   4. (FX-DEVICE-IOS) Observe the step-up banner; do NOT tap anything for 10 seconds; check that no order exists (web Orders list) — data: The refused placement must not be re-sent automatically
   5. (FX-DEVICE-IOS) Tap the banner 'Verify'; in the system browser sheet enter the password (prompt=login) and the OTP; return to the app — data: acr_values=mfa 2 is sent by the app
   6. (FX-DEVICE-IOS) Pull to refresh; verify basket and account are unchanged; tap the explicit retry/place-order again exactly once — data: Same pending placement
-  7. (FX-CUST-A) Count orders on the web Orders list and in the DB (isolated) / read-only SQL: `SELECT count(*) FROM orders WHERE customer_id=<A> AND created_at > <test start>`
+  7. (FX-CUST-A) Count orders on the web Orders list and in the DB (isolated) / read-only SQL: `SELECT count(*) FROM customer_order WHERE customer_id=<A> AND created_at > <test start>`
 - **Expected:**
   - UI: Banner testID step-up-banner with a Verify button appears after the refused call and disappears after verification
   - UI: Basket and account unchanged after return; screens work after pull-to-refresh
   - API: Refused placement: 403 STEP_UP_REQUIRED, no order created
   - API: After verification the explicit retry returns 201 (or the idempotent replay of the same Idempotency-Key); exactly one order in total
   - API: Tokens replaced for the same subject (GET /api/v1/me returns the same account id)
-  - DB: Read-only: exactly one orders row created after the test start for the customer; `idempotency` record for the key has one entry (table name per db/migration; confirm)
+  - DB: Read-only: exactly one customer_order row created after the test start for the customer; idempotency_record has one row for (actor_id, idempotency_key) of the placement (V1__baseline_identity_and_idempotency.sql)
 - **Also covered by automated tests:** apps/customer-mobile/src/signIn.test.ts, auth.test.ts, App.test.tsx (jest: params, banner, cancel, other 403s); native CI builds (no MFA journey)
 - **Unverified against code (confirm while executing):** mfa-policy.md states no physical-device or simulator MFA run exists: this case is the first real evidence; Commit 89ec820 says a refused placement is re-sent only by explicit retry: confirm the visible control name on device
 
@@ -660,7 +661,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile, identity · **Actors:** FX-CUST-A, FX-CUST-B, FX-DEVICE-IOS · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-048, TC-052; rules: BR-048, BR-006; decisions: D18; operations: getMe
+- **Traces to:** scenarios: TC-048; rules: BR-048, BR-006; decisions: D18; operations: getMe; partial: TC-052, TC-131
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -686,7 +687,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile, identity · **Actors:** FX-CUST-A, FX-DEVICE-IOS · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-048, TC-052; rules: BR-048; operations: getMe, POST /api/v1/orders
+- **Traces to:** rules: BR-048; operations: getMe, POST /api/v1/orders; partial: TC-048, TC-052
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -703,7 +704,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - UI: No endless spinner; signed-in state restored from Keychain after kill; cancel returns to the app signed out without a crash
   - API: Refresh works without a new login after 5 minutes
   - API: Exactly one order after the airplane-mode submit
-  - DB: Read-only: exactly one orders row for the attempted placement
+  - DB: Read-only: exactly one customer_order row for the attempted placement
 - **Also covered by automated tests:** apps/customer-mobile/src/placement.ts tests (stored placement with fixed idempotency key)
 - **Unverified against code (confirm while executing):** Device plan rows B2/B3/B6/B7 are owned by the mobile domain author too; keep only one execution record
 
@@ -711,7 +712,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-CUST-A, FX-DEVICE-IOS · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-048, TC-052; rules: BR-048; decisions: D18; operations: getMeSecurity
+- **Traces to:** rules: BR-048; decisions: D18; operations: getMeSecurity; partial: TC-048, TC-052
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -736,7 +737,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** BLOCKED — Requires an isolated stack reachable from a physical iPhone over TLS; no such environment is defined in the repository · **Priority:** P0 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile, api, operations-web · **Actors:** FX-CUST-A, FX-STAFF-ADMIN-B, FX-DEVICE-IOS · **Needs:** updated deploy, physical device, isolated stack · **Destructive**
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-048, TC-052, TC-042; rules: BR-048, BR-042; decisions: D18; operations: postOpsAccountsMfaReset, putOpsSecurityMfaPolicyByCategory
+- **Traces to:** rules: BR-048, BR-042; decisions: D18; operations: postOpsAccountsMfaReset, putOpsSecurityMfaPolicyByCategory; partial: TC-048, TC-052
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -744,7 +745,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - TestFlight/Preview build installed on FX-DEVICE-IOS (physical iPhone) and the mobile OIDC client registered (docs/mobile/ios-testflight-beta.md step 'register the mobile client'; `VERIFY_MOBILE=1 ./migrate-mfa.sh verify` no longer SKIPs mobile checks). These documents (ios-beta-device-test-plan.md, ios-testflight-beta.md) exist on branch beta/ios-testflight-prep, NOT on PR #9 or develop
   - Preview allow-list decision made so the phone's network is inside CUSTOMER_ALLOWED_IPS (device test plan expects no 403 'Not available')
   - Customer web (app.<D>) and the phone use the same synthetic customer FX-CUST-A, preference currently off
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
   - Preferred: FX-ISOLATED exists (CUSTOMER=REQUIRED must not be set on the shared preview before the mobile app is device-verified, mfa-policy.md step 5): a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
 - **Steps:**
   1. (FX-DEVICE-IOS) Phone signed in as A with an MFA session (after CFG-024); screens work
@@ -765,7 +766,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack
-- **Traces to:** scenarios: TC-060, TC-140; rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh status
+- **Traces to:** rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh status; partial: TC-060, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -787,7 +788,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-057, TC-060, TC-140; rules: BR-057, BR-060; decisions: D18; operations: ./migrate-mfa.sh apply, ./migrate-mfa.sh verify
+- **Traces to:** rules: BR-057, BR-060; decisions: D18; operations: ./migrate-mfa.sh apply, ./migrate-mfa.sh verify; partial: TC-057, TC-060, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -815,7 +816,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-060; rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh apply
+- **Traces to:** rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh apply; partial: TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -837,7 +838,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, api, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-001, TC-002, TC-060; rules: BR-001, BR-002; decisions: D18; operations: ./migrate-mfa.sh verify
+- **Traces to:** rules: BR-001, BR-002; decisions: D18; operations: ./migrate-mfa.sh verify; partial: TC-002, TC-109
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -862,7 +863,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-060; rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh rollback
+- **Traces to:** rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh rollback; partial: TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -888,7 +889,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-060, TC-057; rules: BR-057, BR-060; decisions: D18; operations: ./migrate-mfa.sh apply
+- **Traces to:** rules: BR-057, BR-060; decisions: D18; operations: ./migrate-mfa.sh apply; partial: TC-060, TC-057
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -912,12 +913,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
 - **Surface:** api, identity, customer-web, operations-web · **Actors:** FX-STAFF-ADMIN-B, FX-CUST-A, FX-COOK-A, FX-STAFF-ADMIN · **Needs:** updated deploy
 - **Fixtures to provision:** FX-STAFF-ADMIN-B
-- **Traces to:** scenarios: TC-001, TC-042; rules: BR-042; decisions: D18; operations: getOpsSecurityMfaPolicy, getMeSecurity
+- **Traces to:** rules: BR-042; decisions: D18; operations: getOpsSecurityMfaPolicy, getMeSecurity
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
-  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
 - **Steps:**
   1. (FX-STAFF-ADMIN-B) GET /api/v1/ops/security/mfa-policy (needs security.mfa_policy; password-only is enough for GET) — data: Three rows
   2. (FX-CUST-A) Sign in password-only at app.<D>; GET /api/v1/me/security
@@ -935,24 +936,24 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** deployment, api, operations-web · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-001, TC-060, TC-140; rules: BR-001, BR-060; operations: deploy.sh smoke (SMOKE_OPS=skip), deploy/web-preview/Caddyfile staff_access / customer_access
+- **Traces to:** rules: BR-001, BR-060; operations: deploy.sh smoke (SMOKE_OPS=skip), deploy/web-preview/Caddyfile staff_access / customer_access; partial: TC-001, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Know the two lists: on the server `grep -E '^(CUSTOMER|STAFF)_ALLOWED_IPS|^ALLOWED_CLIENT_IPS' .env` (values are addresses, not secrets; do not paste into the repository)
-  - Two vantage points: (A) a machine inside the staff class, (B) a machine inside the customer class only (or outside both)
+  - Three vantage points: A = source IP in BOTH CUSTOMER_ALLOWED_IPS and STAFF_ALLOWED_IPS; B = IP in the customer list only; C = IP in neither list. A staff-only IP would get proxy 403 on customer hosts and the backend 401 would be unreachable, so do not use one
 - **Steps:**
-  1. (FX-GUEST) From B: `curl -s -w ' %{http_code}\n' https://ops.<PREVIEW_DOMAIN>/` and `curl -s -w ' %{http_code}\n' https://api.<PREVIEW_DOMAIN>/api/v1/ops/staff` and `.../api/v1/cook/dashboard` — data: Staff-class paths from a non-staff IP
-  2. (FX-GUEST) From B: `curl -s -o /dev/null -w '%{http_code}\n' https://app.<PREVIEW_DOMAIN>/` and https://api.<PREVIEW_DOMAIN>/api/v1/meals — data: Customer-class paths
-  3. (FX-GUEST) From A: same ops. and /api/v1/ops/staff requests with no session — data: Reaches the API
-  4. (FX-GUEST) From a machine outside both lists: app., id., media. and api. — data: All must be refused
-  5. (FX-GUEST) From any: `curl -s -w ' %{http_code}\n' https://api.<PREVIEW_DOMAIN>/nonexistent` and `https://api.<PREVIEW_DOMAIN>/actuator/health` — data: Unrouted paths on api.
+  1. (FX-GUEST) From B: `curl -s -w ' %{http_code}\n' https://ops.<PREVIEW_DOMAIN>/` and `https://api.<PREVIEW_DOMAIN>/api/v1/ops/staff` and `https://api.<PREVIEW_DOMAIN>/api/v1/cook/dashboard` — data: Staff-class paths from a customer-only IP
+  2. (FX-GUEST) From B: `curl -s -o /dev/null -w '%{http_code}\n' https://app.<PREVIEW_DOMAIN>/` and `https://api.<PREVIEW_DOMAIN>/api/v1/meals` — data: Customer-class paths
+  3. (FX-GUEST) From A: `curl -s -o /dev/null -w '%{http_code}\n' https://ops.<PREVIEW_DOMAIN>/` and `curl -s -w ' %{http_code}\n' https://api.<PREVIEW_DOMAIN>/api/v1/ops/staff` with no session — data: Reaches the API
+  4. (FX-GUEST) From C: `curl -s -w ' %{http_code}\n'` against https://app.<PREVIEW_DOMAIN>/, https://id.<PREVIEW_DOMAIN>/realms/matbakhy/.well-known/openid-configuration, https://media.<PREVIEW_DOMAIN>/ and https://api.<PREVIEW_DOMAIN>/api/v1/meals — data: All customer-class hosts
+  5. (FX-GUEST) `curl -s -w ' %{http_code}\n' https://api.<PREVIEW_DOMAIN>/nonexistent` and `https://api.<PREVIEW_DOMAIN>/actuator/health` from B (customer-allowed) and again from C (customer-disallowed) — data: Unrouted paths on api.
 - **Expected:**
   - UI: n/a (HTTP)
-  - API: Step 1: body 'Not available' with status 403 for all three (Caddy staff_access), regardless of any credentials
+  - API: Step 1: body 'Not available' with status 403 for all three (Caddy staff_access), whatever credentials are sent
   - API: Step 2: 200 from app. and /api/v1/meals
   - API: Step 3: ops. serves HTML 200; /api/v1/ops/staff answers 401 (no session), not 200
   - API: Step 4: 403 'Not available' on every customer-class host
-  - API: Step 5: 404 on both
+  - API: Step 5: from B both paths return 404; from C both return 403 'Not available' (customer_access runs before the 404 fallthrough, Caddyfile api. block)
   - DB: none
 - **Also covered by automated tests:** scripts/test_proxy_access.py (runs the Caddyfile); deploy/web-preview/smoke.sh
 - **Unverified against code (confirm while executing):** Original CFG-034 expected ops 'HTML accessible' to anyone; the Caddyfile makes ops. staff-class only, so that expectation is false for non-staff IPs; If the owner has set CUSTOMER_ALLOWED_IPS=0.0.0.0/0 the customer-class steps from any IP are 200; record the active value
@@ -961,7 +962,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** api, customer-web · **Actors:** FX-CUST-A, FX-GUEST
-- **Traces to:** scenarios: TC-002; rules: BR-002; operations: patchMe, SecurityConfiguration corsConfigurationSource
+- **Traces to:** rules: BR-002; operations: patchMe, SecurityConfiguration corsConfigurationSource; partial: TC-002
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -987,7 +988,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** api, customer-web · **Actors:** FX-CUST-A
-- **Traces to:** scenarios: TC-002; rules: BR-002; operations: SecurityConfiguration sessionCookie / csrfTokenRepository
+- **Traces to:** rules: BR-002; operations: SecurityConfiguration sessionCookie / csrfTokenRepository; partial: TC-002
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -1008,7 +1009,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** deployment, customer-web, operations-web · **Actors:** FX-GUEST, FX-CUST-A, FX-STAFF-ADMIN
-- **Traces to:** scenarios: TC-053, TC-140; rules: BR-053; operations: docs/security/csp-rollout.md, deploy/web-preview/Caddyfile (web_csp, headers)
+- **Traces to:** rules: BR-053; operations: docs/security/csp-rollout.md, deploy/web-preview/Caddyfile (web_csp, headers); partial: TC-053, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -1031,7 +1032,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Isolated disposable stack only
 - **Surface:** identity, api · **Actors:** FX-CUST-NEW · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-054; rules: BR-054; operations: postMePhoneChallenges
+- **Traces to:** rules: BR-054; operations: postMePhoneChallenges; partial: TC-054
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete
@@ -1054,7 +1055,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** deployment, api · **Actors:** FX-ISOLATED
-- **Traces to:** scenarios: TC-056, TC-060; rules: BR-056, BR-060; operations: scripts/check_secrets.sh
+- **Traces to:** rules: BR-056, BR-060; operations: scripts/check_secrets.sh; partial: TC-056, TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Repository checkout at the release commit with full history
@@ -1077,7 +1078,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** deployment · **Actors:** FX-ISOLATED · **Destructive**
-- **Traces to:** scenarios: TC-060, TC-140, TC-057; rules: BR-060, BR-057; operations: gh workflow deploy-preview.yml, ./deploy.sh up, ./deploy.sh smoke
+- **Traces to:** rules: BR-060, BR-057; operations: gh workflow deploy-preview.yml, ./deploy.sh up, ./deploy.sh smoke; partial: TC-060, TC-140, TC-057
 - **Prerequisites:**
   - Owner authorizes the merge/push to develop and a deploy window; this case would change the shared preview, so do NOT trigger it as a test: observe an already-planned deploy, or run on a fork/isolated runner
   - GitHub CLI authenticated: `gh run list --workflow deploy-preview.yml --limit 3`
@@ -1101,7 +1102,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** deployment · **Actors:** FX-ISOLATED · **Needs:** isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-060, TC-057; rules: BR-060, BR-057; operations: ./deploy.sh up, ./deploy.sh rollback-plan
+- **Traces to:** rules: BR-060, BR-057; operations: ./deploy.sh up, ./deploy.sh rollback-plan; partial: TC-060, TC-057
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -1119,7 +1120,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - API: Step 3: status shows configured (good) != running (bad) until `up` is run: record this as a documented gap of the CD failure path (restores .env only, 'no automatic DB rollback')
   - API: Step 4: stack healthy and smoke PASS; data row counts unchanged
   - API: Step 5: backup directory with .dump + checksum exists
-  - DB: Read-only: `SELECT count(*) FROM orders` equal before/after; schema version unchanged by the failed deploy (if the bad image never ran migrations)
+  - DB: Read-only: `SELECT count(*) FROM customer_order` equal before/after; schema version unchanged by the failed deploy (if the bad image never ran migrations)
 - **Also covered by automated tests:** scripts/test_preview_release.py; scripts/test_preview_backup.py
 - **Unverified against code (confirm while executing):** Whether the failure path leaves the new containers running was derived from deploy-preview.yml (cp "$old" .env; exit 1) and should be confirmed by this drill
 
@@ -1127,7 +1128,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** deployment · **Actors:** FX-ISOLATED · **Needs:** isolated stack
-- **Traces to:** scenarios: TC-057; rules: BR-057; operations: ./deploy.sh backup, ./deploy.sh restore-db
+- **Traces to:** rules: BR-057; operations: ./deploy.sh backup, ./deploy.sh restore-db; partial: TC-057
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -1137,12 +1138,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   1. (FX-ISOLATED) `./deploy.sh backup 2>&1 | tee backup.log` — data: Writes db dump + checksum + manifest, restores into matbakhy_restore_check, reconciles, then archives storage
   2. (FX-ISOLATED) `grep -E 'backup verified|backups in' backup.log; cat $BACKUP_DIR/metrics/matbakhy_backup.prom`
   3. (FX-ISOLATED) `./deploy.sh restore-db /backups/db-<stamp>/matbakhy-<stamp>.dump` — data: Use the dump named in backup.log; restores into matbakhy_restore
-  4. (FX-ISOLATED) `docker compose exec -T postgres psql -U matbakhy -d matbakhy_restore -c 'SELECT count(*) FROM orders'` vs the same on matbakhy — data: Counts equal
+  4. (FX-ISOLATED) `docker compose exec -T postgres psql -U matbakhy -d matbakhy_restore -c 'SELECT count(*) FROM customer_order'` vs the same on matbakhy — data: Counts equal
   5. (FX-ISOLATED) Corrupt a copy of the dump (truncate 1 KB) and run `restore-db` with it — data: Must fail, metric must not advance
 - **Expected:**
   - UI: n/a
   - API: 'backup verified: <dump> restored and reconciled'; the prom file timestamp advances only on success
-  - API: restore-db leaves the live matbakhy database untouched; orders, allocations and ledger reconcile
+  - API: restore-db leaves the live matbakhy database untouched; customer_order, allocations and ledger reconcile
   - API: Corrupt dump: non-zero exit, no metric update
   - DB: Read-only: row counts equal; reconcile query (infra/db/reconcile.sql) reports no imbalance
 - **Also covered by automated tests:** scripts/test_preview_backup.py; scripts/db-restore.sh
@@ -1152,7 +1153,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** BLOCKED — Needs an owner-approved change window on the real host; do not reboot the shared preview as a test · **Priority:** P2 · **Readiness:** Ready to run manually now
 - **Surface:** deployment · **Actors:** FX-ISOLATED · **Destructive**
-- **Traces to:** scenarios: TC-057, TC-140; rules: BR-057; operations: ./deploy.sh status, ./deploy.sh smoke
+- **Traces to:** rules: BR-057; operations: ./deploy.sh status, ./deploy.sh smoke; partial: TC-057, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -1174,7 +1175,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** customer-web, api, deployment · **Actors:** FX-CUST-A, FX-COOK-A
-- **Traces to:** scenarios: TC-060, TC-140; rules: BR-060; operations: deploy/web-preview/smoke.sh (config reports PREVIEW demo true)
+- **Traces to:** rules: BR-060; operations: deploy/web-preview/smoke.sh (config reports PREVIEW demo true); partial: TC-060, TC-140
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -1197,7 +1198,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile, deployment · **Actors:** FX-DEVICE-IOS, FX-CUST-A, FX-CUST-B · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-048, TC-052, TC-145; rules: BR-048, BR-052; operations: getMe, GET /api/v1/meals
+- **Traces to:** rules: BR-048, BR-052; operations: getMe, GET /api/v1/meals; partial: TC-048, TC-052, TC-145
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -1223,7 +1224,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** BLOCKED — No Android device test plan, build or registered client exists in the repository; CLAUDE.md requires native verification on both platforms · **Priority:** P1 · **Readiness:** Needs a physical iOS/Android build
 - **Surface:** customer-mobile · **Actors:** FX-DEVICE-ANDROID, FX-CUST-A · **Needs:** updated deploy, physical device
-- **Traces to:** scenarios: TC-048, TC-052; rules: BR-048, BR-052; decisions: D18; operations: putMeSecurityMfa
+- **Traces to:** rules: BR-048, BR-052; decisions: D18; operations: putMeSecurityMfa; partial: TC-048, TC-052
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -1242,7 +1243,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Needs the updated application deployment
 - **Surface:** identity, deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack · **Destructive**
-- **Traces to:** scenarios: TC-060; rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh fixture-clean
+- **Traces to:** rules: BR-060; decisions: D18; operations: ./migrate-mfa.sh fixture-clean; partial: TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -1262,7 +1263,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Needs the updated application deployment
 - **Surface:** deployment · **Actors:** FX-ISOLATED · **Needs:** updated deploy, isolated stack
-- **Traces to:** scenarios: TC-057, TC-060; rules: BR-057; operations: ./deploy.sh rollback-plan
+- **Traces to:** rules: BR-057; operations: ./deploy.sh rollback-plan; partial: TC-057, TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -1284,7 +1285,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Isolated disposable stack only
 - **Surface:** deployment · **Actors:** FX-ISOLATED · **Needs:** isolated stack
-- **Traces to:** scenarios: TC-060; rules: BR-060; operations: ./deploy.sh e2e-reset
+- **Traces to:** rules: BR-060; operations: ./deploy.sh e2e-reset; partial: TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Operator shell on the server in the deploy/web-preview directory (CD uses /srv/matbakhy-staging/deploy/web-preview; docs/operations/06 mentions /srv/matbakhy-preview/src/deploy/web-preview; use whichever `./deploy.sh status` works in)
@@ -1294,12 +1295,12 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   1. (FX-ISOLATED) `./deploy.sh e2e-reset; echo exit=$?` — data: No marker
   2. (FX-ISOLATED) `touch .e2e-enabled; CUSTOMER_ALLOWED_IPS='0.0.0.0/0 ::/0' ./deploy.sh e2e-reset; echo exit=$?; rm -f .e2e-enabled` — data: Public customer hosts (adjust .env on the isolated stack)
   3. (FX-ISOLATED) `touch .e2e-enabled; ./deploy.sh e2e-reset; echo exit=$?; rm -f .e2e-enabled` — data: No typed confirmation
-  4. (FX-ISOLATED) `SELECT count(*) FROM orders` before and after steps 1-3 — data: Unchanged
+  4. (FX-ISOLATED) `SELECT count(*) FROM customer_order` before and after steps 1-3 — data: Unchanged
 - **Expected:**
   - UI: n/a
   - API: Step 1: dies 'e2e is not enabled on this host'; step 2: dies 'customer hosts are public'; step 3: dies 'set E2E_RESET_CONFIRM=<domain>'; all non-zero
   - API: No backup taken, no container stopped, counts unchanged
-  - DB: Read-only: orders count unchanged
+  - DB: Read-only: customer_order count unchanged
 - **Also covered by automated tests:** scripts/test_e2e_fixtures.py
 - **Unverified against code (confirm while executing):** NEVER run the confirmed form (E2E_RESET_CONFIRM=<domain>) on the shared preview: it wipes the application database
 
@@ -1307,7 +1308,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P2 · **Readiness:** Needs the updated application deployment
 - **Surface:** customer-web, identity · **Actors:** FX-CUST-A · **Needs:** updated deploy
-- **Traces to:** scenarios: TC-001; rules: BR-001; decisions: D18; operations: getMeSecurity
+- **Traces to:** rules: BR-001; decisions: D18; operations: getMeSecurity
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
@@ -1329,7 +1330,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** deployment · **Actors:** FX-GUEST
-- **Traces to:** scenarios: TC-140, TC-060; rules: BR-060; operations: ./deploy.sh smoke
+- **Traces to:** rules: BR-060; operations: ./deploy.sh smoke; partial: TC-140, TC-060
 - **Prerequisites:**
   - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
   - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
@@ -1342,3 +1343,29 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
   - DB: none
 - **Also covered by automated tests:** scripts/test_proxy_access.py; scripts/test_preview_release.py
 - **Unverified against code (confirm while executing):** Smoke does not assert any MFA behaviour
+
+### CFG-122 — Authorized MFA policy change by an administrator with recent MFA is applied, audited and restored to the exact previous mode
+
+- **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Needs the updated application deployment
+- **Surface:** api, operations-web · **Actors:** FX-STAFF-ADMIN-B · **Needs:** updated deploy, isolated stack · **Destructive**
+- **Fixtures to provision:** FX-STAFF-ADMIN-B
+- **Traces to:** rules: BR-001, BR-007, BR-043; decisions: D18; operations: getOpsSecurityMfaPolicy, putOpsSecurityMfaPolicyByCategory; partial: TC-007
+- **Prerequisites:**
+  - Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version
+  - Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200
+  - Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)
+  - FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)
+  - ISOLATED STACK ONLY: this case really changes policy (REQUIRED->OPTIONAL weakens, DISABLED->OPTIONAL changes behaviour); run only on FX-ISOLATED
+- **Steps:**
+  1. (FX-STAFF-ADMIN-B) GET /api/v1/ops/security/mfa-policy and write down mode and version of STAFF (prior)
+  2. (FX-STAFF-ADMIN-B) Step up with the enrolled TOTP, then PUT /api/v1/ops/security/mfa-policy/STAFF {"mode":"<a mode different from prior>","expectedVersion":<version>,"reason":"E2E authorised change"}
+  3. (FX-STAFF-ADMIN-B) GET /api/v1/me/security for a STAFF-category account and GET /api/v1/ops/security/mfa-policy — data: Effect on the next request
+  4. (FX-STAFF-ADMIN-B) Restore: PUT STAFF back to the prior mode with the new version and reason 'E2E restore' — data: Rollback
+- **Expected:**
+  - UI: Ops web Security tab shows 'Policy saved.'
+  - API: Step 2: 200 with version prior+1 and the new mode
+  - API: Step 3: the staff account's effectiveMode follows the new value without re-login
+  - API: Step 4: 200, mode equals prior, version prior+2
+  - DB: Read-only: two mfa.policy.update audit rows with details {category:STAFF, from, to} in both directions and the reasons given; mfa_policy.mode equals the prior mode at the end
+- **Also covered by automated tests:** MfaPolicyIntegrationTest.only_the_policy_permission_with_a_recent_second_factor_can_change_a_policy; MfaPolicyIntegrationTest.enforcement_and_settings_are_for_signed_in_accounts_only; MfaPolicyIntegrationTest.the_settings_report_which_security_administration_the_account_may_do
+- **Unverified against code (confirm while executing):** Guest PUT order of CSRF vs authentication rejection not confirmed

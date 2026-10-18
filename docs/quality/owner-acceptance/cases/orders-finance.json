@@ -17,10 +17,13 @@
   },
   "seed_money_facts": "Prices are integer piastres: koshari 7500, mahshi 18000, molokhia 12025; zone A delivery fee 3000; synthetic policy tax 0 bps, commission 0 bps; kitchen A deposit 5000 bps (50%), no COD cap; slot 13:00 Africa/Cairo, cutoff 11:00, 20 portions per slot, 10 per meal.",
   "sql_note": "Database checks are read-only SELECTs run through the operator's approved psql channel (never with write credentials, except the isolated-stack immutability case). :'order' is a psql variable holding the order UUID. Column names are from backend/app/src/main/resources/db/migration (V11 customer_order/order_item/stock_allocation/order_event, V12 handover_*, V13 cash_report/ledger_*, V14 notification, V17 support_case, V18 refund/settlement, V24-V25-V28 order_payment/payment_event, V29 request_fingerprint).",
-  "data_hygiene": "Cases that place orders leave data behind. Cancel pending orders when finished so capacity returns, and use the 2nd/3rd seeded slot for capacity-sensitive cases. Cases marked destructive change shared kitchen/catalogue settings and state their restore step.",
-  "staff_fixture_note": "FX-STAFF-ADMIN (preview-ops-1) holds only staff.grant + audit.read (GrantService.bootstrapAdministratorIfNone) and cannot grant itself anything (self-escalation refused), so it cannot read orders or finance. Order, support and finance cases need separately PROVISIONED staff accounts with the grants named in each case. Granting through the API/UI needs staff.grant AND recent MFA.",
+  "data_hygiene": "Cases that place orders leave data behind. Cancel pending orders when finished so capacity returns, and use the 2nd/3rd seeded slot for capacity-sensitive cases. Cases marked destructive change shared kitchen/catalogue settings and state their restore step. Always run the deposit journeys on a PR #9 deployment.",
+  "staff_fixture_note": "Staff fixtures (deploy/web-preview/seed-owner-e2e.sql, fixtures.json): FX-STAFF-ADMIN (preview-ops-1) holds only staff.grant + audit.read and cannot self-grant. FX-STAFF-ADMIN-B: staff.grant, audit.read, config.read, config.write, security.mfa_policy, security.mfa_reset (no finance or order permissions). FX-STAFF-OPS: cook.review, content.moderate, order.ops, order.exception_cancel, order.handover_override. FX-STAFF-FINANCE: finance.read, finance.verify, finance.refund_approve, finance.settlement, config.read. FX-STAFF-SUPPORT and FX-MULTIROLE: support.case. A second finance.refund_approve holder (FIN-044) or finance.verify for FX-MULTIROLE (FIN-114) needs a temporary grant by FX-STAFF-ADMIN-B, which requires recent MFA.",
   "mfa_note": "origin/develop's Keycloak realm (infra/identity/matbakhy-realm.json) contains no OTP/acr flow, so every step that requires a recent MFA proof (payment recipient approval, payment decision, handover override, staff grants) returns 403 STEP_UP_REQUIRED there. They are runnable only on a PR #9 deployment after the realm step-up flow is applied (docs/security/mfa-policy.md, Migration and rollout).",
-  "ui_language_note": "Customer web, ops web and native default language differs (ops web starts in Arabic). Key assertions give the English label; the Arabic mirror is in apps/*/src/i18n.ts. Run each P0 journey once in Arabic (RTL) and once in English (LTR)."
+  "ui_language_note": "Customer web, ops web and native default language differs (ops web starts in Arabic). Key assertions give the English label; the Arabic mirror is in apps/*/src/i18n.ts. Run each P0 journey once in Arabic (RTL) and once in English (LTR).",
+  "browser_profiles": "Use one separate browser profile (cookie store) per actor: all web surfaces share the API session cookie, so a second sign-in in the same profile replaces the first. Run GET /api/v1/me before each actor's steps to confirm identity.",
+  "slot_capacity_rules": "Seeded slots (days 1-3) have 20 portions each and 10 per meal; preparation consumes capacity permanently. Default assignment: ORDER-101 and FIN-101 day 1, ORDER-102, FIN-039 and FIN-106 day 2, ORDER-114/115 day 3. Before each case read meal-specific and aggregate availablePortions and switch day if short.",
+  "statement_definitions": "Statement 'Cash verified' = SUM(cash_obligation.amount_minor) WHERE state VERIFIED for the kitchen's orders whose COMPLETED event is inside the Cairo date range (default: current Cairo calendar month through today); assert increases, not absolutes. Banner text: 'No platform commission: the whole order amount is yours.' ('(owner decision D10)' appears only on the operating-configuration screen)."
  },
  "cases": [
   {
@@ -79,12 +82,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-022",
-     "TC-117",
-     "TC-118",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019",
      "BR-020",
@@ -100,6 +98,12 @@
      "postOrders",
      "getOrdersById",
      "getOrdersEvents"
+    ],
+    "partial": [
+     "TC-022",
+     "TC-117",
+     "TC-118",
+     "TC-157"
     ]
    },
    "readiness": {
@@ -185,12 +189,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-023",
-     "TC-024",
-     "TC-044",
-     "TC-118"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-023",
      "BR-024"
@@ -202,6 +201,12 @@
      "postOrders",
      "getOrdersByRequestById",
      "getOrders"
+    ],
+    "partial": [
+     "TC-023",
+     "TC-024",
+     "TC-044",
+     "TC-118"
     ]
    },
    "readiness": {
@@ -289,7 +294,8 @@
     "operations": [
      "postOrders",
      "postOrdersCancel"
-    ]
+    ],
+    "partial": []
    },
    "readiness": {
     "needs_updated_deploy": false,
@@ -370,10 +376,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-044",
-     "TC-023"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-044",
      "BR-023"
@@ -384,6 +387,10 @@
     "operations": [
      "postOrders",
      "getOrdersByRequestById"
+    ],
+    "partial": [
+     "TC-023",
+     "TC-044"
     ]
    },
    "readiness": {
@@ -422,7 +429,8 @@
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).",
-    "Acceptance deadline not passed (placed less than 15 minutes ago)."
+    "Acceptance deadline not passed (placed less than 15 minutes ago).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -464,11 +472,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-119",
-     "TC-121",
-     "TC-006"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026",
      "BR-027",
@@ -481,6 +485,11 @@
      "postCookOrdersAccept",
      "getCookOrdersById",
      "getNotifications"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-119",
+     "TC-121"
     ]
    },
    "readiness": {
@@ -516,7 +525,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version)."
+    "A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -558,10 +568,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-029",
-     "TC-119"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-029",
      "BR-026"
@@ -572,6 +579,10 @@
     ],
     "operations": [
      "postCookOrdersReject"
+    ],
+    "partial": [
+     "TC-029",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -607,7 +618,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version)."
+    "A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -650,10 +662,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-028",
-     "TC-029"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-028",
      "BR-029"
@@ -663,6 +672,10 @@
     ],
     "operations": [
      "postOrdersCancel"
+    ],
+    "partial": [
+     "TC-028",
+     "TC-029"
     ]
    },
    "readiness": {
@@ -694,7 +707,8 @@
     "FX-ISOLATED disposable stack (parallel writes). Never on the shared preview.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "Run 20 iterations; each iteration needs a fresh pending order O (recipe) and its version v."
+    "Run 20 iterations; each iteration needs a fresh pending order O (recipe) and its version v.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -722,10 +736,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-119",
-     "TC-029"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026",
      "BR-029",
@@ -737,6 +748,10 @@
     "operations": [
      "postCookOrdersAccept",
      "postOrdersCancel"
+    ],
+    "partial": [
+     "TC-029",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -772,7 +787,8 @@
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "A PENDING_ACCEPTANCE pickup/COD order O1 of FX-CUST-A exists (create it with conventions.recipes.place_pickup_cod_x2 in the FX-CUST-A console; keep o.body.id and o.body.version).",
-    "No clock control is available on the preview: the test waits the real acceptance window (about 15 minutes after placement, plus up to 30 s for the expiry job, matbakhy.orders.expiry-job.interval=30s). The disposable stack may shorten it."
+    "No clock control is available on the preview: the test waits the real acceptance window (about 15 minutes after placement, plus up to 30 s for the expiry job, matbakhy.orders.expiry-job.interval=30s). The disposable stack may shorten it.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -815,11 +831,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-119",
-     "TC-029",
-     "TC-027"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-027",
      "BR-029"
@@ -829,6 +841,11 @@
     ],
     "operations": [
      "postCookOrdersAccept"
+    ],
+    "partial": [
+     "TC-029",
+     "TC-119",
+     "TC-027"
     ]
    },
    "readiness": {
@@ -864,7 +881,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "An ACCEPTED pickup/COD order O1 of FX-CUST-A (place per recipe, then FX-COOK-A presses 'Accept')."
+    "An ACCEPTED pickup/COD order O1 of FX-CUST-A (place per recipe, then FX-COOK-A presses 'Accept').",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -912,11 +930,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-031",
-     "TC-119",
-     "TC-006"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-029",
      "BR-031",
@@ -930,6 +944,11 @@
      "postCookOrdersReady",
      "getCookOrdersById",
      "getOrdersById"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-031",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -964,7 +983,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A READY pickup/COD order O1 (per E2E-ORDER-030). Record the customer's 6-digit code from the order page."
+    "A READY pickup/COD order O1 (per E2E-ORDER-030). Record the customer's 6-digit code from the order page.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1007,13 +1027,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-031",
-     "TC-032",
-     "TC-033",
-     "TC-157",
-     "TC-030"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-031",
      "BR-032",
@@ -1024,6 +1038,12 @@
     ],
     "operations": [
      "postCookOrdersHandover"
+    ],
+    "partial": [
+     "TC-031",
+     "TC-032",
+     "TC-157",
+     "TC-030"
     ]
    },
    "readiness": {
@@ -1060,7 +1080,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "Two READY orders of FX-CUST-A: D1 DELIVERY (address in Test zone A, total includes fee 30.00) and P1 PICKUP."
+    "Two READY orders of FX-CUST-A: D1 DELIVERY (address in Test zone A, total includes fee 30.00) and P1 PICKUP.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1100,10 +1121,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-119",
-     "TC-031"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-030",
      "BR-031"
@@ -1114,6 +1132,10 @@
     "operations": [
      "postCookOrdersDispatch",
      "postCookOrdersHandover"
+    ],
+    "partial": [
+     "TC-031",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -1148,7 +1170,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A READY pickup/COD order O1 (E2E-ORDER-030). Note the true code X from the customer page and choose a wrong code W that differs from X (e.g. 000000)."
+    "A READY pickup/COD order O1 (E2E-ORDER-030). Note the true code X from the customer page and choose a wrong code W that differs from X (e.g. 000000).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1189,10 +1212,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-031",
-     "TC-119"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-031"
     ],
@@ -1201,6 +1221,10 @@
     ],
     "operations": [
      "postCookOrdersHandover"
+    ],
+    "partial": [
+     "TC-031",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -1239,7 +1263,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A delivery/COD order O1 in OUT_FOR_DELIVERY (E2E-ORDER-102 up to the courier step). FX-STAFF-OPS holds order.ops."
+    "A delivery/COD order O1 in OUT_FOR_DELIVERY (E2E-ORDER-102 up to the courier step). FX-STAFF-OPS holds order.ops.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1282,10 +1307,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-119",
-     "TC-124"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-029",
      "BR-032"
@@ -1297,6 +1319,10 @@
      "postCookOrdersDeliveryFailure",
      "getCookOrders",
      "getOpsOrders"
+    ],
+    "partial": [
+     "TC-119",
+     "TC-124"
     ]
    },
    "readiness": {
@@ -1337,7 +1363,8 @@
     "FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "An ACCEPTED pickup/COD order O1 of FX-CUST-A and a PENDING one P1. FX-STAFF-SUPPORT holds support.case (PROVISION)."
+    "An ACCEPTED pickup/COD order O1 of FX-CUST-A and a PENDING one P1. FX-STAFF-SUPPORT holds support.case (PROVISION).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1378,11 +1405,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-028",
-     "TC-041",
-     "TC-124"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-028",
      "BR-041"
@@ -1394,6 +1417,11 @@
      "postOrdersCancellationRequests",
      "postOrdersCancel",
      "getOpsCases"
+    ],
+    "partial": [
+     "TC-028",
+     "TC-041",
+     "TC-124"
     ]
    },
    "readiness": {
@@ -1428,7 +1456,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "Four orders of FX-CUST-A at kitchen A: P PENDING, A ACCEPTED, R READY pickup, Z COMPLETED. Record order_event counts and customer_order.version for each before starting."
+    "Four orders of FX-CUST-A at kitchen A: P PENDING, A ACCEPTED, R READY pickup, Z COMPLETED. Record order_event counts and customer_order.version for each before starting.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1468,11 +1497,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-119",
-     "TC-022",
-     "TC-026"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026"
     ],
@@ -1484,6 +1509,10 @@
      "postCookOrdersAccept",
      "postCookOrdersReady",
      "postOrdersCancel"
+    ],
+    "partial": [
+     "TC-119",
+     "TC-026"
     ]
    },
    "readiness": {
@@ -1519,7 +1548,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "Order OK2 of FX-CUST-A at kitchen B (seed kitchen 'مطبخ تجريبي تاني', 1 × 'Preview molokhia', slot from GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd002/slots; kitchen B's owner has no login, so FX-COOK-B is not needed) and order OK1 at kitchen A. Both PENDING.",
-    "FX-COOK-A is a cook of kitchen A only."
+    "FX-COOK-A is a cook of kitchen A only.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1565,10 +1595,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-006",
-     "TC-001"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-006",
      "BR-001"
@@ -1581,6 +1608,10 @@
      "postCookOrdersAccept",
      "postCookOrdersPaymentReceipt",
      "getOpsOrders"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-006"
     ]
    },
    "readiness": {
@@ -1618,13 +1649,15 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
     "FX-STAFF-OPS holds the active grant order.ops (verify: it sees the 'Order monitoring' tab at ops.<PREVIEW_DOMAIN>).",
-    "FX-CUST-A basket is empty (the 'Cart' page shows 'Your cart is empty.')."
+    "FX-CUST-A basket is empty (the 'Cart' page shows 'Your cart is empty.').",
+    "Slot assignment: use the seeded slot of day 1 (items[0]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
      "n": 1,
      "actor": "FX-CUST-A",
-     "action": "Open https://app.<PREVIEW_DOMAIN>, sign in, press the language button until labels are English. Open meal 'Preview koshari', under 'Cooking slots' pick the first slot (13:00, tomorrow), set quantity 2, press 'Add to cart'.",
+     "action": "Open https://app.<PREVIEW_DOMAIN>, sign in, press the language button until labels are English. Open meal 'Preview koshari', under 'Cooking slots' pick the day-1 slot (13:00, tomorrow), set quantity 2, press 'Add to cart'.",
      "data": "quantity=2"
     },
     {
@@ -1689,7 +1722,7 @@
      "Step 6: customer page shows 'Ready', a 6-digit handover code, 'Kitchen contact: مطبخ المعاينة · +201000000201 · Pickup location: Synthetic location 1'.",
      "Step 8: customer page heading '<MB-number> · Delivered' (English label for COMPLETED, also for pickup), the code line is gone, the 'Rate your order' form is shown; the timeline has 5 lines in order: Waiting for the kitchen, Accepted, Preparing, Ready, Delivered. Notifications list contains (newest first) Delivered, Ready, Preparing, Accepted, each with the MB- link and 'Mark read'.",
      "Step 9: completion did not mark cash paid: the card shows 'Cash due'.",
-     "Step 10: operations timeline lists 'Pending → Accepted → …' transitions with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
+     "Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
     ],
     "api": [
      "POST /api/v1/orders 201 (OrderView state PENDING_ACCEPTANCE, total.amountMinor 15000, payment.method COD, cashState DUE, allowedActions ['CANCEL']).",
@@ -1706,12 +1739,7 @@
    },
    "refs": {
     "scenarios": [
-     "TC-022",
-     "TC-028",
-     "TC-031",
-     "TC-032",
-     "TC-119",
-     "TC-124"
+     "TC-032"
     ],
     "rules": [
      "BR-022",
@@ -1733,6 +1761,13 @@
      "postCookOrdersReady",
      "postCookOrdersHandover",
      "getOpsOrdersById"
+    ],
+    "partial": [
+     "TC-022",
+     "TC-031",
+     "TC-117",
+     "TC-119",
+     "TC-124"
     ]
    },
    "readiness": {
@@ -1784,7 +1819,9 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
     "FX-CUST-A has NO saved address yet or has one in 'Test zone A' (check: nav 'My account' > addresses). Kitchen A delivers only to 'Test zone A' (fee EGP 30.00).",
-    "FX-STAFF-OPS holds order.ops."
+    "FX-STAFF-OPS holds order.ops.",
+    "Slot assignment: use the seeded slot of day 2 (items[1]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -1855,12 +1892,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-021",
-     "TC-031",
-     "TC-119",
-     "TC-117"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-021",
      "BR-030",
@@ -1875,6 +1907,12 @@
      "postOrders",
      "postCookOrdersDispatch",
      "postCookOrdersHandover"
+    ],
+    "partial": [
+     "TC-021",
+     "TC-031",
+     "TC-117",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -1955,10 +1993,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-023",
-     "TC-044"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-023",
      "BR-044"
@@ -1969,6 +2004,10 @@
     "operations": [
      "postOrders",
      "getOrdersByRequestById"
+    ],
+    "partial": [
+     "TC-023",
+     "TC-044"
     ]
    },
    "readiness": {
@@ -2038,10 +2077,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-023",
-     "TC-044"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-023",
      "BR-044"
@@ -2051,6 +2087,10 @@
     ],
     "operations": [
      "postOrders"
+    ],
+    "partial": [
+     "TC-023",
+     "TC-044"
     ]
    },
    "readiness": {
@@ -2085,7 +2125,8 @@
    "prerequisites": [
     "Signed iOS and Android builds pointing at the preview API (docs/operations/06-web-preview.md says Apple/Google setup is deferred); FX-CUST-A signed in on the device.",
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
-    "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal)."
+    "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2119,10 +2160,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-049",
-     "TC-132"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-049",
      "BR-044"
@@ -2133,6 +2171,10 @@
     "operations": [
      "postOrders",
      "getOrdersByRequestById"
+    ],
+    "partial": [
+     "TC-049",
+     "TC-132"
     ]
    },
    "readiness": {
@@ -2170,7 +2212,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
     "FX-STAFF-OPS holds order.ops and order.handover_override and can complete a Keycloak MFA step-up (PR #9 realm flow applied; on origin/develop the realm has no OTP/acr flow, so this step ends in 403 STEP_UP_REQUIRED).",
-    "A READY order O1 whose challenge is locked (result of E2E-ORDER-033). PRE_DB."
+    "A READY order O1 whose challenge is locked (result of E2E-ORDER-033). PRE_DB.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2217,10 +2260,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-031",
-     "TC-119"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-031"
     ],
@@ -2230,6 +2270,10 @@
     ],
     "operations": [
      "postOpsOrdersHandoverOverride"
+    ],
+    "partial": [
+     "TC-031",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -2270,7 +2314,8 @@
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "A PREPARING pickup/COD order O1 with an open CANCELLATION_REQUEST case reference CS-XXXXXXXX (E2E-ORDER-035). FX-STAFF-OPS holds order.ops + order.exception_cancel; FX-STAFF-SUPPORT holds support.case.",
-    "Note: the exception-cancel endpoint requires the permission only (no step-up in OpsOrderController); the UI still renders a step-up hint."
+    "Note: the exception-cancel endpoint requires the permission only (no step-up in OpsOrderController); the UI still renders a step-up hint.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2318,11 +2363,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-028",
-     "TC-029",
-     "TC-041"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-028",
      "BR-029",
@@ -2334,6 +2375,11 @@
     "operations": [
      "postOpsOrdersExceptionCancel",
      "patchOpsCasesById"
+    ],
+    "partial": [
+     "TC-028",
+     "TC-029",
+     "TC-041"
     ]
    },
    "readiness": {
@@ -2373,7 +2419,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "ACCEPTED order A1 and PREPARING order B1 (both pickup/COD of FX-CUST-A)."
+    "ACCEPTED order A1 and PREPARING order B1 (both pickup/COD of FX-CUST-A).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2415,10 +2462,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-029",
-     "TC-119"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-029",
      "BR-028"
@@ -2428,6 +2472,10 @@
     ],
     "operations": [
      "postCookOrdersCancel"
+    ],
+    "partial": [
+     "TC-029",
+     "TC-119"
     ]
    },
    "readiness": {
@@ -2502,10 +2550,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-020",
-     "TC-117"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-020"
     ],
@@ -2515,6 +2560,10 @@
     "operations": [
      "postQuotes",
      "postOrders"
+    ],
+    "partial": [
+     "TC-020",
+     "TC-117"
     ]
    },
    "readiness": {
@@ -2548,7 +2597,8 @@
     "FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.",
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
-    "SHARED DATA WARNING: this case changes the price of 'Preview koshari' in the shared preview catalogue and MUST restore EGP 75.00 at the end (steps 7-8)."
+    "SHARED DATA WARNING: this case changes the price of 'Preview koshari' in the shared preview catalogue and MUST restore EGP 75.00 at the end (steps 7-8).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2615,9 +2665,7 @@
    },
    "refs": {
     "scenarios": [
-     "TC-020",
-     "TC-156",
-     "TC-042"
+     "TC-020"
     ],
     "rules": [
      "BR-012",
@@ -2631,6 +2679,10 @@
      "postQuotes",
      "postOrders",
      "getCookMealsPriceHistory"
+    ],
+    "partial": [
+     "TC-042",
+     "TC-156"
     ]
    },
    "readiness": {
@@ -2668,7 +2720,8 @@
     "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "FX-CUST-A has an address in 'Test zone A' (addrA) and one in 'Test zone B' (addrB, create with POST /api/v1/me/addresses {label, recipientName, governorate, city, street, building, zoneId:'00000000-0000-4000-8000-00000000a002', phone:'+201000000101'}). Kitchen A serves only zone A.",
-    "FX-CUST-B signs in in a second browser profile."
+    "FX-CUST-B signs in in a second browser profile.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2717,9 +2770,7 @@
    },
    "refs": {
     "scenarios": [
-     "TC-117",
-     "TC-018",
-     "TC-006"
+     "TC-018"
     ],
     "rules": [
      "BR-018",
@@ -2732,6 +2783,11 @@
     "operations": [
      "postQuotes",
      "postOrders"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-021",
+     "TC-117"
     ]
    },
    "readiness": {
@@ -2775,7 +2831,8 @@
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "FX-CUST-B signs in in a second browser profile; use the THIRD seeded slot (items[2], day+3) so the case does not collide with other cases. Its free portions are untouched: meal_slot capacity 10 koshari, 10 mahshi; cook_slot max_portions 20.",
-    "Sequential case only; the parallel last-portion race is E2E-ORDER-115 (isolated stack)."
+    "Sequential case only; the parallel last-portion race is E2E-ORDER-115 (isolated stack).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2834,11 +2891,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-013",
-     "TC-115",
-     "TC-029"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-013",
      "BR-025",
@@ -2851,6 +2904,11 @@
      "postQuotes",
      "postOrders",
      "postOrdersCancel"
+    ],
+    "partial": [
+     "TC-013",
+     "TC-029",
+     "TC-115"
     ]
    },
    "readiness": {
@@ -2885,7 +2943,8 @@
     "FX-ISOLATED disposable stack (seed-preview.sql + dev policy). Destructive/race case: never on the shared preview.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "Reduce the target slot so that exactly 1 koshari portion remains (order 9 first with FX-CUST-A, or edit capacity in the disposable DB)."
+    "Reduce the target slot so that exactly 1 koshari portion remains (order 9 first with FX-CUST-A, or edit capacity in the disposable DB).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -2919,11 +2978,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-118",
-     "TC-013",
-     "TC-138"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-025",
      "BR-013"
@@ -2933,6 +2988,11 @@
     ],
     "operations": [
      "postOrders"
+    ],
+    "partial": [
+     "TC-013",
+     "TC-118",
+     "TC-138"
     ]
    },
    "readiness": {
@@ -2967,7 +3027,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A pickup/COD order O1 driven through placement, accept, prepare, ready, handover (E2E-ORDER-101). Wait 10 s after the last step (outbox dispatch every 5 s)."
+    "A pickup/COD order O1 driven through placement, accept, prepare, ready, handover (E2E-ORDER-101). Wait 10 s after the last step (outbox dispatch every 5 s).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3008,11 +3069,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-037",
-     "TC-038",
-     "TC-121"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-037",
      "BR-038"
@@ -3023,6 +3080,11 @@
     "operations": [
      "getNotifications",
      "putNotificationsRead"
+    ],
+    "partial": [
+     "TC-037",
+     "TC-038",
+     "TC-121"
     ]
    },
    "readiness": {
@@ -3062,7 +3124,8 @@
     "FX-CUST-A signs in (password from the private fixture sheet) and GET /api/v1/me returns phoneVerified=true.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "A completed or active order O1 of FX-CUST-A; FX-STAFF-SUPPORT holds support.case (PROVISION)."
+    "A completed or active order O1 of FX-CUST-A; FX-STAFF-SUPPORT holds support.case (PROVISION).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3114,11 +3177,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-041",
-     "TC-124",
-     "TC-006"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-041"
     ],
@@ -3130,6 +3189,11 @@
      "getSupportCases",
      "getOpsCases",
      "postOpsCasesMessages"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-041",
+     "TC-124"
     ]
    },
    "readiness": {
@@ -3167,7 +3231,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "One active order O1 (ACCEPTED) and one terminal order T1 exist; FX-STAFF-OPS holds order.ops."
+    "One active order O1 (ACCEPTED) and one terminal order T1 exist; FX-STAFF-OPS holds order.ops.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3207,10 +3272,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-006",
-     "TC-124"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-006",
      "BR-041"
@@ -3221,6 +3283,10 @@
     "operations": [
      "getOpsOrders",
      "getOpsOrdersById"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-124"
     ]
    },
    "readiness": {
@@ -3254,7 +3320,8 @@
    "prerequisites": [
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
-    "Order OA (pending, COD) and deposit order OD (pending) of FX-CUST-A; FX-CUST-B signs in in a separate browser profile; a guest tab without session."
+    "Order OA (pending, COD) and deposit order OD (pending) of FX-CUST-A; FX-CUST-B signs in in a separate browser profile; a guest tab without session.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3295,8 +3362,8 @@
    },
    "refs": {
     "scenarios": [
-     "TC-006",
-     "TC-001"
+     "TC-001",
+     "TC-006"
     ],
     "rules": [
      "BR-006",
@@ -3311,7 +3378,8 @@
      "postOrdersCancel",
      "postOrdersPaymentTransferReport",
      "postSupportCases"
-    ]
+    ],
+    "partial": []
    },
    "readiness": {
     "needs_updated_deploy": false,
@@ -3368,11 +3436,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-022",
-     "TC-033",
-     "TC-156"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-012",
      "BR-026",
@@ -3381,7 +3445,10 @@
     "decisions": [
      "D05"
     ],
-    "operations": []
+    "operations": [],
+    "partial": [
+     "TC-156"
+    ]
    },
    "readiness": {
     "needs_updated_deploy": false,
@@ -3417,7 +3484,8 @@
    ],
    "prerequisites": [
     "Signed iOS and Android builds pointing at the preview API; FX-CUST-A signed in; Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
-    "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200."
+    "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3457,10 +3525,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-132",
-     "TC-163"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-049",
      "BR-019"
@@ -3471,6 +3536,10 @@
     "operations": [
      "postQuotes",
      "postOrders"
+    ],
+    "partial": [
+     "TC-132",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -3534,11 +3603,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-023",
-     "TC-118",
-     "TC-058"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-023",
      "BR-024",
@@ -3549,6 +3614,11 @@
     ],
     "operations": [
      "postOrders"
+    ],
+    "partial": [
+     "TC-023",
+     "TC-058",
+     "TC-118"
     ]
    },
    "readiness": {
@@ -3569,7 +3639,7 @@
   },
   {
    "id": "E2E-FIN-038",
-   "title": "Cash on receipt: completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount",
+   "title": "Cash on receipt (delivery order): completion leaves cash due; the kitchen's report and finance verification are separate steps with the exact amount",
    "priority": "P0",
    "surface": [
     "operations-web",
@@ -3584,71 +3654,76 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.",
-    "A COMPLETED pickup/COD order O1 (total 15000) of FX-CUST-A at kitchen A whose cash is still DUE (E2E-ORDER-101). The cash-verification call has no ops UI; use the console on https://ops.<PREVIEW_DOMAIN> with the helper `api` (conventions.api_helper, pointing at the API origin)."
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.",
+    "A COMPLETED delivery/COD order O2 (total 28500 = 25500 meals + 3000 delivery) from E2E-ORDER-102 whose cash is still DUE. Cash verification has no ops UI: use the console on https://ops.<PREVIEW_DOMAIN> with the helper `api` (conventions.api_helper)."
    ],
    "steps": [
     {
      "n": 1,
      "actor": "operator",
-     "action": "Right after completion read SQL_CASH for O1.",
-     "data": ""
+     "action": "Right after completion read SQL_CASH for O2: cash_obligation.",
+     "data": "SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order';"
     },
     {
      "n": 2,
-     "actor": "FX-COOK-A",
-     "action": "Ops web > 'Orders' > 'Completed': on O1 the card says 'Cash due' and shows 'Report cash collected'. Amount (EGP) is pre-filled 150.00; Reference 'TEST-CASH-001'; press 'Submit'.",
-     "data": "15000, EGP, CASH"
+     "actor": "FX-STAFF-FINANCE",
+     "action": "Ops web > 'Finance': kitchen id 00000000-0000-4000-8000-0000000bd001 > 'Show'. Record the statement value 'Cash verified' as S0 (it sums ALL verified cash of the kitchen in the Cairo month-to-date period, not only this order).",
+     "data": "S0"
     },
     {
      "n": 3,
-     "actor": "FX-STAFF-FINANCE",
-     "action": "Console: GET /api/v1/ops/finance/cash-reports?state=REPORTED&limit=20; pick the item of O1 (publicNumber) and its report {id, version}.",
-     "data": ""
+     "actor": "FX-COOK-A",
+     "action": "Ops web > 'Orders' > 'Completed': on O2 the card says 'Cash due' and shows 'Report cash collected'. Amount (EGP) is pre-filled 285.00; Reference 'TEST-CASH-001'; press 'Submit'.",
+     "data": "28500, EGP, CASH"
     },
     {
      "n": 4,
      "actor": "FX-STAFF-FINANCE",
-     "action": "POST /api/v1/ops/finance/cash-reports/<report id>/verification with a fresh Idempotency-Key and {decision:'VERIFY', verifiedAmountMinor:15000, reference:'TEST-VER-1', expectedVersion:<report.version>}.",
+     "action": "Console: GET /api/v1/ops/finance/cash-reports?state=REPORTED&limit=20; pick the item of O2 (publicNumber) and its report {id, version}.",
      "data": ""
     },
     {
      "n": 5,
      "actor": "FX-STAFF-FINANCE",
-     "action": "Repeat step 4 with the same key, then with a new key.",
+     "action": "POST /api/v1/ops/finance/cash-reports/<report id>/verification with a fresh Idempotency-Key K and {decision:'VERIFY', verifiedAmountMinor:28500, reference:'TEST-VER-1', expectedVersion:<report.version>}.",
      "data": ""
     },
     {
      "n": 6,
      "actor": "FX-STAFF-FINANCE",
-     "action": "Ops web > 'Finance': kitchen id 00000000-0000-4000-8000-0000000bd001 > 'Show'.",
+     "action": "Repeat the call (a) with the same key K and same body; (b) with a NEW key and the ORIGINAL expectedVersion; (c) with a NEW key and the CURRENT version (original + 1).",
      "data": ""
     },
     {
      "n": 7,
+     "actor": "FX-STAFF-FINANCE",
+     "action": "Ops web > 'Finance' > 'Show' again (reload) and read 'Cash verified' (S1) and the row of O2.",
+     "data": ""
+    },
+    {
+     "n": 8,
      "actor": "FX-COOK-A",
-     "action": "Ops web > tab 'Statement'.",
+     "action": "Ops web > tab 'Statement' and read the same figures.",
      "data": ""
     }
    ],
    "expected": {
     "ui": [
-     "Step 2: after Submit the card text reads 'Reported' and the form disappears. Step 6: statement lists '<MB-number> · 150.00 · Verified', 'Cash verified' = 150.00, banner 'No platform commission (owner decision D10)'. Step 7: 'Cash verified' 150.00 and 'No platform commission: the whole order amount is yours.'; no commission rows."
+     "Step 3: after Submit the card text reads 'Reported' and the form disappears.",
+     "Step 7: statement lists '<MB-number> · 285.00 · Verified'; 'Cash verified' S1 = S0 + 285.00 (increase asserted, not an absolute value); banner 'No platform commission: the whole order amount is yours.' (the text '(owner decision D10)' belongs to the operating-configuration screen only).",
+     "Step 8: cook statement shows the same row and the same banner; no commission column."
     ],
     "api": [
-     "Report 201: amount 15000 EGP, discrepancy 0, state REPORTED, version 0. Verification 200: state VERIFIED, verifiedAmount 15000. Same key replay 200 identical; new key 409 STATE_CONFLICT fieldErrors [{state,'VERIFIED'}]."
+     "Report 201: amount 28500 EGP, discrepancy 0, state REPORTED, version 0. Verification 200: state VERIFIED, verifiedAmount 28500. 6a: same key and body -> 200 identical. 6b: 409 VERSION_CONFLICT (the version check precedes the state check, CashService.verify). 6c: 409 STATE_CONFLICT fieldErrors [{state,'VERIFIED'}]."
     ],
     "database": [
-     "Before step 2: cash_obligation 15000 state DUE although the order is COMPLETED (BR-032).",
-     "SELECT amount_minor, discrepancy_minor, state, verified_amount_minor, verified_by, reporter_id FROM cash_report WHERE order_id = :'order'; -> 15000, 0, VERIFIED, 15000; verified_by is the finance user and differs from reporter_id (DB check cash_report_separation_ck).",
-     "SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> VERIFIED.  SELECT action, outcome, details FROM audit_event WHERE action = 'cash.verify' AND object_id = '<report id>'; -> one ALLOWED row, details {decision:'VERIFY', verifiedAmountMinor:15000}."
+     "Before step 3: cash_obligation 28500 state DUE although the order is COMPLETED (BR-032).",
+     "SELECT amount_minor, discrepancy_minor, state, verified_amount_minor, verified_by, reporter_id FROM cash_report WHERE order_id = :'order'; -> 28500, 0, VERIFIED, 28500; verified_by is the finance user and differs from reporter_id (cash_report_separation_ck).",
+     "cash_obligation -> VERIFIED. SELECT action, outcome, details FROM audit_event WHERE action = 'cash.verify' AND object_id = '<report id>'; -> one ALLOWED row, details {decision:'VERIFY', verifiedAmountMinor:28500}."
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-032",
-     "TC-120",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-032",
      "BR-033"
@@ -3663,6 +3738,10 @@
      "postOpsFinanceCashReportsVerification",
      "getOpsFinanceStatements",
      "getCookStatements"
+    ],
+    "partial": [
+     "TC-032",
+     "TC-120"
     ]
    },
    "readiness": {
@@ -3677,8 +3756,8 @@
    "destructive": false,
    "status": "NOT_RUN",
    "unverified": [
-    "The cook can still read 'Reported' as the cash text; the English label for REPORTED is 'Reported' (ar 'تم الإبلاغ').",
-    "Whether the finance staff browser session can call the API from the ops origin console (XSRF cookie scope)."
+    "Whether the finance staff browser session can call the API from the ops origin console (XSRF cookie scope).",
+    "Statement cashVerified = SUM(cash_obligation.amount_minor) of VERIFIED obligations whose COMPLETED event falls in the Cairo date range (StatementService); other orders verified in the same month change S0."
    ],
    "automated_coverage": [
     "CashAndLedgerIntegrationTest",
@@ -3708,7 +3787,9 @@
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.",
-    "On origin/develop the cash-report step produces a false DISPUTED (discrepancy = -deposit) because CashService compared the report with the order total; PR #9 compares with the cash obligation. Run this case against a PR #9 deployment."
+    "On origin/develop the cash-report step produces a false DISPUTED (discrepancy = -deposit) because CashService compared the report with the order total; PR #9 compares with the cash obligation. Run this case against a PR #9 deployment.",
+    "Slot assignment: use the seeded slot of day 2 (items[1]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3789,7 +3870,7 @@
      "Step 1 box: 'Deposit now: 75.00 · Rest on receipt: 75.00', 'InstaPay: demo-kitchen@instapay.invalid · Demo kitchen (not a real account)', 'Send the deposit before <acceptBy time>.', 'You pay the kitchen's account directly; the platform never receives or holds the money. The kitchen confirms after checking its own account; your report alone is not proof.'",
      "Step 2: 'Payment: Waiting for your deposit' + the reference field and 'I sent the deposit'. Step 3: 'Payment: You reported the transfer; waiting for the kitchen to confirm' and 'Preparation starts only after the kitchen confirms the deposit reached its account.' (no bank-verified wording anywhere).",
      "Step 4: cook panel 'Deposit: 75.00 · rest on hand-over 75.00 · Customer reported a transfer' and the notice 'Check your own account before reporting; what you record is your statement, not a bank confirmation.' Step 5: badge 'Kitchen reported receipt'.",
-     "Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; no commission lines; 'No platform commission (owner decision D10)'."
+     "Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
     ],
     "api": [
      "Quote 201: total 15000, payment {method DEPOSIT, depositBps 5000, deposit 7500, remainder 7500, recipient INSTAPAY …}. Order payment {state WAITING_FOR_DEPOSIT, version 0, depositExpiresAt = acceptBy}; after the customer report CUSTOMER_TRANSFER_REPORTED; after the kitchen report KITCHEN_RECEIPT_REPORTED.",
@@ -3797,20 +3878,14 @@
     ],
     "database": [
      "SELECT method, state, total_minor, deposit_minor, remainder_minor, deposit_expires_at, version FROM order_payment WHERE order_id = :'order'; -> DEPOSIT, KITCHEN_RECEIPT_REPORTED, total 15000, deposit 7500, remainder 7500 (terms immutable).",
-     "SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> NULL→WAITING_FOR_DEPOSIT (CUSTOMER, 7500), →CUSTOMER_TRANSFER_REPORTED (CUSTOMER, reference TEST-REF-0001), →KITCHEN_RECEIPT_REPORTED (COOK, 7500).",
+     "SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> NULL→WAITING_FOR_DEPOSIT (CUSTOMER, amount 7500), →CUSTOMER_TRANSFER_REPORTED (CUSTOMER, amount NULL, reference TEST-REF-0001), →KITCHEN_RECEIPT_REPORTED (COOK, amount 7500).",
      "SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> amount_minor 7500; SELECT amount_minor, discrepancy_minor, state, verified_amount_minor, verified_by, reporter_id FROM cash_report WHERE order_id = :'order'; -> 7500, 0, VERIFIED, 7500, verified_by <> reporter_id.",
      "SELECT count(*) FROM support_case WHERE order_id = :'order' AND category = 'PAYMENT'; -> 0 (nothing disputed). SELECT count(*) FROM refund WHERE order_id = :'order'; -> 0.",
-     "SELECT g.kind, g.rate_bps, g.base_minor, e.account, e.direction, e.amount_minor FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id WHERE g.order_id = :'order' ORDER BY g.posted_at, e.direction; -> a COMMISSION group with both entries 0: deposits never enter the ledger."
+     "SELECT g.kind, g.rate_bps, g.base_minor, e.account, e.direction, e.amount_minor FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id WHERE g.order_id = :'order' ORDER BY g.posted_at, e.direction; -> poll (bounded, up to 90 s; LedgerPostingJob runs every 30 s, asynchronously) until the COMPLETED event has its kind COMMISSION group, then assert exactly two entries (COOK_COMMISSION_RECEIVABLE DEBIT and PLATFORM_COMMISSION_REVENUE CREDIT), both amount_minor 0, balanced: deposits never enter the ledger."
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-158",
-     "TC-159",
-     "TC-163",
-     "TC-032",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019",
      "BR-022",
@@ -3830,6 +3905,13 @@
      "postCookOrdersCashReports",
      "postOpsFinanceCashReportsVerification",
      "getOpsFinanceStatements"
+    ],
+    "partial": [
+     "TC-032",
+     "TC-157",
+     "TC-158",
+     "TC-159",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -3853,9 +3935,9 @@
    "destructive": false,
    "status": "NOT_RUN",
    "unverified": [
-    "Statement 'Cash verified' for a deposit order may show the cash obligation (75.00) rather than the order value; confirm which amount the statement reports (StatementService.cash_minor) and adjust the figure.",
     "Exact format of the deposit button label amount ('EGP 75.00') depends on Intl en-EG.",
-    "There is no ops UI to verify a cash report; the API call needs a session with the finance staff cookies (console on the ops origin)."
+    "There is no ops UI to verify a cash report; the API call needs a session with the finance staff cookies (console on the ops origin).",
+    "Record 'Cash verified' before step 10 to assert the +75.00 increase; absolute values depend on other verified orders in the month."
    ],
    "automated_coverage": [
     "DepositPaymentIntegrationTest",
@@ -3883,7 +3965,8 @@
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.",
-    "An ACCEPTED deposit order D1 (pickup, total 15000) whose customer transfer is reported (CUSTOMER_TRANSFER_REPORTED)."
+    "An ACCEPTED deposit order D1 (pickup, total 15000) whose customer transfer is reported (CUSTOMER_TRANSFER_REPORTED).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -3944,11 +4027,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-161",
-     "TC-159",
-     "TC-041"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026",
      "BR-041"
@@ -3960,6 +4039,11 @@
      "postCookOrdersPaymentProblem",
      "getOpsPayments",
      "postSupportCases"
+    ],
+    "partial": [
+     "TC-041",
+     "TC-159",
+     "TC-161"
     ]
    },
    "readiness": {
@@ -3995,7 +4079,8 @@
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
-    "A pending deposit order D1 (total 15000, deposit 7500) with the customer's transfer reported; cook session on ops origin; D1 payment version v from GET /api/v1/cook/orders/<D1> (payment.version)."
+    "A pending deposit order D1 (total 15000, deposit 7500) with the customer's transfer reported; cook session on ops origin; D1 payment version v from GET /api/v1/cook/orders/<D1> (payment.version).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4035,11 +4120,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-158",
-     "TC-117",
-     "TC-161"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019"
     ],
@@ -4050,6 +4131,11 @@
      "postQuotes",
      "postCookOrdersPaymentReceipt",
      "putCookPaymentProfile"
+    ],
+    "partial": [
+     "TC-117",
+     "TC-158",
+     "TC-161"
     ]
    },
    "readiness": {
@@ -4088,7 +4174,8 @@
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
-    "A pending deposit order D1 and a pending COD order P1 of FX-CUST-A."
+    "A pending deposit order D1 and a pending COD order P1 of FX-CUST-A.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4128,10 +4215,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-159",
-     "TC-163"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-024",
      "BR-019"
@@ -4141,6 +4225,10 @@
     ],
     "operations": [
      "postOrdersPaymentTransferReport"
+    ],
+    "partial": [
+     "TC-159",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -4178,7 +4266,8 @@
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.",
-    "A COMPLETED pickup/COD order O1 (total 15000, cash DUE). FX-STAFF-OPS holds order.ops."
+    "A COMPLETED pickup/COD order O1 (total 15000, cash DUE). FX-STAFF-OPS holds order.ops.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4233,11 +4322,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-032",
-     "TC-120",
-     "TC-061"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-032"
     ],
@@ -4248,6 +4333,11 @@
      "postCookOrdersCashReports",
      "postOpsFinanceCashReportsVerification",
      "getOpsOrders"
+    ],
+    "partial": [
+     "TC-032",
+     "TC-061",
+     "TC-120"
     ]
    },
    "readiness": {
@@ -4278,6 +4368,7 @@
    ],
    "actors": [
     "FX-STAFF-FINANCE",
+    "FX-STAFF-OPS",
     "FX-STAFF-ADMIN-B",
     "FX-STAFF-NOGRANT",
     "FX-STAFF-SUPPORT",
@@ -4287,8 +4378,9 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
-    "A COMPLETED COD order O1 with a VERIFIED cash report of 15000 (E2E-FIN-038) whose COMMISSION ledger group exists (about 30 s after completion). FX-STAFF-FINANCE and FX-STAFF-ADMIN-B (PROVISION) both hold finance.refund_approve; FX-STAFF-SUPPORT holds only support.case.",
-    "Console on the ops origin. There is no customer refund request in the product: customers use a support case or cancellation request."
+    "Console on the ops origin. There is no customer refund request in the product: customers use a support case or cancellation request.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.",
+    "FX-STAFF-FINANCE holds finance.refund_approve. A second, different holder is needed (four-eyes): FX-STAFF-ADMIN-B (staff.grant, recent MFA, PR #9) temporarily grants finance.refund_approve to FX-STAFF-OPS (fixtures.json gives OPS order.* and ADMIN-B no finance permission) and revokes it at the end; FX-STAFF-SUPPORT holds only support.case."
    ],
    "steps": [
     {
@@ -4311,13 +4403,13 @@
     },
     {
      "n": 4,
-     "actor": "FX-STAFF-ADMIN-B",
+     "actor": "FX-STAFF-OPS",
      "action": "Same action APPROVE; then action VERIFY immediately; then PAYMENT_RECORDED with evidenceRef 'TEST-REF-PAY-1' and the new version.",
      "data": ""
     },
     {
      "n": 5,
-     "actor": "FX-STAFF-ADMIN-B",
+     "actor": "FX-STAFF-OPS",
      "action": "VERIFY (the same person recorded payment). Then FX-STAFF-FINANCE: VERIFY.",
      "data": ""
     },
@@ -4342,10 +4434,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-035",
-     "TC-006"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-035",
      "BR-006"
@@ -4357,14 +4446,19 @@
     "operations": [
      "postOpsFinanceRefunds",
      "postOpsFinanceRefundsAction"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-035"
     ]
    },
    "readiness": {
-    "needs_updated_deploy": false,
+    "needs_updated_deploy": true,
     "needs_device": false,
     "needs_isolated_stack": false,
     "needs_fixtures": [
      "FX-STAFF-FINANCE",
+     "FX-STAFF-OPS",
      "FX-STAFF-ADMIN-B",
      "FX-STAFF-SUPPORT"
     ]
@@ -4393,7 +4487,7 @@
    "prerequisites": [
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "After at least E2E-ORDER-101, E2E-FIN-039 and E2E-FIN-107 have run (orders in COMPLETED, CANCELLED, deposit states). A read-only SQL channel; the file infra/db/reconcile.sql from the release commit. There is no ledger export endpoint (getOpsAuditExport is x-implemented: false)."
+    "At least one COMPLETED COD order (E2E-ORDER-101/102) and one COMPLETED deposit order (E2E-FIN-039/101) exist. E2E-FIN-107 is NOT required: run it separately for cancelled/disputed-deposit coverage. A read-only SQL channel; infra/db/reconcile.sql from the release commit. There is no ledger export endpoint (getOpsAuditExport is x-implemented: false)."
    ],
    "steps": [
     {
@@ -4411,7 +4505,7 @@
     {
      "n": 3,
      "actor": "FX-STAFF-FINANCE",
-     "action": "Open ops 'Finance' for kitchen 00000000-0000-4000-8000-0000000bd001 and compare 'Cash verified' with the SUM of verified cash_report amounts for completed orders in range.",
+     "action": "Open ops 'Finance' for kitchen 00000000-0000-4000-8000-0000000bd001 (default period = current Cairo calendar month through today) and compare 'Cash verified' with the SQL sum in expected.database.",
      "data": ""
     }
    ],
@@ -4420,22 +4514,17 @@
      "Finance statement totals equal the SQL sums."
     ],
     "api": [
-     "GET /api/v1/ops/finance/statements?kitchenId=00000000-0000-4000-8000-0000000bd001 summary.cashVerified.amountMinor equals SUM(cash_report.verified_amount_minor) for VERIFIED reports in the period."
+     "GET /api/v1/ops/finance/statements?kitchenId=00000000-0000-4000-8000-0000000bd001 summary.cashVerified.amountMinor equals SUM(cash_obligation.amount_minor) WHERE state = 'VERIFIED' for the kitchen's orders whose COMPLETED event falls in the statement's Cairo date range (default: first day of the current Cairo month through today)."
     ],
     "database": [
      "reconcile.sql returns every check_name with violations = 0: meal_slot_counters_match_allocations, cook_slot_counters_match_meal_slots, terminal_orders_hold_no_live_stock, order_items_match_subtotal, order_state_matches_latest_event, one_cash_obligation_per_order, ledger_groups_balanced, ledger_only_for_completed_orders, migrations_all_successful, payment_state_matches_history.",
      "SELECT count(*) FROM (SELECT kind, source_event_id FROM ledger_group GROUP BY 1,2 HAVING count(*) > 1) d; -> 0. SELECT count(*) FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE p.deposit_minor + p.remainder_minor <> o.total_minor; -> 0.",
-     "SELECT count(*) FROM ledger_entry WHERE account NOT IN ('COOK_COMMISSION_RECEIVABLE','PLATFORM_COMMISSION_REVENUE'); -> 0 (no entry for deposits or cash). SELECT count(*) FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id JOIN customer_order o ON o.id = g.order_id WHERE o.commission_bps_snapshot = 0 AND e.amount_minor <> 0; -> 0."
+     "SELECT count(*) FROM ledger_entry WHERE account NOT IN ('COOK_COMMISSION_RECEIVABLE','PLATFORM_COMMISSION_REVENUE'); -> 0 (no entry for deposits or cash). SELECT count(*) FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id JOIN customer_order o ON o.id = g.order_id WHERE o.commission_bps_snapshot = 0 AND e.amount_minor <> 0; -> 0.",
+     "SELECT coalesce(sum(c.amount_minor),0) FROM cash_obligation c JOIN customer_order o ON o.id = c.order_id JOIN order_event e ON e.order_id = o.id AND e.to_state = 'COMPLETED' WHERE o.kitchen_id = '00000000-0000-4000-8000-0000000bd001' AND c.state = 'VERIFIED' AND e.occurred_at >= date_trunc('month', now() AT TIME ZONE 'Africa/Cairo') AT TIME ZONE 'Africa/Cairo' AND e.occurred_at < (date_trunc('day', now() AT TIME ZONE 'Africa/Cairo') + interval '1 day') AT TIME ZONE 'Africa/Cairo'; -> equals the statement 'Cash verified' (not SUM(cash_report.verified_amount_minor))."
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-120",
-     "TC-033",
-     "TC-034",
-     "TC-058",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-032",
      "BR-033",
@@ -4447,6 +4536,11 @@
     ],
     "operations": [
      "getOpsFinanceStatements"
+    ],
+    "partial": [
+     "TC-058",
+     "TC-120",
+     "TC-157"
     ]
    },
    "readiness": {
@@ -4461,7 +4555,7 @@
    "destructive": false,
    "status": "NOT_RUN",
    "unverified": [
-    "Statement cashVerified definition for deposit orders (see E2E-FIN-039)."
+    "Run immediately after the finance statement read so no new verification changes the sum between the two reads."
    ],
    "automated_coverage": [
     "CashAndLedgerIntegrationTest",
@@ -4481,7 +4575,7 @@
    "actors": [
     "FX-CUST-A",
     "FX-COOK-A",
-    "FX-STAFF-OPS"
+    "FX-STAFF-FINANCE"
    ],
    "prerequisites": [
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
@@ -4489,7 +4583,8 @@
     "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "FX-STAFF-OPS may hold config.read (to read the pricing policy screen); otherwise verify the policy by SQL."
+    "FX-STAFF-FINANCE holds config.read (see fixtures.json; FX-STAFF-OPS does not) - needed to open 'Operating configuration'; alternatively read the policy by SQL.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4506,7 +4601,7 @@
     },
     {
      "n": 3,
-     "actor": "FX-STAFF-OPS",
+     "actor": "FX-STAFF-FINANCE",
      "action": "Ops web > 'Operating configuration': read 'Current pricing policy'.",
      "data": ""
     },
@@ -4531,15 +4626,11 @@
      "Every quote: tax.amountMinor 0; total = subtotal + deliveryFee (pickup deliveryFee 0, zone A 3000); JSON has no service-fee or commission property. Order JSON likewise."
     ],
     "database": [
-     "SELECT policy_version, commission_bps_snapshot, commission_minor, tax_minor FROM customer_order; -> every row 0, 0, 0 for preview orders. SELECT version, commission_rate_bps, tax_rate_bps, synthetic FROM commerce_policy WHERE status = 'ACTIVE'; -> commission_rate_bps 0, tax_rate_bps 0. SELECT count(*) FROM ledger_entry WHERE amount_minor <> 0; -> 0."
+     "SELECT policy_version, commission_bps_snapshot, commission_minor, tax_minor FROM customer_order; -> policy_version >= 1 (the active synthetic policy version, not 0) and commission_bps_snapshot, commission_minor and tax_minor all 0 on every preview order. SELECT version, commission_rate_bps, tax_rate_bps, synthetic FROM commerce_policy WHERE status = 'ACTIVE'; -> commission_rate_bps 0, tax_rate_bps 0. SELECT count(*) FROM ledger_entry WHERE amount_minor <> 0; -> 0."
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-157",
-     "TC-034",
-     "TC-117"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-033",
      "BR-019"
@@ -4552,6 +4643,10 @@
      "postQuotes",
      "getOpsConfiguration",
      "getCookStatements"
+    ],
+    "partial": [
+     "TC-117",
+     "TC-157"
     ]
    },
    "readiness": {
@@ -4559,7 +4654,7 @@
     "needs_device": false,
     "needs_isolated_stack": false,
     "needs_fixtures": [
-     "FX-STAFF-OPS"
+     "FX-STAFF-FINANCE"
     ]
    },
    "fixture_data": [],
@@ -4590,7 +4685,8 @@
    ],
    "prerequisites": [
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
-    "Browser DevTools Network panel with 'Preserve log' on; E2E-FIN-039 is executed while the log is recording."
+    "Browser DevTools Network panel with 'Preserve log' on; E2E-FIN-039 is executed while the log is recording.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4630,10 +4726,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-163",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019"
     ],
@@ -4641,7 +4734,11 @@
      "D16",
      "D10"
     ],
-    "operations": []
+    "operations": [],
+    "partial": [
+     "TC-157",
+     "TC-163"
+    ]
    },
    "readiness": {
     "needs_updated_deploy": false,
@@ -4683,7 +4780,9 @@
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement.",
-    "FX-CUST-A has an address in 'Test zone A' (see E2E-ORDER-102 step 2). PR #9 behaviour for the cash step as in E2E-FIN-039."
+    "FX-CUST-A has an address in 'Test zone A' (see E2E-ORDER-102 step 2). PR #9 behaviour for the cash step as in E2E-FIN-039.",
+    "Slot assignment: use the seeded slot of day 1 (items[0]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4733,17 +4832,12 @@
     "database": [
      "SELECT method, state, total_minor, deposit_minor, remainder_minor, deposit_expires_at, version FROM order_payment WHERE order_id = :'order'; -> total 28500, deposit 14250, remainder 14250.",
      "SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> 14250 VERIFIED after step 6.",
-     "SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> three transitions as in E2E-FIN-039 with amount 14250 and reference NULL for the customer report.",
+     "SELECT from_state, to_state, actor_type, amount_minor, reference, reason_code FROM payment_event WHERE order_id = :'order' ORDER BY occurred_at, id; -> amounts in transition order: 14250 (WAITING_FOR_DEPOSIT), NULL (customer report, reference NULL), 14250 (kitchen receipt).",
      "customer_order.dispatch_reference = 'COURIER-TEST-02', delivery_fee_minor 3000; the delivery fee is part of the total the kitchen collects, no separate Matbakhy fee exists."
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-158",
-     "TC-159",
-     "TC-163",
-     "TC-119"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019",
      "BR-021",
@@ -4759,6 +4853,12 @@
      "postCookOrdersDispatch",
      "postCookOrdersPaymentReceipt",
      "postCookOrdersCashReports"
+    ],
+    "partial": [
+     "TC-119",
+     "TC-158",
+     "TC-159",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -4800,7 +4900,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
-    "Two COMPLETED COD orders C1 and C2 (cash DUE, total 15000) at kitchen A, plus one PREPARING order P1; cook session on ops origin. Record customer_order.version of each (v)."
+    "Two COMPLETED COD orders C1 and C2 (cash DUE, total 15000) at kitchen A, plus one PREPARING order P1; cook session on ops origin. Record customer_order.version of each (v).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4852,11 +4953,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-032",
-     "TC-120",
-     "TC-058"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-032",
      "BR-024"
@@ -4866,6 +4963,11 @@
     ],
     "operations": [
      "postCookOrdersCashReports"
+    ],
+    "partial": [
+     "TC-032",
+     "TC-058",
+     "TC-120"
     ]
    },
    "readiness": {
@@ -4904,7 +5006,8 @@
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.",
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
-    "SHARED DATA WARNING: this changes kitchen A's recipient in the shared preview; steps 7-8 restore it. Run on a PR #9 deployment (MFA step-up)."
+    "SHARED DATA WARNING: this changes kitchen A's recipient in the shared preview; steps 7-8 restore it. Run on a PR #9 deployment (MFA step-up).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -4969,11 +5072,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-158",
-     "TC-163",
-     "TC-042"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019",
      "BR-020"
@@ -4989,6 +5088,11 @@
      "postOpsKitchensPaymentRecipientApproval",
      "postQuotes",
      "postOrders"
+    ],
+    "partial": [
+     "TC-042",
+     "TC-158",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -5031,7 +5135,8 @@
     "Kitchen A (00000000-0000-4000-8000-0000000bd001) has OPEN 13:00 Africa/Cairo slots for the next 3 days: in the DevTools Console on app.<PREVIEW_DOMAIN> `(await api('GET','/api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots')).body.items` has >= 3 items and items[0].availablePortions >= 6 (seed: 20 portions per slot, 10 per meal).",
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
-    "SHARED DATA WARNING: changes the COD cap of kitchen A; step 6 restores 'no cap'. The recipient is not edited, so its APPROVED status is kept (PaymentService.updateProfile keeps the status for an identical recipient)."
+    "SHARED DATA WARNING: changes the COD cap of kitchen A; step 6 restores 'no cap'. The recipient is not edited, so its APPROVED status is kept (PaymentService.updateProfile keeps the status for an identical recipient).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -5084,10 +5189,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-158",
-     "TC-163"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019"
     ],
@@ -5098,6 +5200,10 @@
     "operations": [
      "putCookPaymentProfile",
      "postQuotes"
+    ],
+    "partial": [
+     "TC-158",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -5159,10 +5265,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-158",
-     "TC-163"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019"
     ],
@@ -5171,6 +5274,10 @@
     ],
     "operations": [
      "postQuotes"
+    ],
+    "partial": [
+     "TC-158",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -5205,7 +5312,9 @@
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
-    "A pending deposit order D1 (pickup, 2 × koshari, deposit 7500) of FX-CUST-A in payment state WAITING_FOR_DEPOSIT (E2E-FIN-039 steps 1-2)."
+    "Slot assignment: use the seeded slot of day 2 (items[1]) (GET /api/v1/kitchens/00000000-0000-4000-8000-0000000bd001/slots, same index each run). Preparation consumes capacity permanently and each meal-slot has only 10 portions: before the case read the meal-specific availability (items[n].meals / availablePortions per meal) AND the aggregate slot availablePortions (max 20) and switch to another seeded day if fewer portions than the case orders remain. E2E-ORDER-114/115 own the day-3 slot; do not use it here.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor.",
+    "A FRESH pending deposit order D1 (pickup, 2 × koshari, deposit 7500) in payment state WAITING_FOR_DEPOSIT, created by executing only E2E-FIN-039 steps 1-3 on the day-2 slot. Never reuse the order that E2E-FIN-039 completes."
    ],
    "steps": [
     {
@@ -5252,10 +5361,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-159",
-     "TC-119"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026"
     ],
@@ -5266,6 +5372,10 @@
      "postCookOrdersPrepare",
      "postCookOrdersPaymentReceipt",
      "postOrdersPaymentTransferReport"
+    ],
+    "partial": [
+     "TC-119",
+     "TC-159"
     ]
    },
    "readiness": {
@@ -5306,7 +5416,8 @@
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.",
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
-    "Run on a PR #9 deployment with the Keycloak step-up flow applied (steps 5-6 need a recent MFA proof). A pending deposit order D1 with the customer's transfer reported."
+    "Run on a PR #9 deployment with the Keycloak step-up flow applied (steps 5-6 need a recent MFA proof). A pending deposit order D1 with the customer's transfer reported.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -5368,9 +5479,7 @@
    },
    "refs": {
     "scenarios": [
-     "TC-160",
-     "TC-162",
-     "TC-163"
+     "TC-162"
     ],
     "rules": [
      "BR-027",
@@ -5386,6 +5495,10 @@
      "getOpsPayments",
      "postOpsOrdersPaymentDecision",
      "postCookOrdersPaymentRefund"
+    ],
+    "partial": [
+     "TC-160",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -5424,7 +5537,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "D1 from E2E-FIN-040 (ACCEPTED, payment DISPUTED, one open PAYMENT case)."
+    "D1 from E2E-FIN-040 (ACCEPTED, payment DISPUTED, one open PAYMENT case).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -5459,10 +5573,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-161",
-     "TC-159"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026"
     ],
@@ -5471,6 +5582,10 @@
     ],
     "operations": [
      "postCookOrdersPaymentReceipt"
+    ],
+    "partial": [
+     "TC-159",
+     "TC-161"
     ]
    },
    "readiness": {
@@ -5535,9 +5650,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-161"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-026"
     ],
@@ -5546,6 +5659,9 @@
     ],
     "operations": [
      "postCookOrdersPaymentProblem"
+    ],
+    "partial": [
+     "TC-161"
     ]
    },
    "readiness": {
@@ -5604,10 +5720,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-036",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-036",
      "BR-033"
@@ -5617,6 +5730,10 @@
     ],
     "operations": [
      "postOpsFinanceSettlements"
+    ],
+    "partial": [
+     "TC-036",
+     "TC-157"
     ]
    },
    "readiness": {
@@ -5654,7 +5771,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "FX-COOK-A signs in at https://ops.<PREVIEW_DOMAIN> and the tab bar shows 'Orders' (ar: الطلبات); GET /api/v1/cook/dashboard in that session returns 200.",
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
-    "At least one completed order with cash REPORTED/VERIFIED and one with cash DUE at kitchen A today (Africa/Cairo)."
+    "At least one completed order with cash REPORTED/VERIFIED and one with cash DUE at kitchen A today (Africa/Cairo).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -5694,10 +5812,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-120",
-     "TC-157"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-032",
      "BR-033"
@@ -5707,6 +5822,10 @@
     ],
     "operations": [
      "getCookStatements"
+    ],
+    "partial": [
+     "TC-120",
+     "TC-157"
     ]
    },
    "readiness": {
@@ -5744,7 +5863,8 @@
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.",
     "Staff accounts for this case are PROVISIONED fixtures: grants are written by the operator (DB insert into user_grant) or by FX-STAFF-ADMIN in the ops 'Staff permissions' screen; granting through the API requires staff.grant AND recent MFA (StaffController), which needs the PR #9 Keycloak step-up flow.",
-    "A deposit order D1 in any payment state and a completed order O1; ids known."
+    "A deposit order D1 in any payment state and a completed order O1; ids known.",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -5790,11 +5910,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-006",
-     "TC-001",
-     "TC-125"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-006",
      "BR-001"
@@ -5811,6 +5927,11 @@
      "postOpsOrdersPaymentDecision",
      "postOpsFinanceRefunds",
      "postOpsFinanceSettlements"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-006",
+     "TC-125"
     ]
    },
    "readiness": {
@@ -5849,7 +5970,8 @@
    ],
    "prerequisites": [
     "Signed iOS and Android builds pointing at the preview API; Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
-    "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A)."
+    "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -5889,10 +6011,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-163",
-     "TC-132"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-019",
      "BR-049"
@@ -5902,6 +6021,10 @@
     ],
     "operations": [
      "postOrdersPaymentTransferReport"
+    ],
+    "partial": [
+     "TC-132",
+     "TC-163"
     ]
    },
    "readiness": {
@@ -5932,7 +6055,7 @@
    "prerequisites": [
     "Preview stack reachable: customer web https://app.<PREVIEW_DOMAIN>, cook/staff web https://ops.<PREVIEW_DOMAIN>, API https://api.<PREVIEW_DOMAIN>. seed-preview.sql is applied: on the customer web home, kitchen 'مطبخ المعاينة' lists 'Preview koshari' (EGP 75.00) and 'Preview mahshi' (EGP 180.00), and kitchen 'مطبخ تجريبي تاني' lists 'Preview molokhia' (EGP 120.25).",
     "A read-only database method approved by the operator is available (psql through the operator channel); replace :'order' with the order UUID.",
-    "FX-MULTIROLE (PROVISION) is an approved cook of a kitchen AND holds finance.verify; a customer order at that kitchen is COMPLETED with cash DUE. This needs a second kitchen with meals/slots that is NOT in the seed (fixture_data).",
+    "FX-MULTIROLE (seed-owner-e2e.sql: customer + approved cook of kitchen 'مطبخ متعدد الأدوار' + support.case). finance.verify is NOT granted by the fixture: FX-STAFF-ADMIN-B (staff.grant, recent MFA) grants it temporarily and revokes it afterwards. The seeded multirole kitchen has no meal or slot: the cook creates one, then FX-CUST-A orders and the order is completed so cash is DUE.",
     "Console helper on the ops origin."
    ],
    "steps": [
@@ -5967,10 +6090,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-006",
-     "TC-120"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-032",
      "BR-006"
@@ -5980,20 +6100,29 @@
     ],
     "operations": [
      "postOpsFinanceCashReportsVerification"
+    ],
+    "partial": [
+     "TC-006",
+     "TC-120"
     ]
    },
    "readiness": {
-    "needs_updated_deploy": false,
+    "needs_updated_deploy": true,
     "needs_device": false,
     "needs_isolated_stack": false,
     "needs_fixtures": [
      "FX-MULTIROLE",
-     "FX-STAFF-FINANCE"
+     "FX-STAFF-FINANCE",
+     "FX-STAFF-ADMIN-B"
     ]
    },
    "fixture_data": [
     {
-     "item": "second approved kitchen owned by FX-MULTIROLE with a meal and a slot",
+     "item": "meal and slot for the multirole kitchen (bd1c5)",
+     "in_seed": false
+    },
+    {
+     "item": "temporary finance.verify grant for FX-MULTIROLE",
      "in_seed": false
     }
    ],
@@ -6028,7 +6157,8 @@
     "In the DevTools Console of the signed-in tab, define the helper `api` from conventions.api_helper (needed for the API steps).",
     "Kitchen A payment profile is the seeded one: deposit 50% (deposit_bps 5000), no COD cap, recipient INSTAPAY 'demo-kitchen@instapay.invalid' / 'Demo kitchen (not a real account)' with recipient_status APPROVED (verify: GET /api/v1/cook/payment-profile as FX-COOK-A).",
     "FX-STAFF-FINANCE (PROVISION) holds finance.read, finance.verify, finance.refund_approve and finance.settlement; the ops web shows its 'Finance' tab (the tab appears only for accounts that may read statements, so finance.verify alone is not enough). Payment recipient approval and payment decisions also need a recent Keycloak MFA step-up (PR #9 realm flow); cash verification, refunds and settlements do not.",
-    "PR #9 realm step-up for step 4. Two deposit orders: E1 (pending, nothing reported) and E2 (ACCEPTED, customer transfer reported, kitchen already pressed 'Not received' so the payment is DISPUTED)."
+    "PR #9 realm step-up for step 4. Two deposit orders: E1 (pending, nothing reported) and E2 (ACCEPTED, customer transfer reported, kitchen already pressed 'Not received' so the payment is DISPUTED).",
+    "Each actor uses a SEPARATE browser profile (or private window/cookie store): customer web, ops web and the API share one session cookie (SecurityConfiguration), so signing in as a second actor in the same profile silently replaces the first. Before each actor's steps run `await api('GET','/api/v1/me')` (helper in conventions.api_helper) and confirm the displayName is that actor."
    ],
    "steps": [
     {
@@ -6074,11 +6204,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-160",
-     "TC-161",
-     "TC-162"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-027",
      "BR-029"
@@ -6090,6 +6216,11 @@
     "operations": [
      "postCookOrdersReject",
      "postOpsOrdersPaymentDecision"
+    ],
+    "partial": [
+     "TC-160",
+     "TC-161",
+     "TC-162"
     ]
    },
    "readiness": {
@@ -6258,7 +6389,7 @@
   "Wrong mechanism, E2E-FIN-042 (line 480): 'same event key'. Cash reports use Idempotency-Key plus UNIQUE(order_id); the customer transfer report takes no key and is idempotent by state (PaymentService.reportTransfer).",
   "Wrong role, E2E-ORDER-029 (line 332): Role 'Clock/system' is not an actor a tester can sign in as.",
   "Impossible expectation on the deployed baseline, E2E-FIN-039 (line 451): 'no dispute false positive'. On origin/develop CashService compares the cook's report with order.total_minor and the cook UI pre-fills the order total, so a correct remainder report is flagged DISPUTED (discrepancy = -deposit). Fixed only in PR #9 (CashService.java diff, apps/operations-web/src/cook/Orders.tsx diff). Case marked needs_updated_deploy.",
-  "Fixture gap: FX-STAFF-ADMIN (preview-ops-1) is granted only staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone) and cannot grant itself (self-escalation refused); it cannot read orders or finance. Every ops/finance/support case needs PROVISIONED staff with explicit grants, and granting needs recent MFA.",
+  "Fixture gap: FX-STAFF-ADMIN (preview-ops-1) holds only staff.grant and audit.read and cannot self-grant; it cannot read orders or finance. Order, support and finance cases rely on FX-STAFF-OPS/FINANCE/SUPPORT from seed-owner-e2e.sql (grants listed in conventions.staff_fixture_note). FX-STAFF-ADMIN-B has no finance permission, so a second refund approver or FX-MULTIROLE finance.verify needs a temporary grant (requires recent MFA).",
   "MFA gate: payment recipient approval, payment decision and handover override require a recent MFA proof (@staffAssurance.recentMfa); origin/develop's Keycloak realm has no OTP/acr flow, so these steps are not runnable there (PR #9 realm migration needed). The original catalog does not mention this prerequisite.",
   "Cash verification has no UI: apps/operations-web/src/ops/Finance.tsx exposes statements, refunds, settlements and payment decisions but no screen for POST /api/v1/ops/finance/cash-reports/{reportId}/verification, so E2E-FIN-038/043 finance steps are API-only through a browser console.",
   "Finance tab visibility: the ops UI probes GET /api/v1/ops/finance/statements and shows 'Finance' only when it answers 404 (finance.read, refund_approve or settlement); an account with finance.verify alone cannot reach the payment recipient/decision panels through the UI (App.tsx probe).",

@@ -16,7 +16,8 @@
         "Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.",
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
-        "Use a private/incognito window with no cookies for https://app.<PREVIEW_DOMAIN> (no session)."
+        "Use a private/incognito window with no cookies for https://app.<PREVIEW_DOMAIN> (no session).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -53,11 +54,17 @@
         {
           "n": 6,
           "actor": "FX-GUEST",
-          "action": "Press the top-bar button 'English'.",
-          "data": "Page switches to LTR English without reload: heading 'Home-cooked meals to preorder'; card titles 'Preview koshari', 'Preview mahshi', 'Preview molokhia'."
+          "action": "While still on the kitchen page (#/kitchen/preview-kitchen), press the top-bar button 'English'.",
+          "data": "Kitchen page in English: heading 'Meals to preorder' listing only 'Preview koshari' and 'Preview mahshi' (kitchen A's meals); document is LTR (lang=en dir=ltr)."
         },
         {
           "n": 7,
+          "actor": "FX-GUEST",
+          "action": "Press the bottom-nav link 'Home' (English), then read the heading and cards.",
+          "data": "Heading 'Home-cooked meals to preorder' with all three cards: 'Preview koshari', 'Preview mahshi', 'Preview molokhia'."
+        },
+        {
+          "n": 8,
           "actor": "FX-GUEST",
           "action": "Open DevTools console and run: await (await fetch('https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50')).json()",
           "data": "No cookies, no headers."
@@ -80,10 +87,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-016",
-          "TC-017",
-          "TC-046",
-          "TC-116"
+          "TC-150"
         ],
         "rules": [
           "BR-016",
@@ -97,6 +101,12 @@
           "getMeals",
           "getKitchensById",
           "getConfigurationPublic"
+        ],
+        "partial": [
+          "TC-016",
+          "TC-017",
+          "TC-046",
+          "TC-116"
         ]
       },
       "readiness": {
@@ -150,11 +160,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-003",
-          "TC-109",
-          "TC-110"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-001",
           "BR-003"
@@ -162,6 +168,11 @@
         "decisions": [],
         "operations": [
           "getMe"
+        ],
+        "partial": [
+          "TC-003",
+          "TC-109",
+          "TC-110"
         ]
       },
       "readiness": {
@@ -252,8 +263,6 @@
       },
       "refs": {
         "scenarios": [
-          "TC-001",
-          "TC-002",
           "TC-109"
         ],
         "rules": [
@@ -266,6 +275,10 @@
           "getMe",
           "getOrders",
           "getMeFavorites"
+        ],
+        "partial": [
+          "TC-001",
+          "TC-002"
         ]
       },
       "readiness": {
@@ -306,7 +319,9 @@
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "FX-CUST-A (preview-customer-1) and FX-CUST-B (preview-customer-2) both phone-verified. Same browser profile for both (that is the point).",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Cook FX-COOK-A will be needed afterwards only to release stock: A cancels its own order in step 6 so no cook action is required."
+        "Cook FX-COOK-A will be needed afterwards only to release stock: A cancels its own order in step 6 so no cook action is required.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -368,11 +383,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-006",
-          "TC-044",
-          "TC-109"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-006",
           "BR-044",
@@ -385,6 +396,10 @@
           "postQuotes",
           "postOrders",
           "postOrdersCancel"
+        ],
+        "partial": [
+          "TC-006",
+          "TC-109"
         ]
       },
       "readiness": {
@@ -425,7 +440,9 @@
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "FX-COOK-A = 'preview-cook-1' (kitchen 'مطبخ المعاينة'). Pausing the kitchen blocks every tester of kitchen 1: announce a 10 minute window and resume at the end.",
         "A tiny PNG file on the tester machine to upload as a photo if a published test meal is wanted (not needed for this case).",
-        "Before pausing, capture the koshari slot id: GET https://api.<PREVIEW_DOMAIN>/api/v1/meals/00000000-0000-4000-8000-0000000bb001 -> nextSlots[0].id (needed by step 6)."
+        "Before pausing, capture the koshari slot id: GET https://api.<PREVIEW_DOMAIN>/api/v1/meals/00000000-0000-4000-8000-0000000bb001 -> nextSlots[0].id (needed by step 6).",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -489,9 +506,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-009",
-          "TC-017",
-          "TC-116"
+          "TC-009"
         ],
         "rules": [
           "BR-009",
@@ -505,6 +520,10 @@
           "postQuotes",
           "patchCookSettings",
           "postCookMeals"
+        ],
+        "partial": [
+          "TC-017",
+          "TC-116"
         ]
       },
       "readiness": {
@@ -545,7 +564,8 @@
         "FX-COOK-B has an APPROVED kitchen with one published meal and an OPEN slot (PROVISION: not in the seed; the seed's second kitchen 'مطبخ تجريبي تاني' has no login).",
         "FX-COOK-PENDING has a submitted but undecided cook application (no kitchen row).",
         "FX-STAFF-OPS holds the kitchen operating-state permission; staff actions need recent MFA step-up (see the MFA domain cases).",
-        "Never suspend FX-COOK-A (shared kitchen)."
+        "Never suspend FX-COOK-A (shared kitchen).",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -602,10 +622,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-008",
-          "TC-017",
-          "TC-112",
-          "TC-123"
+          "TC-017"
         ],
         "rules": [
           "BR-008",
@@ -618,6 +635,11 @@
           "getKitchensById",
           "getMeals",
           "postQuotes"
+        ],
+        "partial": [
+          "TC-008",
+          "TC-112",
+          "TC-123"
         ]
       },
       "readiness": {
@@ -720,10 +742,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-016",
-          "TC-116"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-016"
         ],
@@ -732,6 +751,10 @@
         ],
         "operations": [
           "getMeals"
+        ],
+        "partial": [
+          "TC-016",
+          "TC-116"
         ]
       },
       "readiness": {
@@ -821,11 +844,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-016",
-          "TC-116",
-          "TC-021"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-016",
           "BR-021"
@@ -834,6 +853,11 @@
         "operations": [
           "getZones",
           "getMeals"
+        ],
+        "partial": [
+          "TC-016",
+          "TC-021",
+          "TC-116"
         ]
       },
       "readiness": {
@@ -909,16 +933,17 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-016",
-          "TC-116"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-016"
         ],
         "decisions": [],
         "operations": [
           "getMeals"
+        ],
+        "partial": [
+          "TC-016",
+          "TC-116"
         ]
       },
       "readiness": {
@@ -992,15 +1017,16 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-016"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-016"
         ],
         "decisions": [],
         "operations": [
           "getMeals"
+        ],
+        "partial": [
+          "TC-016"
         ]
       },
       "readiness": {
@@ -1036,7 +1062,8 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "FX-CUST-A signed in with a non-empty basket: koshari x1, first slot (do E2E-BASKET-009 steps 1-4 first). Kitchen 'مطبخ المعاينة' delivers only to Test zone A.",
-        "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry."
+        "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -1088,9 +1115,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-021",
-          "TC-117",
-          "TC-005"
+          "TC-021"
         ],
         "rules": [
           "BR-021",
@@ -1102,6 +1127,10 @@
           "postMeAddresses",
           "deleteMeAddressesById",
           "getZones"
+        ],
+        "partial": [
+          "TC-117",
+          "TC-005"
         ]
       },
       "readiness": {
@@ -1194,9 +1223,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-046",
-          "TC-150",
-          "TC-128"
+          "TC-150"
         ],
         "rules": [
           "BR-046"
@@ -1207,6 +1234,10 @@
           "getKitchensById",
           "patchMe",
           "postQuotes"
+        ],
+        "partial": [
+          "TC-046",
+          "TC-128"
         ]
       },
       "readiness": {
@@ -1239,7 +1270,8 @@
         "Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.",
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
-        "Desktop Chrome or Firefox, mouse not used. Screen reader optional (VoiceOver/NVDA)."
+        "Desktop Chrome or Firefox, mouse not used. Screen reader optional (VoiceOver/NVDA).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -1287,15 +1319,16 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-047",
-          "TC-129"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-047"
         ],
         "decisions": [],
-        "operations": []
+        "operations": [],
+        "partial": [
+          "TC-047",
+          "TC-129"
+        ]
       },
       "readiness": {
         "needs_updated_deploy": false,
@@ -1387,12 +1420,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-003",
-          "TC-004",
-          "TC-054",
-          "TC-110"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-003",
           "BR-004",
@@ -1403,6 +1431,12 @@
           "postMePhoneChallenges",
           "postMePhoneChallengesVerify",
           "postQuotes"
+        ],
+        "partial": [
+          "TC-003",
+          "TC-004",
+          "TC-054",
+          "TC-110"
         ]
       },
       "readiness": {
@@ -1437,7 +1471,8 @@
         "Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Both customers phone-verified. Keep two browser profiles (A and B) so the helper is defined once in each."
+        "Both customers phone-verified. Keep two browser profiles (A and B) so the helper is defined once in each.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -1490,9 +1525,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-005",
-          "TC-006",
-          "TC-110"
+          "TC-005"
         ],
         "rules": [
           "BR-005",
@@ -1504,6 +1537,10 @@
           "getMeAddresses",
           "patchMeAddressesById",
           "deleteMeAddressesById"
+        ],
+        "partial": [
+          "TC-006",
+          "TC-110"
         ]
       },
       "readiness": {
@@ -1542,7 +1579,9 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Neither customer has favorites at the start (account page section 'المفضلة' empty)."
+        "Neither customer has favorites at the start (account page section 'المفضلة' empty).",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -1613,9 +1652,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-040",
-          "TC-128",
-          "TC-017"
+          "TC-040"
         ],
         "rules": [
           "BR-040",
@@ -1626,6 +1663,10 @@
           "getMeFavorites",
           "putMeFavoritesById",
           "deleteMeFavoritesById"
+        ],
+        "partial": [
+          "TC-128",
+          "TC-017"
         ]
       },
       "readiness": {
@@ -1665,7 +1706,9 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "FX-CUST-A has one PENDING_ACCEPTANCE pickup order (koshari x1, COD) placed in this case's step 1. The notification dispatcher runs in the API (outbox poll); allow up to a minute for inbox rows."
+        "FX-CUST-A has one PENDING_ACCEPTANCE pickup order (koshari x1, COD) placed in this case's step 1. The notification dispatcher runs in the API (outbox poll); allow up to a minute for inbox rows.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+2 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -1726,12 +1769,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-037",
-          "TC-038",
-          "TC-121",
-          "TC-128"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-037",
           "BR-038"
@@ -1740,6 +1778,12 @@
         "operations": [
           "getNotifications",
           "putNotificationsRead"
+        ],
+        "partial": [
+          "TC-037",
+          "TC-038",
+          "TC-121",
+          "TC-128"
         ]
       },
       "readiness": {
@@ -1821,10 +1865,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-110",
-          "TC-128"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-003",
           "BR-006"
@@ -1833,6 +1874,10 @@
         "operations": [
           "getMe",
           "patchMe"
+        ],
+        "partial": [
+          "TC-110",
+          "TC-128"
         ]
       },
       "readiness": {
@@ -1867,7 +1912,8 @@
         "Preview reachable: opening https://api.<PREVIEW_DOMAIN>/api/v1/configuration/public in a browser returns 200 JSON with environment.name='PREVIEW', environment.demo=true and orderLimits.maxQuantityPerLine=10.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "A COMPLETED pickup order of FX-CUST-A at kitchen 'مطبخ المعاينة' exists (cook accepted, prepared, marked ready and confirmed handover with the customer's handover code: follow the cook-workflow cases) and has no review yet. Record its id as ORDER."
+        "A COMPLETED pickup order of FX-CUST-A at kitchen 'مطبخ المعاينة' exists (cook accepted, prepared, marked ready and confirmed handover with the customer's handover code: follow the cook-workflow cases) and has no review yet. Record its id as ORDER.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -1917,8 +1963,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-039",
-          "TC-128"
+          "TC-039"
         ],
         "rules": [
           "BR-039"
@@ -1927,6 +1972,9 @@
         "operations": [
           "postOrdersReviews",
           "getKitchensReviews"
+        ],
+        "partial": [
+          "TC-128"
         ]
       },
       "readiness": {
@@ -2003,10 +2051,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-039",
-          "TC-128"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-039"
         ],
@@ -2014,6 +2059,10 @@
         "operations": [
           "postReviewsReports",
           "getKitchensReviews"
+        ],
+        "partial": [
+          "TC-039",
+          "TC-128"
         ]
       },
       "readiness": {
@@ -2111,7 +2160,8 @@
         ],
         "operations": [
           "postActivity"
-        ]
+        ],
+        "partial": []
       },
       "readiness": {
         "needs_updated_deploy": false,
@@ -2179,11 +2229,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-055",
-          "TC-128",
-          "TC-139"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-055",
           "BR-001"
@@ -2192,6 +2238,11 @@
         "operations": [
           "postMeDeletionRequests",
           "getMe"
+        ],
+        "partial": [
+          "TC-055",
+          "TC-128",
+          "TC-139"
         ]
       },
       "readiness": {
@@ -2257,9 +2308,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-157"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-045"
         ],
@@ -2268,6 +2317,9 @@
         ],
         "operations": [
           "getConfigurationPublic"
+        ],
+        "partial": [
+          "TC-157"
         ]
       },
       "readiness": {
@@ -2299,7 +2351,8 @@
         "FX-GUEST"
       ],
       "prerequisites": [
-        "A signed device build pointing at the preview API (physical device; CI simulator evidence is not equivalent). Seed as in the web cases. Test once on each platform. Device language set to Arabic, then English."
+        "A signed device build pointing at the preview API (physical device; CI simulator evidence is not equivalent). Seed as in the web cases. Test once on each platform. Device language set to Arabic, then English.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -2353,14 +2406,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-049",
-          "TC-051",
-          "TC-052",
-          "TC-132",
-          "TC-134",
-          "TC-135"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-049",
           "BR-051",
@@ -2370,6 +2416,14 @@
         "operations": [
           "getMeals",
           "getMealsById"
+        ],
+        "partial": [
+          "TC-049",
+          "TC-132",
+          "TC-134",
+          "TC-135",
+          "TC-051",
+          "TC-052"
         ]
       },
       "readiness": {
@@ -2403,7 +2457,8 @@
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
-        "FX-CUST-A signed in with an empty basket (matbakhy.cart absent in Local Storage; page '#/checkout' shows 'السلة فارغة.')."
+        "FX-CUST-A signed in with an empty basket (matbakhy.cart absent in Local Storage; page '#/checkout' shows 'السلة فارغة.').",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "Seed only: koshari 7500, mahshi 18000, kitchen 1 slots with 10 portions per meal.",
       "steps": [
@@ -2460,9 +2515,9 @@
         "ui": [
           "Step 3: 'المطبخ: مطبخ المعاينة'; one line 'كشري تجريبي' with quantity 2 and line amount ١٥٠٫٠٠ ج.م; 'الإجمالي التقديري للأطباق' = ١٥٠٫٠٠ ج.م; note 'ده تقدير من الأسعار اللي ظهرت وقت الإضافة. الإجمالي النهائي بالسعر الحالي بيظهر لما تضغط \"احسب الإجمالي\".'",
           "Step 4: quantity 3 -> line ٢٢٥٫٠٠ and estimate ٢٢٥٫٠٠; back to 2 -> ١٥٠٫٠٠. The 'زيادة' button is disabled at the limit (min(10, portions left)); 'تقليل' disabled at 1.",
-          "Step 5: two lines; estimate = 150.00 + 180.00 = ٣٣٠٫٠٠ (with koshari at quantity 2).",
-          "Step 6: the same two lines and estimate after reload (state kept in Local Storage key matbakhy.cart).",
-          "Step 7: koshari line is REPLACED, not summed: quantity 1, line ٧٥٫٠٠, estimate ٢٥٥٫٠٠.",
+          "Step 5: two lines; estimate = 225.00 (koshari at quantity 3, left by step 4) + 180.00 = ٤٠٥٫٠٠ ج.م.",
+          "Step 6: the same two lines and estimate ٤٠٥٫٠٠ ج.م after reload (state kept in Local Storage key matbakhy.cart).",
+          "Step 7: koshari line is REPLACED, not summed: quantity 1, line ٧٥٫٠٠, estimate = 75.00 + 180.00 = ٢٥٥٫٠٠ ج.م.",
           "Step 8: after removing both lines the page shows 'السلة فارغة.' and a button 'الرئيسية'."
         ],
         "api": [
@@ -2474,10 +2529,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-149",
-          "TC-147",
-          "TC-151",
-          "TC-018"
+          "TC-149"
         ],
         "rules": [
           "BR-018",
@@ -2487,6 +2539,11 @@
         "operations": [
           "getMealsById",
           "postActivity"
+        ],
+        "partial": [
+          "TC-018",
+          "TC-147",
+          "TC-151"
         ]
       },
       "readiness": {
@@ -2521,7 +2578,8 @@
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
-        "At least two seeded slots for kitchen 'مطبخ المعاينة' (day +1 and day +2) and one for 'مطبخ تجريبي تاني'. FX-CUST-A basket empty."
+        "At least two seeded slots for kitchen 'مطبخ المعاينة' (day +1 and day +2) and one for 'مطبخ تجريبي تاني'. FX-CUST-A basket empty.",
+        "Slot day for this case: seeded day+1 and 2 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -2584,8 +2642,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-147",
-          "TC-018"
+          "TC-147"
         ],
         "rules": [
           "BR-018"
@@ -2593,6 +2650,9 @@
         "decisions": [],
         "operations": [
           "getMealsById"
+        ],
+        "partial": [
+          "TC-018"
         ]
       },
       "readiness": {
@@ -2631,7 +2691,9 @@
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
         "Console variables: const K=(await call('GET','/api/v1/meals/00000000-0000-4000-8000-0000000bb001')).body.nextSlots[0].id (kitchen 1 slot), const M=(await call('GET','/api/v1/meals/00000000-0000-4000-8000-0000000bb003')).body.nextSlots[0].id (kitchen 2 slot).",
-        "For step 4 FX-COOK-A creates a slot of kitchen 1 that offers ONLY 'محشي تجريبي' (capacity for koshari left empty)."
+        "For step 4 FX-COOK-A creates a slot of kitchen 1 that offers ONLY 'محشي تجريبي' (capacity for koshari left empty).",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "One extra slot of kitchen 1 that offers only mahshi, not in the seed. FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.",
       "steps": [
@@ -2686,8 +2748,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-018",
-          "TC-117"
+          "TC-018"
         ],
         "rules": [
           "BR-018",
@@ -2696,6 +2757,9 @@
         "decisions": [],
         "operations": [
           "postQuotes"
+        ],
+        "partial": [
+          "TC-117"
         ]
       },
       "readiness": {
@@ -2733,7 +2797,9 @@
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
         "Limit check: GET /api/v1/configuration/public -> orderLimits.maxQuantityPerLine = 10.",
-        "Seed slots give koshari exactly 10 portions, so the limit and the stock coincide. To prove the limit is independent of stock, FX-COOK-A creates a slot with koshari capacity 15 (max portions 15)."
+        "Seed slots give koshari exactly 10 portions, so the limit and the stock coincide. To prove the limit is independent of stock, FX-COOK-A creates a slot with koshari capacity 15 (max portions 15).",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "Extra slot with koshari capacity 15 created by FX-COOK-A; not in the seed.",
       "steps": [
@@ -2783,9 +2849,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-152",
-          "TC-117",
-          "TC-019"
+          "TC-152"
         ],
         "rules": [
           "BR-019",
@@ -2795,6 +2859,10 @@
         "operations": [
           "getConfigurationPublic",
           "postQuotes"
+        ],
+        "partial": [
+          "TC-117",
+          "TC-019"
         ]
       },
       "readiness": {
@@ -2831,7 +2899,9 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});"
+        "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+2 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -2878,11 +2948,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-020",
-          "TC-025",
-          "TC-118"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-020",
           "BR-025"
@@ -2892,6 +2958,11 @@
           "postQuotes",
           "postOrders",
           "postOrdersCancel"
+        ],
+        "partial": [
+          "TC-020",
+          "TC-025",
+          "TC-118"
         ]
       },
       "readiness": {
@@ -2928,7 +2999,9 @@
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
-        "Two browser profiles: A and B. A places and later cancels a real pickup COD order (the stock is released on cancellation while the order is 'بانتظار قبول المطبخ')."
+        "Two browser profiles: A and B. A places and later cancels a real pickup COD order (the stock is released on cancellation while the order is 'بانتظار قبول المطبخ').",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -2985,10 +3058,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-013",
-          "TC-151",
-          "TC-025",
-          "TC-029"
+          "TC-151"
         ],
         "rules": [
           "BR-013",
@@ -3001,6 +3071,11 @@
           "postQuotes",
           "postOrders",
           "postOrdersCancel"
+        ],
+        "partial": [
+          "TC-013",
+          "TC-025",
+          "TC-029"
         ]
       },
       "readiness": {
@@ -3040,7 +3115,8 @@
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
         "Plan 25 minutes. Cutoff = slot start minus lead minutes (cook_slot_cutoff_ck). Use clock of the server: compare with the Date response header of GET /api/v1/configuration/public.",
-        "Policy facts (synthetic policy v1): quote lifetime 300 s; acceptance window = min(now+15 min, cutoff); a quote needs at least 5 minutes before cutoff."
+        "Policy facts (synthetic policy v1): quote lifetime 300 s; acceptance window = min(now+15 min, cutoff); a quote needs at least 5 minutes before cutoff.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "Short-lived slot created by FX-COOK-A at now+45 min with lead 30 min (not in the seed). FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.",
       "steps": [
@@ -3090,12 +3166,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-014",
-          "TC-015",
-          "TC-115",
-          "TC-020"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-014",
           "BR-015",
@@ -3109,6 +3180,12 @@
           "postQuotes",
           "postOrders",
           "getMealsById"
+        ],
+        "partial": [
+          "TC-014",
+          "TC-015",
+          "TC-115",
+          "TC-020"
         ]
       },
       "readiness": {
@@ -3145,7 +3222,8 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Basket with 'كشري تجريبي' x1 (day+1 slot). Policy quote lifetime: 300 s (commerce_policy.quote_ttl_seconds). No test clock exists on the preview: the tester waits in real time."
+        "Basket with 'كشري تجريبي' x1 (day+1 slot). Policy quote lifetime: 300 s (commerce_policy.quote_ttl_seconds). No test clock exists on the preview: the tester waits in real time.",
+        "Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -3187,19 +3265,18 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-020",
-          "TC-044",
-          "TC-117"
-        ],
+        "scenarios": [],
         "rules": [
-          "BR-020",
-          "BR-044"
+          "BR-020"
         ],
         "decisions": [],
         "operations": [
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-020",
+          "TC-117"
         ]
       },
       "readiness": {
@@ -3237,7 +3314,8 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "FX-COOK-A publishes a test meal 'اختبار سعر PX1' (English 'Price test PX1') in the operations web: tab 'الأطباق' > form 'طبق جديد (مسودة)': Arabic and English names, السعر (جنيه) = 40, portion, ingredients, allergens 'لا يوجد ما يُعلن عنه', attach any small PNG in 'صورة الطبق', press 'إنشاء', then 'نشر'. A photo is mandatory: the seeded meals have no photo, so editing their price through the cook UI is refused (MealService.update validates published meals as complete: photos APPROVED_PHOTO_REQUIRED). Then create a slot (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.) on day+4 at 17:00 with PX1 capacity 5.",
-        "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry."
+        "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "FX-COOK-A publishes a test meal 'اختبار سعر PX1' (English 'Price test PX1') in the operations web: tab 'الأطباق' > form 'طبق جديد (مسودة)': Arabic and English names, السعر (جنيه) = 40, portion, ingredients, allergens 'لا يوجد ما يُعلن عنه', attach any small PNG in 'صورة الطبق', press 'إنشاء', then 'نشر'. A photo is mandatory: the seeded meals have no photo, so editing their price through the cook UI is refused (MealService.update validates published meals as complete: photos APPROVED_PHOTO_REQUIRED). Then create a slot (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.) on day+4 at 17:00 with PX1 capacity 5.",
       "steps": [
@@ -3294,10 +3372,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-154",
-          "TC-155",
-          "TC-020",
-          "TC-153"
+          "TC-154"
         ],
         "rules": [
           "BR-019",
@@ -3313,6 +3388,11 @@
           "postOrders",
           "patchCookMealsById",
           "getCookMealsPriceHistory"
+        ],
+        "partial": [
+          "TC-155",
+          "TC-020",
+          "TC-153"
         ]
       },
       "readiness": {
@@ -3353,7 +3433,8 @@
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "FX-COOK-A publishes a test meal 'اختبار سعر PX1' (English 'Price test PX1') in the operations web: tab 'الأطباق' > form 'طبق جديد (مسودة)': Arabic and English names, السعر (جنيه) = 40, portion, ingredients, allergens 'لا يوجد ما يُعلن عنه', attach any small PNG in 'صورة الطبق', press 'إنشاء', then 'نشر'. A photo is mandatory: the seeded meals have no photo, so editing their price through the cook UI is refused (MealService.update validates published meals as complete: photos APPROVED_PHOTO_REQUIRED). Then create a slot (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.) on day+4 at 17:00 with PX1 capacity 5.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Output of E2E-BASKET-014: FX-CUST-A has one order of 2 x PX1 at 50.00 (total 100.00), state 'بانتظار قبول المطبخ' or later. Record its id as ORDER."
+        "Output of E2E-BASKET-014: FX-CUST-A has one order of 2 x PX1 at 50.00 (total 100.00), state 'بانتظار قبول المطبخ' or later. Record its id as ORDER.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "FX-COOK-A publishes a test meal 'اختبار سعر PX1' (English 'Price test PX1') in the operations web: tab 'الأطباق' > form 'طبق جديد (مسودة)': Arabic and English names, السعر (جنيه) = 40, portion, ingredients, allergens 'لا يوجد ما يُعلن عنه', attach any small PNG in 'صورة الطبق', press 'إنشاء', then 'نشر'. A photo is mandatory: the seeded meals have no photo, so editing their price through the cook UI is refused (MealService.update validates published meals as complete: photos APPROVED_PHOTO_REQUIRED). Then create a slot (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.) on day+4 at 17:00 with PX1 capacity 5.",
       "steps": [
@@ -3395,11 +3476,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-156",
-          "TC-153",
-          "TC-022"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-012",
           "BR-022"
@@ -3410,6 +3487,11 @@
         "operations": [
           "getOrdersById",
           "patchCookMealsById"
+        ],
+        "partial": [
+          "TC-156",
+          "TC-153",
+          "TC-022"
         ]
       },
       "readiness": {
@@ -3447,7 +3529,8 @@
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
         "Race technique: in each customer's DevTools console define a timer so both fire in the same second: const T=<same epoch milliseconds ~30 s ahead>; setTimeout(async()=>console.log(await place(q)), T-Date.now()). Run it in both consoles before T. Repeat the whole case 3 times with a fresh slot each time.",
-        "FX-COOK-A creates slot LAST1: tomorrow 18:00, أقصى عدد حصص 1, 'كشري تجريبي' capacity 1, then 'فتح'. Copy its id."
+        "FX-COOK-A creates slot LAST1: tomorrow 18:00, أقصى عدد حصص 1, 'كشري تجريبي' capacity 1, then 'فتح'. Copy its id.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "LAST1..LAST3: slots of kitchen 1 with max 1 portion and koshari capacity 1 (not in the seed).",
       "steps": [
@@ -3501,9 +3584,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-025",
-          "TC-137",
-          "TC-118"
+          "TC-025"
         ],
         "rules": [
           "BR-025",
@@ -3513,6 +3594,10 @@
         "operations": [
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-137",
+          "TC-118"
         ]
       },
       "readiness": {
@@ -3549,7 +3634,8 @@
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
         "Race technique: in each customer's DevTools console define a timer so both fire in the same second: const T=<same epoch milliseconds ~30 s ahead>; setTimeout(async()=>console.log(await place(q)), T-Date.now()). Run it in both consoles before T. Repeat the whole case 3 times with a fresh slot each time.",
-        "FX-COOK-A creates slot AGG1: tomorrow 19:00, أقصى عدد حصص 1, capacity 1 for BOTH 'كشري تجريبي' and 'محشي تجريبي', then 'فتح'."
+        "FX-COOK-A creates slot AGG1: tomorrow 19:00, أقصى عدد حصص 1, capacity 1 for BOTH 'كشري تجريبي' and 'محشي تجريبي', then 'فتح'.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "AGG1..AGG3: one-portion cook slots offering two meals with capacity 1 each (not in the seed).",
       "steps": [
@@ -3603,9 +3689,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-013",
-          "TC-025",
-          "TC-137"
+          "TC-025"
         ],
         "rules": [
           "BR-013",
@@ -3615,6 +3699,10 @@
         "operations": [
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-013",
+          "TC-137"
         ]
       },
       "readiness": {
@@ -3651,7 +3739,8 @@
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
-        "FX-COOK-A creates slot LIM: day+4 at 20:00, أقصى عدد حصص 6, capacity 'كشري تجريبي' 5 and 'محشي تجريبي' 1, then 'فتح' (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.). Copy its id."
+        "FX-COOK-A creates slot LIM: day+4 at 20:00, أقصى عدد حصص 6, capacity 'كشري تجريبي' 5 and 'محشي تجريبي' 1, then 'فتح' (FX-COOK-A creates slots in the operations web (https://ops.<PREVIEW_DOMAIN>, tab 'المواعيد', form 'موعد جديد'): fields التاريخ (date), البداية (start HH:MM), النهاية (end), أقصى عدد حصص, مهلة الطلب (دقائق) (minimum 30), then 'حصص لكل طبق' per published meal; press 'إنشاء' then 'فتح' on the new card. Slots must start at a time not already used by that kitchen (unique start per kitchen) - use D+4 or a time other than 13:00.). Copy its id.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "Slot LIM: kitchen 1, day+4 20:00, 6 portions total, koshari 5, mahshi 1 (not in the seed).",
       "steps": [
@@ -3699,11 +3788,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-022",
-          "TC-025",
-          "TC-118"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-022",
           "BR-025"
@@ -3712,6 +3797,11 @@
         "operations": [
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-022",
+          "TC-025",
+          "TC-118"
         ]
       },
       "readiness": {
@@ -3747,7 +3837,8 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Kitchen 'مطبخ المعاينة' offers pickup, delivery to 'Test zone A' (fee 3000) and a 50 % deposit profile (INSTAPAY, demo recipient). FX-CUST-A has no address yet or an old one in Test zone A. Basket: 'كشري تجريبي' x2 (day+1 slot)."
+        "Kitchen 'مطبخ المعاينة' offers pickup, delivery to 'Test zone A' (fee 3000) and a 50 % deposit profile (INSTAPAY, demo recipient). FX-CUST-A has no address yet or an old one in Test zone A. Basket: 'كشري تجريبي' x2 (day+1 slot).",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -3797,12 +3888,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-117",
-          "TC-019",
-          "TC-157",
-          "TC-163"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-019",
           "BR-021",
@@ -3815,6 +3901,12 @@
         "operations": [
           "postQuotes",
           "postMeAddresses"
+        ],
+        "partial": [
+          "TC-117",
+          "TC-019",
+          "TC-157",
+          "TC-163"
         ]
       },
       "readiness": {
@@ -3851,7 +3943,9 @@
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
         "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
-        "K = a seeded kitchen-1 slot id."
+        "K = a seeded kitchen-1 slot id.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders).",
+        "Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -3911,9 +4005,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-019",
-          "TC-053",
-          "TC-136"
+          "TC-019"
         ],
         "rules": [
           "BR-019",
@@ -3923,6 +4015,10 @@
         "operations": [
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-053",
+          "TC-136"
         ]
       },
       "readiness": {
@@ -3957,7 +4053,8 @@
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});"
+        "Place-order console helper (after the base helper): const place=(q,key)=>call('POST','/api/v1/orders',{quoteId:q.quoteId,clientRequestId:crypto.randomUUID(),acceptedPolicyVersions:{terms:q.termsVersion,cancellation:q.cancellationPolicyVersion}},{'Idempotency-Key':key||('e2e-'+crypto.randomUUID())}); const quote=(items,slotId,mode='PICKUP',extra={})=>call('POST','/api/v1/quotes',{items,slotId,fulfillmentMode:mode,paymentMethod:'COD',...extra});",
+        "Slot day for this case: seeded day+3 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -3992,10 +4089,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-022",
-          "TC-024"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-022",
           "BR-024"
@@ -4003,6 +4097,10 @@
         "decisions": [],
         "operations": [
           "postOrders"
+        ],
+        "partial": [
+          "TC-022",
+          "TC-024"
         ]
       },
       "readiness": {
@@ -4034,7 +4132,8 @@
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
-        "Private window, no session."
+        "Private window, no session.",
+        "Slot day for this case: seeded day+1 slot (13:00 Cairo, 10 koshari / 10 mahshi portions); if its availablePortions is lower than needed, use another seeded day and record it. Cases run in parallel by different testers must use different days."
       ],
       "fixture_data": "",
       "steps": [
@@ -4076,11 +4175,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-109",
-          "TC-127",
-          "TC-044"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-001",
           "BR-018"
@@ -4088,6 +4183,10 @@
         "decisions": [],
         "operations": [
           "getMe"
+        ],
+        "partial": [
+          "TC-109",
+          "TC-127"
         ]
       },
       "readiness": {
@@ -4121,7 +4220,8 @@
         "FX-ISOLATED stack (changes the shared zone fee).",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "FX-STAFF-ADMIN has config.write and a fresh MFA step-up (staff configuration changes need recent MFA). Current fee of Test zone A = 3000 (service_zone.delivery_fee_minor). A has a saved address in Test zone A and a basket of koshari x1 for delivery."
+        "FX-STAFF-ADMIN has config.write and a fresh MFA step-up (staff configuration changes need recent MFA). Current fee of Test zone A = 3000 (service_zone.delivery_fee_minor). A has a saved address in Test zone A and a basket of koshari x1 for delivery.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -4170,9 +4270,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-154",
-          "TC-042",
-          "TC-126"
+          "TC-154"
         ],
         "rules": [
           "BR-019",
@@ -4186,6 +4284,10 @@
           "postOpsConfigurationVersions",
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-042",
+          "TC-126"
         ]
       },
       "readiness": {
@@ -4222,7 +4324,8 @@
         "FX-ISOLATED stack (a new commerce policy applies to every user).",
         "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
         "Paste this once in the browser DevTools console of the signed-in app tab (origin https://app.<PREVIEW_DOMAIN>) to define call(method,path,body,extraHeaders): const API='https://api.<PREVIEW_DOMAIN>';const xsrf=()=>decodeURIComponent(document.cookie.split('; ').find(c=>c.startsWith('XSRF-TOKEN=')).slice(11));const call=async(m,p,b,h={})=>{const r=await fetch(API+p,{method:m,credentials:'include',headers:{'Content-Type':'application/json','Accept-Language':'en',...(m==='GET'?{}:{'X-XSRF-TOKEN':xsrf()}),...h},body:b?JSON.stringify(b):undefined});const t=await r.text();return {status:r.status,body:t?JSON.parse(t):null}}; Each call returns {status, body}. If document.cookie has no XSRF-TOKEN yet, reload the page once and retry.",
-        "FX-STAFF-ADMIN has config.write and recent MFA. Current active commerce policy version = 1 (maxItemQuantity 10). The synthetic flag is allowed only in LOCAL/CI profiles. A's basket: 'كشري تجريبي' x8."
+        "FX-STAFF-ADMIN has config.write and recent MFA. Current active commerce policy version = 1 (maxItemQuantity 10). The synthetic flag is allowed only in LOCAL/CI profiles. A's basket: 'كشري تجريبي' x8.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -4277,9 +4380,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-152",
-          "TC-042",
-          "TC-020"
+          "TC-152"
         ],
         "rules": [
           "BR-019",
@@ -4291,6 +4392,10 @@
           "postOpsConfigurationVersions",
           "getConfigurationPublic",
           "postQuotes"
+        ],
+        "partial": [
+          "TC-042",
+          "TC-020"
         ]
       },
       "readiness": {
@@ -4325,7 +4430,8 @@
       "prerequisites": [
         "Signed device build pointing at the preview; FX-CUST-A signed in on the device (system-browser sign-in). PX1 test meal and slot as in E2E-BASKET-014.",
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
-        "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case."
+        "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -4380,11 +4486,7 @@
       },
       "refs": {
         "scenarios": [
-          "TC-148",
-          "TC-132",
-          "TC-134",
-          "TC-135",
-          "TC-154"
+          "TC-148"
         ],
         "rules": [
           "BR-018",
@@ -4398,6 +4500,12 @@
         "operations": [
           "postQuotes",
           "postOrders"
+        ],
+        "partial": [
+          "TC-154",
+          "TC-132",
+          "TC-134",
+          "TC-135"
         ]
       },
       "readiness": {
@@ -4434,7 +4542,8 @@
         "Signed device build of PR #9 (the epoch/ownership guards of accountEpoch and bindShopping exist only there: commits 5e0ce79, 89ec820). Both customers phone-verified.",
         "Seed loaded (deploy/web-preview/seed-preview.sql): GET https://api.<PREVIEW_DOMAIN>/api/v1/meals?limit=50 contains meals 'كشري تجريبي' (price.amountMinor 7500, id 00000000-0000-4000-8000-0000000bb001), 'محشي تجريبي' (18000, id 00000000-0000-4000-8000-0000000bb002) of kitchen 'مطبخ المعاينة' (slug preview-kitchen, id 00000000-0000-4000-8000-0000000bd001) and 'ملوخية تجريبية' (12025, id 00000000-0000-4000-8000-0000000bb003) of kitchen 'مطبخ تجريبي تاني' (slug preview-kitchen-two, id 00000000-0000-4000-8000-0000000bd002). Other testers may have added meals: record the actual list at the start.",
         "Seeded slots are still in the future: the seed created one OPEN slot per kitchen at 13:00 Africa/Cairo on each of the three calendar days after the seed date (20 max portions per slot, 10 per meal, cutoff 11:00 same day). Open GET /api/v1/meals/00000000-0000-4000-8000-0000000bb001 and confirm nextSlots has at least one entry; if the three days have passed, FX-COOK-A must create new OPEN slots (operations web, tab المواعيد/Slots, form 'موعد جديد'/'New slot', then button 'فتح'/'Open') with 10 portions for each seeded meal before any basket case.",
-        "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results."
+        "Sign-in password comes from the private fixture sheet (PREVIEW_USER_PASSWORD); never write it into results.",
+        "Two or more human actors: use a separate browser profile (or browser) per actor; sessions share cookies per profile, so never sign two actors into one profile at once unless the case says so. Before the case, read GET /api/v1/meals/<id> and check nextSlots[].availablePortions of the slot you will use is at least what the case needs (seed: 10 per meal; preparation consumes stock permanently, so prefer cancelling test orders)."
       ],
       "fixture_data": "",
       "steps": [
@@ -4481,12 +4590,7 @@
         ]
       },
       "refs": {
-        "scenarios": [
-          "TC-148",
-          "TC-131",
-          "TC-048",
-          "TC-006"
-        ],
+        "scenarios": [],
         "rules": [
           "BR-048",
           "BR-006",
@@ -4497,6 +4601,12 @@
           "getMe",
           "getOrders",
           "getMeFavorites"
+        ],
+        "partial": [
+          "TC-048",
+          "TC-131",
+          "TC-006",
+          "TC-148"
         ]
       },
       "readiness": {
@@ -4637,6 +4747,7 @@
     "The original catalog contains no case for: phone verification gate and OTP limits (BR-003/004), addresses (BR-005), favorites (BR-040), notifications inbox (BR-037/038), profile/language preference, reviews (BR-039), activity measurement (D17), account deletion intake, demo-environment notice, server-side basket rules (BR-018), quote immutability/stock-free quotes, fee/policy changes (TC-152/154), native offline/discovery/basket/account-switch (TC-049, TC-148). New cases DISC-101..117 and BASKET-021..030 add them.",
     "Customer-visible Arabic currency/time formatting is produced by Intl (apps/customer-web/src/api.ts formatMoney/formatTime); exact glyph sequences depend on the browser ICU and are not asserted verbatim in the cases (listed under unverified).",
     "Staff-only parts (zone fee, commerce policy, kitchen suspension) require recent MFA step-up and, for commerce-policy, a profile that allows synthetic policies (ConfigurationService.newPolicy: synthetic only in LOCAL/CI); on the PREVIEW profile a policy change would need an approvalReference, so TC-152 and the fee-change case are isolated-stack only.",
-    "E2E-DISC-005/E2E-DISC-104 need FX-COOK-B, FX-COOK-PENDING and FX-STAFF-OPS which the seed does not contain (only preview-cook-1 and an unreachable 'preview-cook-2 (no login)' row exist)."
+    "E2E-DISC-005/E2E-DISC-104 need FX-COOK-B, FX-COOK-PENDING and FX-STAFF-OPS which the seed does not contain (only preview-cook-1 and an unreachable 'preview-cook-2 (no login)' row exist).",
+    "Traceability corrected after QA review: refs.scenarios now lists only TCs a case exercises end to end; all other related TCs moved to refs.partial. TC-044 was removed from BASKET-013, BASKET-030 and DISC-004 (stable placement key is not exercised there); TC-018 server rejection belongs to BASKET-021 (BASKET-010 only partial)."
   ]
 }

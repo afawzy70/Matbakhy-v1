@@ -82,5 +82,13 @@
  "TC-133": {
   "classification": "GAP",
   "reason": "Native push permission, lifecycle push and accessibility need a physical-device case; none is authored yet (push delivery is an open owner decision, O07)."
+ },
+ "TC-033": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Specifies a 2400 commission group / commission receivable; owner decision D10 (0% commission at launch) supersedes the amounts. The inactive commission ledger path is verified by automated finance tests; the owner-visible zero-commission guarantee is covered by E2E-FIN-046 and the ledger check inside E2E-FIN-039."
+ },
+ "TC-034": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Specifies a 2400 commission group / commission receivable; owner decision D10 (0% commission at launch) supersedes the amounts. The inactive commission ledger path is verified by automated finance tests; the owner-visible zero-commission guarantee is covered by E2E-FIN-046 and the ledger check inside E2E-FIN-039."
  }
 }

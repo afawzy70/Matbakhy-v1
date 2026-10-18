@@ -58,11 +58,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-060",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-060"
@@ -71,6 +67,11 @@
     "operations": [
      "deploy.sh smoke",
      "deploy/web-preview/Caddyfile id. site block"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-060",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -141,7 +142,7 @@
     {
      "n": 6,
      "actor": "FX-CUST-A",
-     "action": "Repeat GET /api/v1/me from the same tab, then press Browser Back and open https://app.<PREVIEW_DOMAIN>/account",
+     "action": "Repeat GET /api/v1/me from the same tab, then press Browser Back and open https://app.<PREVIEW_DOMAIN>/#/account (the web app uses hash routes)",
      "data": "Also inspect DevTools > Application > Cookies for MATBAKHY_SESSION"
     }
    ],
@@ -161,11 +162,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-002",
-     "TC-109"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-002"
@@ -175,6 +172,11 @@
      "getMe",
      "POST /api/v1/auth/logout",
      "GET /oauth2/authorization/keycloak"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-002",
+     "TC-109"
     ]
    },
    "readiness": {
@@ -252,10 +254,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-002"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-002"
@@ -264,6 +263,10 @@
     "operations": [
      "GET /oauth2/authorization/{registrationId}",
      "GET /login/oauth2/code/{registrationId}"
+    ],
+    "partial": [
+     "TC-002",
+     "TC-109"
     ]
    },
    "readiness": {
@@ -338,16 +341,17 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-109"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001"
     ],
     "decisions": [],
     "operations": [
      "getMe"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-109"
     ]
    },
    "readiness": {
@@ -433,11 +437,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-006",
-     "TC-007"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-006",
@@ -447,6 +447,11 @@
     "operations": [
      "getOpsStaff",
      "getOpsSecurityMfaPolicy"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-006",
+     "TC-007"
     ]
    },
    "readiness": {
@@ -528,10 +533,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-006"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-006"
@@ -539,6 +541,9 @@
     "decisions": [],
     "operations": [
      "getMe"
+    ],
+    "partial": [
+     "TC-006"
     ]
    },
    "readiness": {
@@ -558,7 +563,7 @@
   },
   {
    "id": "CFG-101",
-   "title": "MFA decision table: effective mode, required and available for every category combination, user preference and missing row (replaces CFG-007, 009, 010, 012-matrix, 013)",
+   "title": "MFA decision table (ISOLATED STACK ONLY): effective mode, required and available for every category combination, user preference and missing row (replaces CFG-007, 009, 010, 012-matrix, 013)",
    "priority": "P0",
    "surface": [
     "api",
@@ -573,10 +578,11 @@
     "FX-MULTIROLE"
    ],
    "prerequisites": [
+    "ISOLATED STACK ONLY (needs_isolated_stack): every row changes policy for all users of a category and R13 deletes a policy row; never run on the shared preview",
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "Four account shapes exist on the isolated stack: customer-only (FX-CUST-A: category CUSTOMER), cook (FX-COOK-A owns an approved kitchen: CUSTOMER+KITCHEN), staff (FX-STAFF-SUPPORT holds any active grant, no kitchen: CUSTOMER+STAFF), multi-role (FX-MULTIROLE: kitchen + active grant: all three). Every account is always in CUSTOMER (MfaPolicyService.decide)",
     "Reset all policies first: three PUTs setting CUSTOMER, KITCHEN, STAFF to OPTIONAL and every fixture preference off (PUT /api/v1/me/security/mfa {\"enabled\":false})"
    ],
@@ -602,7 +608,7 @@
     {
      "n": 4,
      "actor": "FX-STAFF-ADMIN-B",
-     "action": "Missing-row row only (run LAST, isolated DB): `DELETE FROM mfa_policy WHERE category='KITCHEN'` via psql, then repeat step 2 for FX-COOK-A and FX-CUST-A; afterwards restore with `INSERT INTO mfa_policy(category,mode) VALUES('KITCHEN','OPTIONAL')`",
+     "action": "Missing-row row only (run LAST, isolated DB): FIRST restore CUSTOMER, KITCHEN and STAFF to OPTIONAL (three PUTs) and set every fixture preference off (PUT /api/v1/me/security/mfa {\"enabled\":false} per account), because R12 left CUSTOMER=DISABLED. THEN `DELETE FROM mfa_policy WHERE category='KITCHEN'` via psql, repeat step 2 for FX-COOK-A and FX-CUST-A; afterwards restore with `INSERT INTO mfa_policy(category,mode) VALUES('KITCHEN','OPTIONAL')`",
      "data": "Fail-safe rule: a missing row counts as REQUIRED for categories the account belongs to"
     }
    ],
@@ -624,7 +630,7 @@
      "R10 staff | D D R | off | REQUIRED, false, true, true",
      "R11 multi-role | D D D | on | DISABLED, true, false, false",
      "R12 multi-role | D D R | off | REQUIRED, false, true, true",
-     "R13 missing KITCHEN row: cook => REQUIRED, required=true, available=true; customer-only unaffected (OPTIONAL, required=false)",
+     "R13 (after resetting all three categories to OPTIONAL and all preferences off) missing KITCHEN row: cook => REQUIRED, required=true, available=true; customer-only => OPTIONAL, required=false (KITCHEN does not apply to it)",
      "In every row `categories` lists exactly the account's applicable categories (customer-only: [CUSTOMER]; cook: [CUSTOMER, KITCHEN]; staff: [CUSTOMER, STAFF]; multi-role: all three) and `policy` maps only those",
      "Recomputed on every request: after each PUT the next GET shows the new values without re-login"
     ],
@@ -634,11 +640,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-007",
-     "TC-042"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-007",
@@ -652,6 +654,9 @@
      "putOpsSecurityMfaPolicyByCategory",
      "getOpsSecurityMfaPolicy",
      "patchMe"
+    ],
+    "partial": [
+     "TC-007"
     ]
    },
    "readiness": {
@@ -752,10 +757,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-002"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-002",
@@ -767,6 +769,9 @@
     "operations": [
      "getMeSecurity",
      "GET /oauth2/authorization/keycloak?stepUp=true"
+    ],
+    "partial": [
+     "TC-109"
     ]
    },
    "readiness": {
@@ -865,10 +870,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-002"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-002"
@@ -879,6 +881,9 @@
     "operations": [
      "putMeSecurityMfa",
      "getMeSecurity"
+    ],
+    "partial": [
+     "TC-002"
     ]
    },
    "readiness": {
@@ -916,7 +921,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "Policies are all OPTIONAL and all preferences off before starting; FX-CUST-A and FX-COOK-A are enrolled (CFG-102) so they can pass the step-up",
     "Do not run on the shared preview: mfa-policy.md step 5 says REQUIRED starts with STAFF and CUSTOMER/KITCHEN must not be REQUIRED until the mobile app is verified (this case sets CUSTOMER and KITCHEN to REQUIRED on the isolated stack only)"
    ],
@@ -974,11 +979,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-007",
-     "TC-042"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-007",
@@ -991,6 +992,9 @@
      "putOpsSecurityMfaPolicyByCategory",
      "putMeSecurityMfa",
      "patchMe"
+    ],
+    "partial": [
+     "TC-007"
     ]
    },
    "readiness": {
@@ -1030,7 +1034,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "FX-CUST-A is enrolled with preference ON (CFG-008 step 2) before the category is changed",
     "FX-STAFF-SUPPORT holds support.case"
    ],
@@ -1088,10 +1092,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-007"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-007"
@@ -1102,6 +1103,9 @@
     "operations": [
      "putMeSecurityMfa",
      "putOpsSecurityMfaPolicyByCategory"
+    ],
+    "partial": [
+     "TC-007"
     ]
    },
    "readiness": {
@@ -1187,9 +1191,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001"
     ],
@@ -1198,6 +1200,9 @@
     ],
     "operations": [
      "getMeSecurity"
+    ],
+    "partial": [
+     "TC-060"
     ]
    },
    "readiness": {
@@ -1230,7 +1235,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)"
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)"
    ],
    "steps": [
     {
@@ -1279,9 +1284,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-042"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-042"
     ],
@@ -1290,6 +1293,9 @@
     ],
     "operations": [
      "putOpsSecurityMfaPolicyByCategory"
+    ],
+    "partial": [
+     "TC-042"
     ]
    },
    "readiness": {
@@ -1311,7 +1317,7 @@
   },
   {
    "id": "CFG-016",
-   "title": "Policy mutation authorization ladder: guest, customer, ungranted staff, granted staff without recent MFA, and read vs write",
+   "title": "Policy mutation authorization ladder (refusals only): guest, customer, ungranted staff, bootstrap admin, and granted staff without recent MFA; no state change",
    "priority": "P0",
    "surface": [
     "api",
@@ -1328,15 +1334,15 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
-    "Use a copy of the policy states in the isolated stack or restore after step 5; requests below use mode OPTIONAL so nothing weakens even if they succeed unexpectedly"
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
+    "Every PUT in this case is expected to be REFUSED; if any returns 2xx the case FAILS and the policy must be restored from the version/mode read in step 1 (GET /api/v1/ops/security/mfa-policy). Safe on the shared preview only because nothing is expected to change"
    ],
    "steps": [
     {
      "n": 1,
      "actor": "FX-GUEST",
      "action": "curl -s -w ' %{http_code}\\n' -X PUT -H 'Content-Type: application/json' -d '{\"mode\":\"OPTIONAL\",\"expectedVersion\":0,\"reason\":\"E2E guest\"}' https://api.<PREVIEW_DOMAIN>/api/v1/ops/security/mfa-policy/STAFF",
-     "data": "No credentials, no CSRF"
+     "data": "Body mode value equals the current STAFF mode read beforehand; no CSRF, no credentials"
     },
     {
      "n": 2,
@@ -1359,8 +1365,8 @@
     {
      "n": 5,
      "actor": "FX-STAFF-ADMIN-B",
-     "action": "GET /api/v1/ops/security/mfa-policy with a password-only session; then the PUT with a password-only session; then the PUT after step-up",
-     "data": "Read needs the permission only; write also needs recent MFA"
+     "action": "With a PASSWORD-ONLY session: GET /api/v1/ops/security/mfa-policy (record all modes and versions), then PUT /api/v1/ops/security/mfa-policy/STAFF with the CURRENT mode and current expectedVersion",
+     "data": "Read needs the permission only; write needs recent MFA, so this PUT must be refused"
     }
    ],
    "expected": {
@@ -1370,19 +1376,15 @@
     "api": [
      "Guest: 401 (or 403 on missing CSRF token before authentication; record which)",
      "Customer, NOGRANT, preview-ops-1: 403 FORBIDDEN",
-     "FX-STAFF-ADMIN-B password-only: GET 200; PUT 403 STEP_UP_REQUIRED; PUT after step-up 200",
+     "FX-STAFF-ADMIN-B password-only: GET 200; PUT 403 STEP_UP_REQUIRED",
      "GET /api/v1/me/security canManagePolicy is true only for ADMIN-B"
     ],
     "database": [
-     "Read-only: mfa_policy unchanged for steps 1-4 (compare version)"
+     "Read-only: mfa_policy rows (mode, version) identical before and after; no new mfa.policy.update audit_event row"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-007",
-     "TC-043"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-007",
@@ -1394,6 +1396,10 @@
     "operations": [
      "getOpsSecurityMfaPolicy",
      "putOpsSecurityMfaPolicyByCategory"
+    ],
+    "partial": [
+     "TC-007",
+     "TC-043"
     ]
    },
    "readiness": {
@@ -1431,7 +1437,7 @@
    "prerequisites": [
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)",
     "FX-CUST-B account id known (SELECT id FROM app_user WHERE subject=... on the isolated DB, or from the ops web account search)"
    ],
@@ -1484,10 +1490,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-007",
-     "TC-043"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-007",
      "BR-043"
@@ -1497,6 +1500,10 @@
     ],
     "operations": [
      "postOpsAccountsMfaReset"
+    ],
+    "partial": [
+     "TC-007",
+     "TC-043"
     ]
    },
    "readiness": {
@@ -1536,7 +1543,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "Live realm migrated (owner-gated): on the server `./migrate-mfa.sh status` prints flows=complete, browserFlow=matbakhy browser and client.matbakhy-admin=present (NOT true on the live realm today: migration has never been run there)",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)",
     "FX-CUST-B enrolled an authenticator (CFG-102 for preview-customer-2) and has preference ON; FX-CUST-B is signed in in a separate browser window WB with an MFA session",
     "This changes the live Keycloak credential of FX-CUST-B: run on FX-ISOLATED first; on the shared preview only after the owner agrees FX-CUST-B may lose its authenticator"
@@ -1590,10 +1597,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-007",
-     "TC-043"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-007"
     ],
@@ -1602,6 +1606,9 @@
     ],
     "operations": [
      "postOpsAccountsMfaReset"
+    ],
+    "partial": [
+     "TC-007"
     ]
    },
    "readiness": {
@@ -1638,7 +1645,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)",
     "Operator can stop/start the identity container of the ISOLATED stack"
    ],
@@ -1676,9 +1683,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-007"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-007"
     ],
@@ -1687,6 +1692,9 @@
     ],
     "operations": [
      "postOpsAccountsMfaReset"
+    ],
+    "partial": [
+     "TC-007"
     ]
    },
    "readiness": {
@@ -1722,7 +1730,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "Live realm migrated (owner-gated): on the server `./migrate-mfa.sh status` prints flows=complete, browserFlow=matbakhy browser and client.matbakhy-admin=present (NOT true on the live realm today: migration has never been run there)",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "OIDC_ADMIN_CLIENT_SECRET is set in the stack's .env (`grep -c '^OIDC_ADMIN_CLIENT_SECRET=.' .env` prints 1; never print the value)",
     "FX-CUST-B has preference ON and an enrolled authenticator; a mobile or scripted client holds an access token issued before the reset (web sessions are ended by the reset, so only the isolated stack with a bearer harness or the iPhone can show the token case: see CFG-109)"
    ],
@@ -1766,9 +1774,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-007"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-007"
     ],
@@ -1778,6 +1784,9 @@
     "operations": [
      "postOpsAccountsMfaReset",
      "patchMe"
+    ],
+    "partial": [
+     "TC-007"
     ]
    },
    "readiness": {
@@ -1846,9 +1855,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-054"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-054"
     ],
@@ -1857,6 +1864,9 @@
     ],
     "operations": [
      "GET /oauth2/authorization/keycloak?stepUp=true"
+    ],
+    "partial": [
+     "TC-054"
     ]
    },
    "readiness": {
@@ -1890,7 +1900,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "Isolated API started with OIDC_ADMIN_CLIENT_SECRET blank (compose env override), nothing else changed"
    ],
    "steps": [
@@ -1927,9 +1937,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
@@ -1939,6 +1947,9 @@
     "operations": [
      "postOpsAccountsMfaReset",
      "putMeSecurityMfa"
+    ],
+    "partial": [
+     "TC-060"
     ]
    },
    "readiness": {
@@ -1959,39 +1970,45 @@
   },
   {
    "id": "CFG-104",
-   "title": "Staff high-risk actions require recent MFA regardless of policy mode; password-only preview-ops accounts are refused",
+   "title": "Staff high-risk actions (grants) require recent MFA regardless of policy mode; a password-only staff session is refused and the step-up path works (isolated, separate synthetic staff accounts)",
    "priority": "P0",
    "surface": [
     "api",
     "operations-web"
    ],
    "actors": [
-    "FX-STAFF-ADMIN"
+    "FX-STAFF-ADMIN-B",
+    "FX-STAFF-SUPPORT"
    ],
    "prerequisites": [
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
-    "Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)",
-    "Runs on the CURRENT deployed baseline for the refusal half (StaffAssurance exists on origin/develop); the 'allowed after step-up' half needs the realm migration",
-    "Allow-listed for ops.<PREVIEW_DOMAIN>"
+    "ISOLATED STACK ONLY: uses separate synthetic staff accounts (fixtures.md), NOT the password-only preview-ops-* accounts, and changes grants. FX-STAFF-ADMIN-B holds staff.grant and has an enrolled authenticator; FX-STAFF-SUPPORT has no support.case grant yet",
+    "FX-ISOLATED exists and `./migrate-mfa.sh status` there prints flows=complete (the step-up half needs the migrated realm; the refusal half works on any build with StaffAssurance)"
    ],
    "steps": [
     {
      "n": 1,
-     "actor": "FX-STAFF-ADMIN",
-     "action": "Sign in at https://ops.<PREVIEW_DOMAIN>/ as preview-ops-1 (password only). Open the Staff tab",
-     "data": "Lists staff accounts (getOpsStaff)"
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "Sign in at ops.<PREVIEW_DOMAIN> password-only; open the Staff tab",
+     "data": ""
     },
     {
      "n": 2,
-     "actor": "FX-STAFF-ADMIN",
-     "action": "POST /api/v1/ops/staff/<preview-ops-2 account id>/grants body {\"permission\":\"support.case\",\"reason\":\"E2E grant probe\"} with the password-only session",
-     "data": "Body fields per GrantService.grant(permission, expiresAt, reason): confirm names in contracts/openapi.yaml postOpsStaffGrants first"
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "POST /api/v1/ops/staff/<FX-STAFF-SUPPORT account id>/grants {\"permission\":\"support.case\",\"reason\":\"E2E grant probe\"} with the password-only session",
+     "data": "Confirm body field names in contracts/openapi.yaml postOpsStaffGrants first"
     },
     {
      "n": 3,
-     "actor": "FX-STAFF-ADMIN",
-     "action": "After migration only: open https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://ops.<PREVIEW_DOMAIN>/, authenticate with the enrolled TOTP, repeat step 2",
-     "data": "Revoke the probe grant afterwards with POST /api/v1/ops/staff/<id>/grant-revocations"
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "Open https://api.<PREVIEW_DOMAIN>/oauth2/authorization/keycloak?stepUp=true&returnTo=https://ops.<PREVIEW_DOMAIN>/, enter the TOTP, repeat step 2",
+     "data": ""
+    },
+    {
+     "n": 4,
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "Cleanup: POST /api/v1/ops/staff/<FX-STAFF-SUPPORT id>/grant-revocations for the new grant, then GET /api/v1/ops/staff",
+     "data": "Grant must show revoked; restore FX-STAFF-SUPPORT to its fixture state"
     }
    ],
    "expected": {
@@ -2004,15 +2021,11 @@
      "GET /api/v1/ops/staff still 200 without MFA"
     ],
     "database": [
-     "Read-only: no user_grant row for preview-ops-2 after step 2; one active row after step 3 and an audit_event staff.grant ALLOWED"
+     "Read-only: no user_grant row for FX-STAFF-SUPPORT after step 2; one active support.case row after step 3 (audit_event staff.grant ALLOWED); revoked_at set after step 4 (audit_event staff.revoke ALLOWED)"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-007",
-     "TC-043",
-     "TC-111"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-007",
      "BR-043"
@@ -2021,19 +2034,25 @@
     "operations": [
      "postOpsStaffGrants",
      "getOpsStaff"
+    ],
+    "partial": [
+     "TC-007",
+     "TC-111"
     ]
    },
    "readiness": {
     "needs_updated_deploy": false,
     "needs_device": false,
-    "needs_isolated_stack": false,
-    "needs_fixtures": []
+    "needs_isolated_stack": true,
+    "needs_fixtures": [
+     "FX-STAFF-ADMIN-B",
+     "FX-STAFF-SUPPORT"
+    ]
    },
-   "destructive": false,
+   "destructive": true,
    "status": "NOT_RUN",
    "unverified": [
-    "Request body field names for postOpsStaffGrants (permission, reason, expiresAt) taken from GrantService signature, schema not read; confirm in contracts/openapi.yaml before running",
-    "Step 3 changes preview-ops-2's grants (a fixture other cases rely on being grant-free): revoke it immediately"
+    "Request body field names for postOpsStaffGrants (permission, reason, expiresAt) taken from GrantService signature, schema not read; confirm in contracts/openapi.yaml before running"
    ],
    "automated_coverage": [
     "StaffAssuranceTest",
@@ -2100,9 +2119,7 @@
    },
    "refs": {
     "scenarios": [
-     "TC-007",
-     "TC-043",
-     "TC-126"
+     "TC-043"
     ],
     "rules": [
      "BR-007",
@@ -2112,6 +2129,10 @@
     "operations": [
      "postOpsStaffGrants",
      "postOpsStaffGrantRevocations"
+    ],
+    "partial": [
+     "TC-007",
+     "TC-126"
     ]
    },
    "readiness": {
@@ -2134,7 +2155,7 @@
   },
   {
    "id": "CFG-106",
-   "title": "Operator runbook: provision the staff and cook fixtures the MFA cases need (grants for FX-STAFF-ADMIN-B, SUPPORT, OPS, FINANCE, MULTIROLE)",
+   "title": "Operator reference: staff and cook fixtures needed by the MFA cases are provisioned as in fixtures.md and carry the intended grants",
    "priority": "P1",
    "surface": [
     "api",
@@ -2145,27 +2166,26 @@
    ],
    "prerequisites": [
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
-    "FX-ISOLATED exists: a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete",
-    "Keycloak users for the new fixtures exist in the isolated realm (kcadm create users, passwords in the private fixture sheet); each has signed in once so an application account exists"
+    "FX-ISOLATED exists (see CFG-101 prerequisites); provisioning itself is described only in docs/quality/owner-acceptance/fixtures.md (Keycloak user ids are not preserved by `kcadm create users`; do not rely on fixed ids)"
    ],
    "steps": [
     {
      "n": 1,
      "actor": "FX-STAFF-ADMIN",
-     "action": "Step-up as preview-ops-1; for each new account id POST /api/v1/ops/staff/<id>/grants with: ADMIN-B => security.mfa_policy, security.mfa_reset, staff.grant; SUPPORT => support.case; OPS => order.ops, cook.review; FINANCE => finance.read, finance.verify; MULTIROLE => cook.review plus an approved kitchen (use the e2e fixture cook_approved_with_kitchen.sql through e2e-fixture.sh only on an isolated stack)",
-     "data": "Permission codes are the Permission enum values in V31"
+     "action": "Provision FX-STAFF-ADMIN-B, FX-STAFF-SUPPORT, FX-STAFF-OPS, FX-STAFF-FINANCE and FX-MULTIROLE exactly as docs/quality/owner-acceptance/fixtures.md says",
+     "data": "No provisioning commands are duplicated here"
     },
     {
      "n": 2,
      "actor": "FX-STAFF-ADMIN-B",
-     "action": "Enrol an authenticator for ADMIN-B (CFG-102) and call GET /api/v1/me/security",
+     "action": "After enrolling an authenticator (CFG-102) call GET /api/v1/me/security",
      "data": "canManagePolicy and canResetMfa must be true"
     },
     {
      "n": 3,
      "actor": "FX-STAFF-ADMIN",
      "action": "GET /api/v1/ops/staff to list grants",
-     "data": ""
+     "data": "Compare with the grant list in fixtures.md"
     }
    ],
    "expected": {
@@ -2173,18 +2193,15 @@
      "Ops web Staff tab shows each account with the granted permissions"
     ],
     "api": [
-     "Each grant POST succeeds; duplicate attempts 409",
-     "ADMIN-B settings report canManagePolicy=true, canResetMfa=true"
+     "ADMIN-B settings report canManagePolicy=true, canResetMfa=true",
+     "Staff list shows exactly the grants fixtures.md lists for each fixture"
     ],
     "database": [
      "Read-only: `SELECT user_id, permission FROM user_grant WHERE revoked_at IS NULL` lists exactly the intended rows"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-007",
-     "TC-126"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-007"
     ],
@@ -2192,7 +2209,8 @@
     "operations": [
      "postOpsStaffGrants",
      "getMeSecurity"
-    ]
+    ],
+    "partial": []
    },
    "readiness": {
     "needs_updated_deploy": true,
@@ -2277,7 +2295,7 @@
     {
      "n": 7,
      "actor": "FX-CUST-A",
-     "action": "Count orders on the web Orders list and in the DB (isolated) / read-only SQL: `SELECT count(*) FROM orders WHERE customer_id=<A> AND created_at > <test start>`",
+     "action": "Count orders on the web Orders list and in the DB (isolated) / read-only SQL: `SELECT count(*) FROM customer_order WHERE customer_id=<A> AND created_at > <test start>`",
      "data": ""
     }
    ],
@@ -2292,15 +2310,11 @@
      "Tokens replaced for the same subject (GET /api/v1/me returns the same account id)"
     ],
     "database": [
-     "Read-only: exactly one orders row created after the test start for the customer; `idempotency` record for the key has one entry (table name per db/migration; confirm)"
+     "Read-only: exactly one customer_order row created after the test start for the customer; idempotency_record has one row for (actor_id, idempotency_key) of the placement (V1__baseline_identity_and_idempotency.sql)"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-048",
-     "TC-052",
-     "TC-131"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-048",
      "BR-052"
@@ -2311,6 +2325,11 @@
     "operations": [
      "putMeSecurityMfa",
      "POST /api/v1/orders"
+    ],
+    "partial": [
+     "TC-048",
+     "TC-052",
+     "TC-131"
     ]
    },
    "readiness": {
@@ -2392,8 +2411,7 @@
    },
    "refs": {
     "scenarios": [
-     "TC-048",
-     "TC-052"
+     "TC-048"
     ],
     "rules": [
      "BR-048",
@@ -2404,6 +2422,10 @@
     ],
     "operations": [
      "getMe"
+    ],
+    "partial": [
+     "TC-052",
+     "TC-131"
     ]
    },
    "readiness": {
@@ -2476,14 +2498,11 @@
      "Exactly one order after the airplane-mode submit"
     ],
     "database": [
-     "Read-only: exactly one orders row for the attempted placement"
+     "Read-only: exactly one customer_order row for the attempted placement"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-048",
-     "TC-052"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-048"
     ],
@@ -2491,6 +2510,10 @@
     "operations": [
      "getMe",
      "POST /api/v1/orders"
+    ],
+    "partial": [
+     "TC-048",
+     "TC-052"
     ]
    },
    "readiness": {
@@ -2571,10 +2594,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-048",
-     "TC-052"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-048"
     ],
@@ -2583,6 +2603,10 @@
     ],
     "operations": [
      "getMeSecurity"
+    ],
+    "partial": [
+     "TC-048",
+     "TC-052"
     ]
    },
    "readiness": {
@@ -2619,7 +2643,7 @@
     "TestFlight/Preview build installed on FX-DEVICE-IOS (physical iPhone) and the mobile OIDC client registered (docs/mobile/ios-testflight-beta.md step 'register the mobile client'; `VERIFY_MOBILE=1 ./migrate-mfa.sh verify` no longer SKIPs mobile checks). These documents (ios-beta-device-test-plan.md, ios-testflight-beta.md) exist on branch beta/ios-testflight-prep, NOT on PR #9 or develop",
     "Preview allow-list decision made so the phone's network is inside CUSTOMER_ALLOWED_IPS (device test plan expects no 403 'Not available')",
     "Customer web (app.<D>) and the phone use the same synthetic customer FX-CUST-A, preference currently off",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
     "Preferred: FX-ISOLATED exists (CUSTOMER=REQUIRED must not be set on the shared preview before the mobile app is device-verified, mfa-policy.md step 5): a disposable compose stack with its own PREVIEW_DOMAIN and fresh volumes built from the PR #9 head images, realm imported, `./deploy.sh up` healthy, `./deploy.sh seed` run, and `./migrate-mfa.sh status` run on it prints flows=complete"
    ],
    "steps": [
@@ -2668,11 +2692,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-048",
-     "TC-052",
-     "TC-042"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-048",
      "BR-042"
@@ -2683,6 +2703,10 @@
     "operations": [
      "postOpsAccountsMfaReset",
      "putOpsSecurityMfaPolicyByCategory"
+    ],
+    "partial": [
+     "TC-048",
+     "TC-052"
     ]
    },
    "readiness": {
@@ -2753,10 +2777,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
@@ -2765,6 +2786,10 @@
     ],
     "operations": [
      "./migrate-mfa.sh status"
+    ],
+    "partial": [
+     "TC-060",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -2853,11 +2878,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-057",
-     "TC-060",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-057",
      "BR-060"
@@ -2868,6 +2889,11 @@
     "operations": [
      "./migrate-mfa.sh apply",
      "./migrate-mfa.sh verify"
+    ],
+    "partial": [
+     "TC-057",
+     "TC-060",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -2937,9 +2963,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
@@ -2948,6 +2972,9 @@
     ],
     "operations": [
      "./migrate-mfa.sh apply"
+    ],
+    "partial": [
+     "TC-060"
     ]
    },
    "readiness": {
@@ -3024,11 +3051,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-002",
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-002"
@@ -3038,6 +3061,10 @@
     ],
     "operations": [
      "./migrate-mfa.sh verify"
+    ],
+    "partial": [
+     "TC-002",
+     "TC-109"
     ]
    },
    "readiness": {
@@ -3121,9 +3148,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
@@ -3132,6 +3157,9 @@
     ],
     "operations": [
      "./migrate-mfa.sh rollback"
+    ],
+    "partial": [
+     "TC-060"
     ]
    },
    "readiness": {
@@ -3206,10 +3234,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060",
-     "TC-057"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-057",
      "BR-060"
@@ -3219,6 +3244,10 @@
     ],
     "operations": [
      "./migrate-mfa.sh apply"
+    ],
+    "partial": [
+     "TC-060",
+     "TC-057"
     ]
    },
    "readiness": {
@@ -3256,7 +3285,7 @@
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
     "Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)",
-    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Note: the bootstrap administrator preview-ops-1 only receives staff.grant and audit.read (GrantService.bootstrapAdministratorIfNone), so these two permissions must be granted by preview-ops-1 to another account (self-grant is refused 403)"
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)"
    ],
    "steps": [
     {
@@ -3297,10 +3326,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-042"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-042"
     ],
@@ -3310,7 +3336,8 @@
     "operations": [
      "getOpsSecurityMfaPolicy",
      "getMeSecurity"
-    ]
+    ],
+    "partial": []
    },
    "readiness": {
     "needs_updated_deploy": true,
@@ -3345,37 +3372,37 @@
    "prerequisites": [
     "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
     "Know the two lists: on the server `grep -E '^(CUSTOMER|STAFF)_ALLOWED_IPS|^ALLOWED_CLIENT_IPS' .env` (values are addresses, not secrets; do not paste into the repository)",
-    "Two vantage points: (A) a machine inside the staff class, (B) a machine inside the customer class only (or outside both)"
+    "Three vantage points: A = source IP in BOTH CUSTOMER_ALLOWED_IPS and STAFF_ALLOWED_IPS; B = IP in the customer list only; C = IP in neither list. A staff-only IP would get proxy 403 on customer hosts and the backend 401 would be unreachable, so do not use one"
    ],
    "steps": [
     {
      "n": 1,
      "actor": "FX-GUEST",
-     "action": "From B: `curl -s -w ' %{http_code}\\n' https://ops.<PREVIEW_DOMAIN>/` and `curl -s -w ' %{http_code}\\n' https://api.<PREVIEW_DOMAIN>/api/v1/ops/staff` and `.../api/v1/cook/dashboard`",
-     "data": "Staff-class paths from a non-staff IP"
+     "action": "From B: `curl -s -w ' %{http_code}\\n' https://ops.<PREVIEW_DOMAIN>/` and `https://api.<PREVIEW_DOMAIN>/api/v1/ops/staff` and `https://api.<PREVIEW_DOMAIN>/api/v1/cook/dashboard`",
+     "data": "Staff-class paths from a customer-only IP"
     },
     {
      "n": 2,
      "actor": "FX-GUEST",
-     "action": "From B: `curl -s -o /dev/null -w '%{http_code}\\n' https://app.<PREVIEW_DOMAIN>/` and https://api.<PREVIEW_DOMAIN>/api/v1/meals",
+     "action": "From B: `curl -s -o /dev/null -w '%{http_code}\\n' https://app.<PREVIEW_DOMAIN>/` and `https://api.<PREVIEW_DOMAIN>/api/v1/meals`",
      "data": "Customer-class paths"
     },
     {
      "n": 3,
      "actor": "FX-GUEST",
-     "action": "From A: same ops. and /api/v1/ops/staff requests with no session",
+     "action": "From A: `curl -s -o /dev/null -w '%{http_code}\\n' https://ops.<PREVIEW_DOMAIN>/` and `curl -s -w ' %{http_code}\\n' https://api.<PREVIEW_DOMAIN>/api/v1/ops/staff` with no session",
      "data": "Reaches the API"
     },
     {
      "n": 4,
      "actor": "FX-GUEST",
-     "action": "From a machine outside both lists: app., id., media. and api.",
-     "data": "All must be refused"
+     "action": "From C: `curl -s -w ' %{http_code}\\n'` against https://app.<PREVIEW_DOMAIN>/, https://id.<PREVIEW_DOMAIN>/realms/matbakhy/.well-known/openid-configuration, https://media.<PREVIEW_DOMAIN>/ and https://api.<PREVIEW_DOMAIN>/api/v1/meals",
+     "data": "All customer-class hosts"
     },
     {
      "n": 5,
      "actor": "FX-GUEST",
-     "action": "From any: `curl -s -w ' %{http_code}\\n' https://api.<PREVIEW_DOMAIN>/nonexistent` and `https://api.<PREVIEW_DOMAIN>/actuator/health`",
+     "action": "`curl -s -w ' %{http_code}\\n' https://api.<PREVIEW_DOMAIN>/nonexistent` and `https://api.<PREVIEW_DOMAIN>/actuator/health` from B (customer-allowed) and again from C (customer-disallowed)",
      "data": "Unrouted paths on api."
     }
    ],
@@ -3384,22 +3411,18 @@
      "n/a (HTTP)"
     ],
     "api": [
-     "Step 1: body 'Not available' with status 403 for all three (Caddy staff_access), regardless of any credentials",
+     "Step 1: body 'Not available' with status 403 for all three (Caddy staff_access), whatever credentials are sent",
      "Step 2: 200 from app. and /api/v1/meals",
      "Step 3: ops. serves HTML 200; /api/v1/ops/staff answers 401 (no session), not 200",
      "Step 4: 403 'Not available' on every customer-class host",
-     "Step 5: 404 on both"
+     "Step 5: from B both paths return 404; from C both return 403 'Not available' (customer_access runs before the 404 fallthrough, Caddyfile api. block)"
     ],
     "database": [
      "none"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001",
-     "TC-060",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001",
      "BR-060"
@@ -3408,6 +3431,10 @@
     "operations": [
      "deploy.sh smoke (SMOKE_OPS=skip)",
      "deploy/web-preview/Caddyfile staff_access / customer_access"
+    ],
+    "partial": [
+     "TC-001",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -3497,9 +3524,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-002"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-002"
     ],
@@ -3507,6 +3532,9 @@
     "operations": [
      "patchMe",
      "SecurityConfiguration corsConfigurationSource"
+    ],
+    "partial": [
+     "TC-002"
     ]
    },
    "readiness": {
@@ -3576,15 +3604,16 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-002"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-002"
     ],
     "decisions": [],
     "operations": [
      "SecurityConfiguration sessionCookie / csrfTokenRepository"
+    ],
+    "partial": [
+     "TC-002"
     ]
    },
    "readiness": {
@@ -3663,10 +3692,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-053",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-053"
     ],
@@ -3674,6 +3700,10 @@
     "operations": [
      "docs/security/csp-rollout.md",
      "deploy/web-preview/Caddyfile (web_csp, headers)"
+    ],
+    "partial": [
+     "TC-053",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -3749,15 +3779,16 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-054"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-054"
     ],
     "decisions": [],
     "operations": [
      "postMePhoneChallenges"
+    ],
+    "partial": [
+     "TC-054"
     ]
    },
    "readiness": {
@@ -3832,10 +3863,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-056",
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-056",
      "BR-060"
@@ -3843,6 +3871,10 @@
     "decisions": [],
     "operations": [
      "scripts/check_secrets.sh"
+    ],
+    "partial": [
+     "TC-056",
+     "TC-060"
     ]
    },
    "readiness": {
@@ -3917,11 +3949,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060",
-     "TC-140",
-     "TC-057"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060",
      "BR-057"
@@ -3931,6 +3959,11 @@
      "gh workflow deploy-preview.yml",
      "./deploy.sh up",
      "./deploy.sh smoke"
+    ],
+    "partial": [
+     "TC-060",
+     "TC-140",
+     "TC-057"
     ]
    },
    "readiness": {
@@ -4010,14 +4043,11 @@
      "Step 5: backup directory with .dump + checksum exists"
     ],
     "database": [
-     "Read-only: `SELECT count(*) FROM orders` equal before/after; schema version unchanged by the failed deploy (if the bad image never ran migrations)"
+     "Read-only: `SELECT count(*) FROM customer_order` equal before/after; schema version unchanged by the failed deploy (if the bad image never ran migrations)"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060",
-     "TC-057"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060",
      "BR-057"
@@ -4026,6 +4056,10 @@
     "operations": [
      "./deploy.sh up",
      "./deploy.sh rollback-plan"
+    ],
+    "partial": [
+     "TC-060",
+     "TC-057"
     ]
    },
    "readiness": {
@@ -4082,7 +4116,7 @@
     {
      "n": 4,
      "actor": "FX-ISOLATED",
-     "action": "`docker compose exec -T postgres psql -U matbakhy -d matbakhy_restore -c 'SELECT count(*) FROM orders'` vs the same on matbakhy",
+     "action": "`docker compose exec -T postgres psql -U matbakhy -d matbakhy_restore -c 'SELECT count(*) FROM customer_order'` vs the same on matbakhy",
      "data": "Counts equal"
     },
     {
@@ -4098,7 +4132,7 @@
     ],
     "api": [
      "'backup verified: <dump> restored and reconciled'; the prom file timestamp advances only on success",
-     "restore-db leaves the live matbakhy database untouched; orders, allocations and ledger reconcile",
+     "restore-db leaves the live matbakhy database untouched; customer_order, allocations and ledger reconcile",
      "Corrupt dump: non-zero exit, no metric update"
     ],
     "database": [
@@ -4106,9 +4140,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-057"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-057"
     ],
@@ -4116,6 +4148,9 @@
     "operations": [
      "./deploy.sh backup",
      "./deploy.sh restore-db"
+    ],
+    "partial": [
+     "TC-057"
     ]
    },
    "readiness": {
@@ -4189,10 +4224,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-057",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-057"
     ],
@@ -4200,6 +4232,10 @@
     "operations": [
      "./deploy.sh status",
      "./deploy.sh smoke"
+    ],
+    "partial": [
+     "TC-057",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -4275,16 +4311,17 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060",
-     "TC-140"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
     "decisions": [],
     "operations": [
      "deploy/web-preview/smoke.sh (config reports PREVIEW demo true)"
+    ],
+    "partial": [
+     "TC-060",
+     "TC-140"
     ]
    },
    "readiness": {
@@ -4369,11 +4406,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-048",
-     "TC-052",
-     "TC-145"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-048",
      "BR-052"
@@ -4382,6 +4415,11 @@
     "operations": [
      "getMe",
      "GET /api/v1/meals"
+    ],
+    "partial": [
+     "TC-048",
+     "TC-052",
+     "TC-145"
     ]
    },
    "readiness": {
@@ -4438,10 +4476,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-048",
-     "TC-052"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-048",
      "BR-052"
@@ -4451,6 +4486,10 @@
     ],
     "operations": [
      "putMeSecurityMfa"
+    ],
+    "partial": [
+     "TC-048",
+     "TC-052"
     ]
    },
    "readiness": {
@@ -4515,9 +4554,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
@@ -4526,6 +4563,9 @@
     ],
     "operations": [
      "./migrate-mfa.sh fixture-clean"
+    ],
+    "partial": [
+     "TC-060"
     ]
    },
    "readiness": {
@@ -4593,16 +4633,17 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-057",
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-057"
     ],
     "decisions": [],
     "operations": [
      "./deploy.sh rollback-plan"
+    ],
+    "partial": [
+     "TC-057",
+     "TC-060"
     ]
    },
    "readiness": {
@@ -4657,7 +4698,7 @@
     {
      "n": 4,
      "actor": "FX-ISOLATED",
-     "action": "`SELECT count(*) FROM orders` before and after steps 1-3",
+     "action": "`SELECT count(*) FROM customer_order` before and after steps 1-3",
      "data": "Unchanged"
     }
    ],
@@ -4670,19 +4711,20 @@
      "No backup taken, no container stopped, counts unchanged"
     ],
     "database": [
-     "Read-only: orders count unchanged"
+     "Read-only: customer_order count unchanged"
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
     "decisions": [],
     "operations": [
      "./deploy.sh e2e-reset"
+    ],
+    "partial": [
+     "TC-060"
     ]
    },
    "readiness": {
@@ -4750,9 +4792,7 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-001"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-001"
     ],
@@ -4761,7 +4801,8 @@
     ],
     "operations": [
      "getMeSecurity"
-    ]
+    ],
+    "partial": []
    },
    "readiness": {
     "needs_updated_deploy": true,
@@ -4818,16 +4859,17 @@
     ]
    },
    "refs": {
-    "scenarios": [
-     "TC-140",
-     "TC-060"
-    ],
+    "scenarios": [],
     "rules": [
      "BR-060"
     ],
     "decisions": [],
     "operations": [
      "./deploy.sh smoke"
+    ],
+    "partial": [
+     "TC-140",
+     "TC-060"
     ]
    },
    "readiness": {
@@ -4844,6 +4886,100 @@
    "automated_coverage": [
     "scripts/test_proxy_access.py",
     "scripts/test_preview_release.py"
+   ]
+  },
+  {
+   "id": "CFG-122",
+   "title": "Authorized MFA policy change by an administrator with recent MFA is applied, audited and restored to the exact previous mode",
+   "priority": "P0",
+   "surface": [
+    "api",
+    "operations-web"
+   ],
+   "actors": [
+    "FX-STAFF-ADMIN-B"
+   ],
+   "prerequisites": [
+    "Deployed release recorded: on the server, in the deploy/web-preview directory, run `./deploy.sh status` and note RELEASE_COMMIT, both image digests and the schema version",
+    "Deployed API contains PR #9 (D18): `./deploy.sh status` shows schema version >= 31 and RELEASE_COMMIT is the PR #9 head or later; origin/develop does NOT contain V31/MfaController, so on the current deployment GET /api/v1/me/security is not a 200",
+    "Tester's source IP is inside CUSTOMER_ALLOWED_IPS (and STAFF_ALLOWED_IPS for ops.<PREVIEW_DOMAIN> and /api/v1/ops, /api/v1/cook): `curl -s -o /dev/null -w '%{http_code}' https://app.<PREVIEW_DOMAIN>/` returns 200 (a 403 body 'Not available' means the IP is not allow-listed; the preview is deny-by-default, not public, unless the owner set CUSTOMER_ALLOWED_IPS=0.0.0.0/0)",
+    "FX-STAFF-ADMIN-B holds active grants security.mfa_policy and security.mfa_reset and has an enrolled authenticator (TOTP secret kept in the private fixture sheet). Provision per docs/quality/owner-acceptance/fixtures.md (the bootstrap administrator preview-ops-1 holds only staff.grant and audit.read, so these permissions are absent by default)",
+    "ISOLATED STACK ONLY: this case really changes policy (REQUIRED->OPTIONAL weakens, DISABLED->OPTIONAL changes behaviour); run only on FX-ISOLATED"
+   ],
+   "steps": [
+    {
+     "n": 1,
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "GET /api/v1/ops/security/mfa-policy and write down mode and version of STAFF (prior)",
+     "data": ""
+    },
+    {
+     "n": 2,
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "Step up with the enrolled TOTP, then PUT /api/v1/ops/security/mfa-policy/STAFF {\"mode\":\"<a mode different from prior>\",\"expectedVersion\":<version>,\"reason\":\"E2E authorised change\"}",
+     "data": ""
+    },
+    {
+     "n": 3,
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "GET /api/v1/me/security for a STAFF-category account and GET /api/v1/ops/security/mfa-policy",
+     "data": "Effect on the next request"
+    },
+    {
+     "n": 4,
+     "actor": "FX-STAFF-ADMIN-B",
+     "action": "Restore: PUT STAFF back to the prior mode with the new version and reason 'E2E restore'",
+     "data": "Rollback"
+    }
+   ],
+   "expected": {
+    "ui": [
+     "Ops web Security tab shows 'Policy saved.'"
+    ],
+    "api": [
+     "Step 2: 200 with version prior+1 and the new mode",
+     "Step 3: the staff account's effectiveMode follows the new value without re-login",
+     "Step 4: 200, mode equals prior, version prior+2"
+    ],
+    "database": [
+     "Read-only: two mfa.policy.update audit rows with details {category:STAFF, from, to} in both directions and the reasons given; mfa_policy.mode equals the prior mode at the end"
+    ]
+   },
+   "refs": {
+    "scenarios": [],
+    "rules": [
+     "BR-001",
+     "BR-007",
+     "BR-043"
+    ],
+    "decisions": [
+     "D18"
+    ],
+    "operations": [
+     "getOpsSecurityMfaPolicy",
+     "putOpsSecurityMfaPolicyByCategory"
+    ],
+    "partial": [
+     "TC-007"
+    ]
+   },
+   "readiness": {
+    "needs_updated_deploy": true,
+    "needs_device": false,
+    "needs_isolated_stack": true,
+    "needs_fixtures": [
+     "FX-STAFF-ADMIN-B"
+    ]
+   },
+   "destructive": true,
+   "status": "NOT_RUN",
+   "unverified": [
+    "Guest PUT order of CSRF vs authentication rejection not confirmed"
+   ],
+   "automated_coverage": [
+    "MfaPolicyIntegrationTest.only_the_policy_permission_with_a_recent_second_factor_can_change_a_policy",
+    "MfaPolicyIntegrationTest.enforcement_and_settings_are_for_signed_in_accounts_only",
+    "MfaPolicyIntegrationTest.the_settings_report_which_security_administration_the_account_may_do"
    ]
   }
  ],
@@ -4922,11 +5058,6 @@
    "original": "CFG-015",
    "action": "rewritten",
    "reason": "Single-admin stale-version proof instead of requiring two admins; adds reason validation"
-  },
-  {
-   "original": "CFG-016",
-   "action": "rewritten",
-   "reason": "Authorization ladder using real fixtures including preview-ops-1 who lacks security.mfa_policy"
   },
   {
    "original": "CFG-017",
@@ -5077,6 +5208,11 @@
    "original": "CFG-046",
    "action": "rewritten",
    "reason": "Mapped to the iOS device plan rows; Android split to CFG-112"
+  },
+  {
+   "original": "CFG-016",
+   "action": "split_into:[CFG-016,CFG-122]",
+   "reason": "Refusal-only checks stay shareable on the preview; the authorized mutation moved to an isolated, destructive case with explicit restore"
   }
  ],
  "findings": [
@@ -5098,6 +5234,7 @@
   "Execution guide says 'run configuration mutations in isolated environment first' but no case states how to build FX-ISOLATED; prerequisites here define it (fresh stack, realm imported, optional migration from origin/develop's realm file, migrate-mfa.sh apply)",
   "docs/security/mfa-policy.md says preview-ops-* must stay password-only for the E2E suite, yet enabling and testing admin policy/reset requires an enrolled administrator; use a separate FX-STAFF-ADMIN-B rather than enrolling preview-ops-1",
   "Original catalog has no case for: staff grant self-escalation and last-administrator protection (TC-043), high-risk step-up independent of MFA mode (BR-007), admin client least privilege, fixture-clean, rollback-plan, e2e-reset guard, security headers per host, Android device; all added",
-  "Unsafe suggestions corrected: any test that changes CUSTOMER or KITCHEN to REQUIRED, resets a live user's authenticator, or deletes mfa_policy rows is now isolated-only (mfa-policy.md step 5: do not set CUSTOMER/KITCHEN REQUIRED until mobile is device-verified); no case publishes the Keycloak admin console (CFG-001 asserts 404; administration only through SSH tunnel/kcadm-in-container)"
+  "Unsafe suggestions corrected: any test that changes CUSTOMER or KITCHEN to REQUIRED, resets a live user's authenticator, or deletes mfa_policy rows is now isolated-only (mfa-policy.md step 5: do not set CUSTOMER/KITCHEN REQUIRED until mobile is device-verified); no case publishes the Keycloak admin console (CFG-001 asserts 404; administration only through SSH tunnel/kcadm-in-container)",
+  "Review round 2: CFG-034 vantage points corrected (a staff-only IP gets proxy 403 not backend 401), customer order table is customer_order (not orders) and idempotency_record (not idempotency), account route is #/account, CFG-016/104 split so shared-preview checks are refusal-only, and refs.scenarios now lists only end-to-end TCs (CFG-043 etc. moved to refs.partial)"
  ]
 }
