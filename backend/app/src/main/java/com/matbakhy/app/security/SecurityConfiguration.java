@@ -142,7 +142,8 @@ class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    SecurityFilterChain bearerChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors) throws Exception {
+    SecurityFilterChain bearerChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors,
+                                    com.matbakhy.app.mfa.MfaPolicyService mfa, IdentityProperties properties) throws Exception {
         http.securityMatcher(request -> {
                     String header = request.getHeader("Authorization");
                     return header != null && header.regionMatches(true, 0, "Bearer ", 0, 7);
@@ -161,7 +162,8 @@ class SecurityConfiguration {
                                 token.getIssuer().toString(), token.getSubject(), token.getClaims())))
                         .authenticationEntryPoint(errors)
                         .accessDeniedHandler(errors))
-                .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors));
+                .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors))
+                .addFilterBefore(new MfaEnforcementFilter(mfa, properties), AuthorizationFilter.class);
         return http.build();
     }
 
@@ -182,7 +184,8 @@ class SecurityConfiguration {
     @Bean
     @Order(2)
     SecurityFilterChain webChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors,
-                                 IdentityProperties properties, ClientRegistrationRepository registrations) throws Exception {
+                                 IdentityProperties properties, ClientRegistrationRepository registrations,
+                                 com.matbakhy.app.mfa.MfaPolicyService mfa) throws Exception {
         http.cors(cors -> { })
                 // MB-054: the activity endpoint acts for nobody and ignores identity, so a signed-out phone (no cookie, no CSRF token)
                 // can send it; every other browser request keeps CSRF protection.
@@ -210,6 +213,7 @@ class SecurityConfiguration {
                         .deleteCookies("MATBAKHY_SESSION"))
                 .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors))
                 .addFilterBefore(new WebAccountFilter(mapper), AuthorizationFilter.class)
+                .addFilterAfter(new MfaEnforcementFilter(mfa, properties), WebAccountFilter.class)
                 .addFilterBefore(WebReturnTo.capture(properties.allowedOrigins()),
                         org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();

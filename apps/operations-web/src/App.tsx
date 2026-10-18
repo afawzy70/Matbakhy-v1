@@ -1,6 +1,6 @@
 import { brand, direction, type Locale } from "@matbakhy/design-tokens";
 import { useEffect, useMemo, useState } from "react";
-import { API_BASE, createApi, loginUrl, type Api } from "./api";
+import { API_BASE, createApi, errorCode, loginUrl, stepUpUrl, type Api } from "./api";
 import { Dashboard } from "./cook/Dashboard";
 import { builtForDemo, EnvironmentNotice } from "./EnvironmentNotice";
 import { Meals } from "./cook/Meals";
@@ -16,12 +16,13 @@ import { Configuration } from "./ops/Configuration";
 import { Finance } from "./ops/Finance";
 import { OpsOrders } from "./ops/OpsOrders";
 import { Reviews } from "./ops/Reviews";
+import { SecurityTab } from "./ops/Security";
 import { Staff } from "./ops/Staff";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
 const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "insights", "settings"] as const;
-type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance" | "configuration" | "staff";
+type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance" | "configuration" | "staff" | "security";
 
 export function title(locale: Locale): string {
   return `${brand.name[locale]} — ${strings[locale].section}`;
@@ -32,10 +33,11 @@ type Session =
   | { kind: "checking" }
   | { kind: "signedOut" }
   | { kind: "error" }
-  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean };
+  | { kind: "stepUp" }
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean; mfaPolicy: boolean };
 
 function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
-  return [
+  const sections: Tab[] = [
     ...(s.kitchen ? COOK_TABS : []),
     ...(s.reviews ? (["reviews"] as const) : []),
     ...(s.catalogue ? (["catalogue"] as const) : []),
@@ -44,7 +46,10 @@ function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
     ...(s.finance ? (["finance"] as const) : []),
     ...(s.configuration ? (["configuration"] as const) : []),
     ...(s.staff ? (["staff"] as const) : []),
+    ...(s.mfaPolicy ? (["security"] as const) : []),
   ];
+  // Account security (D18) is shown beside the other sections; an applicant with none keeps the onboarding screen.
+  return sections.length > 0 && !sections.includes("security") ? [...sections, "security"] : sections;
 }
 
 /** Signed in? Approved kitchen? The server decides; 403 on the dashboard means no approved kitchen. */
@@ -54,7 +59,7 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff] = await Promise.all([
+    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff, mfaPolicy] = await Promise.all([
       api.GET("/api/v1/cook/dashboard"),
       api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
@@ -64,7 +69,12 @@ async function checkSession(api: Api): Promise<Session> {
       api.GET("/api/v1/ops/finance/statements", { params: { query: { kitchenId: "00000000-0000-0000-0000-000000000000" } } }),
       api.GET("/api/v1/ops/configuration"),
       api.GET("/api/v1/ops/staff"),
+      api.GET("/api/v1/ops/security/mfa-policy"),
     ]);
+    // The administrator's policy requires a second factor this session has not passed: nothing else will load, so say so.
+    if ([d, reviews, catalogue, cases, opsOrders, configuration, staff].some((r) => errorCode(r.error) === "STEP_UP_REQUIRED")) {
+      return { kind: "stepUp" };
+    }
     if (!d.data && d.response.status !== 403) {
       return { kind: "error" };
     }
@@ -79,6 +89,7 @@ async function checkSession(api: Api): Promise<Session> {
       finance: finance.response.status === 404,
       configuration: configuration.response.ok,
       staff: staff.response.ok,
+      mfaPolicy: mfaPolicy.response.ok,
     };
   } catch {
     return { kind: "error" };
@@ -184,6 +195,14 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             </button>
           </div>
         ) : null}
+        {session.kind === "stepUp" ? (
+          <section className="card" role="alert">
+            <p>{t.sec.requiredScreen}</p>
+            <a className="button" href={stepUpUrl(window.location.href)}>
+              {t.sec.verifyNow}
+            </a>
+          </section>
+        ) : null}
         {session.kind === "signedOut" ? (
           <section className="card">
             <p>{brand.slogan[locale]}</p>
@@ -213,7 +232,9 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
                               ? t.ops.configuration
                               : name === "staff"
                                 ? t.ops.staff
-                                : t.tabs[name]}
+                                : name === "security"
+                                  ? t.sec.tab
+                                  : t.tabs[name]}
                 </button>
               ))}
             </nav>
@@ -233,6 +254,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "finance" ? <Finance ctx={ctx} /> : null}
             {current === "configuration" ? <Configuration ctx={ctx} /> : null}
             {current === "staff" ? <Staff ctx={ctx} /> : null}
+            {current === "security" ? <SecurityTab ctx={ctx} policyAdmin={session.mfaPolicy} resetAllowed={session.mfaPolicy || session.staff} /> : null}
           </>
         ) : null}
       </main>

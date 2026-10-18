@@ -32,6 +32,18 @@ function server(routes: Record<string, Handler>) {
 
 const egp = (amountMinor: number) => ({ amountMinor, currency: "EGP" });
 const cod = (total: number) => ({ method: "COD", depositBps: 0, deposit: egp(0), remainder: egp(total), recipient: null });
+const security = (over: Record<string, unknown> = {}) => ({
+  categories: ["CUSTOMER"],
+  policy: { CUSTOMER: "OPTIONAL" },
+  effectiveMode: "OPTIONAL",
+  enabled: false,
+  required: false,
+  available: true,
+  verifiedInSession: false,
+  stepUpPath: "/oauth2/authorization/keycloak?stepUp=true",
+  accountManagementUrl: "https://id.example.test/realms/matbakhy/account/#/security/signingin",
+  ...over,
+});
 const me = { id: "u1", displayName: "Mona", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: ["BROWSE", "ORDER"] };
 const order = { id: "11111111-1111-4111-8111-111111111111", publicNumber: "MB-2001" };
 
@@ -222,6 +234,7 @@ describe("customer web", () => {
     const empty = { status: 200, body: { items: [], nextCursor: null, hasMore: false } };
     const { fetchImpl, calls } = server({
       "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/security": () => ({ status: 200, body: security() }),
       "GET /api/v1/me/favorites": () => ({
         status: 200,
         body: { items: [{ mealId: "m9", title: "Molokhia", kitchenName: "Mona", priceMinor: null, available: false }], nextCursor: null, hasMore: false },
@@ -1063,6 +1076,7 @@ describe("QA repair MBQA-004: support case conversation", () => {
       { id: "m1", authorRole: "CUSTOMER", visibility: "PUBLIC", body: "Any update?", createdAt: "2026-10-12T10:30:00Z" },
     ];
     const { fetchImpl, calls } = routes(() => ({ status: 200, body: supportCase(messages) }), {
+      "GET /api/v1/me/security": () => ({ status: 200, body: security() }),
       "GET /api/v1/me/favorites": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
       "GET /api/v1/notifications": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
       "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
@@ -1446,5 +1460,81 @@ describe("demo environment notice", () => {
     const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => "NETWORK_ERROR" });
     render(<App fetchImpl={fetchImpl} />);
     expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+  });
+});
+
+describe("account security (D18)", () => {
+  const accountRoutes = (sec: () => { status: number; body?: unknown }, extra: Record<string, Handler> = {}) => {
+    const empty = { status: 200, body: { items: [], nextCursor: null, hasMore: false } };
+    return server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/security": sec,
+      "GET /api/v1/me/favorites": () => empty,
+      "GET /api/v1/notifications": () => empty,
+      "GET /api/v1/support/cases": () => empty,
+      "GET /api/v1/orders": () => empty,
+      "GET /api/v1/me/addresses": () => empty,
+      ...extra,
+    });
+  };
+
+  it("under an optional policy offers the step-up link to turn MFA on until the session has passed a second factor", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() => ({ status: 200, body: security() }));
+    render(<App fetchImpl={fetchImpl} />);
+    const heading = await screen.findByRole("heading", { name: "الأمان والتحقق بخطوتين" });
+    const section = heading.closest("section") as HTMLElement;
+    await within(section).findByText("اختياري");
+    const link = within(section).getByRole("link", { name: "تفعيل التحقق بخطوتين" });
+    expect(link.getAttribute("href")).toMatch(/\/oauth2\/authorization\/keycloak\?stepUp=true&returnTo=/);
+    expect(within(section).queryByRole("button", { name: "تفعيل التحقق بخطوتين" })).toBeNull();
+    expect(within(section).getByRole("link", { name: "إدارة تطبيق المصادقة (إضافة أو حذف)" }).getAttribute("href")).toContain("/account/#/security/signingin");
+  });
+
+  it("turns MFA on from a verified session and off again, sending only the user's own preference", async () => {
+    window.location.hash = "#/account";
+    let enabled = false;
+    const { fetchImpl, calls } = accountRoutes(() => ({ status: 200, body: security({ enabled, required: enabled, verifiedInSession: true }) }), {
+      "PUT /api/v1/me/security/mfa": (_req, body) => {
+        enabled = (body as { enabled: boolean }).enabled;
+        return { status: 200, body: security({ enabled, required: enabled, verifiedInSession: true }) };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "تفعيل التحقق بخطوتين" }));
+    fireEvent.click(await screen.findByRole("button", { name: "إيقاف التحقق بخطوتين" }));
+    await waitFor(() => expect(screen.queryByRole("button", { name: "إيقاف التحقق بخطوتين" })).toBeNull());
+    const puts = calls.filter((c) => c.method === "PUT" && c.path === "/api/v1/me/security/mfa");
+    expect(puts.map((c) => c.body)).toEqual([{ enabled: true }, { enabled: false }]);
+  });
+
+  it("shows a required policy as not switchable and points to the step-up when the session has not verified", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() =>
+      ({ status: 200, body: security({ policy: { CUSTOMER: "REQUIRED" }, effectiveMode: "REQUIRED", required: true, verifiedInSession: false }) }));
+    render(<App fetchImpl={fetchImpl} />);
+    await screen.findByText("التحقق بخطوتين إلزامي لحسابك ولا يمكن إيقافه.");
+    expect(screen.queryByRole("button", { name: "إيقاف التحقق بخطوتين" })).toBeNull();
+    expect(screen.getByRole("link", { name: "أكمل التحقق بخطوتين" }).getAttribute("href")).toContain("stepUp=true");
+  });
+
+  it("offers no enrolment when the administrator disabled MFA for the category", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() => ({ status: 200, body: security({ policy: { CUSTOMER: "DISABLED" }, effectiveMode: "DISABLED", available: false }) }));
+    render(<App fetchImpl={fetchImpl} />);
+    await screen.findByText("التحقق بخطوتين غير متاح لحسابك حاليًا.");
+    expect(screen.queryByRole("button", { name: "تفعيل التحقق بخطوتين" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "تفعيل التحقق بخطوتين" })).toBeNull();
+  });
+
+  it("asks for fresh verification when turning MFA off is refused for lack of a recent second factor", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() => ({ status: 200, body: security({ enabled: true, required: true, verifiedInSession: true }) }), {
+      "PUT /api/v1/me/security/mfa": () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "إيقاف التحقق بخطوتين" }));
+    const link = await screen.findByRole("link", { name: "تحقق الآن" });
+    expect(link.getAttribute("href")).toContain("stepUp=true");
   });
 });

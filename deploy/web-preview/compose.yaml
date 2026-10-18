@@ -141,13 +141,13 @@ services:
       OIDC_ISSUER: https://id.${PREVIEW_DOMAIN}/realms/matbakhy
       OIDC_BACKCHANNEL_ISSUER: http://identity:8080/realms/matbakhy
       OIDC_WEB_CLIENT_SECRET: ${OIDC_WEB_CLIENT_SECRET:?set OIDC_WEB_CLIENT_SECRET}
+      OIDC_ADMIN_CLIENT_SECRET: ${OIDC_ADMIN_CLIENT_SECRET:-}
       WEB_ALLOWED_ORIGINS: https://app.${PREVIEW_DOMAIN},https://ops.${PREVIEW_DOMAIN}
       # The web apps (app., ops.) read the XSRF-TOKEN cookie that the API (api.) sets: it must be set for the parent domain, or every
       # browser mutation is refused with 403 (found by the remote browser E2E).
       WEB_COOKIE_DOMAIN: ${PREVIEW_DOMAIN}
       WEB_POST_LOGIN_REDIRECT: https://app.${PREVIEW_DOMAIN}/
       STAFF_BOOTSTRAP_SUBJECT: ${STAFF_BOOTSTRAP_SUBJECT:-}
-      IDENTITY_REQUIRE_STAFF_MFA: ${IDENTITY_REQUIRE_STAFF_MFA:-false}
       PHONE_CODE_PEPPER: ${PHONE_CODE_PEPPER:?set PHONE_CODE_PEPPER}
       HANDOVER_HASH_KEY: ${HANDOVER_HASH_KEY:?set HANDOVER_HASH_KEY}
       ACTIVITY_HASH_KEY: ${ACTIVITY_HASH_KEY:?set ACTIVITY_HASH_KEY}

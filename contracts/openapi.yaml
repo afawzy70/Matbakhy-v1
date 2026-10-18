@@ -3584,6 +3584,161 @@ paths:
           $ref: "#/components/responses/Error"
         5XX:
           $ref: "#/components/responses/Error"
+  /api/v1/me/security:
+    get:
+      operationId: getMeSecurity
+      tags:
+        - account
+      summary: "API-112: MFA state of the signed-in account: applicable categories and policies, effective mode, own preference, whether this session passed MFA, step-up path and the provider's account-management link"
+      description: "MFA state of the signed-in account: applicable categories and policies, effective mode, own preference, whether this session passed MFA, step-up path and the provider's account-management link"
+      x-matbakhy-id: API-112
+      x-permission: AUTHENTICATED
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecuritySettings"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/me/security/mfa:
+    put:
+      operationId: putMeSecurityMfa
+      tags:
+        - account
+      summary: "API-113: enabled: turn MFA on (needs a session that passed MFA) or off (needs recent MFA; refused when policy is REQUIRED; unavailable when DISABLED)"
+      description: "enabled: turn MFA on (needs a session that passed MFA) or off (needs recent MFA; refused when policy is REQUIRED; unavailable when DISABLED)"
+      x-matbakhy-id: API-113
+      x-permission: SELF
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecuritySettings"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaPreferenceRequest"
+  /api/v1/ops/security/mfa-policy:
+    get:
+      operationId: getOpsSecurityMfaPolicy
+      tags:
+        - operations
+      summary: "API-114: MFA policy per account category (CUSTOMER, KITCHEN, STAFF)"
+      description: MFA policy per account category (CUSTOMER, KITCHEN, STAFF)
+      x-matbakhy-id: API-114
+      x-permission: SECURITY_MFA_POLICY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaPolicyList"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/security/mfa-policy/{category}:
+    put:
+      operationId: putOpsSecurityMfaPolicyByCategory
+      tags:
+        - operations
+      summary: "API-115: mode DISABLED, OPTIONAL or REQUIRED, expectedVersion, reason; needs recent MFA; audited"
+      description: mode DISABLED, OPTIONAL or REQUIRED, expectedVersion, reason; needs recent MFA; audited
+      x-matbakhy-id: API-115
+      x-permission: SECURITY_MFA_POLICY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - CUSTOMER
+              - KITCHEN
+              - STAFF
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaPolicy"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaPolicyUpdateRequest"
+  /api/v1/ops/accounts/{accountId}/mfa-reset:
+    post:
+      operationId: postOpsAccountsMfaReset
+      tags:
+        - operations
+      summary: "API-116: reason (at least 10 characters); needs recent MFA; removes the account's OTP credentials at the identity provider and ends its sessions; never returns a secret; no self-reset; audited"
+      description: reason (at least 10 characters); needs recent MFA; removes the account's OTP credentials at the identity provider and ends its sessions; never returns a secret; no self-reset; audited
+      x-matbakhy-id: API-116
+      x-permission: SECURITY_MFA_RESET
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaResetResult"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaResetRequest"
   /api/v1/ops/staff/{userId}/grants:
     post:
       operationId: postOpsStaffGrants
@@ -5208,6 +5363,73 @@ components:
       enum:
         - DELIVERY
         - PICKUP
+    SecuritySettings:
+      type: object
+      additionalProperties: false
+      required: [categories, policy, effectiveMode, enabled, required, available, verifiedInSession, stepUpPath, accountManagementUrl]
+      properties:
+        categories:
+          type: array
+          items: {type: string, enum: [CUSTOMER, KITCHEN, STAFF]}
+        policy:
+          type: object
+          description: Policy mode for each category that applies to this account
+          additionalProperties: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        effectiveMode: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        enabled: {type: boolean, description: The user's own preference (kept while the policy makes it irrelevant)}
+        required: {type: boolean, description: MFA must be asserted on the session for protected functions}
+        available: {type: boolean, description: False only when every applicable category is DISABLED}
+        verifiedInSession: {type: boolean, description: The current token/session carries the identity provider's MFA assertion}
+        stepUpPath: {type: string, description: Web path that starts a Keycloak step-up (acr mfa)}
+        accountManagementUrl: {type: string, description: Keycloak account console page for enrolling or removing the authenticator}
+    MfaPreferenceRequest:
+      type: object
+      additionalProperties: false
+      required: [enabled]
+      properties:
+        enabled: {type: boolean}
+    MfaPolicy:
+      type: object
+      additionalProperties: false
+      required: [category, mode, updatedAt, version]
+      properties:
+        category: {type: string, enum: [CUSTOMER, KITCHEN, STAFF]}
+        mode: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        reason: {type: [string, "null"]}
+        updatedBy: {type: [string, "null"], format: uuid}
+        updatedAt: {type: string, format: date-time}
+        version: {type: integer, format: int64}
+    MfaPolicyList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MfaPolicy"
+    MfaPolicyUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [mode, expectedVersion, reason]
+      properties:
+        mode: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        expectedVersion: {type: integer, format: int64}
+        reason: {type: string, minLength: 3, maxLength: 500}
+    MfaResetRequest:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason: {type: string, minLength: 10, maxLength: 500}
+    MfaResetResult:
+      type: object
+      additionalProperties: false
+      required: [accountId, removedFactors, sessionsEnded]
+      properties:
+        accountId: {type: string, format: uuid}
+        removedFactors: {type: integer}
+        sessionsEnded: {type: boolean}
     Grant:
       type: object
       additionalProperties: false
@@ -5239,6 +5461,8 @@ components:
             - config.read
             - config.write
             - integration.ops
+            - security.mfa_policy
+            - security.mfa_reset
         grantedAt: *a6
         expiresAt:
           type:

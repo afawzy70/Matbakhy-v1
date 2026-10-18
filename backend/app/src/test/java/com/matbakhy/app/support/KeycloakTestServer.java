@@ -21,12 +21,19 @@ public final class KeycloakTestServer {
 
     public static final String IMAGE =
             "keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741";
-    public static final String WEB_SECRET = random();
-    public static final String PASSWORD_A = random();
-    public static final String PASSWORD_B = random();
-    public static final String STAFF_PASSWORD = random();
+    /**
+     * Developer convenience, never set in CI: -Dmatbakhy.test.keycloak.url=http://127.0.0.1:18080 uses an already running local
+     * Keycloak (no Docker) that was imported with the same realm file; the matching values come from -Dmatbakhy.test.kc.<name>.
+     */
+    private static final String EXTERNAL = System.getProperty("matbakhy.test.keycloak.url");
+    public static final String WEB_SECRET = value("web", random());
+    public static final String PASSWORD_A = value("passwordA", random());
+    public static final String PASSWORD_B = value("passwordB", random());
+    /** Secret of the realm's admin service-account client (used by the API for the audited MFA reset). */
+    public static final String ADMIN_SECRET = value("admin", random());
+    public static final String MFA_PASSWORD = value("mfaPassword", random());
     /** Per-run synthetic TOTP secret for the dedicated test staff account; never committed. */
-    public static final String STAFF_TOTP_SECRET = random().replace("t-", "").substring(0, 20);
+    public static final String MFA_TOTP_SECRET = value("totp", random().replace("t-", "").substring(0, 20));
     public static final int APP_PORT = freePort();
 
     private static final GenericContainer<?> CONTAINER = start();
@@ -34,8 +41,12 @@ public final class KeycloakTestServer {
     private KeycloakTestServer() {
     }
 
+    private static String value(String name, String generated) {
+        return EXTERNAL == null ? generated : System.getProperty("matbakhy.test.kc." + name, generated);
+    }
+
     public static String baseUrl() {
-        return "http://localhost:" + CONTAINER.getMappedPort(8080);
+        return EXTERNAL != null ? EXTERNAL : "http://localhost:" + CONTAINER.getMappedPort(8080);
     }
 
     public static String issuer() {
@@ -46,17 +57,22 @@ public final class KeycloakTestServer {
         return Map.of(
                 "matbakhy.identity.issuer", issuer(),
                 "matbakhy.identity.web-client-secret", WEB_SECRET,
+                "matbakhy.mfa.admin-client-id", "matbakhy-admin",
+                "matbakhy.mfa.admin-client-secret", ADMIN_SECRET,
                 "matbakhy.identity.post-login-redirect", "http://localhost:5173/",
                 "server.port", Integer.toString(APP_PORT));
     }
 
     private static GenericContainer<?> start() {
+        if (EXTERNAL != null) {
+            return null;
+        }
         String realm;
         try (var in = KeycloakTestServer.class.getResourceAsStream("/keycloak/test-realm.json")) {
             realm = new String(in.readAllBytes(), StandardCharsets.UTF_8)
                     .replace("${WEB_SECRET}", WEB_SECRET).replace("${PASSWORD_A}", PASSWORD_A)
-                    .replace("${PASSWORD_B}", PASSWORD_B).replace("${STAFF_PASSWORD}", STAFF_PASSWORD)
-                    .replace("${STAFF_TOTP_SECRET}", STAFF_TOTP_SECRET).replace("${APP_PORT}", Integer.toString(APP_PORT));
+                    .replace("${PASSWORD_B}", PASSWORD_B).replace("${MFA_PASSWORD}", MFA_PASSWORD).replace("${ADMIN_SECRET}", ADMIN_SECRET)
+                    .replace("${MFA_TOTP_SECRET}", MFA_TOTP_SECRET).replace("${APP_PORT}", Integer.toString(APP_PORT));
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

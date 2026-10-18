@@ -34,6 +34,7 @@ init_secrets() {
       -e "s|^GRAFANA_ADMIN_PASSWORD=.*|GRAFANA_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^KEYCLOAK_ADMIN_PASSWORD=.*|KEYCLOAK_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^OIDC_WEB_CLIENT_SECRET=.*|OIDC_WEB_CLIENT_SECRET=$(hex)|" \
+      -e "s|^OIDC_ADMIN_CLIENT_SECRET=.*|OIDC_ADMIN_CLIENT_SECRET=$(hex)|" \
       -e "s|^PREVIEW_USER_PASSWORD=.*|PREVIEW_USER_PASSWORD=$(openssl rand -hex 10)|" \
       -e "s|^PHONE_CODE_PEPPER=.*|PHONE_CODE_PEPPER=$(hex)|" \
       -e "s|^HANDOVER_HASH_KEY=.*|HANDOVER_HASH_KEY=$(hex)|" \
@@ -62,7 +63,12 @@ render() {
   mkdir -p "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
   chmod 700 "$GENERATED_DIR"
   umask 077
-  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|$OIDC_WEB_CLIENT_SECRET|" -e "s|\${PREVIEW_DOMAIN}|$PREVIEW_DOMAIN|g" \
+  # D18: servers initialised before the admin service-account client existed get its secret added once (mode 600 file kept).
+  if ! grep -q '^OIDC_ADMIN_CLIENT_SECRET=' "$ENV_FILE"; then
+    OIDC_ADMIN_CLIENT_SECRET="$(openssl rand -hex 32)"
+    printf 'OIDC_ADMIN_CLIENT_SECRET=%s\n' "$OIDC_ADMIN_CLIENT_SECRET" >> "$ENV_FILE"
+  fi
+  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|$OIDC_WEB_CLIENT_SECRET|" -e "s|\${OIDC_ADMIN_CLIENT_SECRET}|$OIDC_ADMIN_CLIENT_SECRET|" -e "s|\${PREVIEW_DOMAIN}|$PREVIEW_DOMAIN|g" \
       -e "s|\${PREVIEW_USER_PASSWORD}|$PREVIEW_USER_PASSWORD|g" identity/matbakhy-realm.preview.json > "$GENERATED_DIR/identity/matbakhy-realm.json"
   sed -e "s|\${STORAGE_ACCESS_KEY}|$STORAGE_ACCESS_KEY|" -e "s|\${STORAGE_SECRET_KEY}|$STORAGE_SECRET_KEY|" \
       storage/s3.json.template > "$GENERATED_DIR/storage/s3.json"

@@ -10,10 +10,6 @@
       {
         "name": "admin",
         "description": "Synthetic role used to prove token roles grant nothing"
-      },
-      {
-        "name": "matbakhy-staff",
-        "description": "Accounts holding staff grants; the identity provider requires OTP for every login (BR-007)"
       }
     ]
   },
@@ -29,7 +25,8 @@
         "http://localhost:${APP_PORT}/login/oauth2/code/keycloak"
       ],
       "attributes": {
-        "post.logout.redirect.uris": "http://localhost:5173/"
+        "post.logout.redirect.uris": "http://localhost:5173/",
+        "acr.loa.map": "{\"mfa\": \"2\"}"
       },
       "protocolMappers": [
         {
@@ -63,7 +60,8 @@
         "matbakhy-dev://auth/callback"
       ],
       "attributes": {
-        "pkce.code.challenge.method": "S256"
+        "pkce.code.challenge.method": "S256",
+        "acr.loa.map": "{\"mfa\": \"2\"}"
       },
       "protocolMappers": [
         {
@@ -99,6 +97,17 @@
       "attributes": {
         "pkce.code.challenge.method": "S256"
       }
+    },
+    {
+      "clientId": "matbakhy-admin",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "${ADMIN_SECRET}",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "description": "Service account used only by the API for the audited MFA reset and to end sessions (never public)"
     }
   ],
   "users": [
@@ -136,24 +145,32 @@
       ]
     },
     {
+      "username": "service-account-matbakhy-admin",
+      "serviceAccountClientId": "matbakhy-admin",
+      "enabled": true,
+      "clientRoles": {
+        "realm-management": [
+          "view-users",
+          "manage-users"
+        ]
+      }
+    },
+    {
       "enabled": true,
       "emailVerified": true,
       "firstName": "Staff",
-      "realmRoles": [
-        "matbakhy-staff"
-      ],
-      "username": "staff-mfa",
-      "email": "staff-mfa@matbakhy.test",
-      "lastName": "WithOtp",
+      "username": "otp-login",
+      "email": "otp-login@matbakhy.test",
+      "lastName": "otp-login",
       "credentials": [
         {
           "type": "password",
-          "value": "${STAFF_PASSWORD}",
+          "value": "${MFA_PASSWORD}",
           "temporary": false
         },
         {
           "type": "otp",
-          "secretData": "{\"value\":\"${STAFF_TOTP_SECRET}\"}",
+          "secretData": "{\"value\":\"${MFA_TOTP_SECRET}\"}",
           "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
         }
       ]
@@ -162,16 +179,73 @@
       "enabled": true,
       "emailVerified": true,
       "firstName": "Staff",
-      "realmRoles": [
-        "matbakhy-staff"
-      ],
-      "username": "staff-no-otp",
-      "email": "staff-no-otp@matbakhy.test",
-      "lastName": "NoOtp",
+      "username": "otp-sso",
+      "email": "otp-sso@matbakhy.test",
+      "lastName": "otp-sso",
       "credentials": [
         {
           "type": "password",
-          "value": "${STAFF_PASSWORD}",
+          "value": "${MFA_PASSWORD}",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "secretData": "{\"value\":\"${MFA_TOTP_SECRET}\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "username": "otp-reset",
+      "email": "otp-reset@matbakhy.test",
+      "lastName": "otp-reset",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${MFA_PASSWORD}",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "secretData": "{\"value\":\"${MFA_TOTP_SECRET}\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "username": "otp-stepup",
+      "email": "otp-stepup@matbakhy.test",
+      "lastName": "otp-stepup",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${MFA_PASSWORD}",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "secretData": "{\"value\":\"${MFA_TOTP_SECRET}\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "username": "no-otp",
+      "email": "no-otp@matbakhy.test",
+      "lastName": "no-otp",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${MFA_PASSWORD}",
           "temporary": false
         }
       ]
@@ -180,21 +254,53 @@
       "enabled": true,
       "emailVerified": true,
       "firstName": "Staff",
-      "realmRoles": [
-        "matbakhy-staff"
-      ],
-      "username": "staff-mfa-sso",
-      "email": "staff-mfa-sso@matbakhy.test",
-      "lastName": "WithOtpSso",
+      "username": "enrol",
+      "email": "enrol@matbakhy.test",
+      "lastName": "enrol",
       "credentials": [
         {
           "type": "password",
-          "value": "${STAFF_PASSWORD}",
+          "value": "${MFA_PASSWORD}",
+          "temporary": false
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "username": "otp-admin",
+      "email": "otp-admin@matbakhy.test",
+      "lastName": "otp-admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${MFA_PASSWORD}",
           "temporary": false
         },
         {
           "type": "otp",
-          "secretData": "{\"value\":\"${STAFF_TOTP_SECRET}\"}",
+          "secretData": "{\"value\":\"${MFA_TOTP_SECRET}\"}",
+          "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
+        }
+      ]
+    },
+    {
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Staff",
+      "username": "otp-policy",
+      "email": "otp-policy@matbakhy.test",
+      "lastName": "otp-policy",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "${MFA_PASSWORD}",
+          "temporary": false
+        },
+        {
+          "type": "otp",
+          "secretData": "{\"value\":\"${MFA_TOTP_SECRET}\"}",
           "credentialData": "{\"subType\":\"totp\",\"digits\":6,\"period\":30,\"algorithm\":\"HmacSHA1\",\"counter\":0}"
         }
       ]
@@ -204,31 +310,9 @@
   "authenticationFlows": [
     {
       "alias": "matbakhy browser",
-      "description": "Browser flow; staff accounts (realm role matbakhy-staff) must pass OTP on every authorization, including SSO-cookie logins",
+      "description": "Browser flow with LoA step-up: level 1 password; level 2 adds OTP when the client asks for acr mfa/2",
       "providerId": "basic-flow",
       "topLevel": true,
-      "builtIn": false,
-      "authenticationExecutions": [
-        {
-          "authenticatorFlow": true,
-          "flowAlias": "matbakhy browser login",
-          "requirement": "REQUIRED",
-          "priority": 10,
-          "userSetupAllowed": false
-        },
-        {
-          "authenticatorFlow": true,
-          "flowAlias": "matbakhy staff mfa",
-          "requirement": "CONDITIONAL",
-          "priority": 20,
-          "userSetupAllowed": false
-        }
-      ]
-    },
-    {
-      "alias": "matbakhy browser login",
-      "providerId": "basic-flow",
-      "topLevel": false,
       "builtIn": false,
       "authenticationExecutions": [
         {
@@ -254,24 +338,54 @@
       "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "auth-username-password-form",
-          "authenticatorConfig": "matbakhy-pwd-amr",
-          "authenticatorFlow": false,
-          "requirement": "REQUIRED",
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy level 1",
+          "requirement": "CONDITIONAL",
           "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy level 2",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
           "userSetupAllowed": false
         }
       ]
     },
     {
-      "alias": "matbakhy staff mfa",
+      "alias": "matbakhy level 1",
       "providerId": "basic-flow",
       "topLevel": false,
       "builtIn": false,
       "authenticationExecutions": [
         {
-          "authenticator": "conditional-user-role",
-          "authenticatorConfig": "matbakhy-staff-role",
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "matbakhy-loa-1",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorConfig": "matbakhy-pwd-amr",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy level 2",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "matbakhy-loa-2",
           "authenticatorFlow": false,
           "requirement": "REQUIRED",
           "priority": 10,
@@ -290,10 +404,19 @@
   ],
   "authenticatorConfig": [
     {
-      "alias": "matbakhy-staff-role",
+      "alias": "matbakhy-loa-1",
       "config": {
-        "condUserRole": "matbakhy-staff",
-        "negate": "false"
+        "loa-condition-level": "1",
+        "loa-max-age": "36000",
+        "loa-store-in-user-session": "true"
+      }
+    },
+    {
+      "alias": "matbakhy-loa-2",
+      "config": {
+        "loa-condition-level": "2",
+        "loa-max-age": "0",
+        "loa-store-in-user-session": "true"
       }
     },
     {
@@ -310,5 +433,8 @@
         "default.reference.maxAge": "0"
       }
     }
-  ]
+  ],
+  "attributes": {
+    "acr.loa.map": "{\"mfa\": \"2\"}"
+  }
 }

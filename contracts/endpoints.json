@@ -1001,6 +1001,51 @@
       "response_type": "CookInsights",
       "contract": "The cook's own free report: activity, orders, capacity, gross sales, refunds and known net; no profit claim (D17, MB-054)",
       "implemented": true
+    },
+    {
+      "id": "API-112",
+      "method": "GET",
+      "path": "/api/v1/me/security",
+      "permission": "AUTHENTICATED",
+      "response_type": "SecuritySettings",
+      "contract": "MFA state of the signed-in account (D18): applicable categories/policies, effective mode, own preference, MFA asserted in this session, step-up path, account-management link",
+      "implemented": true
+    },
+    {
+      "id": "API-113",
+      "method": "PUT",
+      "path": "/api/v1/me/security/mfa",
+      "permission": "SELF",
+      "response_type": "SecuritySettings",
+      "contract": "enabled: on needs a session that passed MFA; off needs recent MFA, is refused under REQUIRED and unavailable under DISABLED",
+      "implemented": true
+    },
+    {
+      "id": "API-114",
+      "method": "GET",
+      "path": "/api/v1/ops/security/mfa-policy",
+      "permission": "SECURITY_MFA_POLICY",
+      "response_type": "MfaPolicyList",
+      "contract": "MFA policy per account category (D18)",
+      "implemented": true
+    },
+    {
+      "id": "API-115",
+      "method": "PUT",
+      "path": "/api/v1/ops/security/mfa-policy/{category}",
+      "permission": "SECURITY_MFA_POLICY",
+      "response_type": "MfaPolicy",
+      "contract": "mode, expectedVersion, reason; recent MFA; audited",
+      "implemented": true
+    },
+    {
+      "id": "API-116",
+      "method": "POST",
+      "path": "/api/v1/ops/accounts/{accountId}/mfa-reset",
+      "permission": "SECURITY_MFA_RESET",
+      "response_type": "MfaResetResult",
+      "contract": "reason; recent MFA; removes OTP credentials at the provider and ends sessions; no secrets; no self-reset; audited",
+      "implemented": true
     }
   ]
 }

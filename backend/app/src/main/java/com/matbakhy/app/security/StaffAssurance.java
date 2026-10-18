@@ -23,7 +23,7 @@ public class StaffAssurance {
     }
 
     /** True when the provider asserted an MFA-level ACR or an MFA method in amr (no recency check). */
-    static boolean assertsMfa(java.util.Map<String, Object> claims, java.util.List<String> mfaAcrValues) {
+    public static boolean assertsMfa(java.util.Map<String, Object> claims, java.util.List<String> mfaAcrValues) {
         boolean mfa = claims.get("acr") != null && mfaAcrValues.contains(claims.get("acr").toString());
         if (!mfa && claims.get("amr") instanceof Collection<?> methods) {
             mfa = methods.stream().map(Object::toString).anyMatch(m -> m.equals("mfa") || m.equals("otp") || m.equals("hwk"));

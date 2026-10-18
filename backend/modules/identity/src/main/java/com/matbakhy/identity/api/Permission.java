@@ -19,7 +19,9 @@ public enum Permission {
     FINANCE_SETTLEMENT("finance.settlement"),
     CONFIG_READ("config.read"),
     CONFIG_WRITE("config.write"),
-    INTEGRATION_OPS("integration.ops");
+    INTEGRATION_OPS("integration.ops"),
+    SECURITY_MFA_POLICY("security.mfa_policy"),
+    SECURITY_MFA_RESET("security.mfa_reset");
 
     private final String code;
 

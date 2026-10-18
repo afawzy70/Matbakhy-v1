@@ -43,7 +43,7 @@ public record IdentityProperties(
     }
 
     /** Server-to-provider endpoint (token, JWKS, userinfo); differs from the issuer inside container networks. */
-    String backchannel(String path) {
+    public String backchannel(String path) {
         return backchannelIssuer + "/protocol/openid-connect/" + path;
     }
 }
