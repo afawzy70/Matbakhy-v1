@@ -1,0 +1,30 @@
+[
+ {
+  "id": "CR4-001",
+  "severity": "Medium",
+  "component": "Media cleanup",
+  "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaCleanup.java",
+  "line": 55,
+  "title": "Repeated enqueue silently discards a later deletion deadline",
+  "scenario": "Enqueue a private object for immediate cleanup, then enqueue the same bucket/key with notBefore set to upload-ticket expiry plus one minute. The unique constraint preserves the earlier deadline.",
+  "expected": "A repeated enqueue must preserve the latest required safety deadline.",
+  "actual": "ON CONFLICT DO NOTHING leaves next_attempt_at unchanged. Once the object is unreferenced, runDue can delete it before the later notBefore.",
+  "evidence": "The four-argument enqueue computes due but its INSERT ignores conflicting rows. V30__media_cleanup.sql defines UNIQUE(bucket, object_key). A two-insert SQL model reproduced retention of the earlier deadline. Existing tests repeat only identical immediate requests.",
+  "suggested_fix": "For pending conflicts, atomically retain the greater existing/requested deadline. Explicitly define terminal-row re-enqueue behavior.",
+  "repro_test": "Against PostgreSQL, enqueue a synthetic key immediately, enqueue it again with a future deadline, assert one row with the future deadline, and assert runDue leaves the object untouched before that deadline."
+ },
+ {
+  "id": "CR4-002",
+  "severity": "Medium",
+  "component": "Deployment secret rendering",
+  "file": "deploy/web-preview/deploy.sh",
+  "line": 61,
+  "title": "Generated directory is secured only after secrets are written",
+  "scenario": "Run render for a new GENERATED_DIR under a traversable parent with the common umask 022, or rerender a directory left at mode 755 by the previous script.",
+  "expected": "The generated directory must be owner-only before any secret-bearing file is opened.",
+  "actual": "mkdir creates traversable directories and sed writes secret-bearing files before chmod 700 runs. Another local user can read them during rendering; a failure before chmod leaves the directory exposed.",
+  "evidence": "Directory creation occurs at line 61, secret rendering at lines 62–65, and the first owner-only chmod at line 68. render does not set a restrictive umask before these operations.",
+  "suggested_fix": "Create and chmod GENERATED_DIR to 700 before creating children or opening output files, and use a restrictive umask during rendering.",
+  "repro_test": "With synthetic values and umask 022, pause rendering before the first output completes and assert GENERATED_DIR is already mode 700. Repeat with a pre-existing mode-755 directory and a forced rendering failure."
+ }
+]

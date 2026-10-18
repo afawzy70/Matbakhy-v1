@@ -62,6 +62,7 @@ class MediaIntegrationTest {
     @Autowired ObjectStorage storage;
     @Autowired MediaService media;
     @Autowired com.matbakhy.catalog.internal.media.MediaCleanup cleanup;
+    @Autowired org.springframework.transaction.support.TransactionTemplate tx;
 
     final HttpClient http = HttpClient.newHttpClient();
     String ownerSubject;
@@ -299,6 +300,42 @@ class MediaIntegrationTest {
         HttpResponse<byte[]> fetched = http.send(HttpRequest.newBuilder(URI.create(read)).GET().build(), HttpResponse.BodyHandlers.ofByteArray());
         assertThat(fetched.statusCode()).isEqualTo(200);
         assertThat(fetched.body()).as("approved bytes unchanged by the replayed ticket").isEqualTo(doc);
+    }
+
+    /** CR5-001: cleanup never judges an object while the asset's approval (which holds the row lock) is still in flight. */
+    @Test
+    void cleanup_waits_for_an_in_flight_approval_instead_of_judging_the_object_early() throws Exception {
+        byte[] doc = pdf("");
+        UUID docId = upload(ownerSubject, "COOK_DOCUMENT", "application/pdf", doc, doc);
+        String key = "documents/" + docId;
+        storage.write(Bucket.PRIVATE, key, doc, "application/pdf"); // written by an approval that has not committed yet
+        cleanup.enqueue(Bucket.PRIVATE, key, "IN_FLIGHT");
+        java.util.concurrent.CountDownLatch locked = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.CountDownLatch release = new java.util.concurrent.CountDownLatch(1);
+        java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newSingleThreadExecutor();
+        java.util.concurrent.Future<?> holder = pool.submit(() -> tx.executeWithoutResult(status -> {
+            jdbc.queryForObject("SELECT id FROM media_asset WHERE id = ? FOR UPDATE", UUID.class, docId);
+            locked.countDown();
+            try {
+                release.await(30, java.util.concurrent.TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }));
+        try {
+            assertThat(locked.await(30, java.util.concurrent.TimeUnit.SECONDS)).isTrue();
+            cleanup.runDue();
+            assertThat(storage.size(Bucket.PRIVATE, key)).as("object untouched while the approval holds the asset lock").isPresent();
+            assertThat(jdbc.queryForObject("SELECT state FROM media_cleanup WHERE object_key = ?", String.class, key)).isEqualTo("PENDING");
+        } finally {
+            release.countDown();
+            holder.get(30, java.util.concurrent.TimeUnit.SECONDS);
+            pool.shutdown();
+        }
+        // Approval rolled back (asset still points at its upload key): the orphan is removed once the deadline passes.
+        jdbc.update("UPDATE media_cleanup SET next_attempt_at = now() WHERE object_key = ?", key);
+        assertThat(cleanup.runDue()).isGreaterThanOrEqualTo(1);
+        assertThat(storage.size(Bucket.PRIVATE, key)).isEmpty();
     }
 
     @Test

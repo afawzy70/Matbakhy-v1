@@ -31,7 +31,7 @@ Result: supported checks passed; full verification remains BLOCKED. Python: 69 p
 
 ## Commands and evidence
 
-All commands below ran from the worktree root unless an explicit `cd` appears. Full exact commands, exit codes and log paths: [commands.json](phase2-evidence/commands.json). Counts are taken from actual Vitest/Jest JSON reports; repeated runs are not added to unique test totals. The unmodified pnpm commands all exited 1 due to engine enforcement; direct expansions verify their underlying tasks. A temporary `/tmp/qa2-bin/pnpm` wrapper executed `/home/aiagent/.npm-global/bin/pnpm --config.engine-strict=false "$@"`; it did not resolve nested root-script enforcement and was not installed in the repository.
+All commands below ran from the worktree root unless an explicit `cd` appears. Full exact commands, exit codes and log paths: [commands.json](../phase2-evidence/commands.json). Counts are taken from actual Vitest/Jest JSON reports; repeated runs are not added to unique test totals. The unmodified pnpm commands all exited 1 due to engine enforcement; direct expansions verify their underlying tasks. A temporary `/tmp/qa2-bin/pnpm` wrapper executed `/home/aiagent/.npm-global/bin/pnpm --config.engine-strict=false "$@"`; it did not resolve nested root-script enforcement and was not installed in the repository.
 
 | Exact command | Exit |
 |---|---:|
@@ -89,7 +89,7 @@ All commands below ran from the worktree root unless an explicit `cd` appears. F
 
 ## Findings
 
-QA2-001 through QA2-005 describe engine, invocation and environment failures with exact reproduction details in [findings.json](phase2-evidence/findings.json). These are execution limitations, not demonstrated product defects. Initial Python module import failures were corrected using discovery; the scope failure is retained as BLOCKED. Secret/proxy checks must be rerun with Docker.
+QA2-001 through QA2-005 describe engine, invocation and environment failures with exact reproduction details in [findings.json](../phase2-evidence/findings.json). These are execution limitations, not demonstrated product defects. Initial Python module import failures were corrected using discovery; the scope failure is retained as BLOCKED. Secret/proxy checks must be rerun with Docker.
 
 Recommendations: rerun the blocked scope fixture on a clean checkout, and run backend/secret/proxy suites on a JDK/Docker runner; repeat supported checks with pinned Node for release evidence. No approvals, merges or release-readiness claims follow from this run.
 
@@ -104,6 +104,6 @@ Root pnpm lint passed. Root typecheck/test/build/contract:check with --config.en
 
 Offline backend focused unit command passed: 11 tests, zero failures/errors/skips (StaffAssuranceTest 3, AccountMapperStaffMfaTest 3, MediaInspectorPdfTest 5). No sandbox block. Docker/Testcontainers integration tests, including StaffMfaIdpTest, NOT_RUN locally per owner scope. Owner-supplied CI evidence only: [GitHub Actions 39122215555](https://github.com/afawzy70/Matbakhy-v1/actions/runs/39122215555), 304 backend tests, zero failures; not fetched or represented as a local run.
 
-Traceability and flakiness review: see QA3 table in [qa-test-plan.md](qa-test-plan.md). All requested new tests have meaningful behavior assertions; cash-after-deposit injects the obligation rather than exercising placement, expiry race permits either safe result but does not force both interleavings, and replay verifies approved bytes without asserting replay PUT status. New real price PATCH test is deterministic; older price concurrency tests use fixed sleeps. MFA uses wall-clock OTP computed before browser login and therefore depends on completing login inside the provider acceptance window.
+Traceability and flakiness review: see QA3 table in [qa-test-plan.md](../qa-test-plan.md). All requested new tests have meaningful behavior assertions; cash-after-deposit injects the obligation rather than exercising placement, expiry race permits either safe result but does not force both interleavings, and replay verifies approved bytes without asserting replay PUT status. New real price PATCH test is deterministic; older price concurrency tests use fixed sleeps. MFA uses wall-clock OTP computed before browser login and therefore depends on completing login inside the provider acceptance window.
 
-Findings: QA3-001 Low environment-dependent scope fixture failure; QA3-002 Medium cleanup scheduler timing dependency (static evidence, not a locally reproduced integration failure). See [qa-findings.json](qa-findings.json). No new application defect established. Final QA is qualified by the Python failure, scheduler isolation finding and local integration NOT_RUN status.
+Findings: QA3-001 Low environment-dependent scope fixture failure; QA3-002 Medium cleanup scheduler timing dependency (static evidence, not a locally reproduced integration failure). See [qa-findings.json](../qa-findings.json). No new application defect established. Final QA is qualified by the Python failure, scheduler isolation finding and local integration NOT_RUN status.

@@ -31,6 +31,8 @@ import java.util.regex.Pattern;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Media lifecycle (BR-010): PENDING_UPLOAD → QUARANTINED → APPROVED / REJECTED, plus DELETED. Clients upload
@@ -196,7 +198,7 @@ public class MediaService implements MediaLibrary {
             publicKey = "media/" + mediaId + ".jpg";
             // If this transaction rolls back the object stays behind; a durable job removes it later unless a committed
             // approval references it (a concurrent retry may have approved the same key).
-            cleanup.enqueueUnlessApproved(Bucket.PUBLIC, publicKey, "UNAPPROVED_PUBLIC_VARIANT", Duration.ofMinutes(5));
+            onRollbackEnqueue(Bucket.PUBLIC, publicKey, "UNAPPROVED_PUBLIC_VARIANT");
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', public_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     publicKey, Timestamp.from(clock.instant()), mediaId);
             storage.write(Bucket.PUBLIC, publicKey, variant, MediaInspector.JPEG);
@@ -206,7 +208,7 @@ public class MediaService implements MediaLibrary {
             String uploadKey = row.privateKey();
             // Idempotent, deterministic key: a retry after a rollback rewrites the same verified bytes. It is deliberately not
             // deleted on rollback, because a concurrent retry may already have approved the same key (SECR-003).
-            cleanup.enqueueUnlessApproved(Bucket.PRIVATE, sealed, "UNAPPROVED_SEALED_DOCUMENT", Duration.ofMinutes(5));
+            onRollbackEnqueue(Bucket.PRIVATE, sealed, "UNAPPROVED_SEALED_DOCUMENT");
             storage.write(Bucket.PRIVATE, sealed, content, sniffed);
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', private_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     sealed, Timestamp.from(clock.instant()), mediaId);
@@ -300,6 +302,27 @@ public class MediaService implements MediaLibrary {
     private Row lockOwned(UUID ownerId, UUID mediaId) {
         return jdbc.query("SELECT * FROM media_asset WHERE id = ? AND owner_id = ? AND state <> 'DELETED' FOR UPDATE", MediaService::map,
                 mediaId, ownerId).stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "media not found"));
+    }
+
+    /**
+     * Only on rollback (the rare path, so the second connection is not held on every completion): record the written
+     * object for the guarded durable cleanup. Nothing is deleted here, so a concurrent retry that committed is unharmed.
+     */
+    private void onRollbackEnqueue(Bucket bucket, String key, String reason) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    if (status == STATUS_ROLLED_BACK) {
+                        try {
+                            cleanup.enqueueUnlessApproved(bucket, key, reason, Duration.ofMinutes(5));
+                        } catch (RuntimeException e) {
+                            org.slf4j.LoggerFactory.getLogger(MediaService.class).warn("could not record unapproved object for cleanup ({})", e.getClass().getSimpleName());
+                        }
+                    }
+                }
+            });
+        }
     }
 
     static String sanitize(String filename) {

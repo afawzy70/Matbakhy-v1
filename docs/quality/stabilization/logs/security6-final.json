@@ -1,0 +1,53 @@
+{
+  "agent": "Independent Senior Application Security Reviewer — final static pass",
+  "commit": "72ebca3384604a6e5873cf344c2d8a84ebb15bd0",
+  "summary": "HEAD matched the required SHA before and after review; worktree remained clean. Read-only, offline inspection of git diff d3e22ca..HEAD and related source established: SECR4-002's unconditional rollback deletion is removed, but replacement cleanup retains the in-flight approval race described in SECR5-001, so full closure is not established. SECR4-003 and CR4-002 are closed in source: deploy/web-preview/deploy.sh:62-68 restricts GENERATED_DIR before writing credentials. CR4-001 is closed in source: MediaCleanup.java:74-79 preserves the greater deadline, re-arms finished/skipped rows and retains FAILED visibility. Original audit dispositions: SEC-001 closed in source for the reported escaped-name/compressed-object bypass (MediaInspector.java:100-160 structurally parses and checks decoded PDF names); SEC-002 closed in source for upload-ticket overwrite of approved documents (MediaService.java:204-215 moves verified bytes to a documents/ key unavailable to the upload ticket); SEC-003 closed in source for normal rehearsal use (scripts/rehearsal/load.py:18-27 enables certificate verification by default and limits the explicit insecure exception to .localhost); SEC-004 remains partially mitigated, not closed (deploy/web-preview/Caddyfile:27 supplies Report-Only CSP). CR-002 remains open for live deployment evidence per docs/security/staff-mfa-enforcement.md:28. SECR-001 behaves as documented: AccountMapper.java:55-58 grants staff authorities without MFA when enforcement is off and requires StaffAssurance.assertsMfa when on; application.yaml:71 and compose.yaml:150 wire the documented variable. Dependency overrides are present in backend/pom.xml:45-48 (PDFBox 3.0.8, Tomcat 11.0.26, Jackson BOM 3.1.7), constituting source-level mitigation, not verified advisory closure. No runtime tests, builds, network requests or deployment operations were performed. Static inspection cannot establish packaged dependency resolution, upstream authenticity/current advisories, compatibility, actual CI outcomes, PDF parser runtime behavior, concurrency outcomes, deployed realm/claim behavior, deployed MFA configuration, effective host/container permissions or live CSP behavior. Accepted open decisions are not repeated as new findings.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Before and after inspection, matched the required full SHA."
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "note": "Clean before and after inspection."
+    },
+    {
+      "command": "git diff --stat d3e22ca..HEAD; git diff d3e22ca..HEAD -- backend deploy",
+      "exit_code": 0,
+      "note": "Reviewed changed source, deployment script and integration-test assertions; tests were not executed."
+    },
+    {
+      "command": "Read-only source and audit inspection using cat, rg, nl and sed",
+      "exit_code": 0,
+      "note": "Inspected repository guidance, prior findings, media lifecycle, cleanup, MFA paths, TLS helper, CSP and dependency declarations. No secret values printed."
+    },
+    {
+      "command": "git diff --check d3e22ca..HEAD",
+      "exit_code": 2,
+      "note": "Five trailing-whitespace errors in docs/quality/stabilization/round3/qa-test-plan-r3.md; no security implication established."
+    },
+    {
+      "command": "sh -n deploy/web-preview/deploy.sh",
+      "exit_code": 0,
+      "note": "Shell syntax valid; effective permissions were not tested."
+    }
+  ],
+  "findings": [
+    {
+      "id": "SECR5-001",
+      "severity": "Medium",
+      "component": "Media approval and durable cleanup",
+      "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaCleanup.java",
+      "line": 97,
+      "title": "Cleanup can delete an object while its approval transaction is still in flight",
+      "scenario": "Completion independently commits a cleanup intent due in five minutes, writes the public image or sealed document, then pauses before its outer transaction commits. After the deadline, another instance runs cleanup. Its ordinary SELECT sees the previously committed media row, which does not yet reference the new key, deletes the object and marks cleanup DONE. Completion subsequently commits APPROVED with the deleted key.",
+      "expected": "Cleanup must exclude objects belonging to an in-flight approval, regardless of transaction duration.",
+      "actual": "The five-minute delay is the only barrier protecting an uncommitted approval. The reference check does not lock or synchronize with the media transaction, and complete() declares no transaction timeout enforcing completion before that deadline.",
+      "evidence": "MediaService.java:126-127 opens the outer transaction; :199-202 and :209-212 independently enqueue cleanup before writing and committing approval. MediaCleanup.java:63-65 commits the intent with REQUIRES_NEW; :88-99 selects due intents and checks only committed references; :105-107 deletes and finishes without coordinating with the approval's asset lock.",
+      "suggested_fix": "Coordinate cleanup with the owning media transaction through a consistent locking or attempt-ownership protocol. A fixed delay alone cannot prove an approval is no longer in flight.",
+      "repro_test": "With synthetic storage and separate PostgreSQL transactions, pause completion after object write but before commit, advance the cleanup clock beyond five minutes, and run cleanup from another transaction. Resume completion and assert every committed APPROVED key remains readable. Repeat for public variants and sealed documents. Static scenario; not executed."
+    }
+  ]
+}

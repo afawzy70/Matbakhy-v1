@@ -27,6 +27,8 @@ public class MediaCleanup {
     static final int BATCH = 20;
     private static final Duration BASE_BACKOFF = Duration.ofSeconds(30);
     private static final Duration MAX_BACKOFF = Duration.ofHours(1);
+    private static final java.util.regex.Pattern UUID_IN_KEY = java.util.regex.Pattern.compile(
+            "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}");
     private static final Logger log = LoggerFactory.getLogger(MediaCleanup.class);
 
     private final JdbcTemplate jdbc;
@@ -94,6 +96,18 @@ public class MediaCleanup {
             String key = (String) row.get("object_key");
             Bucket bucket = Bucket.valueOf((String) row.get("bucket"));
             int attempts = ((Number) row.get("attempts")).intValue();
+            // An approval that is still in flight holds the asset row lock: wait for its outcome instead of judging early.
+            java.util.regex.Matcher found = UUID_IN_KEY.matcher(key);
+            if (found.find()) {
+                UUID assetId = UUID.fromString(found.group());
+                Integer known = jdbc.queryForObject("SELECT count(*) FROM media_asset WHERE id = ?", Integer.class, assetId);
+                if (known != null && known > 0
+                        && jdbc.queryForList("SELECT id FROM media_asset WHERE id = ? FOR UPDATE SKIP LOCKED", assetId).isEmpty()) {
+                    jdbc.update("UPDATE media_cleanup SET next_attempt_at = ?, updated_at = ? WHERE id = ?",
+                            Timestamp.from(now.plus(Duration.ofMinutes(1))), Timestamp.from(now), id);
+                    continue;
+                }
+            }
             Boolean referenced = jdbc.queryForObject("""
                     SELECT EXISTS (SELECT 1 FROM media_asset WHERE state IN ('PENDING_UPLOAD', 'QUARANTINED', 'APPROVED')
                                    AND (private_key = ? OR public_key = ?))""", Boolean.class, key, key);
