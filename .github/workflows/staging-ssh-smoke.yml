@@ -1,0 +1,43 @@
+name: Staging SSH connectivity smoke test
+
+on:
+  push:
+    branches: [chore/cd-ssh-smoke]
+    paths:
+      - .github/workflows/staging-ssh-smoke.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ssh-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Validate SSH secrets
+        env:
+          HOST: ${{ secrets.STAGING_SSH_HOST }}
+          USER: ${{ secrets.STAGING_SSH_USER }}
+          KEY: ${{ secrets.STAGING_SSH_KEY }}
+          HOST_PUBKEY: ${{ secrets.STAGING_SSH_HOST_PUBKEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in HOST USER KEY HOST_PUBKEY; do
+            [[ -n "${!v}" ]] || { echo "::error::Missing secret: $v"; exit 1; }
+          done
+          install -d -m 700 ~/.ssh
+          (umask 077; printf '%s\n' "$KEY" > ~/.ssh/id_ed25519)
+          printf '%s %s\n' "$HOST" "$HOST_PUBKEY" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          ssh-keygen -y -f ~/.ssh/id_ed25519 >/dev/null
+
+      - name: Verify remote deployment access (read-only)
+        env:
+          HOST: ${{ secrets.STAGING_SSH_HOST }}
+          USER: ${{ secrets.STAGING_SSH_USER }}
+        run: |
+          ssh -o BatchMode=yes -o ConnectTimeout=12 -o StrictHostKeyChecking=yes \
+            -i ~/.ssh/id_ed25519 "$USER@$HOST" \
+            'test -f /srv/matbakhy-staging/deploy/web-preview/.env && docker compose version >/dev/null && echo "SSH CONNECTED; STAGING READY FOR NEXT STEP"'
