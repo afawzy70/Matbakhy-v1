@@ -7,7 +7,8 @@
 #   admin-console.kcadm.sh harden      idempotent: operations client, master frontend URL, brute-force protection, browser flow with a
 #                                      REQUIRED one-time password, password grant switched off for every master client
 #   admin-console.kcadm.sh rollback    rebinds the previous master browser flow, removes the flow, re-enables the admin-cli password grant
-#   admin-console.kcadm.sh fixture-create | fixture-delete   synthetic read-only verification administrator (see below)
+#   admin-console.kcadm.sh fixture-create | fixture-delete   synthetic read-only verification administrators (see below)
+#   admin-console.kcadm.sh admin-create | admin-delete NAME   a real administrator whose password and one-time password come from the server
 #
 # Why a separate operations client: once every administrator needs a one-time password, kcadm can no longer sign in with a user and
 # password (and the password grant is exactly the path an Internet attacker would use to skip the second factor). Operator scripts sign
@@ -37,15 +38,16 @@ trap cleanup EXIT
 
 login() {
   # The operations client first; the bootstrap administrator's password only while that client cannot sign in yet (first run).
+  # kcadm reads the secrets from KC_CLI_CLIENT_SECRET / KC_CLI_PASSWORD, so they never appear on a command line (ps shows container processes).
   if [ "${KCADM_REMOTE:-0}" = 1 ]; then
     "$KCADM" config credentials --config "$CFG" >/dev/null 2>&1 \
       || die "cannot sign in to the master realm (operations client not yet usable and no valid administrator credentials)"
   else
-    if [ -n "${OPS_CLIENT_SECRET:-}" ] && "$KCADM" config credentials --config "$CFG" --server "$SERVER" --realm master --client "$OPS_CLIENT" --secret "$OPS_CLIENT_SECRET" >/dev/null 2>&1; then
+    if [ -n "${OPS_CLIENT_SECRET:-}" ] && KC_CLI_CLIENT_SECRET="$OPS_CLIENT_SECRET" "$KCADM" config credentials --config "$CFG" --server "$SERVER" --realm master --client "$OPS_CLIENT" >/dev/null 2>&1; then
       return 0
     fi
     [ -n "${ADMIN_USER:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ] || die "no usable credentials (OPS_CLIENT_SECRET, or ADMIN_USER and ADMIN_PASSWORD)"
-    "$KCADM" config credentials --config "$CFG" --server "$SERVER" --realm master --user "$ADMIN_USER" --password "$ADMIN_PASSWORD" >/dev/null 2>&1 \
+    KC_CLI_PASSWORD="$ADMIN_PASSWORD" "$KCADM" config credentials --config "$CFG" --server "$SERVER" --realm master --user "$ADMIN_USER" >/dev/null 2>&1 \
       || die "cannot sign in to the master realm"
   fi
 }
@@ -92,13 +94,17 @@ password_grant_clients() {
   kc get clients -r "$REALM" --fields id,clientId,directAccessGrantsEnabled --format csv --noquotes | awk -F, '$3 == "true" { print $2 }'
 }
 
-otp_enrolled_admins() { # number of master users that have an OTP credential
-  n=0
-  ids="$(kc get users -r "$REALM" --fields id --format csv --noquotes)"
-  for id in $ids; do
-    if kc get "users/$id/credentials" -r "$REALM" --fields type --format csv --noquotes </dev/null | grep -Fxq otp; then n=$((n + 1)); fi
+# One line per master user: whether it has an OTP (without one it cannot sign in: the public page offers no enrolment) and the count.
+admin_accounts() {
+  kc get users -r "$REALM" --fields id,username --format csv --noquotes </dev/null | while IFS=, read -r id name; do
+    [ -n "$id" ] || continue
+    case "$name" in service-account-*) continue ;; esac
+    if kc get "users/$id/credentials" -r "$REALM" --fields type --format csv --noquotes </dev/null | grep -Fxq otp; then
+      echo "admin.$name=otp"
+    else
+      echo "admin.$name=no-otp(cannot-sign-in)"
+    fi
   done
-  echo "$n"
 }
 
 status() {
@@ -113,7 +119,9 @@ status() {
   echo "bruteForceProtected=$(realm_value bruteForceProtected)"
   echo "registrationAllowed=$(realm_value registrationAllowed)"
   echo "resetPasswordAllowed=$(realm_value resetPasswordAllowed)"
-  echo "otpEnrolledUsers=$(otp_enrolled_admins)"
+  accounts="$(admin_accounts)"
+  [ -z "$accounts" ] || echo "$accounts"
+  echo "signInCapableAdministrators=$(printf '%s\n' "$accounts" | grep -c '=otp$' || true)"
 }
 
 harden() {
@@ -138,7 +146,7 @@ harden() {
     "$KCADM" config credentials-client --config "$CFG.ops" >/dev/null 2>&1 && "$KCADM" cleanup "$CFG.ops" >/dev/null 2>&1 \
       || die "the operations client cannot sign in; the password grant was NOT switched off"
   else
-    "$KCADM" config credentials --config "$CFG.ops" --server "$SERVER" --realm master --client "$OPS_CLIENT" --secret "$OPS_CLIENT_SECRET" >/dev/null 2>&1 \
+    KC_CLI_CLIENT_SECRET="$OPS_CLIENT_SECRET" "$KCADM" config credentials --config "$CFG.ops" --server "$SERVER" --realm master --client "$OPS_CLIENT" >/dev/null 2>&1 \
       || die "the operations client cannot sign in; the password grant was NOT switched off"
     rm -f "$CFG.ops"
   fi
@@ -166,20 +174,51 @@ harden() {
     flow_complete || die "the flow tree is not complete after building it; the browser flow was NOT changed"
     echo "flow: created and verified"
   fi
+  changed=0
   if [ "$(bound_flow)" != "$TOP" ]; then
     kc update "realms/$REALM" -s browserFlow="$TOP" >/dev/null
     echo "browserFlow: bound to '$TOP'"
+    changed=1
   else
     echo "browserFlow: already '$TOP'"
   fi
 
-  # 4. No master client may issue tokens for a user and password alone (the OTP lives in the browser flow only).
+  # 4. Nobody can enrol a one-time password over the Internet: with the required action disabled, an account that has no OTP cannot sign
+  #    in at all (so knowing a password is never enough, not even for the first sign-in). Administrators get their OTP from the server
+  #    (admin-create), never from the public page.
+  kc update authentication/required-actions/CONFIGURE_TOTP -r "$REALM" -s enabled=false -s defaultAction=false >/dev/null
+  echo "required action CONFIGURE_TOTP: disabled (no public enrolment)"
+
+  # 5. No master client may issue tokens for a user and password alone (the OTP lives in the browser flow only), and no client may bind
+  #    another browser or direct-grant flow that would skip it.
   for c in $(password_grant_clients); do
     cid="$(client_uuid "$c")"
     kc update "clients/$cid" -r "$REALM" -s directAccessGrantsEnabled=false >/dev/null
     echo "client $c: password grant switched off"
+    changed=1
   done
   [ -z "$(password_grant_clients)" ] || die "a master client still accepts the password grant"
+  # Only clients that have an override are touched (Keycloak refuses to update some built-in clients).
+  overrides="$(kc get clients -r "$REALM" --fields id,authenticationFlowBindingOverrides </dev/null)" || die "cannot read the master clients"
+  for cid in $(printf '%s\n' "$overrides" | awk '/"id" :/ { gsub(/[",]/, "", $3); id = $3 } /"authenticationFlowBindingOverrides" :/ { if ($0 !~ /\{ *\}/) print id }'); do
+    kc update "clients/$cid" -r "$REALM" -s 'authenticationFlowBindingOverrides={}' >/dev/null </dev/null
+    echo "client $cid: flow override removed"
+    changed=1
+  done
+  overrides="$(kc get clients -r "$REALM" --fields clientId,authenticationFlowBindingOverrides </dev/null)" || die "cannot read the master clients"
+  if printf '%s\n' "$overrides" | grep -Eq '"(browser|direct_grant)"'; then
+    die "a master client still overrides the browser or direct-grant flow"
+  fi
+  echo "master clients: no flow overrides"
+
+  # 6. Sessions and tokens that were issued before the hardening (for example while a rollback had password-only sign-in) are revoked, so a
+  #    cookie or refresh token from that time cannot skip the second factor. Only when something actually changed (not on every release).
+  if [ "$changed" = 1 ]; then
+    kc update "realms/$REALM" -s notBefore="$(date +%s)" >/dev/null
+    login # the token used so far predates the new not-before time
+    kc create logout-all -r "$REALM" >/dev/null || die "cannot end the sessions that predate the hardening"
+    echo "sessions and tokens issued before the hardening: revoked"
+  fi
   echo "hardened"
 }
 
@@ -201,22 +240,52 @@ rollback() {
   fi
 }
 
-# Synthetic verification administrator (admin-console.sh verify): a user with a random password and TOTP secret and READ-ONLY rights on the
-# matbakhy realm, created from a JSON body on standard input for one run and always removed. Only names starting "verify-admin-" are removed.
+# Synthetic verification administrators (admin-console.sh verify): users with a random password (one of them also a random TOTP secret) and READ-ONLY
+# rights on the matbakhy realm, created from JSON bodies (one per line) on standard input for one run, and always removed afterwards. Only names
+# starting "verify-admin-" are removed.
 fixture_create() {
-  body="$(cat)"
-  [ -n "$body" ] || die "fixture-create needs the user representation on standard input"
+  bodies="$(cat)" # read before login: the sign-in call must not consume the request body
+  [ -n "$bodies" ] || die "fixture-create needs the user representations on standard input"
   login
-  name="$(printf '%s' "$body" | sed -n 's/.*"username": *"\(verify-admin-[0-9a-f]*\)".*/\1/p' | head -1)"
-  [ -n "$name" ] || die "the fixture username must start with $FIXTURE_PREFIX"
-  printf '%s' "$body" | kc_body create users -r "$REALM" -i >/dev/null || die "cannot create the synthetic verification administrator"
-  kc add-roles -r "$REALM" --uusername "$name" --cclientid matbakhy-realm \
-    --rolename view-realm --rolename view-users --rolename view-clients --rolename query-users --rolename query-clients --rolename query-groups >/dev/null \
-    || die "cannot give the verification administrator its read-only roles"
-  # The console's first call (whoami) needs some right on the realm the administrator signs in to; view-realm is read-only.
-  kc add-roles -r "$REALM" --uusername "$name" --cclientid master-realm --rolename view-realm >/dev/null \
-    || die "cannot give the verification administrator its read-only sign-in role"
-  echo "fixture administrator: created"
+  while IFS= read -r body; do
+    [ -n "$body" ] || continue
+    name="$(printf '%s' "$body" | sed -n 's/.*"username": *"\(verify-admin-[0-9a-f]*\)".*/\1/p' | head -1)"
+    [ -n "$name" ] || die "the fixture username must start with $FIXTURE_PREFIX"
+    printf '%s' "$body" | kc_body create users -r "$REALM" -i >/dev/null || die "cannot create the synthetic verification administrator"
+    kc add-roles -r "$REALM" --uusername "$name" --cclientid matbakhy-realm \
+      --rolename view-realm --rolename view-users --rolename view-clients --rolename query-users --rolename query-clients --rolename query-groups >/dev/null </dev/null \
+      || die "cannot give the verification administrator its read-only roles"
+    # The console's first call (whoami) needs some right on the realm the administrator signs in to; view-realm is read-only.
+    kc add-roles -r "$REALM" --uusername "$name" --cclientid master-realm --rolename view-realm >/dev/null </dev/null \
+      || die "cannot give the verification administrator its read-only sign-in role"
+  done <<BODIES
+$bodies
+BODIES
+  echo "fixture administrators: created"
+}
+
+# A real administrator for a person (admin-console.sh create-admin): password and TOTP are generated on the server and handed over in a private file;
+# the account is created with both credentials, so no enrolment ever happens on the public page. Refuses an existing name.
+admin_create() {
+  body="$(cat)"
+  [ -n "$body" ] || die "admin-create needs the user representation on standard input"
+  name="$(printf '%s' "$body" | sed -n 's/.*"username": *"\([a-z][a-z0-9-]*\)".*/\1/p' | head -1)"
+  case "$name" in ''|"$FIXTURE_PREFIX"*) die "invalid administrator name" ;; esac
+  login
+  if [ -n "$(kc get users -r "$REALM" -q "username=$name" -q exact=true --fields id --format csv --noquotes </dev/null | head -1)" ]; then
+    die "the administrator '$name' already exists (use REPLACE=1 ./admin-console.sh create-admin $name to replace it)"
+  fi
+  printf '%s' "$body" | kc_body create users -r "$REALM" -i >/dev/null || die "cannot create the administrator"
+  kc add-roles -r "$REALM" --uusername "$name" --rolename admin >/dev/null </dev/null || die "cannot give the administrator the admin role"
+  echo "administrator '$name': created with a password and a one-time password (both from the private file)"
+}
+
+admin_delete() { # one administrator by exact name (REPLACE=1); never the fixtures
+  name="$1"
+  case "$name" in ''|"$FIXTURE_PREFIX"*) die "invalid administrator name" ;; esac
+  login
+  id="$(kc get users -r "$REALM" -q "username=$name" -q exact=true --fields id --format csv --noquotes </dev/null | head -1)"
+  [ -z "$id" ] || { kc delete "users/$id" -r "$REALM" </dev/null >/dev/null; echo "administrator '$name': removed"; }
 }
 
 fixture_delete() {
@@ -241,5 +310,7 @@ case "${1:-}" in
   rollback) rollback ;;
   fixture-create) fixture_create ;;
   fixture-delete) fixture_delete ;;
-  *) die "usage: $0 status | harden | rollback | fixture-create | fixture-delete" ;;
+  admin-create) admin_create ;;
+  admin-delete) admin_delete "${2:-}" ;;
+  *) die "usage: $0 status | harden | rollback | fixture-create | fixture-delete | admin-create | admin-delete NAME" ;;
 esac

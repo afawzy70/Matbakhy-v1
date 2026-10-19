@@ -40,8 +40,8 @@ class KeycloakMfaMigrationTest(unittest.TestCase):
         remote = text[text.index("login() {"):text.index("flow_id()")]
         self.assertIn("KCADM_REMOTE", remote)
         wrapper = WRAPPER.read_text()
-        self.assertIn('--password "$ADMIN_PASSWORD"', wrapper)  # expanded inside the container shell (single-quoted here)
-        self.assertIn("-e ADMIN_USER -e ADMIN_PASSWORD", wrapper)  # forwarded by name, not by value
+        self.assertNotIn("--password", wrapper)  # kcadm reads KC_CLI_PASSWORD from the container environment: no password argument
+        self.assertIn("-e ADMIN_USER -e KC_CLI_PASSWORD", wrapper)  # forwarded by name, not by value
 
     def test_the_rollback_baseline_survives_a_repeated_apply_and_the_state_is_never_sourced(self):
         text = OPERATOR.read_text()

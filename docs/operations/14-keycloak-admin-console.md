@@ -20,9 +20,12 @@ the proxy publishes ports (80/443). `id.*` still answers 404 for `/admin` and `/
 ## Security controls
 
 1. **Password AND one-time password for every administrator.** The master realm's browser flow is `matbakhy master browser`: cookie, then username+password
-   (REQUIRED), then OTP form (REQUIRED, not conditional). An administrator without an OTP is forced to enrol one at the first sign-in.
-2. **No password-only path.** The password grant is switched off for every master client (including `admin-cli`), so the Internet cannot obtain a token with a
-   password alone. Operator tooling (kcadm, `migrate-mfa.sh`, this script) signs in as the service account of the confidential master client
+   (REQUIRED), then OTP form (REQUIRED, not conditional).
+   **There is no public enrolment.** The `CONFIGURE_TOTP` required action is disabled in the master realm, so an account without an OTP simply cannot sign in:
+   knowing a password never lets anyone enrol their own authenticator first. Administrators receive their password *and* OTP key from the server
+   (`./deploy.sh admin-console create-admin <name>`, below).
+2. **No password-only path.** The password grant is switched off for every master client (including `admin-cli`), no master client may override the browser or
+   direct-grant flow, and sessions/tokens that predate the hardening are revoked, so the Internet cannot obtain a token or reuse an old cookie with a password alone. Operator tooling (kcadm, `migrate-mfa.sh`, this script) signs in as the service account of the confidential master client
    `matbakhy-ops-cli`; its secret is `KEYCLOAK_OPS_CLIENT_SECRET` in the server's `.env` (mode 600, created by `./deploy.sh render`) and is never printed or committed.
 3. **Brute-force protection** in the master realm: 5 failures, then a temporary lock that grows (60 s steps up to 15 min); no self-registration, no reset-password flow.
 4. **Dedicated hostname.** `KC_HOSTNAME_ADMIN=https://kc-admin.<domain>` plus the master realm's frontend URL, so the master realm's issuer, sign-in forms,
@@ -49,14 +52,21 @@ every asset load from the host; the master realm advertises only `kc-admin` URLs
 form is required); wrong password and wrong OTP issue no code; the right password plus OTP yields a token whose issuer is `kc-admin.*`; the `admin-cli`
 password grant is refused; users, roles, clients and authentication flows of the matbakhy realm are listed through the Admin REST API; a foreign `Origin`
 gets no CORS allowance; the read-only account cannot create users or read master users; paths outside the console answer 404; `id.*` is unchanged; internal ports are not
-reachable on the public address. The synthetic administrator is deleted afterwards (a trap; `./admin-console.sh fixture-clean` removes leftovers).
+reachable on the public address; an account **without** an OTP cannot sign in and is offered no enrolment. The synthetic administrators are deleted afterwards (a trap; `./admin-console.sh fixture-clean` removes leftovers).
 
 ## First sign-in (owner)
 
-The first administrator is the bootstrap account (`KEYCLOAK_ADMIN_USER`, password `KEYCLOAK_ADMIN_PASSWORD` in the server's `.env`). Open the URL, sign in, and Keycloak
-shows a QR code: scan it with an authenticator app (iPhone: Passwords or any TOTP app) and enter the code. **Do this immediately after the deploy:** until an OTP is
-enrolled, whoever holds the password could enrol first (the password lives only in `.env`; never paste it in chats, tickets or logs). `status` prints
-`otpEnrolledUsers`. Afterwards create a personal administrator (the console marks the bootstrap account as temporary) and give it its own OTP.
+The existing bootstrap account (`KEYCLOAK_ADMIN_USER`) has no OTP, so after hardening it **cannot sign in to the console** (that is intended). Create the owner's
+administrator on the server:
+
+```
+./deploy.sh admin-console create-admin <name>      # e.g. owner-admin
+```
+
+It writes `generated/admin-console/<name>.private` (mode 600, directory 700): the generated password, the one-time-password key (base32) and an `otpauth://` URI.
+Read the file over SSH, add the account in an authenticator app (iPhone: Passwords or any TOTP app, "enter a setup key" with the base32 key, 6 digits, 30 s), sign in
+at the console URL, then **delete the file**. Never paste its contents into chats, tickets or logs. `./deploy.sh admin-console status` lists every master account
+as `otp` or `no-otp(cannot-sign-in)`. To replace an administrator (lost phone): `REPLACE=1 ./deploy.sh admin-console create-admin <name>`.
 
 ## Rollback
 
@@ -69,8 +79,8 @@ The previous flow name and a Keycloak database dump (`keycloak-db-<stamp>.dump`)
 (`admin-console-state.env`, parsed as data, never sourced). The `matbakhy` realm, its users, credentials, clients and sessions are never modified by any of this.
 To remove the exposure without touching Keycloak: `./deploy.sh admin-console disable`. To remove it from the code: revert the pull request (the host then no longer exists in the Caddyfile).
 
-If an administrator loses the authenticator, the operations client can reset it: `kcadm` in the container (`./kcadm-in-container.sh`) removes the user's `otp` credential
-through `users/<id>/credentials/<credential id>`; the user enrols a new one at the next sign-in. Lock-out of everything is a database-level recovery (restore the dump above).
+A lost authenticator is handled with `REPLACE=1 ... create-admin <name>`. Lock-out of everything is a database-level recovery (restore the dump above).
+The operations client's secret never appears on a command line (kcadm reads `KC_CLI_CLIENT_SECRET` from the environment).
 
 ## What this does not prove
 

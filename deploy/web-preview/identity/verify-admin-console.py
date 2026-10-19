@@ -264,6 +264,21 @@ def authenticated(fx):
     st = c.req(ADMIN + "/admin/realms/master/users", headers=auth)[0]
     check("least privilege: the verification administrator has no rights on the master realm's users", st == 403, f"status {st}")
 
+    # A password-only account can neither sign in nor enrol an authenticator over the public page (no OTP, no enrolment).
+    plain = fx.get("plain")
+    if plain:
+        b, status, page, action = start()
+        status, hdrs, body = b.req(action, {"username": plain["username"], "password": plain["password"], "credentialId": ""})
+        location = hdrs.get("Location", "")
+        check("an account WITHOUT a one-time password cannot sign in with its password (no code)", not code_from(location), f"status {status} {location[:80]}")
+        offered = 'name="totpSecret"' in body or "CONFIGURE_TOTP" in location or "required-action" in location
+        if not offered and 300 <= status < 400 and location:
+            st2, h2, body2 = b.req(urllib.parse.urljoin(action, location))
+            offered = 'name="totpSecret"' in body2 or "CONFIGURE_TOTP" in h2.get("Location", "")
+        check("... and the public page offers it no authenticator enrolment (no takeover by whoever knows the password)", not offered, f"status {status} {location[:80]}")
+    else:
+        skipped("password-only account cannot sign in or enrol", "no password-only fixture")
+
     # Failed attempts last, one second apart (Keycloak locks a user for a minute after failures that follow each other within a second).
     time.sleep(1.5)
     b, status, page, action = start()
@@ -301,22 +316,27 @@ def main():
 
 
 def fixture_body(directory):
-    """Writes the fixture file (mode 600) into DIRECTORY and prints the Keycloak user representation for `fixture-create` (stdin)."""
+    """Writes the fixture file (mode 600) into DIRECTORY and prints two Keycloak user representations (one per line) for `fixture-create` (stdin):
+    an administrator with a password and a one-time password, and an account with a password only (it must NOT be able to sign in or enrol)."""
     import secrets
-    username = "verify-admin-" + secrets.token_hex(4)
-    password = secrets.token_urlsafe(24)
+    tag = secrets.token_hex(4)
+    username, plain = "verify-admin-" + tag, "verify-admin-" + secrets.token_hex(4)
+    password, plain_password = secrets.token_urlsafe(24), secrets.token_urlsafe(24)
     otp_secret = "".join(secrets.choice("abcdefghijklmnopqrstuvwxyz0123456789") for _ in range(20))
     fd = os.open(os.path.join(directory, "fixture.json"), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w") as f:
-        json.dump({"username": username, "password": password, "totp_secret": otp_secret}, f)
-    print(json.dumps({
-        "username": username, "enabled": True, "emailVerified": True, "email": f"{username}@preview.matbakhy.invalid",
-        "firstName": "Verify", "lastName": "Synthetic",
-        "credentials": [
-            {"type": "password", "value": password, "temporary": False},
-            {"type": "otp", "secretData": json.dumps({"value": otp_secret}),
-             "credentialData": json.dumps({"subType": "totp", "digits": 6, "period": 30, "algorithm": "HmacSHA1", "counter": 0})},
-        ]}))
+        json.dump({"username": username, "password": password, "totp_secret": otp_secret,
+                   "plain": {"username": plain, "password": plain_password}}, f)
+
+    def body(name, creds):
+        return json.dumps({"username": name, "enabled": True, "emailVerified": True, "email": f"{name}@preview.matbakhy.invalid",
+                           "firstName": "Verify", "lastName": "Synthetic", "credentials": creds})
+
+    print(body(username, [
+        {"type": "password", "value": password, "temporary": False},
+        {"type": "otp", "secretData": json.dumps({"value": otp_secret}),
+         "credentialData": json.dumps({"subType": "totp", "digits": 6, "period": 30, "algorithm": "HmacSHA1", "counter": 0})}]))
+    print(body(plain, [{"type": "password", "value": plain_password, "temporary": False}]))
 
 
 if __name__ == "__main__":

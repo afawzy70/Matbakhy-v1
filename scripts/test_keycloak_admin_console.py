@@ -116,9 +116,42 @@ class AdminConsoleFilesTest(unittest.TestCase):
         text = KCADM.read_text()
         self.assertNotIn('secret="$OPS_CLIENT_SECRET"', text)
         self.assertIn("kc_body create clients", text, "the client secret must go through standard input")
-        self.assertIn('-e OPS_CLIENT_SECRET identity sh -c', WRAPPER.read_text(), "inside the container the secret comes from the environment")
+        wrapper = WRAPPER.read_text()
+        self.assertIn("-e KC_CLI_CLIENT_SECRET identity sh -c", wrapper, "inside the container the secret comes from the environment")
+        self.assertIn("-e KC_CLI_PASSWORD identity sh -c", wrapper)
         for script in (OPERATOR, KCADM, WRAPPER):
-            self.assertNotRegex(script.read_text(), r"--secret\s+\S*(?<!\")\$\{?(KEYCLOAK_)?OPS_CLIENT_SECRET", f"{script.name} passes the secret as a host argument")
+            # kcadm lists in `ps` (container processes are visible on the host): no secret or password may follow --secret / --password.
+            self.assertNotRegex(script.read_text(), r"--(secret|password)\b", f"{script.name} passes a credential as an argument")
+
+    def test_nobody_can_enrol_a_one_time_password_on_the_public_page(self):
+        text = KCADM.read_text()
+        harden = text[text.index("harden() {"):text.index("rollback() {")]
+        self.assertIn("authentication/required-actions/CONFIGURE_TOTP", harden)
+        self.assertRegex(harden, r"CONFIGURE_TOTP -r \"\$REALM\" -s enabled=false")
+        op = OPERATOR.read_text()
+        create = op[op.index("  create-admin)"):op.index("  disable)")]
+        self.assertIn('(umask 077; mkdir -p "$dir")', create)
+        self.assertIn("provision-admin.py new-admin", create)
+        self.assertIn("run_kc admin-create", create)
+        provision = (WP / "identity" / "provision-admin.py").read_text()
+        self.assertIn("0o600", provision)
+        self.assertIn("O_EXCL", provision)
+        self.assertNotIn("print(password", provision)
+
+    def test_hardening_revokes_older_sessions_and_removes_client_flow_overrides(self):
+        text = KCADM.read_text()
+        harden = text[text.index("harden() {"):text.index("rollback() {")]
+        self.assertIn("authenticationFlowBindingOverrides={}", harden)
+        self.assertIn("a master client still overrides the browser or direct-grant flow", harden)
+        self.assertLess(harden.index("notBefore="), harden.index("logout-all"))
+        self.assertIn('if [ "$changed" = 1 ]', harden, "revocation happens on a change, not on every release")
+
+    def test_a_certificate_still_pending_does_not_fail_the_smoke_under_set_e(self):
+        text = SMOKE.read_text()
+        func = text[text.index("kc_code() {"):text.index("kc_state=")]
+        script = "set -eu\ncode() { echo 000; return 7; }\nsleep() { :; }\n" + func + 'echo "got:$(kc_code https://x.invalid/)"\n'
+        result = subprocess.run(["sh", "-c", script], capture_output=True, text=True)
+        self.assertEqual((result.returncode, result.stdout.strip()), (0, "got:000"), result.stderr)
 
     def test_the_master_realm_and_matbakhy_realm_users_are_never_modified_by_hardening(self):
         text = KCADM.read_text()
@@ -131,7 +164,7 @@ class AdminConsoleFilesTest(unittest.TestCase):
         text = KCADM.read_text()
         self.assertIn('FIXTURE_PREFIX="verify-admin-"', text)
         self.assertIn('"$FIXTURE_PREFIX"*)', text)
-        roles = re.findall(r"--rolename (\S+)", text[text.index("fixture_create() {"):text.index("fixture_delete() {")])
+        roles = re.findall(r"--rolename (\S+)", text[text.index("fixture_create() {"):text.index("admin_create() {")])
         self.assertTrue(roles and all(r.startswith(("view-", "query-")) for r in roles), roles)
 
     def test_the_console_is_opened_only_after_hardening_and_closed_again_when_verification_fails(self):
@@ -140,9 +173,15 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertLess(enable.index("close_switch"), enable.index("run_kc harden"))
         self.assertLess(enable.index("backup"), enable.index("run_kc harden"))
         self.assertLess(enable.index("run_kc harden"), enable.index("open_switch"))
-        self.assertLess(enable.index("open_switch"), enable.index("verify || rc=$?"))
+        self.assertLess(enable.index("trap 'rc=$?; [ \"$enabled\" = 1 ] || close_switch; exit \"$rc\"' EXIT"), enable.index("open_switch"),
+                        "every exit between opening and a passed verification must close the switch")
+        for signal in ("HUP", "INT", "TERM"):
+            self.assertLess(enable.index(f"' {signal}"), enable.index("open_switch"))
+        self.assertLess(enable.index("open_switch"), enable.index("(verify) || rc=$?"), "verify runs in a subshell so its own traps cannot replace the guard")
         failure = enable[enable.index('if [ "$rc" -ne 0 ]; then'):]
         self.assertLess(failure.index("close_switch"), failure.index("exit"))
+        self.assertLess(enable.index('enabled=1'), enable.index("OPEN:"))
+        self.assertEqual(enable.count("enabled=1"), 1)
         self.assertIn("trap fx_cleanup EXIT", text)
         self.assertIn("fixture-delete", text)
 

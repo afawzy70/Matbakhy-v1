@@ -9,6 +9,8 @@
 #   ./admin-console.sh disable    closes kc-admin.* at once (the realm keeps its hardening)
 #   ./admin-console.sh rollback   closes it, rebinds the previous master browser flow, re-enables the admin-cli password grant (PURGE=1 also removes
 #                                 the operations client and the master frontend URL)
+#   ./admin-console.sh create-admin NAME   a real administrator: password and one-time password generated on the server into a private file
+#                                 (mode 600, under generated/admin-console/); the public page never enrols anyone
 #   ./admin-console.sh fixture-clean   removes synthetic verify-admin-* users left behind by an interrupted run
 #
 # Also reachable as ./deploy.sh admin-console <command>. Needs the server's .env and Docker. The matbakhy realm, its users and credentials are
@@ -41,10 +43,10 @@ ensure_ops_secret() {
   fi
 }
 
-run_kc() { # $1 = status | harden | rollback | fixture-create | fixture-delete
+run_kc() { # $1 = status | harden | rollback | fixture-create | fixture-delete | admin-create | admin-delete NAME
   ADMIN_USER="$KEYCLOAK_ADMIN_USER" ADMIN_PASSWORD="$KEYCLOAK_ADMIN_PASSWORD" OPS_CLIENT_SECRET="${KEYCLOAK_OPS_CLIENT_SECRET:-}" \
   PREVIEW_DOMAIN="$PREVIEW_DOMAIN" KCADM=./kcadm-in-container.sh KCADM_REMOTE=1 KCADM_CONFIG=/tmp/kcadm-admin-console.cfg ENV_FILE="$ENV_FILE" \
-  PREVIOUS_FLOW="${PREVIOUS_FLOW:-}" PURGE="${PURGE:-0}" sh "$SCRIPT" "$1"
+  PREVIOUS_FLOW="${PREVIOUS_FLOW:-}" PURGE="${PURGE:-0}" sh "$SCRIPT" "$@"
 }
 
 open_switch() { mkdir -p "$(dirname "$FLAG")"; : > "$FLAG"; chmod 644 "$FLAG"; }
@@ -100,25 +102,45 @@ case "${1:-}" in
     close_switch
     backup
     run_kc harden
+    # From here until the verification passed, ANY exit (failure, Ctrl-C, SIGTERM, a dropped SSH session) closes the switch again.
+    enabled=0
+    trap 'rc=$?; [ "$enabled" = 1 ] || close_switch; exit "$rc"' EXIT
+    trap 'exit 129' HUP
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     open_switch
     echo "== live verification through https://kc-admin.$PREVIEW_DOMAIN"
     rc=0
-    verify || rc=$?
+    (verify) || rc=$?
     if [ "$rc" -ne 0 ]; then
       close_switch
       echo "admin-console: verification did not pass (exit $rc); the console is CLOSED again. Nothing is claimed as working." >&2
       exit "$rc"
     fi
+    enabled=1
     echo "OPEN: https://kc-admin.$PREVIEW_DOMAIN (verified)"
-    echo "== one-time password enrolment"
-    run_kc status | grep '^otpEnrolledUsers=' || true
-    echo "If otpEnrolledUsers=0, the administrator ($KEYCLOAK_ADMIN_USER) must sign in NOW and scan the QR code: until a one-time password is enrolled,"
-    echo "whoever holds the password can enrol one first. Keep the password out of chats and logs."
+    echo "== administrators who can sign in (an account without a one-time password cannot; there is no public enrolment)"
+    run_kc status | grep -E '^(admin\.|signInCapableAdministrators=)' || true
+    echo "If signInCapableAdministrators=0, create one on this server: ./deploy.sh admin-console create-admin <name>"
     ;;
   verify) verify ;;
   status)
     run_kc status
     if [ -f "$FLAG" ]; then echo "switch=open (kc-admin.$PREVIEW_DOMAIN is served)"; else echo "switch=closed (kc-admin.$PREVIEW_DOMAIN answers 404)"; fi
+    ;;
+  create-admin)
+    name="${2:-}"
+    [ -n "$name" ] || die "usage: ./admin-console.sh create-admin <name>   (REPLACE=1 replaces an existing administrator)"
+    dir="$GENERATED_DIR/admin-console"
+    (umask 077; mkdir -p "$dir"); chmod 700 "$dir"
+    if [ "${REPLACE:-0}" = 1 ]; then run_kc admin-delete "$name"; fi
+    body="$(python3 identity/provision-admin.py new-admin "$dir" "$name")" || die "cannot generate the administrator (an old $dir/$name.private may exist: remove it or use REPLACE=1)"
+    if ! printf '%s' "$body" | run_kc admin-create; then
+      rm -f "$dir/$name.private"
+      die "the administrator was not created"
+    fi
+    echo "Private file (mode 600): $dir/$name.private - read it on the server, set up the authenticator app with the key, sign in at"
+    echo "https://kc-admin.$PREVIEW_DOMAIN, then delete the file. Do not paste its contents into chats, tickets or logs."
     ;;
   disable) close_switch; echo "closed: kc-admin.$PREVIEW_DOMAIN answers 404 again" ;;
   fixture-clean) run_kc fixture-delete ;;
@@ -131,5 +153,5 @@ case "${1:-}" in
     PREVIOUS_FLOW="$PREVIOUS_FLOW" run_kc rollback
     echo "Rolled back and closed. Users and the matbakhy realm were not touched; a full restore uses the dump named in $STATE."
     ;;
-  *) die "usage: ./admin-console.sh enable | verify | status | disable | rollback | fixture-clean" ;;
+  *) die "usage: ./admin-console.sh enable | verify | status | disable | rollback | create-admin <name> | fixture-clean" ;;
 esac

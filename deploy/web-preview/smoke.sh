@@ -69,8 +69,8 @@ check "Keycloak admin console and master realm not published"
 kc_code() { # the first answer other than "no connection", for up to 90 seconds (a new host's certificate is issued on first start)
   i=0
   while :; do
-    c=$(code "$1")
-    [ "$c" != 000 ] && break
+    c=$(code "$1" || true) # curl exits non-zero on a DNS, TLS or connection failure; that is "not reachable yet", not a failed release
+    [ "$c" != 000 ] && [ -n "$c" ] && break
     i=$((i + 1)); [ "$i" -ge 18 ] && break
     sleep 5
   done
