@@ -1,0 +1,96 @@
+name: Owner E2E fixtures (seed SQL against PostgreSQL)
+on:
+  pull_request:
+    paths:
+      - "deploy/web-preview/**"
+      - "backend/**/db/migration/**"
+      - "docs/quality/owner-acceptance/**"
+      - "scripts/owner_e2e_*"
+      - ".github/workflows/owner-e2e-fixtures.yml"
+  push:
+    paths:
+      - "deploy/web-preview/**"
+      - "backend/**/db/migration/**"
+      - "docs/quality/owner-acceptance/**"
+      - "scripts/owner_e2e_*"
+      - ".github/workflows/owner-e2e-fixtures.yml"
+permissions:
+  contents: read
+concurrency:
+  group: owner-e2e-fixtures-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fixtures:
+    name: Migrate, seed, re-seed (idempotent), reconcile
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16.15-alpine
+        env:
+          POSTGRES_DB: matbakhy
+          POSTGRES_USER: matbakhy
+          POSTGRES_PASSWORD: ci-throwaway-not-a-secret
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U matbakhy -d matbakhy" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: matbakhy
+      PGDATABASE: matbakhy
+      PGPASSWORD: ci-throwaway-not-a-secret
+      ISSUER: https://id.example.test/realms/matbakhy
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
+      - name: Install psql client
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Runtime role as the production init script creates it
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "CREATE ROLE matbakhy_app LOGIN PASSWORD 'ci-throwaway' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT" \
+               -c "REVOKE CREATE ON SCHEMA public FROM PUBLIC"
+      - name: Apply Flyway migrations in version order, then the afterMigrate grants and the dev service zones
+        run: |
+          set -eu
+          dir=backend/app/src/main/resources/db
+          for f in $(ls $dir/migration/V*.sql | sed -E 's/.*\/V([0-9]+)__.*/\1 &/' | sort -n | cut -d' ' -f2); do
+            echo "== $f"; psql -v ON_ERROR_STOP=1 --single-transaction -q -f "$f"
+          done
+          sed 's/\${runtimeRole}/matbakhy_app/' $dir/migration/afterMigrate.sql | psql -v ON_ERROR_STOP=1 -q
+          for f in $(ls $dir/devdata/R__*.sql | sort); do echo "== $f"; psql -v ON_ERROR_STOP=1 --single-transaction -q -f "$f"; done
+      - name: First seed (seed-preview, owner E2E, MFA grants, slots)
+        run: |
+          set -eu
+          cd deploy/web-preview
+          for f in seed-preview.sql seed-owner-e2e.sql seed-owner-e2e-mfa.sql refresh-slots.sql; do
+            echo "== $f"; psql -v ON_ERROR_STOP=1 -v issuer="$ISSUER" -f "$f"
+          done
+      - name: Row counts after the first run
+        run: |
+          psql -At -F'|' -f - <<'SQL' > counts-1.txt
+          SELECT 'app_user', count(*) FROM app_user UNION ALL SELECT 'kitchen', count(*) FROM kitchen
+          UNION ALL SELECT 'user_grant', count(*) FROM user_grant UNION ALL SELECT 'cook_slot', count(*) FROM cook_slot
+          UNION ALL SELECT 'meal_slot', count(*) FROM meal_slot UNION ALL SELECT 'cook_application', count(*) FROM cook_application
+          ORDER BY 1;
+          SQL
+          cat counts-1.txt
+      - name: Re-apply the repeatable files (idempotency)
+        run: |
+          set -eu
+          cd deploy/web-preview
+          for f in seed-owner-e2e.sql seed-owner-e2e-mfa.sql refresh-slots.sql; do
+            echo "== again $f"; psql -v ON_ERROR_STOP=1 -v issuer="$ISSUER" -f "$f"
+          done
+      - name: Row counts unchanged by the second run
+        run: |
+          psql -At -F'|' -f - <<'SQL' > counts-2.txt
+          SELECT 'app_user', count(*) FROM app_user UNION ALL SELECT 'kitchen', count(*) FROM kitchen
+          UNION ALL SELECT 'user_grant', count(*) FROM user_grant UNION ALL SELECT 'cook_slot', count(*) FROM cook_slot
+          UNION ALL SELECT 'meal_slot', count(*) FROM meal_slot UNION ALL SELECT 'cook_application', count(*) FROM cook_application
+          ORDER BY 1;
+          SQL
+          cat counts-2.txt
+          diff counts-1.txt counts-2.txt
+      - name: Reconcile fixtures against the manifest (read-only)
+        run: python3 scripts/owner_e2e_reconcile.py
