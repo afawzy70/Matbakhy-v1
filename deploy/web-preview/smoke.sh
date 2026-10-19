@@ -63,6 +63,34 @@ for p in /admin/ /realms/master /realms/master/protocol/openid-connect/auth; do
   [ "$(code "https://id.$d$p")" = 404 ] || fail "id.$d$p must not be published"
 done
 check "Keycloak admin console and master realm not published"
+# Keycloak admin console on its own host (Preview only; ./admin-console.sh enable opens it). Closed = the whole host answers 404; open = the
+# console page is served, Admin REST needs a token, and nothing but the console's paths exists. Either way nothing else is reachable. A host
+# whose certificate is still being issued (000) is a warning here, not a failure of the release: `admin-console.sh enable` verifies it for real.
+kc_code() { # the first answer other than "no connection", for up to 90 seconds (a new host's certificate is issued on first start)
+  i=0
+  while :; do
+    c=$(code "$1")
+    [ "$c" != 000 ] && break
+    i=$((i + 1)); [ "$i" -ge 18 ] && break
+    sleep 5
+  done
+  echo "$c"
+}
+kc_state=$(kc_code "https://kc-admin.$d/admin/master/console/")
+case "$kc_state" in
+  200)
+    [ "$(code "https://kc-admin.$d/admin/realms")" = 401 ] || fail "kc-admin.$d Admin REST must answer 401 without a token"
+    check "Keycloak admin console served on kc-admin.$d; Admin REST refuses a request without a token" ;;
+  404) check "Keycloak admin console switch is closed (kc-admin.$d answers 404)" ;;
+  000) echo "WARN: kc-admin.$d is not reachable yet (certificate pending?); ./deploy.sh admin-console enable verifies it" ;;
+  *) fail "kc-admin.$d must serve the console or answer 404, got $kc_state" ;;
+esac
+if [ "$kc_state" != 000 ]; then
+  for p in /realms/matbakhy/.well-known/openid-configuration /health /metrics; do
+    [ "$(code "https://kc-admin.$d$p")" = 404 ] || fail "kc-admin.$d$p must not be published"
+  done
+  check "kc-admin does not serve the matbakhy realm, health or metrics"
+fi
 loc=$(curl -s -o /dev/null -D - $opts "https://api.$d/oauth2/authorization/keycloak?returnTo=https://app.$d/" | tr -d '\r' | sed -n 's/^[Ll]ocation: //p')
 case "$loc" in "https://id.$d/realms/matbakhy/protocol/openid-connect/auth?"*"redirect_uri=https://api.$d/login/oauth2/code/keycloak"*) ;; *) fail "unexpected sign-in redirect: $loc";; esac
 check "sign-in redirects to the identity provider and back to the API over HTTPS"

@@ -7,12 +7,16 @@ permissions:
 jobs:
   blueprint-integrity:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4, resolved 2026-10-11
       - name: Validate planning structure
         run: python3 scripts/validate_blueprint.py
       - name: Check scope, inventory and traceability (P00-CHECK-1)
         run: python3 scripts/check_scope.py
+      - name: Pull the images the proxy access tests run (they skip when the images are absent; nothing is published)
+        run: |
+          docker pull caddy:2.10.2-alpine
+          docker pull python:3.13-alpine
       - name: Verify planning guardrails
         run: python3 -m unittest discover -s scripts -p 'test_*.py' -v
