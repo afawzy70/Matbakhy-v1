@@ -34,6 +34,7 @@ init_secrets() {
       -e "s|^GRAFANA_ADMIN_PASSWORD=.*|GRAFANA_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^KEYCLOAK_ADMIN_PASSWORD=.*|KEYCLOAK_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^OIDC_WEB_CLIENT_SECRET=.*|OIDC_WEB_CLIENT_SECRET=$(hex)|" \
+      -e "s|^OIDC_ADMIN_CLIENT_SECRET=.*|OIDC_ADMIN_CLIENT_SECRET=$(hex)|" \
       -e "s|^PREVIEW_USER_PASSWORD=.*|PREVIEW_USER_PASSWORD=$(openssl rand -hex 10)|" \
       -e "s|^PHONE_CODE_PEPPER=.*|PHONE_CODE_PEPPER=$(hex)|" \
       -e "s|^HANDOVER_HASH_KEY=.*|HANDOVER_HASH_KEY=$(hex)|" \
@@ -58,12 +59,23 @@ check() {
 
 render() {
   # Secrets go only into files under GENERATED_DIR (outside Git), readable by the container users.
+  # Private before anything secret is written: owner-only directory and a restrictive umask for the files (SECR4-003).
   mkdir -p "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
-  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|$OIDC_WEB_CLIENT_SECRET|" -e "s|\${PREVIEW_DOMAIN}|$PREVIEW_DOMAIN|g" \
+  chmod 700 "$GENERATED_DIR"
+  umask 077
+  # D18: servers initialised before the admin service-account client existed get its secret added once (mode 600 file kept).
+  if ! grep -q '^OIDC_ADMIN_CLIENT_SECRET=' "$ENV_FILE"; then
+    OIDC_ADMIN_CLIENT_SECRET="$(openssl rand -hex 32)"
+    printf 'OIDC_ADMIN_CLIENT_SECRET=%s\n' "$OIDC_ADMIN_CLIENT_SECRET" >> "$ENV_FILE"
+  fi
+  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|$OIDC_WEB_CLIENT_SECRET|" -e "s|\${OIDC_ADMIN_CLIENT_SECRET}|$OIDC_ADMIN_CLIENT_SECRET|" -e "s|\${PREVIEW_DOMAIN}|$PREVIEW_DOMAIN|g" \
       -e "s|\${PREVIEW_USER_PASSWORD}|$PREVIEW_USER_PASSWORD|g" identity/matbakhy-realm.preview.json > "$GENERATED_DIR/identity/matbakhy-realm.json"
   sed -e "s|\${STORAGE_ACCESS_KEY}|$STORAGE_ACCESS_KEY|" -e "s|\${STORAGE_SECRET_KEY}|$STORAGE_SECRET_KEY|" \
       storage/s3.json.template > "$GENERATED_DIR/storage/s3.json"
-  chmod 755 "$GENERATED_DIR" "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
+  # The files must be readable by the container users (mounted read-only), but the parent directory is owner-only so no
+  # other host user can reach them by path (SECR-004). Docker bind mounts are resolved by the daemon as root.
+  chmod 700 "$GENERATED_DIR"
+  chmod 755 "$GENERATED_DIR/identity" "$GENERATED_DIR/storage"
   chmod 644 "$GENERATED_DIR/identity/matbakhy-realm.json" "$GENERATED_DIR/storage/s3.json"
 }
 

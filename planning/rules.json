@@ -64,7 +64,7 @@
     {
       "id": "BR-007",
       "domain": "Access",
-      "text": "Staff privileges are assigned server-side; MFA required; revoked grants cannot perform sensitive commands.",
+      "text": "Staff privileges are assigned server-side; MFA follows the administrator's policy per account category (D18: DISABLED, OPTIONAL or REQUIRED, performed by Keycloak and enforced server-side); revoked grants cannot perform sensitive commands.",
       "story_id": "MB-011",
       "scenario_ids": [
         "TC-007"

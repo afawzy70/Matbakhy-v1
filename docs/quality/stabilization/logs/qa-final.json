@@ -1,0 +1,182 @@
+{
+  "agent": "QA Engineer",
+  "commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "summary": "Phase 1 static analysis only; all product tests NOT_RUN because execution belongs in the writable phase 2 worktree. No files written. HEAD matches the requested commit; git status and git diff were empty. Static scan: 54 backend test files, 6 application test files, 5 shared-package test files. Existing backend tests meaningfully exercise PostgreSQL rollback, immutable snapshots, last-portion concurrency, price serialization, authorization and duplicate recovery. No assertion-free Java @Test methods were identified by the static scan; DOM findBy assertions are meaningful presence checks. Two code defects and five specific coverage weaknesses are reported below. Current owner decisions require zero commission and supersede older commission-bearing rule text.\n\nPhase 2 commands, from the isolated worktree root unless otherwise stated:\nPrerequisites: JDK 21, Node 24.21.0, pnpm 10.34.6, Docker for Testcontainers/local-stack tests; install dependencies with pnpm install --frozen-lockfile.\nBackend full suite: (cd backend && ./mvnw -B -ntp verify).\nBackend focused integrity regression: (cd backend && ./mvnw -B -ntp -pl app -am -Dtest=QuoteIntegrationTest,OrderPlacementIntegrationTest,PriceChangeIntegrationTest,OrderLifecycleIntegrationTest,DepositPaymentIntegrationTest,PaymentReconciliationIntegrationTest,CashAndLedgerIntegrationTest,FinanceOperationsIntegrationTest,ZeroCommissionIntegrationTest,StaffAccessIntegrationTest,IdentityIntegrationTest,StrictJsonIntegrationTest,ContractRoutesTest -Dsurefire.failIfNoSpecifiedTests=false test).\nCustomer web components: pnpm --filter @matbakhy/customer-web test.\nCook/operations web components: pnpm --filter @matbakhy/operations-web test.\nAPI client and contract fixtures: pnpm --filter @matbakhy/api-client test.\nDesign tokens: pnpm --filter @matbakhy/design-tokens test.\nMobile JavaScript: pnpm --filter @matbakhy/customer-mobile test.\nContract lint/generated drift: REDOCLY_TELEMETRY=off pnpm contract:check.\nStatic client checks: pnpm typecheck; pnpm lint; pnpm build.\nReal API browser suite: scripts/dev.sh e2e. This supplies the throwaway stack and fixture boundary; do not invoke it against shared data.\nLocal-stack smoke: scripts/dev.sh verify.\nPlanning and migration checks: python3 scripts/validate_blueprint.py; python3 scripts/check_scope.py; python3 scripts/check_migration_compat.py; python3 -m unittest discover -s scripts -p 'test_*.py' -v.\nNative device suites require their platform runners and prepared synthetic stack: bash apps/customer-mobile/scripts/auth-roundtrip-android.sh followed by bash apps/customer-mobile/scripts/order-roundtrip-android.sh; on macOS, bash apps/customer-mobile/scripts/auth-roundtrip-ios.sh followed by bash apps/customer-mobile/scripts/order-roundtrip-ios.sh. JavaScript tests do not establish native PASS.\nOptional existing-preview smoke, only with configured synthetic preview accounts: pnpm --filter @matbakhy/operations-web e2e:staging. It creates a demo order and is not a substitute for testing the isolated source revision.\nAfter adding reproductions, rerun the affected focused suites and then the full backend and client suites. None of these phase 2 commands was executed here.",
+  "commands": [
+    {
+      "command": "cat .agents/codex/qa-engineer.md",
+      "exit_code": 0,
+      "note": "Read requested role first."
+    },
+    {
+      "command": "git rev-parse HEAD; cat CLAUDE.md docs/delivery/02-execution-protocol.md /home/aiagent/.codex/plugins/cache/openai-curated-remote/cloud-environment/0.1.2/skills/runtime/SKILL.md; rg --files docs/product docs/quality contracts planning backend frontend | head -180",
+      "exit_code": 0,
+      "note": "Overall shell exit 0; rg reported nonexistent frontend directory. Actual clients are under apps/."
+    },
+    {
+      "command": "cat docs/quality/stabilization/qa-coverage-matrix.md; cat planning/rules.json planning/scenarios.json; rg --files | rg '(test|spec|package.json|playwright|pom.xml|verify.py)$|Test.java$|test.ts|spec.ts'",
+      "exit_code": 0,
+      "note": "Requirements and test inventory; tool output was truncated."
+    },
+    {
+      "command": "nl -ba backend/modules/orders/src/main/java/com/matbakhy/orders/internal/PaymentService.java; nl -ba backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java; nl -ba backend/app/src/test/java/com/matbakhy/app/payments/PaymentReconciliationIntegrationTest.java; cat package.json apps/customer-web/package.json apps/operations-web/package.json packages/api-client/package.json; cat backend/app/pom.xml",
+      "exit_code": 0,
+      "note": "Static source and suite configuration reading; output truncated."
+    },
+    {
+      "command": "sed -n '288,560p' backend/modules/orders/src/main/java/com/matbakhy/orders/internal/PaymentService.java; cat docs/product/09-deposit-payment-states.md; rg -n 'void |@Test|concurr|Thread|Executor|assert' backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java; nl -ba backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderLifecycleService.java | sed -n '1,310p'",
+      "exit_code": 0,
+      "note": "Deposit transitions, documented limits and lifecycle guards."
+    },
+    {
+      "command": "nl -ba backend/app/src/test/java/com/matbakhy/app/web/ContractRoutesTest.java; cat backend/app/src/test/java/com/matbakhy/app/support/IntegrationTest.java; rg -n 'test\\(|it\\(|expect\\(|vi.mock|fetch|route\\(' apps/operations-web/src/App.test.tsx apps/customer-web/src/App.test.tsx apps/operations-web/e2e/*; rg --files | rg 'e2e|playwright|workflow|test_.*py'; cat backend/pom.xml; nl -ba backend/modules/orders/src/main/java/com/matbakhy/orders/internal/QuoteService.java | sed -n '90,280p'",
+      "exit_code": 0,
+      "note": "Integration boundary and quote implementation review; output truncated."
+    },
+    {
+      "command": "git status --short; rg -n 'void |@Test|assertThat' backend/app/src/test/java/com/matbakhy/app/orders/{OrderPlacementIntegrationTest,PriceChangeIntegrationTest,QuoteIntegrationTest}.java; rg -n 'vi.mock|stubGlobal|it\\(|test\\(' apps/customer-web/src/App.test.tsx apps/operations-web/src/App.test.tsx; cat apps/operations-web/playwright.config.ts apps/operations-web/playwright.staging.config.ts; rg -n 'mvnw|pnpm|python3|gradlew|xcodebuild' .github/workflows/*.yml; nl -ba backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java | sed -n '75,220p'",
+      "exit_code": 0,
+      "note": "Clean status; placement/replay implementation and suite entry points. Output truncated."
+    },
+    {
+      "command": "python3 -B - <<'PY'\nfrom pathlib import Path\nimport json\nfor f in ['planning/decisions.json','planning/execution-state.json','planning/backlog.json','planning/gates.json']:\n d=json.loads(Path(f).read_text()); print(f, 'read',len(Path(f).read_text()), 'characters; keys',list(d)[:12])\nfor p in sorted(Path('docs/product').glob('*.md')): print(p, len(p.read_text()), 'characters read')\np=Path('contracts/openapi.yaml'); s=p.read_text(); print(p,len(s),'characters read')\nlines=s.splitlines()\nfor i,l in enumerate(lines):\n if any(x in l for x in ['PaymentTerms:', 'PaymentView:', 'PlaceOrderRequest:', 'TransferReportRequest:', 'PaymentReceiptRequest:','depositExpiresAt:', 'fulfillmentNote:']):\n  print('\\n'.join(f'{j+1}:{lines[j]}' for j in range(max(0,i-2),min(len(lines),i+22))))\nPY\nnl -ba apps/operations-web/src/App.test.tsx | head -105\nnl -ba apps/customer-web/src/App.test.tsx | head -85\nrg -n 'assertThat\\([^;]+\\);$|assertThat\\(true|expect\\(true|toBeDefined|toBeTruthy|isNotNull' backend/app/src/test apps/*/src/*.test* packages/*/test/* | head -65\nrg -n 'mvnw|pnpm|test|e2e' scripts/dev.sh .github/workflows/ci.yml | tail -70",
+      "exit_code": 0,
+      "note": "Read-only parsing and targeted contract excerpts. An nl-to-head pipeline reported broken pipe; overall shell exit 0. Output truncated."
+    },
+    {
+      "command": "nl -ba backend/app/src/test/java/com/matbakhy/app/orders/OrderPlacementIntegrationTest.java | sed -n '258,310p'; nl -ba backend/shared/src/main/java/com/matbakhy/shared/idempotency/IdempotentCommands.java | sed -n '30,155p'; nl -ba backend/app/src/test/java/com/matbakhy/app/orders/PriceChangeIntegrationTest.java | sed -n '180,345p'; cat scripts/ci.sh; cat apps/customer-mobile/package.json; nl -ba backend/app/src/test/java/com/matbakhy/app/security/StaffAssuranceTest.java | sed -n '1,180p'; rg -n 'assert|void ' backend/app/src/test/java/com/matbakhy/app/ApplicationShellTest.java",
+      "exit_code": 0,
+      "note": "Overall exit 0; cat reported scripts/ci.sh does not exist. Subsequently located scripts/check_workspace.sh."
+    },
+    {
+      "command": "rg --files | rg 'Idempot|ci|native.*sh|run.*sh'; rg -n 'hash|fingerprint|expires|execute' backend/modules/identity/src/main/java/com/matbakhy/identity/internal/*Idempot*; nl -ba backend/app/src/test/java/com/matbakhy/app/orders/PriceChangeIntegrationTest.java | sed -n '45,170p'; nl -ba backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderLifecycleService.java | sed -n '360,425p'; cat .github/workflows/ci.yml; rg -n 'test|mvnw|pnpm|python' scripts/check.sh scripts/ci/* 2>/dev/null; rg -n 'deposit|payment' apps/operations-web/e2e/*.ts apps/operations-web/e2e-staging/*.ts | tail -25; nl -ba backend/modules/orders/src/main/java/com/matbakhy/orders/web/PaymentController.java | sed -n '1,170p'",
+      "exit_code": 0,
+      "note": "Overall exit 0; initial idempotency glob was nonexistent. Located implementation under backend/app."
+    },
+    {
+      "command": "cat scripts/check_workspace.sh; nl -ba backend/app/src/main/java/com/matbakhy/app/idempotency/JdbcIdempotentCommands.java | sed -n '35,150p'; nl -ba backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java | sed -n '203,268p'; nl -ba backend/app/src/test/java/com/matbakhy/app/payments/PaymentReconciliationIntegrationTest.java | sed -n '80,200p'; python3 -B - <<'PY'\nfrom pathlib import Path\nimport re\nfor p in Path('backend').rglob('*Test.java'):\n s=p.read_text()\n for m in re.finditer(r'@Test\\s+(?:public\\s+)?void\\s+(\\w+)\\([^)]*\\)[^{]*\\{',s):\n  start=m.end(); depth=1; end=start\n  while end<len(s) and depth:\n   depth+=(s[end]=='{')-(s[end]=='}'); end+=1\n  body=s[start:end-1]\n  if not re.search('assert|expect|verify|check',body,re.I): print(str(p)+':'+str(s[:m.start()].count('\\n')+1),m.group(1),body[:500])\nPY",
+      "exit_code": 0,
+      "note": "Static heuristic found no Java @Test method lacking assertion/check terminology; not a semantic proof."
+    },
+    {
+      "command": "nl -ba backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java | sed -n '65,190p'; rg -n 'cash_obligation|amount_minor.*CHECK|amount_minor >|amount_minor >=' backend/app/src/main/resources/db/migration/*.sql | head -35; nl -ba backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java | sed -n '75,106p'; nl -ba packages/api-client/test/registry.test.ts | sed -n '1,110p'; rg -n 'test|run' apps/customer-mobile/scripts/native-stack-macos.sh | tail -18; rg --files apps/customer-mobile | rg 'scripts/|Tests.swift|Test.kt'",
+      "exit_code": 0,
+      "note": "Cash/deposit mismatch and contract tests; output slightly truncated."
+    },
+    {
+      "command": "nl -ba backend/modules/finance/src/main/java/com/matbakhy/finance/internal/LedgerService.java | sed -n '70,150p'; rg -n 'deposit|DEPOSIT|remainder' backend/app/src/test/java/com/matbakhy/app/finance/*.java; nl -ba backend/app/src/test/java/com/matbakhy/app/identity/StaffAccessIntegrationTest.java | sed -n '85,150p'; cat backend/app/src/test/java/com/matbakhy/app/support/TestLogins.java; nl -ba apps/operations-web/e2e-staging/smoke.staging.ts | sed -n '105,170p'; rg -n 'mvn|verify|check_migration' scripts/check_migration_compat.py; python3 -B - <<'PY'\nimport json\nfrom pathlib import Path\nfor f,k in [('planning/rules.json','rules'),('planning/scenarios.json','scenarios')]:\n d=json.loads(Path(f).read_text())[k];print(f,len(d))\nfor f in ['docs/product/03-business-rules.md','docs/product/06-permissions.md','docs/delivery/07-owner-decisions-implementation-sequence.md']:\n for i,l in enumerate(Path(f).read_text().splitlines(),1):\n  if any(x in l.lower() for x in ['br-024','remainder','cash','zero','deposit','revok']):print(f'{f}:{i}:{l}')\nPY",
+      "exit_code": 0,
+      "note": "No deposit/remainder matches in finance tests. TestLogins was initially sought in the wrong directory; overall exit 0."
+    },
+    {
+      "command": "rg -n 'expir|concurr|racing|double|simult|Thread|Executor' backend/app/src/test/java/com/matbakhy/app/orders/OrderLifecycleIntegrationTest.java backend/app/src/test/java/com/matbakhy/app/payments/*.java; rg -n 'deposit|DEPOSIT|remainder' backend/app/src/test/java/com/matbakhy/app/finance; rg -n 'cash|amountMinor|total' apps/operations-web/src/cook/* 2>/dev/null | head -25; nl -ba backend/app/src/test/java/com/matbakhy/app/identity/StaffAccessIntegrationTest.java | sed -n '170,220p'; rg -n 'usage|Usage|MODE|case |auth-roundtrip|order-roundtrip' apps/customer-mobile/scripts/*roundtrip*.sh; git diff --stat; git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Confirmed deposit race coverage boundary, cash form default, clean diff and unchanged HEAD."
+    },
+    {
+      "command": "nl -ba backend/app/src/test/java/com/matbakhy/app/identity/StaffAccessIntegrationTest.java | sed -n '150,172p'; nl -ba apps/operations-web/src/cook/Orders.tsx | sed -n '174,205p'; rg --files backend/app/src/test | rg 'TestLogins'; cat backend/modules/finance/src/main/java/com/matbakhy/finance/internal/LedgerService.java; python3 -B - <<'PY'\nfrom pathlib import Path\nimport re\nfor root,pattern in [('backend','*Test.java'),('apps','*.test.ts*'),('packages','*.test.ts')]:\n ps=sorted(Path(root).rglob(pattern)); texts=[p.read_text() for p in ps]; print(root, 'files statically scanned',len(ps),'Java @Test annotations',sum(s.count('@Test\\n') for s in texts),'JS test declarations',sum(len(re.findall(r'\\b(?:it|test)\\(',s)) for s in texts))\nPY",
+      "exit_code": 0,
+      "note": "Final static inventory and evidence excerpts. No test suites executed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "QA-001",
+      "severity": "High",
+      "component": "Deposit/cash integration",
+      "file": "backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java",
+      "line": 96,
+      "title": "Cash reporting and verification charge the full total after a deposit",
+      "scenario": "Complete a 27000-minor-unit order after the kitchen acknowledges its 13500 deposit. Report the correct remaining cash collection of 13500, then verify that collection.",
+      "expected": "Cash discrepancy is zero and finance can verify the 13500 remainder. The cook form defaults to that remainder.",
+      "actual": "Reporting subtracts customer_order.total_minor, producing discrepancy -13500 and setting the obligation DISPUTED. Verification also requires the full 27000. The cook form defaults to 27000.",
+      "evidence": "CashService.java:77-78 selects o.total_minor; :96-106 computes discrepancy and obligation state; :127-150 again uses o.total_minor for verification. OrderService.java:203-208 correctly creates cash_obligation with total minus deposit. apps/operations-web/src/cook/Orders.tsx:182 initializes the form from order.total. docs/product/09-deposit-payment-states.md states cash due at handover is the remainder. Static rg found no deposit/DEPOSIT/remainder references in backend/app/src/test/java/com/matbakhy/app/finance.",
+      "suggested_fix": "Use cash_obligation.amount_minor for report and verification comparisons; initialize the form from the payment remainder with a compatible fallback for older orders.",
+      "repro_test": "Add a real PostgreSQL deposit-to-completion-to-cash integration test: total 27000, deposit 13500, cash report 13500, discrepancy 0, obligation REPORTED, verification of 13500 succeeds. Add a cook form test expecting 135.00, plus a fully prepaid boundary case. NOT_RUN."
+    },
+    {
+      "id": "QA-002",
+      "severity": "Medium",
+      "component": "Permanent order idempotency",
+      "file": "backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java",
+      "line": 142,
+      "title": "Permanent request recovery accepts a changed payload when its quote is unchanged",
+      "scenario": "Place an order, delete its cached idempotency record as the existing retention test does, then reuse the original key, clientRequestId and quoteId with a different fulfillmentNote.",
+      "expected": "BR-024 requires a conflict for a different payload using the same actor, command and key.",
+      "actual": "The new cache entry hashes the changed payload, but placeOnce returns the existing order solely because quoteId matches. The changed command succeeds and silently retains the old note.",
+      "evidence": "OrderService.java:139-146 selects only id and quote_id and returns before policy or note checks. JdbcIdempotentCommands.java:54-59 creates a new request hash when no cache record remains. OrderPlacementIntegrationTest.java:268-271 tests retention with an identical body; :284-299 tests changed quote IDs, not changed fields on the same quote. docs/product/03-business-rules.md:68 specifies payload conflict.",
+      "suggested_fix": "Persist a durable canonical command fingerprint alongside the permanent request reference and compare it during recovery, preserving identical-request recovery after cache retention.",
+      "repro_test": "Extend the retention test: place with note A, remove cached record, resend the same original key/request/quote with note B; assert 409 IDEMPOTENCY_CONFLICT, one order, unchanged note, stock and events. Also exercise changed acceptedPolicyVersions. NOT_RUN."
+    },
+    {
+      "id": "QA-003",
+      "severity": "Medium",
+      "component": "Deposit concurrency coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java",
+      "line": 244,
+      "title": "Deposit expiry coverage does not exercise transfer/receipt races",
+      "scenario": "TC-160 and owner direction require race-safe expiry, payment claims and capacity handling.",
+      "expected": "Automated tests exercise transfer-report versus expiry and kitchen-receipt versus expiry with both controlled transaction orderings.",
+      "actual": "The expiry test completes a transfer report, advances time, then calls expireOne sequentially. The concurrent payment test covers duplicate customer reports only. The lifecycle suite races acceptance/cancellation/expiry without covering these deposit transitions.",
+      "evidence": "DepositPaymentIntegrationTest.java:205-223 races two transfer reports; :245-256 reports before advancing the clock and expiring. OrderLifecycleIntegrationTest.java:428 names the acceptance/cancellation/expiry race. docs/delivery/07-owner-decisions-implementation-sequence.md:20 requires expiry and capacity claims to be race-safe.",
+      "suggested_fix": "Add transaction-barrier tests using real PostgreSQL and bounded waits; assert final order/payment states, one release, consistent stock, payment events and one open PAYMENT support case.",
+      "repro_test": "Force each side to acquire its relevant row lock first for transfer-versus-expiry and receipt-versus-expiry. Assert a reported transfer is reconciled, never silently lost, and repeated expiry cannot release capacity again. This is a coverage finding, not a demonstrated race defect. NOT_RUN."
+    },
+    {
+      "id": "QA-004",
+      "severity": "Medium",
+      "component": "Cross-kitchen authorization coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java",
+      "line": 231,
+      "title": "Receipt authorization test uses a non-cook instead of a foreign kitchen owner",
+      "scenario": "BR-006 requires object scope checks between two legitimate cooks.",
+      "expected": "A second approved cook requesting receipt for the first cook's order receives 404 with no payment mutation.",
+      "actual": "The receipt test supplies a random subject without creating its kitchen and accepts either 403 or 404. It can pass at the 'not a cook' guard without exercising order-to-kitchen scope.",
+      "evidence": "DepositPaymentIntegrationTest.java:231 calls receipt with UUID.randomUUID().toString(). PaymentService.java:81-83 rejects actors lacking a kitchen before :267-270 checks order ownership. PaymentReconciliationIntegrationTest.java:176-179 correctly creates a second approved kitchen for the problem endpoint, demonstrating the stronger fixture pattern.",
+      "suggested_fix": "Use a second approved kitchen owner for receipt and refund negative tests; assert exact denial and unchanged payment version/event counts.",
+      "repro_test": "Create approved kitchens A and B, place A's deposit order, call its receipt endpoint as B with otherwise valid version/amount; require 404 and no writes. Repeat for refund. NOT_RUN."
+    },
+    {
+      "id": "QA-005",
+      "severity": "Medium",
+      "component": "Revoked-session authorization coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/identity/StaffAccessIntegrationTest.java",
+      "line": 167,
+      "title": "Revocation test reauthenticates instead of reusing the existing authentication",
+      "scenario": "BR-007 and the permissions specification require revoked privileges to stop working in an already authenticated session.",
+      "expected": "A request with the same pre-revocation authentication/session is denied after grant removal.",
+      "actual": "The test constructs authentication again through as(staffSubject) after revocation, so it establishes denial after fresh login rather than denial of stale session authorities.",
+      "evidence": "StaffAccessIntegrationTest.java:97-99 defines as() as logins.login(...). The revocation test invokes as(staffSubject) at :162 and again at :167. docs/product/06-permissions.md:26 explicitly requires current grants to be checked for sensitive commands.",
+      "suggested_fix": "Retain the initial authentication object and add a real session/token test that reuses its original credentials after revocation.",
+      "repro_test": "Authenticate staff once, prove the sensitive endpoint works, revoke the grant from an admin session, then repeat using the original staff session/token and require 403 plus no protected writes. NOT_RUN."
+    },
+    {
+      "id": "QA-006",
+      "severity": "Medium",
+      "component": "Pricing integration coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/orders/PriceChangeIntegrationTest.java",
+      "line": 209,
+      "title": "Price-race tests replace the production price-update command with handwritten SQL",
+      "scenario": "TC-155 requires actual cook price updates and placements to serialize.",
+      "expected": "At least one controlled concurrency test invokes the production meal update service/API and placement together.",
+      "actual": "The race tests call changePriceInCurrentTransaction, which reproduces the intended database effects using direct SQL. This tests placement against those SQL locks but cannot prove the production update path retains the same locking behavior.",
+      "evidence": "PriceChangeIntegrationTest.java:118-120 and :150 call the helper; :204-215 explicitly describe and implement a SQL imitation of MealService.update. The existing real browser price-change journey supplies useful sequential integration, but not this concurrent production-command boundary.",
+      "suggested_fix": "Keep the low-level locking tests and add production-service/API concurrency coverage with observable transaction barriers.",
+      "repro_test": "Run actual cook meal-update and customer placement commands with each committing first. Assert update-first gives PRICE_CHANGED with no order/stock effects; placement-first preserves the validated snapshot and the update applies afterward. NOT_RUN."
+    },
+    {
+      "id": "QA-007",
+      "severity": "Low",
+      "component": "Contract and browser coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/web/ContractRoutesTest.java",
+      "line": 52,
+      "title": "Route and mocked component checks do not validate real response payload contracts",
+      "scenario": "Pricing/payment clients depend on response fields and actual server authorization behavior.",
+      "expected": "Real backend quote/order/payment responses are validated against OpenAPI, with browser interactions covering deposit selection and reporting.",
+      "actual": "ContractRoutesTest compares route sets only. Registry tests validate specification metadata and schema compilation. Component tests inject fake fetch handlers. The staging deposit smoke performs quote, placement, transfer and receipt through direct API calls after browser login.",
+      "evidence": "ContractRoutesTest.java:34-52 compares registry and served routes. packages/api-client/test/registry.test.ts:23-55 checks metadata and schema compilation. apps/customer-web/src/App.test.tsx:15-18 and apps/operations-web/src/App.test.tsx:13-28 explicitly use fake APIs. apps/operations-web/e2e-staging/smoke.staging.ts:108-131 and :158-168 issue payment API calls directly.",
+      "suggested_fix": "Validate captured real HTTP responses against OpenAPI and add a browser deposit workflow driven through customer/cook controls. Preserve the existing component and API tests with their current, accurate labels.",
+      "repro_test": "Schema-validate real quote, placed order and payment-transition responses, including null/legacy payment cases. In Playwright, select deposit, review terms, place, report transfer and acknowledge receipt through UI controls in Arabic and English. NOT_RUN."
+    }
+  ]
+}

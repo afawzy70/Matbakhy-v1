@@ -1,0 +1,33 @@
+{
+  "agent": "Independent Senior Application Security Reviewer",
+  "commit": "4650f5c4cc2d4e4edc8c5b0b851dd08b7a2635ae",
+  "summary": "FINAL: SECR5-001 is CLOSED IN SOURCE. Approval locks the owning asset before storage operations (backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java:130,303). Cleanup extracts the asset UUID from the generated uploads/, documents/ and media/ keys, defers locked assets, and otherwise retains the asset lock through reference checking and deletion (backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaCleanup.java:100-120). Thus approval-first defers cleanup; cleanup-first prevents approval from starting storage operations until cleanup commits. Rollback callbacks enqueue guarded cleanup rather than deleting objects (MediaService.java:311-318). No remaining concrete bypass was established. The added integration test exercises a held asset lock and subsequent orphan removal, but was not executed and does not itself exercise actual approval commit or both object variants.\n\nFinal security disposition table — all conclusions static-only:\n| Item | Disposition | Evidence and scenario |\n| SEC-001 | CLOSED in source | backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaInspector.java:120-160 parses PDF objects and checks decoded names, addressing escaped-name/compressed-object active-content bypass. |\n| SEC-002 / CR-003 | CLOSED in source | backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java:207-217 seals verified documents under documents/<id>; replaying the uploads/<id> ticket cannot overwrite approved bytes. |\n| SEC-003 | CLOSED in source | scripts/rehearsal/load.py:18-27 verifies TLS by default; the explicit insecure option is restricted to .localhost rehearsal domains. |\n| SEC-004 | MITIGATED in part; not closed | deploy/web-preview/Caddyfile:27 sets Report-Only CSP, which does not block injected scripts. Enforcement and browser validation remain outstanding. |\n| CR-002 / SECR-001 | OPEN by owner decision | backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java:55-58 permits staff grants without an MFA assertion when enforcement is off; backend/app/src/main/resources/application.yaml:71 defaults it off. docs/security/staff-mfa-enforcement.md:28 records missing live deployment verification. |\n| Dependency overrides | MITIGATED in source; advisory closure unverified | backend/pom.xml:45-48 declares PDFBox 3.0.8, Tomcat 11.0.26 and Jackson BOM 3.1.7. Packaged resolution, compatibility and upstream advisory status were not verified offline. |\n| SECR-002 | CLOSED in source | infra/identity/matbakhy-realm.json:177-248 nests cookie/forms alternatives inside required login, followed by conditional staff REQUIRED OTP; existing SSO cannot complete the outer flow before that gate. All three realm flow definitions are identical. Live rollout remains unverified. |\n| SECR-003 | CLOSED in source | MediaService.java:201,211,311-318 removes unconditional rollback deletion for both public variants and sealed documents; MediaCleanup.java:100-120 protects concurrent in-flight and committed approvals. |\n| SECR-004 | CLOSED in source | deploy/web-preview/deploy.sh:62-68 restricts the generated parent directory and sets umask before credential rendering, addressing first-render host-user exposure. Effective deployed permissions remain unverified. |\n\nHEAD matched the required SHA before and after inspection; worktree clean. No new evidence-based security finding. No network, builds, runtime tests, DAST or deployment operations performed. Concurrency behavior, storage behavior, PDF parser execution, deployed MFA/claims, effective permissions, live CSP and dependency advisory closure require runtime or deployment evidence.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Matched the required full SHA before and after review."
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "note": "Clean before and after review."
+    },
+    {
+      "command": "git diff --stat 72ebca3..HEAD && git diff 72ebca3..HEAD -- backend",
+      "exit_code": 0,
+      "note": "Inspected the scoped diff and added regression test; test not executed."
+    },
+    {
+      "command": "Read-only source and review-evidence inspection using cat, rg, nl and sed",
+      "exit_code": 0,
+      "note": "Traced approval locks, generated keys, rollback callbacks, cleanup, PDF inspection, MFA configuration, TLS, CSP and dependency declarations. No secret values printed."
+    },
+    {
+      "command": "python3 -B: compare authenticationFlows in the infrastructure, preview and test realm JSON files",
+      "exit_code": 0,
+      "note": "All three authentication flow definitions are identical; static configuration comparison only."
+    }
+  ],
+  "findings": []
+}

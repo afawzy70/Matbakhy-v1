@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatMoney, formatTime, newIdempotencyKey, type Schemas } from "./api";
+import { Security } from "./Security";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 const CASE_CATEGORIES = ["LATE", "MISSING_ITEM", "QUALITY", "FOOD_SAFETY", "CASH", "HANDOVER", "OTHER"] as const;
@@ -9,6 +10,7 @@ export function Account({ ctx, me, onMeChanged }: { ctx: Ctx; me: Schemas["Custo
   return (
     <div className="transaction stack">
       <Profile ctx={ctx} me={me} onMeChanged={onMeChanged} />
+      <Security ctx={ctx} />
       <Favorites ctx={ctx} />
       <Inbox ctx={ctx} />
       <Support ctx={ctx} />

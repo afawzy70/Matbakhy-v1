@@ -1,0 +1,38 @@
+{
+  "agent": "QA9",
+  "commit": "7e61db71e8a089e52d3bae9ffacdf7022907b2cd",
+  "summary": "Final QA artifacts and requirements 1–12 matrix saved under docs/quality/stabilization/mfa-round3/. HEAD matches. Validators, 220 JS tests, five typechecks, lint and 25 backend tests PASS. Python discovery has the host .aws/.codex fixture failure and one Docker skip. Container tests NOT_RUN locally; exact-SHA CI evidence remains unverified. No demonstrated application defect.",
+  "commands": [
+    {
+      "command": "All requested commands; exact invocations and logs in docs/quality/stabilization/mfa-round3/commands.json",
+      "exit_code": 0,
+      "note": "All passed except Python discovery, reported separately."
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p 'test_*.py' -v",
+      "exit_code": 1,
+      "note": "73 reported tests: 71 passed, one host-fixture failure, one Docker skip."
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Matches the required source SHA before and after execution."
+    }
+  ],
+  "findings": [
+    {
+      "id": "QA9-001",
+      "severity": "Low",
+      "component": "Reset audit test coverage",
+      "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaResetAuditIntegrationTest.java",
+      "line": 97,
+      "title": "Attempt-audit assertion does not verify ordering before destructive work",
+      "scenario": "Moving the attempt audit after the first credential deletion but before the second deletion fails would preserve the current assertions.",
+      "expected": "Verify a durable attempt record exists before the first destructive provider call.",
+      "actual": "The test queries the attempt record only after reset returns.",
+      "evidence": "Lines 95–99 check post-failure state; the provider double at lines 45–50 only records deletions. Production ordering is currently correct. Static coverage finding; container test NOT_RUN locally.",
+      "suggested_fix": "Assert target-specific audit persistence from the provider double before its first deletion, using an independent transaction.",
+      "repro_test": "A mutation moving the audit write after the first deletion should fail the strengthened test. Mutation NOT_RUN locally."
+    }
+  ]
+}

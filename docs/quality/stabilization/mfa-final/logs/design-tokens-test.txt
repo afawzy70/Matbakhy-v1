@@ -1,0 +1,13 @@
+
+> @matbakhy/design-tokens@0.1.0 test /home/aiagent/workspaces/agents/codex-qa/packages/design-tokens
+> vitest run
+
+
+ RUN  v5.0.3 /home/aiagent/workspaces/agents/codex-qa/packages/design-tokens
+
+
+ Test Files  1 passed (1)
+      Tests  47 passed (47)
+   Start at  15:08:58
+   Duration  665ms (transform 61%, tests 19%, import 17%, worker 3%)
+

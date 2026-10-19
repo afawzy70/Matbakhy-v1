@@ -4,6 +4,7 @@ usage: load.py <preview-domain> <seconds> <threads>
 Prints one JSON line: requests, errors, status counts and latency percentiles per path.
 """
 import json
+import os
 import ssl
 import statistics
 import sys
@@ -14,9 +15,16 @@ import urllib.request
 domain, seconds, threads = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
 paths = [f"https://app.{domain}/", f"https://api.{domain}/api/v1/configuration/public", f"https://api.{domain}/api/v1/meals?limit=5",
          f"https://api.{domain}/api/v1/zones", f"https://id.{domain}/realms/matbakhy/.well-known/openid-configuration"]
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
+ctx = ssl.create_default_context()  # certificate and hostname verification stay ON (SEC-003)
+ca_file = os.environ.get("REHEARSAL_CA_FILE")
+if ca_file:
+    ctx.load_verify_locations(cafile=ca_file)  # an explicitly scoped test CA, e.g. the local rehearsal's Caddy root
+if os.environ.get("REHEARSAL_INSECURE_LOCAL_TLS") == "1":
+    # Local rehearsal only: the proxy there uses a throwaway internal CA. Refused for any non-.localhost domain.
+    if not domain.endswith(".localhost"):
+        sys.exit("REHEARSAL_INSECURE_LOCAL_TLS is only allowed for *.localhost rehearsal domains")
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
 results = {p: [] for p in paths}
 errors = {p: 0 for p in paths}
 status = {}

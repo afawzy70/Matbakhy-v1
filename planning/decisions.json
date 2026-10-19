@@ -280,6 +280,16 @@
       "required_before": "P08",
       "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
       "build_with_default": false
+    },
+    {
+      "id": "D18",
+      "topic": "Configurable multi-factor authentication",
+      "status": "ACCEPTED",
+      "value": "MFA is performed by Keycloak (OIDC step-up), never by a custom OTP in Spring Boot. Platform administrators set a policy per account category (CUSTOMER, KITCHEN, STAFF/ADMIN) to DISABLED, OPTIONAL or REQUIRED. OPTIONAL lets each user enable or disable MFA for their own account (disabling needs recent MFA and ends sessions); REQUIRED cannot be turned off by the user and is enforced server-side before protected functions; DISABLED removes enrolment and use for the category without deleting enrolled factors. Administrators can run an audited reset (removes OTP credentials at the provider, ends sessions) and can never read OTP secrets. The PREVIEW default is OPTIONAL for every category; REQUIRED is an explicit later administrator action. Supersedes the 2026-10-18 decision to make staff MFA universal.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P08",
+      "approval_reference": "Owner decision in the stabilization session, 2026-10-18 (configurable MFA policy); docs/security/mfa-policy.md",
+      "build_with_default": false
     }
   ]
 }

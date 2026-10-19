@@ -1,0 +1,68 @@
+{
+  "agent": "qa-engineer",
+  "commit": "d3e22ca081dc0ede9ee02f496642de4d1a86d63a",
+  "summary": "HEAD verified. 210 client tests and 15 backend unit tests passed. Python: 73 run, 71 passed, 1 failed, 1 skipped; the .aws/.codex environment cause was confirmed by a passing controlled rerun. Changed tests reviewed; recommendations recorded without claiming reproduced defects. Docker tests NOT_RUN locally; CI evidence remains required. Reports updated under docs/quality/stabilization/; qa4-findings.json is empty.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Equals the requested source SHA."
+    },
+    {
+      "command": "python3 scripts/validate_blueprint.py",
+      "exit_code": 0,
+      "note": "PASS."
+    },
+    {
+      "command": "python3 scripts/check_scope.py",
+      "exit_code": 0,
+      "note": "PASS."
+    },
+    {
+      "command": "python3 scripts/check_migration_compat.py",
+      "exit_code": 0,
+      "note": "PASS."
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p 'test_*.py'",
+      "exit_code": 1,
+      "note": "73 run: 71 passed, 1 failed, 1 skipped. Sole failure: copied host directories .aws/.codex."
+    },
+    {
+      "command": "Controlled test_scope.test_current_repository_passes rerun excluding .aws/.codex from the copy",
+      "exit_code": 0,
+      "note": "1 test passed; confirms environment cause."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --dir packages/design-tokens test",
+      "exit_code": 0,
+      "note": "47 tests passed."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --dir packages/api-client test",
+      "exit_code": 0,
+      "note": "34 tests passed."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --dir apps/customer-web test",
+      "exit_code": 0,
+      "note": "48 tests passed."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --dir apps/operations-web test",
+      "exit_code": 0,
+      "note": "26 tests passed."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --dir apps/customer-mobile test",
+      "exit_code": 0,
+      "note": "55 tests passed across 4 suites; React act() warnings emitted."
+    },
+    {
+      "command": "./mvnw -o -B -pl app -am test -Dtest='StaffAssuranceTest,AccountMapperStaffMfaTest,MediaInspectorPdfTest,OrderFingerprintTest' -Dsurefire.failIfNoSpecifiedTests=false",
+      "exit_code": 0,
+      "note": "JDK 21: 15 tests passed; no failures, errors or skips."
+    }
+  ],
+  "findings": []
+}

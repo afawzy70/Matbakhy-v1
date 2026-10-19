@@ -1,0 +1,22 @@
+{
+  "agent": "QA Engineer",
+  "commit": "4650f5c4cc2d4e4edc8c5b0b851dd08b7a2635ae",
+  "summary": "Exact HEAD verified. Planning checks PASS; 210 JavaScript tests and 15 backend unit tests PASS; operations-web typecheck PASS. Controlled Python rerun confirms the known host-directory caveat. No new evidence-based findings from the media-test determinism review. Docker tests NOT_RUN locally. Reports saved under docs/quality/stabilization/, with logs under qa6/.",
+  "commands": [
+    {"command": "git rev-parse HEAD", "exit_code": 0, "note": "Matches requested source SHA."},
+    {"command": "python3 scripts/validate_blueprint.py", "exit_code": 0, "note": "PASS on final rerun."},
+    {"command": "python3 scripts/check_scope.py", "exit_code": 0, "note": "PASS on final rerun."},
+    {"command": "python3 scripts/check_migration_compat.py", "exit_code": 0, "note": "PASS."},
+    {"command": "python3 -m unittest discover -s scripts", "exit_code": 1, "note": "73 tests reported; one known scope-fixture failure from host .aws/.codex entries; one Docker-dependent skip."},
+    {"command": "Controlled Python discovery excluding only .aws/.codex from test_scope fixture copies", "exit_code": 0, "note": "73 tests reported; OK, one skip. No source changes."},
+    {"command": "pnpm --dir apps/customer-web test", "exit_code": 0, "note": "engine-strict=false; 48 passed."},
+    {"command": "pnpm --dir apps/operations-web test", "exit_code": 0, "note": "engine-strict=false; 26 passed."},
+    {"command": "pnpm --dir apps/customer-mobile test", "exit_code": 0, "note": "engine-strict=false; 55 passed."},
+    {"command": "pnpm --dir packages/api-client test", "exit_code": 0, "note": "engine-strict=false; 34 passed."},
+    {"command": "pnpm --dir packages/design-tokens test", "exit_code": 0, "note": "engine-strict=false; 47 passed."},
+    {"command": "pnpm --dir apps/operations-web typecheck", "exit_code": 0, "note": "PASS."},
+    {"command": "./mvnw -o -B -pl app -am test -Dtest='StaffAssuranceTest,AccountMapperStaffMfaTest,MediaInspectorPdfTest,OrderFingerprintTest' -Dsurefire.failIfNoSpecifiedTests=false", "exit_code": 0, "note": "backend directory, specified JDK 21; 15 passed."},
+    {"command": "git diff --check", "exit_code": 0, "note": "PASS."}
+  ],
+  "findings": []
+}

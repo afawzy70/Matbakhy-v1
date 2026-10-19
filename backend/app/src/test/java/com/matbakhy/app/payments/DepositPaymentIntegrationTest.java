@@ -240,6 +240,37 @@ class DepositPaymentIntegrationTest {
                 .isEqualTo("WAITING_FOR_DEPOSIT:CUSTOMER,CUSTOMER_TRANSFER_REPORTED:CUSTOMER,KITCHEN_RECEIPT_REPORTED:COOK");
     }
 
+    /** QA-004: a second, fully approved kitchen owner cannot act on another kitchen's payment; nothing is written. */
+    @Test
+    void another_approved_kitchen_cannot_receipt_report_a_problem_or_refund_a_foreign_deposit() throws Exception {
+        UUID order = depositOrder();
+        ok(report(order, customerSubject), 200);
+        ok(cook(order, "accept"), 200);
+        String otherCookSubject = UUID.randomUUID().toString();
+        UUID otherCook = logins.login(otherCookSubject, "Other Cook").getPrincipal().id();
+        UUID reviewer = logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id();
+        UUID otherKitchen = TestKitchens.approvedKitchen(jdbc, otherCook, reviewer);
+        assertThat(otherKitchen).isNotEqualTo(kitchen);
+
+        long paymentVersion = jdbc.queryForObject("SELECT version FROM order_payment WHERE order_id = ?", Long.class, order);
+        int events = jdbc.queryForObject("SELECT count(*) FROM payment_event WHERE order_id = ?", Integer.class, order);
+        String state = paymentState(order);
+
+        assertThat(receipt(order, 13500, otherCookSubject).getStatus()).as("receipt by a foreign kitchen").isIn(403, 404);
+        assertThat(call(post("/api/v1/cook/orders/" + order + "/payment/problem")
+                .content("{\"expectedVersion\":" + paymentVersion + ",\"kind\":\"NOT_RECEIVED\"}"), as(otherCookSubject)).getStatus())
+                .as("problem by a foreign kitchen").isIn(403, 404);
+        assertThat(call(post("/api/v1/cook/orders/" + order + "/payment/refund")
+                .content("{\"expectedVersion\":" + paymentVersion + ",\"reference\":\"RF-SYN-1\"}"), as(otherCookSubject)).getStatus())
+                .as("refund by a foreign kitchen").isIn(403, 404);
+
+        assertThat(jdbc.queryForObject("SELECT version FROM order_payment WHERE order_id = ?", Long.class, order)).isEqualTo(paymentVersion);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM payment_event WHERE order_id = ?", Integer.class, order)).isEqualTo(events);
+        assertThat(paymentState(order)).isEqualTo(state);
+        // The owning kitchen is unaffected and still succeeds with the same version.
+        ok(receipt(order, 13500, cookSubject), 200);
+    }
+
     @Test
     void expiry_after_a_reported_transfer_goes_to_reconciliation_and_without_one_the_deposit_expires() throws Exception {
         UUID reported = depositOrder();
@@ -254,6 +285,44 @@ class DepositPaymentIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT state FROM customer_order WHERE id = ?", String.class, reported)).isEqualTo("EXPIRED");
         assertThat(jdbc.queryForObject("SELECT count(*) FROM stock_allocation WHERE order_id = ? AND state = 'RELEASED'", Integer.class, reported))
                 .as("capacity released once").isEqualTo(1);
+    }
+
+    /** QA-003: a customer's transfer report racing the expiry job is never lost and capacity is released exactly once. */
+    @Test
+    void a_transfer_report_racing_expiry_is_reconciled_or_refused_never_lost() throws Exception {
+        for (int round = 0; round < 6; round++) {
+            UUID order = depositOrder();
+            Instant acceptBy = jdbc.queryForObject("SELECT accept_by FROM customer_order WHERE id = ?", Timestamp.class, order).toInstant();
+            ((MutableClock) clock).advance(Duration.between(clock.instant(), acceptBy.plusSeconds(5)));
+            ExecutorService pool = Executors.newFixedThreadPool(2);
+            CountDownLatch start = new CountDownLatch(1);
+            Future<Integer> reported = pool.submit(() -> {
+                start.await();
+                return report(order, customerSubject).getStatus();
+            });
+            Future<Boolean> expired = pool.submit(() -> {
+                start.await();
+                return lifecycle.expireOne(order);
+            });
+            start.countDown();
+            int reportStatus = reported.get(60, java.util.concurrent.TimeUnit.SECONDS);
+            expired.get(60, java.util.concurrent.TimeUnit.SECONDS);
+            pool.shutdown();
+
+            assertThat(jdbc.queryForObject("SELECT state FROM customer_order WHERE id = ?", String.class, order)).isEqualTo("EXPIRED");
+            if (reportStatus == 200) {
+                assertThat(paymentState(order)).as("round %d: a reported transfer must be reconciled, never silently expired", round)
+                        .isEqualTo("RECONCILE_PENDING");
+            } else {
+                assertThat(reportStatus).as("round %d: a refused report is a state conflict", round).isEqualTo(409);
+                assertThat(paymentState(order)).isEqualTo("EXPIRED");
+            }
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM stock_allocation WHERE order_id = ? AND state = 'RELEASED'", Integer.class, order))
+                    .as("round %d: capacity released once", round).isEqualTo(1);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM stock_allocation WHERE order_id = ? AND state <> 'RELEASED'", Integer.class, order))
+                    .isZero();
+            assertThat(lifecycle.expireOne(order)).as("repeated expiry is a no-op").isFalse();
+        }
     }
 
     @Test

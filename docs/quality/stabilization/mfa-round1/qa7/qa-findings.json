@@ -1,0 +1,44 @@
+[
+  {
+    "id": "QA7-001",
+    "severity": "Medium",
+    "component": "Backend MFA integration test fixtures",
+    "file": "backend/app/src/test/java/com/matbakhy/app/identity/MfaResetIntegrationTest.java",
+    "line": 143,
+    "title": "Reset tests insert the same unique active grant twice",
+    "scenario": "Run both reset methods in one Spring context, in either order. Both authenticate the persistent otp-admin account and grant security.mfa_reset.",
+    "expected": "Each method reaches its reset/security assertions independently of execution order.",
+    "actual": "The second method inserts an already-existing active grant and violates user_grant_active_uk before testing the endpoint.",
+    "evidence": "Static source evidence at lines 81\u201382,108,141\u2013143; no grant cleanup at AfterEach lines 44\u201347. V4__grants_and_audit.sql:22 defines UNIQUE(user_id, permission) WHERE revoked_at IS NULL. Container execution NOT_RUN; this is an identified fixture defect, not an observed CI failure.",
+    "suggested_fix": "Use separate synthetic administrators per method or explicitly restore grants; do not rely on method order.",
+    "repro_test": "Run MfaResetIntegrationTest with both test methods against PostgreSQL/Keycloak; verify the second grant insertion succeeds after fixture isolation."
+  },
+  {
+    "id": "QA7-002",
+    "severity": "Medium",
+    "component": "PREVIEW default coverage",
+    "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java",
+    "line": 53,
+    "title": "Default-policy test overwrites the migration defaults it claims to verify",
+    "scenario": "V31 accidentally seeds STAFF or KITCHEN as REQUIRED or DISABLED; run the preview-default test.",
+    "expected": "The new test detects a non-OPTIONAL initial value for every category.",
+    "actual": "BeforeEach calls resetPolicies(), which rewrites every row to OPTIONAL, so assertions at lines 100\u2013101 cannot detect the seed regression. Resolver and UI fixtures also hardcode OPTIONAL. The real-token test only probes a customer.",
+    "evidence": "Static fixture/control-flow evidence: MfaPolicyIntegrationTest.java:49\u201360,98\u2013107; V31__mfa_policy.sql:14 is the production seed. Container execution NOT_RUN.",
+    "suggested_fix": "Assert all three defaults in a fresh migrated database before mutating any policy; keep policy-reset fixtures separate from migration-default verification.",
+    "repro_test": "Mutation check: change only STAFF seed to REQUIRED in a disposable test checkout; the default test should fail without a setup rewrite."
+  },
+  {
+    "id": "QA7-003",
+    "severity": "Medium",
+    "component": "Session invalidation test coverage",
+    "file": "backend/app/src/test/java/com/matbakhy/app/identity/MfaResetIntegrationTest.java",
+    "line": 123,
+    "title": "Session termination assertion checks a response flag rather than invalidation",
+    "scenario": "Provider logout stops terminating sessions but reset still removes a factor and returns sessionsEnded=true; or preference disable skips provider logout.",
+    "expected": "An existing refresh token or SSO session cannot continue after reset/disable, subject to the documented access-token expiry window.",
+    "actual": "Reset test checks only sessionsEnded=true and then opens a new browser. Preference test uses unconfigured provider admin access, allowing successful disable without any session-end assertion. Both tests miss a logout no-op.",
+    "evidence": "MfaResetIntegrationTest.java:109\u2013127 retains only an access token then calls fresh-browser MfaBrowser.login; MfaBrowser.java:104 creates a new OidcBrowser. MfaPolicyIntegrationTest.java:158\u2013179 never exercises refresh/SSO invalidation; MfaController.java:120\u2013129 permits missing/failed admin logout. Static coverage finding; no runtime logout failure claimed.",
+    "suggested_fix": "Capture an existing refresh token and browser SSO session before reset and disable; assert refresh rejection and old-session loss afterward. Include provider failure behavior and web application sessions.",
+    "repro_test": "Against CI containers, retain target browser and refresh token, reset or disable, then retry refresh and cookie-only authorization; a no-op logout mutation must fail the test."
+  }
+]

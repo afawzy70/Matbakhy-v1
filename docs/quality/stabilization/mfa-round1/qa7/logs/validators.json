@@ -1,0 +1,18 @@
+[
+  {
+    "command": "python3 scripts/validate_blueprint.py",
+    "exit_code": 0
+  },
+  {
+    "command": "python3 scripts/check_scope.py",
+    "exit_code": 0
+  },
+  {
+    "command": "python3 scripts/check_migration_compat.py",
+    "exit_code": 0
+  },
+  {
+    "command": "python3 -m unittest discover -s scripts",
+    "exit_code": 1
+  }
+]

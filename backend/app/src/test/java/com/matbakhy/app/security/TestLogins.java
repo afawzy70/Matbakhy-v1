@@ -37,4 +37,9 @@ public class TestLogins {
         return mapper.map(ISSUER, subject, Map.of("email_verified", true, "name", name, "acr", "2",
                 "auth_time", java.time.Instant.now().getEpochSecond()));
     }
+
+    /** MFA asserted by the provider, but authenticated at {@code authTime} (to test "recent" step-up windows). */
+    public AccountAuthentication loginWithMfaAt(String subject, String name, java.time.Instant authTime) {
+        return mapper.map(ISSUER, subject, Map.of("email_verified", true, "name", name, "acr", "2", "auth_time", authTime.getEpochSecond()));
+    }
 }

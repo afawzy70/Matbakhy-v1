@@ -1,0 +1,43 @@
+{
+  "agent": "Codex independent code reviewer, round 2",
+  "commit": "890bc872468085747c938dd3cb27b77ba036c713",
+  "summary": "CR-001 is corrected: reporting and verification use cash_obligation.amount_minor; the UI preserves zero remainders and falls back to the total when payment is null. Zero cash can be reported and verified. CR-003 protects newly approved documents from upload-ticket overwrites. Row locking, UUID-derived document keys and the private_key UNIQUE constraint introduce no identified collision regression; successful writes receive rollback cleanup, re-completion returns the approved asset, and deletion targets the sealed key. One cleanup failure remains below. CR-002 is not established as a code defect: docs/product/06-permissions.md:26 assigns staff-session MFA enforcement to the identity provider, while StaffAssurance enforces recent MFA on selected high-risk actions. Password-only test authentication does not demonstrate a production provider-policy bypass. Provider MFA configuration still needs deployment evidence. Review was static; integration tests were not run and report files were not written because the sandbox is read-only.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Confirmed requested review head."
+    },
+    {
+      "command": "git diff b7ec0e9052a612f7a8aab38f00519107b1dce213..890bc872468085747c938dd3cb27b77ba036c713 -- backend apps",
+      "exit_code": 0,
+      "note": "Reviewed all five changed files and related storage, payment, authorization and migration code."
+    },
+    {
+      "command": "git diff --check b7ec0e9..HEAD -- backend apps",
+      "exit_code": 0,
+      "note": "No whitespace errors."
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "note": "Working tree clean."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CR2-001",
+      "severity": "Medium",
+      "component": "Private document cleanup",
+      "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
+      "line": 210,
+      "title": "Upload cleanup failure cannot be recovered by re-completion",
+      "scenario": "Sealing and database commit succeed, but deleting uploads/<id> fails with a transient S3 error in the afterCommit callback.",
+      "expected": "Approval remains successfully observable and failed cleanup is durably retried, including when the owner later deletes the document.",
+      "actual": "The callback exception escapes after approval has committed. Re-completion returns immediately for APPROVED media without retrying cleanup. The row now stores only documents/<id>, so the delete path also leaves the original upload object behind.",
+      "evidence": "Line 210 schedules an unguarded storage.delete; afterCommit executes action.run() at line 297. S3ObjectStorage.delete propagates SDK failures. Completion returns early at lines 132-133, and delete removes only row.privateKey() at line 242. No durable cleanup retry is registered.",
+      "suggested_fix": "Persist an idempotent cleanup job transactionally with approval and retry storage deletion independently. Prevent cleanup failures from turning committed approval into an error response.",
+      "repro_test": "Inject a one-time failure deleting uploads/<id>. Complete a synthetic document, retry completion, then delete it. Assert approval remains successful and a durable retry eventually removes the upload object. Not executed."
+    }
+  ]
+}

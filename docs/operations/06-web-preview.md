@@ -170,7 +170,7 @@ The access method must work for: browser sign-in and the OIDC redirects between 
    - synthetic data only;
    - no real SMS, e-mail, push or malware scanning;
    - a synthetic commerce policy (O04 open);
-   - staff actions that need MFA are not available, because no OTP is configured in the preview realm.
+   - MFA policy (D18) defaults to OPTIONAL for every category; step-up and enrolment work only after the Keycloak step-up flow and the admin service account are applied to the running preview realm (`--import-realm` skips an existing realm; see docs/security/mfa-policy.md, Migration and rollout).
 
 ## Procedure (after the inputs exist)
 

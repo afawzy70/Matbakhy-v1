@@ -1912,6 +1912,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/security": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-112: MFA state of the signed-in account: applicable categories and policies, effective mode, own preference, whether this session passed MFA, step-up path and the provider's account-management link
+         * @description MFA state of the signed-in account: applicable categories and policies, effective mode, own preference, whether this session passed MFA, step-up path and the provider's account-management link
+         */
+        get: operations["getMeSecurity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/security/mfa": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * API-113: enabled: turn MFA on (needs a session that passed MFA) or off (needs recent MFA; refused when policy is REQUIRED; unavailable when DISABLED)
+         * @description enabled: turn MFA on (needs a session that passed MFA) or off (needs recent MFA; refused when policy is REQUIRED; unavailable when DISABLED)
+         */
+        put: operations["putMeSecurityMfa"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ops/security/mfa-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * API-114: MFA policy per account category (CUSTOMER, KITCHEN, STAFF)
+         * @description MFA policy per account category (CUSTOMER, KITCHEN, STAFF)
+         */
+        get: operations["getOpsSecurityMfaPolicy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ops/security/mfa-policy/{category}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * API-115: mode DISABLED, OPTIONAL or REQUIRED, expectedVersion, reason; needs recent MFA; audited
+         * @description mode DISABLED, OPTIONAL or REQUIRED, expectedVersion, reason; needs recent MFA; audited
+         */
+        put: operations["putOpsSecurityMfaPolicyByCategory"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ops/accounts/{accountId}/mfa-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * API-116: reason (at least 10 characters); needs recent MFA; removes the account's OTP credentials at the identity provider and ends its sessions; never returns a secret; no self-reset; audited
+         * @description reason (at least 10 characters); needs recent MFA; removes the account's OTP credentials at the identity provider and ends its sessions; never returns a secret; no self-reset; audited
+         */
+        post: operations["postOpsAccountsMfaReset"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ops/staff/{userId}/grants": {
         parameters: {
             query?: never;
@@ -2573,13 +2673,73 @@ export interface components {
         };
         /** @enum {string} */
         FulfillmentMode: "DELIVERY" | "PICKUP";
+        SecuritySettings: {
+            categories: ("CUSTOMER" | "KITCHEN" | "STAFF")[];
+            /** @description Policy mode for each category that applies to this account */
+            policy: {
+                [key: string]: "DISABLED" | "OPTIONAL" | "REQUIRED";
+            };
+            /** @enum {string} */
+            effectiveMode: "DISABLED" | "OPTIONAL" | "REQUIRED";
+            /** @description The user's own preference (kept while the policy makes it irrelevant) */
+            enabled: boolean;
+            /** @description MFA must be asserted on the session for protected functions */
+            required: boolean;
+            /** @description False only when every applicable category is DISABLED */
+            available: boolean;
+            /** @description The current token/session carries the identity provider's MFA assertion */
+            verifiedInSession: boolean;
+            /** @description Web path that starts a Keycloak step-up (acr mfa) */
+            stepUpPath: string;
+            /** @description Keycloak account console page for enrolling or removing the authenticator */
+            accountManagementUrl: string;
+            /** @description The account holds security.mfa_policy */
+            canManagePolicy: boolean;
+            /** @description The account holds security.mfa_reset */
+            canResetMfa: boolean;
+        };
+        MfaPreferenceRequest: {
+            enabled: boolean;
+        };
+        MfaPolicy: {
+            /** @enum {string} */
+            category: "CUSTOMER" | "KITCHEN" | "STAFF";
+            /** @enum {string} */
+            mode: "DISABLED" | "OPTIONAL" | "REQUIRED";
+            reason?: string | null;
+            /** Format: uuid */
+            updatedBy?: string | null;
+            /** Format: date-time */
+            updatedAt: string;
+            /** Format: int64 */
+            version: number;
+        };
+        MfaPolicyList: {
+            items: components["schemas"]["MfaPolicy"][];
+        };
+        MfaPolicyUpdateRequest: {
+            /** @enum {string} */
+            mode: "DISABLED" | "OPTIONAL" | "REQUIRED";
+            /** Format: int64 */
+            expectedVersion: number;
+            reason: string;
+        };
+        MfaResetRequest: {
+            reason: string;
+        };
+        MfaResetResult: {
+            /** Format: uuid */
+            accountId: string;
+            removedFactors: number;
+            sessionsEnded: boolean;
+        };
         Grant: {
             /** Format: uuid */
             id: string;
             /** Format: uuid */
             userId: string;
             /** @enum {string} */
-            permission: "staff.grant" | "audit.read" | "cook.review" | "content.moderate" | "order.ops" | "order.exception_cancel" | "order.handover_override" | "support.case" | "finance.read" | "finance.verify" | "finance.refund_approve" | "finance.settlement" | "config.read" | "config.write" | "integration.ops";
+            permission: "staff.grant" | "audit.read" | "cook.review" | "content.moderate" | "order.ops" | "order.exception_cancel" | "order.handover_override" | "support.case" | "finance.read" | "finance.verify" | "finance.refund_approve" | "finance.settlement" | "config.read" | "config.write" | "integration.ops" | "security.mfa_policy" | "security.mfa_reset";
             /** Format: date-time */
             grantedAt: string;
             /** Format: date-time */
@@ -3635,7 +3795,7 @@ export interface components {
                 /** Format: uuid */
                 grantId: string;
                 /** @enum {string} */
-                permission: "staff.grant" | "audit.read" | "cook.review" | "content.moderate" | "order.ops" | "order.exception_cancel" | "order.handover_override" | "support.case" | "finance.read" | "finance.verify" | "finance.refund_approve" | "finance.settlement" | "config.read" | "config.write" | "integration.ops";
+                permission: "staff.grant" | "audit.read" | "cook.review" | "content.moderate" | "order.ops" | "order.exception_cancel" | "order.handover_override" | "support.case" | "finance.read" | "finance.verify" | "finance.refund_approve" | "finance.settlement" | "config.read" | "config.write" | "integration.ops" | "security.mfa_policy" | "security.mfa_reset";
             }[];
         };
         StaffPage: {
@@ -6711,6 +6871,132 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StaffPage"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getMeSecurity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecuritySettings"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    putMeSecurityMfa: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaPreferenceRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecuritySettings"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    getOpsSecurityMfaPolicy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaPolicyList"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    putOpsSecurityMfaPolicyByCategory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category: "CUSTOMER" | "KITCHEN" | "STAFF";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaPolicyUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaPolicy"];
+                };
+            };
+            "4XX": components["responses"]["Error"];
+            "5XX": components["responses"]["Error"];
+        };
+    };
+    postOpsAccountsMfaReset: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                accountId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MfaResetRequest"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MfaResetResult"];
                 };
             };
             "4XX": components["responses"]["Error"];

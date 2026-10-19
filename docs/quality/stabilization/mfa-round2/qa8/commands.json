@@ -1,0 +1,98 @@
+[
+  {
+    "command": "python3 scripts/validate_blueprint.py",
+    "cwd": ".",
+    "exit_code": 0,
+    "log": "logs/validate_blueprint.txt"
+  },
+  {
+    "command": "python3 scripts/check_scope.py",
+    "cwd": ".",
+    "exit_code": 0,
+    "log": "logs/check_scope.txt"
+  },
+  {
+    "command": "python3 scripts/check_migration_compat.py",
+    "cwd": ".",
+    "exit_code": 0,
+    "log": "logs/check_migration_compat.txt"
+  },
+  {
+    "command": "python3 -m unittest discover -s scripts -p 'test_*.py' -v",
+    "cwd": ".",
+    "exit_code": 1,
+    "log": "logs/python-unittest.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false lint",
+    "cwd": ".",
+    "exit_code": 0,
+    "log": "logs/lint.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false test",
+    "cwd": "packages/api-client",
+    "exit_code": 0,
+    "log": "logs/api-client-test.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "cwd": "packages/api-client",
+    "exit_code": 0,
+    "log": "logs/api-client-typecheck.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false test",
+    "cwd": "packages/design-tokens",
+    "exit_code": 0,
+    "log": "logs/design-tokens-test.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "cwd": "packages/design-tokens",
+    "exit_code": 0,
+    "log": "logs/design-tokens-typecheck.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false test",
+    "cwd": "apps/customer-web",
+    "exit_code": 0,
+    "log": "logs/customer-web-test.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "cwd": "apps/customer-web",
+    "exit_code": 0,
+    "log": "logs/customer-web-typecheck.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false test",
+    "cwd": "apps/operations-web",
+    "exit_code": 0,
+    "log": "logs/operations-web-test.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "cwd": "apps/operations-web",
+    "exit_code": 0,
+    "log": "logs/operations-web-typecheck.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false test",
+    "cwd": "apps/customer-mobile",
+    "exit_code": 0,
+    "log": "logs/customer-mobile-test.txt"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "cwd": "apps/customer-mobile",
+    "exit_code": 0,
+    "log": "logs/customer-mobile-typecheck.txt"
+  },
+  {
+    "command": "./mvnw -o -B -pl app -am test -Dtest='MfaPolicyResolveTest,StaffAssuranceTest,ModuleBoundaryTest,MediaInspectorPdfTest,OrderFingerprintTest' -Dsurefire.failIfNoSpecifiedTests=false",
+    "cwd": "backend",
+    "exit_code": 0,
+    "log": "logs/backend.txt"
+  }
+]

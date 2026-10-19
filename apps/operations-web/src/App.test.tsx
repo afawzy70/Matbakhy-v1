@@ -762,3 +762,109 @@ describe("demo environment notice", () => {
     expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
   });
 });
+
+describe("two-step verification policy (D18)", () => {
+  const meBody = { id: "u1", displayName: "Salma", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: [] };
+  const security = (over: Record<string, unknown> = {}) => ({
+    categories: ["CUSTOMER", "STAFF"],
+    policy: { CUSTOMER: "OPTIONAL", STAFF: "OPTIONAL" },
+    effectiveMode: "OPTIONAL",
+    enabled: false,
+    required: false,
+    available: true,
+    verifiedInSession: false,
+    stepUpPath: "/oauth2/authorization/keycloak?stepUp=true",
+    accountManagementUrl: "https://id.example.test/realms/matbakhy/account/#/security/signingin",
+    canManagePolicy: true,
+    canResetMfa: true,
+    ...over,
+  });
+  const policies = () => ({
+    items: ["CUSTOMER", "KITCHEN", "STAFF"].map((category) => ({ category, mode: "OPTIONAL", reason: null, updatedBy: null, updatedAt: SERVER_NOW, version: 4 })),
+  });
+  const adminRoutes = (extra: Record<string, Handler> = {}) => ({
+    "GET /api/v1/me": () => ({ status: 200, body: meBody }),
+    "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+    "GET /api/v1/ops/staff": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    "GET /api/v1/ops/security/mfa-policy": () => ({ status: 200, body: policies() }),
+    "GET /api/v1/me/security": () => ({ status: 200, body: security() }),
+    ...extra,
+  });
+
+  it("shows the administrator the policy per category and saves a change with the version and a reason", async () => {
+    const { fetchImpl, calls } = server(
+      adminRoutes({
+        "PUT /api/v1/ops/security/mfa-policy/STAFF": (_req, body) => ({ status: 200, body: { category: "STAFF", ...(body as object), updatedAt: SERVER_NOW, version: 5 } }),
+      }),
+    );
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    const group = (await screen.findByRole("group", { name: "فريق الإدارة" })) as HTMLElement;
+    const apply = within(group).getByRole("button", { name: "تطبيق" }) as HTMLButtonElement;
+    expect(apply.disabled).toBe(true);
+    fireEvent.change(within(group).getByLabelText("الوضع"), { target: { value: "REQUIRED" } });
+    expect(await within(group).findByText(/يُلزم كل مستخدم في الفئة/)).toBeTruthy();
+    fireEvent.change(within(group).getByLabelText("السبب"), { target: { value: "owner decision" } });
+    fireEvent.click(apply);
+    await within(group).findByText("تم حفظ السياسة.");
+    const put = calls.find((c) => c.method === "PUT" && c.path === "/api/v1/ops/security/mfa-policy/STAFF");
+    expect(put?.body).toEqual({ mode: "REQUIRED", expectedVersion: 4, reason: "owner decision" });
+  });
+
+  it("points to the step-up link when changing the policy needs a fresh second factor", async () => {
+    const { fetchImpl } = server(adminRoutes({ "PUT /api/v1/ops/security/mfa-policy/CUSTOMER": () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } }) }));
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    const group = (await screen.findByRole("group", { name: "العملاء" })) as HTMLElement;
+    fireEvent.change(within(group).getByLabelText("الوضع"), { target: { value: "DISABLED" } });
+    fireEvent.change(within(group).getByLabelText("السبب"), { target: { value: "owner decision" } });
+    fireEvent.click(within(group).getByRole("button", { name: "تطبيق" }));
+    const link = await within(group).findByRole("link", { name: "إعادة التحقق" });
+    expect(link.getAttribute("href")).toContain("stepUp=true");
+  });
+
+  it("sends the audited reset with the account and a reason of at least ten characters, and shows only the count", async () => {
+    const id = "11111111-1111-4111-8111-111111111111";
+    const { fetchImpl, calls } = server(
+      adminRoutes({ [`POST /api/v1/ops/accounts/${id}/mfa-reset`]: () => ({ status: 200, body: { accountId: id, removedFactors: 1, sessionsEnded: true } }) }),
+    );
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    const section = (await screen.findByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).closest("section") as HTMLElement;
+    const reset = within(section).getByRole("button", { name: "إعادة الضبط" }) as HTMLButtonElement;
+    fireEvent.change(within(section).getByLabelText("معرّف الحساب"), { target: { value: id } });
+    fireEvent.change(within(section).getByLabelText("السبب (10 أحرف على الأقل)"), { target: { value: "short" } });
+    expect(reset.disabled).toBe(true);
+    fireEvent.change(within(section).getByLabelText("السبب (10 أحرف على الأقل)"), { target: { value: "lost phone verified by support" } });
+    fireEvent.click(reset);
+    await within(section).findByText("تم حذف 1 من وسائل التحقق وإنهاء الجلسات.");
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ reason: "lost phone verified by support" });
+  });
+
+  it("shows each security administration panel only to the account that holds its own permission", async () => {
+    const onlyReset = server(adminRoutes({ "GET /api/v1/me/security": () => ({ status: 200, body: security({ canManagePolicy: false, canResetMfa: true }) }) }));
+    render(<App fetchImpl={onlyReset.fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    expect(await screen.findByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "سياسة التحقق بخطوتين لكل فئة" })).toBeNull();
+    cleanup();
+    const onlyPolicy = server(adminRoutes({ "GET /api/v1/me/security": () => ({ status: 200, body: security({ canManagePolicy: true, canResetMfa: false }) }) }));
+    render(<App fetchImpl={onlyPolicy.fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    expect(await screen.findByRole("heading", { name: "سياسة التحقق بخطوتين لكل فئة" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).toBeNull();
+  });
+
+  it("explains a required policy that this session has not satisfied instead of showing an empty workspace", async () => {
+    const stepUp = () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } });
+    const { fetchImpl } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: meBody }),
+      "GET /api/v1/cook/dashboard": stepUp,
+      "GET /api/v1/ops/staff": stepUp,
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    const link = await screen.findByRole("link", { name: "أكمل التحقق بخطوتين" });
+    expect(link.getAttribute("href")).toContain("stepUp=true");
+    expect(screen.getByText("يتطلب حسابك التحقق بخطوتين قبل استخدام هذه الشاشات.")).toBeTruthy();
+  });
+});

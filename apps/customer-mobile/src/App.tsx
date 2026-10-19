@@ -23,7 +23,7 @@ import { NotificationsScreen } from "./screens/Notifications";
 import { OrderScreen, OrdersScreen } from "./screens/Orders";
 import { SupportScreen } from "./screens/Support";
 import { Session } from "./session";
-import { colors } from "./ui";
+import { Button, colors, Notice } from "./ui";
 import type { NotificationPermissions } from "./notificationPermission";
 
 /**
@@ -69,21 +69,42 @@ function Tabs() {
   );
 }
 
+/** D18: the server asked for a second factor (the user turned MFA on, or the administrator requires it). */
+function StepUpBanner() {
+  const { t, locale, stepUpRequired, startStepUp, busy } = useApp();
+  if (!stepUpRequired) {
+    return null;
+  }
+  return (
+    <View testID="step-up-banner">
+      <Notice locale={locale}>{t.stepUp.message}</Notice>
+      <Button testID="step-up-verify" label={t.stepUp.action} onPress={() => void startStepUp()} disabled={busy} />
+    </View>
+  );
+}
+
 function Navigation() {
-  const { t, config } = useApp();
+  const { t, config, accountEpoch, shoppingReady } = useApp();
   const linking = useMemo(() => linkingFor(config.redirectUri), [config.redirectUri]);
   return (
-    <NavigationContainer theme={theme} linking={linking}>
-      <Stack.Navigator screenOptions={{ headerBackTitle: t.back }}>
-        <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-        <Stack.Screen name="Meal" component={MealScreen} options={{ title: "" }} />
-        <Stack.Screen name="Cart" component={CartScreen} options={{ title: t.cart }} />
-        <Stack.Screen name="Order" component={OrderScreen} options={{ title: t.tabs.orders }} />
-        <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: t.notifications }} />
-        <Stack.Screen name="Support" component={SupportScreen} options={{ title: t.support }} />
-      </Stack.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <View style={{ flex: 1 }}>
+      <StepUpBanner />
+      <View style={{ flex: 1 }}>
+        {shoppingReady ? (
+        <NavigationContainer key={accountEpoch} theme={theme} linking={linking}>
+          <Stack.Navigator screenOptions={{ headerBackTitle: t.back }}>
+            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+            <Stack.Screen name="Meal" component={MealScreen} options={{ title: "" }} />
+            <Stack.Screen name="Cart" component={CartScreen} options={{ title: t.cart }} />
+            <Stack.Screen name="Order" component={OrderScreen} options={{ title: t.tabs.orders }} />
+            <Stack.Screen name="Notifications" component={NotificationsScreen} options={{ title: t.notifications }} />
+            <Stack.Screen name="Support" component={SupportScreen} options={{ title: t.support }} />
+          </Stack.Navigator>
+          <StatusBar style="auto" />
+        </NavigationContainer>
+        ) : null}
+      </View>
+    </View>
   );
 }
 

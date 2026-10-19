@@ -1,0 +1,38 @@
+{
+  "agent": "code-reviewer",
+  "commit": "240cf0c08fef1fa92bb65f2886a938cf9401d04a",
+  "summary": "No demonstrated defects or blockers found in the scoped diff. CR9-001 and CR9-002 are fixed in source; QA9-001 adds the provider-boundary audit check. Runtime tests NOT_RUN; report files could not be written in the read-only sandbox. Working tree unchanged.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Required SHA matched at start and end."
+    },
+    {
+      "command": "git diff 7e61db7..HEAD",
+      "exit_code": 0,
+      "note": "Reviewed changes and surrounding reset, session, test and script code."
+    },
+    {
+      "command": "git diff --check 7e61db7..HEAD -- backend scripts/dev.sh",
+      "exit_code": 0,
+      "note": "Passed."
+    },
+    {
+      "command": "bash -n scripts/dev.sh",
+      "exit_code": 0,
+      "note": "Passed."
+    },
+    {
+      "command": "python3 -B scripts/validate_blueprint.py",
+      "exit_code": 0,
+      "note": "Structure validation passed; does not verify product behavior."
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "note": "Working tree clean."
+    }
+  ],
+  "findings": []
+}

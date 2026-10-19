@@ -1,0 +1,72 @@
+[
+  {
+    "id": "QA2-001",
+    "severity": "Informational",
+    "component": "QA execution environment",
+    "file": ".npmrc",
+    "line": 1,
+    "title": "BLOCKED: engine enforcement rejects Node 22",
+    "scenario": "pnpm typecheck; pnpm lint; pnpm test; pnpm build; pnpm contract:check",
+    "expected": "The check runs to completion.",
+    "actual": "ERR_PNPM_UNSUPPORTED_ENGINE: Expected version: >=24.21.0 <25; Got: v22.23.3. All five unmodified pnpm commands exit 1 before checks. Environment-only overrides still fail in nested pnpm.",
+    "evidence": "ERR_PNPM_UNSUPPORTED_ENGINE: Expected version: >=24.21.0 <25; Got: v22.23.3. All five unmodified pnpm commands exit 1 before checks. Environment-only overrides still fail in nested pnpm.",
+    "suggested_fix": "Use direct expanded commands with --config.engine-strict=false; use the supported Node version for release evidence.",
+    "repro_test": "pnpm typecheck; pnpm lint; pnpm test; pnpm build; pnpm contract:check"
+  },
+  {
+    "id": "QA2-002",
+    "severity": "Informational",
+    "component": "QA execution environment",
+    "file": "scripts/test_guardrails.py",
+    "line": 9,
+    "title": "Invocation error: two unittest modules require discovery",
+    "scenario": "python3 -m unittest scripts.test_guardrails -v; python3 -m unittest scripts.test_scope -v",
+    "expected": "The check runs to completion.",
+    "actual": "ModuleNotFoundError: No module named 'validate_blueprint'; scripts/test_scope.py:8 similarly cannot import 'check_scope'. Each initial module invocation exits 1 with one loader error, zero real tests executed.",
+    "evidence": "ModuleNotFoundError: No module named 'validate_blueprint'; scripts/test_scope.py:8 similarly cannot import 'check_scope'. Each initial module invocation exits 1 with one loader error, zero real tests executed.",
+    "suggested_fix": "Use unittest discover -s scripts -p test_guardrails.py -v and the equivalent test_scope.py invocation. Guardrails rerun passes; scope result recorded separately.",
+    "repro_test": "python3 -m unittest scripts.test_guardrails -v; python3 -m unittest scripts.test_scope -v"
+  },
+  {
+    "id": "QA2-003",
+    "severity": "Informational",
+    "component": "QA execution environment",
+    "file": "scripts/test_scope.py",
+    "line": 33,
+    "title": "BLOCKED: host directories invalidate copied scope fixture",
+    "scenario": "python3 -m unittest discover -s scripts -p test_scope.py -v",
+    "expected": "The check runs to completion.",
+    "actual": "Discovery run exits 1: 11 passed, 1 failed. AssertionError: ['inventory: unlisted top-level entry .aws', 'inventory: unlisted top-level entry .codex'] != []. The fixture copies host directories without .git, triggering filesystem-list fallback; the real repository scope check passes.",
+    "evidence": "Discovery run exits 1: 11 passed, 1 failed. AssertionError: ['inventory: unlisted top-level entry .aws', 'inventory: unlisted top-level entry .codex'] != []. The fixture copies host directories without .git, triggering filesystem-list fallback; the real repository scope check passes.",
+    "suggested_fix": "Rerun in a clean checkout without host-injected directories; consider excluding ignored host directories from test fixture copies. Do not inspect or publish their contents.",
+    "repro_test": "python3 -m unittest discover -s scripts -p test_scope.py -v"
+  },
+  {
+    "id": "QA2-004",
+    "severity": "Informational",
+    "component": "QA execution environment",
+    "file": "scripts/check_secrets.sh",
+    "line": 1,
+    "title": "BLOCKED: secret scanner needs Docker",
+    "scenario": "bash scripts/check_secrets.sh",
+    "expected": "The check runs to completion.",
+    "actual": "Exit 2: ERROR: Docker daemon not available; secret scan cannot run",
+    "evidence": "Exit 2: ERROR: Docker daemon not available; secret scan cannot run",
+    "suggested_fix": "Run on a Docker-enabled runner.",
+    "repro_test": "bash scripts/check_secrets.sh"
+  },
+  {
+    "id": "QA2-005",
+    "severity": "Informational",
+    "component": "QA execution environment",
+    "file": "scripts/test_proxy_access.py",
+    "line": 64,
+    "title": "BLOCKED: proxy suite skips without Docker",
+    "scenario": "python3 -m unittest scripts.test_proxy_access -v",
+    "expected": "The check runs to completion.",
+    "actual": "Exit 0 but Ran 0 tests; OK (skipped=1); setUpClass skipped 'Docker is not available'. This is not PASS.",
+    "evidence": "Exit 0 but Ran 0 tests; OK (skipped=1); setUpClass skipped 'Docker is not available'. This is not PASS.",
+    "suggested_fix": "Run on a Docker-enabled runner with required local images.",
+    "repro_test": "python3 -m unittest scripts.test_proxy_access -v"
+  }
+]

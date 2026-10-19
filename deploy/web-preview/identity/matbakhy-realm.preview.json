@@ -16,7 +16,8 @@
   "defaultLocale": "ar",
   "accessTokenLifespan": 300,
   "attributes": {
-    "matbakhy.note": "Local reference realm template. scripts/dev.sh fills the placeholders from infra/.env into infra/.generated (ignored by Git)."
+    "matbakhy.note": "Local reference realm template. scripts/dev.sh fills the placeholders from infra/.env into infra/.generated (ignored by Git).",
+    "acr.loa.map": "{\"mfa\": \"2\"}"
   },
   "clients": [
     {
@@ -32,7 +33,8 @@
       ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "https://app.${PREVIEW_DOMAIN}/*##https://ops.${PREVIEW_DOMAIN}/*"
+        "post.logout.redirect.uris": "https://app.${PREVIEW_DOMAIN}/*##https://ops.${PREVIEW_DOMAIN}/*",
+        "acr.loa.map": "{\"mfa\": \"2\"}"
       },
       "protocolMappers": [
         {
@@ -44,8 +46,28 @@
             "access.token.claim": "true",
             "id.token.claim": "false"
           }
+        },
+        {
+          "name": "amr",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-amr-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
         }
       ]
+    },
+    {
+      "clientId": "matbakhy-admin",
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "${OIDC_ADMIN_CLIENT_SECRET}",
+      "serviceAccountsEnabled": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "description": "Service account used only by the API for the audited MFA reset and to end sessions (never public)"
     }
   ],
   "users": [
@@ -128,6 +150,148 @@
           "temporary": false
         }
       ]
+    },
+    {
+      "username": "service-account-matbakhy-admin",
+      "serviceAccountClientId": "matbakhy-admin",
+      "enabled": true,
+      "clientRoles": {
+        "realm-management": [
+          "view-users",
+          "manage-users"
+        ]
+      }
     }
-  ]
+  ],
+  "browserFlow": "matbakhy browser",
+  "authenticationFlows": [
+    {
+      "alias": "matbakhy browser",
+      "description": "Browser flow with LoA step-up: level 1 password; level 2 adds OTP when the client asks for acr mfa/2",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy browser forms",
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy browser forms",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy level 1",
+          "requirement": "CONDITIONAL",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "flowAlias": "matbakhy level 2",
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy level 1",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "matbakhy-loa-1",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorConfig": "matbakhy-pwd-amr",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "matbakhy level 2",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "matbakhy-loa-2",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorConfig": "matbakhy-otp-amr",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "matbakhy-loa-1",
+      "config": {
+        "loa-condition-level": "1",
+        "loa-max-age": "36000",
+        "loa-store-in-user-session": "true"
+      }
+    },
+    {
+      "alias": "matbakhy-loa-2",
+      "config": {
+        "loa-condition-level": "2",
+        "loa-max-age": "0",
+        "loa-store-in-user-session": "true"
+      }
+    },
+    {
+      "alias": "matbakhy-pwd-amr",
+      "config": {
+        "default.reference.value": "pwd",
+        "default.reference.maxAge": "0"
+      }
+    },
+    {
+      "alias": "matbakhy-otp-amr",
+      "config": {
+        "default.reference.value": "otp",
+        "default.reference.maxAge": "0"
+      }
+    }
+  ],
+  "roles": {
+    "realm": []
+  }
 }

@@ -35,14 +35,17 @@ doctor() {
 ensure_env() {
   if [ ! -f "$ENV_FILE" ]; then
     info "creating $ENV_FILE with random local passwords"
-    sed -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
+    (umask 077; sed -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
         -e "s/^KEYCLOAK_ADMIN_PASSWORD=.*/KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -hex 16)/" \
         -e "s/^OIDC_WEB_CLIENT_SECRET=.*/OIDC_WEB_CLIENT_SECRET=$(openssl rand -hex 24)/" \
+        -e "s/^OIDC_ADMIN_CLIENT_SECRET=.*/OIDC_ADMIN_CLIENT_SECRET=$(openssl rand -hex 24)/" \
         -e "s/^DEV_USER_PASSWORD=.*/DEV_USER_PASSWORD=$(openssl rand -hex 12)/" \
-        "$INFRA/.env.example" > "$ENV_FILE"
+        "$INFRA/.env.example" > "$ENV_FILE")
     chmod 600 "$ENV_FILE"
   fi
   grep -q '^MATBAKHY_ENV_MARKER=local$' "$ENV_FILE" || die "$ENV_FILE is not marked MATBAKHY_ENV_MARKER=local; refusing"
+  # D18: secret of the realm's admin service-account client (audited MFA reset); added to env files created before it existed.
+  grep -q '^OIDC_ADMIN_CLIENT_SECRET=' "$ENV_FILE" || echo "OIDC_ADMIN_CLIENT_SECRET=$(openssl rand -hex 24)" >> "$ENV_FILE"
   set -a; . "$ENV_FILE"; set +a
 }
 
@@ -53,11 +56,13 @@ render_realm() {
   local out="${MATBAKHY_GENERATED_DIR:-$INFRA/.generated}"
   export MATBAKHY_GENERATED_DIR="$out"
   mkdir -p "$out/identity"
-  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|${OIDC_WEB_CLIENT_SECRET}|" -e "s|\${API_PORT}|${API_PORT}|" \
+  chmod 700 "$out"   # private before secrets are written; Docker bind mounts are resolved by the daemon
+  umask 077
+  sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|${OIDC_WEB_CLIENT_SECRET}|" -e "s|\${OIDC_ADMIN_CLIENT_SECRET}|${OIDC_ADMIN_CLIENT_SECRET}|" -e "s|\${API_PORT}|${API_PORT}|" \
       -e "s|\${DEV_USER_PASSWORD}|${DEV_USER_PASSWORD}|g" \
       "$INFRA/identity/matbakhy-realm.json" > "$out/identity/matbakhy-realm.json"
   # Readable by the non-root Keycloak user in the container; holds generated local-only values.
-  chmod 755 "$out" "$out/identity"
+  chmod 755 "$out/identity"
   chmod 644 "$out/identity/matbakhy-realm.json"
 }
 
@@ -114,7 +119,7 @@ smoke() {
   info "signed private upload round trip (synthetic PDF): ticket, direct PUT, server verification, signed read"
   local doc xsrf sha ticket upload_url upload_id done read_url
   doc="$(mktemp)"
-  printf '%%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%%%EOF\n' > "$doc"
+  printf '%%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R  >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>\nendobj\nxref\n0 4\n0000000000 65535 f \n0000000009 00000 n \n0000000059 00000 n \n0000000116 00000 n \ntrailer\n<< /Size 4 /Root 1 0 R >>\nstartxref\n187\n%%%%EOF\n' > "$doc"
   sha="$(openssl dgst -sha256 -r "$doc" | cut -d' ' -f1)"
   xsrf="$(awk '$6 == "XSRF-TOKEN" { print $7 }' "$jar" | tail -1)"
   [ -n "$xsrf" ] || { rm -f "$jar" "$doc"; die "no CSRF token cookie after login"; }
@@ -150,6 +155,7 @@ throwaway_env() {
       -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" \
       -e "s/^KEYCLOAK_ADMIN_PASSWORD=.*/KEYCLOAK_ADMIN_PASSWORD=$(openssl rand -hex 16)/" \
       -e "s/^OIDC_WEB_CLIENT_SECRET=.*/OIDC_WEB_CLIENT_SECRET=$(openssl rand -hex 24)/" \
+      -e "s/^OIDC_ADMIN_CLIENT_SECRET=.*/OIDC_ADMIN_CLIENT_SECRET=$(openssl rand -hex 24)/" \
       -e "s/^DEV_USER_PASSWORD=.*/DEV_USER_PASSWORD=$(openssl rand -hex 12)/" \
       -e "s/^POSTGRES_PORT=.*/POSTGRES_PORT=15432/" -e "s/^IDENTITY_PORT=.*/IDENTITY_PORT=18180/" \
       -e "s/^OBJECT_STORAGE_PORT=.*/OBJECT_STORAGE_PORT=19090/" -e "s/^MAIL_UI_PORT=.*/MAIL_UI_PORT=18025/" \

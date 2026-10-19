@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { errorCode, type Api } from "./api";
+import { errorCode, stepUpUrl, type Api } from "./api";
 import { errorText, type Strings } from "./i18n";
 
 export interface Ctx {
@@ -64,9 +64,15 @@ export function Status<T>({ ctx, state, onRetry, children }: { ctx: Ctx; state: 
     return (
       <div role="alert" className="notice notice-danger">
         <p>{errorText(ctx.t, state.code)}</p>
-        <button type="button" onClick={onRetry}>
-          {ctx.t.retry}
-        </button>
+        {state.code === "STEP_UP_REQUIRED" ? (
+          <a className="button" href={stepUpUrl(window.location.href)}>
+            {ctx.t.security.stepUpLink}
+          </a>
+        ) : (
+          <button type="button" onClick={onRetry}>
+            {ctx.t.retry}
+          </button>
+        )}
       </div>
     );
   }

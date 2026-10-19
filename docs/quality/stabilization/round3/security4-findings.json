@@ -1,0 +1,72 @@
+[
+ {
+  "id": "SECR-001",
+  "severity": "High",
+  "component": "Staff MFA enforcement",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
+  "line": 55,
+  "title": "Password-only grant holders retain staff permissions by default",
+  "scenario": "An active account receives support.case or finance.read through the application grant lifecycle but has no Keycloak matbakhy-staff role. Its password-only login skips conditional OTP, yet AccountMapper grants its staff authorities. The preview compose configuration does not enable the optional mapper gate.",
+  "expected": "Every staff grant holder must authenticate with MFA before receiving staff permissions.",
+  "actual": "The IdP condition uses a separate realm role, while application authorization uses database grants. require-staff-mfa defaults to false, allowing password-only access to staff endpoints without an additional step-up requirement.",
+  "evidence": "AccountMapper.java:33 defaults the gate off; lines 55-57 issue permissions without MFA when disabled. GrantService grants database permissions without synchronizing the IdP role. docs/security/staff-mfa-enforcement.md explicitly documents the mismatch and password-only preview staff.",
+  "suggested_fix": "Require provider-asserted MFA for staff authorities in deployed environments and reconcile every grant holder with the IdP MFA policy before activation.",
+  "repro_test": "With default configuration, give a synthetic password-only account support.case without the realm role; authenticate and request /api/v1/ops/cases. Expect denial until MFA is asserted. Existing AccountMapperStaffMfaTest confirms the permissive default; HTTP reproduction was not run."
+ },
+ {
+  "id": "SECR-002",
+  "severity": "High",
+  "component": "Keycloak browser flow",
+  "file": "infra/identity/matbakhy-realm.json",
+  "line": 177,
+  "title": "Existing password-only SSO sessions bypass the staff OTP subflow",
+  "scenario": "A customer signs in with a password, then is assigned the matbakhy-staff role and an application staff grant while its Keycloak SSO session remains active. A subsequent normal authorization request authenticates through auth-cookie.",
+  "expected": "The newly privileged account must complete OTP before obtaining staff access, including when an SSO session already exists.",
+  "actual": "auth-cookie and the forms flow are ALTERNATIVE siblings. OTP is nested exclusively inside forms, so successful cookie authentication avoids the role-conditioned OTP step. The default-off API MFA gate does not compensate.",
+  "evidence": "infra realm lines 175-188 place auth-cookie before the alternative forms flow. The same structure appears at deploy/web-preview/identity/matbakhy-realm.preview.json:152 and backend/app/src/test/resources/keycloak/test-realm.json:190. Inspected IdP tests cover fresh password/OTP flows, not privilege elevation with an existing cookie.",
+  "suggested_fix": "Enforce staff assurance after all primary authentication paths, including cookie authentication, and invalidate or step up existing sessions on staff elevation. Retain API enforcement of the MFA assertion.",
+  "repro_test": "Establish password-only SSO as a synthetic customer, assign the staff role and application grant without ending SSO, then authorize again without max_age=0. Require an OTP challenge and deny staff API access until it succeeds. Static finding; Keycloak reproduction was not run."
+ },
+ {
+  "id": "SECR-003",
+  "severity": "Medium",
+  "component": "Media rollback cleanup",
+  "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
+  "line": 209,
+  "title": "Rollback cleanup can delete a concurrent retry's approved document",
+  "scenario": "Completion A writes documents/<mediaId> and later rolls back. After the database releases A's row lock, completion B retries, writes the same deterministic key and commits APPROVED. A's delayed afterCompletion rollback callback then deletes that key.",
+  "expected": "Cleanup must never delete an object referenced by a committed approved asset.",
+  "actual": "The rollback callback deletes the shared deterministic key directly, without the durable cleanup worker's reference check. The public variant uses the same pattern at line 203.",
+  "evidence": "MediaService.java:207-210 writes a deterministic sealed key and registers unconditional deletion. onRollback at lines 301-310 invokes that deletion after transaction completion, when a waiting retry can proceed. This bypasses MediaCleanup.runDue's active-reference guard.",
+  "suggested_fix": "Use unique object keys per completion attempt and enqueue failed-attempt objects for durable reference-aware cleanup instead of deleting shared keys in rollback callbacks.",
+  "repro_test": "Pause A's rollback callback after its database rollback, allow B to complete and commit the same upload, then resume A. Assert B's approved object remains readable. Repeat for public variants. Concurrency test was not run."
+ },
+ {
+  "id": "SECR-004",
+  "severity": "Medium",
+  "component": "Deployment secret handling",
+  "file": "deploy/web-preview/deploy.sh",
+  "line": 67,
+  "title": "Rendered identity and storage credentials are world-readable",
+  "scenario": "After deploy.sh render or up, an unrelated local host account traverses the generated configuration directories and reads the rendered realm or storage configuration.",
+  "expected": "Only the deployment account and required container identities can read credential-bearing files.",
+  "actual": "The script explicitly makes generated directories mode 755 and both credential-bearing files mode 644.",
+  "evidence": "Lines 62-65 render the OIDC client secret, preview account credentials and storage credentials into files; lines 66-67 grant directory traversal and file readability to all local users. deploy-preview.yml invokes deploy.sh up, which runs render.",
+  "suggested_fix": "Use restrictive directory permissions and narrowly scoped ownership/group permissions for the container UIDs, or mount secrets through an appropriate secret mechanism.",
+  "repro_test": "Render using synthetic credentials, then attempt to read both generated files as an unrelated local UID. Both reads should fail. No secret values were printed and deployment was not executed."
+ },
+ {
+  "id": "SECR-005",
+  "severity": "Low",
+  "component": "Permanent order request fingerprint",
+  "file": "backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java",
+  "line": 139,
+  "title": "Unescaped delimiters allow distinct requests to share a fingerprint",
+  "scenario": "Place an order with cancellation version 'cancel-v1' and fulfillment note 'x\\ny'. Retry the same quoteId/clientRequestId using a fresh Idempotency-Key, cancellation version 'cancel-v1\\nx' and note 'y'. Both strings meet the controller's length constraints.",
+  "expected": "Changed policy acceptance or fulfillment notes must cause IDEMPOTENCY_CONFLICT.",
+  "actual": "Joining unescaped fields with newlines produces identical canonical bytes for these distinct requests. The permanent-request recovery branch accepts the matching fingerprint before validating policy versions.",
+  "evidence": "OrderService.java:139-140 joins variable-length strings without escaping or length prefixes; lines 153-160 return the existing order on a fingerprint match. A synthetic Python check confirmed identical canonical bytes and digests. This bypasses conflict detection but does not create another order or modify the original.",
+  "suggested_fix": "Hash an unambiguous versioned representation, such as a JSON array of normalized fields or length-prefixed values.",
+  "repro_test": "Add the two synthetic requests above to OrderPlacementIntegrationTest using different Idempotency-Keys. Assert the second request returns 409. The canonical collision was verified locally; the HTTP test was not run."
+ }
+]

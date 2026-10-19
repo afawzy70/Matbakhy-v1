@@ -1,0 +1,58 @@
+[
+ {
+  "id": "SECR8-001",
+  "severity": "Medium",
+  "component": "DISABLED policy enforcement",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java",
+  "line": 263,
+  "title": "SECR7-002 remains open for provider enrolment and anonymous step-up",
+  "scenario": "An account whose applicable categories are all DISABLED visits Keycloak account management directly, or signs out of the application and starts stepUp=true before the account is known.",
+  "expected": "D18 DISABLED makes enrolment and policy MFA use unavailable while preserving existing factors and independent privileged assurance.",
+  "actual": "The resolver suppresses MFA only for a known DISABLED account. Anonymous step-up still requests MFA, and provider account-console enrolment has no category-policy guard.",
+  "evidence": "SecurityConfiguration.java:263-277 permits anonymous MFA requests; MfaController.java:75-79 always returns the provider account-management URL. docs/security/mfa-policy.md explicitly records direct provider enrolment and anonymous step-up as residual limitations.",
+  "suggested_fix": "Enforce availability in provider enrolment/authentication entry points, preserving independent privileged step-up, or obtain an explicit owner-approved change to the DISABLED requirement.",
+  "repro_test": "With all applicable categories DISABLED, verify direct account-console enrolment and anonymous application step-up cannot enrol or use policy MFA; separately verify privileged step-up remains available."
+ },
+ {
+  "id": "SECR8-002",
+  "severity": "Medium",
+  "component": "Reset audit durability",
+  "file": "backend/app/src/main/java/com/matbakhy/app/mfa/MfaAdminController.java",
+  "line": 101,
+  "title": "SECR7-003 is mitigated but destructive reset still precedes durable audit",
+  "scenario": "OTP deletion succeeds, then the process terminates before audit insertion, or the audit insert fails after provider changes.",
+  "expected": "Every destructive reset has a durable attempt record that survives partial failure and supports reconciliation.",
+  "actual": "The reset timestamp is committed first, but it is an overwritten per-user marker without attempt reason or progress. Partial and successful audit records are inserted only after remote side effects; the catch-path audit can itself fail.",
+  "evidence": "MfaAdminController.java:101-120 performs deletion before either audit record. MfaPolicyService.java:116-120 upserts only the latest reset time/admin. JdbcAuditLog.java:21-27 directly inserts the event. MfaResetAuditIntegrationTest.java:88-110 covers provider failure with a healthy audit store, not audit failure or process termination.",
+  "suggested_fix": "Persist a reset attempt and reason before remote mutation, then update completion/progress with durable reconciliation for interrupted operations.",
+  "repro_test": "Inject failure into audit persistence after successful credential deletion and terminate a reset between deletion and final audit; verify a durable attempt remains discoverable."
+ },
+ {
+  "id": "SECR8-003",
+  "severity": "High",
+  "component": "Reset revocation and privileged assurance",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/StaffAssurance.java",
+  "line": 39,
+  "title": "Pre-reset bearer proofs still authorize privileged actions under OPTIONAL policy",
+  "scenario": "An attacker holds a recently stepped-up bearer token for a staff account with security.mfa_policy or security.mfa_reset. Another administrator resets that account. STAFF remains OPTIONAL and the victim's preference is off, as allowed by preview defaults. The attacker reuses the unexpired token to downgrade policy or reset another account.",
+  "expected": "Administrative recovery invalidates the victim's earlier MFA proofs for privileged assurance as well as category-policy enforcement.",
+  "actual": "The policy filter checks the reset epoch only when decision.required() is true. StaffAssurance checks MFA claims and recency without consulting reset_at, so the token still satisfies privileged method authorization until token expiry or the recency window ends. A partial reset can also leave application sessions intact because session deletion follows provider logout.",
+  "evidence": "MfaEnforcementFilter.java:42-44 gates epoch validation on required(). StaffAssurance.java:38-45 ignores reset state. MfaAdminController.java:73,80 uses that assurance for policy changes and resets; :102-107 can fail before application-session deletion. docs/security/mfa-policy.md acknowledges pre-reset tokens still count for separate staff assurance.",
+  "suggested_fix": "Make privileged assurance validate the account reset epoch regardless of category policy. Attempt local session invalidation independently of provider failure.",
+  "repro_test": "Under OPTIONAL with preference off, reset a privileged account and replay its earlier MFA bearer token against policy update and another-account reset; both must require fresh post-reset MFA. Repeat with provider deletion/logout failure and an existing web session."
+ },
+ {
+  "id": "SECR8-004",
+  "severity": "Medium",
+  "component": "Local development secret handling",
+  "file": "scripts/dev.sh",
+  "line": 63,
+  "title": "Generated local realm exposes the new user-management client secret to other host users",
+  "scenario": "On a shared development host with traversable workspace ancestors, another local user reads infra/.generated/identity/matbakhy-realm.json after dev.sh renders it, then uses the service-account credential against the loopback Keycloak endpoint.",
+  "expected": "Generated admin credentials remain inaccessible to unrelated host users.",
+  "actual": "The generated directory and identity subdirectory are explicitly mode 755 and the realm is mode 644. The realm contains the rendered admin client secret, whose service account has manage-users. Initial .env creation also writes before chmod 600 without first establishing a restrictive umask.",
+  "evidence": "scripts/dev.sh:38-44 writes .env before chmod; :59-64 renders secrets and applies publicly readable permissions. infra/identity/matbakhy-realm.json:182-187 grants view-users/manage-users. infra/compose.yaml:33-36 exposes Keycloak on host loopback and mounts the generated directory. Preview deploy.sh:64-79 has an owner-only parent safeguard absent locally.",
+  "suggested_fix": "Set umask 077 before secret creation and keep an owner-only generated parent directory, using the preview bind-mount pattern or an equivalent container-readable arrangement.",
+  "repro_test": "On a synthetic shared-host fixture, run rendering and assert an unrelated UID cannot traverse/read generated secret files; check permissions without printing contents."
+ }
+]

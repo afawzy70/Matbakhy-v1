@@ -1,0 +1,35 @@
+{
+  "agent": "QA Engineer",
+  "commit": "72ebca3384604a6e5873cf344c2d8a84ebb15bd0",
+  "summary": "HEAD verified. JavaScript: 210 passed. Backend: 15 passed. Operations typecheck passed. Planning validation failed on four broken links. Controlled Python rerun confirmed host-directory errors disappear; broken-link failures remain. Media test review found no new determinism defect. Docker tests NOT_RUN locally. Evidence saved under docs/quality/stabilization/round5/.",
+  "commands": [
+    {"command": "python3 scripts/validate_blueprint.py", "exit_code": 1, "note": "Four broken links."},
+    {"command": "python3 scripts/check_scope.py", "exit_code": 1, "note": "Same broken links."},
+    {"command": "python3 scripts/check_migration_compat.py", "exit_code": 0, "note": "PASS."},
+    {"command": "python3 -m unittest discover -s scripts", "exit_code": 1, "note": "73 tests reported; two failures; one class-level Docker skip."},
+    {"command": "Controlled Python discovery excluding .aws/.codex from scope fixture", "exit_code": 1, "note": "Host inventory errors removed; two broken-link failures remain."},
+    {"command": "pnpm --config.engine-strict=false -C packages/design-tokens test", "exit_code": 0, "note": "47 passed."},
+    {"command": "pnpm --config.engine-strict=false -C packages/api-client test", "exit_code": 0, "note": "34 passed."},
+    {"command": "pnpm --config.engine-strict=false -C apps/customer-web test", "exit_code": 0, "note": "48 passed."},
+    {"command": "pnpm --config.engine-strict=false -C apps/operations-web test", "exit_code": 0, "note": "26 passed."},
+    {"command": "pnpm --config.engine-strict=false -C apps/customer-mobile test", "exit_code": 0, "note": "55 passed."},
+    {"command": "pnpm --config.engine-strict=false -C apps/operations-web typecheck", "exit_code": 0, "note": "PASS."},
+    {"command": "./mvnw -o -B -pl app -am test -Dtest='StaffAssuranceTest,AccountMapperStaffMfaTest,MediaInspectorPdfTest,OrderFingerprintTest' -Dsurefire.failIfNoSpecifiedTests=false", "exit_code": 0, "note": "backend directory; specified JDK; 15 passed."}
+  ],
+  "findings": [
+    {
+      "id": "QA5-001",
+      "severity": "Low",
+      "component": "QA evidence / planning validation",
+      "file": "docs/quality/stabilization/round3/qa-execution-report-r3.md",
+      "line": 34,
+      "title": "Relocated report contains four broken relative links",
+      "scenario": "Run blueprint validation, scope validation or Python discovery.",
+      "expected": "Evidence links resolve and baseline planning assertions pass.",
+      "actual": "Links at lines 34, 92, 107 and 109 resolve beneath round3 instead of its parent.",
+      "evidence": "Both validators fail with four Broken link errors. Controlled Python discovery retains these errors after host-directory exclusions.",
+      "suggested_fix": "Prefix the four destinations with ../ and rerun affected checks.",
+      "repro_test": "python3 scripts/validate_blueprint.py"
+    }
+  ]
+}

@@ -409,6 +409,17 @@ class IdentityIntegrationTest {
         assertThat(webGet(second, "/api/v1/me").statusCode()).as("other session unaffected").isEqualTo(200);
     }
 
+    /** D18: ending an account's application sessions after an MFA reset relies on sessions being indexed by the provider subject. */
+    @Test
+    void web_sessions_are_indexed_by_the_provider_subject() throws Exception {
+        OidcBrowser browser = webLogin("customer-a", KeycloakTestServer.PASSWORD_A);
+        assertThat(webGet(browser, "/api/v1/me").statusCode()).isEqualTo(200);
+        String session = new String(Base64.getDecoder().decode(browser.cookie("MATBAKHY_SESSION").orElseThrow()), StandardCharsets.UTF_8);
+        String indexed = jdbc.queryForObject("SELECT principal_name FROM spring_session WHERE session_id = ?", String.class, session);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM app_user WHERE issuer = ? AND subject = ?", Integer.class, KeycloakTestServer.issuer(), indexed))
+                .as("the session's principal name is a provider subject of a known account").isEqualTo(1);
+    }
+
     @Test
     void expired_web_session_is_denied() throws Exception {
         OidcBrowser browser = webLogin("customer-a", KeycloakTestServer.PASSWORD_A);

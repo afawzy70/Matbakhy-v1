@@ -46,6 +46,11 @@ export function loginUrl(returnTo: string): string {
   return `${API_BASE}/oauth2/authorization/keycloak?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
+/** Starts a Keycloak step-up (second factor; enrolment when none exists) and returns to {@code returnTo}. */
+export function stepUpUrl(returnTo: string): string {
+  return `${API_BASE}/oauth2/authorization/keycloak?stepUp=true&returnTo=${encodeURIComponent(returnTo)}`;
+}
+
 export function newIdempotencyKey(): string {
   return `ops-${crypto.randomUUID()}`;
 }
