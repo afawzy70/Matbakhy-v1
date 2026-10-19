@@ -77,7 +77,7 @@ cd apps/operations-web && STAGING_APP_URL=https://app.<domain> STAGING_OPS_URL=h
   STAGING_USER_PASSWORD=<PREVIEW_USER_PASSWORD from the server .env> pnpm exec playwright test -c playwright.staging.config.ts
 ```
 
-Test accounts (realm `matbakhy`, the same password): `preview-customer-1`, `preview-customer-2`, `preview-cook-1`, `preview-ops-1` (the bootstrap staff administrator) and `preview-ops-2` (a staff-style account without grants, for the E2E suite and for testing the grant workflow). A realm already imported before this change does not get `preview-ops-2` by itself; create it in Keycloak with the same password. Keycloak is administered through `docker compose exec identity /opt/keycloak/bin/kcadm.sh` or an SSH tunnel; its console and the master realm are not published.
+Test accounts (realm `matbakhy`, the same password): `preview-customer-1`, `preview-customer-2`, `preview-cook-1`, `preview-ops-1` (the bootstrap staff administrator) and `preview-ops-2` (a staff-style account without grants, for the E2E suite and for testing the grant workflow). A realm already imported before this change does not get `preview-ops-2` by itself; create it in Keycloak with the same password. Keycloak is administered through `docker compose exec identity /opt/keycloak/bin/kcadm.sh` or an SSH tunnel; its console is published only on the Preview's `kc-admin` host behind a required one-time password (docs/operations/14-keycloak-admin-console.md); the master realm is not on the customer host.
 
 ## 8. Letting people in
 

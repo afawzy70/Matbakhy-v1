@@ -84,11 +84,39 @@ id.{$PREVIEW_DOMAIN} {
 	route {
 		import headers
 		import customer_access
-		# Keycloak's admin console and the master realm are never published; administer Keycloak through an SSH tunnel
-		# (see docs/operations/06-web-preview.md).
+		# The admin console and the master realm are never served on the customer host: they live on kc-admin.* below.
 		@admin path /admin /admin/* /realms/master /realms/master/*
 		respond @admin 404
 		reverse_proxy identity:8080
+	}
+}
+
+# Keycloak admin console for the Preview (owner approval 2026-10-19; Preview only, never production). Deliberately NOT IP-restricted,
+# so the owner can sign in from a phone on mobile data; the protection is Keycloak's own: every master-realm sign-in needs the password
+# AND a one-time password (browser flow "matbakhy master browser"), the password grant is off for all master clients, failed sign-ins are
+# throttled, and Admin REST calls need a bearer token (401 without one). Only what the console needs is forwarded: /admin (console and
+# Admin REST), /realms/master (its sign-in) and the static assets. The matbakhy realm, the health and metrics endpoints (management port
+# 9000, never published) and everything else answer 404 here. The whole host answers 404 until admin-console.sh has hardened and verified
+# Keycloak and created /srv/flags/admin-console-public (fail closed; deleting that file closes the host again at once).
+kc-admin.{$PREVIEW_DOMAIN} {
+	route {
+		import headers
+		@closed {
+			not {
+				file {
+					root /srv/flags
+					try_files /admin-console-public
+				}
+			}
+		}
+		respond @closed "Not available" 404
+		redir / /admin/master/console/ 302
+		request_body {
+			max_size 10MB
+		}
+		@console path /admin /admin/* /realms/master /realms/master/* /resources/* /js/*
+		reverse_proxy @console identity:8080
+		respond 404
 	}
 }
 
