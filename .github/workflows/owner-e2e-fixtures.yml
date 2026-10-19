@@ -57,6 +57,8 @@ jobs:
           for f in $(ls $dir/migration/V*.sql | sed -E 's/.*\/V([0-9]+)__.*/\1 &/' | sort -n | cut -d' ' -f2); do
             echo "== $f"; psql -v ON_ERROR_STOP=1 --single-transaction -q -f "$f"
           done
+          # Flyway itself is not run here; afterMigrate expects its history table, so a stand-in is created for the grants only.
+          psql -v ON_ERROR_STOP=1 -q -c 'CREATE TABLE flyway_schema_history (installed_rank int)'
           sed 's/\${runtimeRole}/matbakhy_app/' $dir/migration/afterMigrate.sql | psql -v ON_ERROR_STOP=1 -q
           for f in $(ls $dir/devdata/R__*.sql | sort); do echo "== $f"; psql -v ON_ERROR_STOP=1 --single-transaction -q -f "$f"; done
       - name: First seed (seed-preview, owner E2E, MFA grants, slots)
