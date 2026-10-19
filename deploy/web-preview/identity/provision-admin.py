@@ -34,7 +34,7 @@ def main():
     os.makedirs(directory, mode=0o700, exist_ok=True)
     path = os.path.join(directory, name + ".private")
     if os.environ.get("REPLACE") == "1" and os.path.exists(path):
-        os.remove(path)
+        os.replace(path, path + ".replaced")  # kept until the new account exists; the operator deletes it
     fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
     with os.fdopen(fd, "w") as f:
         f.write("Keycloak administrator for the Matbakhy Preview (keep private; delete this file once the authenticator app is set up)\n"

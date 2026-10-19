@@ -146,6 +146,33 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertLess(harden.index("notBefore="), harden.index("logout-all"))
         self.assertIn('if [ "$changed" = 1 ]', harden, "revocation happens on a change, not on every release")
 
+    def test_revocation_cannot_be_skipped_by_an_interrupted_earlier_run_and_purge_deletes_the_client_last(self):
+        text = KCADM.read_text()
+        harden = text[text.index("harden() {"):text.index("rollback() {")]
+        self.assertIn("matbakhyHardened", harden)
+        self.assertLess(harden.index("logout-all"), harden.index("attributes.matbakhyHardened=yes"), "the marker is set only after revocation")
+        self.assertIn("CONFIGURE_TOTP -r \"$REALM\" --fields enabled", harden)
+        rollback = text[text.index("rollback() {"):text.index("# Synthetic verification administrators")]
+        self.assertIn("attributes.matbakhyHardened=no", rollback)
+        self.assertIn("CONFIGURE_TOTP -r \"$REALM\" -s enabled=true", rollback)
+        self.assertLess(rollback.index("attributes.frontendUrl="), rollback.index('kc delete "clients/$oid"'))
+        self.assertLess(rollback.index("login\n"), rollback.index('kc delete "clients/$oid"'))
+
+    def test_the_env_file_is_never_world_readable_while_the_operations_secret_is_added(self):
+        text = OPERATOR.read_text()
+        func = text[text.index("ensure_ops_secret() {"):text.index("run_kc() {")]
+        self.assertIn("umask 077; mktemp", func)
+        self.assertIn('trap \'rm -f "$tmp"\' EXIT', func)
+        self.assertLess(func.index("umask 077; mktemp"), func.index("mv \"$tmp\""))
+
+    def test_replacing_an_administrator_prepares_the_new_credentials_first_and_protects_the_last_one(self):
+        text = OPERATOR.read_text()
+        create = text[text.index("  create-admin)"):text.index("  disable)")]
+        self.assertLess(create.index("provision-admin.py new-admin"), create.index("run_kc admin-delete"))
+        self.assertIn("ALLOW_LAST_ADMIN", create)
+        self.assertLess(create.index("ALLOW_LAST_ADMIN"), create.index("run_kc admin-delete"))
+        self.assertIn("the partly created account was removed", KCADM.read_text())
+
     def test_a_certificate_still_pending_does_not_fail_the_smoke_under_set_e(self):
         text = SMOKE.read_text()
         func = text[text.index("kc_code() {"):text.index("kc_state=")]

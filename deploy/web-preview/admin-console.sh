@@ -32,13 +32,16 @@ SCRIPT=identity/admin-console.kcadm.sh
 . ./identity/mfa-state.sh
 
 ensure_ops_secret() {
-  # deploy.sh render adds it to an older .env; do the same here so the script also works on its own.
+  # deploy.sh render adds it to an older .env; do the same here so the script also works on its own. The new file is created private from the
+  # start (umask 077, unique name) and replaces .env only when completely written.
   if [ -z "${KEYCLOAK_OPS_CLIENT_SECRET:-}" ] || [ "$KEYCLOAK_OPS_CLIENT_SECRET" = REPLACE_ME ]; then
-    KEYCLOAK_OPS_CLIENT_SECRET="$(openssl rand -hex 32)"
-    grep -v '^KEYCLOAK_OPS_CLIENT_SECRET=' "$ENV_FILE" > "$ENV_FILE.tmp.$$" || true
-    printf 'KEYCLOAK_OPS_CLIENT_SECRET=%s\n' "$KEYCLOAK_OPS_CLIENT_SECRET" >> "$ENV_FILE.tmp.$$"
-    chmod 600 "$ENV_FILE.tmp.$$"
-    mv "$ENV_FILE.tmp.$$" "$ENV_FILE"
+    secret="$(openssl rand -hex 32)" && [ -n "$secret" ] || die "cannot generate the operations client secret"
+    tmp="$(umask 077; mktemp "$ENV_FILE.XXXXXX")" || die "cannot create a private temporary file next to $ENV_FILE"
+    trap 'rm -f "$tmp"' EXIT
+    { grep -v '^KEYCLOAK_OPS_CLIENT_SECRET=' "$ENV_FILE" || true; printf 'KEYCLOAK_OPS_CLIENT_SECRET=%s\n' "$secret"; } > "$tmp" || die "cannot write $tmp"
+    chmod 600 "$tmp" && mv "$tmp" "$ENV_FILE" || die "cannot replace $ENV_FILE"
+    trap - EXIT
+    KEYCLOAK_OPS_CLIENT_SECRET="$secret"
     export KEYCLOAK_OPS_CLIENT_SECRET
   fi
 }
@@ -133,11 +136,17 @@ case "${1:-}" in
     [ -n "$name" ] || die "usage: ./admin-console.sh create-admin <name>   (REPLACE=1 replaces an existing administrator)"
     dir="$GENERATED_DIR/admin-console"
     (umask 077; mkdir -p "$dir"); chmod 700 "$dir"
+    if [ "${REPLACE:-0}" = 1 ]; then
+      # Replacing deletes the account first (an OTP credential cannot be changed in place), so never do it to the last administrator who can sign in.
+      others="$(run_kc status | grep -E '^admin\..*=otp$' | grep -vc "^admin\.$name=" || true)"
+      [ "${others:-0}" -ge 1 ] || [ "${ALLOW_LAST_ADMIN:-0}" = 1 ] \
+        || die "refusing to replace '$name': no other administrator can sign in (create another first, or ALLOW_LAST_ADMIN=1 knowing the console is unusable until this finishes)"
+    fi
+    body="$(python3 identity/provision-admin.py new-admin "$dir" "$name")" || die "cannot generate the administrator (an old $dir/$name.private may exist: remove it after checking it is no longer needed, or use REPLACE=1)"
     if [ "${REPLACE:-0}" = 1 ]; then run_kc admin-delete "$name"; fi
-    body="$(python3 identity/provision-admin.py new-admin "$dir" "$name")" || die "cannot generate the administrator (an old $dir/$name.private may exist: remove it or use REPLACE=1)"
     if ! printf '%s' "$body" | run_kc admin-create; then
       rm -f "$dir/$name.private"
-      die "the administrator was not created"
+      die "the administrator was not created (nothing was kept)"
     fi
     echo "Private file (mode 600): $dir/$name.private - read it on the server, set up the authenticator app with the key, sign in at"
     echo "https://kc-admin.$PREVIEW_DOMAIN, then delete the file. Do not paste its contents into chats, tickets or logs."

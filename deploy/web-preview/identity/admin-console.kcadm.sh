@@ -174,7 +174,10 @@ harden() {
     flow_complete || die "the flow tree is not complete after building it; the browser flow was NOT changed"
     echo "flow: created and verified"
   fi
+  # Revocation (step 6) runs whenever the realm does not carry the completion marker, so an earlier run that stopped half way cannot leave
+  # sessions from the password-only time behind; the marker is set only after revocation and cleared by rollback.
   changed=0
+  [ "$(kc get "realms/$REALM" --fields 'attributes(matbakhyHardened)' --format csv --noquotes </dev/null | head -1)" = yes ] || changed=1
   if [ "$(bound_flow)" != "$TOP" ]; then
     kc update "realms/$REALM" -s browserFlow="$TOP" >/dev/null
     echo "browserFlow: bound to '$TOP'"
@@ -186,6 +189,7 @@ harden() {
   # 4. Nobody can enrol a one-time password over the Internet: with the required action disabled, an account that has no OTP cannot sign
   #    in at all (so knowing a password is never enough, not even for the first sign-in). Administrators get their OTP from the server
   #    (admin-create), never from the public page.
+  [ "$(kc get authentication/required-actions/CONFIGURE_TOTP -r "$REALM" --fields enabled --format csv --noquotes </dev/null | head -1)" = false ] || changed=1
   kc update authentication/required-actions/CONFIGURE_TOTP -r "$REALM" -s enabled=false -s defaultAction=false >/dev/null
   echo "required action CONFIGURE_TOTP: disabled (no public enrolment)"
 
@@ -218,7 +222,9 @@ harden() {
     login # the token used so far predates the new not-before time
     kc create logout-all -r "$REALM" >/dev/null || die "cannot end the sessions that predate the hardening"
     echo "sessions and tokens issued before the hardening: revoked"
+    login # ending every session also ended this run's own
   fi
+  kc update "realms/$REALM" -s attributes.matbakhyHardened=yes >/dev/null
   echo "hardened"
 }
 
@@ -226,17 +232,21 @@ rollback() {
   login
   target="${PREVIOUS_FLOW:-browser}"
   flow_exists "$target" || die "flow '$target' to bind again does not exist"
-  kc update "realms/$REALM" -s browserFlow="$target" >/dev/null
+  kc update "realms/$REALM" -s browserFlow="$target" -s attributes.matbakhyHardened=no >/dev/null
   echo "browserFlow: bound back to '$target'"
   delete_flow
   echo "flow '$TOP': removed"
+  kc update authentication/required-actions/CONFIGURE_TOTP -r "$REALM" -s enabled=true >/dev/null
+  echo "required action CONFIGURE_TOTP: enabled again (Keycloak default)"
   cid="$(client_uuid admin-cli)"
   [ -z "$cid" ] || { kc update "clients/$cid" -r "$REALM" -s directAccessGrantsEnabled=true >/dev/null; echo "client admin-cli: password grant re-enabled"; }
   if [ "${PURGE:-0}" = "1" ]; then
-    oid="$(client_uuid "$OPS_CLIENT")"
-    [ -z "$oid" ] || { kc delete "clients/$oid" -r "$REALM" >/dev/null; echo "client $OPS_CLIENT: removed"; }
+    # The frontend URL goes first and the operations client last: the client's own token stops working once it is deleted.
     kc update "realms/$REALM" -s 'attributes.frontendUrl=' >/dev/null
     echo "frontend URL cleared"
+    login
+    oid="$(client_uuid "$OPS_CLIENT")"
+    [ -z "$oid" ] || { kc delete "clients/$oid" -r "$REALM" >/dev/null; echo "client $OPS_CLIENT: removed"; }
   fi
 }
 
@@ -276,7 +286,11 @@ admin_create() {
     die "the administrator '$name' already exists (use REPLACE=1 ./admin-console.sh create-admin $name to replace it)"
   fi
   printf '%s' "$body" | kc_body create users -r "$REALM" -i >/dev/null || die "cannot create the administrator"
-  kc add-roles -r "$REALM" --uusername "$name" --rolename admin >/dev/null </dev/null || die "cannot give the administrator the admin role"
+  if ! kc add-roles -r "$REALM" --uusername "$name" --rolename admin >/dev/null </dev/null; then
+    uid="$(kc get users -r "$REALM" -q "username=$name" -q exact=true --fields id --format csv --noquotes </dev/null | head -1)"
+    [ -z "$uid" ] || kc delete "users/$uid" -r "$REALM" </dev/null >/dev/null || true
+    die "cannot give the administrator the admin role; the partly created account was removed"
+  fi
   echo "administrator '$name': created with a password and a one-time password (both from the private file)"
 }
 
