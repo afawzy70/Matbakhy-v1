@@ -1,12 +1,11 @@
-name: Owner E2E fixtures on the Contabo preview (manual)
+name: Owner E2E fixtures on the Contabo preview (request file)
+# Runs when deploy/web-preview/owner-e2e-run.request changes on develop. Its first word is the mode: plan = read-only; apply = verified backup,
+# Keycloak partial import (existing users skipped), SQL seeds, slot refresh, read-only reconciliation. (workflow_dispatch would need the file on
+# main, which this project does not touch.)
 on:
-  workflow_dispatch:
-    inputs:
-      mode:
-        description: "plan = read-only; apply = verified backup, Keycloak partial import, SQL seeds, slot refresh, reconciliation"
-        type: choice
-        options: [plan, apply]
-        default: plan
+  push:
+    branches: [develop]
+    paths: ['deploy/web-preview/owner-e2e-run.request']
 
 permissions:
   contents: read
@@ -26,8 +25,14 @@ jobs:
       USER: ${{ secrets.STAGING_SSH_USER }}
       SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
       HOST_PUBKEY: ${{ secrets.STAGING_SSH_HOST_PUBKEY }}
-      MODE: ${{ inputs.mode }}
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Read the requested mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          mode=$(head -n1 deploy/web-preview/owner-e2e-run.request | awk '{print $1}')
+          case "$mode" in plan|apply) echo "MODE=$mode" >> "$GITHUB_ENV" ;; *) echo "::error::first word must be plan or apply"; exit 1 ;; esac
       - name: Configure verified SSH host
         shell: bash
         run: |
