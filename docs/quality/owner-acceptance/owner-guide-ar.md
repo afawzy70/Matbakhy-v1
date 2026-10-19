@@ -15,7 +15,7 @@
 
 ## 2) الحسابات (الباسوردات مش هنا)
 - موجودة من الأول: `preview-customer-1` / `preview-customer-2` (عملاء)، `preview-cook-1` (مطبخ المعاينة)، `preview-ops-1` (إداري)، `preview-ops-2` (موظف من غير صلاحيات). الباسورد = `PREVIEW_USER_PASSWORD` في `.env` على السيرفر.
-- بتتجهّز بعد تشغيل `owner-e2e-provision.sh apply`: `owner-e2e-cook-b`, `owner-e2e-cook-pending`, `owner-e2e-support`, `owner-e2e-ops`, `owner-e2e-finance`, `owner-e2e-admin-b`, `owner-e2e-multirole`, `owner-e2e-cust-new-1..4`. باسوردات كل واحد في ملف `credentials.private.json` على السيرفر (صلاحيات 600). **لسه ما اتجهّزتش.**
+- بتتجهّز بعد تشغيل `owner-e2e-provision.sh apply`: `owner-e2e-cook-b`, `owner-e2e-cook-pending`, `owner-e2e-support`, `owner-e2e-ops`, `owner-e2e-finance`, `owner-e2e-admin-b`, `owner-e2e-multirole`, `owner-e2e-cust-new-1..4`. باسوردات كل واحد في ملف `credentials.private.json` في `/srv/matbakhy-backups/owner-e2e-private/<run>/` على السيرفر (صلاحيات 600). **لسه ما اتجهّزتش.**
 
 ## 3) قبل ما تبدأ
 1. افتح نافذة خاصة (Incognito) لكل حساب.
