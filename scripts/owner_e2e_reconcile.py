@@ -6,7 +6,9 @@ deploy/web-preview/reconcile-owner-e2e.sql through psql (connection from the usu
 and exits 1 when any check has violations. Changes nothing; holds no credentials.
 """
 import json
+import os
 import pathlib
+import shlex
 import subprocess
 import sys
 
@@ -24,9 +26,14 @@ def expected():
 
 def main():
     users, grants = expected()
-    cmd = ["psql", "-X", "-At", "-F", "|", "-v", "ON_ERROR_STOP=1",
-           "-v", "expected_users=" + ",".join(users), "-v", "expected_grants=" + ",".join(grants), "-f", str(SQL)]
-    out = subprocess.run(cmd, capture_output=True, text=True)
+    # PSQL_CMD (operator, e.g. "docker compose ... exec -T postgres psql -U matbakhy -d matbakhy") runs psql elsewhere; the SQL then travels on stdin.
+    base = shlex.split(os.environ["PSQL_CMD"]) if os.environ.get("PSQL_CMD") else ["psql"]
+    cmd = base + ["-X", "-At", "-F", "|", "-v", "ON_ERROR_STOP=1",
+                  "-v", "expected_users=" + ",".join(users), "-v", "expected_grants=" + ",".join(grants)]
+    if os.environ.get("PSQL_CMD"):
+        out = subprocess.run(cmd + ["-f", "-"], input=SQL.read_text(encoding="utf-8"), capture_output=True, text=True)
+    else:
+        out = subprocess.run(cmd + ["-f", str(SQL)], capture_output=True, text=True)
     if out.returncode != 0:
         print(out.stderr, file=sys.stderr)
         return 1
