@@ -1,0 +1,72 @@
+name: Owner E2E fixtures on the Contabo preview (request file)
+# Runs when deploy/web-preview/owner-e2e-run.request changes on develop. Its first word is the mode: plan = read-only; apply = verified backup,
+# Keycloak partial import (existing users skipped), SQL seeds, slot refresh, read-only reconciliation. (workflow_dispatch would need the file on
+# main, which this project does not touch.)
+on:
+  push:
+    branches: [develop]
+    paths: ['deploy/web-preview/owner-e2e-run.request']
+
+permissions:
+  contents: read
+  actions: read
+
+# Shares the deployment's lock: fixtures never run while a release or the admin-console enable step is changing the same Keycloak or database.
+concurrency:
+  group: matbakhy-preview-deploy
+  cancel-in-progress: false
+
+jobs:
+  provision:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: preview
+    env:
+      HOST: ${{ secrets.STAGING_SSH_HOST }}
+      USER: ${{ secrets.STAGING_SSH_USER }}
+      SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      HOST_PUBKEY: ${{ secrets.STAGING_SSH_HOST_PUBKEY }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Read the requested mode
+        shell: bash
+        run: |
+          set -euo pipefail
+          mode=$(head -n1 deploy/web-preview/owner-e2e-run.request | awk '{print $1}')
+          case "$mode" in plan|apply) echo "MODE=$mode" >> "$GITHUB_ENV" ;; *) echo "::error::first word must be plan or apply"; exit 1 ;; esac
+      - name: Wait for the deployment of this exact commit (it ships the script and fixture files to the server)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 90); do
+            state=$(gh api "repos/$REPO/actions/workflows/deploy-preview.yml/runs?head_sha=$SHA&per_page=10" \
+              --jq '[.workflow_runs[]] | if length == 0 then "pending" elif any(.conclusion == "success") then "success" elif any(.status == "completed") then "failed" else "pending" end')
+            case "$state" in
+              success) echo "deployment of $SHA finished"; exit 0 ;;
+              failed) echo "::error::the deployment of this commit did not succeed"; exit 1 ;;
+              *) sleep 30 ;;
+            esac
+          done
+          echo "::error::timed out waiting for the deployment"; exit 1
+      - name: Configure verified SSH host
+        shell: bash
+        run: |
+          set -euo pipefail
+          for v in HOST USER SSH_KEY HOST_PUBKEY; do
+            [[ -n "${!v}" ]] || { echo "::error::Missing $v"; exit 1; }
+          done
+          install -d -m 700 ~/.ssh
+          (umask 077; printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519)
+          printf '%s %s\n' "$HOST" "$HOST_PUBKEY" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+      - name: Run the fixture script on the server (synthetic data only; passwords stay in a mode-600 file there)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The script and the fixture files come from the release already deployed to /srv/matbakhy-staging; this job copies nothing and prints no credential.
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 "$USER@$HOST" \
+            "cd /srv/matbakhy-staging/deploy/web-preview && ./owner-e2e-provision.sh $MODE"

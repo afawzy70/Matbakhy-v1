@@ -17,9 +17,9 @@ GENERATED_DIR="${GENERATED_DIR:-/srv/matbakhy-preview/generated}"
 BACKUP_DIR="${BACKUP_DIR:-/srv/matbakhy-backups}"
 # One writer at a time on this server (deployments and the admin console take the same lock in their own scripts).
 LOCK="$BACKUP_DIR/.preview-mutation.lock"
-mkdir -p "$BACKUP_DIR"
-exec 9>"$LOCK"
-command -v flock >/dev/null 2>&1 && { flock -n 9 || die "another preview change holds $LOCK"; }
+command -v flock >/dev/null 2>&1 || die "flock is required for the shared change lock"
+mkdir -p "$BACKUP_DIR" && { exec 9>"$LOCK"; } 2>/dev/null || die "cannot create the shared lock $LOCK"
+flock -n 9 || die "another preview change holds $LOCK"
 ISSUER="https://id.$PREVIEW_DOMAIN/realms/matbakhy"
 psql_app() { compose exec -T postgres psql -U matbakhy -d matbakhy -v ON_ERROR_STOP=1 -v issuer="$ISSUER" "$@"; }
 PSQL_CMD="docker compose --env-file $ENV_FILE -f compose.yaml ${COMPOSE_OVERRIDE:+-f $COMPOSE_OVERRIDE} exec -T postgres psql -U matbakhy -d matbakhy"

@@ -110,9 +110,9 @@ verify() {
 case "${1:-}" in
   enable|rollback|create-admin)
     if [ -z "${MATBAKHY_LOCK_HELD:-}" ]; then  # enable calls create-admin itself: the child must not wait for its parent's lock
-      mkdir -p "$BACKUP_DIR"
-      exec 9>"$BACKUP_DIR/.preview-mutation.lock"
-      command -v flock >/dev/null 2>&1 && { flock -n 9 || die "another preview change holds $BACKUP_DIR/.preview-mutation.lock"; }
+      command -v flock >/dev/null 2>&1 || die "flock is required for the shared change lock"
+      mkdir -p "$BACKUP_DIR" && { exec 9>"$BACKUP_DIR/.preview-mutation.lock"; } 2>/dev/null || die "cannot create the shared lock in $BACKUP_DIR"
+      flock -n 9 || die "another preview change holds $BACKUP_DIR/.preview-mutation.lock"
       MATBAKHY_LOCK_HELD=1; export MATBAKHY_LOCK_HELD
     fi ;;
 esac
