@@ -18,7 +18,7 @@ Common items. **Actor:** staff with the permission named per journey; cook and c
 7. **API.** `POST /api/v1/cook/orders/{orderId}/cash-reports` (063), `GET /api/v1/ops/finance/cash-reports` (082), `POST /api/v1/ops/finance/cash-reports/{reportId}/verification` (083).
 8. **Backend.** `backend/modules/finance/src/main/java/com/matbakhy/finance/web/CashController.java` → `internal/CashService.java` (`report`, `verify`, `refuseSelfVerification`).
 9. **DB.** `cash_obligation` (V11), `cash_report` (V13).
-10. **Transitions.** Cash obligation `DUE → REPORTED → VERIFIED | DISPUTED`; `NOT_DUE` for rejected, cancelled or expired orders.
+10. **Transitions.** Cash obligation `DUE → REPORTED → VERIFIED | DISPUTED`; `NOT_DUE` for rejected or expired orders and for cook cancellation before preparation. Operations exception cancellation (after preparation starts) leaves the cash obligation unchanged for manual finance review (`OrderLifecycleService.opsExceptionCancel`).
 11. **Errors.** `STATE_CONFLICT` (report before handover, already reported, already decided), `VERSION_CONFLICT`.
 12. **Tests.** `CashAndLedgerIntegrationTest.java`, `FinanceOperationsIntegrationTest.java`.
 13. **Owner E2E.** E2E-FIN-038, E2E-FIN-043, E2E-FIN-102, E2E-FIN-114; J2.
@@ -45,7 +45,7 @@ Common items. **Actor:** staff with the permission named per journey; cook and c
 
 ## FS-3 Refunds, settlements and statements (finance)
 
-1. **Goal.** Refund verified platform-collected cash in full, record settlements, read statements.
+1. **Goal.** Record the kitchen-to-customer refund of verified kitchen-collected cash in full (Matbakhy never holds the cash), record commission-remittance settlements (kitchen pays platform; dormant at zero commission), read statements.
 2. **Actor.** `finance.refund_approve`, `finance.settlement`, `finance.read`.
 3. **Prerequisites.** Refund: cash state `VERIFIED` with a verified amount; requester and approver differ.
 4. **Start.** Tab Finance: enter a kitchen UUID to load its statement; refund and settlement forms under it (`apps/operations-web/src/ops/Finance.tsx`).
@@ -53,7 +53,7 @@ Common items. **Actor:** staff with the permission named per journey; cook and c
 6. **Responses.** Only the exact refundable amount is accepted (`FULL_REFUND_REQUIRED`, `OVER_REFUND`); statements show no commission under the zero-commission policy (`hasCommission` in `apps/operations-web/src/api.ts`); under zero commission settlements are dormant, zero-amount entries cannot be batched (E2E-FIN-110).
 7. **API.** 084, 085, 086, 087, 088 (`/api/v1/ops/finance/refunds`, `…/refunds/{refundId}/action`, `…/statements`, `…/settlements`, `…/settlements/{batchId}/action`); cook side `GET /api/v1/cook/statements` (064).
 8. **Backend.** `FinanceOpsController.java` → `FinanceOpsService.java`; `StatementController.java` → `StatementService.java`; `LedgerService.java`, `LedgerPostingJob.java`.
-9. **DB.** `refund`, `settlement_batch`, `settlement_line` (V18), `ledger_group` (kind `COMMISSION` only), `ledger_entry` (V13), `cash_report`.
+9. **DB.** `refund`, `settlement_batch`, `settlement_line` (V18), `ledger_group` (kinds `COMMISSION` and `COMMISSION_REVERSAL`, V18), `ledger_entry` (V13), `cash_report`.
 10. **Transitions.** Refund `REQUESTED → APPROVED → PAID → VERIFIED` or `REJECTED` (approver ≠ requester; verifier ≠ payer). Settlement `DRAFT → REVIEWED → PAYMENT_RECORDED → RECONCILED | CANCELLED`.
 11. **Errors.** `VERSION_CONFLICT`, `STATE_CONFLICT`, `FORBIDDEN` (separation), `VALIDATION_FAILED`.
 12. **Tests.** `FinanceOperationsIntegrationTest.java`, `ZeroCommissionIntegrationTest.java`, `apps/operations-web/e2e/money-reflow.e2e.ts`.
@@ -81,5 +81,5 @@ Common items. **Actor:** staff with the permission named per journey; cook and c
 ## Known limitations and documentation gaps
 
 * `docs/product/06-permissions.md` names `finance.settlement_verify`; code uses `finance.settlement`.
-* The ledger only supports kind `COMMISSION`; with zero commission it carries no customer money. Deposits are never in the ledger (E2E-FIN-045).
+* The ledger supports kinds `COMMISSION` and `COMMISSION_REVERSAL` (written when a refund is verified; `FinanceOpsService`, asserted in `FinanceOperationsIntegrationTest`). Under zero commission both carry zero amounts, so the bookkeeping exists but moves no money. Settlement direction is `COOK_PAYS_PLATFORM` (kitchen remits commission to the platform), never a payout to the kitchen. Deposits are never in the ledger (E2E-FIN-045).
 * Cash-report verification UI is missing (FS-1).

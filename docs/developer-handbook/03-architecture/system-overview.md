@@ -75,7 +75,7 @@ So today the only deployed environment is the preview. No production environment
 
 * **Request ID.** `RequestIdFilter` accepts a well-formed `X-Request-Id` or generates one, puts it into the log MDC, error bodies and the response header, and stores it on outbox events so asynchronous work can be correlated.
 * **Errors.** One error body for everything (`ApiError`) with stable `ErrorCode` values such as `PRICE_CHANGED` or `STEP_UP_REQUIRED`; clients localise the code. See [backend architecture](backend-architecture.md#validation-and-error-handling).
-* **Idempotency.** Mutating commands take an `Idempotency-Key` header and are replay-safe for 24 hours; order placement additionally has a permanent unique `(customer_id, client_request_id)`.
+* **Idempotency.** Mutating commands take an `Idempotency-Key` header and are replay-safe while the `idempotency_record` row exists (its 24-hour `expires_at` is recorded but not enforced); order placement additionally has a permanent unique `(customer_id, client_request_id)`.
 * **Time.** Instants are UTC in the database; business scheduling and display use `Africa/Cairo`.
 * **Money.** `bigint` piastres everywhere (`*_minor` columns, `Money` in `backend/shared`); no floating point.
 * **Append-only history.** Orders' events, audit, ledger, meal revisions and config changes are protected by database triggers and by revoking `UPDATE`/`DELETE` from the runtime database role (`backend/app/src/main/resources/db/migration/afterMigrate.sql`).

@@ -13,10 +13,10 @@ money and deposits in [payment implementation](payment-implementation.md).
 
 | Layer | Scope | Lifetime | Stored in | Code |
 |---|---|---|---|---|
-| `Idempotency-Key` header | actor + command (`order.place`) + key; request body hashed (SHA-256 of the JSON) | 24 h (`JdbcIdempotentCommands.RETENTION`) | table `idempotency_record` (V1) | `backend/app/src/main/java/com/matbakhy/app/idempotency/JdbcIdempotentCommands.java:49` |
+| `Idempotency-Key` header | actor + command (`order.place`) + key; request body hashed (SHA-256 of the JSON) | `expires_at` is stamped 24 h ahead (`JdbcIdempotentCommands.RETENTION`) but never read: records are not expired or purged by current code, so replay works for as long as the row exists | table `idempotency_record` (V1) | `backend/app/src/main/java/com/matbakhy/app/idempotency/JdbcIdempotentCommands.java:49` |
 | `clientRequestId` + request fingerprint | `(customer_id, client_request_id)` unique per customer | permanent | `customer_order.client_request_id`, `customer_order.request_fingerprint` (V29) | `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java:155` |
 
-Why two: the header record expires, but a client that was offline for days must still be unable to create a second order for
+Why two: the header record is only retention metadata (24 h `expires_at`, no automatic expiry or purge today, see Known limitations) and can be removed by an operator or a future purge job, and a client that was offline for days must still be unable to create a second order for
 the same logical attempt (`BR-023`, `BR-024`). V29 (`backend/app/src/main/resources/db/migration/V29__order_request_fingerprint.sql`)
 added the durable fingerprint so reuse of a `clientRequestId` with a materially different request is a deterministic conflict
 even after the cache is gone. Orders placed before V29 have a null fingerprint and keep the older quote-only comparison

@@ -318,10 +318,10 @@ stateDiagram-v2
         DISPUTED --> KITCHEN_RECEIPT_REPORTED: kitchen reports receipt
         WAITING_FOR_DEPOSIT --> DISPUTED: kitchen reports not received or mismatch
         CUSTOMER_TRANSFER_REPORTED --> DISPUTED: kitchen reports problem
-        WAITING_FOR_DEPOSIT --> EXPIRED: order ended with no report
-        CUSTOMER_TRANSFER_REPORTED --> RECONCILE_PENDING: order ended
-        KITCHEN_RECEIPT_REPORTED --> RECONCILE_PENDING: order ended
-        DISPUTED --> RECONCILE_PENDING: order ended
+        WAITING_FOR_DEPOSIT --> EXPIRED: order ended unsuccessfully (REJECTED, EXPIRED, CANCELLED, DELIVERY_FAILED) with no report
+        CUSTOMER_TRANSFER_REPORTED --> RECONCILE_PENDING: order ended unsuccessfully
+        KITCHEN_RECEIPT_REPORTED --> RECONCILE_PENDING: order ended unsuccessfully
+        DISPUTED --> RECONCILE_PENDING: order ended unsuccessfully
         DISPUTED --> REFUND_OWED: staff decision with reason
         RECONCILE_PENDING --> REFUND_OWED: staff decision with reason
         DISPUTED --> CLOSED_NO_FUNDS: staff decision with reason
@@ -339,7 +339,7 @@ stateDiagram-v2
     }
 ```
 
-Caption: derived from `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/PaymentService.java`, `backend/app/src/main/resources/db/migration/V24__deposit_payments.sql`, `backend/app/src/main/resources/db/migration/V25__payment_reconciliation.sql`, `backend/app/src/main/resources/db/migration/V13__cash_and_ledger.sql`, `backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java`. `DISPUTED_CASH` is the `DISPUTED` value of `cash_obligation` and `cash_report`, renamed here only because Mermaid state names must be unique. Every deposit state is a statement by the customer, kitchen or staff; none means "bank verified" and no Matbakhy account holds the money. Settlement batches (`settlement_batch`: DRAFT, REVIEWED, PAYMENT_RECORDED, RECONCILED, CANCELLED) group commission ledger groups; with the zero-commission rule (`backend/app/src/main/resources/db/migration/V23__launch_commission.sql`) they are dormant for live data. See [pricing and payments](../01-business/pricing-and-payments.md).
+Caption: derived from `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/PaymentService.java`, `backend/app/src/main/resources/db/migration/V24__deposit_payments.sql`, `backend/app/src/main/resources/db/migration/V25__payment_reconciliation.sql`, `backend/app/src/main/resources/db/migration/V13__cash_and_ledger.sql`, `backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java`. `DISPUTED_CASH` is the `DISPUTED` value of `cash_obligation` and `cash_report`, renamed here only because Mermaid state names must be unique. The "order ended unsuccessfully" transitions run only for REJECTED, EXPIRED, CANCELLED and DELIVERY_FAILED (`OrderLifecycleService.java:369` skips COMPLETED), so a completed order keeps its receipt state. Every deposit state is a statement by the customer, kitchen or staff; none means "bank verified" and no Matbakhy account holds the money. Settlement batches (`settlement_batch`: DRAFT, REVIEWED, PAYMENT_RECORDED, RECONCILED, CANCELLED) group commission ledger groups; with the zero-commission rule (`backend/app/src/main/resources/db/migration/V23__launch_commission.sql`) they are dormant for live data. See [pricing and payments](../01-business/pricing-and-payments.md).
 
 ## 12 Database relationships
 
@@ -375,7 +375,7 @@ erDiagram
     customer_order ||--o{ ledger_group : "commission posting"
     ledger_group ||--|{ ledger_entry : "double entry"
     settlement_batch ||--o{ settlement_line : contains
-    ledger_group ||--o| settlement_line : "once"
+    ledger_group ||--o{ settlement_line : "history, at most one active line"
     outbox_event ||--o{ notification : "source_event_id"
     notification ||--o{ notification_delivery : channels
     customer_order ||--o| review : "one per order"

@@ -32,7 +32,7 @@ commission or customer platform fee), D13 (stale quote handling, `docs/product/r
 The active policy is the single row with `status = 'ACTIVE'` (unique partial index `commerce_policy_one_active_uq`, V10). New versions are created through
 `ConfigurationService.newVersion` (`backend/modules/orders/src/main/java/com/matbakhy/orders/internal/ConfigurationService.java:85`, `POST /api/v1/ops/configuration/{key}/versions`,
 reason + approval reference + recent MFA); it locks the active row `FOR UPDATE` (`:139`) and retires it. Placed orders keep their snapshot.
-Ordering can be paused by the feature flag `ordering-enabled`; a missing policy or a synthetic one outside LOCAL/CI blocks ordering (`NO_APPROVED_POLICY`).
+Ordering can be paused by the feature flag `ordering-enabled`; a missing policy or a synthetic one outside LOCAL/CI/PREVIEW (`DeploymentEnvironment.synthetic()`) blocks ordering (`NO_APPROVED_POLICY`).
 
 ## Quote creation — `QuoteService.create` (`QuoteService.java:92`)
 

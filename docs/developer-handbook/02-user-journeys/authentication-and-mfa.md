@@ -82,10 +82,10 @@ Claims read by `AccountMapper`: `iss` + `sub` (the account key; creates or finds
 ## AM-4 Own MFA preference (OPTIONAL policy)
 
 1. Goal: a person turns MFA on or off for their account. 2. Actor: any signed-in account. 3. Prereq: mode OPTIONAL.
-4. Start: web account page, operations web Security tab. 5. Actions: turn on (only in a session that just passed MFA); turn off (needs recent MFA).
+4. Start: web account page, operations web Security tab. 5. Actions: turn on (needs a session with a valid MFA assertion; refused with `MFA_UNAVAILABLE` when the mode is DISABLED); turn off (needs recent MFA).
 6. Responses: turning off also ends the user's application sessions and, if the admin client is configured, provider sessions (provider part best effort).
 7. API: `GET /api/v1/me/security` (112), `PUT /api/v1/me/security/mfa` body `{enabled}` (113). 8. `MfaController`, `MfaPolicyService`, `ApplicationSessions`, `KeycloakAdmin`. 9. `user_mfa_preference`, `audit_event`.
-10. Transitions: preference false ↔ true. 11. Errors: field codes `MFA_REQUIRED_BY_POLICY` (REQUIRED), `MFA_UNAVAILABLE` (DISABLED), `STEP_UP_REQUIRED` (HTTP 403).
+10. Transitions: preference false ↔ true. 11. Errors: field codes `MFA_REQUIRED_BY_POLICY` (REQUIRED), `MFA_UNAVAILABLE` (turning ON while DISABLED), `STEP_UP_REQUIRED` (HTTP 403).
 12. Tests: `MfaPolicyIntegrationTest.java`. 13. CFG-008, CFG-011, CFG-012, CFG-120; J7. 14. IMPLEMENTED (web only). 15. No mobile preference screen.
 
 ## AM-5 Administrator sets the MFA policy
@@ -107,10 +107,15 @@ Claims read by `AccountMapper`: `iss` + `sub` (the account key; creates or finds
 
 ## AM-7 Keycloak admin console (operators, high level)
 
-The admin console is reachable only on the internal/private path; the public proxy never publishes `/admin` or the master realm (CFG-001, CFG-121). Operators use it to inspect users and the realm flow, never to share passwords in the repository. Procedure, tooling and verification scripts: `docs/operations/14-keycloak-admin-console.md`; MFA migration steps: `docs/operations/13-keycloak-mfa-migration.md`; scripts under `deploy/web-preview/identity`. Status: IMPLEMENTED as operator tooling; live changes are owner-gated.
+Since the owner approval of 2026-10-19 the Keycloak administration console is published on a dedicated public hostname, `kc-admin.<preview domain>`, **in Preview only** (not approved for staging or production). `deploy/web-preview/Caddyfile` forwards only `/admin`, `/realms/master` and static assets there; the `matbakhy` realm, health and metrics answer 404, and `id.*` still answers 404 for `/admin` and `/realms/master`. The whole host is fail-closed: it answers 404 unless the switch file `admin-console-public` exists, which `admin-console.sh enable` creates only after hardening and live verification (the deploy workflow runs it after each release; `./deploy.sh admin-console disable` removes it at once).
+
+Two different MFA regimes exist and must not be confused. Application accounts (CUSTOMER, KITCHEN, STAFF) follow the database policy in `mfa_policy`, initially **OPTIONAL** for all three (V31, AM-5). Master-realm administrators of the console have **mandatory password plus OTP**: the `matbakhy master browser` flow sets both the password form and the OTP form to REQUIRED (`deploy/web-preview/identity/admin_console.py`, checked by `scripts/test_keycloak_admin_console.py`), there is no public OTP enrolment, and the password grant is off for master clients.
+
+Operators use it to inspect users and the realm flow, never to share passwords in the repository. Procedure, tooling and verification scripts: `docs/operations/14-keycloak-admin-console.md`; MFA migration steps: `docs/operations/13-keycloak-mfa-migration.md`; scripts under `deploy/web-preview/identity`. Status: IMPLEMENTED as operator tooling (Preview only); live changes are owner-gated. Whether the switch is enabled on the running server: NOT VERIFIED.
 
 ## Known limitations and documentation gaps
 
+* Case-text drift: owner cases CFG-001 and CFG-121 (`docs/quality/owner-acceptance/cases/config-security.json`) still describe the older boundary ("Keycloak admin console and master realm are never published"). The code, `docs/operations/14-keycloak-admin-console.md` and the Caddyfile follow the 2026-10-19 owner approval of the public Preview hostname. Trust the code and operations document; the case files are not edited from the handbook and need an owner-acceptance update.
 * `docs/security/mfa-policy.md` rollout step 5 says the mobile app does not handle `STEP_UP_REQUIRED`; the residual-risk section and the code (`apps/customer-mobile/src/AppContext.tsx`) show a banner exists. It also cites an iOS device test plan file under a mobile docs directory that does not exist in the repository.
 * The preview realm template lacks the `matbakhy-mobile` client.
 * No Keycloak realm roles are used, despite generic "role" wording in older documents; permissions live in `user_grant`.

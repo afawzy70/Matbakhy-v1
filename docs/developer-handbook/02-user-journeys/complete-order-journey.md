@@ -1,7 +1,7 @@
 # User journeys: the complete order journey
 
 > **Owner role:** Testing and QA
-> **Status:** PARTIALLY IMPLEMENTED — every step below exists in code and is covered by backend and browser tests; the owner acceptance run on the live preview and physical devices is not recorded as passed here (NOT VERIFIED).
+> **Status:** PARTIALLY IMPLEMENTED — every step below exists in code; backend tests cover the steps individually, browser automation covers only the customer ordering and cook actions (`customer-journey.e2e.ts`) and a finance statement layout (`money-reflow.e2e.ts`); finance verification, refund decisions and the administrator audit read have no browser automation (owner acceptance or API only); the owner acceptance run on the live preview and physical devices is not recorded as passed here (NOT VERIFIED).
 
 This page stitches the single-actor journeys into one walk-through: **customer orders, kitchen fulfils, operations, finance and the administrator inspect**. Each step links to the page that details it: [Customer web](customer-web.md), [Customer mobile](customer-mobile.md), [Cook operations](cook-operations.md), [Backoffice administration](backoffice-admin.md), [Finance and support](finance-and-support.md), [Authentication and MFA](authentication-and-mfa.md). State machines: [Order lifecycle](../01-business/order-lifecycle.md).
 
@@ -78,7 +78,7 @@ sequenceDiagram
 * Acceptance deadline: an order not accepted in time becomes `EXPIRED` through `OrderExpiryJob` (E2E-ORDER-029); capacity is released once.
 * Accept racing customer cancel or expiry: exactly one transition wins (E2E-ORDER-028).
 * Five wrong handover codes lock the challenge; staff recover with `order.handover_override` + recent MFA (E2E-ORDER-033, E2E-ORDER-108).
-* After preparation starts only staff can cancel (`order.exception_cancel`, linked support case).
+* After preparation starts only staff can cancel (`order.exception_cancel`; the case reference is required but only an audited free-text value, not a validated link, see the backoffice page).
 * Lost placement response: client retries with the same keys or looks up `GET /api/v1/orders/by-request/{clientRequestId}`; duplicates are impossible (E2E-ORDER-024, E2E-ORDER-123).
 
 ## Owner acceptance mapping
@@ -112,6 +112,7 @@ Run browser tests with `scripts/dev.sh e2e` (throwaway stack). Whether they pass
 
 ## Known limitations and documentation gaps
 
+* Coverage is per layer, not per step: finance cash verification, refund decisions and audit reading are not exercised by any browser test, so treat them as owner acceptance or missing automation, not inferred coverage.
 * Cash verification (step 14), the audit trail (step 17) and ops dashboard metrics have no screen or are not implemented; owner cases must use the API for them.
 * The browser journey test lives in the operations-web project but drives the customer web as well.
 * No automated test spans customer, cook, finance and audit in one run; the chain is joined only by the owner suite J1 to J4.

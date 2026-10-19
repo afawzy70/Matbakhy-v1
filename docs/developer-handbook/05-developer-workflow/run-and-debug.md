@@ -38,13 +38,15 @@ A browser-based way to see calls: open the browser dev tools Network tab on the 
 ## Logs
 
 ```bash
-$DC logs --tail 200 api            # API (ECS JSON lines, field names service.environment, service.version, log.logger, message)
+$DC logs --tail 200 api            # API: plain text lines locally, each with the request id in brackets, e.g. "INFO [<request-id>] ..."
 $DC logs --tail 100 identity       # Keycloak
 $DC logs --tail 100 postgres
-$DC logs -f api | grep '"requestId":"<id>"'
+$DC logs api | grep -F '[<id>]'     # local default text format (logging.pattern.level in application.yaml)
 ```
 
-Backend test logs: `backend/**/target/surefire-reports/` (the files `scripts/check_backend_suite.sh` reads). Browser test traces and screenshots on failure: Playwright writes `test-results/` (git-ignored) or `E2E_OUTPUT_DIR`; open a trace with `pnpm exec playwright show-trace <trace.zip>` from `apps/operations-web`.
+Local Compose does not set `LOGGING_STRUCTURED_FORMAT_CONSOLE`, so local API logs are text. Only deployments that set it (`deploy/web-preview/compose.yaml` sets `ecs`) emit ECS JSON lines (fields `service.environment`, `service.version`, `log.logger`, `message`, and the request id as the MDC field `requestId`); there filter with `grep '"requestId":"<id>"'` or in Grafana/Loki.
+
+Backend test logs: `backend/**/target/surefire-reports/` (the files `scripts/check_backend_suite.sh` reads). Browser test traces and screenshots on failure: through `scripts/dev.sh e2e` the default output directory is `$VERIFY_TMP/results` inside a temporary directory that the script deletes on exit, so nothing survives by default. Set a persistent, ignored location before the run, for example `E2E_OUTPUT_DIR="$PWD/test-results/e2e" scripts/dev.sh e2e` (`test-results/` is git-ignored, `.gitignore`), then open a trace with `pnpm exec playwright show-trace <trace.zip>` from `apps/operations-web`. Running Playwright directly (outside `dev.sh`) writes `test-results/` under `apps/operations-web`.
 
 On the preview the same request-id technique applies through Grafana/Loki; see [troubleshooting.md](troubleshooting.md) and `docs/operations/08-troubleshooting-runbook.md`.
 
@@ -70,7 +72,7 @@ SELECT version, description, success FROM flyway_schema_history ORDER BY install
 
 ## Debugging the code
 
-- Backend: tests are the fastest loop. Run one class (`cd backend && ./mvnw -B -ntp verify -Dtest=<ClassName> -Dsurefire.failIfNoSpecifiedTests=false`). Integration tests use annotation `IntegrationTest` (`backend/app/src/test/java/com/matbakhy/app/support/IntegrationTest.java`) with real PostgreSQL and S3-emulator containers, so Docker must be running. Attaching an IDE debugger to the containerised API: NOT VERIFIED (no debug port is published in `infra/compose.yaml`); debug through a test instead.
+- Backend: tests are the fastest loop. Run one class (`(cd backend && ./mvnw -B -ntp verify -Dtest=<ClassName> -Dsurefire.failIfNoSpecifiedTests=false)`; the subshell keeps your shell in the repository root). Integration tests use annotation `IntegrationTest` (`backend/app/src/test/java/com/matbakhy/app/support/IntegrationTest.java`) with real PostgreSQL and S3-emulator containers, so Docker must be running. Attaching an IDE debugger to the containerised API: NOT VERIFIED (no debug port is published in `infra/compose.yaml`); debug through a test instead.
 - Web: `pnpm --filter @matbakhy/customer-web test` (Vitest, jsdom) and the browser dev tools; source maps are on in the Vite dev server.
 - Mobile: Jest tests in `apps/customer-mobile/src/*.test.ts(x)`; native behaviour only through the scripts in `apps/customer-mobile/scripts/`.
 

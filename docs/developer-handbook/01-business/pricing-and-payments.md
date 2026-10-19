@@ -114,10 +114,11 @@ stateDiagram-v2
     CUSTOMER_TRANSFER_REPORTED --> RECONCILE_PENDING: order ended
     KITCHEN_RECEIPT_REPORTED --> RECONCILE_PENDING: order ended without completion
     DISPUTED --> RECONCILE_PENDING: order ended
-    DISPUTED --> REFUND_OWED: staff decision (API-107)
-    DISPUTED --> CLOSED_NO_FUNDS: staff decision (API-107)
-    RECONCILE_PENDING --> REFUND_OWED: staff decision (API-107)
-    RECONCILE_PENDING --> CLOSED_NO_FUNDS: staff decision (API-107)
+    RECONCILE_PENDING --> DISPUTED: kitchen reports problem (API-105)
+    DISPUTED --> REFUND_OWED: staff decision (API-107) only after order ended, finance.verify, recent MFA, reason
+    DISPUTED --> CLOSED_NO_FUNDS: staff decision (API-107) only after order ended, finance.verify, recent MFA, reason
+    RECONCILE_PENDING --> REFUND_OWED: staff decision (API-107) only after order ended, finance.verify, recent MFA, reason
+    RECONCILE_PENDING --> CLOSED_NO_FUNDS: staff decision (API-107) only after order ended, finance.verify, recent MFA, reason
     REFUND_OWED --> REFUNDED: kitchen reports refund sent (API-108)
     RECONCILE_PENDING --> REFUNDED: kitchen reports refund sent (API-108)
 ```
@@ -137,7 +138,7 @@ Cash is tracked in `cash_obligation` (one row per order, created at placement wi
 
 | Step | Actor | Rule |
 |---|---|---|
-| Obligation created | System at placement | State `DUE`; becomes `NOT_DUE` if the order is rejected, expired or cancelled |
+| Obligation created | System at placement | State `DUE`; becomes `NOT_DUE` if the order is rejected, expired or cancelled by the cook before preparation. Operations exception cancellation (from `PREPARING`/`READY`) leaves it unchanged, consumed stock stays consumed, and finance reviews it manually |
 | Cook reports collection (API-063) | Owning cook | Only for a `COMPLETED` own order; one report per order; method `CASH`, currency `EGP`; `collectedAt` between order creation and now; exact amount ⇒ obligation `REPORTED`, any difference ⇒ `DISPUTED` |
 | Finance verifies (API-083) | `finance.verify`, **not the reporter** | `VERIFY` must equal the amount due; any other amount must be a `DISPUTE` with a reason of at least 3 characters; obligation becomes `VERIFIED` or `DISPUTED` |
 
@@ -184,7 +185,7 @@ All money-relevant commands are idempotent (`JdbcIdempotentCommands`, `backend/a
 - Header `Idempotency-Key` (8–128 characters `A-Za-z0-9-`) is required; scope is **actor + command + key**; the request is hashed.
 - Same scope, same body ⇒ the stored result is returned (no second effect). Same scope, different body ⇒ `409 IDEMPOTENCY_CONFLICT`. Racing duplicates serialise on the unique row.
 - A failed command stores no outcome, so a corrected retry with the same key can succeed.
-- Records are retained 24 hours (`RETENTION`). For orders there is a *permanent* second guard: `UNIQUE (customer, client_request_id)` plus a request fingerprint (V29), so a retry after retention still returns the same order or a conflict (test `retries_after_timeout_and_after_idempotency_retention_create_exactly_one_order`).
+- Records carry a 24-hour `expires_at` (`RETENTION`) that is recorded but not enforced: no code expires or purges them. For orders there is a *permanent* second guard: `UNIQUE (customer, client_request_id)` plus a request fingerprint (V29), so a retry after retention still returns the same order or a conflict (test `retries_after_timeout_and_after_idempotency_retention_create_exactly_one_order`).
 
 ## 8. Zero-commission policy versus future monetization
 

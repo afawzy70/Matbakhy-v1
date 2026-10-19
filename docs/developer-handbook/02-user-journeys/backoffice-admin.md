@@ -60,7 +60,7 @@ Consequences found while tracing this (derived from code, not from a test):
 
 ## BO-3 Order monitoring and exceptions
 
-1. Goal: inspect any order and resolve exceptions without bypassing the state machine. 2. Actor: `order.ops` (read); `order.exception_cancel`; `order.handover_override` + recent MFA. 3. Prereq: order exists; an exception cancel needs a linked support case id and a state of `PREPARING` or `READY`; a handover override needs evidence and a locked or stuck handover.
+1. Goal: inspect any order and resolve exceptions without bypassing the state machine. 2. Actor: `order.ops` (read); `order.exception_cancel`; `order.handover_override` + recent MFA. 3. Prereq: order exists; an exception cancel needs a non-blank case reference (required by the product rules to be a linked support case, but see Known limitations: currently an unenforced, audited free-text reference) and a state of `PREPARING` or `READY`; a handover override needs evidence and a locked or stuck handover.
 4. Start: tab Orders (`ops/OpsOrders.tsx`). 5. Actions: filter/list, open an order (timeline, totals, masked contact; opening customer contact is audited), exception-cancel with reason (`SAFETY`, `OPERATIONAL`, `OTHER`) and case id, or override handover with evidence reference.
 6. Responses: no handover code is ever exposed to staff (`OrderService.staffView`). 7. API: `GET /api/v1/ops/orders`, `GET /api/v1/ops/orders/{orderId}`, `POST …/exception-cancel`, `POST …/handover-override` (074 to 077). 8. Backend: `OpsOrderController.java` → `OpsOrderService.java`, `OrderLifecycleService.opsExceptionCancel / opsHandoverOverride`. 9. DB: `customer_order`, `order_event`, `handover_challenge`, `stock_allocation`, `audit_event`. 10. `PREPARING | READY → CANCELLED` (consumed capacity is kept, E2E-ORDER-109); locked handover `→ COMPLETED` with reason `HANDOVER_OVERRIDE`. 11. Errors: `VALIDATION_FAILED` (`caseId`, `evidenceRef` required), `STATE_CONFLICT`, `STEP_UP_REQUIRED`. 12. Tests: `backend/app/src/test/java/com/matbakhy/app/orders/OrderLifecycleIntegrationTest.java`. 13. E2E-ORDER-108, E2E-ORDER-109, E2E-ORDER-119, E2E-OPS-103; J1. 14. IMPLEMENTED. 15. Limitation: API-066 operations dashboard metrics are NOT IMPLEMENTED (`contracts/endpoints.json`; E2E-OPS-112).
 
@@ -102,6 +102,7 @@ See [Finance and support](finance-and-support.md#fs-4-support-cases-customer-sid
 
 ## Known limitations and documentation gaps
 
+* GAP (unenforced requirement): exception cancel is meant to be tied to a support case, but `OrderLifecycleService.opsExceptionCancel` only checks that the reference is non-blank and copies it into the audit entry (`caseRef`). It never loads a support case or checks it belongs to the order, and `OrderLifecycleIntegrationTest` succeeds with an invented `"case-77"`. Linkage would need case-existence and same-order validation plus negative tests.
 * `docs/product/06-permissions.md` mentions role columns and `finance.settlement_verify`; code has no role objects and the permission is `finance.settlement`. Code wins.
 * `user_grant` CHECK in V4 lists 15 permission codes; V31 adds the two security codes (see `backend/app/src/main/resources/db/migration/V31__mfa_policy.sql`).
 * Section tab visibility is probe-based (above); a purpose-built "my permissions" endpoint does not exist.

@@ -40,7 +40,7 @@ Order, audit, dead-letter and telemetry diagnosis on the preview is in [08-troub
 | Integration test hangs at start | container pull, slow Docker, or a stale Testcontainers resource | check Docker, free disk, rerun; never replace the container with a mock |
 | Flaky race test | a sleep instead of a barrier | fix the test to use deterministic coordination ([01-verification.md](../../quality/01-verification.md)); do not just rerun until green |
 | Contract check fails with drift | `contracts/openapi.yaml` changed without regenerating `packages/api-client/src/generated/schema.ts` | `pnpm --filter @matbakhy/api-client run generate`, commit, rerun `pnpm contract:check` |
-| `scripts/dev.sh e2e` fails to start webs | ports 5173/5174 busy | free the ports; logs are in the temporary directory printed on failure |
+| `scripts/dev.sh e2e` fails to start webs | ports 5173/5174 busy | free the ports; on failure the script prints the web server log (`web.log` / `customer.log`) to the terminal and then deletes its temporary directory on exit, so copy what you need from the terminal; to keep Playwright traces set `E2E_OUTPUT_DIR` to a persistent ignored path first |
 | Playwright cannot launch a browser | no browser downloaded | set `E2E_CHROMIUM` to an installed Chromium |
 | Owner catalog `check` fails "stale" | edited a generated file or a case without rendering | `python3 scripts/owner_e2e_catalog.py render`; edit only `cases/*.json`, `core-suite.json`, `coverage-notes.json` |
 | Fixture check fails | manifest, SQL seed and cases disagree | `python3 scripts/owner_e2e_fixtures.py check` names the mismatch |

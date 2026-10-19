@@ -11,7 +11,7 @@ Background: [01-verification.md](../../quality/01-verification.md) (levels and w
 |---|---|---|---|---|
 | Blueprint / planning | `python3 scripts/validate_blueprint.py`, `python3 scripts/check_scope.py` | Python | planning files are consistent | any product behaviour (its own output says so) |
 | Script guardrails | `python3 -m unittest discover -s scripts -p 'test_*.py' -v` | Python (Docker images optional: proxy tests skip when absent) | deploy/guard scripts behave as tested | the deployed server |
-| Backend unit + integration | `cd backend && ./mvnw -B -ntp verify` | JDK 21, Docker | domain rules against real PostgreSQL 16 and an S3 emulator (no H2, no mock DB) | browser or native usability |
+| Backend unit + integration | `(cd backend && ./mvnw -B -ntp verify)` | JDK 21, Docker | domain rules against real PostgreSQL 16 and an S3 emulator (no H2, no mock DB) | browser or native usability |
 | Architecture | `ModuleBoundaryTest` in `backend/app/src/test/java/com/matbakhy/app/architecture` | part of `verify` | module boundaries (other modules use only an `api` package; no cycles) | runtime behaviour |
 | API contract | `pnpm contract:check` | Node, pnpm | `contracts/openapi.yaml` lints (Redocly) and the generated client has no drift | server really implements it (`ContractRoutesTest` in `backend/app/src/test/java/com/matbakhy/app/web` covers routes) |
 | Web / package unit | `pnpm test` (Vitest, Jest for mobile) | Node, pnpm | component and logic behaviour | real API integration |
@@ -37,8 +37,8 @@ pnpm --filter @matbakhy/design-tokens test
 pnpm --filter @matbakhy/customer-mobile test      # jest --ci
 
 # Backend
-cd backend && ./mvnw -B -ntp verify
-cd backend && ./mvnw -B -ntp verify -Dtest=ModuleBoundaryTest -Dsurefire.failIfNoSpecifiedTests=false
+(cd backend && ./mvnw -B -ntp verify)
+(cd backend && ./mvnw -B -ntp verify -Dtest=ModuleBoundaryTest -Dsurefire.failIfNoSpecifiedTests=false)
 ```
 
 `scripts/check_workspace.sh` does all of the above from a fresh clone of your committed `HEAD` (backend verify, contract check, typecheck, lint, tests, builds, Android and iOS Hermes bundles) and fails on a version mismatch. Uncommitted changes are not tested by it.
@@ -60,7 +60,7 @@ The script deletes old surefire reports, runs `verify -Dtest=...`, then fails if
 
 ## Browser E2E (Playwright)
 
-Specs: `apps/operations-web/e2e/*.e2e.ts` (`customer-journey`, `cook-workspace`, `money-reflow`, `keyboard`, `operations-layout`), helper `apps/operations-web/e2e/fixtures.ts`, config `apps/operations-web/playwright.config.ts` (one worker, trace and screenshot kept on failure). Run only through `scripts/dev.sh e2e`; it prepares a throwaway stack with random secrets and passes `E2E_*` variables. Never aim it at a shared or production-like environment; the suite resets and seeds data. Set `E2E_CHROMIUM` to use an installed Chromium.
+Specs: `apps/operations-web/e2e/*.e2e.ts` (`customer-journey`, `cook-workspace`, `money-reflow`, `keyboard`, `operations-layout`), helper `apps/operations-web/e2e/fixtures.ts`, config `apps/operations-web/playwright.config.ts` (one worker, trace and screenshot kept on failure). Run only through `scripts/dev.sh e2e`; it prepares a throwaway stack with random secrets and passes `E2E_*` variables. Never aim it at a shared or production-like environment; the suite resets and seeds data. Set `E2E_CHROMIUM` to use an installed Chromium. The script deletes its temporary directory (including the default Playwright output `$VERIFY_TMP/results` and the web server logs) on exit; to keep traces and screenshots set `E2E_OUTPUT_DIR` to a persistent, ignored path first, e.g. `E2E_OUTPUT_DIR="$PWD/test-results/e2e" scripts/dev.sh e2e`.
 
 Staging smoke: `apps/operations-web/e2e-staging/smoke.staging.ts` with `playwright.staging.config.ts`; needs `STAGING_APP_URL`, `STAGING_OPS_URL`, `STAGING_API_URL` and `STAGING_USER_PASSWORD` (from the operator; never commit). It creates one demo order per run.
 

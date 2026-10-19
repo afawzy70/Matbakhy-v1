@@ -26,7 +26,7 @@ flowchart TD
   operations --> identity
   identity --> cooks
   operations --> cooks
-  cooks --> catalog
+  catalog --> cooks
   availability --> catalog
   identity --> availability
   catalog --> orders

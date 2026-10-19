@@ -47,12 +47,13 @@ See [API contracts](../04-codebase/api-contracts.md) for the workflow to add or 
 |---|---|
 | Database migrations | `backend/app/src/main/resources/db/migration/V<n>__<name>.sql` (V1..V31 at the time of writing); Flyway runs them at startup. Compatibility checks: `scripts/check_migration_compat.py` |
 | Least-privilege DB role | `backend/app/src/main/resources/db/migration/afterMigrate.sql`; role creation for the preview in `deploy/web-preview/postgres/20-runtime-role.sh` |
-| Development-only data | `backend/app/src/main/resources/db/devdata/` (never loaded in deployed profiles) |
+| Development-only data | `backend/app/src/main/resources/db/devdata/` (loaded only where the `dev` profile is allowed: LOCAL, CI and PREVIEW; `EnvironmentGuard` refuses it in STAGING/PRODUCTION) |
 | Keycloak realm (local) | `infra/identity/matbakhy-realm.json` (clients `matbakhy-web`, `matbakhy-mobile`, `matbakhy-admin`; custom browser flow with "level 1"/"level 2" for MFA) |
 | Keycloak realm (preview/staging) | `deploy/web-preview/identity/matbakhy-realm.preview.json`, `deploy/web-preview/identity/mfa-migration.kcadm.sh`, `deploy/web-preview/identity/verify-mfa-flow.py` |
 | Keycloak realm used by backend tests | `backend/app/src/test/resources/keycloak/test-realm.json` via `backend/app/src/test/java/com/matbakhy/app/support/KeycloakTestServer.java` |
 | Backend OIDC settings | `matbakhy.identity.*` and `matbakhy.mfa.*` in `backend/app/src/main/resources/application.yaml`, bound by `backend/app/src/main/java/com/matbakhy/app/security/IdentityProperties.java` |
-| Environment safety (fake providers refused outside LOCAL/CI) | `backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java` |
+| Environment safety: fixtures/`dev` profile guard (LOCAL/CI/PREVIEW only) | `backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java` |
+| Provider restrictions (fake SMS/scanner/notifications in LOCAL/CI/PREVIEW; development secrets and local storage in LOCAL/CI only; STAGING/PRODUCTION refuse to start without real adapters) | `backend/app/src/main/java/com/matbakhy/app/providers/ProviderConfiguration.java` |
 
 See also [identity and security](../03-architecture/identity-and-security.md).
 

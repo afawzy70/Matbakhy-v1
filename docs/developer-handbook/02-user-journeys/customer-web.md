@@ -31,7 +31,7 @@ Common to every journey below:
 
 1. **Business goal.** Let anyone see what home kitchens offer before creating an account (BR-018 basket rules start only at "add").
 2. **Actor / permissions.** Guest or Customer; public endpoints (`PUBLIC_GET` in `SecurityConfiguration`).
-3. **Prerequisites.** At least one approved, active kitchen with a published meal and an open slot, otherwise the list is empty.
+3. **Prerequisites.** At least one approved, active kitchen with a published, visible meal to be listed. Without an eligible open slot the meal can still be listed but is marked `UNAVAILABLE` and cannot be ordered; only a date or slot filter requires an orderable slot to match (`DiscoveryService`, `MealOffers`).
 4. **Starting screen.** `#/` (`Browse`).
 5. **User actions.** Open the app; optionally pick an intent tile (self / complement / gathering) which reveals a budget filter; type in the search box; choose a category chip; pick zone; change sort (`NEWEST`, `PRICE_ASC`, `PRICE_DESC`); clear filters; switch between "dishes" and "kitchens"; open a meal or a kitchen.
 6. **Expected responses.** Stacked food cards update from the server result; price shown in EGP formatted with `Intl.NumberFormat` (`formatMoney` in `apps/customer-web/src/api.ts`); empty and error states come from `Status` in `apps/customer-web/src/shared.tsx`; an offline banner appears when `navigator.onLine` is false. Filters are server query parameters; the client never filters, ranks or prices (comment in `Browse.tsx`). Portion-size filters are deferred (decision D11).
@@ -141,13 +141,13 @@ Common to every journey below:
 2. **Actor.** Customer (any category policy value).
 3. **Prerequisites.** Signed in; policy for the CUSTOMER category not DISABLED to change anything.
 4. **Start.** `#/account` → security section (`apps/customer-web/src/Security.tsx`).
-5. **Actions.** Read policy mode and status; if OPTIONAL and off: "turn on" (needs a session that just passed MFA, otherwise a link to a step-up sign-in); if on: "turn off" (needs recent MFA, ends the user's sessions); "manage authenticator" opens Keycloak's account console link from the API.
+5. **Actions.** Read policy mode and status; if OPTIONAL and off: "turn on" (needs a session with a valid MFA assertion, otherwise a link to a step-up sign-in); if on: "turn off" (needs recent MFA, ends the user's sessions); "manage authenticator" opens Keycloak's account console link from the API.
 6. **Responses.** Panel shows effective mode (`OPTIONAL`/`REQUIRED`/`DISABLED`), whether MFA is required, whether this session is verified. `STEP_UP_REQUIRED` shows a "verify" button linking to `/oauth2/authorization/keycloak?stepUp=true&returnTo=…`. Under `REQUIRED`, a notice says it cannot be turned off.
 7. **API.** `GET /api/v1/me/security` (API-112), `PUT /api/v1/me/security/mfa` body `{enabled}` (API-113).
 8. **Backend.** `backend/app/src/main/java/com/matbakhy/app/mfa/MfaController.java`, `MfaPolicyService.java`, `MfaEnforcementFilter.java` (`backend/app/src/main/java/com/matbakhy/app/security/`).
 9. **DB.** `mfa_policy`, `user_mfa_preference`, `user_mfa_reset` (V31).
 10. **Transitions.** Preference off ↔ on; enforcement decision recomputed from the database on every request.
-11. **Errors.** `MFA_REQUIRED_BY_POLICY`, `MFA_UNAVAILABLE` (when DISABLED), `STEP_UP_REQUIRED` (HTTP 403). Full policy: [Authentication and MFA](authentication-and-mfa.md).
+11. **Errors.** `MFA_REQUIRED_BY_POLICY`, `MFA_UNAVAILABLE` (turning on while DISABLED), `STEP_UP_REQUIRED` (HTTP 403). Full policy: [Authentication and MFA](authentication-and-mfa.md).
 12. **Tests.** `backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java`, `MfaPolicyResolveTest.java`, `backend/app/src/test/java/com/matbakhy/app/identity/MfaIdpTest.java` (real Keycloak), `apps/customer-web/src/App.test.tsx` ("account security (D18)").
 13. **Owner E2E.** CFG-102, CFG-008, CFG-011, CFG-012; core suite J7.
 14. **Status.** IMPLEMENTED in code; live Keycloak realm migration for step-up is an owner-gated deployment step (CFG-028). Whether the deployed preview currently has it applied: NOT VERIFIED.

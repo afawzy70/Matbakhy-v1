@@ -67,7 +67,7 @@ Arabic strings below were copied from the i18n files and checked there: `apps/cu
 | Reservation / allocation / consumption | The three stock stages: placed, accepted, preparation started | `SlotInventory.Stage` |
 | Cutoff | Slot start minus lead time; after it, no new orders or capacity edits | `cook_slot.cutoff_at` |
 | Acceptance deadline (`acceptBy`) | When a pending order expires | `customer_order.accept_by` |
-| Idempotency key | `Idempotency-Key` header; scope actor + command + key; 24 h | `JdbcIdempotentCommands` |
+| Idempotency key | `Idempotency-Key` header; scope actor + command + key; `expires_at` = +24 h is recorded but not enforced | `JdbcIdempotentCommands` |
 | `clientRequestId` | Customer-generated id that permanently identifies a placement attempt | `customer_order_request_uq` |
 | Request fingerprint | SHA-256 over quote, request id, terms versions and note, to detect a changed retry | `OrderService.fingerprint` |
 | Optimistic version / `expectedVersion` | Commands carry the version they saw; stale ones get `VERSION_CONFLICT` | all lifecycle commands |
@@ -89,7 +89,7 @@ Arabic strings below were copied from the i18n files and checked there: `apps/cu
 | Deposit recipient | Kitchen's InstaPay / wallet / bank details, staff-approved before customers see them | `kitchen_payment_profile` |
 | Reconciliation | Human comparison of reports and statements; states `RECONCILE_PENDING`, `DISPUTED` | `PaymentService` |
 | Ledger | Balanced, append-only commission entries (zero amounts at launch) | `ledger_group`, `ledger_entry` |
-| Settlement | Batch of ledger lines to pay out; dormant under zero commission | `FinanceOpsService` |
+| Settlement | Batch of commission ledger lines the kitchen remits to the platform (direction `COOK_PAYS_PLATFORM`, not a payout to the kitchen); dormant under zero commission | `FinanceOpsService` |
 | Operational approval | Staff reviewed a cook application; label `OPERATIONALLY_VERIFIED`; not a food-safety guarantee | `KitchenService` |
 | Moderation (`HIDDEN`/`VISIBLE`) | Staff visibility flag on meals and reviews, independent of the cook's own state | `MealService`, `ReviewService` |
 | Owner E2E case | Numbered manual/automated acceptance case, e.g. `E2E-ORDER-021` | `docs/quality/owner-acceptance/cases/*.json` |

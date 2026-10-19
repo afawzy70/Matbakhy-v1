@@ -29,14 +29,14 @@ stateDiagram-v2
     OUT_FOR_DELIVERY --> COMPLETED: ops handover override (API-077)
 ```
 
-Terminal states: `COMPLETED`, `REJECTED`, `EXPIRED`, `CANCELLED`, `DELIVERY_FAILED` (`OrderLifecycleService.TERMINAL`). A terminal order is immutable: the command guard refuses it and a database trigger (`customer_order_terminal_guard`, `backend/app/src/main/resources/db/migration/V12__order_lifecycle.sql`) refuses direct updates. Refunds, disputes and payment changes never rewrite the order state; they live in separate records (`order_payment`, `cash_obligation`, `refund`).
+Terminal states: `COMPLETED`, `REJECTED`, `EXPIRED`, `CANCELLED`, `DELIVERY_FAILED` (`OrderLifecycleService.TERMINAL`). A terminal order is immutable: the command guard refuses it and a database trigger (`customer_order_terminal_guard`, `backend/app/src/main/resources/db/migration/V12__order_lifecycle.sql`) refuses direct updates (one narrow exception: the V21 privacy-erasure update of contact/address snapshots and note, see [database architecture](../03-architecture/database-architecture.md)). Refunds, disputes and payment changes never rewrite the order state; they live in separate records (`order_payment`, `cash_obligation`, `refund`).
 
 Every command has these properties (`OrderLifecycleService`):
 
 - It locks the order row (`SELECT ... FOR UPDATE`) and, for cooks, includes the caller's kitchen in the lookup, so another kitchen's order is `404`.
 - It needs `expectedVersion`; a stale version returns `409 VERSION_CONFLICT`; a command on a terminal order returns `409 STATE_CONFLICT`.
 - It writes the state change, an `order_event` row (sequence number, actor type, reason code), an `outbox_event` row (`ORDER_<STATE>`) and any stock or cash effect in **one transaction**.
-- It runs through `IdempotentCommands` (key scope = actor + command + `Idempotency-Key`, retained 24 hours): replaying the same command returns the original outcome.
+- It runs through `IdempotentCommands` (key scope = actor + command + `Idempotency-Key`, `expires_at` +24 h is recorded but not enforced): replaying the same command returns the original outcome.
 
 ## Step 1 — Discovery
 
@@ -68,7 +68,7 @@ Capacity is the business' defence against overselling. Each cook slot (`cook_slo
 | Cook starts preparation | allocated → **consumed** (no automatic restoration afterwards) | `prepare` |
 | Reject / expire / customer cancel (pending) | reserved → released, exactly once | `release(o, Stage.RESERVED)` |
 | Cook cancel (accepted) | allocated → released, exactly once | `release(o, Stage.ALLOCATED)` |
-| Ops exception cancel (preparing or ready) | **Consumed stock stays consumed**; finance reviews manually | `opsExceptionCancel` |
+| Ops exception cancel (preparing or ready) | **Consumed stock stays consumed and the cash obligation is left unchanged**; finance reviews manually | `opsExceptionCancel` |
 
 Rules: slot capacity can never be reduced below what is reserved+allocated+consumed (`SlotService`, owner case E2E-COOK-106); cutoff = slot start − lead time (`lead_minutes` 30..1440); after cutoff the slot refuses quotes and capacity edits (E2E-BASKET-023). Two customers racing for the last portion produce exactly one order (test `twenty_customers_racing_for_the_last_portion_produce_exactly_one_order`, `backend/app/src/test/java/com/matbakhy/app/orders/OrderPlacementIntegrationTest.java`; E2E-ORDER-115).
 
@@ -97,7 +97,7 @@ At placement the server **revalidates** the quote (`QuoteService.requireValid`):
 |---|---|---|
 | Quote older than its expiry | `409 QUOTE_EXPIRED` | "The quote expired. Calculate the total again." |
 | Policy version changed | `409 PRICE_CHANGED`, reason `POLICY_CHANGED` | Must re-quote and re-accept |
-| Meal revision or unit price changed | `409 PRICE_CHANGED`, reason `MEAL_CHANGED` | Told that the kitchen changed the price; sees old and new totals |
+| Meal revision or unit price changed | `409 PRICE_CHANGED`, reason `MEAL_CHANGED` | Any new meal revision invalidates the quote, even with an unchanged price. The UI attributes a kitchen price change only when the unit amounts actually differ (`packages/api-client/src/priceChanges.ts`); otherwise it shows a generic changed-details notice. Old and new totals are shown |
 | Delivery fee or total changed | `409 PRICE_CHANGED`, reason `TOTAL_CHANGED` | Told the delivery fee/tax changed (not the kitchen) |
 | Address edited or zone changed | `409 STATE_CONFLICT`, reason `ADDRESS_CHANGED` | Re-select the address |
 | Deposit percentage, COD cap or recipient changed | `409 PRICE_CHANGED`, reason `PAYMENT_CHANGED` | Re-quote |
@@ -109,7 +109,7 @@ Nothing is created and nothing is reserved on refusal. The web and mobile client
 `POST /api/v1/orders` (API-022) with `Idempotency-Key` header and body `{quoteId, clientRequestId, acceptedPolicyVersions}`. `OrderService.placeOnce` in one transaction:
 
 1. takes an advisory lock on `(customer, clientRequestId)` to serialise duplicate submits;
-2. if an order already exists for that customer and `clientRequestId`: returns it when the request fingerprint matches, otherwise `409 IDEMPOTENCY_CONFLICT` (survives the 24 h key retention, V29);
+2. if an order already exists for that customer and `clientRequestId`: returns it when the request fingerprint matches, otherwise `409 IDEMPOTENCY_CONFLICT` (survives removal of the header record, V29);
 3. revalidates the quote (step 5) and that the customer accepted the *current* terms and cancellation-policy versions (`POLICY_NOT_ACCEPTED`);
 4. refuses a quote already used by another order (`QUOTE_ALREADY_USED`; E2E-BASKET-028);
 5. reserves stock (step 3);
@@ -190,6 +190,7 @@ Every transition writes an `outbox_event`; a dispatcher turns it into one in-app
 
 ## Known limitations and documentation gaps
 
+- `MEAL_CHANGED` fires on any revision change (for example a description-only edit) while the "kitchen changed the price" wording is only correct when unit prices differ; the reason code alone does not tell which happened.
 - `docs/product/04-state-machines.md` allows "Owning cook/ops" to dispatch and complete. The code gives dispatch and normal handover only to the owning cook; staff can only exception-cancel (`PREPARING`/`READY`) or override a handover.
 - That document also lists "Cancel accepted: Owning cook or ops". The code lets ops cancel only from `PREPARING`/`READY`; for `ACCEPTED` the cook cancels.
 - The customer sees `PENDING_ACCEPTANCE` as "Waiting for the kitchen" and `COMPLETED` as "Delivered" in the UI strings (`apps/customer-web/src/i18n.ts`), including for pickup orders. NOT VERIFIED whether the pickup wording is intentionally the same.

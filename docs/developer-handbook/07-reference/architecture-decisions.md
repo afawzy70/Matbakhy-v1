@@ -40,7 +40,7 @@ Status values allowed by `scripts/check_scope.py`: `PROPOSED_DEFAULT`, `OPEN`, `
 | D18 | Configurable MFA performed by Keycloak; policy DISABLED / OPTIONAL / REQUIRED per account category | ACCEPTED | yes — `MfaPolicyService`, V31 | `docs/security/mfa-policy.md` |
 | O01..O10 | Open owner decisions: launch city/zones, cash vs prepayment at launch, delivery responsibility, refund/tax/invoice policy, brand clearance, food-business and privacy policy, providers/hosting, Apple/Google accounts, support contacts, social features | OPEN | n/a — they gate live operation, not code | `docs/product/01-context-and-decisions.md` "Open decisions" |
 
-Open decisions that most often surprise a developer: O04 (tax and refund policy — synthetic values in code), O06 (retention — a 14-day erasure grace is a PROPOSED default in `application.yaml`), O07 (providers — fake adapters are refused outside LOCAL/CI, push disabled).
+Open decisions that most often surprise a developer: O04 (tax and refund policy — synthetic values in code), O06 (retention — a 14-day erasure grace is a PROPOSED default in `application.yaml`), O07 (providers — fake adapters are allowed only in LOCAL/CI/PREVIEW and STAGING/PRODUCTION refuse to start without real ones, push disabled).
 
 ## ADRs in `docs/engineering/01-architecture.md`
 
