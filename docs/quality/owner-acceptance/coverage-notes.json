@@ -1,0 +1,94 @@
+{
+ "TC-059": {
+  "classification": "PROCESS_GATE",
+  "reason": "Load/performance measurement is an engineering release gate on documented hardware, not an owner click-through."
+ },
+ "TC-062": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-063": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-064": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-141": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-143": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-144": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-146": {
+  "classification": "PROCESS_GATE",
+  "reason": "Release, publication and pilot-closure gates are decided by evidence of builds and operations, not by an owner functional case."
+ },
+ "TC-101": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-102": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-103": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-104": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-105": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-106": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-107": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-108": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Planning/toolchain/CI acceptance verified by the repository checks (blueprint integrity, Product CI); no owner action exists."
+ },
+ "TC-130": {
+  "classification": "PROCESS_GATE",
+  "reason": "Automating these journeys is an engineering story; this catalog is its specification."
+ },
+ "TC-142": {
+  "classification": "OWNER_UAT",
+  "reason": "Executing this suite with retained evidence IS the owner UAT; the TC closes only from recorded runs."
+ },
+ "TC-045": {
+  "classification": "GAP",
+  "reason": "No single case walks every critical screen through loading/empty/error/offline/denied/success; per-screen states appear inside other cases. To be written once the screen list is frozen."
+ },
+ "TC-050": {
+  "classification": "GAP",
+  "reason": "Native push permission, lifecycle push and accessibility need a physical-device case; none is authored yet (push delivery is an open owner decision, O07)."
+ },
+ "TC-133": {
+  "classification": "GAP",
+  "reason": "Native push permission, lifecycle push and accessibility need a physical-device case; none is authored yet (push delivery is an open owner decision, O07)."
+ },
+ "TC-033": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Specifies a 2400 commission group / commission receivable; owner decision D10 (0% commission at launch) supersedes the amounts. The inactive commission ledger path is verified by automated finance tests; the owner-visible zero-commission guarantee is covered by E2E-FIN-046 and the ledger check inside E2E-FIN-039."
+ },
+ "TC-034": {
+  "classification": "AUTOMATED_ONLY",
+  "reason": "Specifies a 2400 commission group / commission receivable; owner decision D10 (0% commission at launch) supersedes the amounts. The inactive commission ledger path is verified by automated finance tests; the owner-visible zero-commission guarantee is covered by E2E-FIN-046 and the ledger check inside E2E-FIN-039."
+ }
+}

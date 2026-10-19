@@ -6,7 +6,9 @@ is skipped when Docker or a Caddy image is not already there. It checks:
 - default (CUSTOMER_ALLOWED_IPS / STAFF_ALLOWED_IPS = the allow-list): a client outside the list gets 403 everywhere;
 - customer class public, staff class restricted: an outsider reaches app., the customer API, id. (matbakhy realm) and
   media., but gets 403 on ops. and on /api/v1/ops and /api/v1/cook, and 404 on the Keycloak admin console and master realm;
-- the staff client reaches everything the outsider does and the privileged hosts and paths.
+- the staff client reaches everything the outsider does and the privileged hosts and paths;
+- kc-admin.* (the public Keycloak admin console, owner approval 2026-10-19): answers 404 for everyone until the switch file exists, then forwards
+  only the console's paths to Keycloak for ANY client address (IP-independent), and never the matbakhy realm, health or metrics.
 """
 import os
 import pathlib
@@ -70,6 +72,7 @@ class ProxyAccessTest(unittest.TestCase):
         cls.names = []
         docker("network", "create", "--subnet", f"{cls.prefix}.0/24", cls.net)
         cls.tmp = pathlib.Path(tempfile.mkdtemp(prefix="proxy-test-"))
+        (cls.tmp / "flags").mkdir()
         for site in ("customer-web", "operations-web"):
             (cls.tmp / site).mkdir()
             (cls.tmp / site / "index.html").write_text(f"<div id=root>{site}</div>")
@@ -93,7 +96,7 @@ class ProxyAccessTest(unittest.TestCase):
         docker("rm", "-f", name, check=False)
         docker("run", "-d", "--rm", "--name", name, "--network", self.net, "--ip", f"{self.prefix}.10",
                "-v", f"{CADDYFILE}:/etc/caddy/Caddyfile:ro", "-v", f"{self.tmp / 'customer-web'}:/srv/customer-web:ro",
-               "-v", f"{self.tmp / 'operations-web'}:/srv/operations-web:ro",
+               "-v", f"{self.tmp / 'operations-web'}:/srv/operations-web:ro", "-v", f"{self.tmp / 'flags'}:/srv/flags:ro",
                "-e", "PREVIEW_DOMAIN=mb.localhost", "-e", "ACME_EMAIL=ops@example.test", "-e", f"ALLOWED_CLIENT_IPS={allowed}",
                "-e", f"CUSTOMER_ALLOWED_IPS={customer}", "-e", f"STAFF_ALLOWED_IPS={staff}", self.image)
         self.addCleanup(docker, "rm", "-f", name, check=False)
@@ -149,6 +152,37 @@ class ProxyAccessTest(unittest.TestCase):
         self.assertEqual(self.get(staff, "api.mb.localhost", "/api/v1/ops/cases")[0], 200)
         self.assertEqual(self.get(staff, "api.mb.localhost", "/api/v1/cook/orders")[0], 200)
         self.assertEqual(self.get(staff, "id.mb.localhost", "/admin/")[0], 404)
+
+    def test_admin_console_host_is_closed_until_the_switch_exists_then_serves_only_the_console(self):
+        flag = self.tmp / "flags" / "admin-console-public"
+        flag.unlink(missing_ok=True)
+        staff = f"{self.prefix}.30"
+        # Customer and staff classes restricted to one client: the console must NOT depend on the client address.
+        self.start_caddy(f"{staff}/32", f"{staff}/32", f"{staff}/32")
+        outsider = f"{self.prefix}.20"
+        for client in (outsider, staff):
+            for path in ("/", "/admin/master/console/", "/admin/realms", "/realms/master/protocol/openid-connect/auth", "/resources/x/y.js"):
+                self.assertEqual(self.get(client, "kc-admin.mb.localhost", path)[0], 404, f"closed switch, {client} {path}")
+        flag.write_text("")
+        try:
+            for client in (outsider, staff):
+                status, body = self.get(client, "kc-admin.mb.localhost", "/")
+                self.assertEqual(status, 302, f"{client} /")
+                for path in ("/admin/master/console/", "/admin/realms", "/admin/realms/matbakhy/users", "/admin", "/realms/master/.well-known/openid-configuration",
+                             "/realms/master/protocol/openid-connect/token", "/resources/zlu30/admin/keycloak.v2/assets/main.js", "/js/keycloak.js"):
+                    self.assertEqual(self.get(client, "kc-admin.mb.localhost", path), (200, f"stub-http {path}"), f"open switch, {client} {path}")
+                for path in ("/realms/matbakhy/.well-known/openid-configuration", "/realms/matbakhy/protocol/openid-connect/auth", "/health", "/health/ready",
+                             "/metrics", "/q/metrics", "/robots.txt", "/welcome", "/realms/masterx", "/adminx", "/resourcesx/a", "/jsx/a", "/auth/admin/"):
+                    self.assertEqual(self.get(client, "kc-admin.mb.localhost", path)[0], 404, f"open switch, {client} {path}")
+            # The customer host still never serves the master realm or the console, whatever the switch says.
+            for path in ("/admin/", "/realms/master", "/realms/master/protocol/openid-connect/auth"):
+                self.assertEqual(self.get(staff, "id.mb.localhost", path)[0], 404, path)
+            self.assertEqual(self.get(staff, "id.mb.localhost", "/realms/matbakhy/x"), (200, "stub-http /realms/matbakhy/x"))
+            self.assertEqual(self.get(outsider, "id.mb.localhost", "/realms/matbakhy/x")[0], 403)
+        finally:
+            flag.unlink(missing_ok=True)
+        # Removing the switch closes the host again without restarting the proxy.
+        self.assertEqual(self.get(staff, "kc-admin.mb.localhost", "/admin/master/console/")[0], 404)
 
 
 if __name__ == "__main__":

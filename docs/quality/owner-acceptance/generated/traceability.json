@@ -1,0 +1,305 @@
+{
+  "cases": 200,
+  "by_status": {
+    "BLOCKED": 8,
+    "NOT_RUN": 192
+  },
+  "by_priority": {
+    "P0": 80,
+    "P1": 102,
+    "P2": 18
+  },
+  "by_readiness": {
+    "A1_NOW": 91,
+    "A2_FIXTURES": 24,
+    "B_UPDATED_DEPLOY": 55,
+    "C_DEVICE": 13,
+    "D_ISOLATED": 17
+  },
+  "scenarios_total": 128,
+  "scenarios_manual": 33,
+  "scenarios_partial_only": 72,
+  "scenarios_uncovered": [],
+  "case_to_scenarios": {
+    "CFG-001": [],
+    "CFG-002": [],
+    "CFG-003": [],
+    "CFG-004": [],
+    "CFG-005": [],
+    "CFG-006": [],
+    "CFG-101": [],
+    "CFG-102": [],
+    "CFG-008": [],
+    "CFG-011": [],
+    "CFG-012": [],
+    "CFG-014": [],
+    "CFG-015": [],
+    "CFG-016": [],
+    "CFG-018": [],
+    "CFG-019": [],
+    "CFG-020": [],
+    "CFG-021": [],
+    "CFG-022": [],
+    "CFG-023": [],
+    "CFG-104": [],
+    "CFG-105": [
+      "TC-043"
+    ],
+    "CFG-106": [],
+    "CFG-024": [],
+    "CFG-025": [
+      "TC-048"
+    ],
+    "CFG-026": [],
+    "CFG-108": [],
+    "CFG-109": [],
+    "CFG-027": [],
+    "CFG-028": [],
+    "CFG-029": [],
+    "CFG-030": [],
+    "CFG-031": [],
+    "CFG-032": [],
+    "CFG-033": [],
+    "CFG-034": [],
+    "CFG-036": [],
+    "CFG-037": [],
+    "CFG-038": [],
+    "CFG-039": [],
+    "CFG-040": [],
+    "CFG-041": [],
+    "CFG-042": [],
+    "CFG-043": [],
+    "CFG-044": [],
+    "CFG-045": [],
+    "CFG-046": [],
+    "CFG-112": [],
+    "CFG-115": [],
+    "CFG-118": [],
+    "CFG-119": [],
+    "CFG-120": [],
+    "CFG-121": [],
+    "CFG-122": [],
+    "E2E-COOK-048": [
+      "TC-008",
+      "TC-112"
+    ],
+    "E2E-COOK-049": [],
+    "E2E-COOK-050": [
+      "TC-009"
+    ],
+    "E2E-COOK-051": [],
+    "E2E-COOK-052": [],
+    "E2E-COOK-053": [],
+    "E2E-COOK-054": [
+      "TC-006"
+    ],
+    "E2E-OPS-055": [],
+    "E2E-OPS-056": [],
+    "E2E-OPS-057": [],
+    "E2E-OPS-058": [
+      "TC-007"
+    ],
+    "E2E-OPS-059": [],
+    "E2E-OPS-060": [
+      "TC-043"
+    ],
+    "E2E-OPS-061": [],
+    "E2E-OPS-062": [],
+    "E2E-COOK-101": [
+      "TC-011"
+    ],
+    "E2E-COOK-102": [],
+    "E2E-COOK-103": [
+      "TC-153"
+    ],
+    "E2E-COOK-104": [],
+    "E2E-COOK-105": [],
+    "E2E-COOK-106": [
+      "TC-013"
+    ],
+    "E2E-COOK-107": [],
+    "E2E-COOK-108": [],
+    "E2E-COOK-109": [],
+    "E2E-COOK-110": [],
+    "E2E-COOK-111": [],
+    "E2E-COOK-112": [],
+    "E2E-OPS-101": [],
+    "E2E-OPS-102": [],
+    "E2E-OPS-103": [],
+    "E2E-OPS-104": [],
+    "E2E-OPS-105": [],
+    "E2E-OPS-106": [
+      "TC-042"
+    ],
+    "E2E-OPS-107": [],
+    "E2E-OPS-108": [],
+    "E2E-OPS-109": [],
+    "E2E-OPS-110": [],
+    "E2E-OPS-111": [],
+    "E2E-OPS-112": [],
+    "E2E-DISC-001": [
+      "TC-150"
+    ],
+    "E2E-DISC-002": [],
+    "E2E-DISC-003": [
+      "TC-109"
+    ],
+    "E2E-DISC-004": [],
+    "E2E-DISC-005": [
+      "TC-009"
+    ],
+    "E2E-DISC-104": [
+      "TC-017"
+    ],
+    "E2E-DISC-006": [],
+    "E2E-DISC-101": [],
+    "E2E-DISC-102": [],
+    "E2E-DISC-103": [],
+    "E2E-DISC-007": [
+      "TC-021"
+    ],
+    "E2E-DISC-008": [
+      "TC-150"
+    ],
+    "E2E-DISC-113": [],
+    "E2E-DISC-105": [],
+    "E2E-DISC-106": [
+      "TC-005"
+    ],
+    "E2E-DISC-107": [
+      "TC-040"
+    ],
+    "E2E-DISC-108": [],
+    "E2E-DISC-109": [],
+    "E2E-DISC-110": [
+      "TC-039"
+    ],
+    "E2E-DISC-111": [],
+    "E2E-DISC-112": [
+      "TC-164"
+    ],
+    "E2E-DISC-114": [],
+    "E2E-DISC-117": [],
+    "E2E-DISC-115": [],
+    "E2E-BASKET-009": [
+      "TC-149"
+    ],
+    "E2E-BASKET-010": [
+      "TC-147"
+    ],
+    "E2E-BASKET-021": [
+      "TC-018"
+    ],
+    "E2E-BASKET-011": [
+      "TC-152"
+    ],
+    "E2E-BASKET-029": [],
+    "E2E-BASKET-012": [
+      "TC-151"
+    ],
+    "E2E-BASKET-023": [],
+    "E2E-BASKET-013": [],
+    "E2E-BASKET-014": [
+      "TC-154"
+    ],
+    "E2E-BASKET-015": [],
+    "E2E-BASKET-016": [
+      "TC-025"
+    ],
+    "E2E-BASKET-017": [
+      "TC-025"
+    ],
+    "E2E-BASKET-018": [],
+    "E2E-BASKET-019": [],
+    "E2E-BASKET-020": [
+      "TC-019"
+    ],
+    "E2E-BASKET-028": [],
+    "E2E-BASKET-030": [],
+    "E2E-BASKET-022": [
+      "TC-154"
+    ],
+    "E2E-BASKET-024": [
+      "TC-152"
+    ],
+    "E2E-BASKET-026": [
+      "TC-148"
+    ],
+    "E2E-BASKET-027": [],
+    "E2E-ORDER-021": [],
+    "E2E-ORDER-022": [],
+    "E2E-ORDER-023": [
+      "TC-024"
+    ],
+    "E2E-ORDER-024": [],
+    "E2E-ORDER-025": [],
+    "E2E-ORDER-026": [],
+    "E2E-ORDER-027": [],
+    "E2E-ORDER-028": [],
+    "E2E-ORDER-029": [],
+    "E2E-ORDER-030": [],
+    "E2E-ORDER-031": [],
+    "E2E-ORDER-032": [],
+    "E2E-ORDER-033": [],
+    "E2E-ORDER-034": [],
+    "E2E-ORDER-035": [],
+    "E2E-ORDER-036": [],
+    "E2E-ORDER-037": [],
+    "E2E-ORDER-101": [
+      "TC-032"
+    ],
+    "E2E-ORDER-102": [],
+    "E2E-ORDER-105": [],
+    "E2E-ORDER-106": [],
+    "E2E-ORDER-107": [],
+    "E2E-ORDER-108": [],
+    "E2E-ORDER-109": [],
+    "E2E-ORDER-110": [],
+    "E2E-ORDER-111": [],
+    "E2E-ORDER-112": [
+      "TC-020"
+    ],
+    "E2E-ORDER-113": [
+      "TC-018"
+    ],
+    "E2E-ORDER-114": [],
+    "E2E-ORDER-115": [],
+    "E2E-ORDER-117": [],
+    "E2E-ORDER-118": [],
+    "E2E-ORDER-119": [],
+    "E2E-ORDER-120": [
+      "TC-001",
+      "TC-006"
+    ],
+    "E2E-ORDER-121": [],
+    "E2E-ORDER-122": [],
+    "E2E-ORDER-123": [],
+    "E2E-FIN-038": [],
+    "E2E-FIN-039": [],
+    "E2E-FIN-040": [],
+    "E2E-FIN-041": [],
+    "E2E-FIN-042": [],
+    "E2E-FIN-043": [],
+    "E2E-FIN-044": [],
+    "E2E-FIN-045": [],
+    "E2E-FIN-046": [],
+    "E2E-FIN-047": [],
+    "E2E-FIN-101": [],
+    "E2E-FIN-102": [],
+    "E2E-FIN-103": [],
+    "E2E-FIN-104": [],
+    "E2E-FIN-105": [],
+    "E2E-FIN-106": [],
+    "E2E-FIN-107": [
+      "TC-162"
+    ],
+    "E2E-FIN-108": [],
+    "E2E-FIN-109": [],
+    "E2E-FIN-110": [],
+    "E2E-FIN-111": [],
+    "E2E-FIN-112": [],
+    "E2E-FIN-113": [],
+    "E2E-FIN-114": [],
+    "E2E-FIN-115": []
+  }
+}
