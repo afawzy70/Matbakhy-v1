@@ -113,7 +113,11 @@ def finalize(out, result_file, users_file):
     pre-existing (Keycloak SKIPs an existing user, so a freshly generated password would not match), and verify that every expected username exists
     in Keycloak with exactly the fixed id the SQL seed refers to. Exit 1 on any mismatch. Prints no password."""
     out = Path(out)
-    result = json.loads(Path(result_file).read_text(encoding="utf-8"))
+    try:
+        result = json.loads(Path(result_file).read_text(encoding="utf-8"))
+    except ValueError:
+        print("the import result is not JSON (the import may still have created users): nothing verified, nothing written to PostgreSQL")
+        return 1
     added = {r["resourceName"] for r in result.get("results", []) if r.get("action") == "ADDED" and r.get("resourceType") == "USER"}
     existing = {u["username"]: u["id"] for u in json.loads(Path(users_file).read_text(encoding="utf-8"))}
     creds_path = out / "credentials.private.json"
@@ -125,7 +129,7 @@ def finalize(out, result_file, users_file):
             problems.append(f"{name}: Keycloak id {existing.get(name)!r} is not the fixed id {a['kc']!r}")
         if name not in added and name in creds:
             creds[name]["password"] = None
-            creds[name]["note"] = "user already existed; its password was not changed by this run"
+            creds[name]["note"] = "user already existed; its password was not changed by this run (look in the earlier run directories of owner-e2e-private)"
     creds_path.write_text(json.dumps(creds, indent=1), encoding="utf-8")
     os.chmod(creds_path, 0o600)
     print(f"import: {len(added)} users added, {len(creds) - len(added)} already existed (passwords unchanged)")

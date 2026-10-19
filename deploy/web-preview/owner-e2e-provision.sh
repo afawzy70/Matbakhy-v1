@@ -54,7 +54,7 @@ case "${1:-}" in
     trap './kcadm-in-container.sh cleanup "$cfg" >/dev/null 2>&1 || true' EXIT
     ADMIN_USER="$KEYCLOAK_ADMIN_USER" ADMIN_PASSWORD="$KEYCLOAK_ADMIN_PASSWORD" ./kcadm-in-container.sh config credentials --config "$cfg" >/dev/null \
       || die "cannot sign in to Keycloak (operations client)"
-    ./kcadm-in-container.sh create partialImport -r matbakhy -f - --config "$cfg" < "$dir/partial-import.json" > "$dir/import-result.json" 2>"$dir/import-error.txt" \
+    ./kcadm-in-container.sh create partialImport -r matbakhy -f - -o --config "$cfg" < "$dir/partial-import.json" > "$dir/import-result.json" 2>"$dir/import-error.txt" \
       || die "the Keycloak import failed (details in $dir/import-error.txt, mode 600; they may name accounts)"
     ./kcadm-in-container.sh get users -r matbakhy --fields id,username -q max=1000 --config "$cfg" > "$dir/users.json" || die "cannot list the Keycloak users"
     python3 ../../scripts/owner_e2e_fixtures.py finalize --out "$dir" --result "$dir/import-result.json" --users "$dir/users.json" \
