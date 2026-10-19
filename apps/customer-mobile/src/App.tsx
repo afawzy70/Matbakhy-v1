@@ -84,12 +84,13 @@ function StepUpBanner() {
 }
 
 function Navigation() {
-  const { t, config, accountEpoch } = useApp();
+  const { t, config, accountEpoch, shoppingReady } = useApp();
   const linking = useMemo(() => linkingFor(config.redirectUri), [config.redirectUri]);
   return (
     <View style={{ flex: 1 }}>
       <StepUpBanner />
       <View style={{ flex: 1 }}>
+        {shoppingReady ? (
         <NavigationContainer key={accountEpoch} theme={theme} linking={linking}>
           <Stack.Navigator screenOptions={{ headerBackTitle: t.back }}>
             <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
@@ -101,6 +102,7 @@ function Navigation() {
           </Stack.Navigator>
           <StatusBar style="auto" />
         </NavigationContainer>
+        ) : null}
       </View>
     </View>
   );

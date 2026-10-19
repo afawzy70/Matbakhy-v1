@@ -3,7 +3,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useRef, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../AppContext";
-import { estimateMinor, lineLimit, loadBasket, loadPending, saveBasket, savePending, type Basket, type BasketLine, type PendingPlacement } from "../basket";
+import { currentShopping, estimateMinor, lineLimit, loadBasket, loadPending, saveBasket, type Basket, type BasketLine, type PendingPlacement } from "../basket";
 import { errorText } from "../i18n";
 import { errorCode, formatMoney, formatTime, newKey, type Schemas } from "../mobileApi";
 import { place, recover, type PlacementOutcome } from "../placement";
@@ -44,10 +44,10 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
   // One recovery check at a time: a second press (or the check on focus) while one is running waits for it instead of
   // sending another lookup and possibly a second re-send (MB-033 retry review; the server's idempotency stays the backstop).
   const inFlight = useRef<Promise<void> | null>(null);
-  const recheck = useCallback(() => {
+  const recheck = useCallback((explicit = false) => {
     if (!inFlight.current) {
       setChecking(true);
-      inFlight.current = recover(api)
+      inFlight.current = recover(api, explicit)
         .then(settleOutcome)
         .finally(() => {
           inFlight.current = null;
@@ -135,7 +135,7 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
       {pending ? (
         <View accessibilityRole="alert" testID="pending-order" style={{ gap: 8 }}>
           <Notice locale={locale}>{outcome?.kind === "uncertain" && outcome.offline ? t.pendingOffline : t.pendingUncertain}</Notice>
-          <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck()} />
+          <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck(true)} />
         </View>
       ) : null}
       {/* A refused stale price is explained by the order form's price-change notice instead (D13). */}
@@ -331,11 +331,12 @@ function OrderForm({
       terms: q.termsVersion ?? "",
       cancellation: q.cancellationPolicyVersion,
     };
-    await savePending(p);
+    const shop = currentShopping(); // one handle from the first write to the answer
+    await shop.savePending(p);
     onPending(p);
     setBusy(true);
     try {
-      const o = await place(api, p);
+      const o = await place(api, p, shop);
       onOutcome(o);
       if (o.kind === "rejected" && o.code === "PRICE_CHANGED") {
         // Nothing was ordered: re-quote and let the customer review and accept the new prices (never resubmit silently).

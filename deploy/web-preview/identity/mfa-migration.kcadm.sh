@@ -219,9 +219,19 @@ fixture_create() {
 
 fixture_delete() {
   login
-  kc get users -r "$REALM" -q "search=$FIXTURE_PREFIX" --fields id,username --format csv --noquotes | while IFS=, read -r id name; do
-    case "$name" in "$FIXTURE_PREFIX"*) kc delete "users/$id" -r "$REALM" >/dev/null && echo "fixture user $name: removed" ;; esac
-  done
+  rows="$(kc get users -r "$REALM" -q "search=$FIXTURE_PREFIX" --fields id,username --format csv --noquotes)" || die "cannot list users for the fixture cleanup"
+  failed=0
+  # Read from a here-document (no subshell, so a failure is remembered) and keep the delete calls off the loop's standard input.
+  while IFS=, read -r id name; do
+    [ -n "$id" ] || continue
+    case "$name" in
+      "$FIXTURE_PREFIX"*)
+        if kc delete "users/$id" -r "$REALM" </dev/null >/dev/null; then echo "fixture user $name: removed"; else echo "fixture user $name: NOT removed" >&2; failed=1; fi ;;
+    esac
+  done <<ROWS
+$rows
+ROWS
+  [ "$failed" -eq 0 ] || die "fixture cleanup incomplete: users named $FIXTURE_PREFIX* remain"
 }
 
 case "${1:-}" in

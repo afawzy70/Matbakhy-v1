@@ -30,3 +30,8 @@
 | D18-RESIDUAL-2 | Medium | Mobile MFA | OPEN_DEVICE_VERIFICATION | Mobile step-up banner implemented and jest/simulator-CI covered; no physical device run; no in-app Security screen |
 | D18-RESIDUAL-3 | Low | DISABLED policy | ACCEPTED_DOCUMENTED | A user can still add an authenticator directly in Keycloak account console under DISABLED; it has no effect in the application |
 | D18-RESIDUAL-4 | Low | Tokens | ACCEPTED_DOCUMENTED | Access tokens issued before a reset or switch-off stay valid up to 5 minutes for non-MFA functions; they no longer count as MFA proof for the policy or high-risk actions |
+| CR12-1 | High | Customer mobile | VERIFIED_CI_AND_INDEPENDENT_REVIEW | Account switch during step-up left the previous account's screens, basket or pending order reachable |
+| CR12-2 | Medium | Customer mobile | VERIFIED_CI_AND_INDEPENDENT_REVIEW | Step-up did not recover the refused request; order placement must not be replayed by itself |
+| CR12-3 | Medium | Migration tooling | VERIFIED_CI_AND_INDEPENDENT_REVIEW | Rollback state was shell-sourced from an untrusted flow name |
+| CR12-4 | Medium | Migration tooling | VERIFIED_LOCAL_REHEARSAL_AND_REVIEW | Verification could report PASS from configuration alone |
+| CR12-5 | Medium | Migration tooling | VERIFIED_LOCAL_TEST_AND_REVIEW | Fixture cleanup could report success while leaving users; apply turned INCOMPLETE verification into exit 0 |

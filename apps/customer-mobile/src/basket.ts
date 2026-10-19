@@ -40,6 +40,8 @@ export interface PendingPlacement {
   quoteId: string;
   terms: string;
   cancellation: string;
+  /** The server asked for a second factor (D18) when this was sent: it is re-sent only by the customer's explicit retry, never on focus or restart. */
+  awaitingExplicitRetry?: boolean;
 }
 
 const BASKET = "matbakhy.basket.v1";
@@ -81,15 +83,90 @@ async function write(key: string, value: unknown) {
   }
 }
 
-export const loadBasket = () => read<Basket>(BASKET);
-export const saveBasket = (basket: Basket | null) => write(BASKET, basket);
-export const loadPending = () => read<PendingPlacement>(PENDING);
-export const savePending = (pending: PendingPlacement | null) => write(PENDING, pending);
-
-export async function clearShopping() {
-  await saveBasket(null);
-  await savePending(null);
+/**
+ * The stored basket and pending placement belong to one signed-in person (TC-048). Each person has their own storage keys
+ * ("<key>.<subject>"); signed out, the keys have no suffix (a guest's basket). Reads and writes go through a {@link Shopping}
+ * handle that is bound to its owner when it is taken, so an answer that arrives after the person changed can only touch the
+ * previous person's keys, never the next person's, and a cleanup that fails leaves data nobody else can read.
+ */
+export interface Shopping {
+  readonly owner: string | null;
+  loadBasket(): Promise<Basket | null>;
+  saveBasket(basket: Basket | null): Promise<void>;
+  loadPending(): Promise<PendingPlacement | null>;
+  savePending(pending: PendingPlacement | null): Promise<void>;
+  /** Removes this owner's basket and pending placement; throws when storage refuses. */
+  clear(): Promise<void>;
 }
+
+/** The guest-to-person move of a basket (see bindShopping); every storage operation waits for it, so a cleanup cannot overtake it. */
+let migration: Promise<void> = Promise.resolve();
+
+function shoppingFor(owner: string | null): Shopping {
+  const key = (base: string) => (owner ? `${base}.${owner}` : base);
+  return {
+    owner,
+    loadBasket: async () => (await migration, read<Basket>(key(BASKET))),
+    saveBasket: async (basket) => (await migration, write(key(BASKET), basket)),
+    loadPending: async () => (await migration, read<PendingPlacement>(key(PENDING))),
+    savePending: async (pending) => (await migration, write(key(PENDING), pending)),
+    async clear() {
+      await migration;
+      await write(key(BASKET), null);
+      await write(key(PENDING), null);
+    },
+  };
+}
+
+let current: Shopping = shoppingFor(null);
+
+/** The handle for whoever is signed in now. Long operations take it once at their start and use it to the end. */
+export const currentShopping = (): Shopping => current;
+
+/**
+ * Switches the storage to {@code subject} (null: signed out). A basket built as a guest follows the person who signs in, unless
+ * they already have one of their own; nothing of another signed-in person is ever adopted.
+ */
+export async function bindShopping(subject: string | null): Promise<void> {
+  if (current.owner === subject) {
+    return;
+  }
+  const previous = current;
+  current = shoppingFor(subject);
+  if (previous.owner === null && subject !== null) {
+    const move = (async () => {
+      try {
+        const [guestBasket, guestPending, ownBasket, ownPending] = await Promise.all([read<Basket>(BASKET), read<PendingPlacement>(PENDING), read<Basket>(`${BASKET}.${subject}`), read<PendingPlacement>(`${PENDING}.${subject}`)]);
+        if (guestBasket || guestPending) {
+          // The guest's keys are removed FIRST, so the same basket can never end up with two people; only then is it written for this
+          // person, and only when they have nothing of their own (their own basket wins; the guest basket is dropped).
+          await write(BASKET, null);
+          await write(PENDING, null);
+          if (!ownBasket && !ownPending) {
+            if (guestBasket) {
+              await write(`${BASKET}.${subject}`, guestBasket);
+            }
+            if (guestPending) {
+              await write(`${PENDING}.${subject}`, guestPending);
+            }
+          }
+        }
+      } catch {
+        // Nothing was copied before the guest keys were removed, so a failure can lose a guest basket but never share it.
+      }
+    })();
+    migration = move;
+    await move;
+  }
+}
+
+export const loadBasket = () => current.loadBasket();
+export const saveBasket = (basket: Basket | null) => current.saveBasket(basket);
+export const loadPending = () => current.loadPending();
+export const savePending = (pending: PendingPlacement | null) => current.savePending(pending);
+
+/** Removes the current owner's basket and pending placement. Throws when storage refuses. */
+export const clearShopping = () => current.clear();
 
 export type AddOutcome =
   | { kind: "added"; basket: Basket }

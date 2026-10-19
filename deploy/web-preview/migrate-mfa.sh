@@ -65,7 +65,12 @@ verify() {
   # is reported NOT_RUN and the exit code is 3, never PASS.
   fxdir="$(mktemp -d)"
   chmod 700 "$fxdir"
-  fx_cleanup() { run_migration fixture-delete >/dev/null 2>&1 || echo "WARNING: remove users named verify-mfa-* by hand (./migrate-mfa.sh fixture-clean)" >&2; rm -rf "$fxdir"; }
+  fx_cleanup() {
+    cleanup_rc=0
+    run_migration fixture-delete >/dev/null 2>&1 || { cleanup_rc=1; echo "WARNING: synthetic users named verify-mfa-* may remain; run ./migrate-mfa.sh fixture-clean" >&2; }
+    rm -rf "$fxdir"
+    return "$cleanup_rc"
+  }
   trap fx_cleanup EXIT
   trap 'exit 130' INT TERM
   fixture=""
@@ -77,8 +82,8 @@ verify() {
   rc=0
   PREVIEW_DOMAIN="$PREVIEW_DOMAIN" PREVIEW_USER_PASSWORD="${PREVIEW_USER_PASSWORD:-}" OIDC_ADMIN_CLIENT_SECRET="${OIDC_ADMIN_CLIENT_SECRET:-}" \
     OIDC_WEB_CLIENT_SECRET="${OIDC_WEB_CLIENT_SECRET:-}" VERIFY_FIXTURE_FILE="$fixture" python3 identity/verify-mfa-flow.py || rc=$?
-  fx_cleanup
   trap - EXIT INT TERM
+  fx_cleanup || { [ "$rc" -ne 0 ] || rc=1; }
   return "$rc"
 }
 
@@ -93,7 +98,10 @@ case "${1:-}" in
     rc=0
     verify || rc=$?
     [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ] || die "verification FAILED (exit $rc): consider ./migrate-mfa.sh rollback"
-    [ "$rc" -ne 3 ] || echo "WARNING: applied, but authentication assurance is NOT proven (verification incomplete). Do not treat this as PASS."
+    if [ "$rc" -eq 3 ]; then
+      echo "WARNING: applied, but authentication assurance is NOT proven (verification incomplete). Do not treat this as PASS." >&2
+      exit 3
+    fi
     ;;
   verify) verify ;;
   fixture-clean) run_migration fixture-delete ;;
