@@ -2,7 +2,7 @@
 """Generates a Keycloak master-realm administrator for a person, on the server (admin-console.sh create-admin NAME).
 
   provision-admin.py new-admin DIR NAME    writes DIR/NAME.private (mode 600) and prints the user representation (JSON, one line) for
-                                           `admin-console.kcadm.sh admin-create` on standard input.
+                                           `admin_console.py admin-create` on standard input.
 
 The private file holds the generated password, the one-time-password key (base32, for "enter a setup key" in an authenticator app) and the
 otpauth:// URI. Nothing secret is printed. The account is created with both credentials, so no enrolment ever happens on the public page.

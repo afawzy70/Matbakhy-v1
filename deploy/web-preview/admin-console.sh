@@ -28,7 +28,6 @@ FLAG="$GENERATED_DIR/flags/admin-console-public"
 BACKUP_DIR="${BACKUP_DIR:-/srv/matbakhy-backups}"
 KCDIR="$BACKUP_DIR/keycloak"
 STATE="$KCDIR/admin-console-state.env"
-SCRIPT=identity/admin-console.kcadm.sh
 . ./identity/mfa-state.sh
 
 ensure_ops_secret() {
@@ -46,10 +45,18 @@ ensure_ops_secret() {
   fi
 }
 
+# Keycloak's Admin REST API is reached on the identity container's address inside the Docker network (nothing is published for it).
+kc_base() {
+  cid="$(compose ps -q identity)"
+  [ -n "$cid" ] || die "the identity container is not running"
+  ip="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$cid" | awk '{ print $1 }')"
+  [ -n "$ip" ] || die "cannot find the identity container's address"
+  echo "http://$ip:8080"
+}
+
 run_kc() { # $1 = status | harden | rollback | fixture-create | fixture-delete | admin-create | admin-delete NAME
-  ADMIN_USER="$KEYCLOAK_ADMIN_USER" ADMIN_PASSWORD="$KEYCLOAK_ADMIN_PASSWORD" OPS_CLIENT_SECRET="${KEYCLOAK_OPS_CLIENT_SECRET:-}" \
-  PREVIEW_DOMAIN="$PREVIEW_DOMAIN" KCADM=./kcadm-in-container.sh KCADM_REMOTE=1 KCADM_CONFIG=/tmp/kcadm-admin-console.cfg ENV_FILE="$ENV_FILE" \
-  PREVIOUS_FLOW="${PREVIOUS_FLOW:-}" PURGE="${PURGE:-0}" sh "$SCRIPT" "$@"
+  KC_BASE="${KC_BASE:-$(kc_base)}" ADMIN_USER="$KEYCLOAK_ADMIN_USER" ADMIN_PASSWORD="$KEYCLOAK_ADMIN_PASSWORD" OPS_CLIENT_SECRET="${KEYCLOAK_OPS_CLIENT_SECRET:-}" \
+  PREVIEW_DOMAIN="$PREVIEW_DOMAIN" PREVIOUS_FLOW="${PREVIOUS_FLOW:-}" PURGE="${PURGE:-0}" python3 -I identity/admin_console.py "$@"
 }
 
 open_switch() { mkdir -p "$(dirname "$FLAG")"; : > "$FLAG"; chmod 644 "$FLAG"; }
