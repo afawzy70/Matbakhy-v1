@@ -115,11 +115,14 @@ record_release() {
 }
 
 up() {
-  # One writer at a time on this server (the admin console and the owner E2E provisioning take the same lock).
-  mkdir -p "${BACKUP_DIR:-/srv/matbakhy-backups}"
-  exec 9>"${BACKUP_DIR:-/srv/matbakhy-backups}/.preview-mutation.lock"
-  command -v flock >/dev/null 2>&1 && { flock -n 9 || die "another preview change holds the lock"; }
   check
+  # One writer at a time on this server (the admin console and the owner E2E provisioning take the same lock).
+  lock="${BACKUP_DIR:-/srv/matbakhy-backups}/.preview-mutation.lock"
+  if mkdir -p "$(dirname "$lock")" 2>/dev/null && { exec 9>"$lock"; } 2>/dev/null; then
+    command -v flock >/dev/null 2>&1 && { flock -n 9 || die "another preview change holds $lock"; }
+  else
+    echo "deploy: WARNING: cannot create the shared lock $lock; continuing without it" >&2
+  fi
   render
   LAST_BACKUP_DIR=""
   schema_before=0
