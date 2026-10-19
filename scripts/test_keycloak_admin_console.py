@@ -152,6 +152,10 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertIn("matbakhyHardened", harden)
         self.assertLess(harden.index("logout-all"), harden.index("attributes.matbakhyHardened=yes"), "the marker is set only after revocation")
         self.assertIn("CONFIGURE_TOTP -r \"$REALM\" --fields enabled", harden)
+        no, bind, grants = harden.index("attributes.matbakhyHardened=no"), harden.index('browserFlow="$TOP"'), harden.index("directAccessGrantsEnabled=false")
+        self.assertLess(no, bind, "the marker is cleared before the first mutation that matters for sessions")
+        self.assertLess(no, grants)
+        self.assertLess(no, harden.index("authentication/required-actions/CONFIGURE_TOTP -r \"$REALM\" -s enabled=false"))
         rollback = text[text.index("rollback() {"):text.index("# Synthetic verification administrators")]
         self.assertIn("attributes.matbakhyHardened=no", rollback)
         self.assertIn("CONFIGURE_TOTP -r \"$REALM\" -s enabled=true", rollback)
@@ -211,6 +215,10 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertEqual(enable.count("enabled=1"), 1)
         self.assertIn('create-admin "$owner"', enable, "an owner administrator is created on the server when nobody can sign in")
         self.assertGreater(enable.index('create-admin "$owner"'), enable.index("OPEN:"), "created only after a passed verification")
+        accounts = KCADM.read_text()
+        accounts = accounts[accounts.index("admin_accounts() {"):accounts.index("status() {")]
+        for state in ("disabled", "not-an-administrator", "no-otp(cannot-sign-in)", "otp"):
+            self.assertIn(f"={state}", accounts)
         self.assertIn("trap fx_cleanup EXIT", text)
         self.assertIn("fixture-delete", text)
 

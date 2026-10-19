@@ -94,11 +94,18 @@ password_grant_clients() {
   kc get clients -r "$REALM" --fields id,clientId,directAccessGrantsEnabled --format csv --noquotes | awk -F, '$3 == "true" { print $2 }'
 }
 
-# One line per master user: whether it has an OTP (without one it cannot sign in: the public page offers no enrolment) and the count.
+# One line per master user. Only an ENABLED user with the realm role "admin" and an OTP credential can sign in to the console and manage it
+# (an account without an OTP cannot sign in: the public page offers no enrolment; the read-only verification users are not administrators).
 admin_accounts() {
   kc get users -r "$REALM" --fields id,username --format csv --noquotes </dev/null | while IFS=, read -r id name; do
     [ -n "$id" ] || continue
     case "$name" in service-account-*) continue ;; esac
+    if [ "$(kc get "users/$id" -r "$REALM" --fields enabled --format csv --noquotes </dev/null | head -1)" != true ]; then
+      echo "admin.$name=disabled"; continue
+    fi
+    if ! kc get "users/$id/role-mappings/realm" -r "$REALM" --fields name --format csv --noquotes </dev/null | grep -Fxq admin; then
+      echo "admin.$name=not-an-administrator"; continue
+    fi
     if kc get "users/$id/credentials" -r "$REALM" --fields type --format csv --noquotes </dev/null | grep -Fxq otp; then
       echo "admin.$name=otp"
     else
@@ -174,14 +181,20 @@ harden() {
     flow_complete || die "the flow tree is not complete after building it; the browser flow was NOT changed"
     echo "flow: created and verified"
   fi
-  # Revocation (step 6) runs whenever the realm does not carry the completion marker, so an earlier run that stopped half way cannot leave
-  # sessions from the password-only time behind; the marker is set only after revocation and cleared by rollback.
+  # Drift is read BEFORE anything is changed. When there is any (first run, or something was re-opened since), the completion marker is
+  # cleared first and set again only after the sessions and tokens issued before the hardening were revoked, so an interrupted run can never
+  # leave password-only sessions behind. A clean re-run (nothing to change) revokes nothing, so the console's users stay signed in.
   changed=0
   [ "$(kc get "realms/$REALM" --fields 'attributes(matbakhyHardened)' --format csv --noquotes </dev/null | head -1)" = yes ] || changed=1
+  [ "$(bound_flow)" = "$TOP" ] || changed=1
+  [ "$(kc get authentication/required-actions/CONFIGURE_TOTP -r "$REALM" --fields enabled --format csv --noquotes </dev/null | head -1)" = false ] || changed=1
+  [ -z "$(password_grant_clients)" ] || changed=1
+  overrides="$(kc get clients -r "$REALM" --fields id,authenticationFlowBindingOverrides </dev/null)" || die "cannot read the master clients"
+  [ -z "$(printf '%s\n' "$overrides" | awk '/"id" :/ { gsub(/[",]/, "", $3); id = $3 } /"authenticationFlowBindingOverrides" :/ { if ($0 !~ /\{ *\}/) print id }')" ] || changed=1
+  if [ "$changed" = 1 ]; then kc update "realms/$REALM" -s attributes.matbakhyHardened=no >/dev/null; fi
   if [ "$(bound_flow)" != "$TOP" ]; then
     kc update "realms/$REALM" -s browserFlow="$TOP" >/dev/null
     echo "browserFlow: bound to '$TOP'"
-    changed=1
   else
     echo "browserFlow: already '$TOP'"
   fi
@@ -189,7 +202,6 @@ harden() {
   # 4. Nobody can enrol a one-time password over the Internet: with the required action disabled, an account that has no OTP cannot sign
   #    in at all (so knowing a password is never enough, not even for the first sign-in). Administrators get their OTP from the server
   #    (admin-create), never from the public page.
-  [ "$(kc get authentication/required-actions/CONFIGURE_TOTP -r "$REALM" --fields enabled --format csv --noquotes </dev/null | head -1)" = false ] || changed=1
   kc update authentication/required-actions/CONFIGURE_TOTP -r "$REALM" -s enabled=false -s defaultAction=false >/dev/null
   echo "required action CONFIGURE_TOTP: disabled (no public enrolment)"
 
@@ -199,7 +211,6 @@ harden() {
     cid="$(client_uuid "$c")"
     kc update "clients/$cid" -r "$REALM" -s directAccessGrantsEnabled=false >/dev/null
     echo "client $c: password grant switched off"
-    changed=1
   done
   [ -z "$(password_grant_clients)" ] || die "a master client still accepts the password grant"
   # Only clients that have an override are touched (Keycloak refuses to update some built-in clients).
@@ -207,7 +218,6 @@ harden() {
   for cid in $(printf '%s\n' "$overrides" | awk '/"id" :/ { gsub(/[",]/, "", $3); id = $3 } /"authenticationFlowBindingOverrides" :/ { if ($0 !~ /\{ *\}/) print id }'); do
     kc update "clients/$cid" -r "$REALM" -s 'authenticationFlowBindingOverrides={}' >/dev/null </dev/null
     echo "client $cid: flow override removed"
-    changed=1
   done
   overrides="$(kc get clients -r "$REALM" --fields clientId,authenticationFlowBindingOverrides </dev/null)" || die "cannot read the master clients"
   if printf '%s\n' "$overrides" | grep -Eq '"(browser|direct_grant)"'; then
