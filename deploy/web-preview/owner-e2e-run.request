@@ -1,2 +1,2 @@
 apply
-# request 3 (apply): verified backup, Keycloak partial import (existing users skipped), SQL seeds, slot refresh, read-only reconciliation. First word = mode.
+# request 4 (apply, private directory outside the deployed tree). First word = mode.

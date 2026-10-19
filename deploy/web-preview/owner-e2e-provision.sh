@@ -2,7 +2,7 @@
 # Owner E2E fixtures on the shared PREVIEW (owner-approved, non-destructive, never production). Run on the server in deploy/web-preview by a user with Docker:
 #   ./owner-e2e-provision.sh plan      read-only: release, existing fixture users, what would be created
 #   ./owner-e2e-provision.sh apply     verified backup, Keycloak partial import (existing users are skipped), SQL seeds, slot refresh, read-only reconciliation
-# Every step is idempotent and additive: nothing is deleted or overwritten. Passwords are generated into GENERATED_DIR/owner-e2e/<run> (directory 700,
+# Every step is idempotent and additive: nothing is deleted or overwritten. Passwords are generated into BACKUP_DIR/owner-e2e-private/<run> (directory 700,
 # files 600), never printed, never committed. Do not run it at the same time as admin-console.sh or any other Keycloak/database change.
 set +x
 set -eu
@@ -44,9 +44,10 @@ case "${1:-}" in
     kcdump="$BACKUP_DIR/keycloak/keycloak-db-e2e-$(date -u +%Y%m%dT%H%M%SZ).dump"
     compose exec -T postgres pg_dump -U "${POSTGRES_USER:-matbakhy}" -Fc keycloak > "$kcdump"
     [ -s "$kcdump" ] || die "empty Keycloak database dump"
-    run="$(date -u +%Y%m%dT%H%M%SZ)"; dir="$GENERATED_DIR/owner-e2e/$run"
+    # Outside the deployed tree (the render script refuses a path inside the repository checkout); BACKUP_DIR is private to the deploy user.
+    run="$(date -u +%Y%m%dT%H%M%SZ)"; dir="$BACKUP_DIR/owner-e2e-private/$run"
     echo "== credentials -> $dir (not printed)"
-    mkdir -p "$GENERATED_DIR/owner-e2e"; chmod 700 "$GENERATED_DIR/owner-e2e"
+    mkdir -p "$BACKUP_DIR/owner-e2e-private"; chmod 700 "$BACKUP_DIR/owner-e2e-private"
     python3 ../../scripts/owner_e2e_fixtures.py render --out "$dir"
     echo "== Keycloak users (partial import keeps the fixed ids; existing users are skipped and keep their passwords)"
     cfg="/tmp/kcadm-e2e.$$.cfg"
