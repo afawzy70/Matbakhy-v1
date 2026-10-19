@@ -115,7 +115,7 @@ Operators use it to inspect users and the realm flow, never to share passwords i
 
 ## Known limitations and documentation gaps
 
-* Case-text drift: owner cases CFG-001 and CFG-121 (`docs/quality/owner-acceptance/cases/config-security.json`) still describe the older boundary ("Keycloak admin console and master realm are never published"). The code, `docs/operations/14-keycloak-admin-console.md` and the Caddyfile follow the 2026-10-19 owner approval of the public Preview hostname. Trust the code and operations document; the case files are not edited from the handbook and need an owner-acceptance update.
+* Owner cases CFG-001 and CFG-121 (`docs/quality/owner-acceptance/cases/config-security.json`) now state that the admin console is not published on the customer identity host `id.<PREVIEW_DOMAIN>`; the separate `kc-admin` host is covered by `docs/operations/14-keycloak-admin-console.md`. There is still no dedicated owner case for signing in to the console with password plus OTP (gap).
 * `docs/security/mfa-policy.md` rollout step 5 says the mobile app does not handle `STEP_UP_REQUIRED`; the residual-risk section and the code (`apps/customer-mobile/src/AppContext.tsx`) show a banner exists. It also cites an iOS device test plan file under a mobile docs directory that does not exist in the repository.
 * The preview realm template lacks the `matbakhy-mobile` client.
 * No Keycloak realm roles are used, despite generic "role" wording in older documents; permissions live in `user_grant`.

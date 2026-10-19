@@ -40,7 +40,7 @@ scripts/dev.sh smoke      # prints PASS only if every check passed
 
 ## Synthetic users
 
-The local realm (`infra/identity/matbakhy-realm.json`) defines `customer-a`, `customer-b`, `cook-a` and `ops-a`, plus the service account `service-account-matbakhy-admin`. All users share one password, `DEV_USER_PASSWORD` in your local env file. Read it from your own file when you need it; do not paste it anywhere. Local MFA and SMS are not available; browser tests simulate phone verification with SQL (see `apps/operations-web/e2e/fixtures.ts`).
+The local realm (`infra/identity/matbakhy-realm.json`) defines `customer-a`, `customer-b`, `cook-a` and `ops-a`, plus the service account `service-account-matbakhy-admin`. All users share one password, `DEV_USER_PASSWORD` in your local env file. Read it from your own file when you need it; do not paste it anywhere. SMS is not available locally and interactive local MFA enrolment is NOT VERIFIED (the realm defines the OTP flow in `infra/identity/matbakhy-realm.json`); browser tests simulate phone verification with SQL (see `apps/operations-web/e2e/fixtures.ts`).
 
 Development data comes from Flyway repeatable scripts in `backend/app/src/main/resources/db/devdata` (service zones named `test-zone-*`, synthetic commerce policy). `EnvironmentGuard` (`backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`) refuses the `dev` profile or devdata locations when `APP_ENV` is STAGING or PRODUCTION; LOCAL, CI and PREVIEW count as synthetic.
 

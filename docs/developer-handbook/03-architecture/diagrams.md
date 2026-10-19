@@ -317,15 +317,16 @@ stateDiagram-v2
         CUSTOMER_TRANSFER_REPORTED --> KITCHEN_RECEIPT_REPORTED: kitchen reports receipt (amount equals deposit)
         DISPUTED --> KITCHEN_RECEIPT_REPORTED: kitchen reports receipt
         WAITING_FOR_DEPOSIT --> DISPUTED: kitchen reports not received or mismatch
+        RECONCILE_PENDING --> DISPUTED: kitchen reports problem
         CUSTOMER_TRANSFER_REPORTED --> DISPUTED: kitchen reports problem
         WAITING_FOR_DEPOSIT --> EXPIRED: order ended unsuccessfully (REJECTED, EXPIRED, CANCELLED, DELIVERY_FAILED) with no report
         CUSTOMER_TRANSFER_REPORTED --> RECONCILE_PENDING: order ended unsuccessfully
         KITCHEN_RECEIPT_REPORTED --> RECONCILE_PENDING: order ended unsuccessfully
         DISPUTED --> RECONCILE_PENDING: order ended unsuccessfully
-        DISPUTED --> REFUND_OWED: staff decision with reason
-        RECONCILE_PENDING --> REFUND_OWED: staff decision with reason
-        DISPUTED --> CLOSED_NO_FUNDS: staff decision with reason
-        RECONCILE_PENDING --> CLOSED_NO_FUNDS: staff decision with reason
+        DISPUTED --> REFUND_OWED: staff decision only after order ended, finance.verify, recent MFA, reason
+        RECONCILE_PENDING --> REFUND_OWED: staff decision only after order ended, finance.verify, recent MFA, reason
+        DISPUTED --> CLOSED_NO_FUNDS: staff decision only after order ended, finance.verify, recent MFA, reason
+        RECONCILE_PENDING --> CLOSED_NO_FUNDS: staff decision only after order ended, finance.verify, recent MFA, reason
         REFUND_OWED --> REFUNDED: kitchen reports refund sent
         RECONCILE_PENDING --> REFUNDED: kitchen reports refund sent
     }
@@ -335,7 +336,7 @@ stateDiagram-v2
         DUE --> DISPUTED_CASH: reported amount differs
         REPORTED --> VERIFIED: finance verifies
         REPORTED --> DISPUTED_CASH: finance disputes
-        DUE --> NOT_DUE: order rejected, cancelled or expired
+        DUE --> NOT_DUE: order rejected or expired, or cancelled by the customer/cook before preparation (an operations exception cancel leaves the obligation unchanged for manual finance review)
     }
 ```
 

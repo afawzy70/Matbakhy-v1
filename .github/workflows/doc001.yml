@@ -1,7 +1,9 @@
 name: Documentation Consistency
 # DOC-001. The job name below is the stable required-status-check context: "Documentation Consistency / DOC-001".
-# pull_request_target runs THIS workflow definition and the gate script from the base branch, so a pull request cannot
-# weaken its own gate. The pull request's files are only read as data (never executed, no secrets are used).
+# pull_request_target never runs the pull request's own workflow file; the gate script that executes is always the one at
+# the base SHA (checked out below), so a pull request cannot weaken its own gate. The pull request's files are only read
+# as data (never executed). NOT VERIFIED: which branch GitHub reads this workflow definition from (base branch vs default
+# branch `main`); see docs/developer-handbook/05-developer-workflow/documentation-policy.md before making the check required.
 on:
   pull_request_target:
     branches: [develop, main]

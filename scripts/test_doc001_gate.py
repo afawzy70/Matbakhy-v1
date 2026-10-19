@@ -298,6 +298,21 @@ class GateTests(unittest.TestCase):
         self.assertFails(self.r.run("<!-- hidden\n" + good + "\n-->"), "hidden inside another HTML comment")
         self.assertFails(self.r.run("```\n" + good + "\n```"), "declaration is required")
 
+    def test_22b_nested_fences_cannot_hide_a_declaration(self) -> None:
+        self.code_change(); self.doc_change(); self.r.commit()
+        good = decl(**UPDATED)
+        self.assertFails(self.r.run("````\n```\n" + good + "\n```\n````"), "declaration is required")
+        self.assertFails(self.r.run("~~~\n```\n" + good + "\n```\n~~~"), "declaration is required")
+        self.assertPasses(self.r.run("```\nexample only\n```\n" + good))
+
+    def test_22c_repository_root_links_count_for_navigation(self) -> None:
+        self.r.write(f"{HB}/README.md", PAGE.format(t="Handbook",
+            body="[a](/docs/developer-handbook/04-codebase/order-implementation.md) [b](02-user-journeys/customer-web.md) "
+                 "[c](05-developer-workflow/documentation-policy.md) [ar](README-ar.md)"))
+        self.r.commit()
+        self.assertPasses(self.r.run(decl(impact="updated", summary="Root links.", handbook_pages=f"{HB}/README.md",
+                                          consistency="Compared the links.")))
+
     def test_23_inline_comment_in_value_is_rejected(self) -> None:
         self.code_change(); self.doc_change(); self.r.commit()
         self.assertFails(self.r.run(decl(**UPDATED).replace("impact: updated", "impact: updated   # or none")), "'impact' must be")

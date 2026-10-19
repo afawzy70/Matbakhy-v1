@@ -128,14 +128,21 @@ CODE_RE = re.compile(r"`([^`\n]+)`")
 HEAD_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 
 
+FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})(.*)$")
+
+
 def strip_fences(text: str) -> list[tuple[int, str]]:
-    out, fenced = [], False
+    """Lines outside fenced code blocks. A fence closes only with the same character and at least the same length."""
+    out, opener = [], None
     for i, line in enumerate(text.splitlines(), 1):
-        if FENCE_RE.match(line):
-            fenced = not fenced
-            continue
-        if not fenced:
+        m = FENCE_OPEN_RE.match(line)
+        if opener is None:
+            if m and not (m.group(1)[0] == "`" and "`" in m.group(2)):
+                opener = m.group(1)
+                continue
             out.append((i, line))
+        elif m and m.group(1)[0] == opener[0] and len(m.group(1)) >= len(opener) and not m.group(2).strip():
+            opener = None
     return out
 
 
@@ -260,7 +267,7 @@ def validate_handbook(root: Path, rep: Report) -> list[str]:
                     t = m.group(1).partition("#")[0]
                     if not t or re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", t):
                         continue
-                    dest = (root / cur).parent.joinpath(t).resolve()
+                    dest = (root / t.lstrip("/")).resolve() if t.startswith("/") else (root / cur).parent.joinpath(t).resolve()
                     try:
                         r = str(dest.relative_to(root.resolve()))
                     except ValueError:
@@ -302,15 +309,8 @@ def validate_matrix(root: Path, rep: Report) -> dict:
 
 # --------------------------------------------------------------------------- declaration
 def visible_body(body: str) -> str:
-    """Drop fenced code blocks; reject a marker hidden inside a larger HTML comment."""
-    out, fenced = [], False
-    for line in body.splitlines():
-        if FENCE_RE.match(line):
-            fenced = not fenced
-            continue
-        if not fenced:
-            out.append(line)
-    return "\n".join(out)
+    """Drop fenced code blocks (nested fences included); the comment-hiding check follows in parse_declaration."""
+    return "\n".join(line for _, line in strip_fences(body))
 
 
 def parse_declaration(body: str, rep: Report) -> dict | None:
