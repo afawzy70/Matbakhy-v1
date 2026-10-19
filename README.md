@@ -2,7 +2,10 @@
 
 An Egypt-focused marketplace for discovering and ordering homemade meals from approved home cooks.
 
-**Current state: implementation in progress on branch `implementation/mvp`.** Minimal backend, web and Expo shells exist; no product feature, deployed environment, payment integration or native mobile build is claimed. See [latest status](docs/status/latest.md) and [toolchain](docs/engineering/toolchain.md).
+> ## New developer? Start with the [Developer Handbook](docs/developer-handbook/README.md)
+> Business, applications, architecture, codebase, workflow and a five-day onboarding ([Arabic guide](docs/developer-handbook/README-ar.md)). Every change must keep it current: [DOC-001 policy](docs/developer-handbook/05-developer-workflow/documentation-policy.md).
+
+**Current state:** the backend, customer web, operations web and Expo mobile app are implemented and a Preview deploys from `develop`; see [implementation status](docs/developer-handbook/07-reference/implementation-status.md) for what is implemented, partial or planned, and [latest status](docs/status/latest.md) (historical reports) and the [toolchain](docs/engineering/toolchain.md). The Preview is not production; no live payment integration is enabled.
 
 ## Start here
 
