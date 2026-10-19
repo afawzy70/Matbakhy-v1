@@ -51,7 +51,9 @@
         "backend/modules/identity/**",
         "infra/identity/**",
         "deploy/web-preview/identity/**",
-        "deploy/web-preview/admin-console.sh"
+        "deploy/web-preview/admin-console.sh",
+        "backend/app/src/main/java/**/security/**",
+        "backend/app/src/main/java/**/mfa/**"
       ],
       "docs": [
         "docs/developer-handbook/03-architecture/identity-and-security.md",
@@ -190,7 +192,8 @@
       "code": [
         "infra/compose.yaml",
         "infra/storage/**",
-        "deploy/**"
+        "deploy/**",
+        "infra/.env.example"
       ],
       "docs": [
         "docs/developer-handbook/03-architecture/infrastructure-and-deployment.md",
@@ -204,7 +207,8 @@
       "id": "ci-cd",
       "description": "GitHub Actions workflows",
       "code": [
-        ".github/workflows/**"
+        ".github/workflows/**",
+        ".gitleaksignore"
       ],
       "docs": [
         "docs/developer-handbook/05-developer-workflow/ci-cd.md",
@@ -241,7 +245,16 @@
         "package.json",
         "pnpm-workspace.yaml",
         "eslint.config.js",
-        "tsconfig.base.json"
+        "tsconfig.base.json",
+        ".node-version",
+        ".nvmrc",
+        ".npmrc",
+        ".gitignore",
+        "pnpm-lock.yaml",
+        "backend/.mvn/**",
+        "backend/mvnw",
+        "backend/mvnw.cmd",
+        "backend/.dockerignore"
       ],
       "docs": [
         "docs/developer-handbook/05-developer-workflow/local-environment.md",
@@ -277,6 +290,20 @@
         "docs/product/rq-004-stale-quote.md"
       ],
       "owner_role": "Business documentation"
+    },
+    {
+      "id": "governance",
+      "description": "Documentation governance files (gate, ownership, PR template)",
+      "code": [
+        ".github/CODEOWNERS",
+        ".github/pull_request_template.md",
+        ".github/ISSUE_TEMPLATE/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/05-developer-workflow/documentation-policy.md",
+        "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow.md"
+      ],
+      "owner_role": "Handbook navigation"
     }
   ]
 }

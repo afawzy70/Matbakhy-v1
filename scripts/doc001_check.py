@@ -90,9 +90,26 @@ def git(root: Path, *args: str) -> str:
     return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout
 
 
+def merge_base(root: Path, base: str, head: str) -> str:
+    try:
+        return git(root, "merge-base", base, head).strip()
+    except subprocess.CalledProcessError:
+        raise SystemExit("DOC-001: no merge base between base and head (history missing); fetch the full base history")
+
+
+def substantive(root: Path, mb: str, head: str, path: str, status: str) -> bool:
+    """A changed documentation file counts only if it survives and changes beyond whitespace."""
+    if status == "D":
+        return False
+    if status == "A":
+        return bool((root / path).read_text(encoding="utf-8", errors="replace").strip())
+    r = subprocess.run(["git", "diff", "-w", "--ignore-blank-lines", "--quiet", mb, head, "--", path], cwd=root)
+    return r.returncode == 1
+
+
 def changed_files(root: Path, base: str, head: str) -> dict[str, str]:
-    """path -> status letter (A/M/D/R...), diffing against the merge base."""
-    mb = git(root, "merge-base", base, head).strip()
+    """path -> status letter (A/M/D/...), diffing against the merge base."""
+    mb = merge_base(root, base, head)
     out = git(root, "diff", "--name-status", "--no-renames", mb, head)
     result: dict[str, str] = {}
     for line in out.splitlines():
@@ -123,6 +140,7 @@ def strip_fences(text: str) -> list[tuple[int, str]]:
 
 
 def slug(heading: str) -> str:
+    heading = re.sub(r"(?<![\w])([*_]{1,3})(\S(?:.*?\S)?)\1(?![\w])", r"\2", heading)
     h = re.sub(r"<[^>]+>", "", heading)
     h = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", h)
     h = h.replace("`", "").strip().lower()
@@ -131,16 +149,20 @@ def slug(heading: str) -> str:
 
 
 def anchors_of(path: Path) -> set[str]:
-    seen: dict[str, int] = {}
     out: set[str] = set()
-    for _, line in strip_fences(path.read_text(encoding="utf-8", errors="replace")):
+    text = path.read_text(encoding="utf-8", errors="replace")
+    for _, line in strip_fences(text):
         m = HEAD_RE.match(line)
         if not m:
             continue
-        s = slug(m.group(2))
-        n = seen.get(s, 0)
-        seen[s] = n + 1
-        out.add(s if n == 0 else f"{s}-{n}")
+        base = slug(m.group(2))
+        cand, n = base, 0
+        while cand in out:
+            n += 1
+            cand = f"{base}-{n}"
+        out.add(cand)
+    for m in re.finditer(r"<a\s+(?:name|id)=[\"']([^\"']+)[\"']", text, re.I):
+        out.add(m.group(1).lower())
     return out
 
 
@@ -172,7 +194,12 @@ def validate_markdown(root: Path, rel: str, rep: Report, ids: dict[str, set[str]
                 if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", target) or target.startswith("//"):
                     continue
                 file_part, _, frag = target.partition("#")
-                dest = path if not file_part else (path.parent / file_part).resolve()
+                if not file_part:
+                    dest = path
+                elif file_part.startswith("/"):
+                    dest = (root / file_part.lstrip("/")).resolve()
+                else:
+                    dest = (path.parent / file_part).resolve()
                 try:
                     dest.relative_to(root.resolve())
                 except ValueError:
@@ -274,7 +301,25 @@ def validate_matrix(root: Path, rep: Report) -> dict:
 
 
 # --------------------------------------------------------------------------- declaration
+def visible_body(body: str) -> str:
+    """Drop fenced code blocks; reject a marker hidden inside a larger HTML comment."""
+    out, fenced = [], False
+    for line in body.splitlines():
+        if FENCE_RE.match(line):
+            fenced = not fenced
+            continue
+        if not fenced:
+            out.append(line)
+    return "\n".join(out)
+
+
 def parse_declaration(body: str, rep: Report) -> dict | None:
+    body = visible_body(body)
+    for m in re.finditer(r"<!--.*?-->", body, re.S):
+        inner = m.group(0)
+        if re.search(r"DOC-001:(BEGIN|END)", inner) and not re.fullmatch(r"<!--\s*DOC-001:(BEGIN|END)\s*-->", inner):
+            rep.fail("DOC-001 declaration: a marker is hidden inside another HTML comment")
+            return None
     begins = [m.start() for m in re.finditer(r"<!--\s*DOC-001:BEGIN\s*-->", body)]
     ends = [m.start() for m in re.finditer(r"<!--\s*DOC-001:END\s*-->", body)]
     if len(begins) != 1 or len(ends) != 1 or ends[0] < begins[0]:
@@ -330,8 +375,15 @@ def generic_justification(text: str) -> bool:
     return len(re.sub(r"\s+", " ", t).strip()) < 25
 
 
+def doc_citation(path: str) -> bool:
+    return (path.endswith(".md") and (path.startswith("docs/") or path in TOP_FILES)) or path in (
+        "contracts/openapi.yaml", "contracts/endpoints.json")
+
+
 def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] | None, author: str | None,
-              bootstrap: bool, rep: Report) -> None:
+              rep: Report) -> None:
+    mb = merge_base(root, base, head)
+    head_sha = git(root, "rev-parse", head).strip()
     files = changed_files(root, base, head)
     if not files:
         rep.note("no changed files against the merge base")
@@ -375,10 +427,11 @@ def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] |
             elif generic_justification(just):
                 rep.fail("DOC-001: 'justification' is generic; describe which documented behaviour is unchanged and why")
             else:
-                refs = [r for r in re.findall(r"[\w./-]+\.(?:md|json|yaml|yml)\b", just) if (root / r).exists()]
+                refs = [r for r in re.findall(r"[\w./-]+\.(?:md|json|yaml|yml)\b", just)
+                        if (root / r).exists() and doc_citation(r)]
                 if not refs:
                     rep.fail("DOC-001: 'justification' must cite at least one existing documentation page or contract "
-                             "(repo-relative path) that stays accurate")
+                             "(repo-relative path under docs/, a top-level guide, or the API contract) that stays accurate")
             rep.note("impact 'none' accepted structurally; a REVIEWER MUST EVALUATE the justification against the code")
         else:
             listed = {k: split_list(decl.get(k, "")) for k in LIST_KEYS}
@@ -390,6 +443,15 @@ def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] |
                         rep.fail(f"DOC-001: declared {k} entry does not exist: {v}")
                     elif v not in files:
                         rep.fail(f"DOC-001: declared {k} entry is not changed in this PR: {v}")
+                    elif k in ("handbook_pages", "other_docs", "diagrams", "traceability"):
+                        if not is_doc(v):
+                            rep.fail(f"DOC-001: declared {k} entry is not a documentation file: {v}")
+                        elif not substantive(root, mb, head, v, files[v]):
+                            rep.fail(f"DOC-001: declared {k} entry has no substantive change (whitespace-only or deleted): {v}")
+                    elif k == "contracts" and not v.startswith(("contracts/", "packages/api-client/")):
+                        rep.fail(f"DOC-001: declared contracts entry is not a contract file: {v}")
+                    elif k == "tests" and is_doc(v):
+                        rep.fail(f"DOC-001: declared tests entry is a documentation file: {v}")
             for v in listed["handbook_pages"]:
                 if not v.startswith(HANDBOOK + "/"):
                     rep.fail(f"DOC-001: handbook_pages entry is outside {HANDBOOK}/: {v}")
@@ -397,7 +459,7 @@ def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] |
                 rep.fail("DOC-001: 'consistency' must state what was compared (code, contract, tests) to verify agreement")
             if not decl.get("summary", "").strip():
                 rep.fail("DOC-001: 'summary' must say what changed and why")
-            changed_docs = set(doc_files)
+            changed_docs = {d for d in doc_files if substantive(root, mb, head, d, files[d])}
             for aid, fs in triggered.items():
                 area = next(a for a in areas if a["id"] == aid)
                 if not any(gmatch(d, g) for d in changed_docs for g in area["docs"]):
@@ -408,20 +470,21 @@ def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] |
         if gov:
             if not decl.get("governance_review", "").strip():
                 rep.fail("DOC-001: governance files changed (" + ", ".join(gov) + ") but 'governance_review' is empty")
-            elif bootstrap:
-                rep.note("bootstrap: the base branch has no DOC-001 gate; the governance review requirement is "
-                         "satisfied only by the owner's explicit merge approval")
             elif reviews is None:
                 rep.fail("DOC-001: governance files changed and no review information is available to verify approval")
             else:
                 latest: dict[str, str] = {}
-                for r in reviews:  # chronological; the last review of each reviewer decides
-                    if r.get("user"):
-                        latest[r["user"]] = r.get("state", "")
+                for r in reviews:  # chronological; comments never change a decision; approvals bind to a commit
+                    state = r.get("state", "")
+                    if not r.get("user") or state == "COMMENTED" or state == "PENDING":
+                        continue
+                    if state == "APPROVED" and r.get("commit_id") != head_sha:
+                        state = "STALE"
+                    latest[r["user"]] = state
                 ok = any(state == "APPROVED" and user != author for user, state in latest.items())
                 if not ok:
-                    rep.fail("DOC-001: governance files changed; an APPROVED review from someone other than the PR "
-                             "author is required (a developer cannot self-approve a DOC-001 change)")
+                    rep.fail("DOC-001: governance files changed; an APPROVED review of the CURRENT head commit from someone "
+                             "other than the PR author is required (no self-approval; re-run the check after approving)")
     elif gov:
         rep.fail("DOC-001: governance files changed and no valid declaration")
     validate_changed_markdown(root, files, rep)
@@ -449,7 +512,6 @@ def main() -> int:
     p.add_argument("--body-file", required=True)
     p.add_argument("--reviews-file", help="JSON list of {user,state} from the GitHub reviews API")
     p.add_argument("--author")
-    p.add_argument("--bootstrap", action="store_true", help="base branch has no gate yet (introducing PR)")
     a = ap.parse_args()
     root = Path(a.root).resolve()
     rep = Report()
@@ -461,7 +523,7 @@ def main() -> int:
     else:
         body = Path(a.body_file).read_text(encoding="utf-8")
         reviews = json.loads(Path(a.reviews_file).read_text()) if a.reviews_file else None
-        assess_pr(root, a.base, a.head, body, reviews, a.author, a.bootstrap, rep)
+        assess_pr(root, a.base, a.head, body, reviews, a.author, rep)
     return rep.emit()
 
 

@@ -213,7 +213,9 @@ class GateTests(unittest.TestCase):
         self.assertFails(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED"}, {"user": "owner", "state": "CHANGES_REQUESTED"}]),
                          "APPROVED review")
         self.assertFails(self.r.run(gov), "no review information")
-        self.assertPasses(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED"}]))
+        head = self.r.git("rev-parse", "HEAD").strip()
+        self.assertFails(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED"}]), "CURRENT head")
+        self.assertPasses(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED", "commit_id": head}]))
 
     # 12
     def test_12_multi_application_change_with_docs_and_traceability_passes(self) -> None:
@@ -254,14 +256,71 @@ class GateTests(unittest.TestCase):
         res = self.r.run(decl(impact="none", justification=GOOD_JUSTIFICATION))
         self.assertPasses(res)  # structurally acceptable; the reviewer decides
 
-    def test_17_bootstrap_notes_governance_but_still_requires_the_field(self) -> None:
+    def test_17_comment_review_does_not_cancel_approval_and_stale_approval_fails(self) -> None:
         self.r.write("scripts/doc001_check.py", "# changed\n"); self.doc_change(); self.r.commit()
-        self.assertFails(self.r.run(decl(**UPDATED), bootstrap=True), "governance_review")
+        head = self.r.git("rev-parse", "HEAD").strip()
         gov = decl(**{**UPDATED, "governance_review": "owner approval"})
-        self.assertPasses(self.r.run(gov, bootstrap=True))
+        approved = {"user": "owner", "state": "APPROVED", "commit_id": head}
+        self.assertPasses(self.r.run(gov, reviews=[approved, {"user": "owner", "state": "COMMENTED", "commit_id": head}]))
+        self.assertFails(self.r.run(gov, reviews=[{**approved, "commit_id": "0" * 40}]), "CURRENT head")
+        self.assertFails(self.r.run(gov, reviews=[approved, {"user": "owner", "state": "DISMISSED", "commit_id": head}]), "CURRENT head")
+
+    def test_18_deleting_required_documentation_does_not_count(self) -> None:
+        self.code_change()
+        self.r.write("docs/extra.md", "# Extra\nx\n")
+        self.r.git("add", "-A"); self.r.git("commit", "-qm", "extra"); self.r.base = self.r.git("rev-parse", "HEAD").strip()
+        (self.r.p / f"{HB}/04-codebase/order-implementation.md").unlink()
+        (self.r.p / "docs/extra.md").write_text("# Extra\nchanged\n")
+        self.r.commit()
+        self.assertFails(self.r.run(decl(**{**UPDATED, "handbook_pages": f"{HB}/04-codebase/order-implementation.md"})))
+
+    def test_19_whitespace_only_documentation_change_does_not_count(self) -> None:
+        self.code_change()
+        path = self.r.p / f"{HB}/04-codebase/order-implementation.md"
+        path.write_text(path.read_text() + "\n\n   \n")
+        self.r.commit()
+        self.assertFails(self.r.run(decl(**UPDATED)), "no substantive change")
+
+    def test_20_source_file_cannot_pose_as_documentation(self) -> None:
+        self.code_change(); self.doc_change(); self.r.commit()
+        self.assertFails(self.r.run(decl(**{**UPDATED, "other_docs": "backend/modules/orders/Service.java"})),
+                         "not a documentation file")
+
+    def test_21_none_justification_must_cite_documentation_not_config(self) -> None:
+        self.code_change(); self.r.commit()
+        just = ("The change only renames a private local variable in the order service so behaviour and endpoints stay "
+                "exactly the same as before; see apps/customer-web/src/App.tsx and the existing tests for confirmation.")
+        self.assertFails(self.r.run(decl(impact="none", justification=just)), "must cite")
+
+    def test_22_declaration_hidden_in_comment_or_fence_fails(self) -> None:
+        self.code_change(); self.doc_change(); self.r.commit()
+        good = decl(**UPDATED)
+        self.assertFails(self.r.run("<!-- hidden\n" + good + "\n-->"), "hidden inside another HTML comment")
+        self.assertFails(self.r.run("```\n" + good + "\n```"), "declaration is required")
+
+    def test_23_inline_comment_in_value_is_rejected(self) -> None:
+        self.code_change(); self.doc_change(); self.r.commit()
+        self.assertFails(self.r.run(decl(**UPDATED).replace("impact: updated", "impact: updated   # or none")), "'impact' must be")
+
+    def test_24_repository_root_links_and_anchor_rules_follow_github(self) -> None:
+        self.r.write("docs/a.md", "# A\n## _Hello_ World\n## Foo\n## Foo\n## Foo-1\n<a name=\"custom\"></a>\n"
+                     "[ok](/docs/a.md#hello-world) [ok2](#foo-1) [ok3](#foo-1-1) [ok4](#custom) [bad](#nope)\n")
+        self.r.commit()
+        code, out = self.r.run(decl(impact="updated", summary="Adds notes.", other_docs="docs/a.md", consistency="Read."))
+        self.assertEqual(code, 1, out)
+        self.assertEqual(out.count("link anchor not found"), 1, out)
+        self.assertIn("#nope", out)
 
 
 class RepositoryContractTests(unittest.TestCase):
+    def test_matrix_covers_every_tracked_non_documentation_file(self) -> None:
+        import fnmatch
+        matrix = json.loads((ROOT / "docs/developer-handbook/doc001-matrix.json").read_text())
+        tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
+        uncovered = [f for f in tracked if not (f.endswith(".md") or f.startswith("docs/"))
+                     and not any(fnmatch.fnmatchcase(f, g.replace("**", "*")) for a in matrix["areas"] for g in a["code"])]
+        self.assertEqual(uncovered, [], "map these files to a documentation area in doc001-matrix.json")
+
     def test_workflow_keeps_the_stable_check_name_and_safe_triggers(self) -> None:
         wf = (ROOT / ".github/workflows/doc001.yml").read_text()
         self.assertIn("name: Documentation Consistency / DOC-001", wf)
@@ -269,7 +328,9 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertNotRegex(wf, r"(?m)^\s*(secrets|id-token):")
         self.assertRegex(wf, r"(?m)^permissions:\n  contents: read\n  pull-requests: read")
         # the pull request is only ever read as data
-        self.assertNotRegex(wf, r"run:.*\bpr/(?!scripts/doc001_check\.py)\S*\.(sh|py)")
+        self.assertNotIn("pr/scripts", wf)  # nothing from the pull request is ever executed
+        self.assertIn("base/scripts/doc001_check.py", wf)
+        self.assertNotIn("--bootstrap", wf)
 
     def test_pr_template_carries_the_declaration_block(self) -> None:
         t = (ROOT / ".github/pull_request_template.md").read_text()

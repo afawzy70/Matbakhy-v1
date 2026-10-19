@@ -32,7 +32,7 @@ git switch -c fix/<short-description> origin/develop
 
 ```bash
 pnpm typecheck && pnpm lint && pnpm test      # JS/TS you touched
-cd backend && ./mvnw -B -ntp verify           # backend you touched (Docker running)
+(cd backend && ./mvnw -B -ntp verify)         # backend you touched (Docker running); the subshell keeps you in the repository root
 pnpm contract:check                            # if contracts/openapi.yaml or the client changed
 python3 scripts/validate_blueprint.py          # if planning/ changed
 python3 scripts/doc001_check.py docs           # always, when any Markdown or handbook page changed
@@ -43,9 +43,9 @@ Do not reduce acceptance criteria, suppress failures, remove security checks or 
 
 ## The PR description
 
-The template is `.github/pull_request_template.md` with four sections: Problem and intended behavior; Changes (story IDs, behavior, contracts/migrations, surfaces); Verification (tested source commit, actual commands and results, evidence paths, NOT_RUN/BLOCKED listed explicitly); Review and risks (findings, repairs, residual risks, owner decisions, deploy/rollback implications). Do not claim independent review or approval unless it happened.
+The template is `.github/pull_request_template.md` with five sections: Problem and intended behavior; Changes (story IDs, behavior, contracts/migrations, surfaces); Verification (tested source commit, actual commands and results, evidence paths, NOT_RUN/BLOCKED listed explicitly); Review and risks (findings, repairs, residual risks, owner decisions, deploy/rollback implications); and the DOC-001 Documentation Impact section. Do not claim independent review or approval unless it happened.
 
-DOC-001 adds a mandatory **Documentation Impact declaration** between `<!-- DOC-001:BEGIN -->` and `<!-- DOC-001:END -->`. Its allowed keys and rules are enforced by `python3 scripts/doc001_check.py pr` (keys: `impact`, `summary`, `handbook_pages`, `other_docs`, `diagrams`, `contracts`, `tests`, `traceability`, `consistency`, `justification`, `governance_review`). Format, examples and the change matrix: [documentation-policy.md](documentation-policy.md). The PR template contains the block as an empty form; leaving it empty fails the check.
+DOC-001 adds a mandatory **Documentation Impact declaration** between `<!-- DOC-001:BEGIN -->` and `<!-- DOC-001:END -->`. Its allowed keys and rules are enforced by `python3 scripts/doc001_check.py pr` (keys: `impact`, `summary`, `handbook_pages`, `other_docs`, `diagrams`, `contracts`, `tests`, `traceability`, `consistency`, `justification`, `governance_review`). Format, examples and the change matrix: [documentation-policy.md](documentation-policy.md). The PR template already contains the block as an empty form: fill it in, keep exactly one block, and do not paste a second copy (an empty or duplicated block fails the check).
 
 ## Starting on an issue
 

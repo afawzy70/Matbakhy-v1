@@ -25,7 +25,7 @@ The PR description contains exactly one block:
 
 ```
 <!-- DOC-001:BEGIN -->
-impact: updated            # or: none
+impact: updated
 summary: what changed and why
 handbook_pages: docs/developer-handbook/<page>.md, ...
 other_docs: docs/product/..., ...
@@ -39,11 +39,13 @@ governance_review: (only when the gate, policy, agent files or PR template chang
 <!-- DOC-001:END -->
 ```
 
+`impact` is `updated` or `none`; values must not carry inline comments. Write each key on one line (indented continuation lines are allowed); put the block in the visible PR description, not inside a code fence or another HTML comment (both are rejected).
+
 Rules enforced by `scripts/doc001_check.py pr`:
 
 - Unknown keys, duplicate keys, a missing/duplicated/unbalanced marker pair, or an `impact` other than `updated`/`none` fail.
-- `updated`: needs `summary`, `consistency`, and at least one of `handbook_pages`/`other_docs`; every listed path must exist **and be changed in the PR**; `handbook_pages` must live under `docs/developer-handbook/`; for every matrix area whose code changed, at least one of that area's documentation files must be changed.
-- `none`: only for PRs that change non-documentation files and no documentation files; `justification` of at least 80 characters, not generic, citing at least one existing documentation page or contract (repo-relative path) that stays accurate. Generic text ("No docs needed", "Minor change", "Internal only", "Bug fix", "No user impact") fails. A structurally valid `none` is **accepted only for reviewer evaluation** — the gate prints `REVIEWER MUST EVALUATE`.
+- `updated`: needs `summary`, `consistency`, and at least one of `handbook_pages`/`other_docs`; every listed path must exist **and have a substantive change in the PR** (deleted files and whitespace-only edits do not count; `handbook_pages`/`other_docs`/`diagrams`/`traceability` must be documentation files, `contracts` contract files, `tests` non-documentation files); `handbook_pages` must live under `docs/developer-handbook/`; for every matrix area whose code changed, at least one of that area's documentation files must be changed.
+- `none`: only for PRs that change non-documentation files and no documentation files; `justification` of at least 80 characters, not generic, citing at least one existing documentation page under `docs/`, a top-level guide or the API contract (repo-relative path) that stays accurate; citing `package.json` or source code does not count. Generic text ("No docs needed", "Minor change", "Internal only", "Bug fix", "No user impact") fails. A structurally valid `none` is **accepted only for reviewer evaluation** — the gate prints `REVIEWER MUST EVALUATE`.
 - Files outside every matrix area are never silent: they need a documentation change or a specific justification.
 - A documentation-only PR must declare `updated`.
 
@@ -51,11 +53,15 @@ Rules enforced by `scripts/doc001_check.py pr`:
 
 Broken relative links and anchors; links leaving the repository; inline-code references to repository paths that do not exist (`path` or `path:line`); missing metadata (`Owner role`, `Status` with an allowed label) on handbook pages; handbook pages unreachable from `README.md`; missing required entry points (README, README-ar, this policy, the matrix, the PR template); `TC-`/`MB-`/`BR-` identifiers and owner-E2E case ids that do not exist in `planning/` or `docs/quality/owner-acceptance/cases/`; an invalid matrix.
 
-**What the gate cannot do:** prove that a sentence is true. Passing the gate means "structure and references are intact". Semantic accuracy needs the reviewer's comparison (section 2, step 5). Never read a green check as an accuracy certificate.
+**What the gate cannot do:** prove that a sentence is true. Passing the gate means "structure and references are intact". When documenting something that does not exist (a missing file, a planned path), do not format it as inline code (the gate treats code-formatted repository paths as claims that the file exists). Semantic accuracy needs the reviewer's comparison (section 2, step 5). Never read a green check as an accuracy certificate.
 
 ## 5. Governance of the gate itself
 
-Changes to `.github/workflows/doc001.yml`, `scripts/doc001_check.py`, `scripts/test_doc001_gate.py`, the matrix, this policy, `AGENTS.md`, `CLAUDE.md`, `.github/pull_request_template.md` or `.github/CODEOWNERS` require `governance_review` in the declaration **and** an approving GitHub review from someone other than the PR author. The workflow uses `pull_request_target` so the gate definition and script that run are the ones on the base branch; the PR's files are read as data only. A PR therefore cannot weaken its own gate. Deleting the workflow does not silently pass: the required check would never report.
+Changes to `.github/workflows/doc001.yml`, `scripts/doc001_check.py`, `scripts/test_doc001_gate.py`, the matrix, this policy, `AGENTS.md`, `CLAUDE.md`, `.github/pull_request_template.md` or `.github/CODEOWNERS` require `governance_review` in the declaration **and** an APPROVED GitHub review of the **current head commit** by someone other than the PR author (a comment never cancels an approval; an approval of an older commit, or a dismissed one, does not count). GitHub does not re-run the check when a review is submitted or dismissed: after approving, **re-run the `Documentation Consistency` workflow** (Actions → re-run) and enable "Dismiss stale pull request approvals when new commits are pushed" in the ruleset.
+
+The workflow uses `pull_request_target` and runs the gate script from the **base** branch (checked out at the PR's base SHA); the PR's files are only read as data and nothing from the PR is executed. If the base branch has no gate the job fails closed, so the gate must be installed by a separately reviewed merge. A PR cannot weaken its own gate. Deleting the workflow does not silently pass: the required check would never report.
+
+**To verify after the first merge (NOT VERIFIED today):** which branch GitHub reads the `pull_request_target` workflow definition from. GitHub's documentation describes it as running in the context of the base branch, but a reviewer pointed to default-branch sourcing (this repository's default branch is `main`, which must not be modified by this work). Open a throw-away PR against `develop` after the merge and confirm that a check named `Documentation Consistency / DOC-001` appears on the PR's head commit before making it required. If it does not appear, the workflow must be installed on the default branch through an owner-approved change.
 
 Emergency exceptions: only the repository owner may authorize one, in writing on the PR; the exception and a follow-up remediation issue are recorded in the PR. A developer cannot approve an exception to their own change.
 
