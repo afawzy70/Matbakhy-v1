@@ -165,6 +165,15 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertLess(rollback.index('{"frontendUrl": ""}'), rollback.index("kc.delete("))
         self.assertLess(rollback.index("kc.login()"), rollback.index("kc.delete("))
 
+    def test_all_drift_is_read_before_the_first_mutation_and_the_forms_subflow_must_be_alternative(self):
+        text = KC.read_text()
+        harden = text[text.index("def harden(kc):"):text.index("def rollback(kc):")]
+        self.assertLess(harden.index("changed = ("), harden.index('attributes={"matbakhyHardened": "no"}'))
+        self.assertLess(harden.index('attributes={"matbakhyHardened": "no"}'), harden.index("kc.update_realm(wanted"))
+        self.assertIn('e.get("requirement") == "ALTERNATIVE" for e in top', text)
+        self.assertIn("needs-action(cannot-sign-in)", text)
+        self.assertIn("def paged(", text)
+
     def test_every_failed_api_call_stops_the_run(self):
         text = KC.read_text()
         call = text[text.index("    def call(self"):text.index("    def get(self")]
@@ -202,7 +211,7 @@ class AdminConsoleFilesTest(unittest.TestCase):
     def test_fixtures_are_removed_by_prefix_only_and_are_read_only_administrators(self):
         text = KC.read_text()
         self.assertIn('FIXTURE_PREFIX = "verify-admin-"', text)
-        self.assertIn("if not u[\"username\"].startswith(FIXTURE_PREFIX):", text)
+        self.assertIn('if u["username"].startswith(FIXTURE_PREFIX)]', text)
         roles = re.search(r"READ_ROLES = \[(.*?)\]", text).group(1)
         names = re.findall(r'"([a-z-]+)"', roles)
         self.assertTrue(names and all(r.startswith(("view-", "query-")) for r in names), names)

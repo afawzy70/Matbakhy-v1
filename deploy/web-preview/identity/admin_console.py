@@ -128,6 +128,17 @@ class Kc:
     def attribute(self, name):
         return (self.realm().get("attributes") or {}).get(name, "")
 
+    def paged(self, path, page=100):
+        """All rows of a list endpoint (first/max paging)."""
+        rows, first = [], 0
+        sep = "&" if "?" in path else "?"
+        while True:
+            chunk = self.get(f"{path}{sep}first={first}&max={page}")
+            rows.extend(chunk)
+            if len(chunk) < page:
+                return rows
+            first += page
+
     def clients(self):
         return self.get(f"/admin/realms/{REALM}/clients")
 
@@ -187,7 +198,7 @@ def flow_complete(kc):
     if not kc.flow_exists(TOP):
         return False
     top = kc.executions(TOP)
-    if not any(e.get("displayName") == FORMS for e in top):
+    if not any(e.get("displayName") == FORMS and e.get("requirement") == "ALTERNATIVE" for e in top):
         return False
     forms = {(e.get("providerId"), e.get("requirement")) for e in kc.executions(FORMS)}
     cookie = {(e.get("providerId"), e.get("requirement")) for e in top}
@@ -233,7 +244,7 @@ def override_clients(clients):
 
 def admin_accounts(kc):
     out = []
-    for u in kc.get(f"/admin/realms/{REALM}/users?max=1000"):
+    for u in kc.paged(f"/admin/realms/{REALM}/users"):
         name = u["username"]
         if name.startswith("service-account-"):
             continue
@@ -245,7 +256,12 @@ def admin_accounts(kc):
             out.append((name, "not-an-administrator"))
             continue
         creds = {c["type"] for c in kc.get(f"/admin/realms/{REALM}/users/{u['id']}/credentials")}
-        out.append((name, "otp" if "otp" in creds else "no-otp(cannot-sign-in)"))
+        if "otp" not in creds:
+            out.append((name, "no-otp(cannot-sign-in)"))
+        elif "password" not in creds or u.get("requiredActions"):
+            out.append((name, "needs-action(cannot-sign-in)"))  # no password, or a pending required action the public page cannot complete
+        else:
+            out.append((name, "otp"))
     return out
 
 
@@ -295,15 +311,27 @@ def harden(kc):
         die("the operations client cannot sign in; the password grant was NOT switched off")
     print(f"client {OPS_CLIENT}: sign-in proven")
 
-    # 2. Realm: the master realm lives on the dedicated host, failed sign-ins are throttled, no self-service path.
-    kc.update_realm({"bruteForceProtected": True, "permanentLockout": False, "failureFactor": 5, "waitIncrementSeconds": 60,
-                     "maxFailureWaitSeconds": 900, "maxDeltaTimeSeconds": 43200, "minimumQuickLoginWaitSeconds": 60,
-                     "registrationAllowed": False, "resetPasswordAllowed": False, "rememberMe": False},
-                    {"frontendUrl": f"https://kc-admin.{domain}"})
+    # 2. Drift is read BEFORE anything is changed (realm settings, flow binding, enrolment, grants, overrides). If there is any (first run, or
+    #    something was re-opened since), the completion marker is cleared first and set again only after the sessions and tokens issued before
+    #    the hardening were revoked. A clean re-run revokes nothing, so the console's users stay signed in.
+    wanted = {"bruteForceProtected": True, "permanentLockout": False, "failureFactor": 5, "waitIncrementSeconds": 60, "maxFailureWaitSeconds": 900,
+              "maxDeltaTimeSeconds": 43200, "minimumQuickLoginWaitSeconds": 60, "registrationAllowed": False, "resetPasswordAllowed": False, "rememberMe": False}
+    frontend = f"https://kc-admin.{domain}"
+    realm = kc.realm()
+    clients = kc.clients()
+    totp = kc.get(f"/admin/realms/{REALM}/authentication/required-actions/CONFIGURE_TOTP")
+    changed = (kc.attribute("matbakhyHardened") != "yes" or realm.get("browserFlow") != TOP or totp.get("enabled") is not False
+               or any(realm.get(k) != v for k, v in wanted.items()) or (realm.get("attributes") or {}).get("frontendUrl") != frontend
+               or bool(password_grant_clients(clients)) or bool(override_clients(clients)))
+    if changed:
+        kc.update_realm(attributes={"matbakhyHardened": "no"})
+
+    # 3. Realm: the master realm lives on the dedicated host, failed sign-ins are throttled, no self-service path.
+    kc.update_realm(wanted, {"frontendUrl": frontend})
     print("realm settings: frontend URL, brute-force protection, no registration or reset-password")
     kc.login()  # the frontend URL changed this realm's token issuer
 
-    # 3. Browser flow with a REQUIRED one-time password; bound only when the tree is verified complete.
+    # 4. Browser flow with a REQUIRED one-time password; bound only when the tree is verified complete.
     if flow_complete(kc):
         print("flow: already complete, left as is")
     else:
@@ -317,28 +345,20 @@ def harden(kc):
             die("the flow tree is not complete after building it; the browser flow was NOT changed")
         print("flow: created and verified")
 
-    # Drift is read BEFORE anything session-relevant changes. If there is any (first run, or something was re-opened since), the completion
-    # marker is cleared first and set again only after the sessions and tokens issued before the hardening were revoked. A clean re-run
-    # revokes nothing, so the console's users stay signed in.
     clients = kc.clients()
     totp = kc.get(f"/admin/realms/{REALM}/authentication/required-actions/CONFIGURE_TOTP")
-    changed = (kc.attribute("matbakhyHardened") != "yes" or kc.realm().get("browserFlow") != TOP or totp.get("enabled") is not False
-               or bool(password_grant_clients(clients)) or bool(override_clients(clients)))
-    if changed:
-        kc.update_realm(attributes={"matbakhyHardened": "no"})
-
     if kc.realm().get("browserFlow") != TOP:
         kc.update_realm({"browserFlow": TOP})
         print(f"browserFlow: bound to '{TOP}'")
     else:
         print(f"browserFlow: already '{TOP}'")
 
-    # 4. Nobody can enrol a one-time password over the Internet: with the required action disabled an account without OTP cannot sign in at all.
+    # 5. Nobody can enrol a one-time password over the Internet: with the required action disabled an account without OTP cannot sign in at all.
     totp.update({"enabled": False, "defaultAction": False})
     kc.put(f"/admin/realms/{REALM}/authentication/required-actions/CONFIGURE_TOTP", totp)
     print("required action CONFIGURE_TOTP: disabled (no public enrolment)")
 
-    # 5. No master client may issue tokens for a user and password alone, and none may bind another browser or direct-grant flow.
+    # 6. No master client may issue tokens for a user and password alone, and none may bind another browser or direct-grant flow.
     for c in clients:
         if c.get("directAccessGrantsEnabled"):
             kc.update_client(c, directAccessGrantsEnabled=False)
@@ -353,7 +373,7 @@ def harden(kc):
         die("a master client still overrides the browser or direct-grant flow")
     print("master clients: no password grant, no flow overrides")
 
-    # 6. Sessions and tokens issued before the hardening are revoked (only when something changed, not on every release).
+    # 7. Sessions and tokens issued before the hardening are revoked (only when something changed, not on every release).
     if changed:
         kc.update_realm({"notBefore": int(time.time())})
         kc.login()  # the token used so far predates the new not-before time
@@ -416,9 +436,8 @@ def fixture_create(kc):
 
 def fixture_delete(kc):
     failed = False
-    for u in kc.get(f"/admin/realms/{REALM}/users?search={urllib.parse.quote(FIXTURE_PREFIX)}&max=1000"):
-        if not u["username"].startswith(FIXTURE_PREFIX):
-            continue
+    victims = [u for u in kc.paged(f"/admin/realms/{REALM}/users?search={urllib.parse.quote(FIXTURE_PREFIX)}") if u["username"].startswith(FIXTURE_PREFIX)]
+    for u in victims:
         try:
             kc.delete(f"/admin/realms/{REALM}/users/{u['id']}")
             print(f"fixture administrator {u['username']}: removed")
