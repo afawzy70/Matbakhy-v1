@@ -1,2 +1,2 @@
-plan
-# request 2 (read-only). First word = mode (plan or apply). Changing this file on develop runs .github/workflows/owner-e2e-provision.yml against the preview.
+apply
+# request 3 (apply): verified backup, Keycloak partial import (existing users skipped), SQL seeds, slot refresh, read-only reconciliation. First word = mode.
