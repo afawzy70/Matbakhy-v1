@@ -258,6 +258,9 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertIn("admin-console) shift; load; sh ./admin-console.sh", text)
         self.assertIn('mkdir -p "$GENERATED_DIR/flags"', text)
 
+    def test_the_deploy_ships_the_fixture_manifest_the_provisioning_script_reads(self):
+        self.assertIn("docs/quality/owner-acceptance/fixtures.json", (ROOT / ".github" / "workflows" / "deploy-preview.yml").read_text())
+
     def test_the_ci_deploy_workflow_enables_and_verifies_the_console_after_the_release(self):
         text = (ROOT / ".github" / "workflows" / "deploy-preview.yml").read_text()
         self.assertIn("deploy.sh admin-console enable", text)
