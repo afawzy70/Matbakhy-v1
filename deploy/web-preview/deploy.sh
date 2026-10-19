@@ -115,6 +115,10 @@ record_release() {
 }
 
 up() {
+  # One writer at a time on this server (the admin console and the owner E2E provisioning take the same lock).
+  mkdir -p "${BACKUP_DIR:-/srv/matbakhy-backups}"
+  exec 9>"${BACKUP_DIR:-/srv/matbakhy-backups}/.preview-mutation.lock"
+  command -v flock >/dev/null 2>&1 && { flock -n 9 || die "another preview change holds the lock"; }
   check
   render
   LAST_BACKUP_DIR=""

@@ -4,6 +4,7 @@
   python3 scripts/owner_e2e_fixtures.py plan                 what exists, what must be provisioned (prints no secret)
   python3 scripts/owner_e2e_fixtures.py check                consistency of the manifest, the SQL seed and the case files (CI)
   python3 scripts/owner_e2e_fixtures.py render --out DIR     writes the PRIVATE credential files for the actors to provision
+  python3 scripts/owner_e2e_fixtures.py finalize --out DIR --result F --users F   after the import: keep passwords only for ADDED users, verify ids
 
 `render` generates a fresh random password per actor into DIR/credentials.private.json and DIR/partial-import.json (mode 600, DIR mode 700).
 DIR must be outside this repository and must not exist yet. Passwords are never printed or committed. Nothing here talks to Keycloak or a
@@ -107,6 +108,32 @@ def render(out):
     print(f"wrote {len(users)} synthetic users to {out} (mode 700; files mode 600). Passwords are not printed.")
 
 
+def finalize(out, result_file, users_file):
+    """After the Keycloak partial import: keep a password in credentials.private.json only for users the import actually ADDED, mark the others as
+    pre-existing (Keycloak SKIPs an existing user, so a freshly generated password would not match), and verify that every expected username exists
+    in Keycloak with exactly the fixed id the SQL seed refers to. Exit 1 on any mismatch. Prints no password."""
+    out = Path(out)
+    result = json.loads(Path(result_file).read_text(encoding="utf-8"))
+    added = {r["resourceName"] for r in result.get("results", []) if r.get("action") == "ADDED" and r.get("resourceType") == "USER"}
+    existing = {u["username"]: u["id"] for u in json.loads(Path(users_file).read_text(encoding="utf-8"))}
+    creds_path = out / "credentials.private.json"
+    creds = json.loads(creds_path.read_text(encoding="utf-8"))
+    problems = []
+    for a in to_provision():
+        name = a["username"]
+        if existing.get(name) != a["kc"]:
+            problems.append(f"{name}: Keycloak id {existing.get(name)!r} is not the fixed id {a['kc']!r}")
+        if name not in added and name in creds:
+            creds[name]["password"] = None
+            creds[name]["note"] = "user already existed; its password was not changed by this run"
+    creds_path.write_text(json.dumps(creds, indent=1), encoding="utf-8")
+    os.chmod(creds_path, 0o600)
+    print(f"import: {len(added)} users added, {len(creds) - len(added)} already existed (passwords unchanged)")
+    for p in problems:
+        print("MISMATCH " + p)
+    return 1 if problems else 0
+
+
 def plan():
     print("Actor                     Keycloak user              Provision?  Grants")
     for a in actors():
@@ -123,6 +150,8 @@ def main():
         return 1 if problems else 0
     elif cmd == "render" and len(sys.argv) == 4 and sys.argv[2] == "--out":
         render(sys.argv[3])
+    elif cmd == "finalize" and len(sys.argv) == 8 and sys.argv[2] == "--out" and sys.argv[4] == "--result" and sys.argv[6] == "--users":
+        return finalize(sys.argv[3], sys.argv[5], sys.argv[7])
     else:
         print(__doc__)
         return 2

@@ -106,6 +106,17 @@ verify() {
   return "$rc"
 }
 
+# One writer at a time on this server (deployments and the owner E2E provisioning take the same lock).
+case "${1:-}" in
+  enable|rollback|create-admin)
+    if [ -z "${MATBAKHY_LOCK_HELD:-}" ]; then  # enable calls create-admin itself: the child must not wait for its parent's lock
+      mkdir -p "$BACKUP_DIR"
+      exec 9>"$BACKUP_DIR/.preview-mutation.lock"
+      command -v flock >/dev/null 2>&1 && { flock -n 9 || die "another preview change holds $BACKUP_DIR/.preview-mutation.lock"; }
+      MATBAKHY_LOCK_HELD=1; export MATBAKHY_LOCK_HELD
+    fi ;;
+esac
+
 case "${1:-}" in
   enable)
     ensure_ops_secret
