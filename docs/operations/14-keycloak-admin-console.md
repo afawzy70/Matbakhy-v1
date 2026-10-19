@@ -56,15 +56,15 @@ reachable on the public address; an account **without** an OTP cannot sign in an
 
 ## First sign-in (owner)
 
-The existing bootstrap account (`KEYCLOAK_ADMIN_USER`) has no OTP, so after hardening it **cannot sign in to the console** (that is intended). Create the owner's
-administrator on the server:
+The existing bootstrap account (`KEYCLOAK_ADMIN_USER`) has no OTP, so after hardening it **cannot sign in to the console** (that is intended). The first
+`enable` therefore creates the owner's administrator `owner-admin` by itself when nobody can sign in yet (name: `ADMIN_CONSOLE_OWNER`); more can be created on the server:
 
 ```
-./deploy.sh admin-console create-admin <name>      # e.g. owner-admin
+./deploy.sh admin-console create-admin <name>      # e.g. a personal account
 ```
 
 It writes `generated/admin-console/<name>.private` (mode 600, directory 700): the generated password, the one-time-password key (base32) and an `otpauth://` URI.
-Read the file over SSH, add the account in an authenticator app (iPhone: Passwords or any TOTP app, "enter a setup key" with the base32 key, 6 digits, 30 s), sign in
+Read the file on the server (`sudo -u devops cat <GENERATED_DIR>/admin-console/<name>.private`, e.g. `/srv/matbakhy-staging/generated/admin-console/owner-admin.private` where `GENERATED_DIR` is the directory in the server's `.env`), add the account in an authenticator app (iPhone: Passwords or any TOTP app, "enter a setup key" with the base32 key, 6 digits, 30 s), sign in
 at the console URL, then **delete the file**. Never paste its contents into chats, tickets or logs. `./deploy.sh admin-console status` lists every master account
 as `otp` or `no-otp(cannot-sign-in)`. To replace an administrator (lost phone): `REPLACE=1 ./deploy.sh admin-console create-admin <name>`.
 

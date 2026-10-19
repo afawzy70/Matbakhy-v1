@@ -209,6 +209,8 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertLess(failure.index("close_switch"), failure.index("exit"))
         self.assertLess(enable.index('enabled=1'), enable.index("OPEN:"))
         self.assertEqual(enable.count("enabled=1"), 1)
+        self.assertIn('create-admin "$owner"', enable, "an owner administrator is created on the server when nobody can sign in")
+        self.assertGreater(enable.index('create-admin "$owner"'), enable.index("OPEN:"), "created only after a passed verification")
         self.assertIn("trap fx_cleanup EXIT", text)
         self.assertIn("fixture-delete", text)
 

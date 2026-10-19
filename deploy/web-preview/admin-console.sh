@@ -123,8 +123,15 @@ case "${1:-}" in
     enabled=1
     echo "OPEN: https://kc-admin.$PREVIEW_DOMAIN (verified)"
     echo "== administrators who can sign in (an account without a one-time password cannot; there is no public enrolment)"
-    run_kc status | grep -E '^(admin\.|signInCapableAdministrators=)' || true
-    echo "If signInCapableAdministrators=0, create one on this server: ./deploy.sh admin-console create-admin <name>"
+    summary="$(run_kc status | grep -E '^(admin\.|signInCapableAdministrators=)' || true)"
+    printf '%s\n' "$summary"
+    if printf '%s\n' "$summary" | grep -Fxq 'signInCapableAdministrators=0'; then
+      # Nobody could sign in (the bootstrap account has no OTP and the public page never enrols): create the owner's administrator now. Its
+      # password and OTP key go to a private file on this server only, never to this output.
+      owner="${ADMIN_CONSOLE_OWNER:-owner-admin}"
+      echo "== no administrator can sign in yet: creating '$owner'"
+      sh ./admin-console.sh create-admin "$owner"
+    fi
     ;;
   verify) verify ;;
   status)
