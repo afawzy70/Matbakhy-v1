@@ -1,2 +1,2 @@
 plan
-# request 1 (read-only). First word = mode (plan or apply). Changing this file on develop runs .github/workflows/owner-e2e-provision.yml against the preview.
+# request 2 (read-only). First word = mode (plan or apply). Changing this file on develop runs .github/workflows/owner-e2e-provision.yml against the preview.
