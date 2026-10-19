@@ -162,6 +162,13 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertLess(rollback.index("attributes.frontendUrl="), rollback.index('kc delete "clients/$oid"'))
         self.assertLess(rollback.index("login\n"), rollback.index('kc delete "clients/$oid"'))
 
+    def test_a_failed_read_of_the_master_clients_stops_the_run_instead_of_looking_clean(self):
+        text = KCADM.read_text()
+        self.assertIn('load_grants() { GRANTS_RAW="$(kc get clients', text)
+        self.assertIn('|| die "cannot read the master clients"', text)
+        harden = text[text.index("harden() {"):text.index("rollback() {")]
+        self.assertLess(harden.index("load_grants"), harden.index("attributes.matbakhyHardened=no"))
+
     def test_the_env_file_is_never_world_readable_while_the_operations_secret_is_added(self):
         text = OPERATOR.read_text()
         func = text[text.index("ensure_ops_secret() {"):text.index("run_kc() {")]

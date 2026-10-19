@@ -89,10 +89,10 @@ delete_flow() {
   if [ -n "$id" ]; then kc delete "authentication/flows/$id" -r "$REALM" >/dev/null; fi
 }
 
-# Clients of the master realm that still accept the password grant (one "clientId" per line).
-password_grant_clients() {
-  kc get clients -r "$REALM" --fields id,clientId,directAccessGrantsEnabled --format csv --noquotes | awk -F, '$3 == "true" { print $2 }'
-}
+# Clients of the master realm that still accept the password grant (one "clientId" per line), parsed from a snapshot that load_grants read in THIS
+# shell, so a failed read stops the run instead of looking like "no such client".
+load_grants() { GRANTS_RAW="$(kc get clients -r "$REALM" --fields id,clientId,directAccessGrantsEnabled --format csv --noquotes </dev/null)" || die "cannot read the master clients"; }
+password_grant_clients() { printf '%s\n' "$GRANTS_RAW" | awk -F, '$3 == "true" { print $2 }'; }
 
 # One line per master user. Only an ENABLED user with the realm role "admin" and an OTP credential can sign in to the console and manage it
 # (an account without an OTP cannot sign in: the public page offers no enrolment; the read-only verification users are not administrators).
@@ -116,6 +116,7 @@ admin_accounts() {
 
 status() {
   login
+  load_grants
   echo "realm=$REALM"
   echo "browserFlow=$(bound_flow)"
   if flow_complete; then echo "flow=complete"; elif flow_exists "$TOP"; then echo "flow=incomplete"; else echo "flow=absent"; fi
@@ -188,6 +189,7 @@ harden() {
   [ "$(kc get "realms/$REALM" --fields 'attributes(matbakhyHardened)' --format csv --noquotes </dev/null | head -1)" = yes ] || changed=1
   [ "$(bound_flow)" = "$TOP" ] || changed=1
   [ "$(kc get authentication/required-actions/CONFIGURE_TOTP -r "$REALM" --fields enabled --format csv --noquotes </dev/null | head -1)" = false ] || changed=1
+  load_grants
   [ -z "$(password_grant_clients)" ] || changed=1
   overrides="$(kc get clients -r "$REALM" --fields id,authenticationFlowBindingOverrides </dev/null)" || die "cannot read the master clients"
   [ -z "$(printf '%s\n' "$overrides" | awk '/"id" :/ { gsub(/[",]/, "", $3); id = $3 } /"authenticationFlowBindingOverrides" :/ { if ($0 !~ /\{ *\}/) print id }')" ] || changed=1
@@ -212,6 +214,7 @@ harden() {
     kc update "clients/$cid" -r "$REALM" -s directAccessGrantsEnabled=false >/dev/null
     echo "client $c: password grant switched off"
   done
+  load_grants
   [ -z "$(password_grant_clients)" ] || die "a master client still accepts the password grant"
   # Only clients that have an override are touched (Keycloak refuses to update some built-in clients).
   overrides="$(kc get clients -r "$REALM" --fields id,authenticationFlowBindingOverrides </dev/null)" || die "cannot read the master clients"
