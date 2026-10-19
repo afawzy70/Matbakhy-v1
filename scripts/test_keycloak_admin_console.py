@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WP = ROOT / "deploy" / "web-preview"
 CADDYFILE = (WP / "Caddyfile").read_text()
 COMPOSE = (WP / "compose.yaml").read_text()
-KCADM = WP / "identity" / "admin-console.kcadm.sh"
+KC = WP / "identity" / "admin_console.py"
 OPERATOR = WP / "admin-console.sh"
 WRAPPER = WP / "kcadm-in-container.sh"
 VERIFY = WP / "identity" / "verify-admin-console.py"
@@ -36,12 +36,13 @@ def site_block(text, header):
 
 class AdminConsoleFilesTest(unittest.TestCase):
     def test_shell_scripts_are_valid_posix_sh(self):
-        for script in (KCADM, OPERATOR, WRAPPER, SMOKE, DEPLOY):
+        for script in (OPERATOR, WRAPPER, SMOKE, DEPLOY):
             result = subprocess.run(["sh", "-n", str(script)], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, f"{script.name}: {result.stderr}")
 
-    def test_verification_script_is_valid_python(self):
-        ast.parse(VERIFY.read_text())
+    def test_python_helpers_are_valid_python(self):
+        for path in (VERIFY, KC, WP / "identity" / "provision-admin.py"):
+            ast.parse(path.read_text())
 
     def test_the_admin_host_is_fail_closed_and_forwards_only_the_console_paths(self):
         block = site_block(CADDYFILE, "kc-admin.{$PREVIEW_DOMAIN}")
@@ -91,43 +92,47 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertRegex(COMPOSE, r"/flags:/srv/flags:ro")
 
     def test_one_time_password_is_required_not_conditional_in_the_master_flow(self):
-        text = KCADM.read_text()
-        build = text[text.index("build_flow() {"):text.index("delete_flow() {")]
+        text = KC.read_text()
+        build = text[text.index("def build_flow(kc):"):text.index("def delete_flow(kc):")]
         self.assertIn("auth-username-password-form", build)
         self.assertIn("auth-otp-form", build)
         self.assertNotIn("conditional", build.lower())
-        self.assertIn('"$(exec_id_by_provider "$FORMS" auth-otp-form)" REQUIRED', build)
-        self.assertIn("auth-otp-form,REQUIRED", text[text.index("flow_complete() {"):text.index("build_flow() {")])
+        self.assertIn('exec_id(FORMS, provider="auth-otp-form"), "REQUIRED"', build)
+        self.assertIn('("auth-otp-form", "REQUIRED") in forms', text[text.index("def flow_complete(kc):"):text.index("def build_flow(kc):")])
 
     def test_the_password_grant_is_switched_off_only_after_the_operations_client_signed_in(self):
-        text = KCADM.read_text()
-        harden = text[text.index("harden() {"):text.index("rollback() {")]
+        text = KC.read_text()
+        harden = text[text.index("def harden(kc):"):text.index("def rollback(kc):")]
         proven = harden.index("sign-in proven")
-        self.assertLess(proven, harden.index("directAccessGrantsEnabled=false"))
-        self.assertLess(harden.index("cannot sign in; the password grant was NOT switched off"), harden.index("directAccessGrantsEnabled=false"))
-        self.assertLess(harden.index("flow_complete || die"), harden.index('browserFlow="$TOP"'))
-        self.assertEqual(harden.count('browserFlow="$TOP"'), 1)
+        self.assertLess(proven, harden.index("directAccessGrantsEnabled=False"))
+        self.assertLess(harden.index("the operations client cannot sign in; the password grant was NOT switched off"), harden.index("directAccessGrantsEnabled=False"))
+        self.assertLess(harden.index("if not flow_complete(kc):"), harden.index('kc.update_realm({"browserFlow": TOP})'))
+        self.assertEqual(harden.count('{"browserFlow": TOP}'), 1)
         self.assertIn("a master client still accepts the password grant", harden)
-        self.assertIn("bruteForceProtected=true", harden)
-        self.assertIn("registrationAllowed=false", harden)
-        self.assertIn("kc-admin.$PREVIEW_DOMAIN", harden)
+        self.assertIn('"bruteForceProtected": True', harden)
+        self.assertIn('"registrationAllowed": False', harden)
+        self.assertIn("https://kc-admin.{domain}", harden)
 
-    def test_secrets_are_not_passed_as_host_arguments(self):
-        text = KCADM.read_text()
-        self.assertNotIn('secret="$OPS_CLIENT_SECRET"', text)
-        self.assertIn("kc_body create clients", text, "the client secret must go through standard input")
-        wrapper = WRAPPER.read_text()
-        self.assertIn("-e KC_CLI_CLIENT_SECRET identity sh -c", wrapper, "inside the container the secret comes from the environment")
-        self.assertIn("-e KC_CLI_PASSWORD identity sh -c", wrapper)
-        for script in (OPERATOR, KCADM, WRAPPER):
-            # kcadm lists in `ps` (container processes are visible on the host): no secret or password may follow --secret / --password.
+    def test_secrets_are_never_arguments_or_printed(self):
+        text = KC.read_text()
+        self.assertEqual(set(re.findall(r"sys\.argv\[(\d+)\]", text)), {"1", "2"}, "only the command and an administrator NAME come from arguments")
+        self.assertNotRegex(text, r"print\([^)]*(\{(secret|password)\b|ADMIN_PASSWORD|os\.environ)", "no secret may be printed")
+        self.assertIn('os.environ.get("OPS_CLIENT_SECRET"', text)
+        for script in (OPERATOR, WRAPPER):
             self.assertNotRegex(script.read_text(), r"--(secret|password)\b", f"{script.name} passes a credential as an argument")
+        self.assertIn("-e KC_CLI_CLIENT_SECRET identity sh -c", WRAPPER.read_text())
+
+    def test_the_admin_api_is_reached_on_the_container_address_not_a_published_port(self):
+        text = OPERATOR.read_text()
+        self.assertIn("docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}'", text)
+        self.assertIn("python3 -I identity/admin_console.py", text)
+        self.assertNotIn("kcadm", text)
 
     def test_nobody_can_enrol_a_one_time_password_on_the_public_page(self):
-        text = KCADM.read_text()
-        harden = text[text.index("harden() {"):text.index("rollback() {")]
-        self.assertIn("authentication/required-actions/CONFIGURE_TOTP", harden)
-        self.assertRegex(harden, r"CONFIGURE_TOTP -r \"\$REALM\" -s enabled=false")
+        text = KC.read_text()
+        harden = text[text.index("def harden(kc):"):text.index("def rollback(kc):")]
+        self.assertIn("required-actions/CONFIGURE_TOTP", harden)
+        self.assertIn('totp.update({"enabled": False, "defaultAction": False})', harden)
         op = OPERATOR.read_text()
         create = op[op.index("  create-admin)"):op.index("  disable)")]
         self.assertIn('(umask 077; mkdir -p "$dir")', create)
@@ -139,39 +144,37 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertNotIn("print(password", provision)
 
     def test_hardening_revokes_older_sessions_and_removes_client_flow_overrides(self):
-        text = KCADM.read_text()
-        harden = text[text.index("harden() {"):text.index("rollback() {")]
-        self.assertIn("authenticationFlowBindingOverrides={}", harden)
+        text = KC.read_text()
+        harden = text[text.index("def harden(kc):"):text.index("def rollback(kc):")]
+        self.assertIn('"browser": "", "direct_grant": ""', harden, "an empty flow id is what removes an override")
         self.assertIn("a master client still overrides the browser or direct-grant flow", harden)
-        self.assertLess(harden.index("notBefore="), harden.index("logout-all"))
-        self.assertIn('if [ "$changed" = 1 ]', harden, "revocation happens on a change, not on every release")
+        self.assertLess(harden.index('"notBefore"'), harden.index("logout-all"))
+        self.assertIn("if changed:", harden, "revocation happens on a change, not on every release")
 
     def test_revocation_cannot_be_skipped_by_an_interrupted_earlier_run_and_purge_deletes_the_client_last(self):
-        text = KCADM.read_text()
-        harden = text[text.index("harden() {"):text.index("rollback() {")]
-        self.assertIn("matbakhyHardened", harden)
-        self.assertLess(harden.index("logout-all"), harden.index("attributes.matbakhyHardened=yes"), "the marker is set only after revocation")
-        self.assertIn("CONFIGURE_TOTP -r \"$REALM\" --fields enabled", harden)
-        no, bind, grants = harden.index("attributes.matbakhyHardened=no"), harden.index('browserFlow="$TOP"'), harden.index("directAccessGrantsEnabled=false")
-        self.assertLess(no, bind, "the marker is cleared before the first mutation that matters for sessions")
-        self.assertLess(no, grants)
-        self.assertLess(no, harden.index("authentication/required-actions/CONFIGURE_TOTP -r \"$REALM\" -s enabled=false"))
-        rollback = text[text.index("rollback() {"):text.index("# Synthetic verification administrators")]
-        self.assertIn("attributes.matbakhyHardened=no", rollback)
-        self.assertIn("CONFIGURE_TOTP -r \"$REALM\" -s enabled=true", rollback)
-        self.assertLess(rollback.index("attributes.frontendUrl="), rollback.index('kc delete "clients/$oid"'))
-        self.assertLess(rollback.index("login\n"), rollback.index('kc delete "clients/$oid"'))
+        text = KC.read_text()
+        harden = text[text.index("def harden(kc):"):text.index("def rollback(kc):")]
+        self.assertLess(harden.index('{"matbakhyHardened": "no"}'), harden.index('kc.update_realm({"browserFlow": TOP})'), "the marker is cleared before the first mutation that matters for sessions")
+        self.assertLess(harden.index('{"matbakhyHardened": "no"}'), harden.index("directAccessGrantsEnabled=False"))
+        self.assertLess(harden.index("logout-all"), harden.index('{"matbakhyHardened": "yes"}'), "the marker is set only after revocation")
+        self.assertIn('totp.get("enabled") is not False', harden)
+        self.assertIn("clients = kc.clients()", harden, "drift is computed from a validated snapshot; a failed read dies in call()")
+        rollback = text[text.index("def rollback(kc):"):text.index("def read_lines")]
+        self.assertIn('{"matbakhyHardened": "no"}', rollback)
+        self.assertIn('totp["enabled"] = True', rollback)
+        self.assertLess(rollback.index('{"frontendUrl": ""}'), rollback.index("kc.delete("))
+        self.assertLess(rollback.index("kc.login()"), rollback.index("kc.delete("))
 
-    def test_a_failed_read_of_the_master_clients_stops_the_run_instead_of_looking_clean(self):
-        text = KCADM.read_text()
-        self.assertIn('load_grants() { GRANTS_RAW="$(kc get clients', text)
-        self.assertIn('|| die "cannot read the master clients"', text)
-        harden = text[text.index("harden() {"):text.index("rollback() {")]
-        self.assertLess(harden.index("load_grants"), harden.index("attributes.matbakhyHardened=no"))
+    def test_every_failed_api_call_stops_the_run(self):
+        text = KC.read_text()
+        call = text[text.index("    def call(self"):text.index("    def get(self")]
+        self.assertIn("if status not in ok:", call)
+        self.assertIn("die(", call)
+        self.assertIn("sys.exit(1)", text)
 
     def test_the_env_file_is_never_world_readable_while_the_operations_secret_is_added(self):
         text = OPERATOR.read_text()
-        func = text[text.index("ensure_ops_secret() {"):text.index("run_kc() {")]
+        func = text[text.index("ensure_ops_secret() {"):text.index("# Keycloak's Admin REST API")]
         self.assertIn("umask 077; mktemp", func)
         self.assertIn('trap \'rm -f "$tmp"\' EXIT', func)
         self.assertLess(func.index("umask 077; mktemp"), func.index("mv \"$tmp\""))
@@ -182,7 +185,7 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertLess(create.index("provision-admin.py new-admin"), create.index("run_kc admin-delete"))
         self.assertIn("ALLOW_LAST_ADMIN", create)
         self.assertLess(create.index("ALLOW_LAST_ADMIN"), create.index("run_kc admin-delete"))
-        self.assertIn("the partly created account was removed", KCADM.read_text())
+        self.assertIn("the partly created account was removed", KC.read_text())
 
     def test_a_certificate_still_pending_does_not_fail_the_smoke_under_set_e(self):
         text = SMOKE.read_text()
@@ -191,19 +194,18 @@ class AdminConsoleFilesTest(unittest.TestCase):
         result = subprocess.run(["sh", "-c", script], capture_output=True, text=True)
         self.assertEqual((result.returncode, result.stdout.strip()), (0, "got:000"), result.stderr)
 
-    def test_the_master_realm_and_matbakhy_realm_users_are_never_modified_by_hardening(self):
-        text = KCADM.read_text()
-        harden = text[text.index("harden() {"):text.index("rollback() {")]
-        self.assertNotIn("-r matbakhy", text)
-        self.assertNotIn("delete users", harden)
-        self.assertEqual(re.findall(r"^REALM=(\w+)$", text, re.M), ["master"])
+    def test_the_matbakhy_realm_is_never_modified_by_hardening(self):
+        text = KC.read_text()
+        self.assertEqual(re.findall(r'^REALM = "(\w+)"$', text, re.M), ["master"])
+        self.assertNotIn("matbakhy/", text.replace("https://kc-admin", ""), "no request path may name the matbakhy realm")
 
     def test_fixtures_are_removed_by_prefix_only_and_are_read_only_administrators(self):
-        text = KCADM.read_text()
-        self.assertIn('FIXTURE_PREFIX="verify-admin-"', text)
-        self.assertIn('"$FIXTURE_PREFIX"*)', text)
-        roles = re.findall(r"--rolename (\S+)", text[text.index("fixture_create() {"):text.index("admin_create() {")])
-        self.assertTrue(roles and all(r.startswith(("view-", "query-")) for r in roles), roles)
+        text = KC.read_text()
+        self.assertIn('FIXTURE_PREFIX = "verify-admin-"', text)
+        self.assertIn("if not u[\"username\"].startswith(FIXTURE_PREFIX):", text)
+        roles = re.search(r"READ_ROLES = \[(.*?)\]", text).group(1)
+        names = re.findall(r'"([a-z-]+)"', roles)
+        self.assertTrue(names and all(r.startswith(("view-", "query-")) for r in names), names)
 
     def test_the_console_is_opened_only_after_hardening_and_closed_again_when_verification_fails(self):
         text = OPERATOR.read_text()
@@ -222,15 +224,15 @@ class AdminConsoleFilesTest(unittest.TestCase):
         self.assertEqual(enable.count("enabled=1"), 1)
         self.assertIn('create-admin "$owner"', enable, "an owner administrator is created on the server when nobody can sign in")
         self.assertGreater(enable.index('create-admin "$owner"'), enable.index("OPEN:"), "created only after a passed verification")
-        accounts = KCADM.read_text()
-        accounts = accounts[accounts.index("admin_accounts() {"):accounts.index("status() {")]
-        for state in ("disabled", "not-an-administrator", "no-otp(cannot-sign-in)", "otp"):
-            self.assertIn(f"={state}", accounts)
         self.assertIn("trap fx_cleanup EXIT", text)
         self.assertIn("fixture-delete", text)
+        accounts = KC.read_text()
+        accounts = accounts[accounts.index("def admin_accounts(kc):"):accounts.index("# ---- commands")]
+        for state in ("disabled", "not-an-administrator", "no-otp(cannot-sign-in)", "otp"):
+            self.assertIn(f'"{state}"', accounts)
 
     def test_nothing_secret_is_in_the_repository_files(self):
-        for path in (KCADM, OPERATOR, VERIFY, WRAPPER, WP / ".env.example"):
+        for path in (KC, OPERATOR, VERIFY, WRAPPER, WP / ".env.example"):
             text = path.read_text()
             self.assertNotRegex(text, r"(?i)(password|secret)\s*=\s*[\"']?[A-Za-z0-9]{20,}", path.name)
         self.assertIn("KEYCLOAK_OPS_CLIENT_SECRET=REPLACE_ME", (WP / ".env.example").read_text())

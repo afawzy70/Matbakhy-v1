@@ -25,7 +25,7 @@ the proxy publishes ports (80/443). `id.*` still answers 404 for `/admin` and `/
    knowing a password never lets anyone enrol their own authenticator first. Administrators receive their password *and* OTP key from the server
    (`./deploy.sh admin-console create-admin <name>`, below).
 2. **No password-only path.** The password grant is switched off for every master client (including `admin-cli`), no master client may override the browser or
-   direct-grant flow, and sessions/tokens that predate the hardening are revoked, so the Internet cannot obtain a token or reuse an old cookie with a password alone. Operator tooling (kcadm, `migrate-mfa.sh`, this script) signs in as the service account of the confidential master client
+   direct-grant flow, and sessions/tokens that predate the hardening are revoked, so the Internet cannot obtain a token or reuse an old cookie with a password alone. Operator tooling (`migrate-mfa.sh`'s kcadm, and `identity/admin_console.py`, which talks to the Admin REST API on the identity container's Docker address) signs in as the service account of the confidential master client
    `matbakhy-ops-cli`; its secret is `KEYCLOAK_OPS_CLIENT_SECRET` in the server's `.env` (mode 600, created by `./deploy.sh render`) and is never printed or committed.
 3. **Brute-force protection** in the master realm: 5 failures, then a temporary lock that grows (60 s steps up to 15 min); no self-registration, no reset-password flow.
 4. **Dedicated hostname.** `KC_HOSTNAME_ADMIN=https://kc-admin.<domain>` plus the master realm's frontend URL, so the master realm's issuer, sign-in forms,
@@ -80,7 +80,7 @@ The previous flow name and a Keycloak database dump (`keycloak-db-<stamp>.dump`)
 To remove the exposure without touching Keycloak: `./deploy.sh admin-console disable`. To remove it from the code: revert the pull request (the host then no longer exists in the Caddyfile).
 
 A lost authenticator is handled with `REPLACE=1 ... create-admin <name>`. Lock-out of everything is a database-level recovery (restore the dump above).
-The operations client's secret never appears on a command line (kcadm reads `KC_CLI_CLIENT_SECRET` from the environment).
+The operations client's secret never appears on a command line (the Admin REST client reads it from the environment).
 
 ## What this does not prove
 
