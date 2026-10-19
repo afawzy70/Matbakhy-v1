@@ -1,0 +1,61 @@
+name: Documentation Consistency
+# DOC-001. The job name below is the stable required-status-check context: "Documentation Consistency / DOC-001".
+# pull_request_target runs THIS workflow definition and the gate script from the base branch, so a pull request cannot
+# weaken its own gate. The pull request's files are only read as data (never executed, no secrets are used).
+on:
+  pull_request_target:
+    branches: [develop, main]
+    types: [opened, synchronize, reopened, edited, ready_for_review]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: doc001-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  doc001:
+    name: Documentation Consistency / DOC-001
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out the trusted base branch (gate script)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: Check out the pull request as data (not executed)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Assess documentation impact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
+          git -C pr fetch --no-tags --depth=200 origin "$BASE_SHA" || git -C pr fetch --no-tags origin "$BASE_SHA"
+          gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" --paginate \
+            --jq '.[] | {user: .user.login, state: .state}' | python3 -c \
+            'import json,sys; print(json.dumps([json.loads(l) for l in sys.stdin if l.strip()]))' \
+            > "$RUNNER_TEMP/reviews.json"
+          if [ -f base/scripts/doc001_check.py ]; then gate=base/scripts/doc001_check.py; extra=""; else
+            echo "::warning::Base branch has no DOC-001 gate yet (bootstrap): using the pull request's script"
+            gate=pr/scripts/doc001_check.py; extra="--bootstrap"
+          fi
+          python3 -I "$gate" pr --root pr --base "$BASE_SHA" --head "$HEAD_SHA" \
+            --body-file "$RUNNER_TEMP/pr-body.md" --reviews-file "$RUNNER_TEMP/reviews.json" \
+            --author "$PR_AUTHOR" $extra
