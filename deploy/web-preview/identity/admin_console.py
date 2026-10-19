@@ -320,7 +320,7 @@ def harden(kc):
     realm = kc.realm()
     clients = kc.clients()
     totp = kc.get(f"/admin/realms/{REALM}/authentication/required-actions/CONFIGURE_TOTP")
-    changed = (kc.attribute("matbakhyHardened") != "yes" or realm.get("browserFlow") != TOP or totp.get("enabled") is not False
+    changed = (kc.attribute("matbakhyHardened") != "yes" or realm.get("browserFlow") != TOP or not flow_complete(kc) or totp.get("enabled") is not False
                or any(realm.get(k) != v for k, v in wanted.items()) or (realm.get("attributes") or {}).get("frontendUrl") != frontend
                or bool(password_grant_clients(clients)) or bool(override_clients(clients)))
     if changed:
