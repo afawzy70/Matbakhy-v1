@@ -45,7 +45,15 @@ Do not reduce acceptance criteria, suppress failures, remove security checks or 
 
 The template is `.github/pull_request_template.md` with four sections: Problem and intended behavior; Changes (story IDs, behavior, contracts/migrations, surfaces); Verification (tested source commit, actual commands and results, evidence paths, NOT_RUN/BLOCKED listed explicitly); Review and risks (findings, repairs, residual risks, owner decisions, deploy/rollback implications). Do not claim independent review or approval unless it happened.
 
-DOC-001 adds a mandatory **Documentation Impact declaration** between `<!-- DOC-001:BEGIN -->` and `<!-- DOC-001:END -->`. Its allowed keys and rules are enforced by `python3 scripts/doc001_check.py pr` (keys: `impact`, `summary`, `handbook_pages`, `other_docs`, `diagrams`, `contracts`, `tests`, `traceability`, `consistency`, `justification`, `governance_review`). Format, examples and the change matrix: [documentation-policy.md](documentation-policy.md). The repository's current PR template does not yet contain the declaration block (NOT VERIFIED whether the supervisor adds it in the same change); until it does, paste the block from the policy page yourself.
+DOC-001 adds a mandatory **Documentation Impact declaration** between `<!-- DOC-001:BEGIN -->` and `<!-- DOC-001:END -->`. Its allowed keys and rules are enforced by `python3 scripts/doc001_check.py pr` (keys: `impact`, `summary`, `handbook_pages`, `other_docs`, `diagrams`, `contracts`, `tests`, `traceability`, `consistency`, `justification`, `governance_review`). Format, examples and the change matrix: [documentation-policy.md](documentation-policy.md). The PR template contains the block as an empty form; leaving it empty fails the check.
+
+## Starting on an issue
+
+1. List open work: `gh issue list --state open` (add `--label <label>` after `gh label list` shows what exists; there is no label convention beyond the defect issue template in `.github/ISSUE_TEMPLATE`).
+2. Comment a short plan on the issue (requirement, affected modules, tests, handbook pages from [doc001-matrix.json](../doc001-matrix.json)) before coding.
+3. Branch from the integration branch: `git switch -c <kind>/<short-description> origin/develop` (`fix/`, `feat/`, `docs/`, `test/`).
+4. Write the failing test first, implement, update the documentation in the same change, run the checks in [test-execution](test-execution.md) and `python3 scripts/doc001_check.py docs`.
+5. Open the PR against `develop` with `gh pr create --base develop`, fill the Documentation Impact block, and link the issue. Do not merge it yourself without owner authorization.
 
 ## Review roles
 

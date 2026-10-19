@@ -263,6 +263,20 @@
         "docs/developer-handbook/07-reference/implementation-status.md"
       ],
       "owner_role": "Business documentation"
+    },
+    {
+      "id": "quotes-pricing",
+      "description": "Quote creation/validation, quote lifetime and the commerce policy seed",
+      "code": [
+        "backend/modules/orders/**/Quote*",
+        "backend/app/src/main/resources/db/devdata/R__dev_commerce_policy.sql"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/pricing-implementation.md",
+        "docs/developer-handbook/01-business/pricing-and-payments.md",
+        "docs/product/rq-004-stale-quote.md"
+      ],
+      "owner_role": "Business documentation"
     }
   ]
 }

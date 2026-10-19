@@ -24,7 +24,7 @@
 5. Database. In psql (see [run-and-debug](../05-developer-workflow/run-and-debug.md)) list tables, then read the first migrations in `backend/app/src/main/resources/db/migration`. Find a table that is append-only and the trigger that enforces it. Check which migration annotations exist with `python3 scripts/check_migration_compat.py --list`.
 6. Keycloak. Open the local admin console, find realm `matbakhy`, clients (`matbakhy-web`, `matbakhy-mobile`) and the four synthetic users. Explain why the mobile client uses PKCE and no secret.
 7. Failure drill: call `curl -i http://127.0.0.1:8080/api/v1/me` without a session and read the status and body shape; take the `requestId` from an error and find it in `docker compose ... logs api`.
-8. Run one real integration test class from `backend/app/src/test/java/com/matbakhy/app/orders` and read its output in `backend/app/target/surefire-reports`.
+8. Run one real integration test class from `backend/app/src/test/java/com/matbakhy/app/orders` and read its output in the `target/surefire-reports` directory that the Maven build creates under `backend/app/`.
 
 ## Deliverable
 

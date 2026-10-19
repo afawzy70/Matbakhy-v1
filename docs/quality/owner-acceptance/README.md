@@ -4,7 +4,7 @@
 
 | File | What it is |
 |---|---|
-| `cases/*.json` | The only hand-edited sources: 199 cases (discovery/basket 45, orders/finance 62, cook/ops 39, config/security 53). Each has exact steps, expected UI/API/database outcomes, fixtures, traceability and readiness flags. |
+| `cases/*.json` | The only hand-edited sources: 200 cases (discovery/basket 45, orders/finance 62, cook/ops 39, config/security 54). Each has exact steps, expected UI/API/database outcomes, fixtures, traceability and readiness flags. |
 | `core-suite.json` | The ordered core owner acceptance journeys J0–J8 (Customer → Kitchen → Operations/Finance/Admin). |
 | `coverage-notes.json` | Planning scenarios (TC) that no manual case covers, each classified (`PROCESS_GATE`, `AUTOMATED_ONLY`, `OWNER_UAT`, `GAP`) with the reason. |
 | `fixtures.json`, `fixtures.md` | The synthetic actors and how to provision them without exposing credentials. |

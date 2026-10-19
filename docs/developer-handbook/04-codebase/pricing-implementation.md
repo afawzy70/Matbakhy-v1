@@ -94,3 +94,7 @@ Rounding rules, the `FOR SHARE`/`FOR UPDATE` lock pairing between `requireValid`
 
 - Tax treatment is undecided (O04, `planning/decisions.json`); the code supports a tax rate but the synthetic policy uses 0 and no invoice logic exists. PLANNED.
 - Quote TTL is a policy value; `BR-020` says 5 minutes, which equals the synthetic dev policy (300 s) but the live value is NOT VERIFIED because no approved live policy is in the repository.
+
+## Changing the quote lifetime
+
+The lifetime is data, not code: `commerce_policy.quote_ttl_seconds` (database check 60..3600 in migration `V10__quotes.sql`). Placement compares `now` with the quote's `expires_at` (`QuoteService.requireValid`), it does not compute an age. To change the documented "5 minutes": update the policy seed `backend/app/src/main/resources/db/devdata/R__dev_commerce_policy.sql` and the test policy, the javadoc in `QuoteService`, the tests that assert expiry, and every page that states the value (search the handbook for "5 minutes", plus `docs/product/03-business-rules.md` BR-020, `docs/product/04-state-machines.md`, `docs/product/rq-004-stale-quote.md`). A live value needs an approved owner decision (O04).
