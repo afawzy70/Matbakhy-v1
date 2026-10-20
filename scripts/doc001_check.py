@@ -483,6 +483,8 @@ def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] |
                         continue
                     if state == "APPROVED" and r.get("commit_id") != head_sha:
                         state = "STALE"
+                    elif state == "APPROVED" and r.get("author_association") not in ("OWNER", "MEMBER", "COLLABORATOR"):
+                        state = "UNAUTHORISED"
                     latest[r["user"]] = state
                 ok = any(state == "APPROVED" and user != author for user, state in latest.items())
                 if not ok:

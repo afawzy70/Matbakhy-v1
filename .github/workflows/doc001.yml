@@ -52,7 +52,7 @@ jobs:
           printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
           git -C pr fetch --no-tags origin "$BASE_SHA"
           gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" --paginate \
-            --jq '.[] | {user: .user.login, state: .state, commit_id: .commit_id}' | python3 -c \
+            --jq '.[] | {user: .user.login, state: .state, commit_id: .commit_id, author_association: .author_association}' | python3 -c \
             'import json,sys; print(json.dumps([json.loads(l) for l in sys.stdin if l.strip()]))' \
             > "$RUNNER_TEMP/reviews.json"
           # Fail closed: the gate that runs is always the base branch's. Never execute anything from the pull request.

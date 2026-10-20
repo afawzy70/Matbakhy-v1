@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Regression tests for the DOC-001 gate (scripts/doc001_check.py).
+"""Regression tests for the DOC-001 gate script (scripts/doc001_check.py).
+
+These are script-level contract tests. They do NOT prove that GitHub enforces the gate: a pull request can edit the
+workflow that runs it (demonstrated on a disposable PR; see documentation-maintenance.md).
 
 Every test builds a throw-away git repository, so the gate is exercised through its real command line
 against real diffs. The gate must fail on bad input as well as pass on good input.
@@ -215,7 +218,7 @@ class GateTests(unittest.TestCase):
         self.assertFails(self.r.run(gov), "no review information")
         head = self.r.git("rev-parse", "HEAD").strip()
         self.assertFails(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED"}]), "CURRENT head")
-        self.assertPasses(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED", "commit_id": head}]))
+        self.assertPasses(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED", "commit_id": head, "author_association": "OWNER"}]))
 
     # 12
     def test_12_multi_application_change_with_docs_and_traceability_passes(self) -> None:
@@ -260,8 +263,10 @@ class GateTests(unittest.TestCase):
         self.r.write("scripts/doc001_check.py", "# changed\n"); self.doc_change(); self.r.commit()
         head = self.r.git("rev-parse", "HEAD").strip()
         gov = decl(**{**UPDATED, "governance_review": "owner approval"})
-        approved = {"user": "owner", "state": "APPROVED", "commit_id": head}
+        approved = {"user": "owner", "state": "APPROVED", "commit_id": head, "author_association": "OWNER"}
         self.assertPasses(self.r.run(gov, reviews=[approved, {"user": "owner", "state": "COMMENTED", "commit_id": head}]))
+        stranger = {**approved, "user": "stranger", "author_association": "NONE"}
+        self.assertFails(self.r.run(gov, reviews=[stranger]), "CURRENT head")  # any non-author login is not enough
         self.assertFails(self.r.run(gov, reviews=[{**approved, "commit_id": "0" * 40}]), "CURRENT head")
         self.assertFails(self.r.run(gov, reviews=[approved, {"user": "owner", "state": "DISMISSED", "commit_id": head}]), "CURRENT head")
 
