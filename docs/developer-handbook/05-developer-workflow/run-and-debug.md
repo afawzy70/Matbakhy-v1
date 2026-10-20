@@ -79,3 +79,5 @@ SELECT version, description, success FROM flyway_schema_history ORDER BY install
 ## Common failure modes
 
 See [troubleshooting.md](troubleshooting.md).
+
+Disposable DOC-001 enforcement test marker (not merged).
