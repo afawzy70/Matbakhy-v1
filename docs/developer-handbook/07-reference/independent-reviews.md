@@ -31,7 +31,18 @@ Environmental note: in the governance reviewer's sandbox the temporary directory
 |---|---|---|
 | Governance and content, all round-two findings re-checked | Every round-two finding confirmed fixed (nested fences, root-link navigation, lab MFA wording, handover override, both diagrams, owner case wording); 1 new Medium: declaration fields could be hidden in an HTML comment inside the marker block | fixed in the gate (any HTML comment inside the block is rejected) with a regression test; **this last one-line fix was verified by the test suite only and was not re-reviewed by Codex** |
 
-The dismissal-after-green limitation is accepted as documented: the authoritative control is the Code Owners ruleset requirement, which is **not installed yet** (no ruleset exists on develop; see [documentation maintenance](../05-developer-workflow/documentation-maintenance.md#branch-protection-status)).
+The dismissal-after-green limitation is accepted as documented. (An earlier version of this record called Code Owners the authoritative control; the final review showed that is not demonstrated — see round 4 and [documentation maintenance](../05-developer-workflow/documentation-maintenance.md#branch-protection-status).)
+
+## Round 4 — final focused review of the activation (after PR #26, the ruleset and the disposable PRs)
+
+| Finding | Result | State |
+|---|---|---|
+| **High** — with the `pull_request` event a PR can edit `.github/workflows/doc001.yml` and neutralise its own DOC-001 check | **Confirmed on GitHub** with disposable PR #33 (the check passed in 2 s with a no-op job). `pull_request_target` would fix it but runs from `main` (not modified here); rulesets' "required workflows" are unavailable for personal-account repositories (API rejected it) | **OPEN — owner decision** (install a `pull_request_target` workflow on `main`, or accept and review every workflow diff). Documented in the maintenance page |
+| **Medium** — governance approval accepted from any non-author login | fix written (owner/member/collaborator only, with test) in PR #34 | **OPEN until PR #34 is applied by the owner** (governance PRs cannot merge without a second identity or a deliberate ruleset relaxation) |
+| **Medium** — gate tests do not prove the workflow-level boundary | tests relabelled script-level in PR #34; the real boundary was exercised with the disposable PRs | **OPEN until PR #34 is applied** |
+| Low — branch audit reads at most 500 PRs and only `*.yml` workflow files | not fixed; report-only tool, ancestor check still protects unique work | recorded |
+
+The final Codex verdict was "unresolved High/Medium issues remain", which is accurate; this record does not claim otherwise.
 
 ## What the reviews do not establish
 

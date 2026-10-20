@@ -79,3 +79,7 @@ SELECT version, description, success FROM flyway_schema_history ORDER BY install
 ## Common failure modes
 
 See [troubleshooting.md](troubleshooting.md).
+
+## Repository hygiene
+
+`python3 scripts/branch_audit.py --gh --local` prints a report-only classification of branches (it never deletes). The cleanup policy and its rules are in [branch maintenance](branch-maintenance.md).

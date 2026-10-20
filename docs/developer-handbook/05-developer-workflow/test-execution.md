@@ -47,6 +47,8 @@ pnpm --filter @matbakhy/customer-mobile test      # jest --ci
 
 `python3 scripts/test_doc001_gate.py` exercises the DOC-001 gate (`scripts/doc001_check.py`) through its command line against throw-away git repositories: the 12 required positive/negative cases plus hardening cases (declaration hiding, whitespace-only edits, comment/approval handling, matrix coverage of every tracked file). It runs with the other `scripts/test_*.py` in the Blueprint integrity workflow. Run `python3 scripts/doc001_check.py docs` for the documentation validation alone.
 
+`python3 scripts/test_branch_audit.py` tests the report-only branch audit (`scripts/branch_audit.py`, see [branch maintenance](branch-maintenance.md)).
+
 ## Proving that named tests really ran
 
 ```bash
