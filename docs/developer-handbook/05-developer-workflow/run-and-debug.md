@@ -79,3 +79,5 @@ SELECT version, description, success FROM flyway_schema_history ORDER BY install
 ## Common failure modes
 
 See [troubleshooting.md](troubleshooting.md).
+
+See [nowhere](../07-reference/does-not-exist.md).
