@@ -216,6 +216,11 @@ class GateTests(unittest.TestCase):
         self.assertFails(self.r.run(gov, comments=[{**auth, "user": "stranger", "author_association": "NONE"}]), "CURRENT head")
         self.assertFails(self.r.run(gov, comments=[{**auth, "author_association": "CONTRIBUTOR"}]), "CURRENT head")
         self.assertFails(self.r.run(gov, comments=[{**auth, "body": "I authorize this (no marker)"}]), "CURRENT head")
+        for quoted in (f"Do NOT use `OWNER-AUTHORIZES-GOVERNANCE {head[:12]}` yet.", f"> OWNER-AUTHORIZES-GOVERNANCE {head[:12]}",
+                       f"not yet: OWNER-AUTHORIZES-GOVERNANCE {head[:12]}", f"OWNER-AUTHORIZES-GOVERNANCE {head[:11]}"):
+            self.assertFails(self.r.run(gov, comments=[{**auth, "body": quoted}]), "CURRENT head")
+        self.assertFails(self.r.run(gov, comments=[{k: v for k, v in auth.items() if k != "author_association"}]), "CURRENT head")
+        self.assertPasses(self.r.run(gov, comments=[{**auth, "body": f"ok\r\nOWNER-AUTHORIZES-GOVERNANCE {head[:12]}\r\nthanks"}]))
         self.assertPasses(self.r.run(gov, comments=[auth]))  # single-account model: the owner may also be the PR author
 
     # 12
@@ -263,7 +268,7 @@ class GateTests(unittest.TestCase):
         gov = decl(**{**UPDATED, "governance_review": "author role: agent; reviewer role: owner; Codex review: NOT_RUN"})
         auth = {"user": "owner", "author_association": "OWNER", "body": f"approved.\nOWNER-AUTHORIZES-GOVERNANCE {head}"}
         self.assertPasses(self.r.run(gov, comments=[{"user": "bot", "body": "hi"}, auth]))
-        self.assertFails(self.r.run(gov, comments=[{**auth, "body": "OWNER-AUTHORIZES-GOVERNANCE abc"}]), "CURRENT head")  # < 7 chars
+        self.assertFails(self.r.run(gov, comments=[{**auth, "body": "OWNER-AUTHORIZES-GOVERNANCE " + head[:8]}]), "CURRENT head")  # < 12 chars
         self.r.write("scripts/doc001_check.py", "# changed again\n"); self.r.commit()  # a new push invalidates it
         self.assertFails(self.r.run(gov, comments=[auth]), "CURRENT head")
         self.assertFails(self.r.run(decl(**{**UPDATED, "governance_review": "ok"}), comments=[auth]), "too short")

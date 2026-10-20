@@ -44,6 +44,22 @@ The dismissal-after-green limitation is accepted as documented. (An earlier vers
 
 The final Codex verdict was "unresolved High/Medium issues remain", which is accurate; this record does not claim otherwise.
 
+## Round 5 — trusted enforcement and single-account governance (branch `governance/doc001-single-account-model`)
+
+Codex (read-only, supporting evidence — not a human approval, and GitHub cannot show who ran it) reviewed the first version of the verifier and the owner-authorization rule. Result: 1 High, 5 Medium, 2 Low and test gaps.
+
+| Finding | State |
+|---|---|
+| **High** — installation token echoed in the exception of a failed `git fetch` (argument filter matched the wrong prefix) | fixed: credentials travel in the git child's environment, errors name only the subcommand, tokens masked; test added |
+| **Medium** — an error kept a previous green and aborted the scan | fixed: every error posts a failure and the scan continues; test added |
+| **Medium** — two PRs with one head commit overwrote each other's verdict | fixed: success only if all PRs on that head pass; test added |
+| **Medium** — quoted or negated authorization text counted | fixed: marker must be a line of its own, at least 12 hex characters, association required; tests added |
+| **Medium** — description or comments could change between judging and posting | fixed for the judging window (final snapshot, fail closed); the revocation window until the next poll is documented |
+| **Medium** — no pagination of PRs and comments | fixed; test added |
+| Low — 7-character prefix accepted, missing association defaulted to OWNER, branch-protection documentation not in the governance path list | fixed / documentation corrected |
+
+These fixes were tested locally only (`scripts/test_doc001_gate.py`, `scripts/test_doc001_trusted_verifier.py`). A second Codex pass over the fixed code and the live App behaviour are NOT_RUN. The workflow-bypass hole remains open until the App is installed and a copy of PR #33 is observed blocked.
+
 ## What the reviews do not establish
 
 No human review; no execution of the GitHub workflow on a real pull request; no live verification of branch-protection behaviour; no Java, Docker, Playwright or native runs.

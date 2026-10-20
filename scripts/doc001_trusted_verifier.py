@@ -70,9 +70,19 @@ class GitHubApp:
     def _get(self, path: str):
         return self._request("GET", path, self.token)
 
+    def _get_all(self, path: str) -> list:
+        """Follow pagination to the end (a PR or comment beyond the first page must not be skipped)."""
+        out: list = []
+        for page in range(1, 51):
+            chunk = self._get(f"{path}{'&' if '?' in path else '?'}per_page=100&page={page}")
+            out.extend(chunk)
+            if len(chunk) < 100:
+                return out
+        raise RuntimeError("pagination limit reached; failing closed")
+
     def open_prs(self, base_branch: str) -> list[dict]:
         out = []
-        for pr in self._get(f"/repos/{self.repo}/pulls?state=open&base={base_branch}&per_page=100"):
+        for pr in self._get_all(f"/repos/{self.repo}/pulls?state=open&base={base_branch}"):
             out.append({"number": pr["number"], "head_sha": pr["head"]["sha"], "base_ref": pr["base"]["ref"],
                         "body": pr.get("body") or "", "draft": pr.get("draft", False)})
         return out
@@ -82,7 +92,11 @@ class GitHubApp:
 
     def comments(self, number: int) -> list[dict]:
         return [{"user": c["user"]["login"], "author_association": c["author_association"], "body": c.get("body") or ""}
-                for c in self._get(f"/repos/{self.repo}/issues/{number}/comments?per_page=100")]
+                for c in self._get_all(f"/repos/{self.repo}/issues/{number}/comments")]
+
+    def snapshot(self, number: int) -> tuple[str, str]:
+        pr = self._get(f"/repos/{self.repo}/pulls/{number}")
+        return pr["head"]["sha"], pr.get("body") or ""
 
     def latest_result(self, head_sha: str) -> str | None:
         runs = self._get(f"/repos/{self.repo}/commits/{head_sha}/check-runs?check_name={CHECK_NAME.replace(' ', '%20')}")
@@ -98,28 +112,32 @@ class GitHubApp:
     def clone_url(self) -> str:
         return f"https://github.com/{self.repo}.git"
 
-    def git_auth_args(self) -> list[str]:
+    def git_env(self) -> dict[str, str]:
+        """Credentials travel in the environment of the git child only: never in argv, so never in an error message."""
         basic = base64.b64encode(f"x-access-token:{self.token}".encode()).decode()
-        return ["-c", f"http.extraheader=AUTHORIZATION: basic {basic}"]
+        print(f"::add-mask::{self.token}\n::add-mask::{basic}")
+        return {"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "http.extraheader",
+                "GIT_CONFIG_VALUE_0": f"AUTHORIZATION: basic {basic}"}
 
 
 # --------------------------------------------------------------------------- verification
-def git(cwd: Path, *args: str, check: bool = True) -> str:
-    r = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
-    if check and r.returncode:
-        raise RuntimeError(f"git {' '.join(a for a in args if not a.startswith('AUTHORIZATION'))}: {r.stderr.strip()}")
+def git(cwd: Path, *args: str, env: dict[str, str] | None = None) -> str:
+    r = subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, env={**os.environ, **(env or {})})
+    if r.returncode:
+        # Only the subcommand is reported; the remote URL and credentials are never echoed.
+        raise RuntimeError(f"git {args[0]} failed (exit {r.returncode})")
     return r.stdout
 
 
-def evaluate(pr: dict, base_sha: str, comments: list[dict], owner: str, clone_url: str, auth_args: list[str]) -> tuple[bool, str]:
+def evaluate(pr: dict, base_sha: str, comments: list[dict], owner: str, clone_url: str, env: dict[str, str]) -> tuple[bool, str]:
     """Run the BASE branch's gate against the PR as data. Returns (passed, report)."""
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp) / "pr"
         trusted = Path(tmp) / "base"
         work.mkdir()
         git(work, "init", "-q")
-        git(work, *auth_args, "fetch", "-q", "--no-tags", clone_url, f"{base_sha}:refs/trusted/base",
-            f"refs/pull/{pr['number']}/head:refs/pull/head")
+        git(work, "fetch", "-q", "--no-tags", clone_url, f"{base_sha}:refs/trusted/base",
+            f"refs/pull/{pr['number']}/head:refs/pull/head", env=env)
         head = git(work, "rev-parse", "refs/pull/head").strip()
         if head != pr["head_sha"]:
             return False, f"head moved during verification ({head[:12]} != {pr['head_sha'][:12]}); will re-run"
@@ -143,17 +161,40 @@ def evaluate(pr: dict, base_sha: str, comments: list[dict], owner: str, clone_ur
         return r.returncode == 0, (r.stdout + r.stderr).strip()
 
 
+def verdict(gh, pr: dict, base_sha: str, owner: str) -> tuple[bool, str]:
+    """Evaluate one PR; any error is a failure (never a silent keep-the-old-green)."""
+    try:
+        for _ in range(3):
+            comments = gh.comments(pr["number"])
+            passed, report = evaluate(pr, base_sha, comments, owner, gh.clone_url(), gh.git_env())
+            # Final snapshot: the owner's comment, the description and the head must be what was judged.
+            head_now, body_now = gh.snapshot(pr["number"])
+            if (head_now, body_now, gh.comments(pr["number"])) == (pr["head_sha"], pr["body"], comments):
+                return passed, report
+            if head_now != pr["head_sha"]:
+                return False, "head changed during verification; the next run judges the new head"
+            pr = {**pr, "body": body_now}
+        return False, "pull request description or comments kept changing during verification; failing closed"
+    except Exception as exc:  # noqa: BLE001 - fail closed on every error class
+        return False, f"verification error ({type(exc).__name__}): {exc}"
+
+
 def verify_all(gh, base_branch: str, owner: str, dry_run: bool) -> list[tuple[int, str]]:
     results = []
     base_sha = gh.ref_sha(base_branch)
+    judged: dict[str, list[tuple[dict, bool, str]]] = {}
     for pr in gh.open_prs(base_branch):
-        passed, report = evaluate(pr, base_sha, gh.comments(pr["number"]), owner, gh.clone_url(), gh.git_auth_args())
-        conclusion = "success" if passed else "failure"
-        # Re-post only when the outcome for this head changed (the digest covers verdict, report and base tip).
+        passed, report = verdict(gh, pr, base_sha, owner)
+        judged.setdefault(pr["head_sha"], []).append((pr, passed, report))
+        results.append((pr["number"], "success" if passed else "failure"))
+    for head_sha, items in judged.items():
+        # Several PRs can share one head commit but a commit has a single check: success only if every one of them passes.
+        ok = all(p for _, p, _ in items)
+        conclusion = "success" if ok else "failure"
+        report = "\n\n".join(f"PR #{pr['number']}: {'PASS' if p else 'FAIL'}\n{r}" for pr, p, r in items)
         digest = hashlib.sha256(f"{conclusion}\n{base_sha}\n{report}".encode()).hexdigest()[:40]
-        results.append((pr["number"], conclusion))
-        if not dry_run and gh.latest_result(pr["head_sha"]) != digest:
-            gh.post_check(pr["head_sha"], conclusion, f"Gate from {base_branch}@{base_sha[:12]}\n\n{report}", digest)
+        if not dry_run and gh.latest_result(head_sha) != digest:
+            gh.post_check(head_sha, conclusion, f"Gate from {base_branch}@{base_sha[:12]}\n\n{report}", digest)
     return results
 
 

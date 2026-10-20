@@ -385,17 +385,18 @@ def doc_citation(path: str) -> bool:
         "contracts/openapi.yaml", "contracts/endpoints.json")
 
 
-AUTH_RE = re.compile(r"OWNER-AUTHORIZES-GOVERNANCE\s+([0-9a-f]{7,40})\b")
+AUTH_RE = re.compile(r"^[ \t]*OWNER-AUTHORIZES-GOVERNANCE[ \t]+([0-9a-f]{12,40})[ \t\r]*$", re.MULTILINE)
 
 
 def owner_authorized(comments: list[dict], owner: str, head_sha: str) -> bool:
     """Single-account model: the owner's explicit comment bound to the current head commit.
 
+    The marker must be a line of its own (quoted, backticked or negated text does not count) with at least 12 hex characters.
     GitHub cannot prove WHO typed the comment when the owner, a new developer and an agent share one account, so this
     is an auditable owner-authorization record, not an identity guarantee (see documentation-policy.md).
     """
     for c in comments:
-        if str(c.get("user", "")).lower() != owner.lower() or c.get("author_association", "OWNER") != "OWNER":
+        if str(c.get("user", "")).lower() != owner.lower() or c.get("author_association") != "OWNER":
             continue
         for m in AUTH_RE.finditer(c.get("body") or ""):
             if head_sha.startswith(m.group(1)):

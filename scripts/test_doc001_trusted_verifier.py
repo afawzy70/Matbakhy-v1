@@ -38,12 +38,16 @@ def sh(cwd: Path, *args: str) -> str:
 class FakeGitHub:
     def __init__(self, origin: Path, prs: list[dict], comments: dict[int, list[dict]]) -> None:
         self.origin, self.prs, self._comments, self.posted = origin, prs, comments, []
+        self.fail_clone = False
 
     def ref_sha(self, ref): return sh(self.origin, "git", "rev-parse", f"refs/heads/{ref}")
     def open_prs(self, base): return self.prs
     def comments(self, n): return self._comments.get(n, [])
-    def clone_url(self): return str(self.origin)
-    def git_auth_args(self): return []
+    def clone_url(self): return str(self.origin) if not self.fail_clone else "/nonexistent/https://x-access-token:SECRET@example.test"
+    def git_env(self): return {}
+    def snapshot(self, n):
+        pr = next(p for p in self.prs if p["number"] == n)
+        return pr["head_sha"], pr["body"]
     def latest_result(self, sha):
         mine = [p for p in self.posted if p[0] == sha]
         return mine[-1][3] if mine else None
@@ -114,6 +118,55 @@ class TrustedVerifierTests(unittest.TestCase):
         self.assertEqual(self.run_one(pr, [auth])[0], [(4, "success")])
         stale = {**auth, "body": "OWNER-AUTHORIZES-GOVERNANCE " + "1" * 12}
         self.assertEqual(self.run_one(pr, [stale])[0], [(4, "failure")])
+
+    def test_errors_fail_closed_without_leaking_credentials_and_do_not_stop_other_prs(self) -> None:
+        good = self.pr(6, {f"{HB}/README.md": "\nsentence six\n"})
+        bad = self.pr(7, {f"{HB}/README.md": "\nsentence seven\n"})
+        gh = FakeGitHub(self.origin, [bad, good], {})
+        gh.git_env = lambda: {"GIT_CONFIG_COUNT": "1", "GIT_CONFIG_KEY_0": "http.extraheader",
+                               "GIT_CONFIG_VALUE_0": "AUTHORIZATION: basic c2VjcmV0LXRva2Vu"}
+        real = gh.clone_url
+        gh.clone_url = lambda: str(self.origin / "missing") if gh.fail_clone else real()
+        gh.fail_clone = True
+        gh.posted.append((bad["head_sha"], "success", "old green", "olddigest"))  # a stale success must be replaced
+        out = v.verify_all(gh, "develop", "owner", dry_run=False)
+        self.assertEqual(out, [(7, "failure"), (6, "failure")])  # both fail closed, the scan continued past the first error
+        latest = [p for p in gh.posted if p[0] == bad["head_sha"]][-1]
+        self.assertEqual(latest[1], "failure")
+        self.assertNotIn("c2VjcmV0LXRva2Vu", "".join(p[2] for p in gh.posted))
+        self.assertNotIn("SECRET", "".join(p[2] for p in gh.posted))
+
+    def test_shared_head_commit_needs_every_pr_to_pass(self) -> None:
+        pr = self.pr(8, {".github/workflows/doc001.yml": "# touched\n", f"{HB}/05-developer-workflow/ci-cd.md": "\nshared head\n"},
+                     pages=f"{HB}/05-developer-workflow/ci-cd.md")
+        other = {**pr, "number": 9}
+        sh(self.origin, "git", "update-ref", "refs/pull/9/head", pr["head_sha"])
+        auth = {"user": "owner", "author_association": "OWNER", "body": f"OWNER-AUTHORIZES-GOVERNANCE {pr['head_sha'][:12]}"}
+        gh = FakeGitHub(self.origin, [pr, other], {9: [auth]})  # only PR 9 carries the owner's authorization
+        out = v.verify_all(gh, "develop", "owner", dry_run=False)
+        self.assertEqual(out, [(8, "failure"), (9, "success")])
+        self.assertEqual([p[1] for p in gh.posted], ["failure"])  # the shared commit's check is failure, not the last PR's success
+
+    def test_authorization_edited_during_verification_fails_closed(self) -> None:
+        pr = self.pr(10, {".github/workflows/doc001.yml": "# touched\n", f"{HB}/05-developer-workflow/ci-cd.md": "\nx\n"},
+                     pages=f"{HB}/05-developer-workflow/ci-cd.md")
+        auth = {"user": "owner", "author_association": "OWNER", "body": f"OWNER-AUTHORIZES-GOVERNANCE {pr['head_sha'][:12]}"}
+        gh = FakeGitHub(self.origin, [pr], {10: [auth]})
+        calls = {"n": 0}
+        base_comments = gh.comments
+
+        def flapping(n):
+            calls["n"] += 1
+            return base_comments(n) if calls["n"] % 2 else []  # deleted between the judging read and the final snapshot
+        gh.comments = flapping
+        self.assertEqual(v.verify_all(gh, "develop", "owner", dry_run=False), [(10, "failure")])
+        self.assertIn("kept changing", gh.posted[0][2])
+
+    def test_pagination_follows_every_page(self) -> None:
+        app = v.GitHubApp.__new__(v.GitHubApp)
+        pages = {1: [{"i": n} for n in range(100)], 2: [{"i": 100}]}
+        app._get = lambda path: pages[int(path.rsplit("page=", 1)[1])]
+        self.assertEqual(len(app._get_all("/x?state=open")), 101)
 
     def test_result_is_posted_once_per_unchanged_outcome(self) -> None:
         pr = self.pr(5, {f"{HB}/README.md": "\nanother sentence\n"})
