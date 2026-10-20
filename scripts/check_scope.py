@@ -208,3 +208,5 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
+# DOC-001 disposable test: no assessment
