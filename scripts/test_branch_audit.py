@@ -75,6 +75,8 @@ class AuditTests(unittest.TestCase):
 
     def test_audit_never_modifies_the_repository(self):
         self.branch("merged/old")
+        self.g("fetch", "-q", "origin")  # the helper fetches; take the snapshot after it so only the audit is measured
+        self.g("remote", "set-head", "origin", "-a")
         before = self.g("for-each-ref", "refs", "--format=%(refname) %(objectname)")
         self.audit()
         self.assertEqual(before, self.g("for-each-ref", "refs", "--format=%(refname) %(objectname)"))
