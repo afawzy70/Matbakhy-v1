@@ -41,6 +41,36 @@ When anyone finds missing, confusing or wrong documentation: record it as a GitH
 
 ## Branch protection status
 
-Verified on 2026-10-19 with the repository API: `develop` is not protected and no rulesets exist (`gh api repos/afawzy70/Matbakhy-v1/rulesets` returned `[]`). **DOC-001 is therefore NOT a required merge check yet.** See the section at the end of this page for the follow-up state after the PR merges.
+**Enforced since 2026-10-20 by a repository ruleset** (id 25447480, "develop protection (PR + required checks + DOC-001)", enforcement active, target `develop` only; `main` is untouched).
 
-To enforce it (repository admin): Settings → Rules → Rulesets → New branch ruleset → target `develop` → enable *Require status checks to pass* → add **`Documentation Consistency / DOC-001`** (the check must have run once on a PR before it can be selected) → enable *Require a pull request before merging* and *Require review from Code Owners* (so governance files in `.github/CODEOWNERS` need the owner's review). Keep the existing checks (Product CI, Blueprint integrity, native builds) required as well; do not remove them.
+| Rule | Setting |
+|---|---|
+| Deletion, force push | blocked |
+| Pull request required | yes; approving reviews required: 0 (see limitations); stale reviews dismissed on push; Code Owners review option on |
+| Required status checks | `Documentation Consistency / DOC-001`; `Workspace from clean checkout (P01-CHECK-1/2)`; `Local stack bootstrap and smoke (P01-CHECK-3)`; `Design tokens, specimens and prototype journeys (P00-CHECK-2)`; `Secret scan`; `blueprint-integrity`; `Android debug APK (Gradle)`; `iOS simulator build (Xcode, unsigned)`; branch need not be up to date (avoids rebase deadlocks) |
+| Bypass actors | none |
+
+Not required on purpose: `Migrate, seed, re-seed (idempotent), reconcile` (path-filtered, would never report on most PRs) and the deploy jobs (post-merge). Deployment is unaffected: `deploy-preview.yml` and the owner E2E provisioning workflow run on pushes created by merging a PR, and no workflow pushes to `develop` itself.
+
+**Verified on GitHub (2026-10-20), using disposable PRs against `develop`:** the workflow triggers on pull requests to `develop` (a first attempt with `pull_request_target` never ran because GitHub reads that event's workflow from `main`; the trigger was changed in PR #26). Results of the check:
+
+| Disposable PR | Case | DOC-001 result |
+|---|---|---|
+| #25 | code change, no declaration | fail ("exactly one DOC-001 declaration is required") |
+| #27 | `impact: none` with a generic justification | fail |
+| #28 | code change plus a real handbook update and valid declaration | pass |
+| #29 | `impact: none` with a specific justification citing existing pages | pass, flagged for reviewer evaluation |
+| #30 | documentation-only change with a broken link | fail (broken relative link) |
+| #26 (real PR) | governance change without a second identity's approval; first run also failed for missing area documentation | fail, as designed |
+
+With the ruleset active, `gh pr merge` was refused for the failing disposable PRs and GitHub reported their merge state as blocked.
+
+**Limitations (honest status):**
+
+- **Independent review is not enforced.** One GitHub account authors and could approve everything, so "approval by someone other than the author" can never be satisfied. Governance changes (workflow, gate script, matrix, policy, agent files, PR template, CODEOWNERS) therefore always fail DOC-001 and cannot merge while the ruleset has no bypass actor. The owner must edit the ruleset (Settings → Rules → Rulesets) for the specific change and restore it afterwards, or add a second reviewer identity. No bypass actor was configured because adding one weakens enforcement and was not approved.
+- **Code Owners review is configured but not demonstrated as enforcing**: with zero required approvals GitHub reported no review decision on a disposable PR touching a Code Owners file (#31). Raising the count to 1 would deadlock every PR while the account is the only author. Treat DOC-001's governance rule, not Code Owners, as the effective control.
+- **Merge restrictions were verified with the owner-level token only**; no unprivileged or non-bypass test identity exists, so enforcement against other contributors is PARTIALLY VERIFIED. Direct pushes to `develop` were not attempted (it would change `develop` if the rule failed); the rule's presence is confirmed through the rules API.
+- Approval dismissal after a green DOC-001 run does not re-run the check; a check on a stale head is replaced when new commits arrive.
+- The check proves structure and reference integrity only; semantic review remains a human or independent-reviewer duty ([documentation policy](documentation-policy.md)).
+
+To change or recreate the ruleset: Settings → Rules → Rulesets, or `gh api repos/afawzy70/Matbakhy-v1/rulesets`. Keep the existing checks required whenever editing it.
