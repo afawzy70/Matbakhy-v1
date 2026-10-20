@@ -260,7 +260,8 @@
         "docs/developer-handbook/05-developer-workflow/local-environment.md",
         "docs/developer-handbook/05-developer-workflow/run-and-debug.md",
         "docs/developer-handbook/05-developer-workflow/prerequisites.md",
-        "docs/engineering/toolchain.md"
+        "docs/engineering/toolchain.md",
+        "docs/developer-handbook/05-developer-workflow/test-execution.md"
       ],
       "owner_role": "Handbook navigation"
     },

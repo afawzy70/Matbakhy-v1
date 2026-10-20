@@ -43,6 +43,10 @@ pnpm --filter @matbakhy/customer-mobile test      # jest --ci
 
 `scripts/check_workspace.sh` does all of the above from a fresh clone of your committed `HEAD` (backend verify, contract check, typecheck, lint, tests, builds, Android and iOS Hermes bundles) and fails on a version mismatch. Uncommitted changes are not tested by it.
 
+## Documentation gate tests
+
+`python3 scripts/test_doc001_gate.py` exercises the DOC-001 gate (`scripts/doc001_check.py`) through its command line against throw-away git repositories: the 12 required positive/negative cases plus hardening cases (declaration hiding, whitespace-only edits, comment/approval handling, matrix coverage of every tracked file). It runs with the other `scripts/test_*.py` in the Blueprint integrity workflow. Run `python3 scripts/doc001_check.py docs` for the documentation validation alone.
+
 ## Proving that named tests really ran
 
 ```bash
