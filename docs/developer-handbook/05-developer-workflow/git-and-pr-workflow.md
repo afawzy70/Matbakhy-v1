@@ -60,7 +60,7 @@ DOC-001 adds a mandatory **Documentation Impact declaration** between `<!-- DOC-
 - **Self-review** by the author or implementation agent is useful and required, but is labelled self-review everywhere. It is never "independent review".
 - **Independent QA** was performed by Codex against fixed candidate SHAs: handoff and repair records are [06](../../quality/06-codex-qa-handoff.md), [07](../../quality/07-codex-qa-repair.md), [08](../../quality/08-codex-qa-repair-cross-role.md). Findings are FIXED_PENDING_INDEPENDENT_RETEST until the reviewer retests; the author cannot close them.
 - **Owner** decides scope, approves previews/deployments and merges to protected branches.
-- **Governance files** (DOC-001 policy, matrix, checker, workflow) need an APPROVED review from someone other than the PR author (`scripts/doc001_check.py`, rule on `governance_review`).
+- **Governance files** (DOC-001 policy, matrix, checker, workflow, verifier, agent files, PR template) need the owner's `OWNER-AUTHORIZES-GOVERNANCE <head sha>` comment and a `governance_review` that records the actual author and reviewer roles; Codex reviews are supporting evidence only and no separate GitHub approval is required while one account is shared (`scripts/doc001_check.py`, [trusted enforcement](doc001-trusted-enforcement.md)).
 - The scheduled external reviewer is read-only: it never changes code, comments, merges or deploys ([05-progress-reporting.md](../../delivery/05-progress-reporting.md)).
 
 ## Merge rules

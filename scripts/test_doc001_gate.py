@@ -86,15 +86,15 @@ class Repo:
         self.git("add", "-A")
         self.git("commit", "-qm", "change")
 
-    def run(self, body: str, reviews: list | None = None, author: str = "dev", bootstrap: bool = False):
+    def run(self, body: str, comments: list | None = None, owner: str = "owner", bootstrap: bool = False):
         bf = self.p.parent / (self.p.name + "-body.md")
         bf.write_text(body, encoding="utf-8")
         cmd = [sys.executable, str(GATE), "pr", "--root", str(self.p), "--base", self.base, "--head", "HEAD",
-               "--body-file", str(bf), "--author", author]
-        if reviews is not None:
-            rf = self.p.parent / (self.p.name + "-reviews.json")
-            rf.write_text(json.dumps(reviews))
-            cmd += ["--reviews-file", str(rf)]
+               "--body-file", str(bf), "--owner", owner]
+        if comments is not None:
+            rf = self.p.parent / (self.p.name + "-comments.json")
+            rf.write_text(json.dumps(comments))
+            cmd += ["--comments-file", str(rf)]
         if bootstrap:
             cmd.append("--bootstrap")
         r = subprocess.run(cmd, capture_output=True, text=True)
@@ -206,16 +206,17 @@ class GateTests(unittest.TestCase):
         self.r.write(".github/workflows/doc001.yml", "name: Documentation Consistency\njobs:\n  doc001:\n    if: false\n")
         self.doc_change(); self.r.commit()
         body = decl(**UPDATED)
-        self.assertFails(self.r.run(body, reviews=[]), "governance_review")
-        gov = decl(**{**UPDATED, "governance_review": "owner approval requested in the PR"})
-        self.assertFails(self.r.run(gov, reviews=[]), "APPROVED review")
-        self.assertFails(self.r.run(gov, reviews=[{"user": "dev", "state": "APPROVED"}], author="dev"), "APPROVED review")
-        self.assertFails(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED"}, {"user": "owner", "state": "CHANGES_REQUESTED"}]),
-                         "APPROVED review")
-        self.assertFails(self.r.run(gov), "no review information")
+        self.assertFails(self.r.run(body, comments=[]), "governance_review")
+        gov = decl(**{**UPDATED, "governance_review": "author role: agent; reviewer role: owner; Codex review: NOT_RUN"})
         head = self.r.git("rev-parse", "HEAD").strip()
-        self.assertFails(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED"}]), "CURRENT head")
-        self.assertPasses(self.r.run(gov, reviews=[{"user": "owner", "state": "APPROVED", "commit_id": head}]))
+        auth = {"user": "owner", "author_association": "OWNER", "body": f"OWNER-AUTHORIZES-GOVERNANCE {head[:12]}"}
+        self.assertFails(self.r.run(gov, comments=[]), "OWNER-AUTHORIZES-GOVERNANCE")
+        self.assertFails(self.r.run(gov), "no owner-authorization information")
+        self.assertFails(self.r.run(gov, comments=[{**auth, "body": "OWNER-AUTHORIZES-GOVERNANCE " + "0" * 12}]), "CURRENT head")
+        self.assertFails(self.r.run(gov, comments=[{**auth, "user": "stranger", "author_association": "NONE"}]), "CURRENT head")
+        self.assertFails(self.r.run(gov, comments=[{**auth, "author_association": "CONTRIBUTOR"}]), "CURRENT head")
+        self.assertFails(self.r.run(gov, comments=[{**auth, "body": "I authorize this (no marker)"}]), "CURRENT head")
+        self.assertPasses(self.r.run(gov, comments=[auth]))  # single-account model: the owner may also be the PR author
 
     # 12
     def test_12_multi_application_change_with_docs_and_traceability_passes(self) -> None:
@@ -256,14 +257,16 @@ class GateTests(unittest.TestCase):
         res = self.r.run(decl(impact="none", justification=GOOD_JUSTIFICATION))
         self.assertPasses(res)  # structurally acceptable; the reviewer decides
 
-    def test_17_comment_review_does_not_cancel_approval_and_stale_approval_fails(self) -> None:
+    def test_17_authorization_binds_to_the_current_head_commit(self) -> None:
         self.r.write("scripts/doc001_check.py", "# changed\n"); self.doc_change(); self.r.commit()
         head = self.r.git("rev-parse", "HEAD").strip()
-        gov = decl(**{**UPDATED, "governance_review": "owner approval"})
-        approved = {"user": "owner", "state": "APPROVED", "commit_id": head}
-        self.assertPasses(self.r.run(gov, reviews=[approved, {"user": "owner", "state": "COMMENTED", "commit_id": head}]))
-        self.assertFails(self.r.run(gov, reviews=[{**approved, "commit_id": "0" * 40}]), "CURRENT head")
-        self.assertFails(self.r.run(gov, reviews=[approved, {"user": "owner", "state": "DISMISSED", "commit_id": head}]), "CURRENT head")
+        gov = decl(**{**UPDATED, "governance_review": "author role: agent; reviewer role: owner; Codex review: NOT_RUN"})
+        auth = {"user": "owner", "author_association": "OWNER", "body": f"approved.\nOWNER-AUTHORIZES-GOVERNANCE {head}"}
+        self.assertPasses(self.r.run(gov, comments=[{"user": "bot", "body": "hi"}, auth]))
+        self.assertFails(self.r.run(gov, comments=[{**auth, "body": "OWNER-AUTHORIZES-GOVERNANCE abc"}]), "CURRENT head")  # < 7 chars
+        self.r.write("scripts/doc001_check.py", "# changed again\n"); self.r.commit()  # a new push invalidates it
+        self.assertFails(self.r.run(gov, comments=[auth]), "CURRENT head")
+        self.assertFails(self.r.run(decl(**{**UPDATED, "governance_review": "ok"}), comments=[auth]), "too short")
 
     def test_18_deleting_required_documentation_does_not_count(self) -> None:
         self.code_change()

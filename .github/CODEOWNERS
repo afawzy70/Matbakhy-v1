@@ -1,7 +1,10 @@
-# DOC-001 governance files need the owner's review (enforce with a ruleset "Require review from Code Owners").
+# DOC-001 governance files. With one shared GitHub account this file documents ownership only; enforcement is the owner-
+# authorization rule in DOC-001 (see docs/developer-handbook/05-developer-workflow/doc001-trusted-enforcement.md).
 /.github/workflows/doc001.yml          @afawzy70
 /scripts/doc001_check.py               @afawzy70
 /scripts/test_doc001_gate.py           @afawzy70
+/scripts/doc001_trusted_verifier.py    @afawzy70
+/scripts/test_doc001_trusted_verifier.py @afawzy70
 /docs/developer-handbook/doc001-matrix.json @afawzy70
 /docs/developer-handbook/05-developer-workflow/documentation-policy.md @afawzy70
 /AGENTS.md                             @afawzy70

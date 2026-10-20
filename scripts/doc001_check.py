@@ -37,6 +37,8 @@ GOVERNANCE_PATHS = (
     ".github/workflows/doc001.yml",
     "scripts/doc001_check.py",
     "scripts/test_doc001_gate.py",
+    "scripts/doc001_trusted_verifier.py",
+    "scripts/test_doc001_trusted_verifier.py",
     MATRIX,
     POLICY,
     "AGENTS.md",
@@ -383,7 +385,25 @@ def doc_citation(path: str) -> bool:
         "contracts/openapi.yaml", "contracts/endpoints.json")
 
 
-def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] | None, author: str | None,
+AUTH_RE = re.compile(r"OWNER-AUTHORIZES-GOVERNANCE\s+([0-9a-f]{7,40})\b")
+
+
+def owner_authorized(comments: list[dict], owner: str, head_sha: str) -> bool:
+    """Single-account model: the owner's explicit comment bound to the current head commit.
+
+    GitHub cannot prove WHO typed the comment when the owner, a new developer and an agent share one account, so this
+    is an auditable owner-authorization record, not an identity guarantee (see documentation-policy.md).
+    """
+    for c in comments:
+        if str(c.get("user", "")).lower() != owner.lower() or c.get("author_association", "OWNER") != "OWNER":
+            continue
+        for m in AUTH_RE.finditer(c.get("body") or ""):
+            if head_sha.startswith(m.group(1)):
+                return True
+    return False
+
+
+def assess_pr(root: Path, base: str, head: str, body: str, comments: list[dict] | None, owner: str | None,
               rep: Report) -> None:
     mb = merge_base(root, base, head)
     head_sha = git(root, "rev-parse", head).strip()
@@ -471,23 +491,16 @@ def assess_pr(root: Path, base: str, head: str, body: str, reviews: list[dict] |
             if unclassified and not changed_docs:
                 rep.fail("DOC-001: unclassified files changed without any documentation update: " + ", ".join(unclassified[:5]))
         if gov:
-            if not decl.get("governance_review", "").strip():
-                rep.fail("DOC-001: governance files changed (" + ", ".join(gov) + ") but 'governance_review' is empty")
-            elif reviews is None:
-                rep.fail("DOC-001: governance files changed and no review information is available to verify approval")
-            else:
-                latest: dict[str, str] = {}
-                for r in reviews:  # chronological; comments never change a decision; approvals bind to a commit
-                    state = r.get("state", "")
-                    if not r.get("user") or state == "COMMENTED" or state == "PENDING":
-                        continue
-                    if state == "APPROVED" and r.get("commit_id") != head_sha:
-                        state = "STALE"
-                    latest[r["user"]] = state
-                ok = any(state == "APPROVED" and user != author for user, state in latest.items())
-                if not ok:
-                    rep.fail("DOC-001: governance files changed; an APPROVED review of the CURRENT head commit from someone "
-                             "other than the PR author is required (no self-approval; re-run the check after approving)")
+            review = decl.get("governance_review", "").strip()
+            if len(review) < 40:
+                rep.fail("DOC-001: governance files changed (" + ", ".join(gov) + ") but 'governance_review' is missing or too "
+                         "short; record the actual author and reviewer roles and the Codex review evidence (or NOT_RUN)")
+            if comments is None or not owner:
+                rep.fail("DOC-001: governance files changed and no owner-authorization information is available")
+            elif not owner_authorized(comments, owner, head_sha):
+                rep.fail("DOC-001: governance files changed; the repository owner must comment "
+                         f"'OWNER-AUTHORIZES-GOVERNANCE {head_sha[:12]}' on this PR for the CURRENT head commit "
+                         "(an agent must never post it; re-run the check after commenting)")
     elif gov:
         rep.fail("DOC-001: governance files changed and no valid declaration")
     validate_changed_markdown(root, files, rep)
@@ -513,8 +526,8 @@ def main() -> int:
     p.add_argument("--base", required=True)
     p.add_argument("--head", default="HEAD")
     p.add_argument("--body-file", required=True)
-    p.add_argument("--reviews-file", help="JSON list of {user,state} from the GitHub reviews API")
-    p.add_argument("--author")
+    p.add_argument("--comments-file", help="JSON list of {user,body,author_association} from the GitHub issue-comments API")
+    p.add_argument("--owner", help="repository owner login whose comment authorizes governance changes")
     a = ap.parse_args()
     root = Path(a.root).resolve()
     rep = Report()
@@ -525,8 +538,8 @@ def main() -> int:
             validate_markdown(root, f, rep, ids, check_ids=False)
     else:
         body = Path(a.body_file).read_text(encoding="utf-8")
-        reviews = json.loads(Path(a.reviews_file).read_text()) if a.reviews_file else None
-        assess_pr(root, a.base, a.head, body, reviews, a.author, rep)
+        comments = json.loads(Path(a.comments_file).read_text()) if a.comments_file else None
+        assess_pr(root, a.base, a.head, body, comments, a.owner, rep)
     return rep.emit()
 
 

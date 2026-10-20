@@ -35,7 +35,7 @@ tests: ...
 traceability: ...
 consistency: what you compared (code, contract, tests) to verify agreement
 justification: (only for impact none)
-governance_review: (only when the gate, policy, agent files or PR template change)
+governance_review: (only for governance changes) actual author/reviewer roles, Codex review evidence or NOT_RUN
 <!-- DOC-001:END -->
 ```
 
@@ -57,13 +57,16 @@ Broken relative links and anchors; links leaving the repository; inline-code ref
 
 ## 5. Governance of the gate itself
 
-Changes to `.github/workflows/doc001.yml`, `scripts/doc001_check.py`, `scripts/test_doc001_gate.py`, the matrix, this policy, `AGENTS.md`, `CLAUDE.md`, `.github/pull_request_template.md` or `.github/CODEOWNERS` require `governance_review` in the declaration **and** an APPROVED GitHub review of the **current head commit** by someone other than the PR author (a comment never cancels an approval; an approval of an older commit, or a dismissed one, does not count). GitHub does not re-run the check when a review is submitted or dismissed, so a green result can outlive a later dismissal of the approval (known limitation; the check is defence in depth). The authoritative control for governance files is the ruleset rule "Require review from Code Owners" (`.github/CODEOWNERS`), which GitHub evaluates at merge time. After approving, re-run the `Documentation Consistency` workflow (Actions → re-run) and enable "Dismiss stale pull request approvals when new commits are pushed" in the ruleset.
+Changes to `.github/workflows/doc001.yml`, `scripts/doc001_check.py`, `scripts/test_doc001_gate.py`, `scripts/doc001_trusted_verifier.py`, `scripts/test_doc001_trusted_verifier.py`, the matrix, this policy, `AGENTS.md`, `CLAUDE.md`, `.github/pull_request_template.md` or `.github/CODEOWNERS` are **governance changes**. They require, in addition to a valid declaration:
 
-The workflow uses the `pull_request` event. A `pull_request_target` version was tried first and did not run on pull requests against `develop`, because GitHub reads that event's workflow from the default branch (`main`), which this project does not modify (verified 2026-10-20 on PR #25). With `pull_request` the workflow file comes from the PR, so the gate script that executes is always the one checked out at the **base** SHA, nothing from the PR is executed, and the PR's files are only read as data. If the base branch has no gate the job fails closed. Consequently a PR that edits `.github/workflows/doc001.yml` could try to neutralise the check; the defences are (1) the gate marks that file as a governance file (declaration plus non-author approval required) and (2) the Code Owners rule in the ruleset. Deleting the workflow does not silently pass: the required check would never report.
+- `governance_review`: the **actual roles** (who authored: owner, Mohamed or which AI agent session; who reviewed), the Codex code-review and security-review evidence as supporting evidence (link, or `NOT_RUN`), and the statement that GitHub cannot independently verify identities; and
+- an **owner authorization** comment by the repository owner on the PR, `OWNER-AUTHORIZES-GOVERNANCE <first 12 characters of the head commit>`, bound to the current head commit (a new push needs a new comment). Agents never post it. Re-run the check after commenting (editing the PR description also re-runs it).
 
-Emergency exceptions: only the repository owner may authorize one, in writing on the PR; the exception and a follow-up remediation issue are recorded in the PR. A developer cannot approve an exception to their own change.
+The project currently has **one GitHub account** shared by the owner, the new developer and AI agents, so a separate GitHub approval is neither required nor possible, and Codex review is never treated as equivalent to a separate human approval. The gate verifies the commenter login and `author_association`, not who typed; see [trusted enforcement](doc001-trusted-enforcement.md#5-governance-changes-in-the-single-account-model) for the limits.
 
-**Limitation (single GitHub identity):** if the same GitHub account authors and would approve, the "other than the author" rule cannot be satisfied and the owner must use a second account or an owner-administered ruleset decision. The gate does not hide this; it fails.
+The workflow uses the `pull_request` event (`pull_request_target` reads its workflow from `main`, which this project does not modify; verified on PR #25). The in-repository job runs the gate script checked out at the **base** SHA and reads the PR only as data, but a PR can still replace the job itself (demonstrated by disposable PR #33). The fix is the external verifier in [trusted enforcement](doc001-trusted-enforcement.md): a GitHub App posts the required check from the protected base branch's gate and the ruleset pins the check to that App. Until it is installed and the #33 scenario is observed blocked, the hole is open and every diff touching `.github/workflows/` needs the owner's diff review.
+
+Emergency exceptions: only the repository owner may authorize one, in writing on the PR; the exception and a follow-up remediation issue are recorded in the PR.
 
 ## 6. Branch protection status
 

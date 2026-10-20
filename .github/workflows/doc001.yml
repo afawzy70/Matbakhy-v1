@@ -4,7 +4,9 @@ name: Documentation Consistency
 # against develop because GitHub reads that event's workflow from the default branch (main), which this project must not
 # modify. With `pull_request` the workflow file comes from the PR's merge ref, so a PR could edit THIS file; therefore the
 # gate script that executes is always the one at the base SHA (checked out below), nothing from the PR is executed, and
-# changes to this file are governance changes that need the Code Owners review (see CODEOWNERS and the ruleset).
+# changes to this file are governance changes that need the owner's recorded authorization. This in-repo job is NOT a
+# trusted control against a malicious or careless PR (a PR can replace the job); the trusted control is the external
+# verifier described in docs/developer-handbook/05-developer-workflow/doc001-trusted-enforcement.md.
 on:
   pull_request:
     branches: [develop, main]
@@ -41,7 +43,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PR_BODY: ${{ github.event.pull_request.body }}
-          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          OWNER: ${{ github.repository_owner }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -51,12 +53,12 @@ jobs:
           set -euo pipefail
           printf '%s' "$PR_BODY" > "$RUNNER_TEMP/pr-body.md"
           git -C pr fetch --no-tags origin "$BASE_SHA"
-          gh api "repos/$REPO/pulls/$PR_NUMBER/reviews" --paginate \
-            --jq '.[] | {user: .user.login, state: .state, commit_id: .commit_id}' | python3 -c \
+          gh api "repos/$REPO/issues/$PR_NUMBER/comments" --paginate \
+            --jq '.[] | {user: .user.login, author_association: .author_association, body: .body}' | python3 -c \
             'import json,sys; print(json.dumps([json.loads(l) for l in sys.stdin if l.strip()]))' \
-            > "$RUNNER_TEMP/reviews.json"
+            > "$RUNNER_TEMP/comments.json"
           # Fail closed: the gate that runs is always the base branch's. Never execute anything from the pull request.
           test -f base/scripts/doc001_check.py || { echo "::error::The base branch has no DOC-001 gate; install it through a separately reviewed change"; exit 1; }
           python3 -I base/scripts/doc001_check.py pr --root pr --base "$BASE_SHA" --head "$HEAD_SHA" \
-            --body-file "$RUNNER_TEMP/pr-body.md" --reviews-file "$RUNNER_TEMP/reviews.json" \
-            --author "$PR_AUTHOR"
+            --body-file "$RUNNER_TEMP/pr-body.md" --comments-file "$RUNNER_TEMP/comments.json" \
+            --owner "$OWNER"
