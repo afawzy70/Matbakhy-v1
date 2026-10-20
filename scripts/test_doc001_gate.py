@@ -298,6 +298,12 @@ class GateTests(unittest.TestCase):
         self.assertFails(self.r.run("<!-- hidden\n" + good + "\n-->"), "hidden inside another HTML comment")
         self.assertFails(self.r.run("```\n" + good + "\n```"), "declaration is required")
 
+    def test_22a_fields_hidden_in_a_comment_inside_the_block_fail(self) -> None:
+        self.code_change(); self.doc_change(); self.r.commit()
+        fields = decl(**UPDATED).split("<!-- DOC-001:BEGIN -->\n")[1].split("<!-- DOC-001:END -->")[0]
+        hidden = "<!-- DOC-001:BEGIN -->\n<!--\n" + fields + "  -->\n<!-- DOC-001:END -->\n"
+        self.assertFails(self.r.run(hidden), "HTML comments are not allowed")
+
     def test_22b_nested_fences_cannot_hide_a_declaration(self) -> None:
         self.code_change(); self.doc_change(); self.r.commit()
         good = decl(**UPDATED)

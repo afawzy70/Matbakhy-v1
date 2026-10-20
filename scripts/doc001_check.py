@@ -327,10 +327,13 @@ def parse_declaration(body: str, rep: Report) -> dict | None:
         return None
     block = body[begins[0]:ends[0]]
     block = re.sub(r"^<!--\s*DOC-001:BEGIN\s*-->", "", block)
+    if "<!--" in block or "-->" in block:
+        rep.fail("DOC-001 declaration: HTML comments are not allowed inside the declaration block (its fields must be visible)")
+        return None
     decl: dict[str, str] = {}
     cur = None
     for raw in block.splitlines():
-        if not raw.strip() or raw.strip().startswith("#") or raw.strip().startswith("<!--"):
+        if not raw.strip() or raw.strip().startswith("#"):
             continue
         m = re.match(r"^([a-z_]+):\s*(.*)$", raw)
         if m and not raw.startswith((" ", "\t")):

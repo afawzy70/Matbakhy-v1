@@ -41,7 +41,7 @@ Welcome. This handbook lets a new developer understand Matbakhy (مطبخي) —
 [Day 1 business](06-onboarding-labs/day-1-business.md) · [Day 2 applications](06-onboarding-labs/day-2-applications.md) · [Day 3 backend, database, security](06-onboarding-labs/day-3-backend-security.md) · [Day 4 development workflow](06-onboarding-labs/day-4-development.md) · [Day 5 first contribution](06-onboarding-labs/day-5-first-contribution.md) · [Final assessment](06-onboarding-labs/final-assessment.md)
 
 ### 07 Reference
-[Architecture decisions](07-reference/architecture-decisions.md) · [Implementation status](07-reference/implementation-status.md) · [Requirements traceability](07-reference/requirements-traceability.md) · [Documentation map](07-reference/documentation-map.md) · [FAQ](07-reference/frequently-asked-questions.md) · [Inventory and gap assessment](07-reference/inventory-and-gaps.md) · [Fresh-developer simulation](07-reference/fresh-developer-simulation.md)
+[Architecture decisions](07-reference/architecture-decisions.md) · [Implementation status](07-reference/implementation-status.md) · [Requirements traceability](07-reference/requirements-traceability.md) · [Documentation map](07-reference/documentation-map.md) · [FAQ](07-reference/frequently-asked-questions.md) · [Inventory and gap assessment](07-reference/inventory-and-gaps.md) · [Fresh-developer simulation](07-reference/fresh-developer-simulation.md) · [Independent review record](07-reference/independent-reviews.md)
 
 Machine-readable: [doc001-matrix.json](doc001-matrix.json) (which code areas require which documentation).
 
