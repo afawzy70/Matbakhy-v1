@@ -345,7 +345,8 @@ class RepositoryContractTests(unittest.TestCase):
     def test_workflow_keeps_the_stable_check_name_and_safe_triggers(self) -> None:
         wf = (ROOT / ".github/workflows/doc001.yml").read_text()
         self.assertIn("name: Documentation Consistency / DOC-001", wf)
-        self.assertIn("pull_request_target", wf)
+        self.assertRegex(wf, r"(?m)^  pull_request:")
+        self.assertNotRegex(wf, r"(?m)^  pull_request_target:")  # never runs from the default branch only
         self.assertNotRegex(wf, r"(?m)^\s*(secrets|id-token):")
         self.assertRegex(wf, r"(?m)^permissions:\n  contents: read\n  pull-requests: read")
         # the pull request is only ever read as data
