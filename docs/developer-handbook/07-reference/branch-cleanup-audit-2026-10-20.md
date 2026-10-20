@@ -7,7 +7,7 @@ Executed under the owner's authorization of 2026-10-20 (delete only conclusively
 
 ## Deleted (all commits are ancestors of `develop` at the time; restore with `git branch <name> <sha>`)
 
-| Branch | Last SHA | Pull request | Where deleted |
+| Branch | Last SHA | Pull request / reason | Where deleted |
 |---|---|---|---|
 | chore/contabo-auto-cd | `9f2ad828eb8dbbcbc179e07a591191e961d9031c` | #8:MERGED | deleted-remote |
 | ci/owner-e2e-provision-workflow | `821400fd59ad3042b5c44ee5c34d745c0245561a` | #15:MERGED | deleted-remote |
@@ -37,6 +37,18 @@ Executed under the owner's authorization of 2026-10-20 (delete only conclusively
 | security/kc-admin-console-preview | `55b96dd976038339391fbbe8df00c48eb48cf7e0` | - | deleted-local |
 | stabilize/integration-2026-10-18 | `713631f4ada37f7565537cfd63b7dec2dc73bbdc` | - | deleted-local |
 | qa/owner-e2e-master-catalog-2026-10-18 | `274c94d0a68fc92744861d2b5c88cecfafc3ef45` | #16,#12:MERGED | deleted-remote+local (worktree removed first) |
+| test/doc001-negative-no-assessment | `02673c986d8a751100035da23292d30134ffa508` | disposable test PR (closed unmerged) | deleted-remote |
+| test/doc001-negative-generic-justification | `057212652bb787bdcfd806de4da49ba261aeccd5` | disposable test PR (closed unmerged) | deleted-remote |
+| test/doc001-positive-valid-update | `3b53c61c50a64b691604e30580f56d1e92b7caff` | disposable test PR (closed unmerged) | deleted-remote |
+| test/doc001-positive-specific-neutral | `addd5086961d1b50516196fd044d7ec59fa7f2d2` | disposable test PR (closed unmerged) | deleted-remote |
+| test/doc001-negative-docs-broken-link | `dee3861cdce42c0ee0a7e3561297f8abc8e5702c` | disposable test PR (closed unmerged) | deleted-remote |
+| test/doc001-governance-codeowner | `7634c720c12fc2e3885d7ee38192d55f23eb26c0` | disposable test PR (closed unmerged) | deleted-remote |
+| test/doc001-workflow-noop | `d88d6867aa02c5803c522fa2042762995ae47009` | disposable test PR (closed unmerged) | deleted-remote |
+| docs/developer-handbook-doc001 | `5404c42a0542e6958ada48a64319f0ba81744ef6` | merged PR | deleted-remote |
+| fix/doc001-pull-request-trigger | `d8de1eb32da4c557378ec103fbceacb0b652811d` | merged PR | deleted-remote |
+| docs/branch-maintenance | `994456625b58f00d3184980527128719a345305e` | merged PR | deleted-remote |
+
+The seven `test/doc001-*` branches were disposable enforcement-test branches (one test-only commit each, PRs closed unmerged, their PR heads remain on GitHub); their local copies needed `git branch -D` because they were never merged — the single forced deletion, justified by that.
 
 ## Preserved
 
@@ -47,8 +59,7 @@ Executed under the owner's authorization of 2026-10-20 (delete only conclusively
 | `stabilize/integration-2026-10-18` | base of open PRs #10 and #11; its tip is a merge commit of the mistargeted PR #12 not in `develop` (NEEDS_REVIEW) |
 | `agent/security-audit` (PR #10), `beta/ios-testflight-prep` (PR #11), `audit/ux-independent-implementation-2026-10-13` (PR #6) | open PRs, unique commits, owner-approval needed to close |
 | `ci/develop-pipeline` | fully merged (PR #7), but checked out in the primary clone worktree; preserved |
-| docs/developer-handbook-doc001 (branch name) | PR #24 source; checked out in an active worktree (delete after verification) |
-| `fix/doc001-pull-request-trigger`, docs/branch-maintenance (branch name), `test/doc001-*` | open PRs of the DOC-001 activation |
+| `fix/doc001-reviewer-authority` | open PR #34 (governance fix awaiting the owner) |
 | `chore/cd-ssh-smoke` | 1 unique commit, no PR: UNMERGED_WORK |
 | `claude/kane-cli-qa-pilot-*` (4 branches) | unique QA pilot commits (1, 2, 4 and 3), no PR: UNMERGED_WORK / possibly owned by idle sessions |
 | `qa/full-regression-d877a15-20261013` (34 commits), `qa/independent-browse-basket-eb1a671-20261012` (2), `qa/independent-cross-role-4eaee3a-20261012` (6) | unique QA evidence, no PR: UNMERGED_WORK |
@@ -60,3 +71,7 @@ Removed (clean, contained in `develop`, no process using them, plain `git worktr
 ## Not cleaned (needs owner review)
 
 The preserved UNMERGED_WORK and open-PR branches above. Candidates for an owner decision: abandoned QA pilot branches and `chore/cd-ssh-smoke`.
+
+## Final verification (after all deletions)
+
+`git fetch --prune origin` leaves these remote branches: main, develop, implementation/mvp, stabilize/integration-2026-10-18, agent/security-audit, beta/ios-testflight-prep, audit/ux-independent-implementation-2026-10-13, ci/develop-pipeline, chore/cd-ssh-smoke, the four claude/kane-cli-qa-pilot-* branches, the three qa/* evidence branches and fix/doc001-reviewer-authority. Local branches: agent/security-audit, beta/ios-testflight-prep, ci/develop-pipeline, develop, fix/doc001-reviewer-authority, implementation/mvp. Worktrees: primary clone, claude (detached at develop), claude-beta, security, codex-sec. Re-run `python3 scripts/branch_audit.py --gh --local` for the live classification.
