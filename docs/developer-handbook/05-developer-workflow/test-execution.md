@@ -47,6 +47,8 @@ pnpm --filter @matbakhy/customer-mobile test      # jest --ci
 
 `python3 scripts/test_doc001_gate.py` exercises the DOC-001 gate (`scripts/doc001_check.py`) through its command line against throw-away git repositories: the 12 required positive/negative cases plus hardening cases (declaration hiding, whitespace-only edits, comment/approval handling, matrix coverage of every tracked file). It runs with the other `scripts/test_*.py` in the Blueprint integrity workflow. Run `python3 scripts/doc001_check.py docs` for the documentation validation alone.
 
+`python3 scripts/test_doc001_trusted_verifier.py` (about 70 seconds; needs `git` and `rsync`, no network) runs `scripts/doc001_trusted_verifier.py` against a local copy of the repository with a fake GitHub client: an ordinary documentation PR passes; the PR #33 scenario (workflow replaced by a no-op) and a PR that rewrites `scripts/doc001_check.py` both fail because the gate comes from the base branch; the owner-authorization comment unblocks a governance change only for the exact head commit; results are posted once per unchanged outcome. It proves the verifier logic only, not the GitHub App, the ruleset pin or the scheduler ([trusted enforcement](doc001-trusted-enforcement.md)). Governance tests for the gate itself now cover owner authorization instead of reviews.
+
 `python3 scripts/test_branch_audit.py` tests the report-only branch audit (`scripts/branch_audit.py`, see [branch maintenance](branch-maintenance.md)).
 
 ## Proving that named tests really ran
