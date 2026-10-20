@@ -4,7 +4,7 @@
 
 ## Ready to run manually now (deployed preview, existing seed accounts only) — 91
 
-- CFG-001 (P0) Public realm discovery is served; Keycloak admin console and master realm are never published (absorbs CFG-035)
+- CFG-001 (P0) Public realm discovery is served; Keycloak admin console and master realm are not published on the customer identity host id.<PREVIEW_DOMAIN> (the owner-approved console lives on the separate kc-admin host and is covered by docs/operations/14-keycloak-admin-console.md; absorbs CFG-035)
 - CFG-002 (P0) Customer web sign-in uses authorization code + PKCE S256 and a real logout ends the server session
 - CFG-003 (P0) Hostile OIDC inputs: unregistered redirect_uri, forged callback state/code, and returnTo open-redirect are all refused
 - CFG-006 (P1) Web account switch on a shared browser leaves no trace of the previous customer
@@ -15,7 +15,7 @@
 - CFG-041 (P1) Develop CD: push to develop runs build, digest-pinned deploy, health and smoke; record the deployed SHA and digests
 - CFG-044 (P2) Server reboot drill: services return in dependency order and the stack passes smoke (operator, change window)
 - CFG-045 (P0) Synthetic money guarantee: demo deposit and COD orders produce no outbound provider traffic and no real transfer or message
-- CFG-121 (P1) Smoke and release read-only gate: ./deploy.sh smoke covers headers, boundary, issuer, admin console 404, unauthenticated refusals
+- CFG-121 (P1) Smoke and release read-only gate: ./deploy.sh smoke covers headers, boundary, issuer, admin console 404 on the customer identity host, unauthenticated refusals
 - E2E-COOK-051 (P0) Cook creates a meal draft with an uploaded photo and publishes it; customers see it only after publication
 - E2E-COOK-052 (P0) Cook creates a slot in the ops web, opens it, and it becomes orderable for customers
 - E2E-OPS-058 (P0) A customer cannot make themselves staff: role fields, staff endpoints, forged tokens and grant requests are all refused server-side

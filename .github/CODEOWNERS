@@ -1,0 +1,10 @@
+# DOC-001 governance files need the owner's review (enforce with a ruleset "Require review from Code Owners").
+/.github/workflows/doc001.yml          @afawzy70
+/scripts/doc001_check.py               @afawzy70
+/scripts/test_doc001_gate.py           @afawzy70
+/docs/developer-handbook/doc001-matrix.json @afawzy70
+/docs/developer-handbook/05-developer-workflow/documentation-policy.md @afawzy70
+/AGENTS.md                             @afawzy70
+/CLAUDE.md                             @afawzy70
+/.github/pull_request_template.md      @afawzy70
+/.github/CODEOWNERS                    @afawzy70

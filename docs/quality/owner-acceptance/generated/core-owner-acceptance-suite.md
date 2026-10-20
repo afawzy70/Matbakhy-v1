@@ -8,7 +8,7 @@ Record the deployed source SHA, prove public discovery and sign-in/out work and 
 
 | # | Case | Title | Readiness | Status |
 |---|---|---|---|---|
-| 1 | CFG-001 | Public realm discovery is served; Keycloak admin console and master realm are never published (absorbs CFG-035) | Ready to run manually now | NOT_RUN |
+| 1 | CFG-001 | Public realm discovery is served; Keycloak admin console and master realm are not published on the customer identity host id.<PREVIEW_DOMAIN> (the owner-approved console lives on the separate kc-admin host and is covered by docs/operations/14-keycloak-admin-console.md; absorbs CFG-035) | Ready to run manually now | NOT_RUN |
 | 2 | E2E-DISC-001 | Anonymous visitor discovers published meals and kitchens in Arabic and English without signing in | Ready to run manually now | NOT_RUN |
 | 3 | CFG-002 | Customer web sign-in uses authorization code + PKCE S256 and a real logout ends the server session | Ready to run manually now | NOT_RUN |
 | 4 | E2E-DISC-003 | Customer signs in and out; private data and the session are gone after sign-out | Ready to run manually now | NOT_RUN |

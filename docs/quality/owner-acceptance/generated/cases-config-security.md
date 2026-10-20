@@ -2,7 +2,7 @@
 
 Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Every case is NOT_RUN or BLOCKED until a run records evidence.
 
-### CFG-001 — Public realm discovery is served; Keycloak admin console and master realm are never published (absorbs CFG-035)
+### CFG-001 — Public realm discovery is served; Keycloak admin console and master realm are not published on the customer identity host id.<PREVIEW_DOMAIN> (the owner-approved console lives on the separate kc-admin host and is covered by docs/operations/14-keycloak-admin-console.md; absorbs CFG-035)
 
 - **Status:** NOT_RUN · **Priority:** P0 · **Readiness:** Ready to run manually now
 - **Surface:** identity, deployment · **Actors:** FX-GUEST
@@ -1328,7 +1328,7 @@ Generated from `cases/*.json` by `scripts/owner_e2e_catalog.py`; do not edit. Ev
 - **Also covered by automated tests:** MfaPolicyIntegrationTest.the_settings_report_which_security_administration_the_account_may_do
 - **Unverified against code (confirm while executing):** The account console client/theme is enabled by default in Keycloak 26; not verified on the live realm
 
-### CFG-121 — Smoke and release read-only gate: ./deploy.sh smoke covers headers, boundary, issuer, admin console 404, unauthenticated refusals
+### CFG-121 — Smoke and release read-only gate: ./deploy.sh smoke covers headers, boundary, issuer, admin console 404 on the customer identity host, unauthenticated refusals
 
 - **Status:** NOT_RUN · **Priority:** P1 · **Readiness:** Ready to run manually now
 - **Surface:** deployment · **Actors:** FX-GUEST

@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "purpose": "DOC-001 change matrix: which documentation must change when code in an area changes. A PR that changes a file matching 'code' must change at least one file matching 'docs' of that area (or declare a specific, reviewable justification). Matching is deterministic path matching only; it does not prove the documentation is accurate.",
+  "areas": [
+    {
+      "id": "backend-orders",
+      "description": "Backend: order placement, lifecycle, availability and capacity",
+      "code": [
+        "backend/modules/orders/**",
+        "backend/modules/availability/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/order-implementation.md",
+        "docs/developer-handbook/01-business/order-lifecycle.md",
+        "docs/developer-handbook/02-user-journeys/complete-order-journey.md",
+        "docs/product/04-state-machines.md"
+      ],
+      "owner_role": "Backend architecture"
+    },
+    {
+      "id": "backend-catalog-pricing",
+      "description": "Backend: catalogue, meals, quotes and price versions",
+      "code": [
+        "backend/modules/catalog/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/pricing-implementation.md",
+        "docs/developer-handbook/01-business/pricing-and-payments.md",
+        "docs/developer-handbook/01-business/kitchen-management.md"
+      ],
+      "owner_role": "Business documentation"
+    },
+    {
+      "id": "backend-finance-payments",
+      "description": "Backend: ledger, deposits, cash, reconciliation",
+      "code": [
+        "backend/modules/finance/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/payment-implementation.md",
+        "docs/developer-handbook/01-business/pricing-and-payments.md",
+        "docs/developer-handbook/02-user-journeys/finance-and-support.md",
+        "docs/product/09-deposit-payment-states.md"
+      ],
+      "owner_role": "Business documentation"
+    },
+    {
+      "id": "backend-identity-security",
+      "description": "Backend and infra: identity, MFA, Keycloak, authorization",
+      "code": [
+        "backend/modules/identity/**",
+        "infra/identity/**",
+        "deploy/web-preview/identity/**",
+        "deploy/web-preview/admin-console.sh",
+        "backend/app/src/main/java/**/security/**",
+        "backend/app/src/main/java/**/mfa/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/03-architecture/identity-and-security.md",
+        "docs/developer-handbook/02-user-journeys/authentication-and-mfa.md",
+        "docs/security/mfa-policy.md",
+        "docs/operations/14-keycloak-admin-console.md"
+      ],
+      "owner_role": "Security and Keycloak"
+    },
+    {
+      "id": "backend-cooks",
+      "description": "Backend: cook applications, kitchens, staff grants",
+      "code": [
+        "backend/modules/cooks/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/01-business/kitchen-management.md",
+        "docs/developer-handbook/02-user-journeys/cook-operations.md",
+        "docs/developer-handbook/01-business/actors-and-permissions.md"
+      ],
+      "owner_role": "Business documentation"
+    },
+    {
+      "id": "backend-support-ops-notifications",
+      "description": "Backend: support, operations, notifications, outbox",
+      "code": [
+        "backend/modules/support/**",
+        "backend/modules/operations/**",
+        "backend/modules/notifications/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/02-user-journeys/backoffice-admin.md",
+        "docs/developer-handbook/02-user-journeys/finance-and-support.md",
+        "docs/developer-handbook/03-architecture/integration-and-events.md"
+      ],
+      "owner_role": "Backend architecture"
+    },
+    {
+      "id": "backend-platform",
+      "description": "Backend: shared kernel, application assembly, build",
+      "code": [
+        "backend/shared/**",
+        "backend/app/src/main/**",
+        "backend/app/pom.xml",
+        "backend/pom.xml",
+        "backend/Dockerfile"
+      ],
+      "docs": [
+        "docs/developer-handbook/03-architecture/backend-architecture.md",
+        "docs/developer-handbook/04-codebase/backend-module-guide.md"
+      ],
+      "owner_role": "Backend architecture"
+    },
+    {
+      "id": "database",
+      "description": "Database migrations and schema",
+      "code": [
+        "backend/app/src/main/resources/db/**",
+        "infra/db/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/03-architecture/database-architecture.md",
+        "docs/engineering/02-data-model.md"
+      ],
+      "owner_role": "Backend architecture"
+    },
+    {
+      "id": "contracts",
+      "description": "API contracts and generated client",
+      "code": [
+        "contracts/**",
+        "packages/api-client/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/api-contracts.md",
+        "docs/engineering/03-api-contract.md"
+      ],
+      "owner_role": "Backend architecture"
+    },
+    {
+      "id": "customer-web",
+      "description": "Customer web application",
+      "code": [
+        "apps/customer-web/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/02-user-journeys/customer-web.md",
+        "docs/developer-handbook/03-architecture/frontend-architecture.md",
+        "docs/developer-handbook/04-codebase/frontend-code-guide.md"
+      ],
+      "owner_role": "Frontend and mobile"
+    },
+    {
+      "id": "operations-web",
+      "description": "Operations (cook workspace and back-office) web application",
+      "code": [
+        "apps/operations-web/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/02-user-journeys/cook-operations.md",
+        "docs/developer-handbook/02-user-journeys/backoffice-admin.md",
+        "docs/developer-handbook/02-user-journeys/finance-and-support.md",
+        "docs/developer-handbook/04-codebase/frontend-code-guide.md"
+      ],
+      "owner_role": "Frontend and mobile"
+    },
+    {
+      "id": "customer-mobile",
+      "description": "Customer mobile application (Expo, Android and iOS)",
+      "code": [
+        "apps/customer-mobile/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/02-user-journeys/customer-mobile.md",
+        "docs/developer-handbook/03-architecture/mobile-architecture.md",
+        "docs/developer-handbook/04-codebase/mobile-code-guide.md",
+        "docs/engineering/05-mobile.md"
+      ],
+      "owner_role": "Frontend and mobile"
+    },
+    {
+      "id": "shared-packages",
+      "description": "Shared TypeScript packages",
+      "code": [
+        "packages/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/shared-libraries.md",
+        "docs/developer-handbook/04-codebase/frontend-code-guide.md"
+      ],
+      "owner_role": "Frontend and mobile"
+    },
+    {
+      "id": "infrastructure",
+      "description": "Compose stack, storage, preview deployment files",
+      "code": [
+        "infra/compose.yaml",
+        "infra/storage/**",
+        "deploy/**",
+        "infra/.env.example"
+      ],
+      "docs": [
+        "docs/developer-handbook/03-architecture/infrastructure-and-deployment.md",
+        "docs/developer-handbook/05-developer-workflow/preview-environment.md",
+        "docs/operations/06-web-preview.md",
+        "docs/operations/11-staging-deployment-and-rollback.md"
+      ],
+      "owner_role": "Infrastructure and deployment"
+    },
+    {
+      "id": "ci-cd",
+      "description": "GitHub Actions workflows",
+      "code": [
+        ".github/workflows/**",
+        ".gitleaksignore"
+      ],
+      "docs": [
+        "docs/developer-handbook/05-developer-workflow/ci-cd.md",
+        "docs/developer-handbook/05-developer-workflow/preview-environment.md"
+      ],
+      "owner_role": "Infrastructure and deployment"
+    },
+    {
+      "id": "tests",
+      "description": "Automated tests and owner acceptance assets",
+      "code": [
+        "**/src/test/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/e2e/**",
+        "**/e2e-native/**",
+        "**/e2e-ios/**",
+        "**/e2e-staging/**",
+        "scripts/test_*.py",
+        "verification/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/05-developer-workflow/test-execution.md",
+        "docs/developer-handbook/07-reference/requirements-traceability.md",
+        "docs/quality/01-verification.md"
+      ],
+      "owner_role": "Testing and QA"
+    },
+    {
+      "id": "tooling-scripts",
+      "description": "Repository scripts and local tooling",
+      "code": [
+        "scripts/**",
+        "package.json",
+        "pnpm-workspace.yaml",
+        "eslint.config.js",
+        "tsconfig.base.json",
+        ".node-version",
+        ".nvmrc",
+        ".npmrc",
+        ".gitignore",
+        "pnpm-lock.yaml",
+        "backend/.mvn/**",
+        "backend/mvnw",
+        "backend/mvnw.cmd",
+        "backend/.dockerignore"
+      ],
+      "docs": [
+        "docs/developer-handbook/05-developer-workflow/local-environment.md",
+        "docs/developer-handbook/05-developer-workflow/run-and-debug.md",
+        "docs/developer-handbook/05-developer-workflow/prerequisites.md",
+        "docs/engineering/toolchain.md"
+      ],
+      "owner_role": "Handbook navigation"
+    },
+    {
+      "id": "planning",
+      "description": "Backlog, rules, scenarios, decisions, gates",
+      "code": [
+        "planning/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/07-reference/requirements-traceability.md",
+        "docs/developer-handbook/07-reference/architecture-decisions.md",
+        "docs/developer-handbook/07-reference/implementation-status.md"
+      ],
+      "owner_role": "Business documentation"
+    },
+    {
+      "id": "quotes-pricing",
+      "description": "Quote creation/validation, quote lifetime and the commerce policy seed",
+      "code": [
+        "backend/modules/orders/**/Quote*",
+        "backend/app/src/main/resources/db/devdata/R__dev_commerce_policy.sql"
+      ],
+      "docs": [
+        "docs/developer-handbook/04-codebase/pricing-implementation.md",
+        "docs/developer-handbook/01-business/pricing-and-payments.md",
+        "docs/product/rq-004-stale-quote.md"
+      ],
+      "owner_role": "Business documentation"
+    },
+    {
+      "id": "governance",
+      "description": "Documentation governance files (gate, ownership, PR template)",
+      "code": [
+        ".github/CODEOWNERS",
+        ".github/pull_request_template.md",
+        ".github/ISSUE_TEMPLATE/**"
+      ],
+      "docs": [
+        "docs/developer-handbook/05-developer-workflow/documentation-policy.md",
+        "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow.md"
+      ],
+      "owner_role": "Handbook navigation"
+    }
+  ]
+}
