@@ -180,20 +180,30 @@ def verdict(gh, pr: dict, base_sha: str, owner: str) -> tuple[bool, str]:
 
 
 def verify_all(gh, base_branch: str, owner: str, dry_run: bool) -> list[tuple[int, str]]:
+    """Judge and publish head by head, so no verdict waits behind another PR's slow evaluation."""
     results = []
     base_sha = gh.ref_sha(base_branch)
-    judged: dict[str, list[tuple[dict, bool, str]]] = {}
+    by_head: dict[str, list[dict]] = {}
     for pr in gh.open_prs(base_branch):
-        passed, report = verdict(gh, pr, base_sha, owner)
-        judged.setdefault(pr["head_sha"], []).append((pr, passed, report))
-        results.append((pr["number"], "success" if passed else "failure"))
-    for head_sha, items in judged.items():
+        by_head.setdefault(pr["head_sha"], []).append(pr)
+    for head_sha, prs in by_head.items():
+        items = []
+        for pr in prs:
+            passed, report = verdict(gh, pr, base_sha, owner)
+            items.append((pr, passed, report))
+            results.append((pr["number"], "success" if passed else "failure"))
         # Several PRs can share one head commit but a commit has a single check: success only if every one of them passes.
         ok = all(p for _, p, _ in items)
         conclusion = "success" if ok else "failure"
         report = "\n\n".join(f"PR #{pr['number']}: {'PASS' if p else 'FAIL'}\n{r}" for pr, p, r in items)
         digest = hashlib.sha256(f"{conclusion}\n{base_sha}\n{report}".encode()).hexdigest()[:40]
-        if not dry_run and gh.latest_result(head_sha) != digest:
+        if dry_run:
+            continue
+        try:
+            unchanged = gh.latest_result(head_sha) == digest
+        except Exception:  # noqa: BLE001 - an unreadable previous result must not suppress a new verdict
+            unchanged = False
+        if not unchanged:
             gh.post_check(head_sha, conclusion, f"Gate from {base_branch}@{base_sha[:12]}\n\n{report}", digest)
     return results
 

@@ -53,10 +53,12 @@ Codex (read-only, supporting evidence — not a human approval, and GitHub canno
 | **High** — installation token echoed in the exception of a failed `git fetch` (argument filter matched the wrong prefix) | fixed: credentials travel in the git child's environment, errors name only the subcommand, tokens masked; test added |
 | **Medium** — an error kept a previous green and aborted the scan | fixed: every error posts a failure and the scan continues; test added |
 | **Medium** — two PRs with one head commit overwrote each other's verdict | fixed: success only if all PRs on that head pass; test added |
-| **Medium** — quoted or negated authorization text counted | fixed: marker must be a line of its own, at least 12 hex characters, association required; tests added |
+| **Medium** — quoted or negated authorization text counted | partly fixed in pass 1; pass 2 showed fenced, HTML-commented and prose-prefixed markers still counted — fixed again: the whole comment must be the marker |
 | **Medium** — description or comments could change between judging and posting | fixed for the judging window (final snapshot, fail closed); the revocation window until the next poll is documented |
 | **Medium** — no pagination of PRs and comments | fixed; test added |
 | Low — 7-character prefix accepted, missing association defaulted to OWNER, branch-protection documentation not in the governance path list | fixed / documentation corrected |
+
+**Second pass (same reviewer, commit `e21db63`):** no High; three Medium — (1) fenced/commented/prose-prefixed marker still counted, (2) a failing check lookup suppressed a computed failure and the claim that every error fails closed was too broad, (3) a verdict could be published after a slow later PR let the owner delete the authorization. All three fixed (whole-comment marker; lookup errors no longer suppress posting and the total-outage behaviour is documented; per-head publication immediately after judging) with tests. A third pass over these last fixes is NOT_RUN.
 
 These fixes were tested locally only (`scripts/test_doc001_gate.py`, `scripts/test_doc001_trusted_verifier.py`). A second Codex pass over the fixed code and the live App behaviour are NOT_RUN. The workflow-bypass hole remains open until the App is installed and a copy of PR #33 is observed blocked.
 

@@ -216,12 +216,15 @@ class GateTests(unittest.TestCase):
         self.assertFails(self.r.run(gov, comments=[{**auth, "user": "stranger", "author_association": "NONE"}]), "CURRENT head")
         self.assertFails(self.r.run(gov, comments=[{**auth, "author_association": "CONTRIBUTOR"}]), "CURRENT head")
         self.assertFails(self.r.run(gov, comments=[{**auth, "body": "I authorize this (no marker)"}]), "CURRENT head")
-        for quoted in (f"Do NOT use `OWNER-AUTHORIZES-GOVERNANCE {head[:12]}` yet.", f"> OWNER-AUTHORIZES-GOVERNANCE {head[:12]}",
-                       f"not yet: OWNER-AUTHORIZES-GOVERNANCE {head[:12]}", f"OWNER-AUTHORIZES-GOVERNANCE {head[:11]}"):
-            self.assertFails(self.r.run(gov, comments=[{**auth, "body": quoted}]), "CURRENT head")
+        for text in (f"Do NOT use `OWNER-AUTHORIZES-GOVERNANCE {head[:12]}` yet.", f"> OWNER-AUTHORIZES-GOVERNANCE {head[:12]}",
+                     f"not yet: OWNER-AUTHORIZES-GOVERNANCE {head[:12]}", f"OWNER-AUTHORIZES-GOVERNANCE {head[:11]}",
+                     f"```\nOWNER-AUTHORIZES-GOVERNANCE {head[:12]}\n```", f"<!--\nOWNER-AUTHORIZES-GOVERNANCE {head[:12]}\n-->",
+                     f"Do NOT authorize this example:\nOWNER-AUTHORIZES-GOVERNANCE {head[:12]}",
+                     f"OWNER-AUTHORIZES-GOVERNANCE {head[:12]} (only after the review)"):
+            self.assertFails(self.r.run(gov, comments=[{**auth, "body": text}]), "CURRENT head")
         self.assertFails(self.r.run(gov, comments=[{k: v for k, v in auth.items() if k != "author_association"}]), "CURRENT head")
-        self.assertPasses(self.r.run(gov, comments=[{**auth, "body": f"ok\r\nOWNER-AUTHORIZES-GOVERNANCE {head[:12]}\r\nthanks"}]))
-        self.assertPasses(self.r.run(gov, comments=[auth]))  # single-account model: the owner may also be the PR author
+        self.assertPasses(self.r.run(gov, comments=[{**auth, "body": f"OWNER-AUTHORIZES-GOVERNANCE {head[:12]}\r\n"}]))
+        self.assertPasses(self.r.run(gov, comments=[{**auth, "body": f"OWNER-AUTHORIZES-GOVERNANCE {head}"}]))
 
     # 12
     def test_12_multi_application_change_with_docs_and_traceability_passes(self) -> None:
@@ -266,7 +269,7 @@ class GateTests(unittest.TestCase):
         self.r.write("scripts/doc001_check.py", "# changed\n"); self.doc_change(); self.r.commit()
         head = self.r.git("rev-parse", "HEAD").strip()
         gov = decl(**{**UPDATED, "governance_review": "author role: agent; reviewer role: owner; Codex review: NOT_RUN"})
-        auth = {"user": "owner", "author_association": "OWNER", "body": f"approved.\nOWNER-AUTHORIZES-GOVERNANCE {head}"}
+        auth = {"user": "owner", "author_association": "OWNER", "body": f"OWNER-AUTHORIZES-GOVERNANCE {head}"}
         self.assertPasses(self.r.run(gov, comments=[{"user": "bot", "body": "hi"}, auth]))
         self.assertFails(self.r.run(gov, comments=[{**auth, "body": "OWNER-AUTHORIZES-GOVERNANCE " + head[:8]}]), "CURRENT head")  # < 12 chars
         self.r.write("scripts/doc001_check.py", "# changed again\n"); self.r.commit()  # a new push invalidates it

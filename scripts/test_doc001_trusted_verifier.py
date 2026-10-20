@@ -162,6 +162,20 @@ class TrustedVerifierTests(unittest.TestCase):
         self.assertEqual(v.verify_all(gh, "develop", "owner", dry_run=False), [(10, "failure")])
         self.assertIn("kept changing", gh.posted[0][2])
 
+    def test_verdict_is_published_before_a_slower_pr_is_evaluated_and_lookup_errors_do_not_suppress_it(self) -> None:
+        a = self.pr(11, {f"{HB}/README.md": "\nsentence eleven\n"})
+        b = self.pr(12, {f"{HB}/README.md": "\nsentence twelve\n"})
+        gh = FakeGitHub(self.origin, [a, b], {})
+        order = []
+        real_post, real_comments = gh.post_check, gh.comments
+        gh.post_check = lambda sha, *r: (order.append(("post", sha)), real_post(sha, *r))
+        gh.comments = lambda n: (order.append(("eval", n)), real_comments(n))[1]
+        gh.latest_result = lambda sha: (_ for _ in ()).throw(RuntimeError("lookup failed"))
+        v.verify_all(gh, "develop", "owner", dry_run=False)
+        self.assertEqual([o for o in order if o[0] == "post"][0][1], a["head_sha"])
+        self.assertLess(order.index(("post", a["head_sha"])), order.index(("eval", 12)))  # PR 11 is published before PR 12 is judged
+        self.assertEqual(len(gh.posted), 2)
+
     def test_pagination_follows_every_page(self) -> None:
         app = v.GitHubApp.__new__(v.GitHubApp)
         pages = {1: [{"i": n} for n in range(100)], 2: [{"i": 100}]}
