@@ -5,7 +5,7 @@ Part of the `developer-handbook` skill. Every source page `X.md` under the docum
 `X<suffix>.md` in the same directory with the same structure and the same protected technical content; the source language is
 authoritative. Parsing uses markdown-it-py (python3 -m pip install 'markdown-it-py==3.0.0').
 
-It is a STRUCTURAL check. It compares headings, code fences (content included), Mermaid structure with labels masked, tables, lists,
+It is a STRUCTURAL check. Numbers are checked for omission and for a reduced count; extra numbers in the mirror are not flagged (spelled-out numbers in the source make that too noisy), so the semantic review must look for added values. It compares headings, code fences (content included), Mermaid structure with labels masked, tables, lists,
 checklists, blockquotes, paragraphs, images, link destinations (internal links must target the mirror and the equivalent heading),
 inline-code identifiers, protected technical tokens and numbers, arrow direction, the language-switch line, a reviewed-pair record and
 justified exceptions. It can NOT prove that a sentence means the same in both languages: pair it with a side-by-side semantic review.
@@ -136,7 +136,7 @@ SECRET_PATTERNS = (
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b"),
 )
-SECRET_ASSIGN_RE = re.compile(r"\b[A-Z][A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=([^\s#`]+)")
+SECRET_ASSIGN_RE = re.compile(r"\b[A-Z][A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)")
 SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
 
 
@@ -304,7 +304,11 @@ class Validator:
             return
         en_text, ar_text = en_p.read_text(encoding="utf-8"), ar_p.read_text(encoding="utf-8")
         for t in (en_text, ar_text):
-            self.secret_values.update(sv for m in SECRET_ASSIGN_RE.finditer(t) if (sv := unsafe_secret_value(m.group(1))))
+            for m in SECRET_ASSIGN_RE.finditer(t):
+                sv = unsafe_secret_value(m.group(1))
+                if sv:  # mask the whole value and every fragment of it that a token diagnostic could print on its own
+                    self.secret_values.add(sv)
+                    self.secret_values.update(w for w in re.split(r"\s+", sv) if len(w) >= 4)
         en, ar = Features(en_text), Features(ar_text)
         if not ar_text.strip() or len(ar_text.strip()) < 0.2 * len(en_text.strip()):
             self.fail(rel, "headings", "Arabic file is empty or implausibly short")

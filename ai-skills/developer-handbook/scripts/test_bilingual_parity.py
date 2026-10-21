@@ -297,6 +297,15 @@ class ParityTests(unittest.TestCase):
             self.assertEqual(v.Validator(self.f.root).update_sync(), 2)
         self.assertEqual(outside.read_text(encoding="utf-8"), "{}")
 
+    def test_quoted_credentials_with_spaces_and_extra_numbers(self) -> None:
+        self.f.edit("a-ar.md", "فقرة افتتاحية", 'فقرة DB_PASSWORD="Synthetic Secret42" افتتاحية')
+        problems = self.f.check()
+        flat = json.dumps(problems, ensure_ascii=False)
+        self.assertNotIn("Secret42", flat)
+        self.assertNotIn("Synthetic", flat.replace("Synthetic Data", ""))
+        self.f.edit("a-ar.md", 'DB_PASSWORD="Synthetic Secret42" ', "")
+        self.assertEqual(self.f.check(), {})
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")
