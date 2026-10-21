@@ -53,3 +53,5 @@ The owner's staged implementation sequence is in `docs/delivery/07-owner-decisio
 
 - `docs/product/01-context-and-decisions.md` marks several early decisions (D01–D09) as "proposed defaults"; later sections record owner approvals. When a statement there conflicts with the code, the code and the later owner-decision sections win; this handbook follows that rule.
 - The pilot city, service zones, tax treatment, refund policy and legal entity are open owner decisions (O01–O06). The repository contains only synthetic zones and a synthetic commerce policy (`backend/app/src/main/resources/db/devdata/R__dev_commerce_policy.sql`).
+
+An English-only sentence added without the Arabic mirror.
