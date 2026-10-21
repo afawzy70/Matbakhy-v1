@@ -10,6 +10,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -247,6 +248,51 @@ class ParityTests(unittest.TestCase):
         r = sp.run(base + ["--docs-dir", "docs/empty"], capture_output=True, text=True)
         self.assertEqual(r.returncode, 2, r.stdout)
         self.assertNotIn("PARITY RESULT: PASS", r.stdout)
+
+    def test_symlinked_pages_outside_the_repository_are_not_read(self) -> None:
+        outside = Path(tempfile.mkdtemp()) / "secret-ar.md"
+        outside.write_text("# x\n\nDB_PASSWORD=Sup3rSecretValue99\n", encoding="utf-8")
+        self.addCleanup(lambda: shutil.rmtree(outside.parent, ignore_errors=True))
+        (self.f.hb / "b-ar.md").unlink()
+        (self.f.hb / "b-ar.md").symlink_to(outside)
+        problems = self.f.check(record=False)
+        self.assertProblem(problems, "outside", "b.md")
+        self.assertNotIn("Sup3rSecretValue99", json.dumps(problems))
+
+    def test_credential_values_are_redacted_in_diagnostics(self) -> None:
+        self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة DB_PASSWORD=Sup3rSecretValue99 افتتاحية")
+        problems = self.f.check()
+        self.assertProblem(problems, "secrets")
+        self.assertNotIn("Sup3rSecretValue99", json.dumps(problems, ensure_ascii=False))
+
+    def test_base_ref_cannot_inject_git_options(self) -> None:
+        val = v.Validator(self.f.root)
+        for bad in ("--output=probe", "-x", "a b", "main;rm"):
+            with self.assertRaises(SystemExit):
+                val.with_base(bad)
+
+    def test_repeated_numbers_must_keep_their_count(self) -> None:
+        self.f.edit("a.md", "and 42 items", "and 25 items, 25 more and 30 extra")
+        self.f.edit("a-ar.md", "و 42 عنصر", "و 25 عنصر و 30 زيادة و 30 كمان")
+        self.assertProblem(self.f.check(), "tokens")
+
+    def test_require_metadata_rejects_missing_metadata_in_both_pages(self) -> None:
+        for name in ("a.md", "a-ar.md"):
+            t = (self.f.hb / name).read_text(encoding="utf-8")
+            self.f.write(name, t.replace("> **Owner role:** Handbook navigation\n", "").replace("> **Status:** REFERENCE", "> Note"))
+        self.assertProblem(self.f.check(), "metadata")
+
+    def test_non_ascii_file_names_are_seen_by_the_same_pr_rule(self) -> None:
+        r = self.f.root
+        run = lambda *a: subprocess.run(["git", *a], cwd=r, check=True, capture_output=True, text=True)
+        run("init", "-q", "-b", "main"), run("config", "user.email", "t@e"), run("config", "user.name", "t")
+        self.f.write("دليل.md", B_EN.replace("b-ar.md", "دليل-ar.md")); self.f.write("دليل-ar.md", B_AR.replace("(b.md)", "(دليل.md)"))
+        run("add", "-A"), run("commit", "-qm", "base"), run("checkout", "-qb", "feature")
+        self.f.edit("دليل.md", "Text.", "Changed text.")
+        run("commit", "-qam", "english only")
+        val = v.Validator(r)
+        val.with_base("main")
+        self.assertProblem(val.problems, "same-pr", "دليل.md")
 
     def test_inline_code_identifier_drift(self) -> None:
         self.f.edit("a-ar.md", "`code_id`", "`codeId`")

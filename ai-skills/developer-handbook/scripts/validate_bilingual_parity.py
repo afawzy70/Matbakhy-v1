@@ -138,7 +138,7 @@ SECRET_PATTERNS = (
 )
 SECRET_ASSIGN_RE = re.compile(r"\b[A-Z][A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=([^\s#`]+)")
 SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|\"|'|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
-CHECKS = ("evidence", "secrets", "arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
+CHECKS = ("outside", "same-pr", "sync", "missing", "orphan", "exceptions", "evidence", "secrets", "arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
           "anchors")
 
 
@@ -263,6 +263,9 @@ class Validator:
 
     def _load(self, rel: str) -> dict:
         p = self.root / rel
+        if p.is_file() and not self.inside(p):
+            self.problems.setdefault(rel, []).append("[outside] file resolves outside the repository and is not read")
+            return {}
         return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
 
     def fail(self, page: str, check: str, msg: str) -> None:
@@ -275,6 +278,10 @@ class Validator:
     # ------------------------------------------------------------------ one pair
     def compare(self, rel: str) -> None:
         en_p, ar_p = self.hb / rel, self.hb / ar_name(rel)
+        for p in (en_p, ar_p):
+            if p.exists() and not self.inside(p):
+                self.fail(rel, "outside", f"{p.name} resolves outside the repository (symlink or path traversal); it is not read")
+                return
         if not ar_p.is_file():
             self.fail(rel, "missing", f"no Arabic counterpart {ar_name(rel)}")
             return
@@ -320,7 +327,7 @@ class Validator:
         if en.code != ar.code:
             miss, extra = en.code - ar.code, ar.code - en.code
             self.fail(rel, "inline-code", f"inline code identifiers differ; missing: {sorted(miss)[:6]}; unexpected: {sorted(extra)[:6]}")
-        lost = [t for t in en.tokens if t not in ar.tokens]
+        lost = [t for t, c in en.tokens.items() if (ar.tokens[t] < c if re.fullmatch(r"\d{2,}(?:[.,]\d+)*|\d+[.,]\d+(?:[.,]\d+)*", t) else t not in ar.tokens)]  # multi-digit numbers keep their count; single digits are often spelled out in Arabic
         if lost:
             self.fail(rel, "tokens", f"technical tokens/numbers from English missing in Arabic: {sorted(lost)[:10]}")
         if REQUIRE_METADATA:
@@ -356,11 +363,15 @@ class Validator:
     def secrets(self, rel: str, en_text: str, ar_text: str) -> None:
         """No credentials in the public repository: private keys, token shapes and NAME=value secret assignments with a real-looking value."""
         for lang, text in (("English", en_text), ("Arabic", ar_text)):
-            hit = next((m.group(0)[:30] for pat in SECRET_PATTERNS for m in pat.finditer(text)), None)
-            if not hit:
-                hit = next((m.group(0)[:50] for m in SECRET_ASSIGN_RE.finditer(text) if not SAFE_SECRET_VALUE_RE.match(m.group(1))), None)
-            if hit:
-                self.fail(rel, "secrets", f"{lang} page contains something that looks like a credential: {hit!r}")
+            kind = None
+            if any(pat.search(text) for pat in SECRET_PATTERNS):
+                kind = "a private key header or a token-shaped string"
+            else:
+                m = next((m for m in SECRET_ASSIGN_RE.finditer(text) if not SAFE_SECRET_VALUE_RE.match(m.group(1))), None)
+                if m:
+                    kind = f"a real-looking value assigned to {m.group(0).split('=', 1)[0]}"
+            if kind:  # never echo the value: diagnostics are printed to CI logs
+                self.fail(rel, "secrets", f"{lang} page contains something that looks like a credential ({kind}); value redacted")
 
     def metadata(self, rel: str, en_text: str, ar_text: str) -> None:
         def meta(t: str) -> tuple[str | None, str | None]:
@@ -370,6 +381,9 @@ class Validator:
             label = next((l for l in sorted(STATUS_LABELS, key=len, reverse=True) if st and st.group(1).upper().startswith(l)), None)
             return (role.group(1).strip() if role else None, label)
         e, a = meta(en_text), meta(ar_text)
+        for lang, m in (("English", e), ("Arabic", a)):
+            if m[0] is None or m[1] is None:
+                self.fail(rel, "metadata", f"{lang} page lacks a parsable 'Owner role' line or a recognised 'Status' label")
         if e[0] != a[0]:
             self.fail(rel, "metadata", f"Owner role differs: {e[0]!r} vs {a[0]!r}")
         if e[1] != a[1]:
@@ -523,9 +537,16 @@ class Validator:
 
     def with_base(self, base: str) -> None:
         """Require Arabic to change whenever English changes in this PR (same-PR update rule)."""
-        out = subprocess.run(["git", "diff", "--name-status", "--no-renames", f"{base}...HEAD", "--", HB], cwd=self.root,
-                             capture_output=True, text=True, check=True).stdout
-        changed = {line.split("\t", 1)[1]: line[0] for line in out.splitlines() if "\t" in line}
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/@^~-]*", base):
+            raise SystemExit(f"--base must be a branch, tag or commit name (no leading dash or unusual characters): {base!r}")
+        sha = subprocess.run(["git", "rev-parse", "--verify", "--end-of-options", base + "^{commit}"], cwd=self.root,
+                             capture_output=True, text=True)
+        if sha.returncode:
+            raise SystemExit(f"--base does not name a commit: {base!r}")
+        out = subprocess.run(["git", "diff", "--name-status", "--no-renames", "-z", f"{sha.stdout.strip()}...HEAD", "--", HB],
+                             cwd=self.root, capture_output=True, text=True, check=True).stdout
+        parts = [x for x in out.split("\0") if x]  # NUL-separated: status, path, status, path ... (no quoting of non-ASCII names)
+        changed = {parts[i + 1]: parts[i][0] for i in range(0, len(parts) - 1, 2)}
         for path, st in changed.items():
             rel = path[len(HB) + 1:]
             if not rel.endswith(".md") or rel.endswith(LANG_SUFFIX + ".md") or rel in EXCLUDED_FROM_MIRROR:
