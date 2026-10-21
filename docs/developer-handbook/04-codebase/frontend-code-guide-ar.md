@@ -59,7 +59,7 @@ API مرة واحدة بعد تسجيل الدخول (`checkSession`، `src/App.
 | المنطقة | الملفات |
 |---|---|
 | الطبّاخ | `src/cook/Dashboard.tsx` و `Orders.tsx` (قبول/رفض/تحضير/جاهز/إرسال/تسليم/إلغاء/تقرير الكاش) و `Meals.tsx` (CRUD ورفع الصور وتاريخ الأسعار) و `Slots.tsx` و `Payments.tsx` (استلام العربون والمشكلة والاسترداد وبروفايل الدفع) و `Statement.tsx` و `Insights.tsx` و `Settings.tsx` و `Onboarding.tsx` (الطلب)، والمساعدات المشتركة `shared.tsx` |
-| الموظفين | `src/ops/Reviews.tsx` (طلبات الطبّاخين وإشراف المراجعات) و `Catalogue.tsx` و `Cases.tsx` و `OpsOrders.tsx` و `Finance.tsx` (التحقق من الكاش والاستردادات والتسويات وكشوف الحساب) و `Payments.tsx` (طابور مراجعة وتسوية مدفوعات العربون والموافقة على المستلم) و `Configuration.tsx` و `Staff.tsx` و `Security.tsx` (سياسة الـ MFA وإعادة الضبط) |
+| الموظفين | `src/ops/Reviews.tsx` (طلبات الطبّاخين وإشراف المراجعات) و `Catalogue.tsx` و `Cases.tsx` و `OpsOrders.tsx` و `Finance.tsx` (التحقق من الكاش والاستردادات والتسويات وكشوف الحساب) و `Payments.tsx` (طابور مطابقة مدفوعات العربون والموافقة على المستلم) و `Configuration.tsx` و `Staff.tsx` و `Security.tsx` (سياسة الـ MFA وإعادة الضبط) |
 | الـ Step-up | لما السيرفر يرد بـ `STEP_UP_REQUIRED` التطبيق بيعرض شاشة Step-up بدل البيانات |
 | الاختبارات | `src/App.test.tsx` (Vitest)؛ رحلات Playwright في `apps/operations-web/e2e/` (`cook-workspace.e2e.ts` و `customer-journey.e2e.ts` و `keyboard.e2e.ts` و `money-reflow.e2e.ts` و `operations-layout.e2e.ts`)، والإعدادات `apps/operations-web/playwright.config.ts`؛ و Smoke الـ Staging في `apps/operations-web/e2e-staging/smoke.staging.ts` |
 

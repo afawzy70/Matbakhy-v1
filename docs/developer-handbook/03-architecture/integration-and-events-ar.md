@@ -43,7 +43,7 @@
 
 ### تشغيل الـ Outbox
 
-* الموظفين اللي معاهم `integration.ops` يقدروا يقرأوا صحة التكامل (`GET /api/v1/ops/integrations`: أعداد المعلّق والفاشل، وعمر أقدم معلّق، وعمليات التسليم اللي استنفدت محاولاتها (Dead deliveries)) ويعيدوا تشغيل حدث `FAILED` (`POST /api/v1/ops/outbox/{eventId}/retry` مع `expectedVersion` وسبب؛ ومسجّل في الـ Audit كـ `outbox.retry`). الأحداث `FAILED` بس هي اللي تتعاد (`NotificationService.retryOutbox`).
+* الموظفين اللي معاهم `integration.ops` يقدروا يقرأوا صحة التكامل (`GET /api/v1/ops/integrations`: أعداد المعلّق والفاشل، وعمر أقدم معلّق، وعمليات التسليم المتوقفة نهائيًا (Dead deliveries)) ويعيدوا تشغيل حدث `FAILED` (`POST /api/v1/ops/outbox/{eventId}/retry` مع `expectedVersion` وسبب؛ ومسجّل في الـ Audit كـ `outbox.retry`). الأحداث `FAILED` بس هي اللي تتعاد (`NotificationService.retryOutbox`).
 * الـ Gauges للتنبيه: `matbakhy.outbox.oldest.pending.age` و`matbakhy.outbox.failed` و`matbakhy.notifications.dead` و`matbakhy.notifications.oldest.pending.age` (`OperationalMetrics`)، مع قواعد تنبيه في `deploy/web-preview/observability/alerts.yml`.
 * الاختبارات: `backend/app/src/test/java/com/matbakhy/app/notifications/NotificationIntegrationTest.java` و`PushFlagIntegrationTest.java` و`backend/app/src/test/java/com/matbakhy/app/reliability/RestartRecoveryIntegrationTest.java`.
 
