@@ -259,6 +259,37 @@ class ParityTests(unittest.TestCase):
         self.assertProblem(problems, "outside", "b.md")
         self.assertNotIn("Sup3rSecretValue99", json.dumps(problems))
 
+    def test_external_symlinks_are_never_opened_by_sync_or_repair(self) -> None:
+        import os
+        outside_dir = Path(tempfile.mkdtemp())
+        outside = outside_dir / "x-ar.md"
+        outside.write_text("# x\n", encoding="utf-8")
+        self.addCleanup(lambda: (os.chmod(outside, 0o600), shutil.rmtree(outside_dir, ignore_errors=True)))
+        os.chmod(outside, 0)  # any attempt to open it raises PermissionError instead of silently passing
+        (self.f.hb / "b-ar.md").unlink()
+        (self.f.hb / "b-ar.md").symlink_to(outside)
+        val = v.Validator(self.f.root)
+        with contextlib.redirect_stdout(io.StringIO()):
+            val.run()
+            val.fix_anchors("b.md")
+            val.update_sync()
+        self.assertTrue(any("[outside]" in m for ms in val.problems.values() for m in ms))
+        (self.f.hb / "b-ar.md").unlink()
+        (self.f.hb / "b-ar.md").write_text(B_AR, encoding="utf-8")
+        (self.f.root / v.EXCEPTIONS).symlink_to(outside)  # an external exceptions file must not crash initialisation
+        self.assertTrue(any("[outside]" in m for ms in v.Validator(self.f.root).problems.values() for m in ms))
+
+    def test_file_option_rejects_traversal(self) -> None:
+        val = v.Validator(self.f.root)
+        val.run("../../etc/passwd.md")
+        self.assertTrue(any("[outside]" in m for ms in val.problems.values() for m in ms))
+
+    def test_credentials_in_inline_code_and_destinations_are_redacted_everywhere(self) -> None:
+        self.f.edit("a.md", "`code_id`", "`DB_PASSWORD=Sup3rSecretValue99`")
+        problems = self.f.check()
+        self.assertProblem(problems, "inline-code")
+        self.assertNotIn("Sup3rSecretValue99", json.dumps(problems, ensure_ascii=False))
+
     def test_credential_values_are_redacted_in_diagnostics(self) -> None:
         self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة DB_PASSWORD=Sup3rSecretValue99 افتتاحية")
         problems = self.f.check()

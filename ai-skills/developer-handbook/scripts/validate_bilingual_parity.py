@@ -253,13 +253,20 @@ def heading_slugs(path: Path) -> list[str]:
     return dedup_slugs(heading_texts(path.read_text(encoding="utf-8")))
 
 
+def redact(text: str) -> str:
+    """Diagnostics go to CI logs: never print credential-shaped values, whatever check found them."""
+    for pat in SECRET_PATTERNS:
+        text = pat.sub("<redacted>", text)
+    return SECRET_ASSIGN_RE.sub(lambda m: m.group(0).split("=", 1)[0] + "=<redacted>" if not SAFE_SECRET_VALUE_RE.match(m.group(1)) else m.group(0), text)
+
+
 class Validator:
     def __init__(self, root: Path) -> None:
         self.root = root
         self.hb = root / HB
-        self.exc = self._load(EXCEPTIONS).get("files", {})
         self.used_exc: set[tuple[str, str]] = set()
         self.problems: dict[str, list[str]] = {}
+        self.exc = self._load(EXCEPTIONS).get("files", {})
 
     def _load(self, rel: str) -> dict:
         p = self.root / rel
@@ -273,7 +280,7 @@ class Validator:
         if check in allowed and allowed[check].get("reason", "").strip() and allowed[check].get("reviewed", "").strip():
             self.used_exc.add((page, check))
             return
-        self.problems.setdefault(page, []).append(f"[{check}] {msg}")
+        self.problems.setdefault(page, []).append(f"[{check}] {redact(msg)}")
 
     # ------------------------------------------------------------------ one pair
     def compare(self, rel: str) -> None:
@@ -449,8 +456,8 @@ class Validator:
     def fix_anchors(self, rel: str) -> int:
         """Rewrite fragments that still use the English heading slug to the slug of the equivalent Arabic heading."""
         ar_path = self.hb / ar_name(rel)
-        if not ar_path.is_file():
-            return 0
+        if not ar_path.is_file() or not self.inside(ar_path):
+            return 0  # never read or rewrite a file that resolves outside the repository
         lines = ar_path.read_text(encoding="utf-8").split("\n")
         outside = {n for n, _ in strip_fences("\n".join(lines))}
         changed = 0
@@ -484,6 +491,9 @@ class Validator:
 
     # ------------------------------------------------------------------ whole tree
     def run(self, only: str | None = None) -> None:
+        if only is not None and (Path(only).is_absolute() or ".." in Path(only).parts or not only.endswith(".md")):
+            self.fail(only, "outside", "--file must be a relative .md path inside the documentation directory")
+            return
         en, ar = en_pages(self.root), ar_pages(self.root)
         targets = [only] if only else en
         for rel in targets:
@@ -506,6 +516,8 @@ class Validator:
         for rel in en:
             if not (self.hb / ar_name(rel)).is_file():
                 continue
+            if not (self.inside(self.hb / rel) and self.inside(self.hb / ar_name(rel))):
+                continue  # reported by compare(); never hash a file that resolves outside the repository
             now = {"en": sha(self.hb / rel), "ar": sha(self.hb / ar_name(rel))}
             old = rec.get(rel)
             if not old:
@@ -523,6 +535,9 @@ class Validator:
         pairs = {}
         for rel in en_pages(self.root):
             if not (self.hb / ar_name(rel)).is_file():
+                continue
+            if not (self.inside(self.hb / rel) and self.inside(self.hb / ar_name(rel))):
+                print(f"SKIPPED {rel}: resolves outside the repository")
                 continue
             now = {"en": sha(self.hb / rel), "ar": sha(self.hb / ar_name(rel))}
             if rel in old and old[rel]["en"] != now["en"] and old[rel]["ar"] == now["ar"]:
@@ -601,6 +616,9 @@ def main() -> int:
     en = [a.file] if a.file else en_pages(root)
     if a.update_report:
         p = root / REPORT
+        if not v.inside(p):
+            print(f"FAIL  {REPORT} resolves outside the repository; not updated")
+            return 2
         text = p.read_text(encoding="utf-8")
         block = f"<!-- STRUCTURAL:BEGIN -->\n{structural_report(v, en)}\n<!-- STRUCTURAL:END -->"
         text = re.sub(r"<!-- STRUCTURAL:BEGIN -->.*?<!-- STRUCTURAL:END -->", lambda _m: block, text, flags=re.S)
