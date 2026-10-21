@@ -29,7 +29,7 @@
 | 17 | الأدمن | قراءة سجل الـ Audit | `GET /api/v1/ops/audit` (API بس) | القراءة متسجّلة في الـ Audit |
 | 18 | العميل | التقييم | `POST /api/v1/orders/{orderId}/reviews` | تقييم واحد |
 
-كل `POST` بيغيّر أوردر بيشيل `Idempotency-Key` و`expectedVersion`. السيرفر بيرفض الأوامر خارج الترتيب (`STATE_CONFLICT`) والـ Version الغلط (`VERSION_CONFLICT`).
+كل `POST` بيغيّر أوردر بيحتوي على `Idempotency-Key` و`expectedVersion`. السيرفر بيرفض الأوامر خارج الترتيب (`STATE_CONFLICT`) والـ Version الغلط (`VERSION_CONFLICT`).
 
 ## السيناريو B: التوصيل
 
