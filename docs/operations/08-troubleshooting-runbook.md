@@ -1,7 +1,5 @@
 # Troubleshooting runbook: orders, audit, dead letters, telemetry (draft)
 
-> **NOTE.** Infrastructure troubleshooting (DNS, HTTPS, Caddy, Docker, deployment) is covered in [infrastructure troubleshooting](../developer-handbook/08-infrastructure/infrastructure-troubleshooting.md); this runbook remains the reference for orders, audit, dead letters and telemetry.
-
 Part of the OPS-03 preparation for MB-039 ([05-observability-readiness.md](05-observability-readiness.md)). It is **not exercised on a deployed environment**: OPS-03 is NOT_RUN until an operator follows it on the preview (MB-040). The commands match the preview package (`deploy/web-preview`). Use synthetic data only.
 
 ## 1. Locate an order failure

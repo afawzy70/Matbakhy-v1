@@ -64,7 +64,7 @@ The directory docs/security exists and holds exactly the two files above.
 
 ### Reading of the matrix
 
-- Only the handbook pages and operations documents 06, 09, 12 and 13 name Contabo. The five operations files (06, 08, 09, 11, 12) that still say Hetzner have committed historical or status banners (last change 2026-10-21 for all five); the banners of 06, 09 and 12 name Contabo, so operations documents 06, 09, 12 and 13 now mention Contabo. The body text under those banners is still the older, Hetzner-era text and is OUTDATED where the banner says so. The deployment README still says Hetzner, was last changed on 2026-10-14 and has no banner yet.
+- Only the handbook pages and operations documents 06, 09, 12 and 13 name Contabo. The four operations files (06, 09, 11, 12) that still say Hetzner have committed historical or status banners (last change 2026-10-21 for all four); file 08 was deliberately not edited and has no banner; the banners of 06, 09 and 12 name Contabo, so operations documents 06, 09, 12 and 13 now mention Contabo. The body text under those banners is still the older, Hetzner-era text and is OUTDATED where the banner says so. The deployment README still says Hetzner, was last changed on 2026-10-14 and has no banner yet.
 - No document written before this handbook records the Linux accounts, the real deployment directory layout or the live HTTP behaviour of the Preview. Those are now in the inventory and [Live Preview access](../05-developer-workflow/live-preview-access.md).
 - There is no Egyptian Arabic version of any operations or security document. The handbook mirrors cover only handbook pages.
 

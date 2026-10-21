@@ -21,7 +21,7 @@
 | Onboarding | five infrastructure labs, [day 1](../06-onboarding-labs/infra-day-1-topology-accounts.md) to [day 5](../06-onboarding-labs/infra-day-5-rebuild-recovery.md) |
 | Reference | [documentation coverage and drift report](infrastructure-documentation-coverage.md) and this report |
 
-Also changed: the two README entry points (navigation), the test-execution page (new checks), five operations documents under `docs/operations/` (historical or partly-outdated banners that point to the current pages; these are outside the handbook and have no Arabic mirror), and the parity validator (credential-shape scan, evidence-label presence and equal counts on the infrastructure pages) with its tests.
+Also changed: the two README entry points (navigation), the test-execution page (new checks), four operations documents under `docs/operations/` (historical or partly-outdated banners that point to the current pages; these are outside the handbook and have no Arabic mirror), and the parity validator (credential-shape scan, evidence-label presence and equal counts on the infrastructure pages) with its tests.
 
 ## 3. Validation
 
