@@ -44,7 +44,7 @@
 
 **ينفع أكتب PASS في تقرير لو ماشغّلتش الاختبار؟** لا. استخدم NOT_RUN أو NOT VERIFIED.
 
-**أبلّغ عن Bug فين؟** GitHub Issue باستخدام `.github/ISSUE_TEMPLATE/defect.md`، ببيانات تجريبية وLogs متنضّفة.
+**أبلّغ عن Bug فين؟** GitHub Issue باستخدام `.github/ISSUE_TEMPLATE/defect.md`، ببيانات اصطناعية (Synthetic) وLogs متنضّفة.
 
 ## Git والـ PR والـ CI
 
@@ -60,7 +60,7 @@
 
 **ليه بيجيلي 403 على بيئة المعاينة؟** الـ IP بتاعك مش في الـ allow-list الخاصة بفئة الـ Host دي ([بيئة المعاينة](../05-developer-workflow/preview-environment-ar.md)).
 
-**بيئة المعاينة هي الـ Production؟** لا: بيانات تجريبية، وبانر Demo، ومزوّدين وهميين، وسيرفر واحد.
+**بيئة المعاينة هي الـ Production؟** لا: بيانات اصطناعية، وبانر Demo، ومزوّدين وهميين، وسيرفر واحد.
 
 **فين الـ Runbooks التشغيلية؟** `docs/operations/` (ابدأ بـ [08-troubleshooting-runbook.md](../../operations/08-troubleshooting-runbook.md) و[11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md)).
 

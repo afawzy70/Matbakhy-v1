@@ -49,7 +49,7 @@ flowchart LR
 
 | البند | الحالة |
 |---|---|
-| عمولة الأوردر | `commission_rate_bps` حقل في سياسة التجارة اللي ليها إصدارات، وبيتعمل له Snapshot على كل أوردر (`customer_order.commission_bps_snapshot`، `commission_minor`). **مثبّت على 0**: السياسة الحية (مش التجريبية) لازم معدّلها 0 (فحص V23)، والـ API بيرفض المعدّلات غير الصفرية. IMPLEMENTED كخامل. |
+| عمولة الأوردر | `commission_rate_bps` حقل في سياسة التجارة اللي ليها إصدارات، وبيتعمل له Snapshot على كل أوردر (`customer_order.commission_bps_snapshot`، `commission_minor`). **مثبّت على 0**: السياسة الحية (غير اصطناعية (non-synthetic)) لازم معدّلها 0 (فحص V23)، والـ API بيرفض المعدّلات غير الصفرية. IMPLEMENTED كخامل. |
 | رسوم العميل | مفيش. الـ Quote مفيهاش بند رسوم خدمة. |
 | دفعات التسوية | الكود موجود (`FinanceOpsService.createSettlement`) لكن مجموعات الـ Ledger بمبالغ صفر مينفعش تتجمّع في دفعة (`ZERO_AMOUNT`)، فالتسوية خاملة تحت صفر عمولة (حالة المالك E2E-FIN-110). |
 | الظهور المدفوع / الإعلانات | PLANNED بس؛ مفيش كود. |

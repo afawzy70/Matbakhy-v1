@@ -1,7 +1,7 @@
 # رحلات المستخدم: المالية والدعم
 
 > **Owner role:** Business documentation
-> **Status:** PARTIALLY IMPLEMENTED — مطابقة العربون، والاستردادات، والتسويات، وكشوف الحساب، وحالات الدعم ليها API وشاشات؛ والتحقق من تقرير الكاش له API ومفيش له شاشة؛ كل الفلوس بيانات تجريبية والفلوس الحية مقفولة بشروط.
+> **Status:** PARTIALLY IMPLEMENTED — مطابقة العربون، والاستردادات، والتسويات، وكشوف الحساب، وحالات الدعم ليها API وشاشات؛ والتحقق من تقرير الكاش له API ومفيش له شاشة؛ كل الفلوس بيانات اصطناعية (Synthetic) والفلوس الحية مقفولة بشروط.
 > **Language / اللغة:** [English](finance-and-support.md) · العربية
 
 قواعد الفلوس اللي لازم تفتكرها: صفر عمولة لمطبخي ومفيش رسوم منصة على العميل في الـ MVP؛ مطبخي عمره ما بيمسك فلوس العميل؛ والعربون تحويل يدوي مباشر من العميل للمستلم المعتمد عند المطبخ، والمطبخ **بيبلّغ** عن الاستلام (عمره ما يتقال "متحقق منه بنكيًا"). الخلفية: [التسعير والدفع](../01-business/pricing-and-payments-ar.md)، `docs/product/09-deposit-payment-states.md`، [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md). صلاحيات الـ Staff: [إدارة الـ Backoffice](backoffice-admin-ar.md).
@@ -41,7 +41,7 @@
 11. **الأخطاء.** `ORDER_ENDED`، `NO_DEPOSIT_WAITING`، `NOTHING_TO_DISPUTE`، `NOTHING_TO_DECIDE`، `ORDER_ACTIVE`، المستلم `MISSING`؛ العملاء مايقدروش يفرضوا مبالغ (E2E-FIN-041).
 12. **الاختبارات.** `DepositPaymentIntegrationTest.java`، `PaymentReconciliationIntegrationTest.java`، وفي الويب `App.test.tsx` (بلوكات MB-053 في ويب العميل والموبايل).
 13. **اختبارات المالك E2E.** من E2E-FIN-039 لـ E2E-FIN-042، E2E-FIN-045، E2E-FIN-101، E2E-FIN-103، من E2E-FIN-106 لـ E2E-FIN-109، E2E-FIN-113، E2E-FIN-115، E2E-COOK-108؛ J3، J4.
-14. **الحالة.** IMPLEMENTED بمستلمين تجريبيين؛ والفلوس الحقيقية DISABLED بقرار المالك (E2E-FIN-047).
+14. **الحالة.** IMPLEMENTED بمستلمين وهميين؛ والفلوس الحقيقية DISABLED بقرار المالك (E2E-FIN-047).
 15. **القيود.** مفيش API بنك، ومفيش مطابقة تلقائية: الإنسان هو اللي بيطابق.
 
 ## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)

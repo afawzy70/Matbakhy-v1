@@ -64,7 +64,7 @@
 | Snapshot | نسخة مجمّدة من محتوى الوجبة والأسعار وإصدارات السياسات وبيانات التواصل والعنوان، متخزّنة على الأوردر | `order_item.meal_snapshot`، `customer_order` |
 | Meal revision | إصدار غير قابل للتعديل من محتوى الوجبة، شامل السعر | `meal_revision` |
 | Commerce policy | إعدادات بيزنس بإصدارات: الضريبة، العمولة، مدة صلاحية الـ Quote، نوافذ القبول، وإصدارات الشروط والإلغاء | `commerce_policy`، `CommercePolicies` |
-| Synthetic policy | سياسة وهمية مسموحة بس في local/CI/preview؛ السياسات الحقيقية محتاجة مرجع موافقة | `SyntheticPolicyPermission` |
+| Synthetic policy | سياسة اصطناعية مسموحة بس في local/CI/preview؛ السياسات الحقيقية محتاجة مرجع موافقة | `SyntheticPolicyPermission` |
 | Reservation / allocation / consumption | مراحل المخزون التلاتة: الأوردر اتسجّل، الأوردر اتقبل، التحضير بدأ | `SlotInventory.Stage` |
 | Cutoff | بداية الـ Slot ناقص مهلة الطلب المسبق (lead time)؛ بعده مفيش أوردرات جديدة ولا تعديل للسعة | `cook_slot.cutoff_at` |
 | Acceptance deadline (`acceptBy`) | الوقت اللي الأوردر المعلّق بينتهي فيه | `customer_order.accept_by` |

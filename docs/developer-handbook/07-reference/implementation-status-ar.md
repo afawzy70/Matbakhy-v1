@@ -5,7 +5,7 @@
 > **Language / اللغة:** [English](implementation-status.md) · العربية
 
 الوسوم بتتبع اصطلاح الدليل (IMPLEMENTED, PARTIALLY IMPLEMENTED, PLANNED, DISABLED, DEPRECATED, NOT VERIFIED).
-**IMPLEMENTED معناها إن الكود موجود وفيه اختبار آلي بيشغّله اتلاقى في الـ Repository.** مش معناها إن الاختبار نجح في الجلسة دي (كتّاب الدليل ماشغّلوش الـ Suites) ولا إن مراجع مستقل قبله، ومعناها أبدًا مش "شغّال فعليًا": مفيش بيئة Production، والفلوس الحقيقية متقفّل عليها بـ Gate (D16)، وبيئة PREVIEW التجريبية بس هي اللي اتنشرت (شوف التعارضات تحت). حالة الـ Story في `planning/backlog.json` وحالة السيناريو في `planning/scenarios.json` تلميحات اتقارنت بغيرها، مش حاجات بنثق فيها.
+**IMPLEMENTED معناها إن الكود موجود وفيه اختبار آلي بيشغّله اتلاقى في الـ Repository.** مش معناها إن الاختبار نجح في الجلسة دي (كتّاب الدليل ماشغّلوش الـ Suites) ولا إن مراجع مستقل قبله، ومعناها أبدًا مش "شغّال فعليًا": مفيش بيئة Production، والفلوس الحقيقية متقفّل عليها بـ Gate (D16)، وبيئة PREVIEW ببيانات اصطناعية (Synthetic) بس هي اللي اتنشرت (شوف التعارضات تحت). حالة الـ Story في `planning/backlog.json` وحالة السيناريو في `planning/scenarios.json` تلميحات اتقارنت بغيرها، مش حاجات بنثق فيها.
 
 إزاي اتستخرجت الحالة: الـ Controller موجود والـ Route في `contracts/endpoints.json` مع `implemented: true` (113 من 116 Route)؛ كود الـ Service اتقرا؛ والـ Test class اتلاقى بمعرّف السيناريو أو باسم المنطقة في `backend/app/src/test/java/com/matbakhy/app/`، و`apps/*/src/*.test.tsx`، و`packages/*/test/`؛ والـ Migration موجودة. أعداد الاختبارات أو نتايج النجاح **مش** مؤكَّدة هنا.
 
@@ -30,7 +30,7 @@
 | دورة حياة الأوردر، وأكواد التسليم، وـ Job الانتهاء، وإلغاء الاستثناء من العمليات وتجاوز التسليم | IMPLEMENTED | `OrderLifecycleIntegrationTest`، TC-026..031 |
 | الكاش عند الاستلام: تبليغ الطبّاخ، وتحقق المالية، وفصل المهام | IMPLEMENTED | `CashAndLedgerIntegrationTest` |
 | دفتر الأستاذ (Ledger) (متوازن، للإضافة فقط)، والاستردادات، والتسويات، وكشوف الحساب | IMPLEMENTED | `CashAndLedgerIntegrationTest`، `FinanceOperationsIntegrationTest`؛ العمولة 0 عند الإطلاق (`ZeroCommissionIntegrationTest`، D10) |
-| عمولة المنصة ورسوم المنصة على العميل | DISABLED | قدرة نايمة: الـ Database بترفض أي نسبة مش صفر للسياسات غير التجريبية (V23)؛ D10 |
+| عمولة المنصة ورسوم المنصة على العميل | DISABLED | قدرة نايمة: الـ Database بترفض أي نسبة مش صفر للسياسات غير الاصطناعية (non-synthetic) (V23)؛ D10 |
 | مدفوعات العربون (اعتماد مستلم مدفوعات المطبخ، تبليغ العميل، استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **الفلوس الحقيقية متقفّل عليها** (D16، مراجعة قانونية/مزوّد) |
 | بوابة دفع آلية، وتحقق بنكي، وEscrow، وصندوق ضمان | PLANNED (بحث مستقبلي فقط) | `docs/strategy/mvp-direct-deposit-payment.md` بيوسمهم مؤجَّلين |
 | صندوق الإشعارات داخل التطبيق، وـ Outbox Dispatcher بـ Leases/إعادة محاولة/Dead Letters | IMPLEMENTED | `NotificationIntegrationTest` |
@@ -69,7 +69,7 @@
 | البند | الحالة | الدليل |
 |---|---|---|
 | الـ Stack المحلي (`scripts/dev.sh`، `infra/compose.yaml`) | IMPLEMENTED | MB-008 DONE |
-| المعاينة (بيانات تجريبية، `APP_ENV=PREVIEW`) | IMPLEMENTED (اتنشرت مرة؛ الحالة الحالية NOT VERIFIED) | `deploy/web-preview/`؛ `docs/quality/owner-acceptance/run-2026-10-19.md` بيسجّل تطبيق Fixtures على إصدار معاينة |
+| المعاينة (بيانات اصطناعية، `APP_ENV=PREVIEW`) | IMPLEMENTED (اتنشرت مرة؛ الحالة الحالية NOT VERIFIED) | `deploy/web-preview/`؛ `docs/quality/owner-acceptance/run-2026-10-19.md` بيسجّل تطبيق Fixtures على إصدار معاينة |
 | مجموعة قبول المالك (200 حالة) | NOT VERIFIED | `docs/quality/owner-acceptance/generated/traceability.json`: 192 NOT_RUN، 8 BLOCKED |
 | بيئات الـ Staging والـ Production | PLANNED | MB-040، MB-044 TODO؛ `APP_ENV=STAGING` بيرفض يشتغل من غير مزوّدين حقيقيين |
 | بوابات الأدلة (مرشّح الإصدار) | PLANNED | MB-043 TODO |

@@ -4,7 +4,7 @@
 > **Status:** PARTIALLY IMPLEMENTED — الـ Local Stack المبني على Docker وخوادم Vite للتطوير موجودين (IMPLEMENTED) والـ CI بيجرّبهم على Linux؛ وإجراءات Windows/macOS وتشغيل الـ API برّه Docker هي NOT VERIFIED.
 > **Language / اللغة:** [English](local-environment.md) · العربية
 
-سطّب الأدوات الأول ([prerequisites.md](prerequisites-ar.md)). كل حاجة هنا بتستخدم بيانات تجريبية وSecrets محلية بس.
+سطّب الأدوات الأول ([prerequisites.md](prerequisites-ar.md)). كل حاجة هنا بتستخدم بيانات اصطناعية (Synthetic) وSecrets محلية بس.
 
 ## اللي بيوفّره `scripts/dev.sh`
 
@@ -24,7 +24,7 @@
 |---|---|
 | `scripts/dev.sh doctor` | بيتحقق من المتطلبات المسبقة؛ مابيشغّلش حاجة |
 | `scripts/dev.sh up` | `doctor`، وبينشئ ملف الـ env لو ناقص، وبيبني الـ API jar (`./mvnw -DskipTests package`)، وبيرندر الـ Realm، و`docker compose up --build --detach --wait` |
-| `scripts/dev.sh smoke` | الصحة، وFlyway baseline، ومناطق التطوير، وOIDC discovery، وS3 buckets، والتقاط البريد، وإنفاذ PKCE، واستجابة 401 للمستخدم المجهول، وتسجيل دخول OIDC من الويب بمستخدم تجريبي، ودورة رفع خاص موقّع |
+| `scripts/dev.sh smoke` | الصحة، وFlyway baseline، ومناطق التطوير، وOIDC discovery، وS3 buckets، والتقاط البريد، وإنفاذ PKCE، واستجابة 401 للمستخدم المجهول، وتسجيل دخول OIDC من الويب بمستخدم وهمي، ودورة رفع خاص موقّع |
 | `scripts/dev.sh down` | بيوقف الـ Containers وبيحتفظ بـ Volume البيانات |
 | `scripts/dev.sh reset` | بيوقف ويمسح Volume الـ Stack ده (وبيرفض ملفات env مش معلّمة إنها محلية) |
 | `scripts/dev.sh verify` | `doctor` + `up` + `smoke` في مشروع Compose مؤقت على بورتات بديلة (15432، 18180، 18080 ...)، وبيتشال عند الخروج |
@@ -39,11 +39,11 @@ scripts/dev.sh smoke      # prints PASS only if every check passed
 
 `up` بينشئ ملف الـ env المحلي (infra/.env، متجاهل من Git) من `infra/.env.example` بكلمات سر عشوائية (صلاحية 600). الملف متجاهل من Git (`.gitignore` بيتجاهل `.env` و`.env.*`) ولازم يحمل `MATBAKHY_ENV_MARKER=local`؛ والسكريبت بيرفض أي ملف تاني. الـ Realm المترندر بيروح على infra/.generated/ (متجاهل من Git). عشان تفصل أكتر من Stack عن بعض اظبط `MATBAKHY_ENV_FILE` و`COMPOSE_PROJECT_NAME`.
 
-## المستخدمين التجريبيين
+## المستخدمين الوهميين
 
 الـ Realm المحلي (`infra/identity/matbakhy-realm.json`) بيعرّف `customer-a` و`customer-b` و`cook-a` و`ops-a`، بالإضافة لحساب الخدمة `service-account-matbakhy-admin`. كل المستخدمين ليهم نفس كلمة السر، `DEV_USER_PASSWORD` في ملف الـ env المحلي بتاعك. اقراها من ملفك لما تحتاجها؛ وماتلصقهاش في أي مكان. الـ SMS مش متاح محليًا، وتسجيل الـ MFA التفاعلي المحلي NOT VERIFIED (الـ Realm بيعرّف تدفق OTP في `infra/identity/matbakhy-realm.json`)؛ واختبارات المتصفح بتحاكي التحقق من التليفون بـ SQL (شوف `apps/operations-web/e2e/fixtures.ts`).
 
-بيانات التطوير بتيجي من سكريبتات Flyway المتكررة في `backend/app/src/main/resources/db/devdata` (مناطق خدمة اسمها `test-zone-*`، وسياسة تجارة تجريبية). `EnvironmentGuard` (`backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`) بيرفض البروفايل `dev` أو مواقع devdata لما `APP_ENV` يكون STAGING أو PRODUCTION؛ وLOCAL وCI وPREVIEW بيتحسبوا بيئات تجريبية.
+بيانات التطوير بتيجي من سكريبتات Flyway المتكررة في `backend/app/src/main/resources/db/devdata` (مناطق خدمة اسمها `test-zone-*`، وسياسة تجارة اصطناعية). `EnvironmentGuard` (`backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`) بيرفض البروفايل `dev` أو مواقع devdata لما `APP_ENV` يكون STAGING أو PRODUCTION؛ وLOCAL وCI وPREVIEW بيتحسبوا بيئات اصطناعية.
 
 ## الـ Frontends
 

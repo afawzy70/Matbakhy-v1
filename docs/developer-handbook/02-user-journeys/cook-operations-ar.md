@@ -127,7 +127,7 @@
 11. **الأخطاء.** `ORDER_ENDED` (بلّغ عن استرداد بدلها)، `NO_DEPOSIT_WAITING`، تقرير كاش واحد لكل أوردر (E2E-FIN-102)، لازم مبلغ الاستلام يتطابق (E2E-FIN-041).
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `PaymentReconciliationIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/finance/CashAndLedgerIntegrationTest.java`، `ZeroCommissionIntegrationTest.java`، `apps/operations-web/e2e/money-reflow.e2e.ts`.
 13. **اختبارات المالك E2E.** E2E-FIN-038، E2E-FIN-039، E2E-FIN-040، E2E-FIN-043، E2E-FIN-106، E2E-FIN-107، E2E-FIN-108، E2E-FIN-109، E2E-FIN-111، E2E-FIN-102، E2E-COOK-108؛ من J2 لـ J4.
-14. **الحالة.** IMPLEMENTED (بيانات تجريبية؛ الفلوس الحية مقفولة بشروط).
+14. **الحالة.** IMPLEMENTED (بيانات اصطناعية (Synthetic)؛ الفلوس الحية مقفولة بشروط).
 15. **القيود.** تفاصيل تحويل العربون إفادة من المطبخ، مش تأكيد بنكي.
 
 ## CO-7 إعدادات المطبخ، الإيقاف المؤقت، والتعليق

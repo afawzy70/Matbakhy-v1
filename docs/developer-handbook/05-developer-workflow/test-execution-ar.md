@@ -89,15 +89,15 @@ python3 scripts/owner_e2e_fixtures.py check    # manifest, SQL seed and case fil
 
 اقرا بالترتيب ده: [README قبول المالك](../../quality/owner-acceptance/README.md)، و`docs/quality/owner-acceptance/generated/readiness-report.md`، والرحلات المرتبة J0-J8 في `docs/quality/owner-acceptance/generated/core-owner-acceptance-suite.md`، و[fixtures.md](../../quality/owner-acceptance/fixtures.md)، و[owner-e2e-execution-guide.md](../../quality/owner-e2e-execution-guide.md). دليل المالك بالعربي المصري هو [owner-guide-ar.md](../../quality/owner-acceptance/owner-guide-ar.md)؛ وآخر تشغيل متسجّل هو `docs/quality/owner-acceptance/run-2026-10-19.md`.
 
-## الـ Fixtures التجريبية
+## الـ Fixtures الاصطناعية (Synthetic)
 
-مفيش غير أطراف تجريبية: `customer-a/b` و`cook-a` و`ops-a` محليًا؛ و`preview-customer-1/2` و`preview-cook-1` و`preview-ops-1/2` وحسابات `owner-e2e-*` على بيئة المعاينة. كلمات السر مش موجودة في الـ Repository أبدًا؛ والملفات المتولّدة بتروح لمجلد خاص برّه الـ Checkout. ماتستخدمش أرقام تليفونات ولا عناوين ولا أسامي حقيقية في أي مكان، بما فيها لقطات الشاشة.
+مفيش غير أطراف وهمية: `customer-a/b` و`cook-a` و`ops-a` محليًا؛ و`preview-customer-1/2` و`preview-cook-1` و`preview-ops-1/2` وحسابات `owner-e2e-*` على بيئة المعاينة. كلمات السر مش موجودة في الـ Repository أبدًا؛ والملفات المتولّدة بتروح لمجلد خاص برّه الـ Checkout. ماتستخدمش أرقام تليفونات ولا عناوين ولا أسامي حقيقية في أي مكان، بما فيها لقطات الشاشة.
 
 ## الأدلة والتعامل مع العيوب
 
 - دليل كل Story: `verification/runs/<date>-<story>/evidence.json` بيكتبه `scripts/record_evidence.py` على مصدر نضيف معمول له Commit؛ و`scripts/mark_story.py` بيرفض DONE من غير دليل ناجح ومراجعة PASS. فحوصات الـ Schema: `python3 scripts/validate_blueprint.py`.
 - مفردات النتايج: PASS لحاجة اتنفّذت ومعاها مخرجات بس؛ غير كده NOT_RUN أو BLOCKED أو FAIL. الـ CI الأخضر مش معناه "كل السيناريوهات نجحت" ([owner-e2e-execution-guide.md](../../quality/owner-e2e-execution-guide.md)).
-- بلّغ عن العيب بقالب GitHub issue اسمه `.github/ISSUE_TEMPLATE/defect.md` (معرّفات الـ Story/القاعدة/السيناريو، والـ Source Commit، والخطورة، ومعرّفات الـ Fixtures التجريبية، والخطوات، والمتوقع، والملاحظ، والـ Logs بعد التنضيف، والثوابت المتأثرة).
+- بلّغ عن العيب بقالب GitHub issue اسمه `.github/ISSUE_TEMPLATE/defect.md` (معرّفات الـ Story/القاعدة/السيناريو، والـ Source Commit، والخطورة، ومعرّفات الـ Fixtures الاصطناعية، والخطوات، والمتوقع، والملاحظ، والـ Logs بعد التنضيف، والثوابت المتأثرة).
 - إصلاح عيب: اعمل Reproduce باختبار آلي بيفشل الأول لو ممكن، وبعدين صلّح، وأعد تشغيل الـ Suite المتأثرة والمجاورة ليها، وبعدين اذكر الاختبار في الـ PR. تغطية الـ Regression جزء من الإصلاح، مش اختيارية.
 
 ## القيود المعروفة وفجوات التوثيق

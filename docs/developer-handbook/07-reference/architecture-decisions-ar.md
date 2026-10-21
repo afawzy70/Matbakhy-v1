@@ -36,7 +36,7 @@
 | D13 | تغيّر السعر قبل التسجيل: رفض الـ Quote القديم، وإعادة تأكيد صريحة | ACCEPTED | أيوه — [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) | `docs/product/rq-004-stale-quote.md` |
 | D14 | تاريخ أسعار المطبخ | ACCEPTED | أيوه — `MealService.priceHistory` | |
 | D15 | نافذة التنفيذ اليومية | ACCEPTED | قاعدة عملية، مش كود | `docs/delivery/06-daily-execution.md` |
-| D16 | دفع الـ MVP: COD المؤهل + عربون يدوي مباشر بيبلّغ عنه المطبخ؛ مش "متحقق منه بنكيًا" أبدًا؛ والفلوس الحقيقية متقفّلة بـ Gate | ACCEPTED | أيوه (اصطناعي/معاينة بس) — [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md) | `docs/strategy/mvp-direct-deposit-payment.md` |
+| D16 | دفع الـ MVP: COD المؤهل + عربون يدوي مباشر بيبلّغ عنه المطبخ؛ مش "متحقق منه بنكيًا" أبدًا؛ والفلوس الحقيقية متقفّلة بـ Gate | ACCEPTED | أيوه (اصطناعي (Synthetic)/معاينة بس) — [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md) | `docs/strategy/mvp-direct-deposit-payment.md` |
 | D17 | الأساسيات مجانية؛ قياس النشاط العضوي وأداء المطبخ بشكل بيحافظ على الخصوصية؛ مفيش وظيفة حملات مدفوعة | ACCEPTED | أيوه — `ActivityController`، `InsightsController` | `docs/product/10-organic-activity-and-cook-insights.md` |
 | D18 | MFA قابل للضبط بينفّذه Keycloak؛ السياسة DISABLED / OPTIONAL / REQUIRED لكل فئة حساب | ACCEPTED | أيوه — `MfaPolicyService`، V31 | `docs/security/mfa-policy.md` |
 | O01..O10 | قرارات مالك مفتوحة: مدينة/مناطق الإطلاق، الكاش مقابل الدفع المسبق عند الإطلاق، مسؤولية التوصيل، سياسة الاسترداد/الضريبة/الفواتير، تصريح العلامة التجارية، سياسة نشاط الغذاء والخصوصية، المزوّدين/الاستضافة، حسابات Apple/Google، جهات اتصال الدعم، الميزات الاجتماعية | OPEN | لا ينطبق — بتقفل التشغيل الفعلي، مش الكود | `docs/product/01-context-and-decisions.md` "Open decisions" |

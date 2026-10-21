@@ -52,7 +52,7 @@
 | `V30__media_cleanup.sql` | `media_cleanup` (طابور حذف الـ Objects الدائم) | CR2-001 |
 | `V31__mfa_policy.sql` | `mfa_policy`، `user_mfa_preference`، `user_mfa_reset`، وكودين صلاحيات جداد | D18 |
 
-قواعد الـ Migrations الجديدة: عمرك ما تعدّل Migration اتطبّقت (ضيف `V32` وما بعدها)؛ وابدأ أي Migration ممكن تكسر الـ API السابق بتعليق `-- rollback-compat:`. السكريبت `scripts/check_migration_compat.py` بيفرض التعليق ده للـ Migrations اللي بعد V28 (`BASELINE = 28`)؛ شوف [CI/CD](../05-developer-workflow/ci-cd-ar.md). البيانات التجريبية للتطوير هي Migrations قابلة للتكرار في `backend/app/src/main/resources/db/devdata` (`R__dev_commerce_policy.sql`، `R__dev_service_zones.sql`)، بتتحمّل بالـ Profile اسمه `dev` بس، اللي `EnvironmentGuard` بيمنعه برّه LOCAL/CI/PREVIEW.
+قواعد الـ Migrations الجديدة: عمرك ما تعدّل Migration اتطبّقت (ضيف `V32` وما بعدها)؛ وابدأ أي Migration ممكن تكسر الـ API السابق بتعليق `-- rollback-compat:`. السكريبت `scripts/check_migration_compat.py` بيفرض التعليق ده للـ Migrations اللي بعد V28 (`BASELINE = 28`)؛ شوف [CI/CD](../05-developer-workflow/ci-cd-ar.md). البيانات الاصطناعية (Synthetic) للتطوير هي Migrations قابلة للتكرار في `backend/app/src/main/resources/db/devdata` (`R__dev_commerce_policy.sql`، `R__dev_service_zones.sql`)، بتتحمّل بالـ Profile اسمه `dev` بس، اللي `EnvironmentGuard` بيمنعه برّه LOCAL/CI/PREVIEW.
 
 ## الكيانات الأساسية والعلاقات
 

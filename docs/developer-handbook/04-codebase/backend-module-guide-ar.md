@@ -84,7 +84,7 @@ flowchart TD
   `AccountLifecycleService.java` و`AccountErasureService.java` + `AccountErasureJob.java`.
 - الـ APIs اللي بيقدّمها (`identity/api`): `Permission` (Enum صلاحيات الموظفين) و`AccessPolicy` و`CurrentAccount` و`AccountDirectory` و
   `AddressDirectory` و`CheckoutContactPolicy` و`GrantDirectory` و`EgyptianPhone` و`PhoneVerificationSender` (Port؛ الـ Fake
-  هو `backend/app/src/main/java/com/matbakhy/app/providers/FakePhoneVerificationSender.java`، ومسموح بس في البيئات التجريبية LOCAL و CI و PREVIEW؛ البيئتين STAGING و PRODUCTION بيرفضوا يشتغلوا من غير Provider حقيقي، O07).
+  هو `backend/app/src/main/java/com/matbakhy/app/providers/FakePhoneVerificationSender.java`، ومسموح بس في البيئات الاصطناعية (Synthetic) LOCAL و CI و PREVIEW؛ البيئتين STAGING و PRODUCTION بيرفضوا يشتغلوا من غير Provider حقيقي، O07).
 - الـ DB: الـ Migrations هي V1 و V2 و V3 و V4 و V21 و V27. الاختبارات: `IdentityIntegrationTest` و `ContactIntegrationTest` و
   `StaffAccessIntegrationTest` و `EgyptianPhoneTest` و `AccountErasureIntegrationTest` (في `backend/app/src/test/java/com/matbakhy/app/identity/` و `.../privacy/`).
 - نقاط التوسعة: صلاحية موظف جديدة (Enum + واجهة المنح + التوثيق)؛ قاعدة تواصل جديدة في `CheckoutContactPolicy`.

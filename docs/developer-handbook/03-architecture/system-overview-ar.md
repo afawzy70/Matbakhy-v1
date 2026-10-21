@@ -1,7 +1,7 @@
 # نظرة عامة على السيستم
 
 > **Owner role:** Backend architecture
-> **Status:** PARTIALLY IMPLEMENTED — منصة الطلبات الأساسية شغّالة على بيئة معاينة ببيانات تجريبية؛ مفيش مزوّدين حقيقيين ولا Push ولا فلوس حقيقية ولا Deployment على الـ Production
+> **Status:** PARTIALLY IMPLEMENTED — منصة الطلبات الأساسية شغّالة على بيئة معاينة ببيانات اصطناعية (Synthetic)؛ مفيش مزوّدين حقيقيين ولا Push ولا فلوس حقيقية ولا Deployment على الـ Production
 > **Language / اللغة:** [English](system-overview.md) · العربية
 
 الصفحة دي هي الخريطة. بتسمّي كل جزء بيتعمل له Deployment، وإيه اللي بيكلّم إيه، وأنهي Integrations حقيقية وأنهي لأ. التفاصيل في الصفحات المجاورة، ومعنى البيزنس في [نموذج الـ Marketplace](../01-business/marketplace-model-ar.md).
@@ -54,7 +54,7 @@
 | Keycloak Admin REST (إعادة ضبط الـ MFA، إنهاء الـ Sessions) | IMPLEMENTED؛ محتاج سر الـ Service-account بتاع `matbakhy-admin`، وإلا العمليتين دول بيردّوا 503 | `backend/app/src/main/java/com/matbakhy/app/mfa/KeycloakAdmin.java`, `docs/security/mfa-policy.md` |
 | تخزين Object متوافق مع S3 | IMPLEMENTED (رفع/قراءة بـ Presigned URLs) | `backend/modules/catalog/src/main/java/com/matbakhy/catalog/api/ObjectStorage.java` |
 | فاحص الـ Malware | DISABLED خارج LOCAL/CI/PREVIEW: التنفيذ الوحيد الموجود وهمي (Fake)؛ وأي بيئة تانية بترفض تشتغل | `backend/app/src/main/java/com/matbakhy/app/providers/FakeMalwareScanner.java`, `ProviderConfiguration.malwareScanner` |
-| التحقق من التليفون بـ SMS | PLANNED: فيه `FakePhoneVerificationSender` بس؛ والبيئات غير التجريبية بترمي Exception وقت الـ Startup | `backend/app/src/main/java/com/matbakhy/app/providers/FakePhoneVerificationSender.java` |
+| التحقق من التليفون بـ SMS | PLANNED: فيه `FakePhoneVerificationSender` بس؛ والبيئات غير الاصطناعية (non-synthetic) بترمي Exception وقت الـ Startup | `backend/app/src/main/java/com/matbakhy/app/providers/FakePhoneVerificationSender.java` |
 | إشعارات الإيميل | PLANNED: فيه Adapter بيكتب في الـ Log بس | `backend/app/src/main/java/com/matbakhy/app/providers/LoggingNotificationChannels.java` |
 | إشعارات الـ Push | DISABLED: الـ Flag اسمه `PUSH_DELIVERY_ENABLED` وقيمته الافتراضية false؛ وحتى لو true فيه Adapter بيكتب في الـ Log بس؛ تطبيق الموبايل بيطلب إذن النظام بس مبيسجّلش Device token | `backend/modules/notifications/src/main/java/com/matbakhy/notifications/internal/OutboxDispatcher.java`, `apps/customer-mobile/src/notificationPermission.ts` |
 | مزوّد دفع / API بنكي / InstaPay | NOT INTEGRATED. العربون تحويلات يدوية من العميل للمطبخ، والأطراف هي اللي بتبلّغ عنها | `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/PaymentService.java` |
@@ -65,9 +65,9 @@
 
 | `APP_ENV` | المعنى | المزوّدين | متعرّف فين |
 |---|---|---|---|
-| `LOCAL` | جهاز المطوّر عن طريق `scripts/dev.sh up` و`infra/compose.yaml` | Fakes، والمفاتيح الخاصة بالتطوير مسموحة، والـ Profile بتاع `dev` بيضيف Migrations تجريبية | `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java` |
+| `LOCAL` | جهاز المطوّر عن طريق `scripts/dev.sh up` و`infra/compose.yaml` | Fakes، والمفاتيح الخاصة بالتطوير مسموحة، والـ Profile بتاع `dev` بيضيف Migrations اصطناعية | `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java` |
 | `CI` | تشغيلات الاختبارات | زي LOCAL | نفس المكان |
-| `PREVIEW` | المعاينة المحدودة الوصول ببيانات تجريبية | الـ Fakes مسموحة، والأسرار لازم تكون حقيقية، وبيظهر إشعار الديمو | `deploy/web-preview/compose.yaml` |
+| `PREVIEW` | المعاينة المحدودة الوصول ببيانات اصطناعية | الـ Fakes مسموحة، والأسرار لازم تكون حقيقية، وبيظهر إشعار الديمو | `deploy/web-preview/compose.yaml` |
 | `STAGING`, `PRODUCTION` | متعرّفين في الـ Enum؛ والتطبيق بيرفض يشتغل من غير مزوّدين حقيقيين | مفيش | `backend/app/src/main/java/com/matbakhy/app/providers/ProviderConfiguration.java` |
 
 يعني النهارده البيئة الوحيدة اللي متعمل لها Deployment هي المعاينة. مفيش بيئة Production ولا فلوس حقيقية ولا SMS/email/push حقيقي ولا إصدار على متاجر التطبيقات. أي كلام عن "staging" في المستندات القديمة اعتبره المعاينة؛ شوف [البنية التحتية والـ Deployment](infrastructure-and-deployment-ar.md).

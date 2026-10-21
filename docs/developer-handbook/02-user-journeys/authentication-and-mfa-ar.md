@@ -15,7 +15,7 @@
 | عميل الموبايل | `matbakhy-mobile`، عام (Public)، PKCE `S256`، نفس خريطة الـ ACR ونفس الـ Mappers | الـ Redirect هو `matbakhy-dev://auth/callback` (تطوير). موجود في القالب المحلي بس؛ قالب المعاينة مفيهوش (NOT VERIFIED على الـ Realm الحي) |
 | عميل الأدمن | `matbakhy-admin`، حساب خدمة (Service Account)، مفيش Flow تفاعلي | الـ Backend بس هو اللي بيستخدمه لإعادة ضبط الـ MFA وإنهاء Sessions المزوّد (`backend/app/src/main/java/com/matbakhy/app/mfa/KeycloakAdmin.java`)؛ السرّ بيتولّد لكل بيئة ومابيتعملوش Commit أبدًا |
 | أدوار الـ Realm | مفيش أي دور معرّف في أي من القالبين | الـ Authorization مش مبني على أدوار Keycloak |
-| مستخدمين تجريبيين (Synthetic) | محلي: `customer-a`، `customer-b`، `cook-a`، `ops-a`؛ معاينة: `preview-customer-1/2`، `preview-cook-1`، `preview-ops-1/2` | كلمات السر بتتولّد برّه الـ Repository |
+| مستخدمين وهميين (Synthetic) | محلي: `customer-a`، `customer-b`، `cook-a`، `ops-a`؛ معاينة: `preview-customer-1/2`، `preview-cook-1`، `preview-ops-1/2` | كلمات السر بتتولّد برّه الـ Repository |
 
 ### الـ Claims اللي الـ Backend بيستخدمها في الـ Token
 

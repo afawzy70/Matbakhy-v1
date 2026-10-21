@@ -30,7 +30,7 @@
 | أسرار الـ Realm باينة قديمة | قيم `OIDC_*_CLIENT_SECRET` في ملف env مختلفة عن الـ realm المتولّد | `scripts/dev.sh reset` ثم `up` |
 | تطبيق الويب: تسجيل الدخول بيحوّل لـ Host غلط أو بيلف في Loop | التطبيقات لازم تشتغل على `localhost:5173` / `5174` (`strictPort`؛ والـ CORS والـ redirect في الـ API متثبتين على دول) | فضّي البورتات؛ وافتح التطبيق على `localhost` |
 | الـ API بيرفض يبدأ: `APP_ENV` ناقص | `matbakhy.environment: ${APP_ENV}` مالوش قيمة افتراضية في `application.yaml` | اضبط `APP_ENV=LOCAL` (الـ compose بيعمل كده) |
-| "The dev profile is not allowed in ..." | `EnvironmentGuard` بيمنع الـ Profile `dev` وdevdata في STAGING/PRODUCTION | شيل `SPRING_PROFILES_ACTIVE=dev` من البيئات غير التجريبية |
+| "The dev profile is not allowed in ..." | `EnvironmentGuard` بيمنع الـ Profile `dev` وdevdata في STAGING/PRODUCTION | شيل `SPRING_PROFILES_ACTIVE=dev` من البيئات غير الاصطناعية (non-synthetic) |
 | الرفع المباشر بيفشل، والـ Signed URL بيشاور على بورت غلط | الـ Signed URLs بتستخدم البورت المنشور على الـ Host (`OBJECT_STORAGE_CLIENT_ENDPOINT`) بينما اتصال الـ API بالتخزين بيستخدم شبكة الـ compose | خلّي `OBJECT_STORAGE_PORT` متسق في ملف env |
 
 ## الاختبارات

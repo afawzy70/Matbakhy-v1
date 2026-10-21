@@ -1,7 +1,7 @@
 # البنية التحتية والـ Deployment
 
 > **Owner role:** Infrastructure and deployment
-> **Status:** PARTIALLY IMPLEMENTED — فيه Stack محلي ومعاينة ببيانات تجريبية محدودة الوصول؛ ومفيش Deployment للـ Staging أو الـ Production، والمعاينة مش Production
+> **Status:** PARTIALLY IMPLEMENTED — فيه Stack محلي ومعاينة ببيانات اصطناعية (Synthetic) محدودة الوصول؛ ومفيش Deployment للـ Staging أو الـ Production، والمعاينة مش Production
 > **Language / اللغة:** [English](infrastructure-and-deployment.md) · العربية
 
 الرسومات: [CI/CD](diagrams-ar.md#13-cicd) و[البنية التحتية للمعاينة](diagrams-ar.md#14-بنية-المعاينة). الإجراءات اليومية مكانها [بيئة المعاينة](../05-developer-workflow/preview-environment-ar.md) و[CI/CD](../05-developer-workflow/ci-cd-ar.md)؛ والصفحة دي بتشرح الأجزاء إيه وإزاي بتتركب مع بعض.
@@ -10,9 +10,9 @@
 
 | البيئة | بتشتغل فين | الإعدادات | البيانات | الغرض |
 |---|---|---|---|---|
-| التطوير المحلي | جهاز المطوّر، Docker Compose + JDK/Node محلي | `infra/compose.yaml`, `scripts/dev.sh` | Fixtures تجريبية من الـ Profile اسمه `dev` | الشغل اليومي |
+| التطوير المحلي | جهاز المطوّر، Docker Compose + JDK/Node محلي | `infra/compose.yaml`, `scripts/dev.sh` | Fixtures اصطناعية من الـ Profile اسمه `dev` | الشغل اليومي |
 | CI | Runners مستضافة على GitHub | `.github/workflows/*.yml` | Testcontainers وStacks Compose مؤقتة | البناء، والاختبار، وفحوصات الـ Native |
-| المعاينة (Preview) | VPS واحد بيشغّل Docker Compose (المشروع `matbakhy-preview`) | `deploy/web-preview/` | تجريبية بس، وعربون محاكى، وإشعارات وهمية، وإشعار ديمو ظاهر | معاينة ويب مبكرة محدودة الوصول للمالك والمختبرين المدعوّين |
+| المعاينة (Preview) | VPS واحد بيشغّل Docker Compose (المشروع `matbakhy-preview`) | `deploy/web-preview/` | اصطناعية بس، وعربون محاكى، وإشعارات وهمية، وإشعار ديمو ظاهر | معاينة ويب مبكرة محدودة الوصول للمالك والمختبرين المدعوّين |
 | Staging, Production | مفيش | الأسماء موجودة في الكود بس | n/a | PLANNED؛ والتطبيق بيرفض يشتغل هناك من غير مزوّدين حقيقيين |
 
 متوصفش المعاينة إنها Production: هي بتشتغل بـ `APP_ENV=PREVIEW` مع مزوّدين وهميين وFixtures الـ Profile بتاع التطوير ومن غير فلوس حقيقية وعلى Host واحد من غير Redundancy.
@@ -113,4 +113,4 @@
 
 * **تعارض في تسمية المزوّد.** الملفين `.github/workflows/deploy-preview.yml` و`.github/workflows/owner-e2e-provision.yml` بيقولوا "Contabo"، و`docs/operations/09-staging-hetzner-preparation.md` و`12-owner-server-setup.md` و`deploy/web-preview/README.md` بيقولوا "Hetzner". الـ Workflow هو اللي بيعمل الـ Deployment فعلًا (الـ Host من سر `STAGING_SSH_HOST`، والدومين `167-86-90-174.sslip.io` مدموج في Build صورة الـ front)؛ والمزوّد NOT VERIFIED من الـ Repository. ومسار السيرفر اللي بيستخدمه الـ CD هو `/srv/matbakhy-staging`، بينما `.env.example` بيقول `/srv/matbakhy-preview`: بقية تانية من تسمية "staging".
 * `deploy/web-preview/README.md` لسه بيقول "Nothing here has been deployed"، وده قديم دلوقتي إن الـ CD بيعمل Deployment مع كل Push على `develop`.
-* المعاينة بتشغّل Spring Profile اسمه `dev` (مسموح لإن `PREVIEW` بتتحسب بيئة تجريبية)، فـ Migrations الـ Fixtures الخاصة بالتطوير شغّالة هناك.
+* المعاينة بتشغّل Spring Profile اسمه `dev` (مسموح لإن `PREVIEW` بتتحسب بيئة اصطناعية)، فـ Migrations الـ Fixtures الخاصة بالتطوير شغّالة هناك.

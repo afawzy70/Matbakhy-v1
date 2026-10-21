@@ -25,7 +25,7 @@
 
 * الـ Android config plugin اسمه `apps/customer-mobile/plugins/withLocalhostCleartext.cjs`، وبيشتغل بس لما `extra.environment` تكون `development`: بيسمح بـ HTTP من غير تشفير (cleartext) لـ `localhost` و`10.0.2.2` عشان الـ Emulator يقدر يوصل لمزوّد الهوية والـ API المحليين. إعدادات الإصدار للبيئات التانية عمرها ما بتاخده.
 * iOS: جلسة Authentication من نوع `ephemeral` (`preferEphemeralSession: true`) عشان متصفح النظام ميعيدش استخدام Cookie المزوّد بتاعة الشخص اللي قبله من غير ما يبان.
-* أصول الاختبار الـ Native (في الـ CI بس، مش بتتشحن): `apps/customer-mobile/scripts/*.sh` (رحلات كاملة للتشغيل والـ Authentication والأوردر على Android وiOS)، و`apps/customer-mobile/e2e-ios` (مشروع XcodeGen فيه تطبيق مضيف وحزمة XCUITest بتشغّل التطبيق المتسطّب)، و`apps/customer-mobile/e2e-native` (SQL للـ Seed التجريبي، وSQL لتغيّر السعر والعربون، و`slow_proxy.py`، وهو TCP proxy بيأخّر الاتصال بيستخدم لمحاكاة "السيرفر عمل الأوردر بس التطبيق مسمعش رد").
+* أصول الاختبار الـ Native (في الـ CI بس، مش بتتشحن): `apps/customer-mobile/scripts/*.sh` (رحلات كاملة للتشغيل والـ Authentication والأوردر على Android وiOS)، و`apps/customer-mobile/e2e-ios` (مشروع XcodeGen فيه تطبيق مضيف وحزمة XCUITest بتشغّل التطبيق المتسطّب)، و`apps/customer-mobile/e2e-native` (SQL للـ Seed الاصطناعي (Synthetic)، وSQL لتغيّر السعر والعربون، و`slow_proxy.py`، وهو TCP proxy بيأخّر الاتصال بيستخدم لمحاكاة "السيرفر عمل الأوردر بس التطبيق مسمعش رد").
 
 ## الإعدادات
 

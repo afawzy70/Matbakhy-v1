@@ -65,7 +65,7 @@ flowchart LR
 
 ## حدود الجاهزية للـ Production
 
-بيئة المعاينة اصطناعية، ومقيّدة بـ IP، وسيرفر واحد، ومفيهاش مزودين حقيقيين ولا فلوس حقيقية. مفيش بيئة Production ولا Deployment عام ولا تقديم للمتاجر ولا دفع فعلي في الـ Repository؛ وده كله محتاج تفويض من المالك وبوابات قانونية/مزودين ([CLAUDE.md](../../../CLAUDE.md)). ماتوصفش Deployment أخضر على إنه جاهزية للـ Production. شوف [preview-environment.md](preview-environment-ar.md).
+بيئة المعاينة اصطناعية (Synthetic)، ومقيّدة بـ IP، وسيرفر واحد، ومفيهاش مزودين حقيقيين ولا فلوس حقيقية. مفيش بيئة Production ولا Deployment عام ولا تقديم للمتاجر ولا دفع فعلي في الـ Repository؛ وده كله محتاج تفويض من المالك وبوابات قانونية/مزودين ([CLAUDE.md](../../../CLAUDE.md)). ماتوصفش Deployment أخضر على إنه جاهزية للـ Production. شوف [preview-environment.md](preview-environment-ar.md).
 
 ## القيود المعروفة وفجوات التوثيق
 

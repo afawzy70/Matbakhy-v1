@@ -1,12 +1,12 @@
 # بيئة المعاينة
 
 > **Owner role:** Infrastructure and deployment
-> **Status:** PARTIALLY IMPLEMENTED — بيئة معاينة ببيانات تجريبية على VPS واحد بتتنشر من `develop` بواسطة `.github/workflows/deploy-preview.yml`؛ هي مش Staging ومش Production. حالة السيرفر ماتفحصتش وقت كتابة الصفحة (NOT VERIFIED).
+> **Status:** PARTIALLY IMPLEMENTED — بيئة معاينة ببيانات اصطناعية (Synthetic) على VPS واحد بتتنشر من `develop` بواسطة `.github/workflows/deploy-preview.yml`؛ هي مش Staging ومش Production. حالة السيرفر ماتفحصتش وقت كتابة الصفحة (NOT VERIFIED).
 > **Language / اللغة:** [English](preview-environment.md) · العربية
 
 ## هي إيه
 
-بيئة الوصول ليها مقيّد، ومعلّمة إنها Demo، وبياناتها تجريبية، وبتشتغل بـ Docker Compose من `deploy/web-preview` (`compose.yaml`، وملف `compose.4gb.yaml` الاختياري لتعديل الأحجام، وCaddy كـ Reverse Proxy في `deploy/web-preview/Caddyfile`، وقالب Keycloak realm تحت `deploy/web-preview/identity`، وتخزين متوافق مع S3 تحت `deploy/web-preview/storage`، وإعدادات Grafana/Loki/Prometheus تحت `deploy/web-preview/observability`). الـ API بيشتغل بـ `APP_ENV=PREVIEW`، والكود بيعتبره بيئة تجريبية (مسموح فيها الـ Fixtures ومزوّدي الخدمة اللي مابيبعتوش فعلًا؛ شوف `DeploymentEnvironment` في `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java`). الإعدادات العامة بترجّع `{"environment":{"name":"PREVIEW","demo":true}}`، وده اللي بيتحقق منه `deploy/web-preview/smoke.sh`.
+بيئة الوصول ليها مقيّد، ومعلّمة إنها Demo، وبياناتها اصطناعية، وبتشتغل بـ Docker Compose من `deploy/web-preview` (`compose.yaml`، وملف `compose.4gb.yaml` الاختياري لتعديل الأحجام، وCaddy كـ Reverse Proxy في `deploy/web-preview/Caddyfile`، وقالب Keycloak realm تحت `deploy/web-preview/identity`، وتخزين متوافق مع S3 تحت `deploy/web-preview/storage`، وإعدادات Grafana/Loki/Prometheus تحت `deploy/web-preview/observability`). الـ API بيشتغل بـ `APP_ENV=PREVIEW`، والكود بيعتبره بيئة اصطناعية (مسموح فيها الـ Fixtures ومزوّدي الخدمة اللي مابيبعتوش فعلًا؛ شوف `DeploymentEnvironment` في `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java`). الإعدادات العامة بترجّع `{"environment":{"name":"PREVIEW","demo":true}}`، وده اللي بيتحقق منه `deploy/web-preview/smoke.sh`.
 
 الخلفية: [06-web-preview.md](../../operations/06-web-preview.md)، [09-staging-hetzner-preparation.md](../../operations/09-staging-hetzner-preparation.md)، [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md)، [12-owner-server-setup.md](../../operations/12-owner-server-setup.md).
 
@@ -23,7 +23,7 @@
 | `https://kc-admin.<PREVIEW_DOMAIN>` | لوحة إدارة Keycloak، في بيئة Preview بس، وبتتفتح بـ `deploy.sh admin-console enable`؛ بتتعمل بتشديد أمني وبتتقفل تاني لو التحقق فشل | شوف [14-keycloak-admin-console.md](../../operations/14-keycloak-admin-console.md) |
 | `media.<PREVIEW_DOMAIN>` | الـ Bucket العام للميديا | العميل |
 
-مفيش Credentials مكتوبة هنا. أسماء الحسابات التجريبية: `preview-customer-1` و`preview-customer-2` و`preview-cook-1` و`preview-ops-1` و`preview-ops-2`، ومجموعة `owner-e2e-*` بعد ما تتجهّز. كلمات السر محفوظة في الملفات الخاصة بالسيرفر بس والمالك هو اللي بيسلّمها.
+مفيش Credentials مكتوبة هنا. أسماء الحسابات الوهمية: `preview-customer-1` و`preview-customer-2` و`preview-cook-1` و`preview-ops-1` و`preview-ops-2`، ومجموعة `owner-e2e-*` بعد ما تتجهّز. كلمات السر محفوظة في الملفات الخاصة بالسيرفر بس والمالك هو اللي بيسلّمها.
 
 ## مين يقدر يوصلها
 
