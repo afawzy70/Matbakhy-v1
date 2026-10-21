@@ -69,7 +69,7 @@ def heading_texts(text: str) -> list[str]:
     """Heading contents as the Markdown parser sees them (ATX and Setext headings; never headings inside code fences)."""
     from markdown_it import MarkdownIt
     toks = MarkdownIt("commonmark").enable("table").parse(text)
-    return [toks[i + 1].content for i, t in enumerate(toks) if t.type == "heading_open"]
+    return [redact(toks[i + 1].content) for i, t in enumerate(toks) if t.type == "heading_open"]  # credentials never become slugs
 
 
 def dedup_slugs(texts: list[str]) -> list[str]:
@@ -288,8 +288,10 @@ class Validator:
             self.used_exc.add((page, check))
             return
         msg = redact(msg)
-        for sv in self.secret_values:  # a value found in any page is masked wherever a diagnostic would print it (tokens, links, code)
-            msg = msg.replace(sv, "<redacted>")
+        for sv in self.secret_values:  # a value found in any page is masked wherever a diagnostic would print it (tokens, links, code, slugs)
+            for variant in {sv, re.sub(r"[^\w]", "", sv)}:
+                if len(variant) >= 4:
+                    msg = re.sub(re.escape(variant), "<redacted>", msg, flags=re.I)
         self.problems.setdefault(page, []).append(f"[{check}] {msg}")
 
     # ------------------------------------------------------------------ one pair

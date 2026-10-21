@@ -313,6 +313,13 @@ class ParityTests(unittest.TestCase):
         self.assertNotIn("SomeSecret42", flat)
         self.assertProblem(problems, "secrets")
 
+    def test_credential_in_a_heading_never_appears_in_anchor_diagnostics(self) -> None:
+        self.f.edit("a-ar.md", "## الجزء التاني", "## DB_PASSWORD=SomeSecret42!")
+        self.f.edit("a-ar.md", "(#الجزء-التاني)", "(#wrong-anchor)")
+        problems = self.f.check()
+        flat = json.dumps(problems, ensure_ascii=False).lower()
+        self.assertNotIn("somesecret42", flat)
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")
