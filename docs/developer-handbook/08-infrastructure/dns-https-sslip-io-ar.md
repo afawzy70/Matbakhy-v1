@@ -110,7 +110,7 @@ Caddy بيجدّد الشهادات تلقائيًا قبل ما تنتهي، و
 
 ## 2. الأسماء والتوجيه والسلوك الحي
 
-الستة Hosts كلهم متعرّفين في `deploy/web-preview/Caddyfile` (VERIFIED IN CODE). كل Site بيلفّ الـ Directives بتاعته في Route Block عشان الترتيب المكتوب يتحافظ عليه. الـ Access Logs مقفولة. النتايج الحية اتجابت بـ curl من الـ VPS نفسه، فعنوان المتصل هو عنوان السيرفر نفسه؛ والمتصل من شبكة تانية ممكن ياخد رد مختلف في المواضع اللي فيها Access Class (VERIFIED LIVE).
+الستة Hosts كلهم متعرّفين في `deploy/web-preview/Caddyfile` (VERIFIED IN CODE). كل Site بيحطّ الـ Directives بتاعته جوه Route Block عشان يحافظ على ترتيبها المكتوب. الـ Access Logs مقفولة. النتايج الحية اتجابت بـ curl من الـ VPS نفسه، فعنوان المتصل هو عنوان السيرفر نفسه؛ والمتصل من شبكة تانية ممكن ياخد رد مختلف في المواضع اللي فيها Access Class (VERIFIED LIVE).
 
 | الـ Host | اللي بيعمله الـ Caddyfile (VERIFIED IN CODE) | النتيجة الحية (VERIFIED LIVE) | القراءة |
 |---|---|---|---|

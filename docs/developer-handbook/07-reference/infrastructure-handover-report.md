@@ -8,7 +8,7 @@
 
 ## 1. Verdict
 
-**PARTIAL.** The infrastructure handbook (16 English pages, each with a complete Egyptian Arabic mirror) is written, structurally validated and has passed four independent AI review rounds plus a targeted fifth. It is **not** a complete handover: complete-service disaster recovery is BLOCKED (no supported, rehearsed multi-store recovery sequence exists in the repository), the rebuild guide is DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED, and every Docker, firewall, sudo and effective SSH fact is NOT VERIFIED because the observing account has no privileges. No human reviewed the English or the Arabic.
+**PARTIAL.** The infrastructure handbook (17 English pages, each with a complete Egyptian Arabic mirror) is written, structurally validated and underwent five AI review rounds with fixes applied afterwards (a sixth round is under way); it has not been re-reviewed after the last fixes, so no review of the corrected revision is recorded as clean. It is **not** a complete handover: complete-service disaster recovery is BLOCKED (no supported, rehearsed multi-store recovery sequence exists in the repository), the rebuild guide is DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED, and every Docker, firewall, sudo and effective SSH fact is NOT VERIFIED because the observing account has no privileges. No human reviewed the English or the Arabic.
 
 ## 2. What was added
 
@@ -16,7 +16,7 @@
 |---|---|
 | Server and accounts | [Contabo server inventory](../08-infrastructure/contabo-server-inventory.md), [administrator read-only verification](../08-infrastructure/admin-readonly-verification.md) |
 | Rebuild and operations | [server rebuild guide](../08-infrastructure/server-rebuild-guide.md), [deployment pipeline](../08-infrastructure/deployment-pipeline.md), [DNS, HTTPS and sslip.io](../08-infrastructure/dns-https-sslip-io.md), [runtime architecture](../08-infrastructure/runtime-architecture.md) |
-| Recovery and troubleshooting | [backup, restore and disaster recovery](../08-infrastructure/backup-restore-disaster-recovery.md), [infrastructure troubleshooting](../08-infrastructure/infrastructure-troubleshooting.md) |
+| Recovery and troubleshooting | [backup, restore and disaster recovery](../08-infrastructure/backup-restore-disaster-recovery.md), [infrastructure troubleshooting](../08-infrastructure/infrastructure-troubleshooting.md), [complete recovery sequence](../08-infrastructure/complete-recovery-sequence.md) (a PLANNED design, NOT VERIFIED: never rehearsed) |
 | Live Preview | [live Preview access and journeys](../05-developer-workflow/live-preview-access.md) |
 | Onboarding | five infrastructure labs, [day 1](../06-onboarding-labs/infra-day-1-topology-accounts.md) to [day 5](../06-onboarding-labs/infra-day-5-rebuild-recovery.md) |
 | Reference | [documentation coverage and drift report](infrastructure-documentation-coverage.md) and this report |
@@ -44,7 +44,8 @@ Reviewers were separate Codex sessions (AI, not human) that read the pages side 
 | 2 | 16 / 5 | 16 / 43 | Keycloak dump paths discovered, run-list command lacked fields, language findings began |
 | 3 | 14 / 8 | 10 / 21 | a documented `backup` subcommand that does not exist, rollback numbering, rehearsal isolation |
 | 4 | 8 / 7 | 2 / 12 | SSH value wording, seed not idempotent, restore companions, disaster recovery marked BLOCKED |
-| 5 (targeted, 8 pages) | 6 / 7 | 1 / 5 | fixed afterwards; this last fix set was not independently re-reviewed |
+| 5 (targeted, 8 pages) | 6 / 7 | 1 / 5 | fixed afterwards; this fix set was not independently re-reviewed |
+| 6 | to be recorded | to be recorded | round-six counts are added by the supervisor after the round; conformance of the rebuild procedure to the observed host was reviewed in this round; its fixes are not independently re-reviewed |
 
 The language-quality gates (naturalness, grammar, clarity, technical accuracy, terminology, completeness, readability, Markdown and right-to-left presentation) were recorded per page by the reviewers; the last full pass left naturalness or terminology FAIL on several pages, all of which received the round-5 wording fixes. They are therefore NOT VERIFIED as clean after those fixes.
 
@@ -54,6 +55,7 @@ The language-quality gates (naturalness, grammar, clarity, technical accuracy, t
 |---|---|---|
 | Infrastructure engineer | Independent technical reviewers read the pages as an engineer who had never seen the project, checking commands, flags, paths, labels and missing steps against the repository | Several missing steps were found and added; a clean-server rebuild was **not executed** (DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED); complete disaster recovery stays BLOCKED |
 | Software developer | The live Preview walkthroughs were reviewed for semantic parity and against the application sources | A separate new-developer simulation of the new pages was NOT RUN |
+| Fresh engineer, documentation only | A read-only simulation of a new engineer working only from the pages, without the author context | NOT YET RUN |
 
 ## 6. Unverified items and limits
 
@@ -61,7 +63,7 @@ The language-quality gates (naturalness, grammar, clarity, technical accuracy, t
 - The recovery gap: no supported sequence restores the application database, the identity database and the object storage together; the owner decides whether to define and rehearse one.
 - The pages under `docs/operations/` remain English-only and are partly historical.
 - Mermaid and right-to-left rendering were not inspected in a browser.
-- The reviewers and the translators were AI sessions; a human native-speaker and infrastructure review is recommended before the pages are treated as final.
+- The reviewers and the translators were AI sessions; a human native-speaker language review of the Egyptian Arabic, and a separate infrastructure review, are recommended before the pages are treated as final.
 - The deferred DOC-001 limitation is unchanged: a pull request can alter its own documentation check workflow.
 
 ## 7. Follow-up for the owner

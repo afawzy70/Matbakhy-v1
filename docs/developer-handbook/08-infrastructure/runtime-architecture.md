@@ -313,7 +313,7 @@ flowchart LR
     smoke -.->|"failure"| restore[".env restored, no automatic database rollback"]
 ```
 
-How to read it. Nothing is built on the server. The deploy overwrites files tracked in Git but keeps the server `.env` and data (VERIFIED IN CODE). A concurrency group prevents two deploys at once, and `deploy.sh up` takes a lock file in the backups directory so the admin console tooling and the deploy cannot overlap. The user that SSH connects as is the secret STAGING_SSH_USER and is NOT VERIFIED (the deploy directory is owned by devops, which is circumstantial only).
+How to read it. Nothing is built on the server. The deploy overwrites files tracked in Git but keeps the server `.env` and data (VERIFIED IN CODE). A concurrency group prevents two deploys at once, and `deploy.sh up` takes a non-waiting lock file (`.preview-mutation.lock`) in the backups directory and fails at once if another change holds it. `admin-console.sh` takes the same lock only for `enable`, `rollback` and `create-admin`; its `verify`, `disable` and `fixture-clean` commands take no lock and can overlap a deployment, and `deploy.sh backup` takes no lock either (VERIFIED IN CODE: `deploy.sh`, `admin-console.sh`). The user that SSH connects as is the secret STAGING_SSH_USER and is NOT VERIFIED (the deploy directory is owned by devops, which is circumstantial only).
 
 ## 11. Failure and recovery paths
 

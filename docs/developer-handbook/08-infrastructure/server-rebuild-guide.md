@@ -19,6 +19,7 @@
 | DOCUMENTED ONLY | A document or an upstream product manual says it; not confirmed by code or by the host. |
 | OUTDATED / INCORRECT | Conflicts with newer evidence, typically Hetzner-era text. Never follow it as a current instruction. |
 | NOT VERIFIED | Neither the repository nor the live observation settles it. The text names a read-only check an authorized administrator can run. |
+| PROPOSED | A recommended choice of this guide that is not the observed configuration and not read in the repository. It needs review and a rehearsal; never read it as a description of the live host. |
 
 ## How to read this guide
 
@@ -55,6 +56,43 @@ The diagram shows the order of the phases. DNS and the GitHub secrets must exist
 
 The running Preview (answering over HTTPS, see the inventory page) is circumstantial evidence that the CD path works on that host. It is not evidence that this guide, executed from a blank VPS, produces the same result.
 
+## Parity with the observed Contabo host
+
+This table compares each step with the host recorded in [Contabo server inventory](contabo-server-inventory.md). "Reproduces" means the step creates the observed state, as far as the code and the readable observations show. "Differs" means the step gives a recommended or PROPOSED choice that is not the observed one. "NOT VERIFIED" means the observed state cannot be read without an administrator. A step marked "Differs" is a rebuild choice, not a description of the live configuration. Following this guide builds a working Preview; it does not clone the Contabo host.
+
+| Step | Status | Detail |
+|---|---|---|
+| 1. Inputs | Reproduces | The domain `167-86-90-174.sslip.io` and the six hosts match the code and the live DNS. The live allow-lists and ACME e-mail are NOT VERIFIED; owner-selected values are replacements, not parity |
+| 2. VPS | NOT VERIFIED | Size and IPv6 match. Choosing "Ubuntu 24.04" does not give the observed 24.04.5 image and kernel 6.8.0-147-generic. No step sets the observed time zone `Europe/Berlin`, the interface addressing or the disk layout |
+| 3. Base packages | NOT VERIFIED | The packages match the scripts; `unattended-upgrades` present and `fail2ban` absent match. An unpinned `apt-get upgrade` can change the kernel. Live package versions, swap and upgrade settings are NOT VERIFIED |
+| 4. Users and groups | Differs | `adduser` does not reproduce UIDs and GIDs 1000, 1001 and 1002, the recorded supplementary groups or home mode 750. The observed `devops` is in `sudo`; the recipe omits sudo for the deploy account (PROPOSED). Effective sudo rights and the deploy role are NOT VERIFIED. `aiagent` stays outside `sudo` and `docker` |
+| 5. Deploy key | NOT VERIFIED | The key supports the workflow login. The live authorized keys, their number and restrictions, and `STAGING_SSH_USER` are unknown. A newly generated key is a replacement credential (PROPOSED), not evidence of the current arrangement |
+| 6. SSH hardening | Differs | The drop-in is a PROPOSED policy; the effective live settings and root-login policy are NOT VERIFIED. `X11Forwarding no` is optional and differs from the observed `yes` |
+| 7. Firewall | Differs | Public TCP 22, 80 and 443 and Grafana on loopback 3000 match. Enabling `ufw` with these rules is a PROPOSED policy; the live rules, defaults and any Contabo panel firewall are NOT VERIFIED. The guide omits Tailscale, so `tailscaled`, `tailscale0` and the loopback listeners on 3080, 18080 and 38189 are not reproduced |
+| 8. Docker | Differs | The apt command is unpinned. It does not give Docker 29.9.1 and Compose v5.6.0 and does not name `docker-ce-rootless-extras`. Pin versions an administrator has checked (PROPOSED). The live install method is NOT VERIFIED |
+| 9. Docker group | Reproduces | One deploy account in `docker` matches the observed pattern when that account is `devops`. The numeric group ID 988 is not reproduced |
+| 10. Directories | Differs | The staging and backup paths and modes match when the deploy account is `devops`. The guide omits the legacy, auxiliary and tooling directories and adds the QA and metrics directories, whose live existence is NOT VERIFIED. The live `GENERATED_DIR` and `BACKUP_DIR` contents are NOT VERIFIED |
+| 11. Deployment files | Differs | The bootstrap copies `deploy`, `infra`, `scripts` and the fixtures file, which is what the CD job needs. The live staging directory holds a wider repository-like tree |
+| 12. init-secrets | Reproduces | `.env` is created with mode 600 and an existing file is never overwritten. The creation history and the secret values are NOT VERIFIED |
+| 13. `.env` inputs | Differs | The explicit staging `GENERATED_DIR`, the default `BACKUP_DIR`, the unset `COMPOSE_OVERRIDE`, the allow-lists, the push setting, retention and QA settings are PROPOSED values. The live values are NOT VERIFIED |
+| 14. DNS | Reproduces | The six names and the sslip.io IPv4 resolution match. A new IP means a new domain by design. IPv6 DNS is NOT VERIFIED |
+| 15. GitHub secrets | Reproduces | Both workflows use the environment `preview` and the four secrets. The values, their scope and the environment protections are NOT VERIFIED. A separate rehearsal repository is an intentional isolation change |
+| 16. GHCR images | Reproduces | The workflows match the description. The digests that run now and the package access are NOT VERIFIED |
+| 17. Workflow values | Reproduces | The hard-coded domain, login, path, branch and concurrency groups are correctly listed; `owner-e2e-provision.yml` also hard-codes the staging path. Changed concurrency groups in a rehearsal are intentional differences |
+| 18. First deploy | NOT VERIFIED | The sequence matches the workflow and `deploy.sh`. The deployed commit, the digests, the provenance and a clean-server run are NOT VERIFIED |
+| 19. PostgreSQL | NOT VERIFIED | The init scripts, role, internal-only network and image pin match the repository. The live image, roles, schema, volume and initialisation history are NOT VERIFIED |
+| 20. Keycloak realm | Reproduces | Rendering, import command, health check and `KC_HOSTNAME_ADMIN` match; the `id.` root redirect matches. The realm contents and later migrations are NOT VERIFIED |
+| 21. Storage | Reproduces | Internal `storage:8333`, `s3.json` and the bucket commands match; the media root 403 matches. The buckets, permissions and volume contents are NOT VERIFIED |
+| 22. Caddy routing | Reproduces | Six hosts, class checks, the restricted API routes, actuator 404 and the admin switch match. Access from other networks is NOT VERIFIED |
+| 23. Certificates | NOT VERIFIED | The recorded `app.` certificate issuer and dates match. Other certificates, the volume contents and renewal are NOT VERIFIED |
+| 24. Admin console switch | Reproduces | The `enable` sequence and the `create-admin` failure caveat match the code. Full hardening state, administrator state and backup validity are NOT VERIFIED |
+| 25. Synthetic accounts | NOT VERIFIED | The seed behaviour, five realm users and bootstrap subject match the files. Whether the catalogue and accounts exist live is NOT VERIFIED |
+| 26. Smoke test | Reproduces | The commands match `smoke.sh`. The endpoint observations cover only part of the suite; no complete current smoke PASS is established |
+| 27. Owner E2E | Differs | Trigger, environment, secrets, path and lock match. The API check for `APP_ENV=PREVIEW` happens only for `apply`; `plan` runs before it. Live provisioning state is NOT VERIFIED |
+| 28. Backups | Differs | The backup, restore-check and storage-stop description matches the scripts. The cron entry, its time zone and the lock wrapper are PROPOSED. Live backups, schedules and off-server copies are NOT VERIFIED |
+| 29. Logging | NOT VERIFIED | The logging driver, rotation, retention defaults and loopback Grafana match `compose.yaml`. The process behind port 3000, effective retention and service health are NOT VERIFIED |
+| 30. Rollback readiness | NOT VERIFIED | `rollback-plan` and the failure recovery match the code. The live release history, the running digests, migration compatibility and a successful rollback are NOT VERIFIED |
+
 ---
 
 # Part A. Clean installation
@@ -80,10 +118,11 @@ Prerequisite: Step 1. Contabo-specific ordering screens, image catalogue and pan
 
 | Item | Model to follow | Evidence |
 |---|---|---|
-| Operating system | Ubuntu 24.04 LTS (the current host runs 24.04.5, kernel 6.8.0-147-generic) | VERIFIED LIVE |
+| Operating system | Ubuntu 24.04 LTS (the current host runs 24.04.5, kernel 6.8.0-147-generic). Selecting "Ubuntu 24.04" does not reproduce that exact image and kernel; record the exact version if parity matters | VERIFIED LIVE |
 | Size | The current host has 8 vCPU, 23 GiB RAM and a 290 GB disk | VERIFIED LIVE |
 | Minimum for the code | `compose.yaml` memory limits add up to about 6.9 GiB (proxy 256m, postgres 1536m, identity 1g, storage 512m, api 2g, loki 384m, alloy 256m, prometheus 512m, alertmanager 128m, alert-sink 64m, node-exporter 64m, grafana 256m). A smaller host needs `compose.4gb.yaml`, which was sized for 2 vCPU and 4 GB | VERIFIED IN CODE: `deploy/web-preview/compose.yaml`, `deploy/web-preview/compose.4gb.yaml` |
-| Network | Public IPv4 on the first interface; the current host also has public IPv6 | VERIFIED LIVE |
+| Network | Public IPv4 on the first interface; the current host also has public IPv6. Interface addressing and disk layout are provider details this guide does not preserve | VERIFIED LIVE |
+| Time zone | The current host uses `Europe/Berlin`. No step here sets it; setting it is PROPOSED and decides when the cron time in Step 28 fires (`timedatectl` shows the zone) | VERIFIED LIVE |
 | Access at creation | Your SSH public key for the admin account; no password login | DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md` section 1 (Hetzner-era wording, the principle is generic) |
 
 Verification once the VPS exists (laptop, any user): `ssh <admin-user>@<vps-ip> true` returns without prompting for a password. Likely failure: the provider default user differs; use the user named in the provider welcome message.
@@ -97,7 +136,7 @@ Prerequisite: SSH access as a sudo-capable administrator.
 | `sudo apt-get update` then `sudo apt-get -y upgrade` | VPS, `<admin-user>` with sudo | state-changing | `lsb_release -d` shows Ubuntu 24.04 | a kernel package held back by `apt-mark hold`, or a reboot is required: reboot in a quiet window |
 | `sudo apt-get -y install unattended-upgrades ca-certificates curl gnupg openssl python3 tar` | VPS, `<admin-user>` with sudo | state-changing | `command -v openssl python3 curl flock tar` prints five paths | `flock` is in util-linux, normally preinstalled |
 
-Why these packages (VERIFIED IN CODE): `deploy.sh` uses `openssl`, `flock`, `sed`, `awk`; the CD remote script and `admin-console.sh` call `python3`; the CD job streams `tar`; `smoke.sh` uses `curl`. Nothing in the scripts uses `sudo`. `git` is not needed by the CD path (it copies files with `tar`); `docs/operations/12-owner-server-setup.md` installs it only for a manual clone. `unattended-upgrades` is active on the current host (VERIFIED LIVE) but is a convention, not a code requirement. `fail2ban` is not installed on the current host (VERIFIED LIVE) and nothing in the repository requires it. The 2 GiB swap file in the Hetzner-era text was sized for a 4 GB host; whether the current host has swap is NOT VERIFIED and the code does not require it.
+Why these packages (VERIFIED IN CODE): `deploy.sh` uses `openssl`, `flock`, `sed`, `awk`; the CD remote script and `admin-console.sh` call `python3`; the CD job streams `tar`; `smoke.sh` uses `curl`. Nothing in the scripts uses `sudo`. `git` is not needed by the CD path (it copies files with `tar`); `docs/operations/12-owner-server-setup.md` installs it only for a manual clone. `unattended-upgrades` is active on the current host (VERIFIED LIVE) but is a convention, not a code requirement. `fail2ban` is not installed on the current host (VERIFIED LIVE) and nothing in the repository requires it. The package versions are not pinned, so `apt-get upgrade` can install a newer kernel than the observed one; the versions installed are rebuild choices, not a copy of the current host. The 2 GiB swap file in the Hetzner-era text was sized for a 4 GB host; whether the current host has swap is NOT VERIFIED and the code does not require it.
 
 ## Phase 2. Accounts, SSH, firewall, Docker
 
@@ -115,7 +154,7 @@ Prerequisite: Step 3. Do not create accounts by guesswork about roles; the table
 | `devops` | 1001 | devops, sudo, users, docker | Nothing beyond the facts: it owns `/srv/matbakhy-staging`, and is the only member of `docker`. Which account the pipeline logs in as is NOT VERIFIED (it lives in the secret `STAGING_SSH_USER`). |
 | `aiagent` | 1002 | aiagent, users | Nothing. It is deliberately NOT in `sudo` or `docker`; keep any non-human or observer account that way. |
 
-Convention (not required by code): one human administrator with sudo, one deploy account in `docker` that does not need sudo, and any observer or tooling accounts with neither. Whether the current deploy account also has sudo is unknown to this guide; the code does not need it, so a rebuild can omit it.
+PROPOSED convention (not required by code and not the observed arrangement): one human administrator with sudo, one deploy account in `docker` that does not need sudo, and any observer or tooling accounts with neither. The observed `devops` is a member of `sudo`; whether that membership gives it effective sudo rights, and which account the pipeline uses, is NOT VERIFIED. The recipe below does not reproduce the observed UIDs and GIDs (1000, 1001, 1002), the supplementary groups or the home mode 750. It gives the deploy account no sudo membership, which differs from the observed `devops`. Exact reconstruction of the accounts needs administrator-supplied details and is outside this guide. The `aiagent` exclusion from `sudo` and `docker` stays in every case.
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
@@ -126,7 +165,7 @@ Do not add a non-human or observer account to `sudo` or `docker`. Membership of 
 
 ### Step 5. SSH key access for the deploy account
 
-Prerequisite: Step 4. The CD job writes the private key to a file and connects with `BatchMode=yes`, so the key must have no passphrase (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`).
+Prerequisite: Step 4. The key and the installation below are a PROPOSED replacement credential, not evidence of the current arrangement: the live authorized keys, their number, restrictions and source, and the value of `STAGING_SSH_USER`, are NOT VERIFIED; get a sanitized confirmation from the administrator before you claim parity. The CD job writes the private key to a file and connects with `BatchMode=yes`, so the key must have no passphrase (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`).
 
 Generate a dedicated key pair on your laptop (never reuse a personal key), copy only the public half to the VPS and install it. The private key never leaves the laptop except into the GitHub secret in Step 15. Do not delete the local private key until a separate human operator login (your own personal key on `<admin-user>`, from Step 2) is proven, because that key is the only credential this guide installs for the deploy account; without a human login you lose the route for later manual steps, which can go through `<admin-user>` and `sudo -iu <deploy-user>` instead.
 
@@ -149,7 +188,7 @@ rm /tmp/matbakhy-cd.pub
 
 Prerequisite: Step 5 verified from a second terminal. Keep your current session open until the new settings are proven.
 
-Observed (VERIFIED LIVE): the readable SSH configuration text contains `PasswordAuthentication no`, `KbdInteractiveAuthentication no` and `PubkeyAuthentication yes`. This is file text, not the effective setting, because `/etc/ssh/sshd_config.d/50-cloud-init.conf` was not readable. The readable files contain both `PermitRootLogin no` and `PermitRootLogin yes`; which value is effective is NOT VERIFIED and needs `sshd -T` run by an administrator. The Hetzner-era `sed` edit of `sshd_config` in `docs/operations/12-owner-server-setup.md` is not reused: cloud images ship drop-in files that can override it.
+The drop-in below is a PROPOSED hardening policy, not the live configuration. Observed (VERIFIED LIVE): the readable SSH configuration text contains `PasswordAuthentication no`, `KbdInteractiveAuthentication no` and `PubkeyAuthentication yes`. This is file text, not the effective setting, because `/etc/ssh/sshd_config.d/50-cloud-init.conf` was not readable. The readable files contain both `PermitRootLogin no` and `PermitRootLogin yes`; which value is effective is NOT VERIFIED and needs `sshd -T` run by an administrator. The Hetzner-era `sed` edit of `sshd_config` in `docs/operations/12-owner-server-setup.md` is not reused: cloud images ship drop-in files that can override it.
 
 ```sh
 # VPS, <admin-user> with sudo: state-changing. The 00- prefix makes this file the first one read, ahead of 50-cloud-init.conf.
@@ -167,7 +206,7 @@ sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|kbdinteractivea
 |---|---|
 | The last command prints `permitrootlogin no`, `passwordauthentication no`, `kbdinteractiveauthentication no`, `pubkeyauthentication yes` | A value still shows `yes`: another drop-in wins. sshd keeps the first value it reads (DOCUMENTED ONLY: `sshd_config(5)`); list `ls /etc/ssh/sshd_config.d` and reorder. `sshd -t` errors: remove the new file, do not reload. The service unit is `ssh` on this OS (VERIFIED LIVE: `ssh` is active). |
 
-`X11Forwarding yes` was observed on the current host (VERIFIED LIVE); the code does not use it and you may set it to `no`.
+`X11Forwarding yes` was observed on the current host (VERIFIED LIVE); the code does not use it and you may set it to `no`, which differs from the observed state. To claim parity with the effective policy, an administrator must supply the output of `sshd -T`.
 
 ### Step 7. Firewall
 
@@ -178,11 +217,11 @@ Prerequisite: Step 6. Install the firewall tool first on a fresh image: `sudo ap
 | `sudo ufw allow 22/tcp` then `sudo ufw allow 80/tcp` then `sudo ufw allow 443/tcp` | VPS, `<admin-user>` with sudo | state-changing | `sudo ufw show added` lists three rules | allow SSH first; enabling before it locks you out |
 | `sudo ufw enable` | VPS, `<admin-user>` with sudo | state-changing | `sudo ufw status verbose` shows active, default deny incoming | lockout: use the provider console to disable |
 
-Do not open 3000, 5432, 8080, 8081, 8180 or 8333 (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md`; consistent with the compose file, where those services have no host port). Docker-published ports can bypass host firewall rules (DOCUMENTED ONLY: Docker documentation, not tested here), so the safety comes mainly from publishing only 80 and 443. Port 80 must stay reachable for certificate issuance (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md` section 1). Tailscale is running on the current host (VERIFIED LIVE) but nothing in the repository uses it; do not copy it into a rebuild unless you decide to.
+The `ufw` rules above are a PROPOSED policy: the live state, rules and defaults are NOT VERIFIED, so the commands establish a new policy rather than reproduce the current one. Do not open 3000, 5432, 8080, 8081, 8180 or 8333 (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md`; consistent with the compose file, where those services have no host port). Docker-published ports can bypass host firewall rules (DOCUMENTED ONLY: Docker documentation, not tested here), so the safety comes mainly from publishing only 80 and 443. Port 80 must stay reachable for certificate issuance (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md` section 1). Tailscale is running on the current host (`tailscaled`, the `tailscale0` interface and loopback listeners on 3080, 18080 and 38189, VERIFIED LIVE) but nothing in the repository uses it. This guide deliberately omits them, so the rebuilt host is not a full copy of the observed one; if you need them, document their reconstruction separately.
 
 ### Step 8. Docker Engine and the Compose plugin
 
-Prerequisite: Step 3. The current host reports Docker 29.9.1 and Compose v5.6.0 (VERIFIED LIVE). Installed Docker packages seen: docker-ce, docker-ce-cli, containerd.io, docker-ce-rootless-extras (VERIFIED LIVE); how the Compose plugin was installed is NOT VERIFIED. The commands below follow Docker's apt repository method as written in `docs/operations/12-owner-server-setup.md` section 3 (DOCUMENTED ONLY; check them against Docker's current Ubuntu instructions, which also add the architecture to the source line).
+Prerequisite: Step 3. The commands below install unpinned packages, so they do not reproduce Docker 29.9.1 and Compose v5.6.0, and they do not name `docker-ce-rootless-extras`. Pinning versions that an administrator has checked as available is a PROPOSED choice; otherwise accept that the versions differ. The current host reports Docker 29.9.1 and Compose v5.6.0 (VERIFIED LIVE). Installed Docker packages seen: docker-ce, docker-ce-cli, containerd.io, docker-ce-rootless-extras (VERIFIED LIVE); how the Compose plugin was installed is NOT VERIFIED. The commands below follow Docker's apt repository method as written in `docs/operations/12-owner-server-setup.md` section 3 (DOCUMENTED ONLY; check them against Docker's current Ubuntu instructions, which also add the architecture to the source line).
 
 ```sh
 # VPS, <admin-user> with sudo: state-changing
@@ -204,13 +243,13 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 | `sudo usermod -aG docker <deploy-user>` | VPS, `<admin-user>` with sudo | state-changing | `id <deploy-user>` lists `docker`; then from a NEW login `docker ps` works without sudo | group not applied: the account needs a fresh SSH session |
 | `getent group docker` | VPS, any | read-only | members list only the deploy account | a non-human account listed: remove it with `sudo gpasswd -d <name> docker` |
 
-Do not add any account other than the deploy account. The CD job's SSH sessions are new logins, so they receive the group.
+Do not add any account other than the deploy account. This matches the observed membership pattern only when the deploy account is `devops`, and it does not reproduce the numeric group ID 988 of the observed `docker` group (preserving it is optional; the code does not depend on it). The CD job's SSH sessions are new logins, so they receive the group.
 
 ## Phase 3. Directories, files, secrets
 
 ### Step 10. Directories and ownership
 
-Prerequisite: Steps 4 and 9. Observed on the current host (VERIFIED LIVE): `/srv` is `root:root` 755; `/srv/matbakhy-staging` is `devops:devops` 755; `/srv/matbakhy-staging/deploy/web-preview` is `devops:devops` 755 and contains the `.env` file with mode 600; `/srv/matbakhy-staging/generated` is mode 700 owned by `devops`; `/srv/matbakhy-backups` is `devops:devops` 750. The current host also has older or unrelated directories: `/srv/matbakhy-preview` (an older copy of the deploy files), `/srv/backups`, `/srv/deployments`, `/srv/ai-supervisor`, `/srv/ai-workspaces`; their purposes are NOT VERIFIED and nothing in the repository references `/srv/backups` or `/srv/deployments`, so a rebuild does not create them.
+Prerequisite: Steps 4 and 9. Observed on the current host (VERIFIED LIVE): `/srv` is `root:root` 755; `/srv/matbakhy-staging` is `devops:devops` 755; `/srv/matbakhy-staging/deploy/web-preview` is `devops:devops` 755 and contains the `.env` file with mode 600; `/srv/matbakhy-staging/generated` is mode 700 owned by `devops`; `/srv/matbakhy-backups` is `devops:devops` 750. The current host also has older or unrelated directories: `/srv/matbakhy-preview` (an older copy of the deploy files), `/srv/backups`, `/srv/deployments`, `/srv/ai-supervisor`, `/srv/ai-workspaces`; their purposes are NOT VERIFIED and nothing in the repository references `/srv/backups` or `/srv/deployments`, so a rebuild does not create them. The layout below therefore reconstructs the runtime directories only, not the whole observed host; the QA and metrics directories are additions whose live existence is NOT VERIFIED, and the generated-directory and backup-directory paths are PROPOSED choices until an administrator confirms the live values.
 
 What the code requires:
 
@@ -236,7 +275,7 @@ Container-written files: the PostgreSQL container writes dumps into `/backups` (
 
 ### Step 11. Put the deployment files on the server (first time only)
 
-Prerequisite: Step 10 and the release commit chosen. The CD job normally copies the files, but it first requires `.env` to exist (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`, VERIFIED IN CODE), and `.env` is created from `.env.example`, which arrives with the files. So the first copy is manual. This bootstrap recipe sends only the TRACKED files of the release commit with `git archive`, never `.env` or generated files (`.gitignore` hides those, so a clean `git status` does not prove a plain `tar` of the working tree is free of them); it has not been executed (NOT VERIFIED).
+Prerequisite: Step 10 and the release commit chosen. The CD job normally copies the files, but it first requires `.env` to exist (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`, VERIFIED IN CODE), and `.env` is created from `.env.example`, which arrives with the files. So the first copy is manual. This bootstrap recipe sends only the TRACKED files of the release commit with `git archive`, never `.env` or generated files (`.gitignore` hides those, so a clean `git status` does not prove a plain `tar` of the working tree is free of them); it has not been executed (NOT VERIFIED). It reconstructs what the deploy job depends on, not the wider repository-like tree (including `.github`, `apps`, `backend`, `contracts` and `docs`) observed on the live host.
 
 ```sh
 # laptop, in a checkout of the repository, as your own user: state-changing on the VPS. git archive exports only tracked files of <release-commit>
@@ -259,7 +298,7 @@ Never regenerate `.env` after the data volumes exist: the PostgreSQL role passwo
 
 ### Step 13. Fill in the owner inputs in .env
 
-Prerequisite: Step 12. Edit the file with the editor of your choice as `<deploy-user>`; do not paste its content anywhere.
+Prerequisite: Step 12. The values below are PROPOSED settings and defaults for a rebuild; none of them is confirmed as the live configuration. Edit the file with the editor of your choice as `<deploy-user>`; do not paste its content anywhere.
 
 | Variable | Set to | Evidence |
 |---|---|---|
@@ -313,7 +352,7 @@ gh secret set STAGING_SSH_HOST_PUBKEY --env preview --repo <owner>/<repo> < <fil
 |---|---|
 | `gh secret list --env preview --repo <owner>/<repo>` lists the four names (names only, values are never shown) | The environment `preview` must exist first; create it in the repository settings. After setting the key, and only after the human operator login from Step 5 works, delete the local `<keyfile>` and its `.pub` if you do not need them. The `gh` flags follow the tool's own manual; confirm with `gh secret set --help` |
 
-The deploy job aborts with `Missing <name>` when any of the four is empty (VERIFIED IN CODE).
+The deploy job aborts when any of the four is empty and prints `Missing HOST`, `Missing USER`, `Missing SSH_KEY` or `Missing HOST_PUBKEY`, which are the workflow's own variable names for `STAGING_SSH_HOST`, `STAGING_SSH_USER`, `STAGING_SSH_KEY` and `STAGING_SSH_HOST_PUBKEY` respectively (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`). It prints `Missing API_IMAGE` or `Missing FRONT_IMAGE` for an empty image digest from the build job.
 
 ### Step 16. GHCR images
 
@@ -348,7 +387,7 @@ What `./deploy.sh up` does on the server (VERIFIED IN CODE): validates `.env`; t
 
 | Verify | Likely failure |
 |---|---|
-| The workflow run ends green with `DEPLOYED <sha>` (supporting evidence of what was deployed, not proof of what runs now). On the VPS as `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` lists the containers, the schema version and the last release | `Missing STAGING_SSH_*`: Step 15. `Host key verification failed`: the host key secret differs from the server key. `.env still has placeholders`: Step 13. `API did not become healthy`: read the printed API and identity logs. Product CI failed or timed out: nothing is built |
+| The workflow run ends green with `DEPLOYED <sha>` (supporting evidence of what was deployed, not proof of what runs now). On the VPS as `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` lists the containers, the schema version and the last release | `Missing HOST`, `Missing USER`, `Missing SSH_KEY` or `Missing HOST_PUBKEY` (the workflow's names for the four secrets): Step 15. `Host key verification failed`: the host key secret differs from the server key. `.env still has placeholders`: Step 13. `API did not become healthy`: read the printed API and identity logs. Product CI failed or timed out: nothing is built |
 
 ## Phase 6. Verify the running pieces
 
@@ -407,14 +446,20 @@ Caddy runs inside the front container, not on the host (VERIFIED IN CODE: `deplo
 
 Caddy obtains and renews certificates automatically for every host name in the Caddyfile and stores them in the `caddy-data` volume (VERIFIED IN CODE for the configuration; automatic issuance is Caddy's documented behaviour). The current `app.` certificate was issued by Let's Encrypt (CN YE1), valid 2026-10-18 to 2027-01-16 (VERIFIED LIVE); renewal itself is NOT VERIFIED. Losing the `caddy-data` volume forces reissuance and can hit rate limits (DOCUMENTED ONLY).
 
+Two read-only checks from any machine (not run by the authors; run them against a rebuilt server). The first verifies the chain and the host name and keeps any error; the second lists the names in the certificate and its dates.
+
 ```sh
-# any machine: read-only
-openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates
+# any machine: read-only. -verify_hostname checks the name, -verify_return_error aborts the handshake on any trust failure, and stderr is kept
+openssl s_client -connect <vps-ip>:443 -servername app.<domain> -verify_hostname app.<domain> -verify_return_error </dev/null 2>&1 | grep -E 'Verified peername|Verification|Verify return code|verify error'
+# any machine: read-only. issuer, dates and subject alternative names
+openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates -ext subjectAltName
+# alternative without openssl: curl verifies the chain and the host name by default (never add -k); any HTTP code, even 403, shows that TLS succeeded
+curl -sS -o /dev/null -w '%{http_code} tls_verify=%{ssl_verify_result}\n' https://app.<domain>/
 ```
 
 | Verify | Likely failure |
 |---|---|
-| the certificate is trusted (not self-signed), valid for the host name `app.<domain>` and not expired; the recorded Let's Encrypt certificate with dates about 90 days apart is only an observation, since Caddy may use a fallback issuer | self-signed or handshake error: DNS (Step 14) or port 80 closed (Step 7); see [infrastructure troubleshooting](infrastructure-troubleshooting.md) |
+| The first command prints `Verify return code: 0 (ok)` and `Verified peername: app.<domain>`; the second lists `app.<domain>` among the DNS names and a `notAfter` date in the future; `curl` prints `tls_verify=0` and no certificate error. The recorded Let's Encrypt certificate with dates about 90 days apart is only an observation, since Caddy may use a fallback issuer. Renewal remains NOT VERIFIED | A `verify error`, a `Verify return code` other than 0, a `curl` certificate error (exit 60) or a missing name means the certificate is self-signed, expired or for another host: DNS (Step 14) or port 80 closed (Step 7); see [infrastructure troubleshooting](infrastructure-troubleshooting.md) |
 
 ### Step 24. Keycloak admin console switch
 
@@ -447,7 +492,7 @@ Realm users come from the rendered realm file: `preview-customer-1`, `preview-cu
 
 ### Step 27. Owner E2E fixtures (optional)
 
-A change to `deploy/web-preview/owner-e2e-run.request` on `develop` triggers `.github/workflows/owner-e2e-provision.yml`. Its first word is `plan` (makes no application-data changes; the script still creates `BACKUP_DIR` if missing and opens the shared lock file before it selects the mode) or `apply` (verified backup, Keycloak partial import, SQL seeds, slot refresh, reconciliation); it waits for the deployment of the same commit and then runs `./owner-e2e-provision.sh` on the server over the same SSH secrets (VERIFIED IN CODE). It refuses unless the API reports `APP_ENV=PREVIEW`. Generated passwords are written to a mode-600 file under `BACKUP_DIR/owner-e2e-private/<run>` and are never printed. Skip this step unless owner acceptance testing needs it.
+A change to `deploy/web-preview/owner-e2e-run.request` on `develop` triggers `.github/workflows/owner-e2e-provision.yml`. Its first word is `plan` (makes no application-data changes; the script still creates `BACKUP_DIR` if missing and opens the shared lock file before it selects the mode) or `apply` (verified backup, Keycloak partial import, SQL seeds, slot refresh, reconciliation); it waits for the deployment of the same commit and then runs `./owner-e2e-provision.sh` on the server over the same SSH secrets (VERIFIED IN CODE). For `apply` it refuses unless the API reports `APP_ENV=PREVIEW`; `plan` runs before that check and has no environment guard (VERIFIED IN CODE: `deploy/web-preview/owner-e2e-provision.sh`). A guard that covers both modes would be a PROPOSED code change that needs separate authorization. Generated passwords are written to a mode-600 file under `BACKUP_DIR/owner-e2e-private/<run>` and are never printed. Skip this step unless owner acceptance testing needs it.
 
 The destructive `./deploy.sh e2e-reset` additionally needs the marker file `.e2e-enabled`, non-public customer hosts and a typed confirmation (VERIFIED IN CODE). Never run it on a live Preview.
 
@@ -455,16 +500,16 @@ The destructive `./deploy.sh e2e-reset` additionally needs the marker file `.e2e
 
 ### Step 28. Backups
 
-`./deploy.sh backup` writes a custom-format PostgreSQL dump with checksum and manifest into `BACKUP_DIR`, restores it into a scratch database and reconciles it, then stops the storage service briefly and archives its data as `storage-<stamp>.tgz` (uploads pause meanwhile). A backup counts only after the restore check. Failure state: `backup` has no recovery trap, so if the archive command fails the script exits before `compose start storage` and the storage service stays stopped (uploads keep failing); check it with `docker compose --env-file .env -f compose.yaml ps storage` and, as the deploy account, restart it with `docker compose --env-file .env -f compose.yaml start storage` (add `-f <override-file>` when `.env` sets `COMPOSE_OVERRIDE`; `--env-file` does not load it into the shell, see Step 21), then investigate the archive error. The pre-deploy backup in `up` uses the same database routine (VERIFIED IN CODE). Serialization: `deploy.sh backup` does not take the shared mutation lock, and its verification drops and recreates the fixed database `matbakhy_restore_check`, so a backup that overlaps a deployment, a pre-deploy backup or a provisioning run can interfere with that verification. Do not schedule it to run concurrently with them; pick a time with no deployment and check `releases.log` and the workflow runs before running it by hand (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`). The repository contains no cron entry or timer for backups; no Matbakhy backup cron was visible to the unprivileged account on the live host, and other users' crontabs are unreadable, so whether scheduled backups exist is NOT VERIFIED.
+`./deploy.sh backup` writes a custom-format PostgreSQL dump with checksum and manifest into `BACKUP_DIR`, restores it into a scratch database and reconciles it, then stops the storage service briefly and archives its data as `storage-<stamp>.tgz` (uploads pause meanwhile). A backup counts only after the restore check. Failure state: `backup` has no recovery trap, so if the archive command fails the script exits before `compose start storage` and the storage service stays stopped (uploads keep failing); check it with `docker compose --env-file .env -f compose.yaml ps storage` and, as the deploy account, restart it with `docker compose --env-file .env -f compose.yaml start storage` (add `-f <override-file>` when `.env` sets `COMPOSE_OVERRIDE`; `--env-file` does not load it into the shell, see Step 21), then investigate the archive error. The pre-deploy backup in `up` uses the same database routine (VERIFIED IN CODE). Serialization (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, `admin-console.sh`): `./deploy.sh up` takes the shared mutation lock `BACKUP_DIR/.preview-mutation.lock`; `./deploy.sh backup` does not, and its verification drops and recreates the fixed database `matbakhy_restore_check`, so a backup that overlaps a deployment, a pre-deploy backup or a provisioning run can interfere with that verification. Do not start a manual backup while any such run is possible: check the workflow runs and `releases.log` first, knowing that a push can start a deployment at any time. Because a quiet hour does not prevent an overlap, automatic scheduling stays BLOCKED until the backup is serialized with deployments. The wrapper below is a PROPOSED change, not a repository feature and not the live configuration. It holds the same lock file with `flock` while the backup runs, so a deployment that starts in that window stops with the message `another preview change holds ...` instead of interfering (rerun it afterwards). The repository contains no cron entry or timer for backups; no Matbakhy backup cron was visible to the unprivileged account on the live host, and other users' crontabs are unreadable, so whether scheduled backups exist is NOT VERIFIED.
 
 ```sh
-# VPS, <deploy-user>: state-changing (edits that account's crontab). The schedule is a convention taken from docs/operations/12-owner-server-setup.md section 9, adapted to this install path; server local time applies.
-( crontab -l 2>/dev/null; echo '17 3 * * * cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh backup >> /srv/matbakhy-backups/backup.log 2>&1' ) | crontab -
+# VPS, <deploy-user>: PROPOSED and state-changing (edits that account's crontab). The schedule is a convention from docs/operations/12-owner-server-setup.md section 9 adapted to this install path. cron uses the server time zone (the live host shows Europe/Berlin; this guide does not set it, see Step 2), so confirm it with timedatectl first. flock -w 1800 waits up to 30 minutes for the shared lock
+( crontab -l 2>/dev/null; echo '17 3 * * * cd /srv/matbakhy-staging/deploy/web-preview && flock -w 1800 /srv/matbakhy-backups/.preview-mutation.lock ./deploy.sh backup >> /srv/matbakhy-backups/backup.log 2>&1' ) | crontab -
 ```
 
 | Verify | Likely failure |
 |---|---|
-| Run `./deploy.sh backup` once by hand: `backup verified:` is printed and `/srv/matbakhy-backups/metrics/matbakhy_backup.prom` exists | `flock` or permission errors: Step 10 ownership. Backups stay on the same server; copying them elsewhere is not configured in the repository. See [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) |
+| Run the command from the crontab line once by hand (with the `flock` prefix): `backup verified:` is printed and `/srv/matbakhy-backups/metrics/matbakhy_backup.prom` exists | `flock` or permission errors: Step 10 ownership. Backups stay on the same server; copying them elsewhere is not configured in the repository. See [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) |
 
 ### Step 29. Logging and monitoring
 
@@ -481,9 +526,9 @@ Before declaring the server ready, confirm the rollback tools work (VERIFIED IN 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
 | `./deploy.sh rollback-plan` | VPS, `<deploy-user>` | read-only (prints only) | with at least two entries in `releases.log` it prints the target commit and a verdict; with one entry it says `only 1 release(s) recorded` | no log: no `up` has completed yet. The number N counts lines of `releases.log`, which holds only recorded successful releases; a failed `up` leaves no line. To find the right target, list the log first (`cut -f1,2 /srv/matbakhy-backups/releases.log \| nl -ba`, read-only: time and commit; N is the line count minus the line number of the wanted release) and match commits against the workflow runs |
-| `./deploy.sh status` | VPS, `<deploy-user>` | read-only | configured versus running images match | mismatch: a failed deploy |
+| `./deploy.sh status` | VPS, `<deploy-user>` | read-only | lists the Compose services, the configured image digests and the release history; it does not compare the configured digests with the running ones | to prove what runs, an authorized administrator needs sanitized evidence of the running image IDs or digests and the revision (for example `docker compose ps` with `--format` and `docker image inspect`), compared with `.env` |
 
-Rollback rules: an image-only rollback is safe when no database schema change was applied since the target release or every later migration is expand-only (`scripts/check_migration_compat.py` enforces the annotation in CI); otherwise restore the backup taken before the first deploy that applied them (data written since is lost). The CD job restores only `.env` on failure, never the database. Decision tables are in [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) and [deployment pipeline](deployment-pipeline.md).
+Rollback readiness is NOT VERIFIED until three things exist: sanitized evidence of the running image IDs or digests and the revision, a match with the configured values, and a rehearsal of `rollback-plan` plus an actual rollback on a throwaway server. `rollback-plan` and the recovery of a configuration-only failure match the code, but nothing here proves the live host can roll back. Rollback rules: an image-only rollback is safe when no database schema change was applied since the target release or every later migration is expand-only (`scripts/check_migration_compat.py` enforces the annotation in CI); otherwise restore the backup taken before the first deploy that applied them (data written since is lost). The CD job restores only `.env` on failure, never the database. Decision tables are in [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) and [deployment pipeline](deployment-pipeline.md).
 
 ---
 
@@ -511,6 +556,7 @@ Verification after a restore: `./deploy.sh status` (schema version) and the row-
 - The deploy workflow hard-codes the domain `167-86-90-174.sslip.io` and the GHCR login name `afawzy70`; a rebuild on another IP needs a reviewed workflow change (Step 17).
 - Not verified live: effective `PermitRootLogin`, sudo policy, `ufw` state and rules, Docker containers, networks and volumes, host locations of the Docker named volumes (not established by `compose.yaml`; inspect them with a volume check by an authorized administrator), ownership of container-written backup files, the value of `STAGING_SSH_USER`, whether backup cron exists, certificate renewal, whether the Compose override is used.
 - Contabo ordering and panel-level firewall steps are not documented anywhere in the repository.
+- The recipes for accounts, SSH hardening, firewall rules, Docker versions, the paths and values of Steps 10 and 13, and the backup schedule are PROPOSED choices. The section "Parity with the observed Contabo host" lists, per step, what reproduces the observed state, what differs and what is NOT VERIFIED.
 - No restore procedure exists in code for the Keycloak database or the storage archive. Complete-service recovery is BLOCKED (see the status box at the top of Part B).
 - Effective SSH authentication settings (including `PasswordAuthentication` and `KbdInteractiveAuthentication`) are NOT VERIFIED: only configuration file text was readable.
 - Administrator commands that would settle several of the items above are collected in [admin read-only verification](admin-readonly-verification.md); an agent account must not run them.

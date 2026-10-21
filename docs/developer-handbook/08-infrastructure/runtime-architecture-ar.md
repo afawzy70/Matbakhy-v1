@@ -199,7 +199,7 @@ flowchart TD
 
 | الخطوة | اللي بيحصل | فين | الدليل |
 |---|---|---|---|
-| 1 | المتصفح بيحلّ `app.167-86-90-174.sslip.io`. خدمة sslip.io DNS بترد بالـ IP المضمّن في الاسم. | الـ DNS العام | VERIFIED LIVE (بيتحلّ إلى 167.86.90.174)؛ الآلية DOCUMENTED ONLY، راجع [صفحة الـ DNS](dns-https-sslip-io-ar.md) |
+| 1 | المتصفح بيستعلم عن عنوان الـ IP للدومين `app.167-86-90-174.sslip.io`. خدمة sslip.io DNS بترد بالـ IP المضمّن في الاسم. | الـ DNS العام | VERIFIED LIVE (الاستعلام بيرجّع 167.86.90.174)؛ الآلية DOCUMENTED ONLY، راجع [صفحة الـ DNS](dns-https-sslip-io-ar.md) |
 | 2 | المتصفح بيفتح TCP 443 على الـ IP العام. Docker بيمرّره للـ proxy container. | بورت الـ Host 443 | VERIFIED LIVE (الـ Listener)؛ التمرير VERIFIED IN CODE |
 | 3 | Caddy بيقدّم شهادة Let's Encrypt (صالحة من 2026-10-18 إلى 2027-01-16 لـ app) وبيطبّق هيدرز الأمان. | proxy | VERIFIED LIVE (الشهادة)؛ الهيدرز VERIFIED IN CODE |
 | 4 | Caddy بيفحص الـ IP بتاع المتصل مقابل فئة العملاء، وبعدين بيقدّم ملفات الـ single-page app من الـ Image. | proxy | VERIFIED IN CODE |
@@ -313,7 +313,7 @@ flowchart LR
     smoke -.->|"فشل"| restore["استرجاع .env، مفيش rollback تلقائي للـ Database"]
 ```
 
-إزاي تقرا الرسم. مفيش حاجة بتتبني على السيرفر. الـ deploy بيكتب فوق الملفات المتتبَّعة في Git بس بيحتفظ بـ `.env` السيرفر والبيانات (VERIFIED IN CODE). Concurrency group بيمنع اتنين deploy في نفس الوقت، و`deploy.sh up` بياخد Lock file في مجلد الـ backups عشان أدوات الـ admin console والـ deploy مايتداخلوش. المستخدم اللي SSH بيتصل بيه هو السر STAGING_SSH_USER وهو NOT VERIFIED (مجلد الـ deploy مالكه devops، وده دليل غير مباشر بس).
+إزاي تقرا الرسم. مفيش حاجة بتتبني على السيرفر. الـ deploy بيكتب فوق الملفات المتتبَّعة في Git بس بيحتفظ بـ `.env` السيرفر والبيانات (VERIFIED IN CODE). Concurrency group بيمنع اتنين deploy في نفس الوقت، و`deploy.sh up` بياخد Lock file مابيستناش (`.preview-mutation.lock`) في مجلد الـ backups وبيفشل فورًا لو تغيير تاني ماسكه. و`admin-console.sh` بياخد نفس الـ Lock مع `enable` و`rollback` و`create-admin` بس؛ أوامر `verify` و`disable` و`fixture-clean` فيه مابتاخدش Lock وممكن تتداخل مع Deploy، و`deploy.sh backup` كمان مابياخدش Lock (VERIFIED IN CODE: `deploy.sh` و`admin-console.sh`). المستخدم اللي SSH بيتصل بيه هو السر STAGING_SSH_USER وهو NOT VERIFIED (مجلد الـ deploy مالكه devops، وده دليل غير مباشر بس).
 
 ## 11. مسارات الفشل والاستعادة
 

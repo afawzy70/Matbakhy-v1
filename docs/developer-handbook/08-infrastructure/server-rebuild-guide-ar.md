@@ -19,6 +19,7 @@
 | DOCUMENTED ONLY | مستند أو دليل منتج خارجي بيقوله؛ مش مؤكد بالكود ولا بالسيرفر. |
 | OUTDATED / INCORRECT | بيتعارض مع دليل أحدث، وغالبًا نص من وقت Hetzner. ماتتّبعوش أبدًا كتعليمات حالية. |
 | NOT VERIFIED | لا الـ Repository ولا الملاحظة الحيّة حسمته. النص بيذكر فحص للقراءة فقط ممكن أدمن مُصرَّح له يشغّله. |
+| PROPOSED | اختيار موصى بيه في الدليل ده، مش الإعداد المُلاحَظ ومش مقروء في الـ Repository. محتاج مراجعة وتجربة، وماتقراهوش أبدًا كوصف للسيرفر الشغّال. |
 
 ## إزاي تقرا الدليل ده
 
@@ -55,6 +56,43 @@ flowchart TD
 
 الـ Preview الشغّال (بيرد على HTTPS، راجع صفحة الجرد) دليل غير مباشر (Circumstantial) إن مسار الـ CD شغّال على السيرفر ده. مش دليل إن الدليل ده، لو اتنفّذ من VPS فاضي، هيطلّع نفس النتيجة.
 
+## المطابقة مع سيرفر Contabo المُلاحَظ
+
+الجدول ده بيقارن كل خطوة بالسيرفر المسجَّل في [جرد سيرفر Contabo](contabo-server-inventory-ar.md). "بيطابق" معناها إن الخطوة بتعمل الحالة المُلاحَظة، على قد ما الكود والملاحظات المقروءة بتبيّن. "بيختلف" معناها إن الخطوة بتقدّم اختيار موصى بيه أو PROPOSED مش هو المُلاحَظ. "NOT VERIFIED" معناها إن الحالة المُلاحَظة ماينفعش تتقري من غير أدمن. الخطوة اللي قدامها "بيختلف" هي اختيار لإعادة البناء، مش وصف للإعداد الشغّال. اتباع الدليل ده بيبني Preview شغّال، لكنه مش بيعمل نسخة طبق الأصل من سيرفر Contabo.
+
+| الخطوة | الحالة | التفصيل |
+|---|---|---|
+| 1. المدخلات | بيطابق | الدومين `167-86-90-174.sslip.io` والـ Hosts الستة بيطابقوا الكود والـ DNS الشغّال. قوائم العناوين المسموحة والإيميل بتاع ACME الشغّالين NOT VERIFIED؛ والقيم اللي المالك بيختارها بدايل مش مطابقة |
+| 2. الـ VPS | NOT VERIFIED | الحجم والـ IPv6 بيطابقوا. اختيار "Ubuntu 24.04" مابيدّيش صورة 24.04.5 ولا Kernel 6.8.0-147-generic المُلاحَظين. مفيش خطوة بتضبط المنطقة الزمنية المُلاحَظة `Europe/Berlin` ولا عنونة الـ Interface ولا تقسيم القرص |
+| 3. الحزم الأساسية | NOT VERIFIED | الحزم بتطابق السكريبتات؛ وجود `unattended-upgrades` وغياب `fail2ban` بيطابقوا. أمر `apt-get upgrade` من غير تثبيت إصدارات ممكن يغيّر الـ Kernel. إصدارات الحزم على السيرفر الشغّال والـ Swap وإعدادات الترقية NOT VERIFIED |
+| 4. المستخدمين والمجموعات | بيختلف | `adduser` مابيعيدش الـ UIDs والـ GIDs 1000 و 1001 و 1002 ولا المجموعات الإضافية المسجَّلة ولا Mode المنزل 750. الحساب `devops` المُلاحَظ عضو في `sudo`؛ والوصفة بتستغنى عن sudo لحساب الـ Deploy (PROPOSED). صلاحيات sudo الفعلية ودور حساب الـ Deploy NOT VERIFIED. `aiagent` بيفضل برّه `sudo` و`docker` |
+| 5. مفتاح الـ Deploy | NOT VERIFIED | المفتاح بيدعم تسجيل دخول الـ Workflow. المفاتيح المصرّح بيها على السيرفر الشغّال وعددها وقيودها وقيمة `STAGING_SSH_USER` مش معروفة. المفتاح الجديد بيمثّل Credential بديل (PROPOSED)، مش دليل على الترتيب الحالي |
+| 6. تقوية SSH | بيختلف | ملف الـ Drop-in سياسة PROPOSED؛ الإعدادات الفعلية وسياسة دخول root على السيرفر الشغّال NOT VERIFIED. `X11Forwarding no` اختياري وبيختلف عن `yes` المُلاحَظ |
+| 7. الـ Firewall | بيختلف | TCP العامة 22 و 80 و 443 وGrafana على 3000 Loopback بيطابقوا. تفعيل `ufw` بالقواعد دي سياسة PROPOSED؛ القواعد والإعدادات الافتراضية على السيرفر الشغّال وأي Firewall على لوحة Contabo NOT VERIFIED. الدليل مابيذكرش Tailscale، فـ `tailscaled` وواجهة `tailscale0` ومنافذ الـ Loopback 3080 و 18080 و 38189 مش بتتعاد |
+| 8. Docker | بيختلف | أمر الـ apt من غير تثبيت إصدارات، فمابيدّيش Docker 29.9.1 وCompose v5.6.0 ومابيسمّيش `docker-ce-rootless-extras`. تثبيت إصدارات فحصها أدمن اختيار PROPOSED. طريقة التسطيب على السيرفر الشغّال NOT VERIFIED |
+| 9. مجموعة docker | بيطابق | حساب Deploy واحد في `docker` بيطابق النمط المُلاحَظ لما الحساب ده يبقى `devops`. رقم المجموعة 988 مش بيتعاد |
+| 10. المجلدات | بيختلف | مسارات الـ Staging والنسخ الاحتياطية وصلاحياتها بتطابق لما حساب الـ Deploy يبقى `devops`. الدليل مابينشئش المجلدات القديمة والمساعدة ومجلدات الأدوات، وبيضيف مجلدي الـ QA والـ metrics اللي وجودهم على السيرفر الشغّال NOT VERIFIED. محتويات `GENERATED_DIR` و`BACKUP_DIR` الشغّالين NOT VERIFIED |
+| 11. ملفات الـ Deployment | بيختلف | الـ Bootstrap بينسخ `deploy` و`infra` و`scripts` وملف الـ Fixtures، وده اللي الـ CD Job محتاجه. مجلد الـ Staging الشغّال فيه شجرة أوسع شبه الـ Repository |
+| 12. init-secrets | بيطابق | `.env` بيتنشأ بـ Mode 600 ومابيتكتبش فوق ملف موجود. تاريخ الإنشاء وقيم الـ Secrets NOT VERIFIED |
+| 13. مدخلات `.env` | بيختلف | `GENERATED_DIR` الصريح للـ Staging و`BACKUP_DIR` الافتراضي و`COMPOSE_OVERRIDE` غير المضبوط وقوائم العناوين المسموحة وإعداد الـ Push والاحتفاظ وإعدادات الـ QA كلها قيم PROPOSED. القيم الشغّالة NOT VERIFIED |
+| 14. الـ DNS | بيطابق | الأسماء الستة وحلّ IPv4 على sslip.io بيطابقوا. الـ IP الجديد معناه دومين جديد بالتصميم. الـ DNS على IPv6 NOT VERIFIED |
+| 15. Secrets بتاعة GitHub | بيطابق | الـ Workflowين بيستخدموا البيئة `preview` والأربع Secrets. القيم ونطاقها وحمايات البيئة NOT VERIFIED. Repository التجربة المنفصل تغيير عزل مقصود |
+| 16. صور GHCR | بيطابق | الـ Workflows بتطابق الوصف. الـ Digests الشغّالة دلوقتي وصلاحية الوصول للحزم NOT VERIFIED |
+| 17. قيم الـ Workflow | بيطابق | الدومين واسم الـ Login والمسار والفرع ومجموعات التزامن المكتوبة ثابتة مذكورة صح؛ و`owner-e2e-provision.yml` كمان بيكتب مسار الـ Staging ثابت. تغيير مجموعات التزامن في التجربة اختلاف مقصود |
+| 18. أول Deploy | NOT VERIFIED | التسلسل بيطابق الـ Workflow و`deploy.sh`. الـ Commit المنشور والـ Digests والمصدر وتشغيل ناجح على سيرفر نضيف NOT VERIFIED |
+| 19. PostgreSQL | NOT VERIFIED | سكريبتات الـ Init والدور والشبكة الداخلية فقط وتثبيت الصورة بتطابق الـ Repository. الصورة والأدوار والـ Schema والـ Volume وتاريخ التهيئة على السيرفر الشغّال NOT VERIFIED |
+| 20. Realm بتاع Keycloak | بيطابق | التوليد وأمر الاستيراد وفحص الصحة و`KC_HOSTNAME_ADMIN` بيطابقوا؛ وتحويل جذر `id.` بيطابق. محتويات الـ Realm والـ Migrations اللاحقة NOT VERIFIED |
+| 21. التخزين | بيطابق | `storage:8333` الداخلي و`s3.json` وأوامر الـ Buckets بيطابقوا؛ ورد 403 على جذر الميديا بيطابق. الـ Buckets والصلاحيات ومحتويات الـ Volume NOT VERIFIED |
+| 22. توجيه Caddy | بيطابق | الـ Hosts الستة وفحوص الفئات ومسارات الـ API المقيّدة ورد 404 للـ actuator ومفتاح الأدمن بيطابقوا. الوصول من شبكات تانية NOT VERIFIED |
+| 23. شهادات HTTPS | NOT VERIFIED | جهة الإصدار وتواريخ شهادة `app.` المسجَّلة بتطابق. الشهادات التانية ومحتويات الـ Volume والتجديد NOT VERIFIED |
+| 24. مفتاح كونسول الأدمن | بيطابق | تسلسل `enable` وتحذير فشل `create-admin` بيطابقوا الكود. حالة التقوية الكاملة وحالة الأدمن وصلاحية النسخة الاحتياطية NOT VERIFIED |
+| 25. الحسابات التجريبية غير الحقيقية | NOT VERIFIED | سلوك الـ Seed والمستخدمين الخمسة في الـ Realm والـ Subject الأولي بيطابقوا الملفات. وجود الكتالوج والحسابات على السيرفر الشغّال NOT VERIFIED |
+| 26. اختبار الـ Smoke | بيطابق | الأوامر بتطابق `smoke.sh`. ملاحظات الـ Endpoints بتغطي جزء بس من المجموعة؛ ومفيش PASS كامل حالي للـ Smoke مثبت |
+| 27. Owner E2E | بيختلف | المُحفِّز والبيئة والـ Secrets والمسار والقفل بيطابقوا. فحص `APP_ENV=PREVIEW` في الـ API بيحصل مع `apply` بس؛ و`plan` بيشتغل قبله. حالة التجهيز على السيرفر الشغّال NOT VERIFIED |
+| 28. النسخ الاحتياطية | بيختلف | وصف النسخة الاحتياطية وفحص الاستعادة وإيقاف التخزين بيطابق السكريبتات. سطر الـ cron ومنطقته الزمنية والـ Wrapper بتاع القفل PROPOSED. النسخ والجداول والنسخ خارج السيرفر على السيرفر الشغّال NOT VERIFIED |
+| 29. اللوجات والمراقبة | NOT VERIFIED | Logging Driver والتدوير وقيم الاحتفاظ الافتراضية وGrafana على Loopback بيطابقوا `compose.yaml`. العملية اللي ورا بورت 3000 والاحتفاظ الفعلي وصحة الخدمات NOT VERIFIED |
+| 30. جاهزية الـ Rollback | NOT VERIFIED | `rollback-plan` والتعافي من فشل الإعداد بيطابقوا الكود. سجل الإصدارات الشغّال والـ Digests الشغّالة وتوافق الـ Migrations ونجاح Rollback فعلي NOT VERIFIED |
+
 ---
 
 # الجزء A. تثبيت نظيف
@@ -80,10 +118,11 @@ flowchart TD
 
 | البند | النموذج اللي تمشي عليه | الدليل |
 |---|---|---|
-| نظام التشغيل | Ubuntu 24.04 LTS (السيرفر الحالي بيشغّل 24.04.5، الـ Kernel هو 6.8.0-147-generic) | VERIFIED LIVE |
+| نظام التشغيل | Ubuntu 24.04 LTS (السيرفر الحالي بيشغّل 24.04.5، الـ Kernel هو 6.8.0-147-generic). اختيار "Ubuntu 24.04" مابيعيدش نفس الصورة والـ Kernel بالظبط؛ سجّل الإصدار الدقيق لو المطابقة مهمة | VERIFIED LIVE |
 | الحجم | السيرفر الحالي فيه 8 vCPU و 23 GiB RAM وديسك 290 GB | VERIFIED LIVE |
 | الحد الأدنى للكود | حدود الذاكرة في `compose.yaml` مجموعها حوالي 6.9 GiB (proxy 256m، postgres 1536m، identity 1g، storage 512m، api 2g، loki 384m، alloy 256m، prometheus 512m، alertmanager 128m، alert-sink 64m، node-exporter 64m، grafana 256m). السيرفر الأصغر محتاج `compose.4gb.yaml` اللي اتحجّم لـ 2 vCPU و 4 GB | VERIFIED IN CODE: `deploy/web-preview/compose.yaml`، `deploy/web-preview/compose.4gb.yaml` |
-| الشبكة | IPv4 عام على أول Interface؛ السيرفر الحالي كمان فيه IPv6 عام | VERIFIED LIVE |
+| الشبكة | IPv4 عام على أول Interface؛ السيرفر الحالي كمان فيه IPv6 عام. عنونة الـ Interface وتقسيم القرص تفاصيل عند المزوّد مش بيحافظ عليها الدليل ده | VERIFIED LIVE |
+| المنطقة الزمنية | السيرفر الحالي بيستخدم `Europe/Berlin`. مفيش خطوة هنا بتضبطها؛ وضبطها PROPOSED وهي اللي بتحدد وقت تشغيل الـ cron في الخطوة 28 (`timedatectl` بيعرض المنطقة) | VERIFIED LIVE |
 | الوصول وقت الإنشاء | مفتاح SSH العام بتاعك لحساب الأدمن؛ من غير Login بباسورد | DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md` القسم 1 (صياغة وقت Hetzner، لكن المبدأ عام) |
 
 التحقق بعد ما الـ VPS يتعمل (اللابتوب، أي مستخدم): `ssh <admin-user>@<vps-ip> true` بيرجع من غير ما يطلب باسورد. الفشل المحتمل: المستخدم الافتراضي عند المزوّد مختلف؛ استخدم المستخدم المذكور في رسالة الترحيب بتاعة المزوّد.
@@ -97,7 +136,7 @@ flowchart TD
 | `sudo apt-get update` then `sudo apt-get -y upgrade` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `lsb_release -d` بيعرض Ubuntu 24.04 | حزمة Kernel تحديثها متوقّف بـ `apt-mark hold`، أو محتاج إعادة تشغيل: أعد التشغيل في وقت هادي |
 | `sudo apt-get -y install unattended-upgrades ca-certificates curl gnupg openssl python3 tar` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `command -v openssl python3 curl flock tar` بيطبع خمسة مسارات | `flock` جزء من util-linux، وغالبًا بيبقى متسطّب |
 
-ليه الحزم دي (VERIFIED IN CODE): `deploy.sh` بيستخدم `openssl` و`flock` و`sed` و`awk`؛ سكريبت الـ CD البعيد و`admin-console.sh` بيستدعوا `python3`؛ الـ CD Job بيبعت `tar` Stream؛ و`smoke.sh` بيستخدم `curl`. مفيش حاجة في السكريبتات بتستخدم `sudo`. مسار الـ CD مش محتاج `git` (بينسخ الملفات بـ `tar`)؛ و`docs/operations/12-owner-server-setup.md` بيسطّبه للـ Clone اليدوي بس. `unattended-upgrades` شغّال على السيرفر الحالي (VERIFIED LIVE) لكنه مجرد عُرف مش متطلب في الكود. `fail2ban` مش متسطّب على السيرفر الحالي (VERIFIED LIVE) ومفيش حاجة في الـ Repository بتتطلبه. ملف الـ Swap بحجم 2 GiB في نص وقت Hetzner كان متحجّم لسيرفر 4 GB؛ هل السيرفر الحالي فيه swap NOT VERIFIED والكود مابيتطلبوش.
+ليه الحزم دي (VERIFIED IN CODE): `deploy.sh` بيستخدم `openssl` و`flock` و`sed` و`awk`؛ سكريبت الـ CD البعيد و`admin-console.sh` بيستدعوا `python3`؛ الـ CD Job بيبعت `tar` Stream؛ و`smoke.sh` بيستخدم `curl`. مفيش حاجة في السكريبتات بتستخدم `sudo`. مسار الـ CD مش محتاج `git` (بينسخ الملفات بـ `tar`)؛ و`docs/operations/12-owner-server-setup.md` بيسطّبه للـ Clone اليدوي بس. `unattended-upgrades` شغّال على السيرفر الحالي (VERIFIED LIVE) لكنه مجرد عُرف مش متطلب في الكود. `fail2ban` مش متسطّب على السيرفر الحالي (VERIFIED LIVE) ومفيش حاجة في الـ Repository بتتطلبه. إصدارات الحزم مش مثبّتة، فـ `apt-get upgrade` ممكن يسطّب Kernel أحدث من المُلاحَظ؛ والإصدارات المتسطّبة اختيارات لإعادة البناء، مش نسخة من السيرفر الحالي. ملف الـ Swap بحجم 2 GiB في نص وقت Hetzner كان متحجّم لسيرفر 4 GB؛ هل السيرفر الحالي فيه swap NOT VERIFIED والكود مابيتطلبوش.
 
 ## المرحلة 2. الحسابات والـ SSH والـ Firewall وDocker
 
@@ -115,7 +154,7 @@ flowchart TD
 | `devops` | 1001 | devops, sudo, users, docker | ولا حاجة بعد الحقايق دي: بيملك `/srv/matbakhy-staging`، وهو العضو الوحيد في `docker`. أنهي حساب الـ Pipeline بيسجّل بيه NOT VERIFIED (مخزّن في الـ Secret `STAGING_SSH_USER`). |
 | `aiagent` | 1002 | aiagent, users | ولا حاجة. هو عن قصد مش في `sudo` ولا `docker`؛ خلّي أي حساب غير بشري أو مراقِب كده. |
 
-الشائع (Convention، مش مطلوب من الكود): أدمن بشري واحد عنده sudo، وحساب Deploy واحد في `docker` مش محتاج sudo، وأي حسابات مراقبة أو أدوات من غير الاتنين. هل حساب الـ Deploy الحالي عنده sudo كمان مش معروف للدليل ده؛ الكود مش محتاجه، فإعادة البناء تقدر تستغنى عنه من غير مشكلة.
+الشائع (Convention) PROPOSED، مش مطلوب من الكود ومش هو الترتيب المُلاحَظ: أدمن بشري واحد عنده sudo، وحساب Deploy واحد في `docker` مش محتاج sudo، وأي حسابات مراقبة أو أدوات من غير الاتنين. الحساب `devops` المُلاحَظ عضو في `sudo`؛ وهل العضوية دي بتدّيه صلاحيات sudo فعلية، وأنهي حساب بيستخدمه الـ Pipeline، NOT VERIFIED. الوصفة اللي تحت مابتعيدش الـ UIDs والـ GIDs المُلاحَظة (1000 و 1001 و 1002) ولا المجموعات الإضافية ولا Mode المنزل 750. وهي مابتدّيش حساب الـ Deploy عضوية في sudo، وده بيختلف عن `devops` المُلاحَظ. إعادة بناء الحسابات بالظبط محتاجة تفاصيل يقدّمها أدمن وبره نطاق الدليل ده. استبعاد `aiagent` من `sudo` و`docker` بيفضل في كل الحالات.
 
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
@@ -126,7 +165,7 @@ flowchart TD
 
 ### الخطوة 5. وصول SSH بالمفتاح لحساب الـ Deploy
 
-المتطلب المسبق: الخطوة 4. الـ CD Job بيكتب المفتاح الخاص في ملف ويتصل بـ `BatchMode=yes`، فلازم المفتاح يكون من غير Passphrase (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`).
+المتطلب المسبق: الخطوة 4. المفتاح والتسطيب اللي تحت Credential بديل PROPOSED، مش دليل على الترتيب الحالي: المفاتيح المصرّح بيها على السيرفر الشغّال وعددها وقيودها ومصدرها وقيمة `STAGING_SSH_USER` كلها NOT VERIFIED؛ خد تأكيد منقّح من الأدمن قبل ما تدّعي المطابقة. الـ CD Job بيكتب المفتاح الخاص في ملف ويتصل بـ `BatchMode=yes`، فلازم المفتاح يكون من غير Passphrase (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`).
 
 ولّد زوج مفاتيح مخصص على اللابتوب بتاعك (ماتعيدش استخدام مفتاح شخصي أبدًا)، وانسخ المفتاح العام بس للـ VPS وسطّبه. المفتاح الخاص عمره ما بيسيب اللابتوب غير للـ Secret بتاع GitHub في الخطوة 15. ماتمسحش المفتاح الخاص المحلي قبل ما تثبت إن فيه Login بشري تاني منفصل شغّال (مفتاحك الشخصي على `<admin-user>`، من الخطوة 2)، لأن المفتاح ده هو الـ Credential الوحيد اللي الدليل بيسطّبه لحساب الـ Deploy؛ من غير Login بشري هتفقد الطريق للخطوات اليدوية اللاحقة، اللي تقدر تعدّي بدالها على `<admin-user>` وبعدين `sudo -iu <deploy-user>`.
 
@@ -149,7 +188,7 @@ rm /tmp/matbakhy-cd.pub
 
 المتطلب المسبق: الخطوة 5 متحقق منها من Terminal تاني. سيب الـ Session الحالية مفتوحة لحد ما الإعدادات الجديدة تثبت.
 
-اللي اتلاحظ (VERIFIED LIVE): نص إعدادات الـ SSH المقروء فيه `PasswordAuthentication no` و`KbdInteractiveAuthentication no` و`PubkeyAuthentication yes`. ده نص ملف مش القيمة الفعلية، لأن `/etc/ssh/sshd_config.d/50-cloud-init.conf` ماكانش مقروء. الملفات المقروءة فيها `PermitRootLogin no` و`PermitRootLogin yes` الاتنين؛ القيمة الفعلية منهم NOT VERIFIED ومحتاجة `sshd -T` يشغّله أدمن. تعديل `sed` على `sshd_config` من وقت Hetzner في `docs/operations/12-owner-server-setup.md` مابنعيدش استخدامه: صور السحابة بتيجي بملفات Drop-in ممكن تلغي مفعوله.
+ملف الـ Drop-in اللي تحت سياسة تقوية PROPOSED، مش الإعداد الشغّال. اللي اتلاحظ (VERIFIED LIVE): نص إعدادات الـ SSH المقروء فيه `PasswordAuthentication no` و`KbdInteractiveAuthentication no` و`PubkeyAuthentication yes`. ده نص ملف مش القيمة الفعلية، لأن `/etc/ssh/sshd_config.d/50-cloud-init.conf` ماكانش مقروء. الملفات المقروءة فيها `PermitRootLogin no` و`PermitRootLogin yes` الاتنين؛ القيمة الفعلية منهم NOT VERIFIED ومحتاجة `sshd -T` يشغّله أدمن. تعديل `sed` على `sshd_config` من وقت Hetzner في `docs/operations/12-owner-server-setup.md` مابنعيدش استخدامه: صور السحابة بتيجي بملفات Drop-in ممكن تلغي مفعوله.
 
 ```sh
 # VPS, <admin-user> with sudo: state-changing. The 00- prefix makes this file the first one read, ahead of 50-cloud-init.conf.
@@ -167,7 +206,7 @@ sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|kbdinteractivea
 |---|---|
 | آخر أمر بيطبع `permitrootlogin no` و`passwordauthentication no` و`kbdinteractiveauthentication no` و`pubkeyauthentication yes` | قيمة لسه `yes`: Drop-in تاني قيمته هي اللي بتتطبّق. sshd بيحتفظ بأول قيمة يقراها (DOCUMENTED ONLY: `sshd_config(5)`)؛ اعرض `ls /etc/ssh/sshd_config.d` وأعد الترتيب. لو `sshd -t` طلّع أخطاء: امسح الملف الجديد وماتعملش reload. اسم الـ Service Unit هو `ssh` على نظام التشغيل ده (VERIFIED LIVE: `ssh` شغّال). |
 
-`X11Forwarding yes` اتلاحظ على السيرفر الحالي (VERIFIED LIVE)؛ الكود مابيستخدموش وتقدر تحطه `no`.
+`X11Forwarding yes` اتلاحظ على السيرفر الحالي (VERIFIED LIVE)؛ الكود مابيستخدموش وتقدر تحطه `no`، وده بيختلف عن الحالة المُلاحَظة. عشان تدّعي مطابقة السياسة الفعلية، لازم أدمن يقدّم ناتج `sshd -T`.
 
 ### الخطوة 7. الـ Firewall
 
@@ -178,11 +217,11 @@ sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|kbdinteractivea
 | `sudo ufw allow 22/tcp` then `sudo ufw allow 80/tcp` then `sudo ufw allow 443/tcp` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `sudo ufw show added` بيعرض ثلاث قواعد | اسمح بالـ SSH الأول؛ التفعيل قبله بيقفل عليك |
 | `sudo ufw enable` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `sudo ufw status verbose` بيبيّن active، والافتراضي deny incoming | اتقفل عليك: استخدم كونسول المزوّد لتعطيله |
 
-ماتفتحش 3000 ولا 5432 ولا 8080 ولا 8081 ولا 8180 ولا 8333 (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md`؛ متسق مع ملف الـ Compose، حيث الخدمات دي ملهاش بورت على الـ Host). البورتات المنشورة من Docker ممكن تتخطى قواعد Firewall الـ Host (DOCUMENTED ONLY: توثيق Docker، مااتختبرش هنا)، فالأمان بييجي أساسًا من نشر 80 و 443 بس. لازم بورت 80 يفضل متاح لإصدار الشهادات (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md` القسم 1). Tailscale شغّال على السيرفر الحالي (VERIFIED LIVE) لكن مفيش حاجة في الـ Repository بتستخدمه؛ ماتنسخهوش في إعادة بناء إلا لو قررت كده.
+قواعد `ufw` اللي فوق سياسة PROPOSED: الحالة والقواعد والإعدادات الافتراضية على السيرفر الشغّال NOT VERIFIED، فالأوامر بتأسس سياسة جديدة ومابتعيدش الحالية. ماتفتحش 3000 ولا 5432 ولا 8080 ولا 8081 ولا 8180 ولا 8333 (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md`؛ متسق مع ملف الـ Compose، حيث الخدمات دي ملهاش بورت على الـ Host). البورتات المنشورة من Docker ممكن تتخطى قواعد Firewall الـ Host (DOCUMENTED ONLY: توثيق Docker، مااتختبرش هنا)، فالأمان بييجي أساسًا من نشر 80 و 443 بس. لازم بورت 80 يفضل متاح لإصدار الشهادات (DOCUMENTED ONLY: `docs/operations/12-owner-server-setup.md` القسم 1). Tailscale شغّال على السيرفر الحالي (`tailscaled` وواجهة `tailscale0` ومنافذ Loopback على 3080 و 18080 و 38189، VERIFIED LIVE) لكن مفيش حاجة في الـ Repository بتستخدمه. الدليل ده سايبهم عمدًا، فالسيرفر المعاد بناؤه مش نسخة كاملة من المُلاحَظ؛ لو محتاجهم وثّق إعادة بنائهم لوحدها.
 
 ### الخطوة 8. Docker Engine وإضافة Compose
 
-المتطلب المسبق: الخطوة 3. السيرفر الحالي بيبلّغ عن Docker 29.9.1 وCompose v5.6.0 (VERIFIED LIVE). حزم Docker اللي اتشافت: docker-ce, docker-ce-cli, containerd.io, docker-ce-rootless-extras (VERIFIED LIVE)؛ إزاي إضافة Compose اتسطّبت NOT VERIFIED. الأوامر اللي تحت بتتبع طريقة Docker بالـ apt repository زي ما هي مكتوبة في `docs/operations/12-owner-server-setup.md` القسم 3 (DOCUMENTED ONLY؛ قارنها بتعليمات Docker الحالية لـ Ubuntu، اللي كمان بتضيف الـ Architecture لسطر المصدر).
+المتطلب المسبق: الخطوة 3. الأوامر اللي تحت بتسطّب حزم من غير تثبيت إصدارات، فمابتعيدش Docker 29.9.1 وCompose v5.6.0 ومابتسمّيش `docker-ce-rootless-extras`. تثبيت إصدارات فحصها أدمن إنها متاحة اختيار PROPOSED؛ وغير كده اقبل إن الإصدارات هتختلف. السيرفر الحالي بيبلّغ عن Docker 29.9.1 وCompose v5.6.0 (VERIFIED LIVE). حزم Docker اللي اتشافت: docker-ce, docker-ce-cli, containerd.io, docker-ce-rootless-extras (VERIFIED LIVE)؛ إزاي إضافة Compose اتسطّبت NOT VERIFIED. الأوامر اللي تحت بتتبع طريقة Docker بالـ apt repository زي ما هي مكتوبة في `docs/operations/12-owner-server-setup.md` القسم 3 (DOCUMENTED ONLY؛ قارنها بتعليمات Docker الحالية لـ Ubuntu، اللي كمان بتضيف الـ Architecture لسطر المصدر).
 
 ```sh
 # VPS, <admin-user> with sudo: state-changing
@@ -204,13 +243,13 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 | `sudo usermod -aG docker <deploy-user>` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `id <deploy-user>` بيعرض `docker`؛ وبعدين من Login جديد `docker ps` بيشتغل من غير sudo | المجموعة ماتطبّقتش: الحساب محتاج SSH Session جديدة |
 | `getent group docker` | VPS، أي مستخدم | للقراءة فقط | الأعضاء فيها حساب الـ Deploy بس | حساب غير بشري موجود: شيله بـ `sudo gpasswd -d <name> docker` |
 
-ماتضيفش أي حساب غير حساب الـ Deploy. جلسات SSH بتاعة الـ CD Job هي Logins جديدة، فبتاخد المجموعة.
+ماتضيفش أي حساب غير حساب الـ Deploy. ده بيطابق نمط العضوية المُلاحَظ لما حساب الـ Deploy يبقى `devops` بس، ومابيعيدش رقم المجموعة 988 لمجموعة `docker` المُلاحَظة (الحفاظ عليه اختياري؛ الكود مش معتمد عليه). جلسات SSH بتاعة الـ CD Job هي Logins جديدة، فبتاخد المجموعة.
 
 ## المرحلة 3. المجلدات والملفات والـ Secrets
 
 ### الخطوة 10. المجلدات والملكية
 
-المتطلب المسبق: الخطوتين 4 و 9. ملاحظ على السيرفر الحالي (VERIFIED LIVE): `/srv` هو `root:root` 755؛ `/srv/matbakhy-staging` هو `devops:devops` 755؛ `/srv/matbakhy-staging/deploy/web-preview` هو `devops:devops` 755 وفيه ملف `.env` بـ Mode 600؛ `/srv/matbakhy-staging/generated` بـ Mode 700 ومملوك لـ `devops`؛ و`/srv/matbakhy-backups` هو `devops:devops` 750. السيرفر الحالي كمان فيه مجلدات أقدم أو مش متعلقة: `/srv/matbakhy-preview` (نسخة أقدم من ملفات الـ Deploy)، `/srv/backups`، `/srv/deployments`، `/srv/ai-supervisor`، `/srv/ai-workspaces`؛ أغراضها NOT VERIFIED ومفيش حاجة في الـ Repository بتشاور على `/srv/backups` أو `/srv/deployments`، فإعادة البناء مابتعملهمش.
+المتطلب المسبق: الخطوتين 4 و 9. ملاحظ على السيرفر الحالي (VERIFIED LIVE): `/srv` هو `root:root` 755؛ `/srv/matbakhy-staging` هو `devops:devops` 755؛ `/srv/matbakhy-staging/deploy/web-preview` هو `devops:devops` 755 وفيه ملف `.env` بـ Mode 600؛ `/srv/matbakhy-staging/generated` بـ Mode 700 ومملوك لـ `devops`؛ و`/srv/matbakhy-backups` هو `devops:devops` 750. السيرفر الحالي كمان فيه مجلدات أقدم أو مش متعلقة: `/srv/matbakhy-preview` (نسخة أقدم من ملفات الـ Deploy)، `/srv/backups`، `/srv/deployments`، `/srv/ai-supervisor`، `/srv/ai-workspaces`؛ أغراضها NOT VERIFIED ومفيش حاجة في الـ Repository بتشاور على `/srv/backups` أو `/srv/deployments`، فإعادة البناء مابتعملهمش. الترتيب اللي تحت بيعيد بناء مجلدات التشغيل بس، مش السيرفر المُلاحَظ كله؛ مجلدا الـ QA والـ metrics إضافتان وجودهم على السيرفر الشغّال NOT VERIFIED، ومساري المجلد المولّد ومجلد النسخ الاحتياطية اختيارات PROPOSED لحد ما أدمن يأكد القيم الشغّالة.
 
 اللي الكود بيتطلبه:
 
@@ -236,7 +275,7 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 
 ### الخطوة 11. حط ملفات الـ Deployment على السيرفر (أول مرة بس)
 
-المتطلب المسبق: الخطوة 10 وإنك اخترت الـ Commit بتاع الإصدار. الـ CD Job عادةً بينسخ الملفات، لكنه الأول بيتطلب إن `.env` يكون موجود (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`، VERIFIED IN CODE)، و`.env` بيتعمل من `.env.example` اللي بيوصل مع الملفات. فأول نسخة بتبقى يدوية. وصفة الـ Bootstrap دي بتبعت الملفات المتتبَّعة (Tracked) بتاعة الـ Commit بتاع الإصدار بس عن طريق `git archive`، ومش بتبعت `.env` ولا الملفات المتولّدة أبدًا (`.gitignore` بيخفيهم، فـ `git status` النضيف مابيثبتش إن `tar` عادي على مجلد الشغل خالي منهم)؛ ماتنفّذتش (NOT VERIFIED).
+المتطلب المسبق: الخطوة 10 وإنك اخترت الـ Commit بتاع الإصدار. الـ CD Job عادةً بينسخ الملفات، لكنه الأول بيتطلب إن `.env` يكون موجود (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`، VERIFIED IN CODE)، و`.env` بيتعمل من `.env.example` اللي بيوصل مع الملفات. فأول نسخة بتبقى يدوية. وصفة الـ Bootstrap دي بتبعت الملفات المتتبَّعة (Tracked) بتاعة الـ Commit بتاع الإصدار بس عن طريق `git archive`، ومش بتبعت `.env` ولا الملفات المتولّدة أبدًا (`.gitignore` بيخفيهم، فـ `git status` النضيف مابيثبتش إن `tar` عادي على مجلد الشغل خالي منهم)؛ ماتنفّذتش (NOT VERIFIED). هو بيعيد بناء اللي الـ Deploy Job معتمد عليه، مش الشجرة الأوسع الشبيهة بالـ Repository (فيها `.github` و`apps` و`backend` و`contracts` و`docs`) المُلاحَظة على السيرفر الشغّال.
 
 ```sh
 # laptop, in a checkout of the repository, as your own user: state-changing on the VPS. git archive exports only tracked files of <release-commit>
@@ -259,7 +298,7 @@ git archive --format=tar <release-commit> deploy infra scripts docs/quality/owne
 
 ### الخطوة 13. املا مدخلات المالك في .env
 
-المتطلب المسبق: الخطوة 12. عدّل الملف بالمحرر اللي تفضّله كـ `<deploy-user>`؛ ماتلصقش محتواه في أي مكان.
+المتطلب المسبق: الخطوة 12. القيم اللي تحت إعدادات وافتراضيات PROPOSED لإعادة البناء؛ ولا واحدة منها مؤكدة إنها الإعداد الشغّال. عدّل الملف بالمحرر اللي تفضّله كـ `<deploy-user>`؛ ماتلصقش محتواه في أي مكان.
 
 | المتغيّر | اضبطه على | الدليل |
 |---|---|---|
@@ -313,7 +352,7 @@ gh secret set STAGING_SSH_HOST_PUBKEY --env preview --repo <owner>/<repo> < <fil
 |---|---|
 | `gh secret list --env preview --repo <owner>/<repo>` بيعرض الأسماء الأربعة (أسماء بس، القيم عمرها ما بتتعرض) | لازم البيئة `preview` تكون موجودة الأول؛ اعملها من إعدادات الـ Repository. بعد ضبط المفتاح، وبس بعد ما Login الأدمن البشري من الخطوة 5 يشتغل، امسح `<keyfile>` المحلي و`.pub` بتاعه لو مش محتاجهم. الـ Flags بتاعة `gh` بتتبع دليل الأداة نفسها؛ أكّد بـ `gh secret set --help` |
 
-الـ Deploy Job بيوقف بـ `Missing <name>` لو أي واحد من الأربعة فاضي (VERIFIED IN CODE).
+الـ Deploy Job بيوقف لو أي واحد من الأربعة فاضي وبيطبع `Missing HOST` أو `Missing USER` أو `Missing SSH_KEY` أو `Missing HOST_PUBKEY`، وهي أسماء المتغيرات الخاصة بالـ Workflow لـ `STAGING_SSH_HOST` و`STAGING_SSH_USER` و`STAGING_SSH_KEY` و`STAGING_SSH_HOST_PUBKEY` بالترتيب (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`). وبيطبع `Missing API_IMAGE` أو `Missing FRONT_IMAGE` لو Digest الصورة جاي فاضي من الـ Build Job.
 
 ### الخطوة 16. صور GHCR
 
@@ -348,7 +387,7 @@ gh secret set STAGING_SSH_HOST_PUBKEY --env preview --repo <owner>/<repo> < <fil
 
 | التحقق | الفشل المحتمل |
 |---|---|
-| الـ Workflow بينجح وبيخلص بـ `DEPLOYED <sha>` (دليل مساعد على اللي اتنشر، مش إثبات للي شغّال دلوقتي). على الـ VPS كـ `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` بيعرض الحاويات ونسخة الـ Schema وآخر إصدار | `Missing STAGING_SSH_*`: الخطوة 15. `Host key verification failed`: قيمة الـ Secret بتاع مفتاح الـ Host مختلفة عن مفتاح السيرفر. `.env still has placeholders`: الخطوة 13. `API did not become healthy`: اقرا لوجات الـ API والـ Identity المطبوعة. Product CI فشل أو انتهت مهلته: مفيش حاجة اتبنت |
+| الـ Workflow بينجح وبيخلص بـ `DEPLOYED <sha>` (دليل مساعد على اللي اتنشر، مش إثبات للي شغّال دلوقتي). على الـ VPS كـ `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` بيعرض الحاويات ونسخة الـ Schema وآخر إصدار | `Missing HOST` أو `Missing USER` أو `Missing SSH_KEY` أو `Missing HOST_PUBKEY` (أسماء الـ Workflow للـ Secrets الأربعة): الخطوة 15. `Host key verification failed`: قيمة الـ Secret بتاع مفتاح الـ Host مختلفة عن مفتاح السيرفر. `.env still has placeholders`: الخطوة 13. `API did not become healthy`: اقرا لوجات الـ API والـ Identity المطبوعة. Product CI فشل أو انتهت مهلته: مفيش حاجة اتبنت |
 
 ## المرحلة 6. تحقق من الأجزاء الشغّالة
 
@@ -407,14 +446,20 @@ Caddy شغّال جوه حاوية الـ Front، مش على الـ Host (VERIF
 
 Caddy بيحصل على الشهادات ويجددها تلقائيًا لكل اسم Host في الـ Caddyfile وبيخزّنها في Volume اسمه `caddy-data` (VERIFIED IN CODE للإعداد؛ الإصدار التلقائي سلوك Caddy الموثّق). شهادة `app.` الحالية صدرت من Let's Encrypt (CN YE1)، صالحة من 2026-10-18 إلى 2027-01-16 (VERIFIED LIVE)؛ التجديد نفسه NOT VERIFIED. فقدان Volume `caddy-data` بيجبر على إعادة الإصدار وممكن توصل لحدود معدّل Let's Encrypt (Rate Limits) (DOCUMENTED ONLY).
 
+فحصين للقراءة فقط من أي جهاز (الكتّاب ماشغّلوهمش؛ شغّلهم على سيرفر معاد بناؤه). الأول بيتحقق من السلسلة (Chain) واسم الـ Host وبيحتفظ بأي خطأ، والتاني بيعرض الأسماء اللي في الشهادة وتواريخها.
+
 ```sh
-# any machine: read-only
-openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates
+# any machine: read-only. -verify_hostname checks the name, -verify_return_error aborts the handshake on any trust failure, and stderr is kept
+openssl s_client -connect <vps-ip>:443 -servername app.<domain> -verify_hostname app.<domain> -verify_return_error </dev/null 2>&1 | grep -E 'Verified peername|Verification|Verify return code|verify error'
+# any machine: read-only. issuer, dates and subject alternative names
+openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates -ext subjectAltName
+# alternative without openssl: curl verifies the chain and the host name by default (never add -k); any HTTP code, even 403, shows that TLS succeeded
+curl -sS -o /dev/null -w '%{http_code} tls_verify=%{ssl_verify_result}\n' https://app.<domain>/
 ```
 
 | التحقق | الفشل المحتمل |
 |---|---|
-| الشهادة موثوقة (مش موقّعة ذاتيًا) وصالحة لاسم الـ Host `app.<domain>` ومنتهيتش؛ شهادة Let's Encrypt المسجَّلة وتواريخها بينها حوالي 90 يوم مجرد ملاحظة، لأن Caddy ممكن يستخدم جهة إصدار بديلة | شهادة موقّعة ذاتيًا أو خطأ Handshake: الـ DNS (الخطوة 14) أو بورت 80 مقفول (الخطوة 7)؛ راجع [حل مشاكل البنية التحتية](infrastructure-troubleshooting-ar.md) |
+| الأمر الأول بيطبع `Verify return code: 0 (ok)` و`Verified peername: app.<domain>`؛ والتاني بيعرض `app.<domain>` ضمن أسماء الـ DNS وتاريخ `notAfter` في المستقبل؛ و`curl` بيطبع `tls_verify=0` ومفيش خطأ شهادة. شهادة Let's Encrypt المسجَّلة وتواريخها بينها حوالي 90 يوم مجرد ملاحظة، لأن Caddy ممكن يستخدم جهة إصدار بديلة. التجديد لسه NOT VERIFIED | ظهور `verify error` أو `Verify return code` غير 0 أو خطأ شهادة من `curl` (الخروج 60) أو اسم ناقص معناه إن الشهادة موقّعة ذاتيًا أو منتهية أو لـ Host تاني: الـ DNS (الخطوة 14) أو بورت 80 مقفول (الخطوة 7)؛ راجع [حل مشاكل البنية التحتية](infrastructure-troubleshooting-ar.md) |
 
 ### الخطوة 24. مفتاح كونسول أدمن Keycloak
 
@@ -447,7 +492,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### الخطوة 27. Fixtures الـ E2E بتاعة المالك (اختياري)
 
-تغيير في `deploy/web-preview/owner-e2e-run.request` على `develop` بيحفّز `.github/workflows/owner-e2e-provision.yml`. أول كلمة فيه هي `plan` (مابيغيّرش بيانات التطبيق؛ لكن السكريبت بينشئ `BACKUP_DIR` لو مش موجود وبيفتح ملف القفل المشترك قبل ما يختار الوضع) أو `apply` (نسخة احتياطية متحقق منها، استيراد جزئي لـ Keycloak، SQL Seeds، تحديث الـ Slots، مطابقة (Reconciliation))؛ بيستنى Deployment نفس الـ Commit وبعدين بيشغّل `./owner-e2e-provision.sh` على السيرفر عن طريق نفس Secrets الـ SSH (VERIFIED IN CODE). بيرفض إلا لو الـ API بيبلّغ `APP_ENV=PREVIEW`. الباسوردات المولّدة بتتكتب في ملف Mode 600 تحت `BACKUP_DIR/owner-e2e-private/<run>` وعمرها ما بتتطبع. اتخطى الخطوة دي إلا لو اختبار قبول المالك محتاجها.
+تغيير في `deploy/web-preview/owner-e2e-run.request` على `develop` بيحفّز `.github/workflows/owner-e2e-provision.yml`. أول كلمة فيه هي `plan` (مابيغيّرش بيانات التطبيق؛ لكن السكريبت بينشئ `BACKUP_DIR` لو مش موجود وبيفتح ملف القفل المشترك قبل ما يختار الوضع) أو `apply` (نسخة احتياطية متحقق منها، استيراد جزئي لـ Keycloak، SQL Seeds، تحديث الـ Slots، مطابقة (Reconciliation))؛ بيستنى Deployment نفس الـ Commit وبعدين بيشغّل `./owner-e2e-provision.sh` على السيرفر عن طريق نفس Secrets الـ SSH (VERIFIED IN CODE). مع `apply` بيرفض إلا لو الـ API بيبلّغ `APP_ENV=PREVIEW`؛ أما `plan` فبيشتغل قبل الفحص ده ومالوش حارس للبيئة (VERIFIED IN CODE: `deploy/web-preview/owner-e2e-provision.sh`). حارس يغطي الوضعين هيبقى تعديل كود PROPOSED محتاج تصريح منفصل. الباسوردات المولّدة بتتكتب في ملف Mode 600 تحت `BACKUP_DIR/owner-e2e-private/<run>` وعمرها ما بتتطبع. اتخطى الخطوة دي إلا لو اختبار قبول المالك محتاجها.
 
 الأمر المدمّر `./deploy.sh e2e-reset` كمان محتاج ملف العلامة `.e2e-enabled` وHosts عملاء مش عامة وتأكيد بالكتابة (Typed Confirmation) (VERIFIED IN CODE). ماتشغّلهوش أبدًا على Preview شغّال.
 
@@ -455,16 +500,16 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### الخطوة 28. النسخ الاحتياطية
 
-`./deploy.sh backup` بيكتب Dump بصيغة custom لـ PostgreSQL مع Checksum وManifest في `BACKUP_DIR`، ويستعيده في Database مؤقتة ويطابقه، وبعدين يوقف خدمة التخزين لفترة قصيرة ويؤرشف بياناتها كـ `storage-<stamp>.tgz` (الرفع بيتوقف في الأثناء). النسخة الاحتياطية مابتتحسبش إلا بعد فحص الاستعادة. حالة الفشل: `backup` ملوش Recovery Trap، فلو أمر الأرشفة فشل السكريبت بيخرج قبل `compose start storage` وخدمة التخزين بتفضل واقفة (الرفع بيفضل يفشل)؛ اتأكد بـ `docker compose --env-file .env -f compose.yaml ps storage` وشغّلها تاني بحساب الـ Deploy بـ `docker compose --env-file .env -f compose.yaml start storage` (أضف `-f <override-file>` لما `.env` يضبط `COMPOSE_OVERRIDE`؛ الـ `--env-file` مابيحمّلوش في الـ Shell، شوف الخطوة 21)، وبعدين دوّر على سبب خطأ الأرشفة. النسخة الاحتياطية قبل الـ Deploy في `up` بتستخدم نفس روتين الـ Database (VERIFIED IN CODE). التسلسل: `deploy.sh backup` مابياخدش قفل التعديل المشترك، والتحقق بتاعه بيمسح ويعيد إنشاء الـ Database الثابتة `matbakhy_restore_check`، فلو النسخة اتداخلت مع Deployment أو نسخة قبل الـ Deploy أو تشغيل Provisioning ممكن تبوّظ التحقق ده. ماتجدولهاش تشتغل في نفس الوقت معاهم؛ اختار وقت مفيهوش Deployment وراجع `releases.log` وتشغيلات الـ Workflow قبل ما تشغّلها بإيدك (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`). الـ Repository مفيهوش Cron ولا Timer للنسخ الاحتياطية؛ ومفيش Cron لنسخ Matbakhy الاحتياطية كان ظاهر للحساب من غير صلاحيات على السيرفر الشغّال، وملفات crontab بتاعة المستخدمين التانيين مش مقروءة، فهل فيه نسخ احتياطية مجدولة NOT VERIFIED.
+`./deploy.sh backup` بيكتب Dump بصيغة custom لـ PostgreSQL مع Checksum وManifest في `BACKUP_DIR`، ويستعيده في Database مؤقتة ويطابقه، وبعدين يوقف خدمة التخزين لفترة قصيرة ويؤرشف بياناتها كـ `storage-<stamp>.tgz` (الرفع بيتوقف في الأثناء). النسخة الاحتياطية مابتتحسبش إلا بعد فحص الاستعادة. حالة الفشل: `backup` ملوش Recovery Trap، فلو أمر الأرشفة فشل السكريبت بيخرج قبل `compose start storage` وخدمة التخزين بتفضل واقفة (الرفع بيفضل يفشل)؛ اتأكد بـ `docker compose --env-file .env -f compose.yaml ps storage` وشغّلها تاني بحساب الـ Deploy بـ `docker compose --env-file .env -f compose.yaml start storage` (أضف `-f <override-file>` لما `.env` يضبط `COMPOSE_OVERRIDE`؛ الـ `--env-file` مابيحمّلوش في الـ Shell، شوف الخطوة 21)، وبعدين دوّر على سبب خطأ الأرشفة. النسخة الاحتياطية قبل الـ Deploy في `up` بتستخدم نفس روتين الـ Database (VERIFIED IN CODE). التسلسل (VERIFIED IN CODE: `deploy/web-preview/deploy.sh` و`admin-console.sh`): `./deploy.sh up` بياخد قفل التعديل المشترك `BACKUP_DIR/.preview-mutation.lock`؛ أما `./deploy.sh backup` فلأ، والتحقق بتاعه بيمسح ويعيد إنشاء الـ Database الثابتة `matbakhy_restore_check`، فلو النسخة اتداخلت مع Deployment أو نسخة قبل الـ Deploy أو تشغيل Provisioning ممكن تبوّظ التحقق ده. ماتبدأش نسخة يدوية وفي أي تشغيل من دول ممكن يحصل: راجع تشغيلات الـ Workflow و`releases.log` الأول، مع العلم إن أي Push ممكن يبدأ Deployment في أي وقت. وعشان الوقت الهادي مابيمنعش التداخل، الجدولة التلقائية بتفضل BLOCKED لحد ما النسخة تتسلسل مع الـ Deployments. الـ Wrapper اللي تحت تعديل PROPOSED، مش ميزة في الـ Repository ومش الإعداد الشغّال. هو بيمسك نفس ملف القفل بـ `flock` طول ما النسخة شغّالة، فأي Deployment يبدأ في الفترة دي بيقف برسالة `another preview change holds ...` بدل ما يتداخل (شغّله تاني بعدها). الـ Repository مفيهوش Cron ولا Timer للنسخ الاحتياطية؛ ومفيش Cron لنسخ Matbakhy الاحتياطية كان ظاهر للحساب من غير صلاحيات على السيرفر الشغّال، وملفات crontab بتاعة المستخدمين التانيين مش مقروءة، فهل فيه نسخ احتياطية مجدولة NOT VERIFIED.
 
 ```sh
-# VPS, <deploy-user>: state-changing (edits that account's crontab). The schedule is a convention taken from docs/operations/12-owner-server-setup.md section 9, adapted to this install path; server local time applies.
-( crontab -l 2>/dev/null; echo '17 3 * * * cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh backup >> /srv/matbakhy-backups/backup.log 2>&1' ) | crontab -
+# VPS, <deploy-user>: PROPOSED and state-changing (edits that account's crontab). The schedule is a convention from docs/operations/12-owner-server-setup.md section 9 adapted to this install path. cron uses the server time zone (the live host shows Europe/Berlin; this guide does not set it, see Step 2), so confirm it with timedatectl first. flock -w 1800 waits up to 30 minutes for the shared lock
+( crontab -l 2>/dev/null; echo '17 3 * * * cd /srv/matbakhy-staging/deploy/web-preview && flock -w 1800 /srv/matbakhy-backups/.preview-mutation.lock ./deploy.sh backup >> /srv/matbakhy-backups/backup.log 2>&1' ) | crontab -
 ```
 
 | التحقق | الفشل المحتمل |
 |---|---|
-| شغّل `./deploy.sh backup` مرة يدويًا: بيتطبع `backup verified:` والملف `/srv/matbakhy-backups/metrics/matbakhy_backup.prom` موجود | أخطاء `flock` أو صلاحيات: ملكية الخطوة 10. النسخ الاحتياطية بتفضل على نفس السيرفر؛ نسخها لمكان تاني مش مضبوط في الـ Repository. راجع [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) |
+| شغّل الأمر اللي في سطر الـ crontab مرة يدويًا (بالبادئة `flock`): بيتطبع `backup verified:` والملف `/srv/matbakhy-backups/metrics/matbakhy_backup.prom` موجود | أخطاء `flock` أو صلاحيات: ملكية الخطوة 10. النسخ الاحتياطية بتفضل على نفس السيرفر؛ نسخها لمكان تاني مش مضبوط في الـ Repository. راجع [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) |
 
 ### الخطوة 29. اللوجات والمراقبة
 
@@ -481,15 +526,15 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
 | `./deploy.sh rollback-plan` | VPS، `<deploy-user>` | للقراءة فقط (بيطبع بس) | مع مدخلين على الأقل في `releases.log` بيطبع الـ Commit الهدف ونتيجة التقييم (Verdict)؛ ومع مدخل واحد بيقول `only 1 release(s) recorded` | مفيش سجل: ماحصلش `up` مكتمل لسه. الرقم N بيعدّ أسطر `releases.log`، واللي فيه الإصدارات الناجحة المسجّلة بس؛ `up` الفاشل مابيسيبش سطر. عشان تلاقي الهدف الصح اعرض السجل الأول (`cut -f1,2 /srv/matbakhy-backups/releases.log \| nl -ba`، للقراءة فقط: الوقت والـ Commit؛ و N = عدد الأسطر ناقص رقم سطر الإصدار المطلوب) وطابق الـ Commits مع تشغيلات الـ Workflow |
-| `./deploy.sh status` | VPS، `<deploy-user>` | للقراءة فقط | الصور المضبوطة بتطابق الشغّالة | عدم تطابق: Deployment فاشل |
+| `./deploy.sh status` | VPS، `<deploy-user>` | للقراءة فقط | بيعرض خدمات الـ Compose وDigests الصور المضبوطة وسجل الإصدارات؛ ومابيقارنش الـ Digests المضبوطة بالشغّالة | عشان تثبت إيه اللي شغّال فعلًا، الأدمن المصرّح له محتاج دليل منقّح بمعرّفات أو Digests الصور الشغّالة والـ Revision (مثلًا `docker compose ps` مع `--format` و`docker image inspect`)، ومقارنته بـ `.env` |
 
-قواعد الـ Rollback: الرجوع لإصدار Docker Images سابق من غير استرجاع قاعدة البيانات آمن لما مفيش أي تغيير في بنية الـ Database Schema اتطبّق بعد الإصدار المستهدف أو كل Migration لاحق هو expand-only (`scripts/check_migration_compat.py` بيفرض الـ Annotation في الـ CI)؛ غير كده استعد النسخة الاحتياطية المأخوذة قبل أول Deployment طبّقهم (البيانات المكتوبة من وقتها بتضيع). الـ CD Job بيستعيد `.env` بس عند الفشل، عمره ما بيستعيد الـ Database. جداول القرار في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) و[الـ Pipeline بتاع الـ Deployment](deployment-pipeline-ar.md).
+جاهزية الـ Rollback NOT VERIFIED لحد ما تتوفر تلات حاجات: دليل منقّح بمعرّفات أو Digests الصور الشغّالة والـ Revision، وتطابقها مع القيم المضبوطة، وتجربة `rollback-plan` مع Rollback فعلي على سيرفر مؤقت. `rollback-plan` والتعافي من فشل الإعداد بيطابقوا الكود، لكن مفيش حاجة هنا بتثبت إن السيرفر الشغّال يقدر يعمل Rollback. قواعد الـ Rollback: الرجوع لإصدار Docker Images سابق من غير استرجاع قاعدة البيانات آمن لما مفيش أي تغيير في بنية الـ Database Schema اتطبّق بعد الإصدار المستهدف أو كل Migration لاحق هو expand-only (`scripts/check_migration_compat.py` بيفرض الـ Annotation في الـ CI)؛ غير كده استعد النسخة الاحتياطية المأخوذة قبل أول Deployment طبّقهم (البيانات المكتوبة من وقتها بتضيع). الـ CD Job بيستعيد `.env` بس عند الفشل، عمره ما بيستعيد الـ Database. جداول القرار في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) و[الـ Pipeline بتاع الـ Deployment](deployment-pipeline-ar.md).
 
 ---
 
 # الجزء B. الاستعادة من نسخة احتياطية على سيرفر اتعمله إعادة بناء
 
-> **حالة الجزء B: BLOCKED للتعافي الكامل للخدمة.** الموجود: استعادة Database التطبيق في Database مؤقتة (`restore-db`)، والسكريبتات اللي بتكتب الـ Dump وأرشيف التخزين، والسكريبتات اللي بتكتب Dump الـ Keycloak. الناقص: تسلسل مدعوم ومتجرَّب على أكتر من مخزن يغطي تجهيز أو استعادة Keycloak، واستعادة التخزين، وتحويل التطبيق للـ Database المستعادة، وملكية وصلاحيات الكائنات المستعادة، والتحقق. قرار مطلوب من المالك: يحدد ويصرّح بتسلسل واحد ويجرّبه على سيرفر مؤقت. الصفحة دي مابتخترعش واحد. التثبيت النظيف في الجزء A فاضل DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED.
+> **حالة الجزء B: BLOCKED للتعافي الكامل للخدمة.** الموجود: استعادة Database التطبيق في Database مؤقتة (`restore-db`)، والسكريبتات اللي بتكتب الـ Dump وأرشيف التخزين، والسكريبتات اللي بتكتب Dump الـ Keycloak. الناقص: تسلسل مدعوم ومتجرَّب على أكتر من مخزن يغطي تجهيز أو استعادة Keycloak، واستعادة التخزين، وتحويل التطبيق للـ Database المستعادة، وملكية وصلاحيات الكائنات المستعادة، والتحقق. قرار مطلوب من المالك: يحدد ويصرّح بتسلسل واحد ويجرّبه على سيرفر مؤقت. الصفحة دي مابتخترعش واحد. التثبيت النظيف في الجزء A لسه حالته DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED.
 
 استخدم الجزء ده على سيرفر جديد ومعزول بس بعد ما خطوات الجزء A من 1 لـ 18 تطلّع Stack سليم فاضي، ومعاك نسخ احتياطية نسختها من سيرفر سابق. منطق القرار الكامل وتفاصيل البيانات اللي ممكن تضيع والسيناريوهات في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)؛ والقسم ده بيسرد اللي الكود بيدعمه بس.
 
@@ -511,6 +556,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 - الـ Deploy Workflow بيكتب الدومين `167-86-90-174.sslip.io` واسم الـ Login على GHCR `afawzy70` بشكل ثابت؛ إعادة بناء على IP تاني محتاجة تعديل بيعدّي على Review في الـ Workflow (الخطوة 17).
 - مش متحقق منه على السيرفر الشغّال: القيمة الفعلية لـ `PermitRootLogin`، سياسة sudo، حالة وقواعد `ufw`، حاويات Docker والشبكات والـ Volumes، أماكن الـ Named Volumes بتاعة Docker على الـ Host (الـ `compose.yaml` مابيحددهاش؛ فحصها بيتم بفحص Volumes على إيد أدمن مُصرَّح له)، ملكية ملفات النسخ الاحتياطي اللي بتكتبها الحاويات، قيمة `STAGING_SSH_USER`، هل فيه Cron للنسخ الاحتياطي، تجديد الشهادات، هل الـ Compose Override بيتستخدم.
 - خطوات الطلب من Contabo والـ Firewall على مستوى اللوحة مش متوثقة في أي مكان في الـ Repository.
+- وصفات الحسابات وتقوية SSH وقواعد الـ Firewall وإصدارات Docker ومسارات وقيم الخطوتين 10 و 13 وجدول النسخ الاحتياطي كلها اختيارات PROPOSED. قسم "المطابقة مع سيرفر Contabo المُلاحَظ" بيعدّد لكل خطوة اللي بيطابق الحالة المُلاحَظة واللي بيختلف واللي NOT VERIFIED.
 - مفيش إجراء استعادة في الكود لـ Database الـ Keycloak ولا لأرشيف الـ Storage. التعافي الكامل للخدمة BLOCKED (شوف الصندوق في أول الجزء B).
 - إعدادات المصادقة الفعلية في الـ SSH (منها `PasswordAuthentication` و`KbdInteractiveAuthentication`) NOT VERIFIED: اللي كان مقروء نص ملفات الإعدادات بس.
 - أوامر الأدمن اللي هتحسم كذا بند من اللي فوق متجمّعة في [التحقق للقراءة فقط للأدمن](admin-readonly-verification-ar.md)؛ حساب الـ Agent ماينفعش يشغّلها أبدًا.
