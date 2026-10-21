@@ -169,7 +169,7 @@ sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|kbdinteractivea
 
 ### الخطوة 7. الـ Firewall
 
-المتطلب المسبق: الخطوة 6. ملف الـ Compose بينشر البورتات 80 و 443 بس على كل الـ Interfaces؛ وGrafana منشور على `127.0.0.1:3000` بس (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`). الـ Sockets العامة على السيرفر الحالي هي 22 و 80 و 443 (VERIFIED LIVE). هل `ufw` مفعّل وإيه القواعد الموجودة NOT VERIFIED LIVE (الحزمة متسطّبة). Firewall على لوحة المزوّد عند Contabo NOT VERIFIED. تعليمات الـ Firewall السحابي بتاع Hetzner OUTDATED / INCORRECT للسيرفر ده.
+المتطلب المسبق: الخطوة 6. على صورة سيرفر جديدة سطّب أداة الـ Firewall الأول: `sudo apt-get -y install ufw` (بيغيّر الحالة؛ الخطوة 3 مابتسطّبهاش). على السيرفر الحالي حزمة `ufw` متسطّبة (VERIFIED LIVE)، وده مش دليل إنها موجودة في صورة سيرفر جديدة. ملف الـ Compose بينشر البورتات 80 و 443 بس على كل الـ Interfaces؛ وGrafana منشور على `127.0.0.1:3000` بس (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`). الـ Sockets العامة على السيرفر الحالي هي 22 و 80 و 443 (VERIFIED LIVE). هل `ufw` مفعّل وإيه القواعد الموجودة NOT VERIFIED LIVE. Firewall على لوحة المزوّد عند Contabo NOT VERIFIED. تعليمات الـ Firewall السحابي بتاع Hetzner OUTDATED / INCORRECT للسيرفر ده.
 
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
@@ -227,7 +227,7 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 
 فجوة مهمة: `.env.example` و`compose.yaml` و`admin-console.sh` الافتراضي لـ `GENERATED_DIR` فيهم هو المسار القديم `/srv/matbakhy-preview/generated`، بينما الـ CD بينشر في `/srv/matbakhy-staging`. لازم إعادة البناء تضبط `GENERATED_DIR` صراحةً في الخطوة 13. إزاي `.env` الشغّال بيضبطه NOT VERIFIED (Mode 600 وماتقراش)؛ المجلد الموجود `/srv/matbakhy-staging/generated` بيوحي إنه بيشاور هناك.
 
-الملفات اللي بتتكتب من الـ Containers: حاوية PostgreSQL بتكتب الـ Dumps في `/backups` (الـ `BACKUP_DIR` المربوط كـ Bind Mount) وأرشيف الـ Storage بتكتبه حاوية كمان. أنهي مالك رقمي الملفات دي بتاخده وهل حساب الـ Deploy يقدر يقراها NOT VERIFIED. بعد أول نسخة احتياطية يقدر الأدمن يتحقق بـ `ls -ln /srv/matbakhy-backups` (راجع [التحقق للقراءة فقط للأدمن](admin-readonly-verification-ar.md)).
+الملفات اللي بتتكتب من الـ Containers: حاوية PostgreSQL بتكتب الـ Dumps في `/backups` (الـ `BACKUP_DIR` المربوط كـ Bind Mount) وأرشيف الـ Storage بتكتبه حاوية كمان. رقم المستخدم المالك للملفات دي (UID) بيكون إيه، وهل حساب الـ Deploy يقدر يقراها NOT VERIFIED. بعد أول نسخة احتياطية يقدر الأدمن يتحقق بـ `ls -ln /srv/matbakhy-backups` (راجع [التحقق للقراءة فقط للأدمن](admin-readonly-verification-ar.md)).
 
 ### الخطوة 11. حط ملفات الـ Deployment على السيرفر (أول مرة بس)
 
@@ -413,7 +413,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### الخطوة 24. مفتاح كونسول أدمن Keycloak
 
-آخر خطوة في الـ CD Job بتشغّل `./deploy.sh admin-console enable`: بياخد نسخة احتياطية، ويقوّي الـ Realm الرئيسي (كلمة مرور لمرة واحدة مطلوبة، من غير password grant، حماية من هجمات التخمين المتكرر (Brute-force Protection))، ويعمل ملف المفتاح ويتحقق من الـ URL العام، ويقفله تاني عند الفشل (VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`، موافقة المالك يوم 2026-10-19). على السيرفر الحالي الـ Host بيرد 302 إلى `/admin/master/console/` (VERIFIED LIVE)، فالمفتاح مفتوح والكونسول منشور. اقرا [كونسول أدمن Keycloak](../../operations/14-keycloak-admin-console.md) قبل أول تسجيل دخول.
+آخر خطوة في الـ CD Job بتشغّل `./deploy.sh admin-console enable`: بياخد نسخة احتياطية، ويقوّي الـ Realm الرئيسي (كلمة مرور لمرة واحدة مطلوبة، من غير password grant، حماية من هجمات التخمين المتكرر (Brute-force Protection))، ويعمل ملف المفتاح ويتحقق من الـ URL العام، ويقفله تاني لو التقوية أو الفتح أو التحقق فشل. بعد كده السكريبت بيحط علامة "enabled" (ومن بعدها الـ Exit Trap مابيقفلش المفتاح تاني)، ولو مفيش أدمن يقدر يسجّل دخول بس بينادي `create-admin` لحساب المالك. لو النداء الأخير ده فشل، الأمر بيخرج بخطأ لكن المفتاح بيفضل مفتوح (VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`، موافقة المالك يوم 2026-10-19). بعد أي `enable` فشل، شغّل `./deploy.sh admin-console status`، ولو المفتاح مفتوح من غير أدمن شغّال شغّل `./deploy.sh admin-console disable`. السكريبت بيكتب Dump لـ Database الـ Keycloak في `BACKUP_DIR/keycloak/keycloak-db-<stamp>.dump` مع كل `enable`؛ هل اتنفّذ على السيرفر الشغّال وقد إيه حديث وهل ينفع يتستعاد NOT VERIFIED LIVE. على السيرفر الحالي الـ Host بيرد 302 إلى `/admin/master/console/` (VERIFIED LIVE)، فالمفتاح مفتوح والكونسول منشور. اقرا [كونسول أدمن Keycloak](../../operations/14-keycloak-admin-console.md) قبل أول تسجيل دخول.
 
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
@@ -442,7 +442,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### الخطوة 27. Fixtures الـ E2E بتاعة المالك (اختياري)
 
-تغيير في `deploy/web-preview/owner-e2e-run.request` على `develop` بيحفّز `.github/workflows/owner-e2e-provision.yml`. أول كلمة فيه هي `plan` (للقراءة فقط) أو `apply` (نسخة احتياطية متحقق منها، استيراد جزئي لـ Keycloak، SQL Seeds، تحديث الـ Slots، مطابقة (Reconciliation))؛ بيستنى Deployment نفس الـ Commit وبعدين بيشغّل `./owner-e2e-provision.sh` على السيرفر عن طريق نفس Secrets الـ SSH (VERIFIED IN CODE). بيرفض إلا لو الـ API بيبلّغ `APP_ENV=PREVIEW`. الباسوردات المولّدة بتتكتب في ملف Mode 600 تحت `BACKUP_DIR/owner-e2e-private/<run>` وعمرها ما بتتطبع. اتخطى الخطوة دي إلا لو اختبار قبول المالك محتاجها.
+تغيير في `deploy/web-preview/owner-e2e-run.request` على `develop` بيحفّز `.github/workflows/owner-e2e-provision.yml`. أول كلمة فيه هي `plan` (مابيغيّرش بيانات التطبيق؛ لكن السكريبت بينشئ `BACKUP_DIR` لو مش موجود وبيفتح ملف القفل المشترك قبل ما يختار الوضع) أو `apply` (نسخة احتياطية متحقق منها، استيراد جزئي لـ Keycloak، SQL Seeds، تحديث الـ Slots، مطابقة (Reconciliation))؛ بيستنى Deployment نفس الـ Commit وبعدين بيشغّل `./owner-e2e-provision.sh` على السيرفر عن طريق نفس Secrets الـ SSH (VERIFIED IN CODE). بيرفض إلا لو الـ API بيبلّغ `APP_ENV=PREVIEW`. الباسوردات المولّدة بتتكتب في ملف Mode 600 تحت `BACKUP_DIR/owner-e2e-private/<run>` وعمرها ما بتتطبع. اتخطى الخطوة دي إلا لو اختبار قبول المالك محتاجها.
 
 الأمر المدمّر `./deploy.sh e2e-reset` كمان محتاج ملف العلامة `.e2e-enabled` وHosts عملاء مش عامة وتأكيد بالكتابة (Typed Confirmation) (VERIFIED IN CODE). ماتشغّلهوش أبدًا على Preview شغّال.
 
@@ -478,7 +478,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 | `./deploy.sh rollback-plan` | VPS، `<deploy-user>` | للقراءة فقط (بيطبع بس) | مع مدخلين على الأقل في `releases.log` بيطبع الـ Commit الهدف ونتيجة التقييم (Verdict)؛ ومع مدخل واحد بيقول `only 1 release(s) recorded` | مفيش سجل: ماحصلش `up` مكتمل لسه |
 | `./deploy.sh status` | VPS، `<deploy-user>` | للقراءة فقط | الصور المضبوطة بتطابق الشغّالة | عدم تطابق: Deployment فاشل |
 
-قواعد الـ Rollback: الرجوع لإصدار Docker Images سابق من غير استرجاع قاعدة البيانات آمن لما الـ Schema ماتحركش أو كل Migration لاحق هو expand-only (`scripts/check_migration_compat.py` بيفرض الـ Annotation في الـ CI)؛ غير كده استعد النسخة الاحتياطية المأخوذة قبل أول Deployment طبّقهم (البيانات المكتوبة من وقتها بتضيع). الـ CD Job بيستعيد `.env` بس عند الفشل، عمره ما بيستعيد الـ Database. جداول القرار في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) و[الـ Pipeline بتاع الـ Deployment](deployment-pipeline-ar.md).
+قواعد الـ Rollback: الرجوع لإصدار Docker Images سابق من غير استرجاع قاعدة البيانات آمن لما مفيش أي تغيير في بنية الـ Database Schema اتطبّق بعد الإصدار المستهدف أو كل Migration لاحق هو expand-only (`scripts/check_migration_compat.py` بيفرض الـ Annotation في الـ CI)؛ غير كده استعد النسخة الاحتياطية المأخوذة قبل أول Deployment طبّقهم (البيانات المكتوبة من وقتها بتضيع). الـ CD Job بيستعيد `.env` بس عند الفشل، عمره ما بيستعيد الـ Database. جداول القرار في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) و[الـ Pipeline بتاع الـ Deployment](deployment-pipeline-ar.md).
 
 ---
 
@@ -489,18 +489,18 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 | البند | الكود بيعمل إيه | الحالة |
 |---|---|---|
 | Database التطبيق | `./deploy.sh restore-db <dump>` بيشغّل `scripts/db-restore.sh` جوه حاوية postgres مع `RESTORE_CONFIRM_TARGET=matbakhy_restore`: فحص Checksum، يعمل Database `matbakhy_restore` لو مش موجودة، يرفض هدف غير فاضي، `pg_restore`، وبعدين مطابقة. مابيكتبش فوق Database `matbakhy` الشغّالة؛ تحويل التطبيق لاستخدام الـ Database المستعادة خطوة يدوية من المالك | VERIFIED IN CODE: `deploy.sh`، `scripts/db-restore.sh` |
-| Database الـ Keycloak | `owner-e2e-provision.sh apply` بيكتب `pg_dump` لـ `keycloak` تحت `BACKUP_DIR/keycloak`؛ مفيش سكريبت استعادة ليه. لازم Secrets الـ Realm في Database مستعادة تطابق `.env` الجديد | إجراء NOT VERIFIED |
+| Database الـ Keycloak | تلات سكريبتات بتكتب `pg_dump` لـ `keycloak` تحت `BACKUP_DIR/keycloak`: `admin-console.sh` (`enable` و`backup`) و`migrate-mfa.sh` (`backup` و`apply`) و`owner-e2e-provision.sh apply`؛ تنفيذها على السيرفر الشغّال وحداثة الـ Dumps وهل بتتستعاد NOT VERIFIED LIVE. مفيش سكريبت استعادة ليها (`migrate-mfa.sh` بس بيذكر `pg_restore` جوه Database `keycloak` فاضية والـ Identity واقف، كتعليمة في تعليق). لازم Secrets الـ Realm في Database مستعادة تطابق `.env` الجديد | إجراء NOT VERIFIED |
 | تخزين الصور | `./deploy.sh backup` بيعمل `storage-<stamp>.tgz`؛ مفيش سكريبت استعادة | إجراء NOT VERIFIED |
 | الـ Secrets (`.env`) | مش في أي نسخة احتياطية عن قصد؛ `.env` مفقود مايتولّدش تاني من غير ما يكسر الـ Volumes الموجودة (الخطوة 12) | VERIFIED IN CODE |
 
-الجدول ده قايمة باللي الكود بيدعمه، مش تسلسل استعادة ينفع يتعمل عليه تمرين. الناقص في الـ Repository: استعادة Keycloak والتخزين، تحويل التطبيق للـ Database المستعادة، ملكية وصلاحيات الكائنات المستعادة، التعامل مع الـ Secrets، والتحقق والـ Rollback للتحويل ده. اعتبر الاستعادة NOT VERIFIED وغير كافية تشغيليًا لحد ما المالك يحدد ويجرّب تسلسل واحد يغطي كل مخازن البيانات.
+الجدول ده قايمة باللي الكود بيدعمه، مش تسلسل استعادة ينفع يتعمل عليه تمرين. الناقص في الـ Repository: استعادة Keycloak والتخزين، تحويل التطبيق للـ Database المستعادة، ملكية وصلاحيات الكائنات المستعادة، مطابقة Secrets الـ Realm وعناوين الـ Redirect URIs للـ Front Image والـ Client في الـ Realm مع الدومين الجديد، التعامل مع الـ Secrets، والتحقق والـ Rollback للتحويل ده. يعني الـ Repository بيدّي لبنات استعادة لـ Database التطبيق بس، ومش بيدّي تسلسل يتعمل عليه تمرين يغطي أكتر من مخزن، والصفحة دي مابتخترعوش. اعتبر الاستعادة NOT VERIFIED ومش متجرّبة. قرار مطلوب من المالك: يحدد تسلسل واحد مُصرَّح بيه يغطي Database التطبيق وDatabase الـ Keycloak وأرشيف التخزين وتحويل التطبيق، وبعدين يجرّبه على سيرفر مؤقت.
 
 التحقق بعد الاستعادة: `./deploy.sh status` (نسخة الـ Schema) وأسطر عدد الصفوف اللي بتطبعها خطوة المطابقة. ماتعتبرش الاستعادة مكتملة لحد ما أدمن مُصرَّح له يشغّل فحوصات صفحة الاستعادة وانت تجرّب الإجراء على سيرفر مؤقت.
 
 ## القيود المعروفة وفجوات التوثيق
 
 - الدليل ده NOT EXECUTION VERIFIED. الـ Bootstrap في الخطوة 11 (النسخ اليدوي الأول) وأوامر الصلاحيات مشتقة من الكود وماتشغّلتش.
-- `GENERATED_DIR` افتراضيه `/srv/matbakhy-preview/generated` في `.env.example` و`compose.yaml` و`admin-console.sh`، بينما الـ CD بينشر في `/srv/matbakhy-staging`؛ القيمة الشغّالة NOT VERIFIED. تعارض في التوثيق: `deploy/web-preview/README.md` و`docs/operations/09-staging-hetzner-preparation.md` لسه بيوصفوا ملف Hetzner 2 vCPU / 4 GB، و`docs/operations/12-owner-server-setup.md` بيعدّد خمس Hosts DNS (من غير `kc-admin`) والمسار `/srv/matbakhy-preview` (كلهم OUTDATED / INCORRECT لسيرفر Contabo).
+- `GENERATED_DIR` افتراضيه `/srv/matbakhy-preview/generated` في `.env.example` و`compose.yaml` و`admin-console.sh`، بينما الـ CD بينشر في `/srv/matbakhy-staging`؛ القيمة الشغّالة NOT VERIFIED. تعارض في التوثيق: `deploy/web-preview/README.md` و`docs/operations/09-staging-hetzner-preparation.md` لسه بيوصفوا سيرفر Hetzner بمواصفات 2 vCPU / 4 GB، و`docs/operations/12-owner-server-setup.md` بيعدّد خمس Hosts DNS (من غير `kc-admin`) والمسار `/srv/matbakhy-preview` (كلهم OUTDATED / INCORRECT لسيرفر Contabo).
 - الـ Deploy Workflow بيكتب الدومين `167-86-90-174.sslip.io` واسم الـ Login على GHCR `afawzy70` بشكل ثابت؛ إعادة بناء على IP تاني محتاجة تعديل بيعدّي على Review في الـ Workflow (الخطوة 17).
 - مش متحقق منه على السيرفر الشغّال: القيمة الفعلية لـ `PermitRootLogin`، سياسة sudo، حالة وقواعد `ufw`، حاويات Docker والشبكات والـ Volumes، ملكية ملفات النسخ الاحتياطي اللي بتكتبها الحاويات، قيمة `STAGING_SSH_USER`، هل فيه Cron للنسخ الاحتياطي، تجديد الشهادات، هل الـ Compose Override بيتستخدم.
 - خطوات الطلب من Contabo والـ Firewall على مستوى اللوحة مش متوثقة في أي مكان في الـ Repository.

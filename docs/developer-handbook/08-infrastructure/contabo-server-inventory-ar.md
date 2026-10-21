@@ -14,7 +14,7 @@
 | VERIFIED IN CODE | اتقرا في الـ Repository ده (الملف مذكور في الصف). بيوصف السلوك المقصود، مش بالضرورة اللي شغّال فعلًا. |
 | DOCUMENTED ONLY | مستند بيقول كده؛ ومفيش حاجة بتأكده. |
 | OUTDATED / INCORRECT | مكتوب للـ Host المقترح على Hetzner أو اتلغى بحاجة أحدث، وبيتعارض مع دليل أحدث. |
-| NOT VERIFIED | ماتلاحظش ومش موجود في الـ Repository. الأمر اللي الأدمن هيشغّله عشان يتحقق منه موجود في [التحقق للقراءة فقط بواسطة الأدمن](admin-readonly-verification-ar.md). |
+| NOT VERIFIED | ماتلاحظش ومش موجود في الـ Repository. الأمر اللي الأدمن هيشغّله عشان يتحقق منه موجود في [التحقق بأوامر للقراءة فقط بواسطة الأدمن](admin-readonly-verification-ar.md). |
 
 الـ Preview بيئة بتشتغل ببيانات تجريبية غير حقيقية (Synthetic Data)، مش Production ومش بيئة إصدار ([البنية التحتية والـ Deployment](../03-architecture/infrastructure-and-deployment-ar.md)).
 
@@ -59,7 +59,7 @@
 قواعد لازم تفضل صحيحة:
 
 - aiagent مش في مجموعة sudo ولا docker، ومينفعش ياخد صلاحيات sudo أو Docker أبدًا. ومش قادر يقرا /var/run/docker.sock، وده سبب إن حالة الـ Containers NOT VERIFIED هنا.
-- ماتغيّرش أي صلاحية أو عضوية مجموعة أو حساب عشان تتكتب الصفحة دي.
+- ماحصلش أي تغيير في الصلاحيات أو عضويات المجموعات أو الحسابات عشان نكتب الصفحة دي.
 
 ### المسؤوليات
 
@@ -147,18 +147,18 @@ VERIFIED IN CODE (`deploy/web-preview/compose.yaml`, project name matbakhy-previ
 | /etc/cron.d | e2scrub_all, staticroute, sysstat | VERIFIED LIVE |
 | جدول النسخ الاحتياطي بتاع Matbakhy | مش ظاهر. الـ Crontabs بتاعة المستخدمين التانيين مش مقروءة للـ aiagent. المستندات الأقدم بتقول للمشغّل يضيف مدخل Cron يومي لـ `deploy.sh backup` للمستخدم اللي بيشغّل السيرفر | NOT VERIFIED على الـ Host ده؛ DOCUMENTED ONLY في `docs/operations/12-owner-server-setup.md`, section 9 |
 
-لو مفيش مدخل Cron، مفيش حاجة بتعمل نسخ احتياطية بين الـ Deployments غير النسخة الاحتياطية اللي بتتاخد قبل كل Deploy بواسطة `deploy.sh up` (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function up). شوف [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md).
+الـ Repository بياخد نسخة احتياطية قبل كل Deploy في `deploy.sh up` (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function up). هل فيه نسخ احتياطي تاني متجدول أو بيتعمل يدوي؟ ده NOT VERIFIED: الـ Crontabs بتاعة المستخدمين التانيين وقائمة الـ systemd timers الكاملة وأي ممارسة يدوية ماتفحصتش (الأمرين 12 و 15 في صفحة الأدمن). غياب مدخل Cron ظاهر مش معناه إن مفيش نسخ احتياطي متجدول أو يدوي. شوف [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md).
 
 ## 7. نسخة /srv/matbakhy-preview القديمة
 
 - VERIFIED LIVE: المجلد /srv/matbakhy-preview (devops:devops, 775) فيه نسخة أقدم من ملفات الـ Deploy بتاريخ Oct 17 إلى 18؛ وملف deploy.sh بتاعها أصغر من اللي في /srv/matbakhy-staging.
 - VERIFIED IN CODE: القيمة الافتراضية لـ GENERATED_DIR في الاتنين `deploy/web-preview/compose.yaml` و`deploy/web-preview/.env.example` لسه /srv/matbakhy-preview/generated. لكن الـ Workflow بتاع الـ Deployment موجّه لـ /srv/matbakhy-staging.
-- النتيجة: القيمة الافتراضية في الـ Repository ومجلد الـ Deployment الشغّال مختلفين. لو ملف .env الشغّال مش بيعمل Override لـ GENERATED_DIR وBACKUP_DIR، الإعدادات المتولّدة بالـ Render (بما فيها الأسرار) ومجلد الـ Flags هيبقوا تحت المسار القديم. القيم اللي بيظبطها .env الشغّال NOT VERIFIED؛ والأمر 2 في صفحة الأدمن بيقرا أسماء المفاتيح دي بس.
+- النتيجة: القيمة الافتراضية في الـ Repository ومجلد الـ Deployment الشغّال مختلفين. لو ملف .env الشغّال مش بيعمل Override لـ GENERATED_DIR، الإعدادات المتولّدة بالـ Render (بما فيها الأسرار) ومجلد الـ Flags هيبقوا تحت المسار القديم (BACKUP_DIR إعداد مستقل ومابيحدّدش مكان الإعدادات المتولّدة). القيم اللي بيظبطها .env الشغّال NOT VERIFIED؛ والأمر 2 في صفحة الأدمن بيقرا أسماء المفاتيح دي بس.
 - ماتمسحش المجلد القديم ولا تعيد استخدامه قبل ما ده يتأكد. اعتبره نسخة قديمة (Legacy) وماتشغّلش `deploy.sh` منه.
 
 ## 8. NOT VERIFIED LIVE (ملخص)
 
-كل اللي تحت محتاج أدمن بنية تحتية مصرّح له. أرقام الأوامر بتشير لـ [التحقق من صلاحية القراءة بس للأدمن](admin-readonly-verification-ar.md).
+كل اللي تحت محتاج أدمن بنية تحتية مصرّح له. أرقام الأوامر بتشير لـ [التحقق بأوامر للقراءة فقط بواسطة الأدمن](admin-readonly-verification-ar.md).
 
 | الموضوع | ليه مجهول | الأمر |
 |---|---|---|
@@ -169,7 +169,7 @@ VERIFIED IN CODE (`deploy/web-preview/compose.yaml`, project name matbakhy-previ
 | حدود الـ Container (الذاكرة، الـ CPU) المطبّقة فعلًا | نفس السبب | 7 |
 | الـ Docker volumes وأسماؤها وأحجامها | نفس السبب | 8, 9, 14 |
 | شبكات Docker | نفس السبب | 6 |
-| الـ systemd timers (القائمة الكاملة، منها أي Timer بتاع Matbakhy) | اتشافت جزء منها بس | 15 |
+| الـ systemd timers (القائمة الكاملة، منها أي Timer بتاع Matbakhy) | اتشاف جزء منها بس | 15 |
 | ملفات الشهادات وحالة التجديد في الـ Volume بتاع Caddy | مسار الـ Volume مش مقروء | 10 |
 | محتوى .env (القيم) | سر؛ وأسماء مفاتيح قليلة غير سرية بس هي اللي ممكن تتشيّك | 2 |
 | محتوى /srv/matbakhy-backups و/srv/backups و/srv/deployments | مش ممكن عرضها | 11 |
@@ -191,7 +191,7 @@ VERIFIED IN CODE (`deploy/web-preview/compose.yaml`, project name matbakhy-previ
 | `deploy/web-preview/compose.4gb.yaml` وملاحظات الـ 4 GB في `deploy/web-preview/README.md` | حدود ذاكرة لجهاز 4 GB | OUTDATED / INCORRECT بالنسبة للحجم؛ إن الـ Override لسه متختار، ده NOT VERIFIED. |
 | `deploy/web-preview/.env.example` | GENERATED_DIR تحت /srv/matbakhy-preview | مختلف عن المجلد الشغّال؛ شوف [القسم 7](#7-نسخة-srvmatbakhy-preview-القديمة). |
 
-التعليمات الحالية هي الصفحة دي، و[التحقق من صلاحية القراءة بس للأدمن](admin-readonly-verification-ar.md)، و[مسار الـ Deployment](deployment-pipeline-ar.md)، و[دليل إعادة بناء السيرفر](server-rebuild-guide-ar.md).
+التعليمات الحالية هي الصفحة دي، و[التحقق بأوامر للقراءة فقط بواسطة الأدمن](admin-readonly-verification-ar.md)، و[مسار الـ Deployment](deployment-pipeline-ar.md)، و[دليل إعادة بناء السيرفر](server-rebuild-guide-ar.md).
 
 ## القيود المعروفة وفجوات التوثيق
 

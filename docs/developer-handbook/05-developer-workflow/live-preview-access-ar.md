@@ -4,7 +4,7 @@
 > **Status:** PARTIALLY IMPLEMENTED — الستة عناوين بتاعة الـ Preview بترد زي ما هو موضّح تحت (اتلاحظت من الـ VPS نفسه)؛ أما تجهيز الحسابات وقوائم السماح للشبكات والرحلات من شبكات تانية فهي NOT VERIFIED LIVE.
 > **Language / اللغة:** [English](live-preview-access.md) · العربية
 
-**دليل الوسوم (Evidence legend).** VERIFIED LIVE: اتلاحظ يوم 2026-10-21 بواسطة مستخدم غير مميّز على الـ Contabo VPS نفسه، للقراءة فقط (سجل الحقائق الحيّة بتاع الدليل ده). VERIFIED IN CODE: اتقرأ في الـ Repository ده. DOCUMENTED ONLY: مستند في الـ Repository بيقوله من غير ما يتأكد. OUTDATED / INCORRECT: بيتعارض مع دليل أحدث. NOT VERIFIED: محدش أكّده؛ والنص بيوضّح إزاي شخص مصرّح له يقدر يأكّده.
+**دليل الوسوم (Evidence legend).** VERIFIED LIVE: اتلاحظ يوم 2026-10-21 بواسطة مستخدم معندوش صلاحيات إدارية على الـ Contabo VPS نفسه، للقراءة فقط (سجل الحقائق الحيّة بتاع الدليل ده). VERIFIED IN CODE: اتقرأ في الـ Repository ده. DOCUMENTED ONLY: مستند في الـ Repository بيقوله من غير ما يتأكد. OUTDATED / INCORRECT: بيتعارض مع دليل أحدث. NOT VERIFIED: محدش أكّده؛ والنص بيوضّح إزاي شخص مصرّح له يقدر يأكّده.
 
 الصفحة دي للمطوّر أو المختبِر أو المالك اللي محتاج يفتح الـ Preview الشغّال ويمشي رحلة بيزنس عليه. هي مش بتكرر تفاصيل الشاشات اللي في صفحات الرحلات؛ هي بتضيف العناوين الحيّة، وردود الـ HTTP المتوقعة، ولكل رحلة الحساب ونقطة الدخول والضغطات بالظبط. الـ Preview بيئة ببيانات تجريبية غير حقيقية (Synthetic Data) وعليها علامة Demo، مش Staging ومش Production (شوف [بيئة المعاينة](preview-environment-ar.md)). تخطيط السيرفر موجود في [جرد سيرفر Contabo](../08-infrastructure/contabo-server-inventory-ar.md) و[معمارية التشغيل](../08-infrastructure/runtime-architecture-ar.md).
 
@@ -15,7 +15,7 @@
 | الاسم | الـ URL | الغرض | الرد الملاحَظ (من الـ VPS نفسه) | الحالة | الـ Authentication والشبكة | مين المفروض يستخدمه |
 |---|---|---|---|---|---|---|
 | Customer Web | `https://app.167-86-90-174.sslip.io/` | تطبيق العميل (Single-Page App) للتصفّح والسلة والـ Checkout والأوردرات | 200 | VERIFIED LIVE | التصفّح من غير تسجيل دخول؛ والأوردر محتاج تسجيل دخول Keycloak. فئة IP بتاعة العملاء (`CUSTOMER_ALLOWED_IPS`) | العملاء، المختبِرين، المطوّرين |
-| Operations Web | `https://ops.167-86-90-174.sslip.io/` | مساحة عمل الطبّاخ والـ Back Office (تطبيق واحد، والتابات حسب الحساب) | 200 | VERIFIED LIVE | تسجيل الدخول مطلوب للبيانات. فئة IP بتاعة الموظفين (`STAFF_ALLOWED_IPS`) | الطبّاخين، الموظفين، المختبِرين |
+| Operations Web | `https://ops.167-86-90-174.sslip.io/` | مساحة عمل الطبّاخ والـ Back Office (تطبيق واحد، والتابات حسب الحساب) | 200 | VERIFIED LIVE | تسجيل الدخول مطلوب للبيانات. فئة IP بتاعة الموظفين (`STAFF_ALLOWED_IPS`) وفئة العملاء كمان (تسجيل الدخول وطلبات الـ API بتعدّي على Hosts بتتبع فئة العملاء) | الطبّاخين، الموظفين، المختبِرين |
 | Public API configuration | `https://api.167-86-90-174.sslip.io/api/v1/configuration/public` | إعدادات الـ Preview العامة اللي بيقراها تطبيقا الويب | 200 مع JSON فيه `orderingAvailable` و`orderLimits` و`environment` باسم `PREVIEW` و`demo` بقيمة true | VERIFIED LIVE | من غير تسجيل دخول. فئة IP بتاعة العملاء؛ والمسارات تحت `/api/v1/ops` و`/api/v1/cook` محتاجة فئة الموظفين | المطوّرين، الـ Smoke Tests |
 | Keycloak | `https://id.167-86-90-174.sslip.io/` | تسجيل الدخول للـ Realm `matbakhy` | 302 مع `Location` بقيمة `https://kc-admin.167-86-90-174.sslip.io/admin/` | VERIFIED LIVE | فئة IP بتاعة العملاء؛ صفحات تسجيل الدخول بتاعة الـ Realm بتتفتح من خلال التطبيقات، مش بكتابة الـ Root ده | محدش بيكتبه؛ التطبيقات هي اللي بتعمل Redirect ليه |
 | Keycloak administration | `https://kc-admin.167-86-90-174.sslip.io/` | كونسول إدارة Keycloak، للـ Preview بس | 302 مع `Location` بقيمة `/admin/master/console/` | VERIFIED LIVE | كلمة سر وكلمة سر لمرة واحدة، من غير تقييد بـ IP | الأدمنز المصرّح لهم بس |
@@ -31,7 +31,7 @@
 
 | الرد | معناه | هل ده عطل؟ |
 |---|---|---|
-| 403 مع النص العادي "Not available" | سياسة الدخول بالـ IP في Caddy: الـ IP العام بتاعك مش في الفئة اللي الـ Host ده محتاجها (`respond ... "Not available" 403` في `deploy/web-preview/Caddyfile`). اطلب من المالك يضيف الـ IP بتاعك للفئة الصح. | لا |
+| 403 مع النص العادي "Not available" | سياسة الدخول بالـ IP في Caddy: الـ IP العام بتاعك مش في الفئة اللي الـ Host ده محتاجها (`respond ... "Not available" 403` في `deploy/web-preview/Caddyfile`). اطلب من المالك يضيف الـ IP بتاعك للفئة الصح؛ وبالنسبة لـ Operations Web وشغل الطبّاخ أو الموظفين ده معناه فئة الموظفين وفئة العملاء الاتنين. | لا |
 | 302 على `id.*` ناحية `kc-admin.*` | Keycloak بيبعت الـ Root بتاعه لـ URL الأدمن لأن اسم الـ Host الخاص بالأدمن متظبّط على الـ Host بتاع kc-admin. الـ Caddyfile بيرد على `/admin` و`/realms/master` في `id.*` بـ 404، فالـ Host بتاع العملاء مابيقدّمش الكونسول أبدًا. ده سلوك Keycloak المتوقع (VERIFIED LIVE للـ Redirect؛ وإعداد الـ Hostname هو VERIFIED IN CODE في `deploy/web-preview/compose.yaml`). | لا |
 | 302 على `kc-admin.*` ناحية `/admin/master/console/` | الـ Caddyfile بيعمل Redirect للـ Root هناك. الـ Host بيرد 404 "Not available" طول ما ملف التفعيل (Flag) `/srv/flags/admin-console-public` مش موجود، فلو جه 302 يبقى الكونسول منشور حاليًا (VERIFIED IN CODE؛ أما مكان الـ Flag جوه الـ Container بتاع Caddy فهو NOT VERIFIED). | لا |
 | 403 على Root بتاع `media.*` | الطلب وصل لـ SeaweedFS (الرد فيه `x-amz-request-id` وجسم XML، فمش هو نص "Not available" بتاع Caddy). الهوية المجهولة مسموح لها بـ `Read` بس على الـ Bucket `matbakhy-public` (VERIFIED IN CODE: `deploy/web-preview/storage/s3.json.template`)، فعرض محتويات الـ Root مرفوض بينما رابط Object زي `.../matbakhy-public/<object>` مقروء. كود الخطأ بالظبط في الجسم ماتخزّنش: ماتقولش أكتر من "XML بشكل رد رفض الوصول (Access Denied) بتاع S3". | لا |
@@ -49,7 +49,9 @@
 | الموظف (Staff) | `ops.*`، و`/api/v1/ops/**`، و`/api/v1/cook/**` | `STAFF_ALLOWED_IPS` (VERIFIED IN CODE) |
 | كونسول الأدمن (Administrator console) | `kc-admin.*` | كلمة سر Keycloak نفسه زائد كلمة سر لمرة واحدة (VERIFIED IN CODE) |
 
-القائمتين الاتنين بيرجعوا افتراضيًا لـ `ALLOWED_CLIENT_IPS`؛ ومفيش حاجة مفتوحة للعالم لحد ما المالك يفتحها. القيم الحالية: NOT VERIFIED (ملف `.env` الخاص؛ أدمن مصرّح له يقدر يقراها باتباع [التحقق للقراءة فقط للأدمن](../08-infrastructure/admin-readonly-verification-ar.md)).
+القائمتين الاتنين بيرجعوا افتراضيًا لـ `ALLOWED_CLIENT_IPS`؛ ومفيش حاجة مفتوحة للعالم لحد ما المالك يفتحها.
+
+**المختبِر من الموظفين لازم يبقى في القائمتين.** `ops.*` ومسارات `/api/v1/ops/**` و`/api/v1/cook/**` بتتحقق من `STAFF_ALLOWED_IPS`، لكن نفس طلبات الـ API بتعدّي بعد كده على `customer_access` (`CUSTOMER_ALLOWED_IPS`)، وتسجيل الدخول بيعدّي على `api.*` (`/oauth2/*`) و`id.*`، وهما Hosts بتتبع فئة العملاء (VERIFIED IN CODE: `deploy/web-preview/Caddyfile`، الـ Host `api.*` بيستورد `customer_access` بعد فحص الموظفين، والـ Host `id.*` بيستورد `customer_access`). مختبِر عنوانه في قائمة الموظفين بس ممكن يفتح Operations Web ومع كده يفشل عند تسجيل الدخول أو عند طلبات الـ API بتاعة الطبّاخ والموظفين. لو مختبِر من الطبّاخين أو الموظفين شاف تسجيل دخول فاشل أو تابات ناقصة، اتأكد إن الـ IP العام بتاعه في القائمتين قبل ما تشك في الحسابات أو الصلاحيات. العناوين الموجودة في كل قائمة NOT VERIFIED LIVE. القيم الحالية: NOT VERIFIED (ملف `.env` الخاص؛ أدمن مصرّح له يقدر يقراها باتباع [التحقق بأوامر للقراءة فقط بواسطة الأدمن](../08-infrastructure/admin-readonly-verification-ar.md)).
 
 أسماء حسابات تجريبية غير حقيقية موثّقة للـ Realm `matbakhy` بتاع الـ Preview (DOCUMENTED ONLY: `docs/operations/06-web-preview.md` و`deploy/web-preview/seed-preview.sql` و`docs/quality/owner-acceptance/fixtures.json`). هل كل حساب موجود فعلًا على الـ Realm الحي ولا لأ فهو NOT VERIFIED LIVE.
 
@@ -79,7 +81,7 @@
 | الدور والحساب | عميل. `preview-customer-1` لتسجيل الدخول. حالة العميل الجديد محتاجة `owner-e2e-cust-new-<n>` (متجهّز، NOT VERIFIED LIVE). |
 | الـ URL | `https://app.167-86-90-174.sslip.io/` |
 | التنقّل | Home، وبعدها "Sign in" في الشريط العلوي. |
-| الخطوات | 1. افتح الـ URL. 2. اضغط "Sign in". 3. المتصفّح بيروح لأصل الـ API على `/oauth2/authorization/keycloak`، وبعدها لصفحة تسجيل الدخول في `id.*`. 4. اكتب اسم المستخدم وكلمة السر اللي خدتها من المالك. 5. بترجع للصفحة اللي جيت منها. 6. لإنهاء الـ Session اضغط "Sign out". |
+| الخطوات | 1. افتح الـ URL. 2. اضغط "Sign in". 3. المتصفّح بيروح للـ Origin بتاع الـ API على `/oauth2/authorization/keycloak`، وبعدها لصفحة تسجيل الدخول في `id.*`. 4. اكتب اسم المستخدم وكلمة السر اللي خدتها من المالك. 5. بترجع للصفحة اللي جيت منها. 6. لإنهاء الـ Session اضغط "Sign out". |
 | النتيجة المتوقعة | التنقّل السفلي دلوقتي بيعرض "My orders" و"My account"؛ وبعد تسجيل الخروج بتتمسح مفاتيح السلة والأوردر المعلّق وتسجيل الدخول الجاي بيطلب Credentials تاني. |
 | الـ Backend APIs | `GET /api/v1/me`, `POST /api/v1/auth/logout` (framework route), `GET /oauth2/authorization/keycloak`, `GET /login/oauth2/code/keycloak` |
 | التنفيذ | `apps/customer-web/src/App.tsx`, `backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java`, `backend/modules/identity/src/main/java/com/matbakhy/identity/web/ProfileController.java` |
@@ -94,7 +96,7 @@
 | الدور والحساب | زائر (Guest)، من غير حساب. |
 | الـ URL | `https://app.167-86-90-174.sslip.io/#/` |
 | التنقّل | الصفحة الرئيسية هي صفحة الاكتشاف. |
-| الخطوات | 1. افتح الـ URL. 2. لو حابب، اختار بلاطة نية (Intent Tile)، اكتب في خانة البحث، اختار تصنيف (Category Chip) أو منطقة، غيّر الترتيب. 3. بدّل بين الأطباق والمطابخ. 4. افتح كارت. |
+| الخطوات | 1. افتح الـ URL. 2. لو حابب، اختار كارت حسب اللي بتدور عليه (Intent Tile)، اكتب في خانة البحث، اختار تصنيف (Category Chip) أو منطقة، غيّر الترتيب. 3. بدّل بين الأطباق والمطابخ. 4. افتح كارت. |
 | النتيجة المتوقعة | الكروت بتتحدّث من نتيجة السيرفر مع أسعار بالجنيه (EGP). الوجبة غير المتاحة بتتعلّم بعلامة وماينفعش تتطلب. إشعار الـ Demo ظاهر (الصفحة بتقرا `environment.demo` من الإعدادات العامة). |
 | الـ Backend APIs | `GET /api/v1/meals`, `GET /api/v1/zones`, `GET /api/v1/configuration/public`, `GET /api/v1/kitchens/{slug}` |
 | التنفيذ | `apps/customer-web/src/Browse.tsx`, `backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/discovery/DiscoveryService.java` |
@@ -182,7 +184,7 @@
 |---|---|
 | الميزة والغرض | يخلّي طبّاخ معتمد يدير الوجبات والـ Slots المحددة بتواريخ وسعة وإعدادات المطبخ. |
 | الدور والحساب | طبّاخ: `preview-cook-1` (المطبخ اللي في الـ Seed). |
-| الـ URL | `https://ops.167-86-90-174.sslip.io/` (محتاج فئة IP بتاعة الموظفين) |
+| الـ URL | `https://ops.167-86-90-174.sslip.io/` (محتاج فئة IP بتاعة الموظفين، وفئة العملاء كمان لأن تسجيل الدخول والـ API بيعدّوا على Hosts بتتبع فئة العملاء) |
 | التنقّل | افتح الـ URL، سجّل دخول، وبعدها التابات Home وOrders وMeals وSlots وStatement وInsights وSettings. |
 | الخطوات | 1. سجّل دخول. 2. "Meals": أنشئ أو عدّل وجبة، انشر أو أوقف مؤقتًا أو أرشف، واقرا تاريخ الأسعار. 3. "Slots": أنشئ Slot وحدد السعة. 4. "Settings": الوصف، الاستلام، مناطق التوصيل، إيقاف مؤقت أو استئناف، بروفايل دفع العربون. |
 | النتيجة المتوقعة | بيظهر بس مطبخ المتصل نفسه. الوجبات الموقوفة مؤقتًا أو المسودة بتختفي من الاكتشاف. مستلم الدفع اللي اتغيّر بيفضل مخفي عن العملاء لحد ما الموظفين يوافقوا. |
@@ -284,7 +286,7 @@
 ## القيود المعروفة وفجوات التوثيق
 
 * حسابات owner-e2e وأرقام التليفون المتحقَّق منها مسبقًا بتتجهّز في كل Run؛ وجودها على الـ Preview الحي NOT VERIFIED LIVE. أدمن مصرّح له يقدر يعرض مستخدمي الـ Realm بأدوات أدمن Keycloak الموصوفة في [كونسول أدمن Keycloak](../../operations/14-keycloak-admin-console.md).
-* قيم `CUSTOMER_ALLOWED_IPS` و`STAFF_ALLOWED_IPS`، وهل `ufw` شغّال، كلها NOT VERIFIED LIVE؛ شوف [التحقق للقراءة فقط للأدمن](../08-infrastructure/admin-readonly-verification-ar.md).
+* قيم `CUSTOMER_ALLOWED_IPS` و`STAFF_ALLOWED_IPS`، وهل `ufw` شغّال، كلها NOT VERIFIED LIVE؛ شوف [التحقق بأوامر للقراءة فقط بواسطة الأدمن](../08-infrastructure/admin-readonly-verification-ar.md).
 * المستندات الموجودة (`docs/operations/06-web-preview.md` و`deploy/web-preview/README.md`) اتكتبت لـ Host Hetzner مقترح؛ والـ Host الشغّال هو Contabo. اعتبر الكلام عن تحديد حجم الـ Host في المستندات دي OUTDATED / INCORRECT للـ Preview الحي.
 * صفحة [بيئة المعاينة](preview-environment-ar.md) الموجودة بتسرد `kc-admin` على إنه بيتفتح بـ `deploy.sh admin-console enable`؛ والـ 302 الحي بيأكّد إنه منشور حاليًا، لكن مين فعّله وإمتى فهو NOT VERIFIED.
 * مفيش Deep Links لصفحات العمليات؛ التنقّل بالتابات بس (VERIFIED IN CODE).

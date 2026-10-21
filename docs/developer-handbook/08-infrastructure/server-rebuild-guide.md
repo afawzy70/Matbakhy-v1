@@ -169,7 +169,7 @@ sudo sshd -T | grep -E '^(permitrootlogin|passwordauthentication|kbdinteractivea
 
 ### Step 7. Firewall
 
-Prerequisite: Step 6. The compose file publishes only ports 80 and 443 on all interfaces; Grafana is published on `127.0.0.1:3000` only (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`). Public sockets on the current host are 22, 80 and 443 (VERIFIED LIVE). Whether `ufw` is enabled and which rules exist is NOT VERIFIED LIVE (the package is installed). A provider-panel firewall at Contabo is NOT VERIFIED. The Hetzner cloud firewall instructions are OUTDATED / INCORRECT for this host.
+Prerequisite: Step 6. Install the firewall tool first on a fresh image: `sudo apt-get -y install ufw` (state-changing; Step 3 does not install it). On the current host the `ufw` package is installed (VERIFIED LIVE), which does not show that a newly provisioned image has it. The compose file publishes only ports 80 and 443 on all interfaces; Grafana is published on `127.0.0.1:3000` only (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`). Public sockets on the current host are 22, 80 and 443 (VERIFIED LIVE). Whether `ufw` is enabled and which rules exist is NOT VERIFIED LIVE. A provider-panel firewall at Contabo is NOT VERIFIED. The Hetzner cloud firewall instructions are OUTDATED / INCORRECT for this host.
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
@@ -227,7 +227,7 @@ What the code requires:
 
 Important gap: `.env.example`, `compose.yaml` and `admin-console.sh` default `GENERATED_DIR` to the legacy `/srv/matbakhy-preview/generated`, while CD deploys into `/srv/matbakhy-staging`. A rebuild must set `GENERATED_DIR` explicitly in Step 13. How the live `.env` sets it is NOT VERIFIED (it is mode 600 and was not read); the existing `/srv/matbakhy-staging/generated` directory suggests it points there.
 
-Container-written files: the PostgreSQL container writes dumps into `/backups` (the bind-mounted `BACKUP_DIR`) and the storage archive is written by a container too. Which numeric owner those files get, and whether the deploy account can read them, is NOT VERIFIED. After the first backup an administrator can check with `ls -ln /srv/matbakhy-backups` (see [admin read-only verification](admin-readonly-verification.md)).
+Container-written files: the PostgreSQL container writes dumps into `/backups` (the bind-mounted `BACKUP_DIR`) and the storage archive is written by a container too. Which numeric owner (UID) those files get, and whether the deploy account can read them, is NOT VERIFIED. After the first backup an administrator can check with `ls -ln /srv/matbakhy-backups` (see [admin read-only verification](admin-readonly-verification.md)).
 
 ### Step 11. Put the deployment files on the server (first time only)
 
@@ -413,7 +413,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### Step 24. Keycloak admin console switch
 
-The last step of the CD job runs `./deploy.sh admin-console enable`: it backs up, hardens the master realm (required one-time password, no password grant, brute-force protection), creates the switch file and verifies the public URL, closing it again on failure (VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`, owner approval of 2026-10-19). On the current host the host answers 302 to `/admin/master/console/` (VERIFIED LIVE), so the switch is open. Read [Keycloak admin console](../../operations/14-keycloak-admin-console.md) before first sign-in.
+The last step of the CD job runs `./deploy.sh admin-console enable`: it backs up, hardens the master realm (required one-time password, no password grant, brute-force protection), creates the switch file and verifies the public URL, closing it again if the hardening, the opening or the verification fails. The script then sets its "enabled" marker (after which the exit trap no longer closes the switch) and, only when no administrator can sign in, calls `create-admin` for the owner account. If that last call fails, the command exits with an error but the switch stays open (VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`, owner approval of 2026-10-19). After any failed `enable`, run `./deploy.sh admin-console status` and, if the switch is open without a working administrator, run `./deploy.sh admin-console disable`. The script writes a Keycloak database dump to `BACKUP_DIR/keycloak/keycloak-db-<stamp>.dump` on every `enable`; whether it ran on the live host, how recent it is and whether it can be restored are NOT VERIFIED LIVE. On the current host the host answers 302 to `/admin/master/console/` (VERIFIED LIVE), so the switch is open. Read [Keycloak admin console](../../operations/14-keycloak-admin-console.md) before first sign-in.
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
@@ -442,7 +442,7 @@ Realm users come from the rendered realm file: `preview-customer-1`, `preview-cu
 
 ### Step 27. Owner E2E fixtures (optional)
 
-A change to `deploy/web-preview/owner-e2e-run.request` on `develop` triggers `.github/workflows/owner-e2e-provision.yml`. Its first word is `plan` (read-only) or `apply` (verified backup, Keycloak partial import, SQL seeds, slot refresh, reconciliation); it waits for the deployment of the same commit and then runs `./owner-e2e-provision.sh` on the server over the same SSH secrets (VERIFIED IN CODE). It refuses unless the API reports `APP_ENV=PREVIEW`. Generated passwords are written to a mode-600 file under `BACKUP_DIR/owner-e2e-private/<run>` and are never printed. Skip this step unless owner acceptance testing needs it.
+A change to `deploy/web-preview/owner-e2e-run.request` on `develop` triggers `.github/workflows/owner-e2e-provision.yml`. Its first word is `plan` (makes no application-data changes; the script still creates `BACKUP_DIR` if missing and opens the shared lock file before it selects the mode) or `apply` (verified backup, Keycloak partial import, SQL seeds, slot refresh, reconciliation); it waits for the deployment of the same commit and then runs `./owner-e2e-provision.sh` on the server over the same SSH secrets (VERIFIED IN CODE). It refuses unless the API reports `APP_ENV=PREVIEW`. Generated passwords are written to a mode-600 file under `BACKUP_DIR/owner-e2e-private/<run>` and are never printed. Skip this step unless owner acceptance testing needs it.
 
 The destructive `./deploy.sh e2e-reset` additionally needs the marker file `.e2e-enabled`, non-public customer hosts and a typed confirmation (VERIFIED IN CODE). Never run it on a live Preview.
 
@@ -478,7 +478,7 @@ Before declaring the server ready, confirm the rollback tools work (VERIFIED IN 
 | `./deploy.sh rollback-plan` | VPS, `<deploy-user>` | read-only (prints only) | with at least two entries in `releases.log` it prints the target commit and a verdict; with one entry it says `only 1 release(s) recorded` | no log: no `up` has completed yet |
 | `./deploy.sh status` | VPS, `<deploy-user>` | read-only | configured versus running images match | mismatch: a failed deploy |
 
-Rollback rules: an image-only rollback is safe when the schema did not move or every later migration is expand-only (`scripts/check_migration_compat.py` enforces the annotation in CI); otherwise restore the backup taken before the first deploy that applied them (data written since is lost). The CD job restores only `.env` on failure, never the database. Decision tables are in [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) and [deployment pipeline](deployment-pipeline.md).
+Rollback rules: an image-only rollback is safe when no database schema change was applied since the target release or every later migration is expand-only (`scripts/check_migration_compat.py` enforces the annotation in CI); otherwise restore the backup taken before the first deploy that applied them (data written since is lost). The CD job restores only `.env` on failure, never the database. Decision tables are in [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) and [deployment pipeline](deployment-pipeline.md).
 
 ---
 
@@ -489,18 +489,18 @@ Use this part only on a NEW isolated server after Part A steps 1 to 18 produced 
 | Item | What the code does | Status |
 |---|---|---|
 | Application database | `./deploy.sh restore-db <dump>` runs `scripts/db-restore.sh` inside the postgres container with `RESTORE_CONFIRM_TARGET=matbakhy_restore`: checksum check, creates the database `matbakhy_restore` if absent, refuses a non-empty target, `pg_restore`, then reconcile. It does NOT overwrite the live `matbakhy` database; pointing the application at the restored one is a manual owner step | VERIFIED IN CODE: `deploy.sh`, `scripts/db-restore.sh` |
-| Keycloak database | `owner-e2e-provision.sh apply` writes a `pg_dump` of `keycloak` under `BACKUP_DIR/keycloak`; there is no restore script for it. Realm secrets in a restored database must match the new `.env` | NOT VERIFIED procedure |
+| Keycloak database | Three scripts write a `pg_dump` of `keycloak` under `BACKUP_DIR/keycloak`: `admin-console.sh` (`enable`, `backup`), `migrate-mfa.sh` (`backup`, `apply`) and `owner-e2e-provision.sh apply`; their execution on the live host, the recency of the dumps and whether they restore are NOT VERIFIED LIVE. There is no restore script for it (`migrate-mfa.sh` only names `pg_restore` into an empty `keycloak` database while identity is stopped, as a comment-level instruction). Realm secrets in a restored database must match the new `.env` | NOT VERIFIED procedure |
 | Image storage | `./deploy.sh backup` creates `storage-<stamp>.tgz`; there is no restore script | NOT VERIFIED procedure |
 | Secrets (`.env`) | Not in any backup by design; a lost `.env` cannot be regenerated without breaking existing volumes (Step 12) | VERIFIED IN CODE |
 
-This table is a list of what the code supports, not a rehearsable recovery sequence. Missing from the repository: the Keycloak and storage restore, the cutover of the application to the restored database, ownership and grants of the restored objects, secrets handling, validation and rollback of the cutover. Treat the recovery as NOT VERIFIED and not operationally sufficient until the owner defines and rehearses one sequence covering all stores.
+This table is a list of what the code supports, not a rehearsable recovery sequence. Missing from the repository: the Keycloak and storage restore, the cutover of the application to the restored database, ownership and grants of the restored objects, matching of realm secrets and the front image and realm client redirect URIs to the new domain, secrets handling, validation and rollback of the cutover. The repository therefore provides recovery building blocks for the application database only; it does not provide a rehearsable multi-store sequence, and this page does not invent one. Treat the recovery as NOT VERIFIED and not rehearsed. Owner decision needed: define one authorised sequence covering the application database, the Keycloak database, the storage archive and the application cutover, then rehearse it on a throwaway server.
 
 Verification after a restore: `./deploy.sh status` (schema version) and the row-count lines printed by the reconcile step. Do not treat a restore as complete until an authorized administrator has run the recovery page's checks and you have rehearsed the procedure on a throwaway server.
 
 ## Known limitations and documentation gaps
 
 - This guide is not execution verified. The bootstrap in Step 11 (manual first copy) and the permission commands are derived from the code and were not run.
-- `GENERATED_DIR` defaults to `/srv/matbakhy-preview/generated` in `.env.example`, `compose.yaml` and `admin-console.sh`, while CD deploys into `/srv/matbakhy-staging`; the live value is NOT VERIFIED. Documentation conflict: `deploy/web-preview/README.md` and `docs/operations/09-staging-hetzner-preparation.md` still describe a Hetzner 2 vCPU / 4 GB profile, `docs/operations/12-owner-server-setup.md` lists five DNS hosts (no `kc-admin`) and the path `/srv/matbakhy-preview` (all OUTDATED / INCORRECT for the Contabo host).
+- `GENERATED_DIR` defaults to `/srv/matbakhy-preview/generated` in `.env.example`, `compose.yaml` and `admin-console.sh`, while CD deploys into `/srv/matbakhy-staging`; the live value is NOT VERIFIED. Documentation conflict: `deploy/web-preview/README.md` and `docs/operations/09-staging-hetzner-preparation.md` still describe a Hetzner server sized 2 vCPU / 4 GB, `docs/operations/12-owner-server-setup.md` lists five DNS hosts (no `kc-admin`) and the path `/srv/matbakhy-preview` (all OUTDATED / INCORRECT for the Contabo host).
 - The deploy workflow hard-codes the domain `167-86-90-174.sslip.io` and the GHCR login name `afawzy70`; a rebuild on another IP needs a reviewed workflow change (Step 17).
 - Not verified live: effective `PermitRootLogin`, sudo policy, `ufw` state and rules, Docker containers, networks and volumes, ownership of container-written backup files, the value of `STAGING_SSH_USER`, whether backup cron exists, certificate renewal, whether the Compose override is used.
 - Contabo ordering and panel-level firewall steps are not documented anywhere in the repository.

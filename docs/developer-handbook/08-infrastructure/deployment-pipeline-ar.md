@@ -10,7 +10,7 @@
 
 | الوسم | المعنى في الصفحة دي |
 |---|---|
-| VERIFIED LIVE | اتلاحظ على الـ Contabo VPS بواسطة المستخدم غير المميّز `aiagent` يوم 2026-10-21 (قراءة فقط). |
+| VERIFIED LIVE | اتلاحظ على الـ Contabo VPS بواسطة المستخدم `aiagent` اللي معندوش صلاحيات إدارية يوم 2026-10-21 (قراءة فقط). |
 | VERIFIED IN CODE | اتقرا في ملف الـ Repository المكتوب جنب الادّعاء. ده بيثبت اللي الكود بيعمله لما يشتغل، مش إن تشغيلة معيّنة حصلت. |
 | DOCUMENTED ONLY | مستند في الـ Repository بيقول كده؛ ماتأكدناش منه هنا. |
 | OUTDATED / INCORRECT | بيتعارض مع دليل أحدث (مثلًا نص فترة Hetzner). |
@@ -98,7 +98,7 @@ sequenceDiagram
 | تسجيل الدخول للـ Registry | `docker login ghcr.io` بتوكن الـ Job (`github.token`) |
 | الـ Digests | بعد `docker push`، الـ Workflow بيقرا `RepoDigests[0]` لكل صورة وبيمرّر `name@sha256:<digest>` لـ Job الـ Deploy كمخرجات Job اسمها `api` و`front` |
 
-دومين الـ Preview مضمَّن جوه صورة الـ Front وقت الـ Build. أي دومين مختلف محتاج تغيير في الـ Workflow (شوف [dns-https-sslip-io.md](dns-https-sslip-io-ar.md)).
+دومين الـ Preview مضمَّن جوه صورة الـ Front وقت الـ Build. أي دومين مختلف محتاج تغيير في الـ Workflow (شوف [dns-https-sslip-io.md](dns-https-sslip-io-ar.md)) ومحتاج أكتر من الصورة: `PREVIEW_DOMAIN` في `.env` على السيرفر هو اللي بيحدد أسماء الـ Hosts في Caddy وأسماء الـ Hosts في Keycloak وأصول الـ API (`Caddyfile`، `compose.yaml`)، وملف الـ Realm `identity/matbakhy-realm.preview.json` فيه الـ Redirect URIs بتاعة الـ Clients، لكن الـ Realm اللي اتعمله Import قبل كده مابيتعملوش Import تاني (التعليق الافتتاحي في `migrate-mfa.sh`)، فتغيير الـ Redirect URIs بتاعته محتاج خطوة منفصلة. صورة الـ Front الأقدم فيها الدومين القديم مضمَّن، فلو رجّعت الصورة بعد تغيير الدومين الدومين القديم هيرجع. استبدال الدومين والرجوع عنه ماتجرّبوش عمليًا: NOT VERIFIED.
 
 الـ Workflow اليدوي `.github/workflows/preview-images.yml` بيبني نفس الصورتين لأي دومين وبيطبع `RELEASE_COMMIT` و`API_IMAGE` و`FRONT_IMAGE` في ملخص الـ Job؛ ومابيعملش Deploy لأي حاجة (VERIFIED IN CODE). وهو تابع للتدفق اليدوي بتاع فترة Hetzner.
 
@@ -119,7 +119,7 @@ sequenceDiagram
 | تثبيت الإصدار في `.env` | مقطع Python بيشيل أي سطور موجودة `RELEASE_COMMIT=` و`API_IMAGE=` و`FRONT_IMAGE=`، وبيضيف التلاتة الجداد، وبيظبط صلاحية 600 على `.env`؛ ومفيش سطر تاني بيتلمس | VERIFIED IN CODE |
 | التشغيل | `./deploy.sh up` (شوف تحت) | VERIFIED IN CODE |
 | الـ Smoke | `./deploy.sh smoke` بيشغّل `smoke.sh` لـ `PREVIEW_DOMAIN`: Headers ويب العميل وإشعار الـ Demo، وويب العمليات، والـ Configuration العامة بترجّع `PREVIEW` مع `demo: true`، والـ Endpoints الخاصة بترد 401 أو 403، والـ Actuator والـ Metrics بيردوا 404، والـ OIDC Issuer، والـ Master Realm مخفي، وRedirect تسجيل الدخول | VERIFIED IN CODE |
-| خطوة Console الأدمن | `./deploy.sh admin-console enable` بيحصّن الـ Master Realm في Keycloak، وبيفتح ملف المفتاح، وبيتحقق عن طريق الرابط العام؛ والسكريبت بيقفله تاني لو التحقق فشل (التعليق الافتتاحي في `deploy/web-preview/admin-console.sh`). السياسة: [14-keycloak-admin-console.md](../../operations/14-keycloak-admin-console.md) | VERIFIED IN CODE |
+| خطوة Console الأدمن | `./deploy.sh admin-console enable` بيحصّن الـ Master Realm في Keycloak، وبيفتح ملف المفتاح، وبيتحقق عن طريق الرابط العام؛ والسكريبت بيقفله تاني لو التحقق الحي بتاعه فشل أو لو السكريبت اتقطع قبل ما التحقق ينجح. بعد ما التحقق ينجح، لو مفيش أي أدمن يقدر يسجّل دخول السكريبت بيشغّل `create-admin`؛ وفشل الخطوة المتأخرة دي مابيقفلش المفتاح، فبعد أي فشل في الخطوة دي افحص حالة المفتاح بـ `./deploy.sh admin-console status` واقفله بـ `./deploy.sh admin-console disable` لو مش عايزه (`deploy/web-preview/admin-console.sh`، فرع `enable`). الأمر `enable` بيكتب الأول Dump لقاعدة بيانات Keycloak في `$BACKUP_DIR/keycloak/keycloak-db-<stamp>.dump`؛ هل اتنفّذ، وهل هو حديث، وهل بيتسترجع ده NOT VERIFIED LIVE. السياسة: [14-keycloak-admin-console.md](../../operations/14-keycloak-admin-console.md) | VERIFIED IN CODE |
 
 ### بيعمل إيه `deploy.sh up`
 
@@ -157,17 +157,17 @@ echo "DEPLOYED $sha"
 |---|---|---|
 | إيه اللي بيتسترجع تلقائيًا؟ | ملف `.env` بس، بيتنسخ من نسخة مؤقتة صلاحيتها 600 اتاخدت قبل ما السطور التلاتة يتعاد كتابتهم | VERIFIED IN CODE |
 | هل الـ Database بتترجع تلقائيًا؟ | لأ. الرسالة بتقول كده، ومفيش خطوة بتسترجع Dump | VERIFIED IN CODE |
-| هل الـ Containers بترجع تلقائيًا؟ | لأ. مفيش خطوة بتعيد تشغيل الـ Stack بعد ما `.env` يترجع. لو `compose up -d` كان بدّل الـ Containers فعلًا، هتفضل شغّالة بالصور الجديدة لحد ما حد يشغّل `./deploy.sh up` تاني بـ `.env` المسترجع أو المصحَّح. قبل ما تعيد التشغيل بتثبيتات الصور المسترجعة، قيّم هل صورة الـ Application الأقدم تقدر تشتغل على Schema ممكن يكون الإصدار الجديد عدّاها بالفعل (شوف صف الـ Migration تحت)؛ ماتعيدش التشغيل بشكل أعمى | VERIFIED IN CODE (غياب خطوة إعادة التشغيل) |
+| هل الـ Containers بترجع تلقائيًا؟ | لأ. مفيش خطوة بتعيد تشغيل الـ Stack بعد ما `.env` يترجع. لو `compose up -d` كان بدّل الـ Containers فعلًا، هتفضل شغّالة بالصور الجديدة لحد ما حد يشغّل `./deploy.sh up` تاني بـ `.env` المسترجع أو المصحَّح. قبل ما تعيد التشغيل بتثبيتات الصور المسترجعة، قيّم هل صورة الـ Application الأقدم تقدر تشتغل على Database Schema ممكن يكون الإصدار الجديد طبّق عليها Migrations بالفعل (شوف صف الـ Migration تحت)؛ ماتعيدش التشغيل بشكل أعمى | VERIFIED IN CODE (غياب خطوة إعادة التشغيل) |
 | هل الـ Deployment الفاشل بيتخطّى خطوة Console الأدمن؟ | أيوه، ترتيب خطوات الـ Workflow بيقف عند أول خطوة بتفشل | VERIFIED IN CODE |
-| هل فشل خطوة Console الأدمن بيلغي الـ Deployment؟ | لأ. الـ Deployment كان نجح بالفعل؛ وسكريبت Console الأدمن بيقفل المفتاح بتاعه لوحده عند الفشل | VERIFIED IN CODE |
-| هل الـ Migration ممكن الرجوع عنها؟ | Flyway في اتجاه واحد بس (Forward-only). الرجوع بالصورة وحدها آمن بس لو بنية أو إصدار الـ Schema ماتغيّرتش أو كل Migration لاحقة هي Expand-only (`scripts/check_migration_compat.py` واختبارات الـ Guardrail في CI)؛ غير كده استرجع الـ Backup اللي قبل الـ Deploy واقبل ضياع البيانات المكتوبة من وقتها | DOCUMENTED ONLY ([11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md)، سياسة مكتوبة لـ Host فترة Hetzner) وVERIFIED IN CODE (`rollback_plan` في `deploy.sh`) |
+| هل فشل خطوة Console الأدمن بيلغي الـ Deployment؟ | لأ. الـ Deployment كان نجح بالفعل. السكريبت بيقفل المفتاح لو التحقق بتاعه فشل أو اتقطع، لكن مش لو فشل إنشاء الأدمن التلقائي المتأخر: ساعتها المفتاح ممكن يفضل مفتوح وتشغيلة الـ Workflow تتعلّم فاشلة. افحص حالة المفتاح واقفله بـ `admin-console disable` لو لزم | VERIFIED IN CODE |
+| هل الـ Migration ممكن الرجوع عنها؟ | Flyway في اتجاه واحد بس (Forward-only). الرجوع لإصدار Docker Images سابق من غير استرجاع قاعدة البيانات آمن بس لو بنية أو إصدار الـ Database Schema ماتغيّرتش أو كل Migration لاحقة هي Expand-only (`scripts/check_migration_compat.py` واختبارات الـ Guardrail في CI)؛ غير كده استرجع الـ Backup اللي قبل الـ Deploy واقبل ضياع البيانات المكتوبة من وقتها | DOCUMENTED ONLY ([11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md)، سياسة مكتوبة لـ Host فترة Hetzner) وVERIFIED IN CODE (`rollback_plan` في `deploy.sh`) |
 | رجوع حقيقي على السيرفر Contabo | مااتجرّبش عمليًا؛ NOT VERIFIED | NOT VERIFIED |
 
 أدوات المشغّل الموجودة للجزء اليدوي (بتتشغّل على السيرفر بواسطة مهندس مصرّح له، وعمرها ما بتتشغّل على الـ Preview الفعلي من تمرين في الدليل): `./deploy.sh status` (read-only)، و`./deploy.sh rollback-plan [N]` (بيطبع بس)، و`./deploy.sh restore-db <dump>`. جداول القرار الكاملة: [backup-restore-disaster-recovery.md](backup-restore-disaster-recovery-ar.md).
 
 ### Workflow مرتبط بعد الـ Deploy
 
-`.github/workflows/owner-e2e-provision.yml` بيشتغل لما `deploy/web-preview/owner-e2e-run.request` يتغيّر على `develop`. بيعمل Polling لتشغيلة ناجحة لـ `deploy-preview.yml` بنفس الـ SHA (لحد 90 محاولة، بينها 30 ث)، وبيتصل بنفس الـ Secrets الأربعة في البيئة `preview`، وبيشغّل `./owner-e2e-provision.sh plan` أو `apply` من `/srv/matbakhy-staging/deploy/web-preview`. مابينسخش ملفات بنفسه وبيستخدم مجموعة Concurrency خاصة بيه `matbakhy-preview-owner-e2e` عشان مايحجبش الـ Deployment اللي مستنيه (VERIFIED IN CODE). التفاصيل: [fixtures.md](../../quality/owner-acceptance/fixtures.md).
+`.github/workflows/owner-e2e-provision.yml` بيشتغل لما `deploy/web-preview/owner-e2e-run.request` يتغيّر على `develop`. بيعمل Polling لتشغيلة ناجحة لـ `deploy-preview.yml` بنفس الـ SHA (لحد 90 محاولة، بينها 30 ث، يعني 45 دقيقة؛ بس الـ Job كله ليه `timeout-minutes: 30`، فمهلة الـ Job بتوقف الـ Polling أبكر، بعد حوالي 60 محاولة)، وبيتصل بنفس الـ Secrets الأربعة في البيئة `preview`، وبيشغّل `./owner-e2e-provision.sh plan` أو `apply` من `/srv/matbakhy-staging/deploy/web-preview`. مابينسخش ملفات بنفسه وبيستخدم مجموعة Concurrency خاصة بيه `matbakhy-preview-owner-e2e` عشان مايحجبش الـ Deployment اللي مستنيه (VERIFIED IN CODE). التفاصيل: [fixtures.md](../../quality/owner-acceptance/fixtures.md).
 
 ## التحقق التشغيلي
 
@@ -175,7 +175,7 @@ echo "DEPLOYED $sha"
 
 | الأمر | الجهاز والمستخدم | Read-only | النتيجة المتوقعة | لو فشل |
 |---|---|---|---|---|
-| `gh run list --workflow deploy-preview.yml --branch develop --limit 5` | اللابتوب بتاعك، حساب GitHub بتاعك | أيوه | آخر التشغيلات مع الحالة والـ SHA بتاع الـ Head Commit | `gh auth status`؛ اتأكد من صلاحية الوصول للـ Repository |
+| `gh run list --workflow deploy-preview.yml --branch develop --limit 5 --json databaseId,headSha,status,conclusion,createdAt` | اللابتوب بتاعك، حساب GitHub بتاعك | أيوه | آخر التشغيلات بصيغة JSON؛ `headSha` هو الـ Commit، و`conclusion` بتبقى `success` للتشغيلة الناجحة بالكامل (الإخراج الافتراضي كجدول مفيهوش عمود SHA). التشغيلة اللي اتعلّمت `failure` بسبب خطوة Console الأدمن ممكن تكون نشرت فعلًا: شوف الـ Log بتاعها وادوّر على `DEPLOYED <sha>` | `gh auth status`؛ اتأكد من صلاحية الوصول للـ Repository |
 | `gh run view <run-id> --log` | اللابتوب بتاعك | أيوه | Logs خطوات الـ Build والـ Deploy؛ وآخر سطر Deploy هو `DEPLOYED <sha>` عند النجاح | دوّر على اسم الخطوة الفاشلة واقرا [infrastructure-troubleshooting.md](infrastructure-troubleshooting-ar.md) |
 | `gh api repos/afawzy70/Matbakhy-v1/rulesets/25447480` | اللابتوب بتاعك؛ بيحتاج Token يقدر يقرا قواعد الـ Repository | أيوه | JSON فيه التنفيذ `active`، ومفيش Bypass Actors، وسياقات الـ Status Checks المطلوبة | 404 أو 403 معناه إن الـ Token مايقدرش يقرا القواعد، وده مش دليل إن القواعد اختفت |
 | `gh pr checks <pr-number>` | اللابتوب بتاعك | أيوه | الـ Checks المطلوبة لـ PR | الـ Checks المعلّقة طبيعية أثناء ما الـ Jobs بتشتغل؛ ماتعيدش تشغيل Jobs سليمة |
@@ -186,12 +186,12 @@ echo "DEPLOYED $sha"
 
 | المصدر | بيوضّح إيه | مين يقدر يقراه | الدليل |
 |---|---|---|---|
-| آخر تشغيلة ناجحة لـ `deploy-preview.yml` على `develop` (`gh run list` فوق) | الـ SHA اللي المسار بلّغ إنه اتنشر آخر مرة | أي مستخدم GitHub معاه صلاحية الوصول للـ Repository | VERIFIED IN CODE (الـ Workflow بيطبع `DEPLOYED <sha>`)؛ وإن الـ Containers لسه مطابقة له NOT VERIFIED |
+| آخر تشغيلة لـ `deploy-preview.yml` على `develop` بنتيجة `success` (`gh run list --json` فوق) | الـ SHA اللي المسار بلّغ إنه اتنشر آخر مرة | أي مستخدم GitHub معاه صلاحية الوصول للـ Repository | VERIFIED IN CODE (الـ Workflow بيطبع `DEPLOYED <sha>`)؛ وإن الـ Containers لسه مطابقة له NOT VERIFIED |
 | سطور `RELEASE_COMMIT` و`API_IMAGE` و`FRONT_IMAGE` في `.env` على السيرفر | الإصدار المثبَّت | الملف صلاحيته 600 ومملوك لـ `devops`؛ و`aiagent` مايقدرش يقراه | NOT VERIFIED LIVE |
 | `./deploy.sh status` في `/srv/matbakhy-staging/deploy/web-preview` | الصور الشغّالة، ونسخة الـ Schema، والقيم المظبوطة، وآخر 5 إصدارات | بيحتاج صلاحية Docker (مش متاحة لـ `aiagent`) | VERIFIED IN CODE؛ مااتشغّلش |
 | `releases.log` تحت مجلد الـ Backup | سطر واحد لكل `up` ناجح | `/srv/matbakhy-backups` صلاحيته 750 `devops:devops` | VERIFIED LIVE (الصلاحيات)؛ المحتوى NOT VERIFIED |
 | الحقل `service.version` في Logs الـ API | `MATBAKHY_VERSION`، بيتظبط من `RELEASE_COMMIT` في `compose.yaml` | بيحتاج Docker أو Stack بتاع Grafana وLoki | VERIFIED IN CODE؛ مااتلاحظش |
-| Label الصورة `org.opencontainers.image.revision` | الـ Commit اللي اتبنت منه | `docker image inspect` مع صلاحية Docker | VERIFIED IN CODE (بيتظبط بواسطة الـ Workflow)؛ مااتلاحظش |
+| Label الصورة `org.opencontainers.image.revision` | الـ Commit اللي اتبنت منه | `docker image inspect` مع صلاحية Docker | VERIFIED IN CODE (الـ Build بيظبطه في `deploy-preview.yml` و`preview-images.yml`)؛ الـ Labels على الـ Containers الشغّالة NOT VERIFIED LIVE |
 | الـ Endpoint العام | الـ Configuration العامة مابتحملش Commit ولا نسخة | أي حد | VERIFIED LIVE (المفاتيح اللي اتلاحظت هي `orderingAvailable` و`orderLimits` و`environment`) |
 
 الأدمن اللي معاه وصول مصرّح له يقدر يأكّد الـ Commit بالأوامر الموجودة في [admin-readonly-verification.md](admin-readonly-verification-ar.md). الـ Agents وحساب `aiagent` ماينفعش يشغّلوها.
@@ -199,9 +199,9 @@ echo "DEPLOYED $sha"
 ## القيود المعروفة وفجوات التوثيق
 
 - NOT VERIFIED LIVE: مستخدم SSH الفعلي اللي المسار بيستخدمه، وقيم `.env` الحية، والـ Containers والـ Digests الشغّالة، وهل آخر SHA منشور مطابق لآخر تشغيلة ناجحة، ومحتويات `releases.log`، وأي رجوع على Contabo.
-- صورة الـ Front مبنية للدومين الثابت `167-86-90-174.sslip.io`؛ وتغيير دومين الـ Preview بيحتاج تعديل الـ Workflow وبناء صور جديدة.
+- صورة الـ Front مبنية للدومين الثابت `167-86-90-174.sslip.io`؛ وتغيير دومين الـ Preview بيحتاج تعديل الـ Workflow وبناء صور جديدة وتحديث `PREVIEW_DOMAIN` ومسارات Caddy والـ Redirect URIs بتاعة الـ Clients في الـ Realm (شوف المرحلة 2). ماتجرّبش عمليًا: NOT VERIFIED؛ والمالك هو اللي يقرّر إمتى ولا إذا كان الدومين هيتغيّر.
 - السكريبت اللي بيتولّد جوه `deploy-preview.yml` وبيتشغّل على السيرفر كاتب اسم مستخدم الـ Registry `afawzy70` ثابت (والملف `deploy.sh` نفسه مفيهوش تسجيل دخول للـ Registry)؛ ونقل الـ Repository أو مالك مختلف يحتاج تغيير في الـ Workflow.
-- الـ Deployment الفاشل بيسترجع `.env` بس؛ ومابيعيدش تشغيل الـ Containers ولا بيرجّع الـ Database (مقتبس فوق). تدفق `rollback-plan` اليدوي هو الاسترجاع الموثَّق.
+- الـ Deployment الفاشل بيسترجع `.env` بس؛ ومابيعيدش تشغيل الـ Containers ولا بيرجّع الـ Database (مقتبس فوق). تدفق `rollback-plan` اليدوي هو الاسترجاع الموثَّق. الـ Repository مابيقدّمش استرجاع كامل عبر كل المخازن (الـ Database وKeycloak والـ Storage) كخطوات واحدة اتجرّبت عمليًا: ده NOT VERIFIED ومحتاج قرار من المالك بتجربة على سيرفر جديد معزول.
 - أسماء الـ Checks المطلوبة بتعتمد على أسماء الـ Jobs. الـ Job اسمه `blueprint-integrity` مفيهوش حقل `name:`، فالسياق بتاعه هو الـ Job id؛ وإعادة تسمية أي واحد من الـ 8 Jobs بتوقّفه بهدوء عن تحقيق شرط الـ Ruleset.
 - عدد الموافقات المطلوبة هو 0 والـ Review المستقل مش ممكن يتحقق حاليًا بهوية GitHub واحدة؛ وقيد إمكانية تعطيل فحص DOC-001 بتعديل الـ Workflow مؤجَّل (DEFERRED) بقرار المالك ولسه مفتوح.
 - حماية الـ Branch متظبطة على GitHub ومش في الـ Repository؛ وحقائق الـ Ruleset اللي فوق حالتها DOCUMENTED ONLY لحد ما تتقرا تاني بـ `gh api`.

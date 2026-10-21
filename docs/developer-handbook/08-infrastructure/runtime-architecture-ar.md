@@ -10,7 +10,7 @@
 
 | التصنيف | معناه في الصفحة دي |
 |---|---|
-| VERIFIED LIVE | اتلاحظ على الـ Host بتاع Contabo بواسطة المستخدم غير المميّز aiagent يوم 2026-10-21 (الـ Endpoints العامة، الـ Sockets اللي بتسمع، تواريخ شهادة TLS). مفيش أي حاجة تانية بتتسمّى LIVE. |
+| VERIFIED LIVE | اتلاحظ على الـ Host بتاع Contabo بواسطة المستخدم aiagent اللي معندوش صلاحيات إدارية يوم 2026-10-21 (الـ Endpoints العامة، الـ Sockets اللي بتسمع، تواريخ شهادة TLS). مفيش أي حاجة تانية بتتسمّى LIVE. |
 | VERIFIED IN CODE | اتقرا في الـ Repository (مع ذكر الملف). بيقول الكود بيطلب إيه، مش إيه اللي شغّال فعلًا. |
 | DOCUMENTED ONLY | مستند أو سلوك منتج خارجي بيقول كده؛ ماتأكدناش منه هنا. |
 | OUTDATED / INCORRECT | بيتعارض مع دليل أحدث، زي نص من فترة Hetzner. |
@@ -230,7 +230,7 @@ flowchart LR
     bk -->|"restore إلى matbakhy_restore"| mb
 ```
 
-إزاي تقرا الرسم. Instance واحدة من PostgreSQL 16 فيها Databaseين. عند أول تشغيل لمجلد بيانات فاضي، `deploy/web-preview/postgres/10-keycloak.sh` بينشئ الـ Role والـ Database `keycloak` و`deploy/web-preview/postgres/20-runtime-role.sh` بينشئ الـ Role الأقل صلاحيات `matbakhy_app`؛ السكريبتات دي مابتشتغلش تاني، فتغيير كلمة سر Database في `.env` بعد كده مابيغيّرش الـ Role جوه Volume بيانات موجود (تعليقات VERIFIED IN CODE وسلوك Docker image، DOCUMENTED ONLY). Flyway بيعمل الـ Migration بدور المالك وبيدّي صلاحيات للـ Role الخاص بالتشغيل في خطوة after-migrate بتاعته. إجراء الـ Backup موجود في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md). حسب الكود، `deploy.sh backup` بيعمل dump للـ Database `matbakhy` بس (إعداد `PGDATABASE=matbakhy` في `backup_db`)، فالـ Database `keycloak` مش جزء من الـ dump ده (راجع قسم الفجوات).
+إزاي تقرا الرسم. Instance واحدة من PostgreSQL 16 فيها Databaseين. عند أول تشغيل لمجلد بيانات فاضي، `deploy/web-preview/postgres/10-keycloak.sh` بينشئ الـ Role والـ Database `keycloak` و`deploy/web-preview/postgres/20-runtime-role.sh` بينشئ الـ Role الأقل صلاحيات `matbakhy_app`؛ السكريبتات دي مابتشتغلش تاني، فتغيير كلمة سر Database في `.env` بعد كده مابيغيّرش الـ Role جوه Volume بيانات موجود (تعليقات VERIFIED IN CODE وسلوك Docker image، DOCUMENTED ONLY). Flyway بيعمل الـ Migration بدور المالك وبيدّي صلاحيات للـ Role الخاص بالتشغيل في خطوة after-migrate بتاعته. إجراء الـ Backup موجود في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md). حسب الكود، `deploy.sh backup` بيعمل dump للـ Database `matbakhy` بس (إعداد `PGDATABASE=matbakhy` في `backup_db`)، فالـ Database `keycloak` مش جزء من الـ dump ده؛ ومسارات Dump منفصلة لـ Keycloak متوصّفة في قسم الفجوات.
 
 ## 7. تخزين الميديا
 
@@ -246,7 +246,7 @@ flowchart LR
     priv["bucket matbakhy-private: وصول موقّع فقط"] --- storage
 ```
 
-إزاي تقرا الرسم. SeaweedFS بيشتغل في Container واحد بـ Volume محلي؛ و`deploy.sh up` بيحاول ينشئ الـ Buckets `matbakhy-public` و`matbakhy-private` بأقصى جهد (Best Effort): الأمر ممكن يتكرر من غير مشاكل، بس مخرجاته بتتجاهل وأي فشل بيتتجاهل (`|| true`)، فنجاح `up` مابيثبتش إن أي واحد من الـ Bucketين موجود. اتأكد من الـ Buckets ومن ملف تجريبي بشكل منفصل (شوف السيناريو 21 في [حل مشاكل البنية التحتية](infrastructure-troubleshooting-ar.md)). ملف الهوية `s3.json` بيتولّد بواسطة `deploy.sh render` من `storage/s3.json.template` إلى المجلد المتولّد، وده بيبعد مفاتيح الـ storage عن Git. هوية `matbakhy-api` ليها كل الصلاحيات؛ وهوية `anonymous` تقدر تقرا الـ Bucket العام بس (VERIFIED IN CODE). أرشيف الـ storage في الـ Backup بيتاخد بعد إيقاف الـ storage service لفترة قصيرة. هل بيانات الـ storage بتتنسخ كمان برّه الـ Host NOT VERIFIED (مفيش خطوة زي كده في `deploy.sh`).
+إزاي تقرا الرسم. SeaweedFS بيشتغل في Container واحد بـ Volume محلي؛ و`deploy.sh up` بيحاول ينشئ الـ Buckets `matbakhy-public` و`matbakhy-private` من غير ما يضمن نجاح الإنشاء (Best Effort): الأمر ممكن يتكرر من غير مشاكل، بس مخرجاته بتتجاهل وأي فشل بيتتجاهل (`|| true`)، فنجاح `up` مابيثبتش إن أي واحد من الـ Bucketين موجود. اتأكد من الـ Buckets ومن ملف تجريبي بشكل منفصل (شوف السيناريو 21 في [حل مشاكل البنية التحتية](infrastructure-troubleshooting-ar.md)). ملف الهوية `s3.json` بيتولّد بواسطة `deploy.sh render` من `storage/s3.json.template` إلى المجلد المتولّد، وده بيبعد مفاتيح الـ storage عن Git. هوية `matbakhy-api` ليها كل الصلاحيات؛ وهوية `anonymous` تقدر تقرا الـ Bucket العام بس (VERIFIED IN CODE). أرشيف الـ storage في الـ Backup بيتاخد بعد إيقاف الـ storage service لفترة قصيرة. هل بيانات الـ storage بتتنسخ كمان برّه الـ Host NOT VERIFIED (مفيش خطوة زي كده في `deploy.sh`).
 
 ## 8. إدارة الأسرار
 
@@ -294,7 +294,7 @@ flowchart LR
     engineer["مهندس عبر SSH tunnel"] --> graf
 ```
 
-إزاي تقرا الرسم. الـ API بيكتب Logs بصيغة ECS JSON فيها request ids؛ وAlloy بيتابع الملفات وبيعمل ليها Labels بالـ Container والـ stream والـ level؛ وLoki بيحتفظ بيها 720 ساعة (الـ debug 168 ساعة) افتراضيًا. Prometheus بيعمل scrape لبورت الـ management بتاع الـ API وnode-exporter وLoki وAlloy وAlertmanager ولنفسه. قواعد التنبيه فيها ApiDown و DatabaseUnavailable و BackupStale (مفيش Backup متحقق منه خلال آخر 24 ساعة) و DiskPressure (أقل من 15% فاضي). كل التنبيهات بتروح لـ alert-sink، وهو مستقبِل اختبار محلي، فمفيش حد بيتنبّه (تعليق VERIFIED IN CODE، موافقة المالك O07 لسه معلّقة). لو Docker لفّ (rotate) ملف Log قبل ما Alloy يقراه، السطور دي بتضيع. هل Grafana و Loki و Prometheus سليمين دلوقتي NOT VERIFIED LIVE.
+إزاي تقرا الرسم. الـ API بيكتب Logs بصيغة ECS JSON فيها request ids؛ وAlloy بيتابع الملفات وبيعمل ليها Labels بالـ Container والـ stream والـ level؛ وLoki بيحتفظ بيها 720 ساعة (الـ debug 168 ساعة) افتراضيًا. Prometheus بيعمل scrape لبورت الـ management بتاع الـ API وnode-exporter وLoki وAlloy وAlertmanager ولنفسه. قواعد التنبيه فيها ApiDown و DatabaseUnavailable و BackupStale (مفيش Backup متحقق منه خلال آخر 24 ساعة) و DiskPressure (أقل من 15% فاضي). كل التنبيهات بتروح لـ alert-sink، وهو مستقبِل اختبار محلي، فمفيش حد بيتنبّه (تعليق VERIFIED IN CODE، موافقة المالك O07 لسه معلّقة). لو Docker عمل Log Rotation لملف قبل ما Alloy يقراه، السطور دي بتضيع. هل Grafana و Loki و Prometheus سليمين دلوقتي NOT VERIFIED LIVE.
 
 ## 10. مسار الـ Deployment
 
@@ -347,7 +347,7 @@ flowchart TD
 ## القيود المعروفة وفجوات التوثيق
 
 * **تعارض الـ profile بتاع Grafana.** [رسم البنية التحتية للـ Preview](../03-architecture/diagrams-ar.md#14-بنية-المعاينة) بيقول إن Grafana بتستخدم الـ profile "tools". في `deploy/web-preview/compose.yaml` مفيش Profile لـ Grafana؛ الـ Profile موجود بس في `compose.4gb.yaml` بتاع فترة Hetzner. هل Grafana شغّالة على السيرفر الفعلي بيعتمد على الـ Override، وده NOT VERIFIED LIVE.
-* **بيانات Keycloak مش في الـ Backup.** `deploy.sh backup` بيعمل dump للـ Database `matbakhy` بس. الـ Database `keycloak` (الحسابات اللي اتعملت بعد استيراد الـ Realm) مش مغطاة بمسار الكود ده؛ ومالقيناش آلية تانية. المفروض الأدمن يتأكد من محتويات مجلد الـ backups ويقرر. NOT VERIFIED.
+* **بيانات Keycloak: مسارات الـ Backup موجودة في الكود، لكن إمكانية الاسترجاع مش مثبتة.** `deploy.sh backup` بيعمل Dump للـ Database `matbakhy` بس، لكن `deploy/web-preview/admin-console.sh backup` (بيتندهله الأول من `admin-console enable` اللي مسار الـ Deployment بيشغّله بعد كل Deploy ناجح) و`deploy/web-preview/migrate-mfa.sh backup` كل واحد منهم بيكتب Dump بصيغة Custom لكل الـ Database `keycloak` في `$BACKUP_DIR/keycloak/keycloak-db-<stamp>.dump` (VERIFIED IN CODE). هل الـ Dumps دي موجودة، وإيه أحدث واحد، وهل بتتسترجع، ده NOT VERIFIED LIVE؛ ماحصلتش تجربة استرجاع منها، ومالقيناش Backup متجدول لـ Keycloak. المفروض الأدمن يتأكد من محتويات مجلد الـ backups ويقرر؛ وقرار المالك المطلوب هو تجربة استرجاع كامل عبر كل المخازن (الـ Database وKeycloak والـ Storage) على سيرفر جديد معزول، والـ Repository مابيقدّمهاش كخطوات واحدة.
 * **نسخ خارج السيرفر (Off-host).** مفيش خطوة بتنسخ الـ backups أو أرشيفات الـ storage برّه الـ VPS (NOT VERIFIED؛ راجع [البنية التحتية والـ Deployment](../03-architecture/infrastructure-and-deployment-ar.md)).
 * **مسارات قديمة.** `.env.example` بيحط `GENERATED_DIR` افتراضيًا وافتراضيات ملف الـ compose بتشاور على `/srv/matbakhy-preview`، بينما مجلد الـ deployment الفعلي هو `/srv/matbakhy-staging` وفيه نسخة أقدم تحت `/srv/matbakhy-preview` (VERIFIED LIVE). القيم الفعلية لـ `GENERATED_DIR` و`BACKUP_DIR` NOT VERIFIED LIVE لأن `.env` محمي.
 * **نص Hetzner تاريخي.** `compose.4gb.yaml` ونصيحة الـ Cloud Firewall في `docs/operations/12-owner-server-setup.md` و`docs/operations/09-staging-hetzner-preparation.md` بيوصفوا Host Hetzner المقترح وهما OUTDATED بالنسبة لـ Host بتاع Contabo. الـ Host الحالي متوصّف في [جرد سيرفر Contabo](contabo-server-inventory-ar.md).

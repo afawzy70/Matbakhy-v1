@@ -4,7 +4,7 @@
 > **Status:** PARTIALLY IMPLEMENTED — the six Preview URLs answer as described below (observed from the VPS itself); account provisioning, network allow-lists and the journeys from other networks are NOT VERIFIED LIVE.
 > **Language / اللغة:** English · [العربية](live-preview-access-ar.md)
 
-**Evidence legend.** VERIFIED LIVE: observed on 2026-10-21 by a non-privileged user on the Contabo VPS itself, read-only (the live-facts record of this handbook). VERIFIED IN CODE: read in this repository. DOCUMENTED ONLY: a repository document says it, not confirmed. OUTDATED / INCORRECT: conflicts with newer evidence. NOT VERIFIED: nobody has confirmed it; the text says how an authorized person can.
+**Evidence legend.** VERIFIED LIVE: observed on 2026-10-21 by a user without administrative privileges on the Contabo VPS itself, read-only (the live-facts record of this handbook). VERIFIED IN CODE: read in this repository. DOCUMENTED ONLY: a repository document says it, not confirmed. OUTDATED / INCORRECT: conflicts with newer evidence. NOT VERIFIED: nobody has confirmed it; the text says how an authorized person can.
 
 This page is for a developer, tester or owner who needs to open the running Preview and walk a business journey on it. It does not repeat the screen-by-screen detail of the journey pages; it adds the live addresses, the expected HTTP answers, and for each journey the account, the entry point and the exact clicks. The Preview is a synthetic-data, demo-labelled environment, not staging and not production (see [Preview environment](preview-environment.md)). Server layout is in the [Contabo server inventory](../08-infrastructure/contabo-server-inventory.md) and [Runtime architecture](../08-infrastructure/runtime-architecture.md).
 
@@ -15,7 +15,7 @@ The domain is the documented sslip.io name `167-86-90-174.sslip.io`, which resol
 | Name | URL | Purpose | Observed answer (from the VPS itself) | Status | Authentication and network | Who should use it |
 |---|---|---|---|---|---|---|
 | Customer Web | `https://app.167-86-90-174.sslip.io/` | Customer single-page app (browse, basket, checkout, orders) | 200 | VERIFIED LIVE | Browse is anonymous; ordering needs a Keycloak sign-in. Customer IP class (`CUSTOMER_ALLOWED_IPS`) | Customers, testers, developers |
-| Operations Web | `https://ops.167-86-90-174.sslip.io/` | Cook workspace and back office (one app, tabs depend on the account) | 200 | VERIFIED LIVE | Sign-in required for data. Staff IP class (`STAFF_ALLOWED_IPS`) | Cooks, staff, testers |
+| Operations Web | `https://ops.167-86-90-174.sslip.io/` | Cook workspace and back office (one app, tabs depend on the account) | 200 | VERIFIED LIVE | Sign-in required for data. Staff IP class (`STAFF_ALLOWED_IPS`) and also the customer class (sign-in and API calls go through customer-class hosts) | Cooks, staff, testers |
 | Public API configuration | `https://api.167-86-90-174.sslip.io/api/v1/configuration/public` | Public Preview configuration read by both web apps | 200 with JSON containing `orderingAvailable`, `orderLimits` and `environment` with name `PREVIEW` and `demo` true | VERIFIED LIVE | Anonymous. Customer IP class; paths under `/api/v1/ops` and `/api/v1/cook` need the staff class | Developers, smoke tests |
 | Keycloak | `https://id.167-86-90-174.sslip.io/` | Sign-in for realm `matbakhy` | 302 with `Location` set to `https://kc-admin.167-86-90-174.sslip.io/admin/` | VERIFIED LIVE | Customer IP class; the realm sign-in pages are reached through the apps, not by typing this root | Nobody types it; the apps redirect to it |
 | Keycloak administration | `https://kc-admin.167-86-90-174.sslip.io/` | Keycloak admin console, Preview only | 302 with `Location` set to `/admin/master/console/` | VERIFIED LIVE | Password plus one-time password, not IP restricted | Authorized administrators only |
@@ -31,7 +31,7 @@ Other facts about the same hosts:
 
 | Answer | Meaning | Is it an outage? |
 |---|---|---|
-| 403 with the plain text "Not available" | Caddy's IP access policy: your public IP is not in the class that host needs (`respond ... "Not available" 403` in `deploy/web-preview/Caddyfile`). Ask the owner to add your IP to the right class. | No |
+| 403 with the plain text "Not available" | Caddy's IP access policy: your public IP is not in the class that host needs (`respond ... "Not available" 403` in `deploy/web-preview/Caddyfile`). Ask the owner to add your IP to the right class; for Operations Web and cook or staff work that means both the staff and the customer class. | No |
 | 302 on `id.*` to `kc-admin.*` | Keycloak sends its own root to the admin URL because the admin hostname is configured as the kc-admin host. The Caddyfile answers `/admin` and `/realms/master` on `id.*` with 404, so the customer host never serves the console. Expected Keycloak behaviour (VERIFIED LIVE for the redirect; the hostname setting is VERIFIED IN CODE in `deploy/web-preview/compose.yaml`). | No |
 | 302 on `kc-admin.*` to `/admin/master/console/` | The Caddyfile redirects the root there. The host answers 404 "Not available" while the switch file `/srv/flags/admin-console-public` is absent, so a 302 means the console is currently published (VERIFIED IN CODE; the flag location inside the Caddy container is NOT VERIFIED). | No |
 | 403 on `media.*` root | The request reached SeaweedFS (the response carries `x-amz-request-id` and an XML body, so it is not Caddy's "Not available" text). The anonymous identity may only `Read` the bucket `matbakhy-public` (VERIFIED IN CODE: `deploy/web-preview/storage/s3.json.template`), so listing the root is denied while an object URL such as `.../matbakhy-public/<object>` is readable. The exact error code in the body was not stored: do not claim more than "S3 access denied style XML". | No |
@@ -49,7 +49,9 @@ Other facts about the same hosts:
 | Staff | `ops.*`, `/api/v1/ops/**`, `/api/v1/cook/**` | `STAFF_ALLOWED_IPS` (VERIFIED IN CODE) |
 | Administrator console | `kc-admin.*` | Keycloak's own password plus one-time password (VERIFIED IN CODE) |
 
-Both lists default to `ALLOWED_CLIENT_IPS`; nothing is open to the world until the owner opens it. Current values: NOT VERIFIED (private `.env`; an authorized administrator can read them following the [administrator read-only verification](../08-infrastructure/admin-readonly-verification.md)).
+Both lists default to `ALLOWED_CLIENT_IPS`; nothing is open to the world until the owner opens it.
+
+**Staff testers need both lists.** `ops.*` and the `/api/v1/ops/**` and `/api/v1/cook/**` paths check `STAFF_ALLOWED_IPS`, but the same API requests then also pass `customer_access` (`CUSTOMER_ALLOWED_IPS`), and sign-in goes through `api.*` (`/oauth2/*`) and `id.*`, which are customer-class hosts (VERIFIED IN CODE: `deploy/web-preview/Caddyfile`, host `api.*` imports `customer_access` after the staff check, host `id.*` imports `customer_access`). A tester whose address is in the staff list only can load Operations Web and still fail at sign-in or at the cook and staff API calls. When a staff or cook tester sees a failed login or missing tabs, check that their public IP is in both lists before suspecting accounts or permissions. Which addresses are in each list is NOT VERIFIED LIVE. Current values: NOT VERIFIED (private `.env`; an authorized administrator can read them following the [administrator read-only verification](../08-infrastructure/admin-readonly-verification.md)).
 
 Synthetic account names documented for the Preview realm `matbakhy` (DOCUMENTED ONLY: `docs/operations/06-web-preview.md`, `deploy/web-preview/seed-preview.sql`, `docs/quality/owner-acceptance/fixtures.json`). Whether each account exists on the live realm is NOT VERIFIED LIVE.
 
@@ -182,7 +184,7 @@ Each journey below has the same fields. Detailed step lists, error tables and te
 |---|---|
 | Feature and purpose | Let an approved cook manage meals, dated slots with capacity, and kitchen settings. |
 | Role and account | Cook: `preview-cook-1` (seeded kitchen). |
-| URL | `https://ops.167-86-90-174.sslip.io/` (staff IP class required) |
+| URL | `https://ops.167-86-90-174.sslip.io/` (staff IP class required, and the customer class too because sign-in and the API use customer-class hosts) |
 | Navigation | Open the URL, sign in, then tabs Home, Orders, Meals, Slots, Statement, Insights, Settings. |
 | Steps | 1. Sign in. 2. "Meals": create or edit a meal, publish, pause or archive, read the price history. 3. "Slots": create a slot and set capacity. 4. "Settings": description, pickup, delivery zones, pause or resume, deposit payment profile. |
 | Expected result | Only the caller's own kitchen is shown. Paused or draft meals disappear from discovery. A changed payment recipient stays hidden from customers until staff approve it. |

@@ -55,7 +55,7 @@
 
 | الخدمة | مصدر الـ Image | الشبكات | الـ Volume الدائم | البورت المنشور |
 |---|---|---|---|---|
-| proxy | FRONT_IMAGE من .env (Caddy ومعاه نسختين الويب جوّاه، بيتبني بواسطة CI) | edge, internal | caddy-data, caddy-config | 80 و 443 على كل العناوين |
+| proxy | FRONT_IMAGE من .env (Caddy وجوّاه نسختَي الويب المبنيّتين بالـ CI) | edge, internal | caddy-data, caddy-config | 80 و 443 على كل العناوين |
 | postgres | postgres:16.15-alpine متثبّت بالـ Digest | internal | postgres-data | مفيش |
 | identity | keycloak 26.8.0 متثبّت بالـ Digest | internal | كمّل من الملف | مفيش |
 | storage | SeaweedFS متثبّت بالـ Digest | internal | storage-data | مفيش |
@@ -85,7 +85,7 @@
 | مستخدم Linux | حسابك انت |
 | النوع | للقراءة فقط |
 | النتيجة المتوقعة | عشرة Volumes مسمّاة |
-| التحقق | كمّل الجدول اللي تحت؛ وقارن بأقسام الاستمرارية في [معمارية التشغيل الخاصة بالـ Preview](../08-infrastructure/runtime-architecture-ar.md) |
+| التحقق | كمّل الجدول اللي تحت؛ وقارن بأقسام حفظ البيانات بشكل دائم (Persistence) في [معمارية التشغيل الخاصة بالـ Preview](../08-infrastructure/runtime-architecture-ar.md) |
 
 | الـ Volume | المخزّن فيه إيه (من مسار الـ Mount) | اللي بيضيع لو اتفقد |
 |---|---|---|

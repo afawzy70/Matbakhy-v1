@@ -147,13 +147,13 @@ No database, Keycloak, storage, API or management port is public. The compose fi
 | /etc/cron.d | e2scrub_all, staticroute, sysstat | VERIFIED LIVE |
 | Matbakhy backup schedule | Not visible. Crontabs of other users are unreadable to aiagent. Older documents tell the operator to add a daily `deploy.sh backup` cron entry for the operating user | NOT VERIFIED on this host; DOCUMENTED ONLY in `docs/operations/12-owner-server-setup.md`, section 9 |
 
-If no cron entry exists, nothing creates backups between deployments except the pre-deploy backup that `deploy.sh up` takes (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function up). See [backup, restore and disaster recovery](backup-restore-disaster-recovery.md).
+The repository takes a pre-deploy backup in `deploy.sh up` (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function up). Whether any other backup is scheduled or run by hand is NOT VERIFIED: the crontabs of other users, the full systemd timer list and any manual practice have not been inspected (commands 12 and 15 on the admin page). The absence of a visible cron entry does not show that no scheduled or manual backup exists. See [backup, restore and disaster recovery](backup-restore-disaster-recovery.md).
 
 ## 7. The stale /srv/matbakhy-preview copy
 
 - VERIFIED LIVE: /srv/matbakhy-preview (devops:devops, 775) holds an older copy of the deploy files dated Oct 17 to 18; its deploy.sh is smaller than the one in /srv/matbakhy-staging.
 - VERIFIED IN CODE: the default for GENERATED_DIR in both `deploy/web-preview/compose.yaml` and `deploy/web-preview/.env.example` is still /srv/matbakhy-preview/generated. The deployment workflow, however, targets /srv/matbakhy-staging.
-- Consequence: the repository default and the live deployment directory disagree. If the live .env does not override GENERATED_DIR and BACKUP_DIR, rendered secrets and the flags directory would sit under the old path. What the live .env sets is NOT VERIFIED; command 2 on the admin page reads only those key names.
+- Consequence: the repository default and the live deployment directory disagree. If the live .env does not override GENERATED_DIR, rendered secrets and the flags directory would sit under the old path (BACKUP_DIR is a separate setting and does not decide where rendered configuration goes). What the live .env sets is NOT VERIFIED; command 2 on the admin page reads only those key names.
 - Do not delete or reuse the old directory until that is confirmed. Treat it as legacy and do not run `deploy.sh` from it.
 
 ## 8. NOT VERIFIED LIVE (summary)

@@ -72,7 +72,7 @@
 | هل ufw نشط وبأنهي قواعد؟ | مش معروف | NOT VERIFIED (محتاج root) |
 | أنهي Containers شغّالة دلوقتي؟ | مش معروف | NOT VERIFIED (محتاج الـ Docker socket) |
 
-فشل محتمل: تكتب "verified" على حاجة موجودة في ملف الـ Compose بس. الـ Compose بيوصف النية؛ والحقائق اللي اتلاحظت على السيرفر نفسه (VERIFIED LIVE) هي بس اللي بتوصفه.
+فشل محتمل: تكتب "verified" على حاجة موجودة في ملف الـ Compose بس. الـ Compose بيوصف النية؛ والحقائق اللي اتلاحظت على السيرفر نفسه هي بس اللي بتوصفه.
 
 ### المهمة 3. اقرا الحسابات والمجموعات
 
@@ -90,7 +90,7 @@
 1. أنهي حسابات في مجموعة sudo؟ (ubuntu وdevops، VERIFIED LIVE كعضوية في المجموعة؛ إنما الصلاحيات الفعلية اللي بتديها قواعد sudo NOT VERIFIED لأن /etc/sudoers.d مش مقروء)
 2. أنهي حسابات في مجموعة docker؟ (devops بس، VERIFIED LIVE)
 3. ليه aiagent مينفعش أبدًا يتضاف لـ docker؟ عضوية مجموعة docker بتخلي المستخدم يشغّل Container بيعمل Mount لنظام ملفات الـ Host، وده بيدّي صلاحيات تعادل root. ده سلوك عام في Linux وDocker (DOCUMENTED ONLY هنا) والجرد بيذكر القاعدة إن aiagent يفضل برّه sudo وdocker.
-4. كل حساب بيعمل إيه تشغيليًا؟ الإجابة الصح: ده مش مثبوت. ماتستنتجش دور من اسم حساب. اسم مستخدم الـ SSH بتاع الـ Deployment متخزّن في Secret الـ Repository اللي اسمه STAGING_SSH_USER، وقيمته NOT VERIFIED.
+4. كل حساب بيعمل إيه تشغيليًا؟ الإجابة الصح: ده مش مثبت. ماتستنتجش دور من اسم حساب. اسم مستخدم الـ SSH بتاع الـ Deployment متخزّن في Secret الـ Repository اللي اسمه STAGING_SSH_USER، وقيمته NOT VERIFIED.
 5. أنهي مجموعة مالهاش معنى موثّق في الـ Repository؟ users (gid 100).
 
 ### المهمة 4. اقرا ملكية المجلدات
@@ -144,7 +144,7 @@
 
 ## اقرا إيه بعد كده
 
-[جرد سيرفر Contabo](../08-infrastructure/contabo-server-inventory-ar.md)، [التحقق للقراءة فقط بواسطة الأدمن](../08-infrastructure/admin-readonly-verification-ar.md)، [معمارية التشغيل الخاصة بالـ Preview](../08-infrastructure/runtime-architecture-ar.md)، [الدخول على الـ Live Preview ورحلات الاستخدام التفاعلية](../05-developer-workflow/live-preview-access-ar.md).
+[جرد سيرفر Contabo](../08-infrastructure/contabo-server-inventory-ar.md)، [التحقق للقراءة فقط بواسطة الأدمن](../08-infrastructure/admin-readonly-verification-ar.md)، [معمارية التشغيل الخاصة بالـ Preview](../08-infrastructure/runtime-architecture-ar.md)، [الوصول للـ Live Preview](../05-developer-workflow/live-preview-access-ar.md).
 
 التالي: [البنية التحتية اليوم 2](infra-day-2-docker-services-ar.md).
 

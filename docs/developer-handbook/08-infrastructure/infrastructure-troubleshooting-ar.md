@@ -61,9 +61,9 @@
 | D1 | `curl -sS -o /dev/null -w '%{http_code} %{content_type} %{redirect_url}\n' https://<host>.<domain>/<path>` | جهازك أو أي جهاز عليه curl | أي مستخدم | وصول للشبكة؛ ممكن الـ IP العام بتاعك يفرق (شوف السيناريو 5) | كود الحالة ونوع المحتوى ووجهة الـ Redirect للمسار ده؛ شوف الجدول في [الوصول للـ Preview الحي](../05-developer-workflow/live-preview-access-ar.md) | Exit code 6 معناه إن الاسم ماتحلّش (السيناريو 2)؛ و 7 معناه إن الاتصال اترفض؛ و 28 معناه Timeout؛ و 35 أو 60 معناه فشل TLS (السيناريو 3) |
 | D2 | `curl -sSI https://<host>.<domain>/<path>` | جهازك | أي مستخدم | زي D1 | هيدرز الرد: Strict-Transport-Security وX-Content-Type-Options وX-Robots-Tag جايين من بلوك الهيدرز في الـ Caddyfile (VERIFIED IN CODE) | رد من غير الهيدرز دي مجاش من الـ Caddyfile ده؛ سيرفر تاني هو اللي ردّ |
 | D3 | `getent hosts <host>.<domain>` | جهازك | أي مستخدم | Resolver | السطر بيبدأ بـ 167.86.90.174 (VERIFIED LIVE لأسماء الـ Preview) | مفيش مخرجات معناه مفيش رد للاسم ده؛ شوف السيناريو 2 |
-| D4 | `openssl s_client -connect <host>.<domain>:443 -servername <host>.<domain> </dev/null 2>/dev/null \| openssl x509 -noout -issuer -subject -dates` | جهازك | أي مستخدم | OpenSSL متسطّب | Subject أو subjectAltName بيغطي المضيف، وIssuer موثوق، وتاريخ not-after في المستقبل. الـ Issuer هو Let's Encrypt بصلاحية حوالي 90 يوم اتلاحظ لمضيف app بس (VERIFIED LIVE: الـ Issuer CN هو YE1، من 2026-10-18 لحد 2027-01-16)؛ أما Issuer وتواريخ المضيفين التانيين فهي NOT VERIFIED LIVE، وصفحة الـ DNS موثّقة إن ممكن تتستخدم جهة إصدار بديلة، فاقرا الـ Issuer ماتفترضوش | نتيجة فاضية معناها إن الـ TLS Handshake فشل؛ ممكن الـ Proxy لسه معندوش شهادة للاسم ده |
+| D4 | الفحص: `openssl s_client -connect <host>.<domain>:443 -servername <host>.<domain> </dev/null 2>/dev/null \| openssl x509 -noout -issuer -subject -dates -ext subjectAltName`. التحقق: `curl -sS -o /dev/null -w '%{http_code} verify=%{ssl_verify_result}\n' https://<host>.<domain>/` | جهازك | أي مستخدم | OpenSSL 1.1.1 أو أحدث وcurl متسطّبين | أمر الفحص بيطبع الشهادة اللي السيرفر بيقدّمها بس، ومابيتحقّقش منها. اقرا سطر subjectAltName للتأكد إن اسم المضيف متغطّي، وشوف الـ Issuer وتاريخ not-after في المستقبل. أمر التحقق بيسيب التحقق من TLS شغّال: بيخرج بـ 0 وبيطبع `verify=0` بس لما سلسلة الشهادات واسم المضيف يتحقّقوا (كود HTTP ممكن يبقى 403 كرد سياسة وصول وده عادي)؛ الخروج بـ 60 أو قيمة verify مش صفر معناه فشل في الشهادة. الـ Issuer هو Let's Encrypt بصلاحية حوالي 90 يوم اتلاحظ لمضيف app بس (VERIFIED LIVE: الـ Issuer CN هو YE1، من 2026-10-18 لحد 2027-01-16)؛ أما Issuer وتواريخ المضيفين التانيين فهي NOT VERIFIED LIVE، وصفحة الـ DNS موثّقة إن ممكن تتستخدم جهة إصدار بديلة، فاقرا الـ Issuer بدل ما تفترضه | نتيجة فحص فاضية معناها إن الـ TLS Handshake فشل؛ ممكن الـ Proxy لسه معندوش شهادة للاسم ده. ماتستبدلش أمر التحقق بـ `curl -k` |
 | D5 | `sh deploy/web-preview/smoke.sh <domain>` (ضيف `SMOKE_OPS=skip` قبله لما تشغّله برّه فئة الـ Staff) | جهازك أو السيرفر | أي مستخدم (على السيرفر: أي حد يقدر يوصل للروابط العامة) | نسخة Checkout من الـ Repository؛ وcurl | بينتهي بـ `PASS: web preview smoke test for <domain>`؛ السكريبت بيقول إنه مابيعملش حساب ولا أوردر ولا Upload (VERIFIED IN CODE) | سطر بيبدأ بـ `FAIL:` بيحدد الفحص اللي باظ؛ شوف السيناريو 22 |
-| D6 | `ssh <admin-user>@<vps-address>` وبعدها `cd <deploy-dir>` | من جهازك للـ VPS | أدمن مصرّح له | مفتاح SSH مصرّح بيه للحساب ده (الـ Directive المقروء PasswordAuthentication no هو VERIFIED LIVE، لكن إعداد sshd الفعّال NOT VERIFIED LIVE لأن ملف Drop-in مش مقروء؛ والأدمن بيأكّد إن الدخول بالمفتاح بس بـ `sshd -T` بحساب root) | Shell داخل مجلد الـ Deployment | خطأ صلاحيات أو مفتاح معناه إنك مش مصرّح لك؛ وقّف واسأل المالك. ماتلفّش حواليه |
+| D6 | `ssh <admin-user>@<vps-address>` وبعدها `cd <deploy-dir>` | من جهازك للـ VPS | أدمن مصرّح له | مفتاح SSH مصرّح بيه للحساب ده (الـ Directive المقروء PasswordAuthentication no هو VERIFIED LIVE، لكن إعداد sshd الفعّال NOT VERIFIED LIVE لأن ملف Drop-in مش مقروء؛ والأدمن بيأكّد إن الدخول بالمفتاح بس بـ `sshd -T` بحساب root) | Shell داخل مجلد الـ Deployment | خطأ صلاحيات أو مفتاح معناه إنك مش مصرّح لك؛ وقّف واسأل المالك. ماتحاولش تتجاوز قيود الوصول |
 | D7 | `./deploy.sh status` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له (محتاج الـ Docker socket وملف .env) | ملف .env موجود (Mode 600، VERIFIED LIVE؛ والمحتوى ماتقراش) | جدول الحاويات بالحالة والـ Image، ونسخة الـ Schema، وقيم RELEASE_COMMIT وAPI_IMAGE وFRONT_IMAGE المضبوطة، وآخر خمسة صفوف إصدار (VERIFIED IN CODE) | "`.env missing`" معناها إنك في المجلد الغلط؛ وجدول حاويات فاضي معناه إن الـ Stack مش شغّال |
 | D8 | `<compose> ps` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | زي D7 | كل خدمة Up؛ وapi وpostgres وidentity بيظهروا (healthy) | خدمة Restarting أو Exited: اقرا الـ Log بتاعها بـ D9 |
 | D9 | `<compose> logs --tail 100 <service>` حيث service واحدة من proxy أو postgres أو identity أو storage أو api أو loki أو alloy أو prometheus أو alertmanager أو alert-sink أو node-exporter أو grafana | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | زي D7 | سطور Log حديثة. Docker بيحتفظ بـ 3 ملفات كحد أقصى بحجم 10 MB لكل حاوية (VERIFIED IN CODE، `x-logging`)، فالسطور القديمة ممكن تكون راحت؛ وLoki محتفظ بتاريخ أطول | الـ Logs ممكن تحمل Request IDs، ماتنسخهاش في مكان عام لو ممكن تحتوي بيانات شخصية |
@@ -71,7 +71,7 @@
 | D11 | `<compose> exec -T postgres pg_isready -U matbakhy -d matbakhy` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | حاوية postgres شغّالة | "accepting connections" (نفس فحص الـ Health Check بتاع الحاوية، VERIFIED IN CODE) | "no response" معناها إن PostgreSQL مش جاهز؛ السيناريو 9 |
 | D12 | `<compose> exec -T postgres psql -U matbakhy -d matbakhy -At -c "SELECT version, success FROM flyway_schema_history ORDER BY installed_rank DESC LIMIT 5"` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | قاعدة البيانات بتقبل اتصالات | أعلى version وقيمة success فيها t؛ دي قراءة لنفس الجدول اللي `deploy.sh` بيسأل عنه لنسخة الـ Schema (VERIFIED IN CODE) | صف فيه قيمة success فيها f معناه Migration فاشل؛ السيناريو 16 |
 | D13 | `<compose> config --images` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | زي D7 | مراجع الـ Images اللي الـ Stack هيشغّلها، مأخوذة من ملف .env | خطأ "set X in .env" بيحدد المتغيّر الناقص |
-| D14 | `docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' <image reference>` | الـ VPS | أدمن مصرّح له | الـ Image موجودة محليًا | الـ Commit SHA الكامل اللي اتبنت منه الـ Image. الـ Pipeline بيحط الـ Label ده على الـ Docker Images الاتنين بتوعنا (VERIFIED IN CODE، `.github/workflows/deploy-preview.yml`) | قيمة فاضية معناها Image طرف تالت أو Image مش مبنية بالـ Pipeline ده |
+| D14 | `docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' <image reference>` | الـ VPS | أدمن مصرّح له | الـ Image موجودة محليًا | الـ Commit SHA الكامل اللي اتبنت منه الـ Image. عملية البناء بتحط الـ Label ده على الـ Docker Images الاتنين بتوعنا (VERIFIED IN CODE، `.github/workflows/deploy-preview.yml` و`.github/workflows/preview-images.yml`)؛ أما الـ Labels على Images الحاويات الشغّالة فهي NOT VERIFIED LIVE | قيمة فاضية معناها Image طرف تالت أو Image مش مبنية بالـ Pipeline ده |
 | D15 | `tail -n 5 <backup-dir>/releases.log` | الـ VPS | أدمن مصرّح له (مجلد النسخ الاحتياطية Mode 750 مملوك لـ devops، VERIFIED LIVE) | `<backup-dir>` هو BACKUP_DIR من ملف .env؛ والافتراضي /srv/matbakhy-backups (VERIFIED IN CODE) | صفوف مفصولة بـ Tab: الوقت، الـ Commit، Image الـ API، Image الـ Front، الـ Schema قبل، الـ Schema بعد، مسار النسخة الاحتياطية | مفيش ملف: مفيش إصدار اتسجّل هناك، أو BACKUP_DIR بيشاور على مكان تاني (راجع القيمة، السيناريو 17) |
 | D16 | `./deploy.sh rollback-plan [N]` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | على الأقل N+1 صف في سجل الإصدارات | بيطبع الإصدار الهدف، وقيم .env التلاتة، وحكم؛ "prints only; changes nothing" (VERIFIED IN CODE) | "no release log" أو "only N release(s) recorded": مفيش حاجة ترجع لها بالطريقة دي |
 | D17 | `<compose> exec -T proxy caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | حاوية الـ Proxy شغّالة؛ والـ Caddyfile متضمّن جوّه Image الـ Front (Baked) في /etc/caddy/Caddyfile (VERIFIED IN CODE، `deploy/web-preview/front.Dockerfile`) | "Valid configuration" | الخطأ بيحدد السطر؛ والإصلاح تغيير في الكود وImage Front جديدة (F9) |
@@ -80,7 +80,7 @@
 | D20 | `docker stats --no-stream` و`docker inspect -f '{{.State.OOMKilled}} {{.RestartCount}}' <container>` | الـ VPS | أدمن مصرّح له | الحاويات موجودة | استخدام الذاكرة أقل من حد كل خدمة؛ وOOMKilled false | OOMKilled true معناها إن الحاوية دي وصلت لحدّها (السيناريو 19) |
 | D21 | `ls -ld <path>` و`stat -c '%U:%G %a %n' <path>` | الـ VPS | أي مستخدم للمسارات اللي الحساب يقدر يعدّي عليها | المسار موجود | مثلًا /srv/matbakhy-staging هو devops:devops 755 (VERIFIED LIVE) | "Permission denied" على قائمة مجلد هو في حد ذاته دليل؛ ماتغيّرهوش، صعّد الموضوع |
 | D22 | `grep -E '^(PREVIEW_DOMAIN\|GENERATED_DIR\|BACKUP_DIR\|COMPOSE_OVERRIDE\|CUSTOMER_ALLOWED_IPS\|STAFF_ALLOWED_IPS\|RELEASE_COMMIT)=' .env` | الـ VPS، داخل `<deploy-dir>` | أدمن مصرّح له | ملف Mode 600؛ النمط بيطبع المفاتيح غير السرّية دي بس | القيم الفعّالة للمفاتيح السبعة دي. ماتطبعش الملف كله أبدًا | طباعة الملف كله هتكشف أسرار؛ ماتعملهاش |
-| D23 | `gh run list --workflow deploy-preview.yml --limit 5` وبعدها `gh run view <run id> --log-failed` | جهازك | أي مستخدم عنده وصول GitHub للـ Repository | GitHub CLI متسجّل دخول | قائمة التشغيلات بنتايجها؛ وLog الخطوة الفاشلة | اسم الخطوة بيقولك أنهي مرحلة فشلت (السيناريو 14) |
+| D23 | `gh run list --workflow deploy-preview.yml --limit 5` وبعدها `gh run view <run id> --log-failed` | جهازك | أي مستخدم عنده وصول GitHub للـ Repository | GitHub CLI متسجّل دخول | قائمة التشغيلات. القائمة الافتراضية مابتعرضش الـ Commit؛ عشان تشوفه استخدم `gh run list --workflow deploy-preview.yml --branch develop --limit 5 --json headSha,status,conclusion,createdAt`. وLog الخطوة الفاشلة | اسم الخطوة بيقولك أنهي مرحلة فشلت (السيناريو 14) |
 | D24 | `systemctl is-active docker` و`systemctl is-enabled docker` | الـ VPS | أي مستخدم | مفيش | الاتنين active وenabled (خدمة docker شغّالة، VERIFIED LIVE) | inactive: الـ Stack كله واقع (السيناريو 1) |
 
 ## كتالوج أوامر التصحيح (بتغيّر الحالة)
@@ -117,7 +117,7 @@
 
 **دليل التشخيص المتوقع.** السليم: app وops بيرجّعوا 200 من شبكة مسموح لها (VERIFIED LIVE، من السيرفر نفسه). لو D1 رجّع Exit code 7 أو 28 وD3 بيحلّ الاسم، يبقى المشكلة في الجهاز أو البورتات. لو D8 بيظهر الـ Proxy ناقص والـ API مش سليم، روح للسيناريو 8. لو الـ Proxy Up وD1 رجّع 403 بالنص "Not available"، روح للسيناريو 5.
 
-**الإجراء التصحيحي.** صلّح السبب اللي بيظهره D8 وD9 باستخدام السيناريو المناسب. لو خدمة Docker واقفة، أدمن مصرّح له بيشغّلها بمدير خدمات النظام؛ وخدمات compose عندها `restart: unless-stopped` (VERIFIED IN CODE)، فالمفروض ترجع بعد ما الـ Daemon يبدأ (مااتجرّبتش). لو انقطاع من المزوّد أو الشبكة، استنى وكلّم المزوّد عن طريق المالك. ماتعيدش إنشاء الـ Stack من الصفر بسبب انقطاع.
+**الإجراء التصحيحي.** صلّح السبب اللي بيظهره D8 وD9 باستخدام السيناريو المناسب. لو خدمة Docker واقفة، أدمن مصرّح له بيشغّلها بمدير خدمات النظام؛ وخدمات compose عندها `restart: unless-stopped` (VERIFIED IN CODE)، فالمفروض ترجع بعد ما الـ Daemon يبدأ (لسه ماجرّبناهاش). لو انقطاع من المزوّد أو الشبكة، استنى وكلّم المزوّد عن طريق المالك. ماتعيدش إنشاء الـ Stack من الصفر بسبب انقطاع.
 
 **مستوى الخطورة.** متوسط. إعادة تشغيل الخدمات بتقطع الـ Preview لكن مابتلمسش البيانات؛ أما إعادة إنشاء الـ Volumes فهتدمّر البيانات وماينفعش تتعمل.
 
@@ -137,9 +137,9 @@
 
 **دليل التشخيص المتوقع.** كل اسم بيرد بـ 167.86.90.174. الفشل على شبكتك بس معناه إن المشكلة في الـ Resolver بتاعك؛ والفشل في كل مكان معناه إن المشكلة في الاسم أو في sslip.io.
 
-**الإجراء التصحيحي.** صحّح الاسم اللي كتبته. غيّر الـ Resolver أو الشبكة. مفيش حاجة على الـ VPS محتاجة تتغيّر لمشكلة DNS في أسماء sslip.io، فماتعيدش تشغيل الحاويات. لو الـ Preview اتنقل لعنوان تاني، اتبع Runbook استبدال الدومين في [الـ DNS والـ HTTPS](dns-https-sslip-io-ar.md) عن طريق Pull Request.
+**الإجراء التصحيحي.** صحّح الاسم اللي كتبته. غيّر الـ Resolver أو الشبكة. مفيش حاجة على الـ VPS محتاجة تتغيّر لمشكلة DNS في أسماء sslip.io، فماتعيدش تشغيل الحاويات. لو الـ Preview اتنقل لعنوان تاني، اتبع Runbook استبدال الدومين في [الـ DNS والـ HTTPS](dns-https-sslip-io-ar.md) عن طريق Pull Request. التغيير ده مش في ملف .env بس: أسماء مواقع Caddy، وImage الـ Front (بتتبني بالدومين)، وعناوين الـ Redirect وPost-logout بتاعة الـ Application Client في الـ Realm المحفوظ في Keycloak، كلها شايلة الدومين. استعادة ملف .env والـ Images السابقة بس مابتعكسش إعدادات الـ Client في الـ Realm، فالرجوع عن تغيير دومين محتاج قرار صريح من المالك، ولسه ماجرّبناهوش بتمرين فعلي (NOT VERIFIED).
 
-**مستوى الخطورة.** منخفض للتشخيص. استبدال الدومين خطورته عالية لأنه بيخلّي الشهادات غير صالحة، وبيغيّر أسماء مضيفي الـ Realm بتاع Keycloak والـ Build Argument الخاص بـ Image الـ Front.
+**مستوى الخطورة.** منخفض للتشخيص. استبدال الدومين خطورته عالية لأنه بيخلّي الشهادات وأسماء المضيفين المتظبّطة في Realm الـ Keycloak والـ Build Argument الخاص بـ Image الـ Front غير صالحين.
 
 **التحقق من التعافي.** D3 بيرجّع العنوان المتوقع لكل الأسماء، وبعدها D1 لكل مضيف بيرجّع أكواد الحالة المتوقعة المذكورة في [الوصول للـ Preview الحي](../05-developer-workflow/live-preview-access-ar.md).
 
@@ -157,13 +157,13 @@
 
 **أوامر التشخيص الآمنة.** D4 للمضيف الفاشل؛ وD3؛ وساعة الـ Caller نفسها؛ وD9 للـ Proxy (أدمن مصرّح له).
 
-**دليل التشخيص المتوقع.** Issuer موثوق، وتاريخ not-after في المستقبل، واسم بيغطي المضيف. شهادة app بس هي اللي اتلاحظت (Let's Encrypt، VERIFIED LIVE)؛ ماتفترضش نفس الـ Issuer أو التواريخ للمضيفين التانيين (NOT VERIFIED LIVE). الـ Subject اللي مابيذكرش المضيف، أو مخرجات D4 الفاضية، معناها إن الـ Proxy معندوش شهادة له. سطور Log الـ Proxy عن الحصول على شهادة بتظهر التقدّم أو نص الخطأ (DOCUMENTED ONLY: Caddy بيكتب أخطاء ACME على خرج الأخطاء القياسي، وDocker بيلتقطه).
+**دليل التشخيص المتوقع.** subjectAltName بيغطي المضيف، وتاريخ not-after في المستقبل، وأمر التحقق (D4) بيخرج بـ 0 مع verify=0، وده اللي بيثبت إن الـ Issuer موثوق. شهادة app بس هي اللي اتلاحظت (Let's Encrypt، VERIFIED LIVE)؛ ماتفترضش نفس الـ Issuer أو التواريخ للمضيفين التانيين (NOT VERIFIED LIVE). الـ Subject اللي مابيذكرش المضيف، أو مخرجات D4 الفاضية، معناها إن الـ Proxy معندوش شهادة له. سطور Log الـ Proxy عن الحصول على شهادة بتظهر التقدّم أو نص الخطأ (DOCUMENTED ONLY: Caddy بيكتب أخطاء ACME على خرج الأخطاء القياسي، وDocker بيلتقطه).
 
 **الإجراء التصحيحي.** استخدم اسم المضيف الصح. صحّح ساعة الـ Caller. للشهادات الناقصة أو المنتهية اتبع السيناريو 20. ماتعطّلش التحقق من الشهادة أبدًا (curl -k) إلا في التجربة المحلية اللي سكريبت الـ Smoke موثّقها؛ وماتنسخش أي مفتاح خاص (Private Key) من الـ Volume بتاع caddy-data أبدًا.
 
 **مستوى الخطورة.** متوسط؛ الـ Preview مش صالح للاستخدام عبر HTTPS طول فترة المشكلة، بس مفيش حاجة بتضيع.
 
-**التحقق من التعافي.** D4 بيظهر لكل مضيف شهادة بتغطيه وموثوقة ومش منتهية، وD5 بينجح.
+**التحقق من التعافي.** لكل مضيف، فحص D4 بيظهر subjectAltName بيغطي المضيف وتاريخ مش منتهي، وأمر التحقق في D4 بيخرج بـ 0 مع verify=0، وD5 بينجح.
 
 ## 4. Caddy مش بيوجّه
 
@@ -191,17 +191,17 @@
 **الأعراض.** مضيف بيرد 403.
 
 **الأسباب المحتملة.** فيه تلات ردود 403 مختلفة، ومش معناهم نفس الحاجة.
-- رد سياسة الوصول في Caddy: الـ Body هو النص "Not available". الـ Caddyfile بيرجّعه لأي حد برّه فئة العميل (مضيفي app وapi وid وmedia) أو فئة الـ Staff (مضيف ops، ومساري /api/v1/ops و/api/v1/cook). الفئتين الافتراضي بتاعهم ALLOWED_CLIENT_IPS، وفئة العميل بتبقى عامة فقط لما المالك يضبط CUSTOMER_ALLOWED_IPS (VERIFIED IN CODE، تعليقات رأس الـ Caddyfile). ده قرار وصول، مش انقطاع. النتيجة بتعتمد على عنوان الـ IP العام للي بيطلب، فالحالة اللي بتتشاف من شبكة تانية ممكن تختلف (VERIFIED LIVE: الطلبات اتعملت من عنوان السيرفر نفسه).
-- جذر مضيف الميديا: https://media.<domain>/ رجّع 403 بنوع محتوى application/xml وهيدر x-amz-request-id، وده بيبيّن إن الرد جاي من بوابة S3 بتاعة SeaweedFS ورا Caddy مش من نص Caddy نفسه (VERIFIED LIVE). القراءة هي إن بوابة S3 بترفض الطلب المجهول لقائمة الـ Buckets على الجذر. نص الخطأ بالظبط ماتخزّنش، فكود خطأ S3 المحدد NOT VERIFIED. الأوبجكتس تحت /matbakhy-public/ هي العامة (VERIFIED IN CODE: الـ Base URL العام للـ API هو https://media.<domain>/matbakhy-public، والـ Bucket العام مقروء بشكل مجهول بإعدادات S3 المولّدة). فـ 403 على جذر الميديا متوقع؛ وهو في حد ذاته مش معناه إن خدمة الميديا مكسورة.
+- رد سياسة الوصول في Caddy: الـ Body هو النص "Not available". الـ Caddyfile بيرجّعه لأي حد برّه فئة العميل (مضيفي app وapi وid وmedia) أو فئة الـ Staff (مضيف ops، ومساري /api/v1/ops و/api/v1/cook). الفئتين الافتراضي بتاعهم ALLOWED_CLIENT_IPS، وفئة العميل بتبقى عامة فقط لما المالك يضبط CUSTOMER_ALLOWED_IPS (VERIFIED IN CODE، تعليقات رأس الـ Caddyfile). ده قرار وصول، مش انقطاع. النتيجة بتعتمد على عنوان الـ IP العام للي بيطلب، فالحالة اللي بتتشاف من شبكة تانية ممكن تختلف (VERIFIED LIVE: الطلبات اتعملت من عنوان السيرفر نفسه). مسارات API بتاعة المطبخ والـ Staff (/api/v1/ops و/api/v1/cook) على مضيف api بتتفحص مقابل قائمة الـ Staff وبعدها مقابل قائمة العميل كمان، فلازم الـ Tester بتاع الـ Staff يبقى في القائمتين؛ وتسجيل الدخول بيستخدم مضيفي فئة العميل برضه (VERIFIED IN CODE، بلوك api في الـ Caddyfile). عنوان مسموح له بفئة الـ Staff بس ممكن يفتح Operations Web وبرضه تفشل نداءات الـ API وتسجيل الدخول بتاعه.
+- جذر مضيف الميديا: https://media.<domain>/ رجّع 403 بنوع محتوى application/xml وهيدر x-amz-request-id، وده بيبيّن إن الرد جاي من بوابة S3 بتاعة SeaweedFS ورا Caddy مش من نص Caddy نفسه (VERIFIED LIVE). التفسير هو إن بوابة S3 بترفض الطلب المجهول لقائمة الـ Buckets على الجذر. نص الخطأ بالظبط ماتخزّنش، فكود خطأ S3 المحدد NOT VERIFIED. الأوبجكتس تحت /matbakhy-public/ هي العامة (VERIFIED IN CODE: الـ Base URL العام للـ API هو https://media.<domain>/matbakhy-public، والـ Bucket العام مقروء بشكل مجهول بإعدادات S3 المولّدة). فـ 403 على جذر الميديا متوقع؛ وهو في حد ذاته مش معناه إن خدمة الميديا مكسورة.
 - 403 على مستوى التطبيق من الـ API، مثلًا Token XSRF ناقص. ملف compose بيذكر إن الـ Cookie لازم تتضبط للدومين الأب وإلا كل Mutation من المتصفح بتتّرفض بـ 403 (VERIFIED IN CODE، تعليق على WEB_COOKIE_DOMAIN في `deploy/web-preview/compose.yaml`).
 
 **أوامر التشخيص الآمنة.** D1 مع نوع المحتوى في المخرجات، وD2؛ قارن نفس الرابط من شبكة مسموح لها وشبكة مش مسموح لها؛ وD22 لـ CUSTOMER_ALLOWED_IPS وSTAFF_ALLOWED_IPS (أدمن مصرّح له).
 
 **دليل التشخيص المتوقع.** 403 الخاص بـ Caddy: نص قصير عادي "Not available" ومن غير x-amz-request-id. 403 الخاص بـ S3: نوع محتوى XML وx-amz-request-id. 403 الخاص بالـ API: Body خطأ JSON فيه requestId (DOCUMENTED ONLY: [دليل حل المشاكل التشغيلي](../../operations/08-troubleshooting-runbook.md)، القسم 1). سكريبت الـ Smoke نفسه بيتوقع 403 من مضيف ops لما يتشغّل برّه فئة الـ Staff مع SMOKE_OPS=skip (VERIFIED IN CODE).
 
-**الإجراء التصحيحي.** ماتوسّعش قائمة وصول عشان 403 يختفي. لو Tester شرعي محجوب، المالك هو اللي يقرر يضيف عنوان الـ Tester العام للـ Allow-list؛ والتغيير بيتعمل في ملف .env على السيرفر بواسطة أدمن مصرّح له، وبعدها F2 بصيغة إعادة الإنشاء للـ Proxy (الـ Caddyfile بيقرا القيم دي من بيئة الحاوية). لجذر الميديا، مفيش إجراء مطلوب. لأوبجكت المفروض يكون عام، شوف السيناريو 21. لحالة XSRF، قارن WEB_COOKIE_DOMAIN بدومين الـ Preview.
+**الإجراء التصحيحي.** ماتوسّعش قائمة وصول عشان 403 يختفي. لو حد مصرّح له بالاختبار مش قادر يدخل، المالك هو اللي يقرر يضيف عنوانه العام للـ Allow-list؛ والتغيير بيتعمل في ملف .env على السيرفر بواسطة أدمن مصرّح له، وبعدها F2 بصيغة إعادة الإنشاء للـ Proxy (الـ Caddyfile بيقرا القيم دي من بيئة الحاوية). الـ Tester اللي محتاج مسارات الـ Staff لازم يتضاف في CUSTOMER_ALLOWED_IPS وSTAFF_ALLOWED_IPS الاتنين. لجذر الميديا، مفيش إجراء مطلوب. لأوبجكت المفروض يكون عام، شوف السيناريو 21. لحالة XSRF، قارن WEB_COOKIE_DOMAIN بدومين الـ Preview.
 
-**مستوى الخطورة.** متوسط لأي تغيير في قائمة الوصول: بيغيّر مين يقدر يوصل للـ Preview. جعل مضيفي العميل عامين هي خطوة المالك صراحةً.
+**مستوى الخطورة.** متوسط لأي تغيير في قائمة الوصول: بيغيّر مين يقدر يوصل للـ Preview. إتاحة مضيفي العميل للعموم خطوة بيقررها المالك صراحةً.
 
 **التحقق من التعافي.** عنوان الـ Tester بياخد 200 على مضيف app؛ وعنوان مش في القائمة لسه بياخد 403 على ops ومسارات الـ API الخاصة بالـ Staff؛ وD5 بينجح.
 
@@ -232,7 +232,7 @@
 **الأعراض.** مضيف بيرجّع 502 (Bad Gateway) أو 503. أو الـ API بيرجّع خطأ JSON بالكود DEPENDENCY_UNAVAILABLE.
 
 **الأسباب المحتملة.**
-- Caddy مش قادر يوصل للـ Upstream بتاعه (حاوية api أو identity أو storage) لأن الحاوية دي واقعة أو بتعيد التشغيل أو لسه بتبدأ. Caddy بيرد 502 في الحالة دي (DOCUMENTED ONLY: سلوك Caddy كـ Reverse Proxy؛ ماحصلش إعادة إنتاجه هنا).
+- Caddy مش قادر يوصل للـ Upstream بتاعه (حاوية api أو identity أو storage) لأن الحاوية دي واقعة أو بتعيد التشغيل أو لسه بتبدأ. Caddy بيرد 502 في الحالة دي (DOCUMENTED ONLY: سلوك Caddy كـ Reverse Proxy؛ ماجرّبناش نعيد نفس الحالة هنا).
 - الـ API بيرجّع 503 DEPENDENCY_UNAVAILABLE قابل لإعادة المحاولة لما PostgreSQL مش متاح، من غير تفاصيل عن قاعدة البيانات؛ وبيتعافى من غير إعادة تشغيل لما قاعدة البيانات ترجع (DOCUMENTED ONLY: [الـ Runbooks التشغيلية](../../operations/02-runbooks.md)، "Database unavailable"؛ والنص نفسه بيستشهد بـ DatabaseOutageRecoveryIntegrationTest كدليل).
 - حاوية اتقتلت بسبب الذاكرة (السيناريو 19) أو مش سليمة (السيناريو 8).
 - فيه Deployment شغّال.
@@ -241,7 +241,7 @@
 
 **دليل التشخيص المتوقع.** D8 بيظهر أنهي Upstream مش Up أو مش سليم. Log الـ Proxy بيسمّي الـ Upstream اللي رفض الاتصال. Body JSON بـ 503 من الـ API مع كود الاعتمادية بيشاور على PostgreSQL (السيناريو 9).
 
-**الإجراء التصحيحي.** صلّح الـ Upstream الفاشل بسيناريوه. 502 قصير أثناء الـ Deployment طبيعي؛ استنى لحد ما الـ Pipeline يخلّص قبل ما تتصرف. ماتعيدش تشغيل Proxy سليم عشان تمسح 502 سببه Upstream واقف.
+**الإجراء التصحيحي.** صلّح مشكلة الـ Upstream باتباع السيناريو الخاص بيه. 502 قصير أثناء الـ Deployment طبيعي؛ استنى لحد ما الـ Pipeline يخلّص قبل ما تتصرف. ماتعيدش تشغيل Proxy سليم عشان تمسح 502 سببه Upstream واقف.
 
 **مستوى الخطورة.** متوسط.
 
@@ -314,7 +314,7 @@
 
 ## 11. عدم تطابق الـ Issuer في OIDC
 
-**الأعراض.** الـ API بيسجّل فشل تحقق من Token أو Issuer؛ وكل نداء متوثّق بيرجّع 401؛ وفحص الـ Smoke "identity issuer is ..." بيفشل.
+**الأعراض.** الـ API بيسجّل فشل تحقق من Token أو Issuer؛ وكل طلب API فيه Authentication بيرجّع 401؛ وفحص الـ Smoke "identity issuer is ..." بيفشل.
 
 **الأسباب المحتملة.**
 - نص الـ Issuer اللي الـ API بيتوقعه، OIDC_ISSUER، هو https://id.<domain>/realms/matbakhy (VERIFIED IN CODE، compose.yaml). Keycloak بيحط اسم المضيف العام المضبوط عنده في الـ Issuer: KC_HOSTNAME هو https://id.<domain>. لو PREVIEW_DOMAIN في ملف .env بيختلف عن الدومين اللي Keycloak اتشغّل بيه، أو الـ Proxy مابيمرّرش هيدرز X-Forwarded، الاتنين بيختلفوا.
@@ -328,7 +328,7 @@
 
 **الإجراء التصحيحي.** خلّي PREVIEW_DOMAIN وKC_HOSTNAME وOIDC_ISSUER متفقين بتصحيح قيمة .env (المالك أو أدمن مصرّح له)، وبعدها F10 وF2 بصيغة إعادة الإنشاء لـ identity وapi (الـ restart كان هيسيب قيم الـ Issuer القديمة). لو كان المقصود استبدال دومين، اتبع الـ Runbook الكامل في [الـ DNS والـ HTTPS](dns-https-sslip-io-ar.md) بدل ترقيع قيم فردية.
 
-**مستوى الخطورة.** عالي؛ إعدادات Issuer غلط بتقفل كل المستخدمين برّه، وتغييرات الـ Realm بتأثر على الحسابات.
+**مستوى الخطورة.** عالي؛ إعدادات الـ Issuer الغلط بتمنع كل المستخدمين من الدخول، وتغييرات الـ Realm بتأثر على الحسابات.
 
 **التحقق من التعافي.** الـ Issuer في وثيقة الـ Discovery متطابق، والـ api سليم، وD5 بينجح، وتسجيل دخول تجريبي بيشتغل.
 
@@ -337,9 +337,9 @@
 **الأعراض.** أدمن مش قادر يسجّل دخول لـ https://kc-admin.<domain>/admin/master/console/: كلمة السر لمرة واحدة مرفوضة، أو الحساب معندوش كلمة سر لمرة واحدة، أو التليفون ضاع، أو الحساب اتقفل بعد محاولات فاشلة.
 
 **الأسباب المحتملة (كلها DOCUMENTED ONLY في [كونسول أدمن Keycloak](../../operations/14-keycloak-admin-console.md)؛ والـ Realm الحي ماتفحصش).**
-- تسجيل الدخول للـ Realm الـ master بيتطلب كلمة السر وكلمة سر لمرة واحدة؛ ومفيش تسجيل جهاز ذاتي للعموم. حساب من غير كلمة سر لمرة واحدة مش قادر يسجّل دخول ومابيتعرضلوش عليه تسجيل جهاز. حساب الـ Bootstrap معندوش واحدة، فبعد التقوية مش قادر يسجّل دخول للـ Console بالتصميم.
+- تسجيل الدخول للـ Realm الـ master بيتطلب كلمة السر وكلمة سر لمرة واحدة؛ ومفيش تسجيل جهاز ذاتي للعموم. حساب من غير كلمة سر لمرة واحدة مش قادر يسجّل دخول ومابيتعرضش عليه خيار تسجيل جهاز. حساب الـ Bootstrap معندوش واحدة، فبعد التقوية مش قادر يسجّل دخول للـ Console بالتصميم.
 - تطبيق المصادقة عنده مفتاح غلط أو ساعة التليفون غلط (كل كود 6 أرقام وبيتغيّر كل 30 ثانية).
-- الحماية من الـ Brute-force وقّفت الحساب مؤقتًا بعد محاولات فاشلة.
+- الحماية من الـ Brute-force حدّت من معدّل محاولات الدخول للحساب بعد محاولات فاشلة.
 - المضيف بيرد 404 لأن ملف التفعيل (Flag) مش موجود (الـ Console مقفول).
 - حساب أدمن تجريبي غير حقيقي (Synthetic) للتحقق فضل موجود بعد تشغيلة اتقطعت.
 
@@ -377,7 +377,7 @@
 
 ## 14. فشل الـ Deployment في GitHub Actions
 
-**الأعراض.** الـ Workflow اسمه Deploy Matbakhy preview to Contabo بينتهي أحمر.
+**الأعراض.** الـ Workflow اسمه Deploy Matbakhy preview to Contabo بينتهي بفشل واحد أو أكتر من الفحوص.
 
 **الأسباب المحتملة.** الـ Workflow فيه Jobs اتنين، build وdeploy (VERIFIED IN CODE، `.github/workflows/deploy-preview.yml`). حدّد الخطوة الفاشلة:
 
@@ -396,11 +396,11 @@
 
 **دليل التشخيص المتوقع.** اسم الخطوة الفاشلة من D23، وسطر الخطأ بتاعها. التشغيلة الناجحة بتنتهي بـ `DEPLOYED <sha>` في خطوة الـ Deploy.
 
-**الإجراء التصحيحي.** صلّح السبب المحدد (CI أو بناء أو Secret أو مفتاح مضيف أو حالة السيرفر). أعد التشغيل بعد ما السبب يتصلّح بس (F8). ماتعيدش تشغيل Job سليم شغّال عشان هو بطيء. ماتطبعش أسرار في Log أثناء الـ Debug أبدًا. استعادة ملف .env السابق بتحصل في مكان واحد بس: جوّه سكريبت الـ Deploy عن بُعد، لما `./deploy.sh up` أو `./deploy.sh smoke` يفشل (VERIFIED IN CODE). أي فشل قبل كده (ملف .env ناقص، تسجيل الدخول للـ Registry، تعديل .env نفسه) بيخرج من غير أي استعادة، وفشل خطوة "Publish and verify the Keycloak admin console" اللي بعدها مابيستعيد حاجة: الـ Images الجديدة و.env الجديد بيفضلوا زي ما هم والـ Console بس هو اللي بيتقفل تاني. الاستعادة بتخص ملف .env بس؛ الحاويات مابتتعملهاش إعادة إنشاء وقاعدة البيانات مابتتعملهاش Rollback (السيناريوهات 15 و 23).
+**الإجراء التصحيحي.** صلّح السبب المحدد (CI أو بناء أو Secret أو مفتاح مضيف أو حالة السيرفر). أعد التشغيل بعد ما السبب يتصلّح بس (F8). ماتعيدش تشغيل Job سليم شغّال عشان هو بطيء. ماتطبعش أسرار في Log أثناء الـ Debug أبدًا. استعادة ملف .env السابق بتحصل في مكان واحد بس: جوّه سكريبت الـ Deploy عن بُعد، لما `./deploy.sh up` أو `./deploy.sh smoke` يفشل (VERIFIED IN CODE). أي فشل قبل كده (ملف .env ناقص، تسجيل الدخول للـ Registry، تعديل .env نفسه) بيخرج من غير أي استعادة، وفشل خطوة "Publish and verify the Keycloak admin console" اللي بعدها مابيستعيدش أي حاجة: الـ Images الجديدة و.env الجديد بيفضلوا زي ما هم والـ Console بس هو اللي بيتقفل تاني. الاستعادة بتخص ملف .env بس؛ الحاويات مابتتعملهاش إعادة إنشاء وقاعدة البيانات مابتتعملهاش Rollback (السيناريوهات 15 و 23).
 
 **مستوى الخطورة.** متوسط؛ Deployment نصف مكتمل ممكن يسيب السيرفر على إعدادات مختلطة: بعد فشل `up` أو `smoke` ملف .env بيبقى القديم وفي نفس الوقت ممكن بعض الحاويات تكون شغّالة بالـ Images الجديدة.
 
-**التحقق من التعافي.** تشغيلة بتوصل لـ `DEPLOYED <sha>` وبتخلّص خضراء، وD7 بيظهر الـ sha ده كـ RELEASE_COMMIT.
+**التحقق من التعافي.** تشغيلة بتوصل لـ `DEPLOYED <sha>` وبتخلّص وكل فحوصها ناجحة، وD7 بيظهر الـ sha ده كـ RELEASE_COMMIT.
 
 ## 15. نسخة Image غلط
 
@@ -416,7 +416,7 @@
 
 **دليل التشخيص المتوقع.** RELEASE_COMMIT في ملف .env، وLabel الـ revision بتاع الـ Docker Images الاتنين، وservice.version في Logs الـ API المفروض يبقوا نفس الـ Commit من 40 حرف. Commit أقصر معروض من status هو عرض مقتطع بس (`substr` لـ 12 حرف، VERIFIED IN CODE).
 
-**الإجراء التصحيحي.** لإعادة المحاذاة، شغّل الـ Pipeline للـ Commit المقصود (F8) أو، بواسطة أدمن مصرّح له، اضبط القيم التلاتة من إصدار مسجّل (D16) وشغّل F1. ماتخلطش Image API من Commit مع Image Front من Commit تاني. أي حاجة بترجّع الـ Schema بتاعة قاعدة البيانات لورا مش إصلاح Image (السيناريو 23).
+**الإجراء التصحيحي.** عشان ترجع قيم الإصدار والـ Images متوافقة مع بعض، شغّل الـ Pipeline للـ Commit المقصود (F8) أو، بواسطة أدمن مصرّح له، اضبط القيم التلاتة من إصدار مسجّل (D16) وشغّل F1. ماتخلطش Image API من Commit مع Image Front من Commit تاني. أي حاجة بترجّع الـ Schema بتاعة قاعدة البيانات لورا مش إصلاح Image (السيناريو 23).
 
 **مستوى الخطورة.** متوسط.
 
@@ -434,7 +434,7 @@
 
 **أوامر التشخيص الآمنة.** D9 لـ api، وD12، وD16، وD15، وD11.
 
-**دليل التشخيص المتوقع.** الـ Log بيسمّي نسخة الـ Migration اللي فشلت. قبل كل `up` بيلاقي قاعدة بيانات شغّالة، `deploy.sh` بياخد نسخة احتياطية متحقق منها وبيسجّلها في سجل الإصدارات (VERIFIED IN CODE)؛ وD15 بيظهر مسارها.
+**دليل التشخيص المتوقع.** الـ Log بيسمّي نسخة الـ Migration اللي فشلت. قبل كل `up` بيلاقي حاوية PostgreSQL شغّالة، `deploy.sh` بياخد نسخة احتياطية وبيستعيدها في قاعدة بيانات مؤقتة عشان يتحقق منها (VERIFIED IN CODE)؛ والمخرجات بتظهر سطرين "backup ... written" و"backup verified: ... restored and reconciled" ومعاهم مسار الـ Dump. أما سجل الإصدارات فالوضع فيه مختلف: `record_release` بيشتغل بعد ما الـ Stack يبدأ ويبقى سليم بس (VERIFIED IN CODE)، فنسخة Deployment فشل أثناء الـ Migration مش بتظهر في D15. دوّر عليها في مخرجات الـ Deployment ده (Log الـ Actions أو Console اللي شغّل `up`) أو في أحدث مجلد `db-<UTC stamp>` تحت BACKUP_DIR (جوه حاوية postgres المسار هو /backups/db-<UTC stamp>)، وراجع ملفات `.sha256` و`.manifest` اللي `scripts/db-backup.sh` بيكتبها جنب الـ Dump. D15 وD16 بيعدّوا الإصدارات الناجحة بس، فترقيم `rollback-plan [N]` مابيحسبش المحاولة الفاشلة. أول Deployment على سيرفر فاضي مابياخدش نسخة احتياطية لأن مفيش حاوية قاعدة بيانات لسه (VERIFIED IN CODE).
 
 **الإجراء التصحيحي.** الـ Migrations بتتحرك للأمام بس (DOCUMENTED ONLY، [الـ Deployment والـ Rollback للـ Staging](../../operations/11-staging-deployment-and-rollback.md)، القسم 4). اختار بالجدول في السيناريو 23: Migration جديد لإصلاح المشكلة للأمام (Fix-forward) عن طريق Pull Request، أو Rollback للـ Images بس لما كل Migration من آخر إصدار سليم هو Expand-only (`scripts/check_migration_compat.py` بيفرض الـ Annotation في الـ CI)، أو استعادة من النسخة الاحتياطية قبل الـ Deployment للـ Migrations الكاسرة (F11). ماتعدّلش جدول flyway_schema_history ولا تمسح صفوف بنفسك، وماتشغّلش أوامر إصلاح ارتجالية على بيانات حيّة من غير المالك.
 
@@ -470,7 +470,7 @@
 - Logs الحاويات: 10 MB × 3 ملفات لكل حاوية.
 - مخزن Logs بتاع Loki بفترة احتفاظ مقترحة 720 ساعة، وmetrics بتاعة Prometheus لمدة 15 يوم وحد حجم 2 GB. الاتنين قيم افتراضية مقترحة، مش سياسات معتمدة.
 - نسخ احتياطية مكتوبة في BACKUP_DIR، كل واحدة فيها Dump لقاعدة البيانات وأرشيف لتخزين الأوبجكتس، وبتفضل لحد ما حد يشيلها (مفيش مسح تلقائي للنسخ الاحتياطية ظاهر في الـ Repository؛ وهل في Cron حي بيعمله NOT VERIFIED، لأن الـ Crontabs بتاعة المستخدمين التانيين مش مقروءة).
-- Images قديمة (كل إصدار بيسحب Docker Images جداد بالـ Digest).
+- Images قديمة (كل إصدار بيسحب اتنين Docker Images جداد بالـ Digest).
 - ملفات الـ QA (السكريبت `deploy.sh prune-qa` موجود ليها).
 - أدوات مالهاش علاقة على نفس الجهاز (مجلدات AI Supervisor موجودة تحت /srv، VERIFIED LIVE؛ وهي مش جزء من وقت تشغيل Matbakhy).
 
@@ -490,7 +490,7 @@
 
 **الأسباب المحتملة.**
 - خدمة وصلت لحدّها. ملف compose بيضبط حدود ذاكرة لكل خدمة: proxy بـ 256 MiB، وpostgres بـ 1536 MiB، وidentity بـ 1 GiB، وstorage بـ 512 MiB، وapi بـ 2 GiB، وloki بـ 384 MiB، وalloy بـ 256 MiB، وprometheus بـ 512 MiB، وalertmanager بـ 128 MiB، وalert-sink بـ 64 MiB، وnode-exporter بـ 64 MiB، وgrafana بـ 256 MiB؛ والمجموع المحسوب من compose.yaml هو 7040 MiB، حوالي 6.9 GiB (VERIFIED IN CODE).
-- الجهاز عنده حوالي 23 GiB والمستخدم حوالي 3.4 GiB وقت الملاحظة (VERIFIED LIVE)، فاستنفاد الذاكرة على مستوى الجهاز بسبب الـ Stack ده لوحده مستبعد؛ والأدوات التانية على نفس الجهاز (AI Supervisor وعملية Java مالكها مجهول، الاتنين ظاهرين في الـ Sockets المسموعة الحيّة، VERIFIED LIVE) مش مثبّت إنها أسباب.
+- الجهاز عنده حوالي 23 GiB والمستخدم حوالي 3.4 GiB وقت الملاحظة (VERIFIED LIVE)، فاستنفاد الذاكرة على مستوى الجهاز بسبب الـ Stack ده لوحده مستبعد؛ والأدوات التانية على نفس الجهاز (AI Supervisor وعملية Java مالكها مجهول، الاتنين ظاهرين في الـ Listening Sockets اللي اتلاحظت على السيرفر، VERIFIED LIVE) مش مثبّت إنها أسباب.
 - خدمات Java بتستخدم نسبة من حد الحاوية (MaxRAMPercentage 70 للـ API وKeycloak)، فحد مضبوط واطي أوي بيسيب Heap قليل (VERIFIED IN CODE).
 - ملف الـ Override لحجم 4 GB اسمه compose.4gb.yaml اتكتب لسيرفر Hetzner مقترح (OUTDATED / INCORRECT لجهاز Contabo ذو الـ 23 GiB). وهل ملف .env الحي بيضبط COMPOSE_OVERRIDE NOT VERIFIED؛ اتأكد بـ D22، لأن الـ Override بيخفض الحدود.
 
@@ -509,7 +509,7 @@
 **الأعراض.** تاريخ الشهادة من D4 قرب ينتهي أو انتهى؛ والمتصفحات بدأت تظهر تحذيرات انتهاء؛ وLog الـ Proxy بيظهر أخطاء ACME.
 
 **الأسباب المحتملة.**
-- Caddy بيحصل على الشهادات من Let's Encrypt وبيجدّدها تلقائيًا لكل اسم موقع في الـ Caddyfile (DOCUMENTED ONLY: سلوك Caddy؛ الـ Issuer وصلاحية الـ 90 يوم اتلاحظوا، VERIFIED LIVE، لكن التجديد نفسه لسه ماتأكدش منه).
+- Caddy بيحصل على الشهادات من Let's Encrypt وبيجدّدها تلقائيًا لكل اسم موقع في الـ Caddyfile (DOCUMENTED ONLY: سلوك Caddy؛ الـ Issuer وصلاحية الـ 90 يوم اتلاحظوا، VERIFIED LIVE، لكن التجديد نفسه لسه ماتأكدش منه). بيانات التواصل الخاصة بـ ACME متظبّطة في ACME_EMAIL.
 - بورت 80 أو 443 مبقاش قابل للوصول من الإنترنت (حالة Firewall الجهاز NOT VERIFIED LIVE؛ وقواعد شبكة المزوّد NOT VERIFIED).
 - أسماء sslip.io مش بتتحلّ للسيرفر (السيناريو 2).
 - Volume اسمه caddy-data، اللي Caddy بيخزّن فيه الشهادات ومفاتيح الحساب، ضاع أو مش قابل للكتابة (السيناريو 17).
@@ -524,7 +524,7 @@
 
 **مستوى الخطورة.** متوسط لعالي؛ شهادة منتهية بتخلي الـ Preview مش صالح للاستخدام في المتصفحات.
 
-**التحقق من التعافي.** D4 بيظهر تاريخ not-after جديد وIssuer موثوق بيغطي المضيف، وD5 بينجح.
+**التحقق من التعافي.** فحص D4 بيظهر تاريخ not-after جديد وsubjectAltName بيغطي المضيف، وأمر التحقق في D4 بيخرج بـ 0 مع verify=0، وD5 بينجح.
 
 ## 21. روابط الميديا مكسورة
 
@@ -534,7 +534,7 @@
 - جذر مضيف الميديا بيرجّع 403 بالتصميم (السيناريو 5)؛ واستخدامه كاختبار مضلّل.
 - الأوبجكت ناقص من الـ Bucket، أو مفتاح الأوبجكت في قاعدة البيانات مش مطابق للملف.
 - الـ Bucket العام matbakhy-public مش موجود. `deploy.sh up` بيعمل الـ Buckets بأمر Best-effort فشله بيتتجاهل (`|| true`، VERIFIED IN CODE)، فالفشل صامت.
-- الـ Base URL العام اللي الـ API بيولّده غلط: OBJECT_STORAGE_PUBLIC_BASE_URL لازم يكون https://media.<domain>/matbakhy-public وـ Endpoint الـ S3 Client هو https://media.<domain> (VERIFIED IN CODE).
+- الـ Base URL العام اللي الـ API بيولّده غلط: OBJECT_STORAGE_PUBLIC_BASE_URL لازم يكون https://media.<domain>/matbakhy-public والـ Endpoint بتاع الـ S3 Client هو https://media.<domain> (VERIFIED IN CODE).
 - الـ Caller برّه فئة العميل (مضيف الميديا بيتبع قائمة وصول العميل، السيناريو 5).
 - حاوية الـ Storage واقعة أو مش سليمة (السيناريو 7)، أو Volume storage-data تالف أو مليان.
 - سياسة أمان المحتوى (Content Security Policy) لتطبيقات الويب بتسمح بالصور من مضيف app نفسه وData URIs ومضيف الميديا بس (VERIFIED IN CODE؛ حاليًا Report-Only).
@@ -574,9 +574,9 @@
 
 **دليل التشخيص المتوقع.** الرسالة بتسمّي أول فحص فشل؛ والسكريبت بيقف عند أول فشل.
 
-**الإجراء التصحيحي.** اتبع السيناريو اللي في الجدول. ماتعدّلش `smoke.sh` عشان ينجح، وماتتخطاش فحص أبدًا؛ الاختبارات ماينفعش تتضعف عشان نجيب نتيجة خضراء (قاعدة المشروع). على السيرفر، Smoke Test فاشل بعد `up` بيخلي سكريبت الـ Deploy عن بُعد يستعيد ملف .env السابق ويخرج بفشل؛ الحاويات مابتتعملهاش إعادة إنشاء وقاعدة البيانات مابتتعملهاش Rollback (السيناريوهات 14 و 15).
+**الإجراء التصحيحي.** اتبع السيناريو اللي في الجدول. ماتعدّلش `smoke.sh` عشان ينجح، وماتتخطاش فحص أبدًا؛ الاختبارات ماينفعش تتضعف عشان نجيب نتيجة ناجحة (قاعدة المشروع). على السيرفر، Smoke Test فاشل بعد `up` بيخلي سكريبت الـ Deploy عن بُعد يستعيد ملف .env السابق ويخرج بفشل؛ الحاويات مابتتعملهاش إعادة إنشاء وقاعدة البيانات مابتتعملهاش Rollback (السيناريوهات 14 و 15).
 
-**مستوى الخطورة.** متوسط؛ بعض الفشل بيدل على كشف Endpoints محمية.
+**مستوى الخطورة.** متوسط؛ بعض حالات الفشل بتدل على كشف Endpoints محمية.
 
 **التحقق من التعافي.** D5 بيطبع سطر PASS الأخير.
 
@@ -597,7 +597,7 @@
 | الإصدار الجديد وحش؛ ومفيش Migration من آخر إصدار سليم | Rollback للـ Images بس: اضبط القيم التلاتة من D16 وشغّل F3. البيانات بتفضل |
 | الـ Migrations من وقتها كلها Expand-only | Rollback للـ Images بس؛ الـ API الأقدم بيتجاهل الـ Migrations اللي ميعرفهاش. شغّل الـ Smoke Test بعدها |
 | Migration فيه تشديد (Tightening) | جرّب الـ Image الأقدم على نسخة الأول؛ لو الكتابات فشلت، استخدم مسار الاستعادة |
-| Migration كاسر، أو البيانات اتضرّت | استعد النسخة الاحتياطية قبل الـ Deployment (F11). البيانات المكتوبة بعد النسخة دي بتضيع؛ بلّغ الTesterين |
+| Migration كاسر، أو البيانات اتضرّت | استعد النسخة الاحتياطية قبل الـ Deployment (F11). البيانات المكتوبة بعد النسخة دي بتضيع؛ بلّغ الـ Testers |
 | الـ Deployment فشل في نصه | D7، اقرا Logs الـ api وidentity، وبعدين صلّح للأمام أو ارجع بالصفوف اللي فوق. `up` ممكن يتكرر |
 
 **الإجراء التصحيحي.** الـ Rollback قرار للمالك. سجّل الـ Commit الفاشل والـ Commit الهدف والسبب. خد نسخة احتياطية جديدة الأول لو قاعدة البيانات لسه مقروءة (F4)، إلا لو القرص أو حالة قاعدة البيانات بتخلي ده مش آمن. وبعدها نفّذ F3، أو F11 لمسار الاستعادة (وقّف الـ API الأول؛ بدّل قواعد البيانات وانت متأكد إن مفيش حد متصل؛ واحتفظ بقاعدة البيانات الفاشلة لحد ما السبب يتفهم). لاحظ إن معالجة الفشل الخاصة بالـ Pipeline بتستعيد ملف .env لما `up` أو `smoke` يفشل في السكريبت عن بُعد بس (مش لما خطوة الـ Admin Console اللي بعدها تفشل)، ومابتعملش إعادة إنشاء لأي حاوية ولا Rollback تلقائي لقاعدة البيانات (VERIFIED IN CODE، `.github/workflows/deploy-preview.yml`). جرّب الاستعادة على سيرفر جديد معزول؛ ماتجرّبهاش على الـ Preview الحي الأول أبدًا ([النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)، [دليل إعادة البناء](server-rebuild-guide-ar.md)).
@@ -612,7 +612,7 @@
 - القيم الحية لـ GENERATED_DIR وBACKUP_DIR وCOMPOSE_OVERRIDE NOT VERIFIED LIVE. الافتراضي في compose و`.env.example` لسه بيسمّوا /srv/matbakhy-preview/generated، وده بيطابق نسخة قديمة موجودة على الجهاز، بينما الـ Deployment في /srv/matbakhy-staging (فجوة توثيق: أكّد بـ D22).
 - الـ Brief الخاص بالصفحة دي بيقول 22 سيناريو بس بيسرد 23؛ كل الـ 23 موجودين.
 - `compose.4gb.yaml`، ومستند تجهيز Hetzner ([تجهيز الـ Staging على Hetzner](../../operations/09-staging-hetzner-preparation.md)) وأجزاء من مستندات التشغيل التانية بتوصف جهاز Hetzner مقترح وهي OUTDATED / INCORRECT لجهاز Contabo (8 vCPU، حوالي 23 GiB RAM). لما تتعارض مع الصفحة دي، الصفحة دي و[جرد السيرفر](contabo-server-inventory-ar.md) هما المرجع.
-- دليل حل المشاكل في التشغيل بيقول إن النسخ الاحتياطية في مجلد backups جوّه مجلد الـ Deployment بينما `deploy.sh` وcompose.yaml الافتراضي عندهم BACKUP_DIR هو /srv/matbakhy-backups (VERIFIED IN CODE)؛ وده تعارض في المستند الأقدم. والـ Runbook التشغيلي نفسه بيقول إنه مااتجرّبتش على بيئة منشورة.
+- دليل حل المشاكل في التشغيل بيقول إن النسخ الاحتياطية في مجلد backups جوّه مجلد الـ Deployment بينما `deploy.sh` وcompose.yaml الافتراضي عندهم BACKUP_DIR هو /srv/matbakhy-backups (VERIFIED IN CODE)؛ وده تعارض في المستند الأقدم. والـ Runbook التشغيلي نفسه بيقول إنه ماتجرّبش على بيئة منشورة.
 - قواعد الـ Firewall (ufw)، وإعدادات sshd الفعّالة، وسياسة sudo، وجداول Cron بتاعة المستخدمين التانيين، والـ Docker data root، وتجديد الشهادة نفسه NOT VERIFIED LIVE؛ ومحتاجين root أو وصول Docker.
 - حساب SSH اللي بيعمل الـ Deploy (STAGING_SSH_USER) هو Secret في الـ Repository وهو NOT VERIFIED.
 - التنبيهات بتروح لـ Sink اختبار محلي بس لحد ما المالك يوافق على مستلم حقيقي (DOCUMENTED ONLY، الـ Runbook التشغيلي)، فتنبيه بيشتغل مابيظهرش إلا لشخص بيقرا Grafana أو Log الـ Sink.

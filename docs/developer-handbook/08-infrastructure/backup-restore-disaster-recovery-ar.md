@@ -40,18 +40,19 @@
 | جدولة يومية لـ `deploy.sh backup` | موصى بيها في مستند من أيام Hetzner؛ ومفيش جدولة ظاهرة لـ `aiagent` | DOCUMENTED ONLY: [12-owner-server-setup.md](../../operations/12-owner-server-setup.md) القسم 9؛ الحالة الحيّة NOT VERIFIED |
 | الاحتفاظ بالنسخ الاحتياطية أو تنظيفها | مفيش. `prune-qa` بتشيل بس مخرجات الـ QA. فترة الاحتفاظ قرار مفتوح عند المالك | VERIFIED IN CODE (مفيش كود تنظيف لـ `BACKUP_DIR`)؛ DOCUMENTED ONLY: [06-web-preview.md](../../operations/06-web-preview.md) |
 | نسخ النسخ الاحتياطية لجهاز تاني | مفيش خطوة. النسخ الاحتياطية بتشارك السيرفر مصيره | VERIFIED IN CODE (الغياب)؛ DOCUMENTED ONLY: [06-web-preview.md](../../operations/06-web-preview.md) |
-| نسخ احتياطي لـ Database الـ Keycloak `keycloak` | مش جزء من `deploy.sh backup`، اللي بيعمل Dump لـ Database `matbakhy` بس | VERIFIED IN CODE: `PGDATABASE=matbakhy` في `backup_db` |
+| نسخ احتياطي لـ Database الـ Keycloak `keycloak` بواسطة `deploy.sh backup` | مش جزء منه: `deploy.sh backup` بيعمل Dump لـ Database `matbakhy` بس | VERIFIED IN CODE: `PGDATABASE=matbakhy` في `backup_db` |
+| Dumps لـ Database الـ Keycloak بتعملها Scripts الهوية | الـ Script موجود. `deploy/web-preview/admin-console.sh backup` بيشتغل الأول جوه `admin-console.sh enable` (وجوه `deploy.sh admin-console enable`) وبيكتب `pg_dump` كامل بصيغة custom لـ Database `keycloak` (فيه المستخدمين والـ Credentials) في `<backup-dir>/keycloak/keycloak-db-<stamp>.dump`، مع ملف حالة `admin-console-state.env`، تحت `umask 077`. الـ Workflow بتاع `deploy-preview.yml` بيشغّل `./deploy.sh admin-console enable` كخطوة منفصلة بعد خطوة الـ Deploy. أما `deploy/web-preview/migrate-mfa.sh backup` (وبيشتغل الأول برضه في `apply`) فبيكتب نفس نوع الـ Dump، وتصدير للـ Realm من غير المستخدمين (`realm-before-<stamp>.json`) وملف `mfa-migration-state.env`. ولا واحد من الـ Scripts دي بيتحقق من الـ Dump بالاسترجاع، ولا بيمسح الـ Dumps القديمة، ومفيش مستند ولا Script بيسترجع واحد منها | VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`، `deploy/web-preview/migrate-mfa.sh`، `.github/workflows/deploy-preview.yml`. هل فيه Dump زي ده على الـ Host الحي، وحديث قد إيه، وهل ينفع يتسترجع: كل ده NOT VERIFIED LIVE |
 | أمر لاسترجاع أرشيف التخزين | مفيش | VERIFIED IN CODE (الغياب) |
 | تجربة استرجاع (Drill) على سيرفر Contabo | مش مسجّلة؛ وتجربة استرجاع الـ Staging مذكورة على إنها لسه مطلوبة | DOCUMENTED ONLY: [04-privacy-and-recovery.md](../../operations/04-privacy-and-recovery.md) |
 
-على الـ Host الحي (VERIFIED LIVE): `/srv/matbakhy-backups` موجود، ومملوك لـ `devops:devops` بصلاحيات 750، وفيه 28 عنصر `aiagent` مش قادر يعرضهم. إيه هي، وهل هي حديثة، وهل فيه جدولة: كل ده NOT VERIFIED. الأدمن يقدر يفحص بالأوامر 11 و 12 في [admin-readonly-verification.md](admin-readonly-verification-ar.md)، واللي بتطبع الأسماء والجدولة بس.
+على الـ Host الحي (VERIFIED LIVE): `/srv/matbakhy-backups` موجود، ومملوك لـ `devops:devops` بصلاحيات 750، وفيه 28 عنصر `aiagent` مش قادر يعرضهم. إيه هي (ومنها هل فيه مجلد فرعي `keycloak` فيه Dumps الهوية)، وهل هي حديثة، وهل فيه جدولة: كل ده NOT VERIFIED. الأدمن يقدر يفحص بالأوامر 11 و 12 في [admin-readonly-verification.md](admin-readonly-verification-ar.md)، واللي بتطبع الأسماء والجدولة بس.
 
 ## 3. إيه اللي بيحمل الحالة، وإيه اللي بيحميها
 
 | الحالة | مكانها | مغطّاة بـ `deploy.sh backup` | النتيجة لو ضاعت |
 |---|---|---|---|
 | Database التطبيق `matbakhy` (أوردرات، حسابات، Ledger، Audit) | Docker Volume اسمه `postgres-data` | أيوه (Dump وChecksum وManifest) | الأوردرات والحسابات من آخر Dump سليم بتضيع |
-| Database الـ Keycloak `keycloak` (مستخدمين، Credentials، إعدادات الـ Realm، تسجيلات كلمة السر لمرة واحدة اللي اتضافت بعد الاستيراد) | نفس نسخة PostgreSQL ونفس الـ Volume | لأ | هويات تسجيل الدخول لازم تتعمل من جديد من ملف الـ Realm؛ وأي حاجة اتعملت في Keycloak بعد أول استيراد بتضيع |
+| Database الـ Keycloak `keycloak` (مستخدمين، Credentials، إعدادات الـ Realm، تسجيلات كلمة السر لمرة واحدة اللي اتضافت بعد الاستيراد) | نفس نسخة PostgreSQL ونفس الـ Volume | لأ. بس كأثر جانبي لـ `admin-console.sh backup` و`migrate-mfa.sh backup` (القسم 2)، اللي بيكتبوا Dumps تحت `<backup-dir>/keycloak/`؛ وهل فيه واحد منها لسه موجود NOT VERIFIED LIVE | من غير Dump موجود، هويات تسجيل الدخول لازم تتعمل من جديد من ملف الـ Realm، وأي حاجة اتعملت في Keycloak بعد أول استيراد بتضيع. ومع وجود Dump، استرجاعه مش إجراء اتجرّب (القسم 7، الخطوة B7) |
 | تخزين الصور (صور الوجبات، المستندات الخاصة) | Docker Volume اسمه `storage-data` | أيوه، كـ `storage-<archive-stamp>.tgz` | الصور والمستندات بتضيع؛ وصفوف الـ Database بتشاور على Objects مش موجودة |
 | `.env` (كل الأسرار والإصدار المثبَّت) | مجلد الـ Deployment، بصلاحيات 600 | لأ | شوف القسم 4: بعض البيانات المخزّنة بتبقى غير مقروءة |
 | الإعدادات المتولّدة (`GENERATED_DIR`: ملف استيراد الـ Realm، ملف هوية التخزين، مجلد `flags`؛ والملف `admin-console-public` جواه بيتعمل بواسطة `admin-console enable` مش بواسطة `render`) | المجلد المتولّد، بصلاحيات 700 | لأ | ملفات الـ Realm والتخزين ومجلد `flags` الفاضي بيتعملوا من جديد بـ `deploy.sh render` من `.env` والـ Repository. كونسول الأدمن بيفضل مقفول لحد ما `./deploy.sh admin-console enable` يتشغّل تاني |
@@ -70,7 +71,7 @@
 |---|---|---|
 | `HANDOVER_ENCRYPTION_KEY` | مفتاح 32 بايت (Base64). أكواد التسليم بتتخزّن كـ AES-GCM ciphertext وبتتعرض لصاحب الأوردر بفك تشفيرها (VERIFIED IN CODE: `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/HandoverCodes.java`) | الـ ciphertexts المخزّنة لأكواد التسليم مش هينفع تتفك. مفتاح تاني صالح بيبدأ من غير خطأ لكن مش هيقدر يقرا الصفوف القديمة. الـ Startup Guard بيرفض القيم الناقصة أو قيم التطوير في البيئات المنشورة (VERIFIED IN CODE: `backend/app/src/main/java/com/matbakhy/app/config/CommerceConfiguration.java`) |
 | `HANDOVER_HASH_KEY` | مفتاح الـ HMAC اللي بيتحقق من كود تسليم اتقدّم للتحقق مقابل الـ Hash المخزَّن (VERIFIED IN CODE: نفس الكلاس) | أكواد الأوردرات الموجودة متقدرش تتحقق منها بعد كده |
-| `PUSH_TOKEN_ENCRYPTION_KEY` | مفتاح 32 بايت (Base64) بيختم الـ Push Tokens (VERIFIED IN CODE: `backend/modules/notifications/src/main/java/com/matbakhy/notifications/internal/TokenVault.java`) | الـ Push Tokens المخزّنة متتقراش |
+| `PUSH_TOKEN_ENCRYPTION_KEY` | مفتاح 32 بايت (Base64) بيشفّر الـ Push Tokens ويحمي سلامتها (VERIFIED IN CODE: `backend/modules/notifications/src/main/java/com/matbakhy/notifications/internal/TokenVault.java`) | الـ Push Tokens المخزّنة متتقراش |
 | `PUSH_TOKEN_HASH_KEY` | Hash بمفتاح للـ Push Tokens لعمليات البحث عن التفرّد (VERIFIED IN CODE: نفس الكلاس) | الـ Tokens الموجودة مبتطابقش عمليات البحث بعد كده |
 | `ACTIVITY_HASH_KEY` | سر بتستخدمه خدمة النشاط العضوي (Organic Activity) لعمل Hash لمعرّفات الزوار (VERIFIED IN CODE: `backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/activity/ActivityService.java`) | Hashes الزوار المخزّنة مبتطابقش الأحداث الجديدة؛ واستمرارية العدّ لكل زائر بتضيع (استنتاج من تصميم الـ Hash بمفتاح) |
 | `PHONE_CODE_PEPPER` | سر بيتخلط في Hash أكواد التحقق من التليفون (VERIFIED IN CODE: `backend/modules/identity/src/main/java/com/matbakhy/identity/internal/PhoneVerificationService.java`) | أكواد التحقق اللي اتصدرت قبل التغيير متتحققش؛ هي قصيرة العمر، فالأثر صغير (استنتاج) |
@@ -78,7 +79,7 @@
 | `OIDC_WEB_CLIENT_SECRET`, `OIDC_ADMIN_CLIENT_SECRET` | أسرار Client بتتكتب في ملف استيراد الـ Realm بواسطة `deploy.sh render` (VERIFIED IN CODE: استبدال `sed` في `render` بيغيّر السرّين دول و`PREVIEW_USER_PASSWORD` بس) | لازم تتطابق بين Keycloak والـ API. بعد استيراد Realm جديد، `render` بيكتب قيم `.env` الحالية، فالحفاظ على `.env` بيحافظ على اتساقها |
 | `KEYCLOAK_OPS_CLIENT_SECRET` | سر Client العمليات في الـ Master Realm بتاع Keycloak. الأمر `render` مابيحطوش في ملف الـ Realm؛ لكن `deploy.sh admin-console enable` بيولّده في `.env` لو ناقص، وبيمرّره لـ `identity/admin_console.py` اللي بينشئ الـ Client ده أو بيحدّثه في Keycloak الشغّال (VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`، `deploy/web-preview/identity/admin_console.py`) | الـ Client ده موجود في Database الـ Keycloak، واللي `deploy.sh backup` مابيعملهاش Dump. بعد إعادة بناء ببيانات Keycloak جديدة، شغّل `./deploy.sh admin-console enable` تاني عشان الـ Client و`.env` يتفقوا؛ وهل ده بيشتغل على بيانات Keycloak مسترجَعة NOT VERIFIED. ده جزء من تجهيز الـ Master Realm المنفصل، مش من التعافي باستيراد الـ Realm |
 | `KEYCLOAK_ADMIN_USER`, `KEYCLOAK_ADMIN_PASSWORD` | أدمن الـ Bootstrap بتاع Keycloak (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`) | ممكن يتعمل من جديد على Keycloak جديد؛ ومع بيانات Keycloak مسترجَعة بيتطبّق الأدمن المخزَّن |
-| `PREVIEW_USER_PASSWORD` | كلمة سر مستخدمي الـ Realm التجريبيين غير الحقيقيين (VERIFIED IN CODE: `render`) | ممكن إدّي المستخدمين كلمة سر جديدة؛ مش بند فقدان بيانات |
+| `PREVIEW_USER_PASSWORD` | كلمة سر مستخدمي الـ Realm التجريبيين غير الحقيقيين (VERIFIED IN CODE: `render`) | ممكن تدّي المستخدمين كلمة سر جديدة؛ مش بند فقدان بيانات |
 | `STORAGE_ACCESS_KEY`, `STORAGE_SECRET_KEY` | بتتكتب في ملف هوية التخزين (VERIFIED IN CODE: `render`, `deploy/web-preview/storage/s3.json.template`) | بدّل الاتنين بشكل متسق وشغّل `render`؛ والـ Objects المخزّنة بتفضل مقروءة |
 | `GRAFANA_ADMIN_PASSWORD` | أدمن Grafana | ممكن تتعيّن من جديد؛ مش بند فقدان بيانات |
 
@@ -107,7 +108,7 @@
 
 أسماء النسخ الاحتياطية: تشغيلة `./deploy.sh backup` واحدة بتاخد تلات Timestamps منفصلة بتوقيت UTC (VERIFIED IN CODE: `backup_db` و`backup` في `deploy/web-preview/deploy.sh`، و`scripts/db-backup.sh`). `<dir-stamp>` هو اسم المجلد `db-<dir-stamp>`، و`<dump-stamp>` بيكتبه `scripts/db-backup.sh` في أسماء الملفات اللي جوه المجلد ده، و`<archive-stamp>` هو اسم `storage-<archive-stamp>.tgz`. ممكن يختلفوا بثواني أو أكتر، فماتفترضش إن قيمة واحدة تنفع للتلاتة. اعرض `<backup-dir>` والمجلد بـ `ls`، واقرا الأسماء الحقيقية، واربط الأرشيف بمجلد الـ Dump بتاع نفس التشغيلة بالوقت (الأرشيف بيتكتب بعد مجلد الـ Dump)؛ مفيش ملف بيسجّل الربط ده.
 
-الأوامر اللي جاية مش في Scripts الـ Repository. هي مشتقّة من أوامر موجودة وهي PROPOSED, NOT REHEARSED، وبتظهر بس في سياق سيرفر جديد.
+الأوامر اللي جاية مش أوامر مستقلة في Scripts الـ Repository. هي مشتقّة من أوامر موجودة وهي PROPOSED, NOT REHEARSED، وبتظهر بس في سياق سيرفر جديد. الأمر P1 هو نفس `pg_dump` اللي `admin-console.sh backup` و`migrate-mfa.sh backup` بيشغّلوه فعلًا جوه مساراتهم (القسم 2)؛ وP1 بس بيخليه Dump تقدر تاخده لوحده، مثلًا بجدولة.
 
 | ID | الأمر | الجهاز والمستخدم | النوع | المتطلب المسبق | النتيجة المتوقعة والتحقق | الفشل المحتمل والإجراء |
 |---|---|---|---|---|---|---|
@@ -141,7 +142,7 @@ flowchart TD
     host --> keep{"B3 Is the old .env available?"}
     keep -->|"yes"| copy["Copy .env to the new server securely"]
     keep -->|"no"| fresh["Run init-secrets: stored encrypted data stays unreadable"]
-    copy --> up["B4 Start stack with new release values (deploy.sh up; PostgreSQL only first if Keycloak is restored)"]
+    copy --> up["B4 Start stack with new release values (deploy.sh up; a bootstrap for restoring Keycloak first is not provided)"]
     fresh --> up
     up --> db["B5 Restore database into matbakhy_restore, reconcile, swap"]
     db --> stor["B6 Restore storage archive"]
@@ -158,7 +159,7 @@ flowchart TD
 | B1 | جرد اللي نجا: `.env` القديم (نسخة آمنة)، وأحدث مجلد نسخة احتياطية متحقَّق منها وأرشيف التخزين، و`releases.log`، والتحكم في سجلات الـ DNS أو الدومين، وإعدادات Repository الـ GitHub وأسرار البيئة. لو النسخ الاحتياطية كانت على الـ Host الضايع بس، محتوى الـ Database راح والسيناريو A هو الاختيار الوحيد | NOT VERIFIED هل فيه أي نسخة خارج الـ Host؛ مفيش خطوة خارج الجهاز في الـ Repository |
 | B2 | ابني الـ Host الجديد زي [server-rebuild-guide.md](server-rebuild-guide-ar.md): حساب المشغّل والمجلدات وDocker والبورتات 80 و 443 متاحة. **ماتدّيش `aiagent` صلاحية sudo أو Docker على الـ Host الجديد برضه** | VERIFIED IN CODE للمجلدات والبورتات اللي ملف compose محتاجها |
 | B3 | انسخ `.env` القديم لمجلد الـ Deployment الجديد عبر قناة آمنة، بصلاحيات 600، والمالك حساب المشغّل. لو مش متاح، شغّل R9 واقبل إن أكواد التسليم والـ Push Tokens في البيانات المسترجَعة متتقراش (القسم 4). عدّل `PREVIEW_DOMAIN` وقوائم الوصول بس لو اتغيّرت | VERIFIED IN CODE |
-| B4 | حط محتوى `<backup-dir>` (مجلد الـ Dump المختار وأرشيف التخزين) في `<backup-dir>` الجديد. **قرر خيار Keycloak بتاع الخطوة B7 الأول.** لو الهويات الجديدة من ملف الـ Realm مقبولة، شغّل R7 عشان تبدأ Stack فاضي على آخر إصدار؛ وأول تشغيل لـ Keycloak بيستورد الـ Realm. لو لازم تسترجع Database الـ Keycloak، ماتشغّلش R7 لسه: شغّل PostgreSQL لوحده، واسترجع Dump الـ Keycloak (شوف B7)، وبعدها بس شغّل R7. بما إن مفيش PostgreSQL اشتغل قبل كده، مفيش نسخة احتياطية قبل الـ Deploy بتتاخد | VERIFIED IN CODE بالنسبة لـ R7 واستيراد الـ Realm عند أول تشغيل لـ Keycloak (`command: ["start", "--import-realm"]` في `compose.yaml`)؛ وتشغيل PostgreSQL لوحده PROPOSED, NOT REHEARSED |
+| B4 | حط محتوى `<backup-dir>` (مجلد الـ Dump المختار وأرشيف التخزين) في `<backup-dir>` الجديد. **قرر خيار Keycloak بتاع الخطوة B7 الأول.** لو الهويات الجديدة من ملف الـ Realm مقبولة، شغّل R7 عشان تبدأ Stack فاضي على آخر إصدار؛ وأول تشغيل لـ Keycloak بيستورد الـ Realm. لو لازم تسترجع Database الـ Keycloak، ماتشغّلش R7 لسه: شغّل PostgreSQL لوحده، واسترجع Dump الـ Keycloak (شوف B7)، وبعدها بس شغّل R7. في الخيار الأول مفيش PostgreSQL اشتغل قبل كده، فـ R7 مش بياخد نسخة احتياطية قبل الـ Deploy. في الخيار التاني تشغيل PostgreSQL لوحده بيغيّر ده: `deploy.sh up` بياخد نسخة احتياطية قبل الـ Deploy كل ما يلاقي Container بتاع PostgreSQL شغّال (`backup_db`)، وملف `scripts/db-backup.sh` بيستعلم عن جداول التطبيق (زي `customer_order`) اللي Database `matbakhy` الجديدة الفاضية مفيهاش لسه، فمتوقع إن R7 يقف عند النسخة دي قبل ما يشغّل التطبيق. الـ Repository مفيهاش Bootstrap مدعوم للحالة دي، وأي ترتيب يتفادى الوقوف ده (مثلًا ترتيب يخلّي Flyway ينشئ الجداول الأول) هيبقى اختراع محدش جرّبه؛ هو NOT VERIFIED، والإجراء الناقص مذكور في القسم 10 | VERIFIED IN CODE بالنسبة لـ R7 واستيراد الـ Realm عند أول تشغيل لـ Keycloak (`command: ["start", "--import-realm"]` في `compose.yaml`)؛ وتشغيل PostgreSQL لوحده ووقوف R7 المتوقع عند النسخة الاحتياطية قبل الـ Deploy مستنتجين من الكود، ومش متجرّبين (NOT VERIFIED) |
 | B5 | اتحقق من الـ Dump بـ R4. استرجعه في `matbakhy_restore` بـ R6 واقرا مخرجات المطابقة. بعدها وقّف الـ API وبدّل الـ Databases. **التبديل ده مدمّر: بيعيد تسمية Database التطبيق الحيّة (الفاضية) بعيد. شغّله بس على السيرفر الجديد المعزول، والـ API متوقف ومفيش حد متصل** (الخطوات تحت) | التبديل DOCUMENTED ONLY في [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) القسم 4.3 (مكتوب لـ Hetzner)؛ والاسترجاع نفسه VERIFIED IN CODE |
 | B6 | وقّف خدمة التخزين واسترجع الأرشيف بـ P2، وبعدها شغّل التخزين. افحص Object معروف واحد تحت `/matbakhy-public/` | PROPOSED, NOT REHEARSED (مفيش أمر استرجاع) |
 | B7 | الهوية، شوف القرار تحت | شوف تحت |
@@ -183,10 +184,10 @@ flowchart TD
 | الخيار | اللي بيحصل | النتيجة | الدليل |
 |---|---|---|---|
 | هويات جديدة من ملف الـ Realm (المسار اللي الكود بيدعمه) | `render` بيكتب ملف الـ Realm وKeycloak بيستورده عند البدء. سلوك Keycloak الموثّق إنه بيتخطى الاستيراد لو الـ Realm موجود بالفعل، فعلى Database جديدة تمامًا بيستورد | المستخدمين التجريبيين غير الحقيقيين الخمسة بيرجعوا بالـ Ids الثابتة المذكورة في `deploy/web-preview/identity/matbakhy-realm.preview.json`، والـ Ids دي تساوي الـ Subjects في بيانات الـ Seed، فالحسابات التجريبية غير الحقيقية المسترجَعة بتتطابق تاني. المستخدمين وتسجيلات كلمة السر لمرة واحدة اللي اتعملت في Keycloak بعد كده مبتتعملش من جديد؛ الناس دول بياخدوا حساب تطبيق جديد وفاضي عند أول تسجيل دخول، وصفوفهم القديمة بتفضل يتيمة | VERIFIED IN CODE (ملف الـ Realm وملف الـ Seed وتحليل الحساب)؛ سلوك تخطي الاستيراد DOCUMENTED ONLY (توثيق Keycloak، ماتقراش في الـ Repository ده) |
-| استرجاع Database الـ Keycloak | محتاج Dump اتعمل قبل كده بـ P1 واسترجاع قبل ما خدمة الهوية تشتغل لأول مرة. بما إن R7 بيشغّل كل الخدمات، الترتيب هو: اعمل Render للإعدادات، وشغّل خدمة PostgreSQL لوحدها، واسترجع الـ Dump في Database `keycloak` (مع الانتباه لملكية الـ Objects للدور `keycloak`)، وبعدها شغّل R7 عشان Keycloak يلاقي بيانات موجودة ويتخطى الاستيراد | بيحافظ على كل المستخدمين والـ Credentials والتسجيلات | NOT VERIFIED: مفيش إجراء استرجاع موجود أو اتجرّب؛ ومفيش Dump زي ده إلا لو حد عمله |
+| استرجاع Database الـ Keycloak | محتاج Dump للـ Keycloak اتعمل قبل كده (بـ `admin-console.sh backup` أو `migrate-mfa.sh backup` أو P1؛ القسم 2 فيه المسارات) واسترجاع قبل ما خدمة الهوية تشتغل لأول مرة. الترتيب المقصود: اعمل Render للإعدادات، وشغّل خدمة PostgreSQL لوحدها، واسترجع الـ Dump في Database `keycloak` (مع الانتباه لملكية الـ Objects للدور `keycloak`)، وبعدها شغّل باقي الخدمات عشان Keycloak يلاقي بيانات موجودة ويتخطى الاستيراد. R7 مينفعش للخطوة الأخيرة زي ما هو (شوف B4: بياخد نسخة احتياطية قبل الـ Deploy ومتوقع تفشل على Database التطبيق الفاضية) | بيحافظ على كل المستخدمين والـ Credentials والتسجيلات | NOT VERIFIED: مفيش إجراء لاسترجاع الـ Dump في الـ Repository (الـ Scripts بتذكر بس `pg_restore` في Database `keycloak` فاضية وخدمة الهوية واقفة) ومفيش حاجة اتجرّبت؛ وهل فيه Dump لسه موجود على الـ Host الحي NOT VERIFIED LIVE |
 | تغيير الدومين بيغيّر الـ Issuer | كل صف حساب تطبيق موجود شايل الـ Issuer القديم | الصفوف الموجودة مبتتطابقش بعد كده؛ والمستخدمين بياخدوا حسابات جديدة وفاضية إلا لو الصفوف اتحدّثت بـ Migration معتمد من المالك (مفيش) | VERIFIED IN CODE (الـ Issuer في المفتاح)؛ شوف [dns-https-sslip-io.md](dns-https-sslip-io-ar.md) لخطوات استبدال الدومين |
 
-بالنسبة للـ Preview، اللي حساباته تجريبية غير حقيقية، الخيار الأول مقبول. لأي بيئة فيها ناس حقيقيين، خد Dump الـ Keycloak (P1) بجدولة وجرّب استرجاعه قبل ما تعتمد عليه.
+بالنسبة للـ Preview، اللي حساباته تجريبية غير حقيقية، الخيار الأول مقبول. لأي بيئة فيها ناس حقيقيين، اعمل جرد لـ Dumps الـ Keycloak اللي لسه موجودة (القسم 2)، وخدها بجدولة، وجرّب استرجاعها قبل ما تعتمد عليها. القرار المطلوب من المالك: هل الـ Preview يحافظ على المستخدمين بعد إعادة البناء ولا يقبل هويات ملف الـ Realm؟ ولو هيحافظ عليهم، مين يبني ويجرّب إجراء الـ Bootstrap الناقص (القسم 10).
 
 ### DNS والدومين
 
@@ -214,9 +215,9 @@ flowchart TD
 
 | المستوى | الإجراء | الأثر على البيانات | الدليل |
 |---|---|---|---|
-| 0 | صلّح للأمام: Commit جديد، Image جديدة، Deploy | مفيش | VERIFIED IN CODE (الـ Pipeline) |
+| 0 | صلّح المشكلة بإصدار جديد (Fix Forward): Commit جديد، Image جديدة، Deploy | مفيش | VERIFIED IN CODE (الـ Pipeline) |
 | 1 | Rollback للـ Image بس: خد القيم التلاتة من R2، حطها في `.env`، شغّل R7 | مفيش؛ البيانات محفوظة | VERIFIED IN CODE: `rollback_plan` |
-| 2 | Rollback للـ Image بس بعد ما الـ Schema اتحرّك، مع Migrations expand-only بس بينهم | مفيش، لو الـ API الأقدم فعلًا بيتحمّل الـ Schema الأحدث | VERIFIED IN CODE: `scripts/check_migration_compat.py`؛ اتجرّب بس على لابتوب في [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) (API أقدم اشتغل على Schema 28)؛ Contabo NOT VERIFIED |
+| 2 | Rollback للـ Image بس بعد ما بنية أو إصدار الـ Database Schema اتغيّر، مع Migrations expand-only بس بينهم | مفيش، لو الـ API الأقدم فعلًا بيتحمّل الـ Schema الأحدث | VERIFIED IN CODE: `scripts/check_migration_compat.py`؛ اتجرّب بس على لابتوب في [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) (API أقدم اشتغل على Schema 28)؛ Contabo NOT VERIFIED |
 | 3 | استرجاع النسخة الاحتياطية قبل الـ Deploy على نفس السيرفر (R6، ومن S1 إلى S3) | **البيانات المكتوبة بعد النسخة دي بتضيع** | VERIFIED IN CODE (الاسترجاع)؛ التبديل DOCUMENTED ONLY |
 | 4 | التعافي من الكوارث على سيرفر جديد (القسم 7) | البيانات من آخر نسخة احتياطية خارج الجهاز بتضيع | مش متجرّب |
 
@@ -231,11 +232,11 @@ flowchart TD
 
 | الحالة | الإجراء | فقدان البيانات المحتمل |
 |---|---|---|
-| الإصدار الجديد وحش و`rollback-plan` بيقول إن الـ Schema ماتحرّكش | المستوى 1 | مفيش |
+| الإصدار الجديد وحش و`rollback-plan` بيقول إن مفيش تغيير في بنية أو إصدار الـ Database Schema | المستوى 1 | مفيش |
 | الإصدار الجديد وحش وكل Migration من وقتها expand-only | المستوى 2، وبعدها R8 (`smoke`) | مفيش متوقع؛ جرّب على نسخة الأول لما الوقت يسمح |
 | Migration من وقتها من نوع tightening | جرّب الـ Image الأقدم على نسخة الأول؛ لو كتاباتها اترفضت، المستوى 3 | مفيش لو التجربة نجحت؛ غير كده الكتابات من وقت النسخة الاحتياطية |
 | Migration من وقتها من نوع breaking، أو البيانات تالفة | المستوى 3 | كل حاجة اتكتبت بعد النسخة الاحتياطية قبل الـ Deploy؛ بلّغ المختبِرين |
-| الـ Deploy وقف في النص (الـ Pipeline استرجع `.env` بس) | R1 عشان تشوف إيه شغّال؛ اقرا لوجات الـ API والهوية؛ صلّح للأمام أو اختار مستوى من اللي فوق. `up` قابل للتكرار | مفيش بنفسه؛ الـ Pipeline مبيعملش Rollback للـ Database (VERIFIED IN CODE، شوف [deployment-pipeline.md](deployment-pipeline-ar.md#سلوك-الفشل-والرجوع)) |
+| الـ Deploy وقف في النص (الـ Pipeline استرجع `.env` بس) | R1 عشان تشوف إيه شغّال؛ اقرا لوجات الـ API والهوية؛ صلّح بإصدار جديد (Fix Forward) أو اختار مستوى من اللي فوق. `up` قابل للتكرار | مفيش بنفسه؛ الـ Pipeline مبيعملش Rollback للـ Database (VERIFIED IN CODE، شوف [deployment-pipeline.md](deployment-pipeline-ar.md#سلوك-الفشل-والرجوع)) |
 | الـ Volume ضاع أو تالف، والـ Host لسه متاح | أعد البناء على سيرفر جديد (القسم 7) بدل الإصلاح في مكانه | كل حاجة من آخر نسخة احتياطية موجودة خارج الـ Volume الضايع |
 | الـ Host ضاع | القسم 7، أو السيناريو A لو مفيش نسخة احتياطية نجت | ممكن كل بيانات التطبيق |
 | قيمة سر اتسرّبت بس | التدوير (Rotation) بره الصفحة دي؛ ماتدوّرش مفاتيح بيانات القسم 4 من غير خطة | تدويرها بيخلّي الصفوف المشفّرة القديمة غير مقروءة |
@@ -250,7 +251,7 @@ flowchart TD
 | نسخة احتياطية من Preview سيرفر Contabo موجودة وحديثة | NOT VERIFIED | المجلد موجود وفيه 28 عنصر (VERIFIED LIVE)؛ والمحتوى مجهول |
 | نسخة احتياطية بتشتغل بجدولة على Contabo | NOT VERIFIED | محتاج الأمر 12 في [admin-readonly-verification.md](admin-readonly-verification-ar.md) |
 | استرجاع على Contabo أو على VPS بديل نجح | NOT VERIFIED؛ مفيش سجل | ملقيناش دليل |
-| Database الـ Keycloak ممكن تتسترجع | NOT VERIFIED؛ مش متنسخة بالـ Script | VERIFIED IN CODE (الغياب) |
+| Database الـ Keycloak ممكن تتسترجع | NOT VERIFIED. الـ Dumps بتتعمل بـ `admin-console.sh backup` و`migrate-mfa.sh backup` (VERIFIED IN CODE) لكن مش بـ `deploy.sh backup`؛ وهل فيه واحد لسه موجود، وحديث قد إيه، وهل بيتسترجع: كل ده NOT VERIFIED LIVE؛ ومفيش إجراء استرجاع اتجرّب | VERIFIED IN CODE (إنشاء الـ Dump وغياب إجراء الاسترجاع) |
 | استرجاع التخزين | مش متكتوب كـ Script؛ P2 مقترح وغير مجرَّب | VERIFIED IN CODE (الغياب) |
 | التعافي من الكوارث بيشتغل من الأول للآخر، بزمن استرجاع متقاس | NOT PROVEN | تجربة استرجاع الـ Staging مذكورة على إنها لسه مطلوبة (DOCUMENTED ONLY) |
 
@@ -260,12 +261,13 @@ flowchart TD
 
 1. اقرا الجدولة الحية وأسماء مجلدات النسخ الاحتياطي بالأوامر الموجودة في [admin-readonly-verification.md](admin-readonly-verification-ar.md) وسجّل الإجابة بعد التنقية.
 2. قرر فترة الاحتفاظ بالنسخ الاحتياطية ووجهة خارج الجهاز (الاتنين قرارات مفتوحة عند المالك).
-3. قرر هل تضيف Database الـ Keycloak واسترجاع التخزين للـ Scripts، مع اختبارات، عن طريق Pull Request عادي.
-4. شغّل تجربة كاملة واحدة للسيناريو B على سيرفر معزول وسجّل الأزمنة المقاسة وأي خطوة فشلت هنا.
+3. اعمل جرد لـ Dumps الـ Keycloak اللي ممكن تكون موجودة تحت `<backup-dir>/keycloak/` (الأسماء والتواريخ بس؛ فيها Credentials)، وبعدها قرر هل تضيف Database الـ Keycloak للنسخة الاحتياطية المتحقَّق منها وتضيف أمر استرجاع للتخزين في الـ Scripts، مع اختبارات، عن طريق Pull Request عادي.
+4. قرر كقرار مالك هل الـ Preview محتاج استرجاعًا كاملًا لكل مخازن البيانات (Database التطبيق وDatabase الـ Keycloak والتخزين). الـ Repository فيها: R6 وS1 لـ S3 لـ Database التطبيق، وDumps للـ Keycloak من غير إجراء استرجاع، وP2 غير المجرَّب للتخزين. ومفيهاش ترتيب متجرَّب بيجمعهم، خصوصًا Bootstrap بيسمح باسترجاع بيانات Keycloak قبل تشغيل الـ Stack وDatabase التطبيق فاضية. الترتيب ده ناقص وNOT VERIFIED؛ ماحدش يعتبر B4 لـ B7 مثبتة.
+5. شغّل تجربة كاملة واحدة للسيناريو B على سيرفر معزول وسجّل الأزمنة المقاسة وأي خطوة فشلت هنا.
 
 ## القيود المعروفة وفجوات التوثيق
 
-- `deploy.sh backup` بيعمل Dump لـ Database `matbakhy` بس. [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) بيقول إن بيانات الهوية "not touched" بمسارات الاسترجاع، وده صحيح، لكنه كمان معناه إن مفيش نسخة احتياطية منها في الـ Scripts.
+- `deploy.sh backup` بيعمل Dump لـ Database `matbakhy` بس؛ وDumps الـ Keycloak موجودة بس كأثر جانبي لـ `admin-console.sh backup` و`migrate-mfa.sh backup`، من غير إجراء استرجاع وحالتها الحية مجهولة. [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) بيقول إن بيانات الهوية "not touched" بمسارات الاسترجاع، وده صحيح، لكنه كمان معناه إن `deploy.sh backup` مابيعملهاش نسخة احتياطية.
 - أرشيف التخزين مفيهوش أمر استرجاع. النص "Image storage is restored from the storage archive" في نفس المستند بتاع أيام Hetzner مش مدعوم بـ Script.
 - `deploy.sh backup` مفيهوش trap: فشل بين إيقاف خدمة التخزين وتشغيلها بيسيبها متوقفة.
 - أمر الاسترجاع بيستهدف دايمًا `matbakhy_restore`. جعلها الـ Database الحيّة إعادة تسمية يدوية موثّقة بس في مستند أيام Hetzner؛ ومسار Contabo الحي عمره ما اتجرّب.

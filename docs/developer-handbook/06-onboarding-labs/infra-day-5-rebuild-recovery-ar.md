@@ -1,7 +1,7 @@
 # البنية التحتية اليوم 5 - تمرين إعادة البناء المعزول وتقييم النسخ الاحتياطي والتعافي
 
 > **Owner role:** Infrastructure and deployment
-> **Status:** REFERENCE — Lab بيجهّز تمرين على سيرفر نضيف معزول (أو الـ Stack المحلي) وتقييم للنسخ الاحتياطي والتعافي؛ كتّاب التوثيق لسه ماشغّلوش التمرين ده (NOT RUN).
+> **Status:** REFERENCE — Lab بيجهّز تمرين على سيرفر نضيف معزول (أو الـ Stack المحلي) وتقييم للنسخ الاحتياطي والتعافي؛ كتّاب التوثيق لسه ماشغّلوش التمرين ده.
 > **Language / اللغة:** [English](infra-day-5-rebuild-recovery.md) · العربية
 
 ## مفتاح الأدلة
@@ -137,7 +137,7 @@ sudo install -d -m 755 -o devops -g devops /srv/matbakhy-staging
 | السؤال | الإجابة بتيجي منين | إجابتك | وسم الدليل |
 |---|---|---|---|
 | هل فيه إجراء للنسخ الاحتياطي؟ | الأوامر الفرعية backup وrestore-db في `deploy/web-preview/deploy.sh`؛ و`scripts/db-backup.sh`؛ و`scripts/db-restore.sh` | أيوه، في الكود | VERIFIED IN CODE |
-| هل `./deploy.sh up` بياخد نسخة احتياطية من قاعدة البيانات قبل ما يغيّر أي حاجة؟ | رأس الاستخدام في `deploy/web-preview/deploy.sh` ("back up the database") | موثّق في الرأس | VERIFIED IN CODE |
+| هل `./deploy.sh up` بياخد نسخة احتياطية من قاعدة البيانات قبل ما يغيّر أي حاجة؟ | قسم تعليمات الاستخدام في بداية السكريبت `deploy/web-preview/deploy.sh` ("back up the database") | موثّق في القسم ده | VERIFIED IN CODE |
 | هل فيه Job نسخ احتياطي مجدول على السيرفر الحي؟ | قايمة cron على السيرفر الحي | مفيش Job نسخ احتياطي لـ Matbakhy كان ظاهر للحساب من غير صلاحيات مرتفعة؛ وcrontabs المستخدمين التانيين ماكانتش مقروءة | NOT VERIFIED |
 | هل فيه نسخ احتياطية، وإيه مدى حداثتها؟ | /srv/matbakhy-backups بصلاحيات 750 devops:devops ومش ممكن aiagent يعرض محتواه | غير معروف | NOT VERIFIED |
 | هل الاسترجاع اتثبت على البيانات الحية؟ | مفيش دليل في الدليل ده | غير معروف | NOT VERIFIED |
@@ -146,7 +146,7 @@ sudo install -d -m 755 -o devops -g devops /srv/matbakhy-staging
 | هل ممكن نسترجع بيانات Keycloak وتخزين الصور ونعمل الـ Cutover للتطبيق بإجراء متجرَّب؟ | [دليل إعادة بناء السيرفر](../08-infrastructure/server-rebuild-guide-ar.md) والأمر `restore-db` اللي بيسترجع في matbakhy_restore بس | مفيش إجراء كامل متجرَّب موثّق | NOT VERIFIED |
 | هل ممكن نسترجع الشهادات والمفاتيح؟ | Caddy بيعيد إصدار الشهادات لما الـ Data Volume بتاعه يبقى فاضي؛ في حدود معدّل الطلبات المسموح بيه عند Let's Encrypt (Rate Limits) | إعادة الإصدار ممكنة | DOCUMENTED ONLY |
 | هل ممكن نسترجع الـ Secrets؟ | ملف .env بتاع السيرفر فيه الـ Secrets؛ مش مذكور إن كان فيه نسخة منها برّه السيرفر ولا لأ | غير معروف | NOT VERIFIED |
-| إيه زمن التعافي (RTO) وكمية البيانات اللي ممكن تتفقد (RPO) المنطبقين؟ | مفيش قيمة اتقاست | مفيش ادعاء | NOT VERIFIED |
+| إيه زمن التعافي والفترة الزمنية لفقد البيانات المنطبقين؟ | مفيش قيمة اتقاست | مفيش ادعاء | NOT VERIFIED |
 
 بعد كده اكتب تقييم في صفحة واحدة من تلات أجزاء: إيه اللي اتثبت (اللي VERIFIED IN CODE كقدرة بس)، وإيه اللي لسه ماتثبتش (كل حاجة NOT VERIFIED)، والحد الأدنى من طلبات القراءة فقط للأدمن (اختار أوامر من [صفحة الأدمن](../08-infrastructure/admin-readonly-verification-ar.md) وجداول القرار في [النسخ الاحتياطي والاسترجاع والتعافي من الكوارث](../08-infrastructure/backup-restore-disaster-recovery-ar.md)). ماتقولش إن الـ Preview ممكن يتعافى؛ قول إيه اللي لازم يتثبت.
 
