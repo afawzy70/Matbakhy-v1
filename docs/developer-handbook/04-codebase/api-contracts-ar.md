@@ -4,7 +4,7 @@
 > **Status:** IMPLEMENTED — أدوات العقود والـ Registry واختبارات الانحراف (Drift) موجودة؛ 113 من 116 Route مسجّلة شغّالة، والباقي 3 متصمّمة بس
 > **Language / اللغة:** [English](api-contracts.md) · العربية
 
-REST API واحد (`/api/v1/...`)، متوصّف مرتين عن قصد: مستند OpenAPI مكتوب بأنواع (Typed) وسجل Routes مسطّح (Flat). الاتنين موجودين في
+REST API واحد (`/api/v1/...`)، متوصّف مرتين عن قصد: مستند OpenAPI بأنواع بيانات محددة (Typed) وسجل Routes مسطّح (Flat). الاتنين موجودين في
 `contracts/`. التطبيقات التلاتة بتستهلك Client متولّد من ملف الـ OpenAPI. الخلفية: `docs/engineering/03-api-contract.md`
 (للسياق بس؛ الصفحة دي بتوصف اللي الكود والاختبارات بيفرضوه).
 
@@ -42,7 +42,7 @@ REST API واحد (`/api/v1/...`)، متوصّف مرتين عن قصد: مست�
 - الفلوس: `{ "amountMinor": <integer piastres>, "currency": "EGP" }`؛ بيتعمل لها Parse عند الـ Client بـ `packages/api-client/src/money.ts`.
 - الأوامر الـ Idempotent بتاخد Header اسمه `Idempotency-Key` (من 8 لـ 128 حرف من `[A-Za-z0-9-]`)؛ والتحكم المتفائل في التزامن (Optimistic Concurrency) بيستخدم `expectedVersion` في
   الجسم وبيرد بـ `VERSION_CONFLICT`.
-- القوائم بتستخدم `cursor` معتّم (Opaque) + `limit` (من 1 لـ 100، والافتراضي 20).
+- القوائم بتستخدم `cursor` قيمته مش مخصّصة للتفسير عند الـ Client (Opaque) + `limit` (من 1 لـ 100، والافتراضي 20).
 - اللغة: `Accept-Language` بيختار المحتوى بالعربي (الافتراضي) أو الإنجليزي.
 - الـ Authentication: الويب = كوكي Session + `X-XSRF-TOKEN` في العمليات اللي بتعدّل؛ الموبايل (Native) = `Authorization: Bearer`. الـ Routes العامة هي قائمة الـ `GET`
   في `SecurityConfiguration.PUBLIC_GET` زائد `POST /api/v1/activity`.
