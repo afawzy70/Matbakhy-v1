@@ -54,7 +54,7 @@
 |---|---|
 | `doc001_check.py docs` بيفشل على رابط أو `path` | المسار اللي بين Backticks لازم يكون موجود؛ استخدم `<placeholders>` أو Code Block للمسارات المستقبلية |
 | `doc001_check.py pr` بيبلّغ "area ... changed but none of its required documentation was updated" | حدّث صفحة من المكتوبة لذلك الـ area في `docs/developer-handbook/doc001-matrix.json` واذكرها في `handbook_pages` |
-| الإقرار اتر فض: التبرير عام | سمّي السلوك الموثّق اللي ماتغيّرش واذكر صفحة موجودة بمسارها ([documentation-policy.md](documentation-policy-ar.md)) |
+| الإقرار اترفض: التبرير عام | سمّي السلوك الموثّق اللي ماتغيّرش واذكر صفحة موجودة بمسارها ([documentation-policy.md](documentation-policy-ar.md)) |
 | الـ CI بيفشل على Branch رغم إن التشغيل المحلي أخضر | الـ CI بيستخدم Clone نضيف لـ `HEAD` اللي عملتله Commit وإصدارات مثبّتة بالظبط؛ والملفات اللي ماتعملهاش Commit أو مش متتبَّعة، أو Node مختلف، أو تحديث Lockfile ناقص بيفسّروا معظم الاختلافات |
 | الـ Push اترفض | اعمل Fetch وMerge أو Rebase للـ Branch بتاعك انت؛ وماتعملش force-push لـ Branch مشترك أبدًا |
 

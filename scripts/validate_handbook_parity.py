@@ -67,7 +67,8 @@ def protected_token(tok: str) -> bool:
             return True
         return bool("." in tok and re.search(r"\d", tok))
     return tok in STATUS_WORDS or bool(re.search(r"[a-z][A-Z]", tok)) or bool(re.search(r"[A-Za-z]\d|\d[A-Za-z]", tok))
-CHECKS = ("headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
+ARROW_RE = re.compile(r"→|←|↔|⇒|⇐|⇔|=>|->|<-")
+CHECKS = ("arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
           "anchors")
 
 
@@ -98,6 +99,7 @@ class Features:
         self.code: collections.Counter = collections.Counter()
         self.tokens: collections.Counter = collections.Counter()
         self.checklist = 0
+        self.arrows: collections.Counter = collections.Counter()
         rows = cols = 0
         in_table = False
         for i, t in enumerate(toks):
@@ -137,6 +139,7 @@ class Features:
                 self.code[c.content] += 1
             elif c.type == "text":
                 prose.append(c.content)
+        self.arrows.update(ARROW_RE.findall(" ".join(prose)))
         for tok in TOKEN_RE.findall(" ".join(prose).translate(ARABIC_DIGITS)):
             if protected_token(tok):
                 self.tokens[tok] += 1
@@ -255,6 +258,8 @@ class Validator:
         if exp != got:
             miss, extra = exp - got, got - exp
             self.fail(rel, "links", f"link destinations differ; missing in Arabic: {sorted(miss)[:6]}; unexpected: {sorted(extra)[:6]}")
+        if en.arrows != ar.arrows:
+            self.fail(rel, "arrows", f"arrow characters differ (direction matters): {dict(en.arrows)} vs {dict(ar.arrows)}")
         if en.code != ar.code:
             miss, extra = en.code - ar.code, ar.code - en.code
             self.fail(rel, "inline-code", f"inline code identifiers differ; missing: {sorted(miss)[:6]}; unexpected: {sorted(extra)[:6]}")

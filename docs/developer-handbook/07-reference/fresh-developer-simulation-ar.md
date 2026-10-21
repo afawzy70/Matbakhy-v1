@@ -14,13 +14,13 @@
 | 4 | تحديد مكان الموبايل | PASS | `apps/customer-mobile` |
 | 5 | تحديد مكان المطبخ والـ Back-office | PASS | `apps/operations-web/src/cook`، `src/ops` |
 | 6 | تحديد مكان تسجيل الأوردر | PASS | `OrderController.place` → `OrderService.place` → `placeOnce` → `QuoteService.requireValid` (أرقام السطور اتفحصت) |
-| 7 | شرح التسعير والـ Snapshots وعرض السعر المنتهي | PASS | `QuoteService.create/requireValid`: `QUOTE_EXPIRED`، `PRICE_CHANGED`؛ الـ Client لازم يقبل التغيير صراحةً |
+| 7 | شرح التسعير والـ Snapshots وعرض السعر اللي مبقاش مواكب للأسعار أو الشروط الحالية | PASS | `QuoteService.create/requireValid`: `QUOTE_EXPIRED`، `PRICE_CHANGED`؛ الـ Client لازم يقبل التغيير صراحةً |
 | 8 | شرح التكامل مع Keycloak | PASS | الـ Clients، وفئات MFA وهي CUSTOMER/KITCHEN/STAFF بقيم DISABLED/OPTIONAL/REQUIRED، و V31 بيزرع OPTIONAL، والصف الناقص بيفشل بأمان إلى REQUIRED |
 | 9 | تحديد الأدوات المطلوبة | PASS | JDK 21، Maven wrapper، Node 24.21.0، pnpm 10.34.6، Docker Compose v2، Python 3 |
 | 10 | متابعة الإعداد المحلي | BLOCKED | `scripts/dev.sh doctor` بلّغ صح عن JDK وNode 24 وpnpm وDocker daemon الناقصين |
 | 11 | تشغيل Build واختبارات مختارة | PARTIAL / BLOCKED | اختبارات Python gate وفحوصات الـ Catalog والـ Fixtures اتشغّلت ونجحت (21 اختبار gate؛ 200 حالة)؛ الـ `verify` بتاع الـ Backend وpnpm lint/test/build و`dev.sh e2e` BLOCKED (مفيش Toolchain) |
-| 12 | إيجاد مسار العمل لـ Issue جديدة | PASS (thin) | كان فيه Lab اليوم الخامس وصفحة مسار الـ PR بس ← اتضاف بعد كده قسم "Starting on an issue" |
-| 13 | تجهيز تقييم DOC-001 | PASS with matrix gap | افتراض "مدة عرض السعر من 5 إلى 4 دقايق" لقى 11 صفحة بتذكر 5 دقايق؛ والـ Matrix ماكانتش بتفرض صفحات التسعير ← اتضافت المنطقة `quotes-pricing` |
+| 12 | إيجاد مسار العمل لـ Issue جديدة | PASS (thin) | كان فيه Lab اليوم الخامس وصفحة مسار الـ PR بس → اتضاف بعد كده قسم "Starting on an issue" |
+| 13 | تجهيز تقييم DOC-001 | PASS with matrix gap | افتراض "مدة عرض السعر 5 → 4 دقايق" لقى 11 صفحة بتذكر 5 دقايق؛ والـ Matrix ماكانتش بتفرض صفحات التسعير → اتضافت المنطقة `quotes-pricing` |
 | 14 | شرح إزاي الـ PR بيوصل لبيئة المعاينة | PASS | الـ PR عمره ما بيوصل؛ بس Merge من المالك على `develop` هو اللي بيشغّل `deploy-preview.yml` (انتظار الـ CI، Images بـ SHA، Deploy بـ SSH، Smoke، تفعيل Admin Console) |
 | 15 | اختيار حالات E2E للمالك لإعادة تأكيد تغيّر السعر | PASS | E2E-BASKET-014، E2E-BASKET-015، E2E-BASKET-022، E2E-ORDER-112، E2E-OPS-106 اتحقق منهم في `docs/quality/owner-acceptance/cases/` |
 

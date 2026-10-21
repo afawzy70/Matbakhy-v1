@@ -73,7 +73,7 @@ sequenceDiagram
 الـ Slot (`cook_slot`، V8) هو نافذة بتاريخ بسعة إجمالية؛ والوجبات بتتربط بحدود حصصها هي (`meal_slot`). بيعملها الطبّاخ في ويب العمليات (E2E-COOK-052). القواعد اللي `SlotService` بيطبّقها:
 
 - التاريخ والأوقات المحلية بتتفسّر بتوقيت `Africa/Cairo`؛ الأوقات اللي مش موجودة (تقديم الساعة في الربيع) بتترفض، والأوقات المتكررة محتاجة Offset صريح (الاختبارات `a_local_time_skipped_by_the_spring_change_is_rejected`، `a_repeated_local_time_needs_an_explicit_offset_and_maps_to_one_instant`، `backend/app/src/test/java/com/matbakhy/app/availability/SlotIntegrationTest.java`)؛ واللحظات بتتخزّن بـ UTC؛
-- `lead_minutes` من 30..1440، والـ Cutoff = البداية − وقت التجهيز ولازم يفضل في المستقبل؛ و`max_portions` من 1..500؛ ومفيش تداخل مع Slots المطبخ التانية؛
+- `lead_minutes` من 30..1440، والـ Cutoff = البداية − مدة الـ lead بالدقايق ولازم يفضل في المستقبل؛ و`max_portions` من 1..500؛ ومفيش تداخل مع Slots المطبخ التانية؛
 - الوجبات لازم تكون من نفس المطبخ (Trigger في الـ Database اسمه `meal_slot_same_kitchen`)؛
 - الـ Slot ممكن يتفتح بس لو بيعرض وجبات، ومش بعد الـ Cutoff؛ والسعة عمرها ما تتقلّل لأقل من الحصص المحجوزة+المخصصة+المستهلكة؛ وبعد الـ Cutoff تعديلات السعة بتترفض (E2E-COOK-105، E2E-COOK-106)؛
 - الطبّاخ مايقدرش يلغي Slot عليه التزامات أوردرات؛ ده محتاج مسار الاستثناءات بتاع العمليات (`SlotService`).

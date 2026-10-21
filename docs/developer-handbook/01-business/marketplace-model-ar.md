@@ -60,12 +60,12 @@ flowchart LR
 ```mermaid
 stateDiagram-v2
   [*] --> DRAFT: المتقدّم بيحفظ مسودة خاصة
-  DRAFT --> SUBMITTED: تقديم مراجعة كاملة
+  DRAFT --> SUBMITTED: تقديم نسخة كاملة من الطلب
   SUBMITTED --> UNDER_REVIEW: الموظف ينفّذ START_REVIEW
   UNDER_REVIEW --> APPROVED: APPROVE (اتعمل المطبخ)
   UNDER_REVIEW --> CHANGES_REQUESTED: REQUEST_CHANGES
   UNDER_REVIEW --> REJECTED: REJECT
-  CHANGES_REQUESTED --> SUBMITTED: المتقدّم بيعيد التقديم (مراجعة جديدة)
+  CHANGES_REQUESTED --> SUBMITTED: المتقدّم بيعيد التقديم (نسخة جديدة من الطلب)
 ```
 
 الحالات بتطابق `CookReviewService.STATES` والـ enum اسمه `Decision` (`START_REVIEW`، `APPROVE`، `REQUEST_CHANGES`، `REJECT`). التفاصيل في [إدارة المطبخ](kitchen-management-ar.md).

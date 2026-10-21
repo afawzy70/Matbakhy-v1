@@ -241,7 +241,7 @@ sequenceDiagram
     O->>I: execute(customer, order.place, key)
     I->>D: بداية transaction واحدة
     O->>D: advisory lock على العميل + clientRequestId
-    O->>Q: requireValid(quote): الـ ttl ونسخة السياسة ومراجعة الوجبة والسعر والعنوان والإجمالي وشروط الدفع
+    O->>Q: requireValid(quote): الـ ttl ونسخة السياسة ونسخة الوجبة والسعر والعنوان والإجمالي وشروط الدفع
     O->>S: reserve(slot, meals) بيقفل صفوف cook_slot وبعدين meal_slot بترتيب الـ id
     S->>D: reserved += n
     O->>D: INSERT للـ customer_order بحالة PENDING_ACCEPTANCE، ولقطات order_item، وstock_allocation بحالة RESERVED
@@ -337,7 +337,7 @@ stateDiagram-v2
         DUE --> DISPUTED_CASH: المبلغ المبلّغ عنه مختلف
         REPORTED --> VERIFIED: المالية تتحقق
         REPORTED --> DISPUTED_CASH: المالية تعترض
-        DUE --> NOT_DUE: الأوردر اترفض أو انتهى، أو العميل/الطبّاخ لغاه قبل التحضير (الإلغاء الاستثنائي من العمليات بيسيب الالتزام زي ما هو للمراجعة اليدوية من المالية)
+        DUE --> NOT_DUE: الأوردر اترفض أو انتهت مهلة قبوله، أو العميل/الطبّاخ لغاه قبل التحضير (الإلغاء الاستثنائي من العمليات بيسيب الالتزام زي ما هو للمراجعة اليدوية من المالية)
     }
 ```
 
@@ -358,7 +358,7 @@ erDiagram
     kitchen ||--o{ cook_slot : "بيجدول"
     kitchen ||--o| kitchen_payment_profile : "شروط الدفع"
     kitchen }o--o{ service_zone : "kitchen_zone"
-    meal ||--o{ meal_revision : "مراجعات غير قابلة للتعديل"
+    meal ||--o{ meal_revision : "نسخ غير قابلة للتعديل"
     cook_slot ||--o{ meal_slot : "السعة لكل وجبة"
     meal ||--o{ meal_slot : "معروضة في"
     quote ||--o{ quote_item : "بنود"

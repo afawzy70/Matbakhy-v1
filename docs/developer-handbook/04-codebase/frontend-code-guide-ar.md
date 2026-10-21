@@ -4,7 +4,7 @@
 > **Status:** IMPLEMENTED — تطبيقين الويب React/Vite زي ما هم موجودين في `apps/`
 > **Language / اللغة:** [English](frontend-code-guide.md) · العربية
 
-تطبيقين ويب بيشتركوا في نفس الـ Stack ونفس الاتفاقيات: React 19 و TypeScript 6 و Vite 8 و Vitest، والـ Client المتكتّب
+تطبيقين ويب بيشتركوا في نفس الـ Stack ونفس الاتفاقيات: React 19 و TypeScript 6 و Vite 8 و Vitest، والـ Typed Client
 `@matbakhy/api-client`، وتوكنز البراند من `@matbakhy/design-tokens`، وخط Cairo، والعربي RTL هو الافتراضي مع الإنجليزي LTR
 (النسخ من `apps/customer-web/package.json` و `apps/operations-web/package.json`).
 منظور المعمارية: [معمارية الـ Frontend](../03-architecture/frontend-architecture-ar.md). مسارات المستخدم:

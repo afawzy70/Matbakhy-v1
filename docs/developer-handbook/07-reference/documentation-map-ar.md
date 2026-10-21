@@ -4,7 +4,7 @@
 > **Status:** REFERENCE — أنهي مستند هو المرجع في إيه، وعلاقة الدليل بالمستندات الأقدم
 > **Language / اللغة:** [English](documentation-map.md) · العربية
 
-الدليل بيشرح وبيربط؛ لكنه مش بديل للمستندات المرجعية تحت. لما مستندين يختلفوا، ترتيب الثقة هو: **الكود الشغّال والـ Migrations والعقود والاختبارات** (حقيقة التنفيذ) ← سجل قرارات المالك (`planning/decisions.json`، `docs/product/01-context-and-decisions.md`، `docs/delivery/07-owner-decisions-implementation-sequence.md`) للنية ← المستندات الموضوعية ← تقارير الحالة (لقطات تاريخية).
+الدليل بيشرح وبيربط؛ لكنه مش بديل للمستندات المرجعية تحت. لما مستندين يختلفوا، ترتيب الثقة هو: **الكود الشغّال والـ Migrations والعقود والاختبارات** (حقيقة التنفيذ) → سجل قرارات المالك (`planning/decisions.json`، `docs/product/01-context-and-decisions.md`، `docs/delivery/07-owner-decisions-implementation-sequence.md`) للنية → المستندات الموضوعية → تقارير الحالة (لقطات تاريخية).
 
 | الموضوع | المصدر المرجعي | صفحة الدليل اللي بتشرحه |
 |---|---|---|
@@ -28,7 +28,7 @@
 
 ## مستندات تاريخية أو لحظية (ماتعتبرهاش حالية)
 
-`docs/status/latest.md` و`docs/status/daily/*` (التقارير)، و`docs/quality/0*-qa-*.md` (تسليمات مرشحي الـ QA)، و`docs/quality/stabilization/` (أدلة التجميع)، و`verification/runs/` (أدلة تشغيلات بعينها). بتوصف اللي كان صح عند Commit معيّن؛ استخدم [حالة التنفيذ](implementation-status-ar.md) للصورة الحالية.
+`docs/status/latest.md` و`docs/status/daily/*` (التقارير)، و`docs/quality/0*-qa-*.md` (مستندات تسليم النسخ المرشّحة لاختبارات الـ QA)، و`docs/quality/stabilization/` (أدلة التجميع)، و`verification/runs/` (أدلة تشغيلات بعينها). بتوصف اللي كان صح عند Commit معيّن؛ استخدم [حالة التنفيذ](implementation-status-ar.md) للصورة الحالية.
 
 ## التكرار المعروف
 

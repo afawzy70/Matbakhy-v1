@@ -188,6 +188,13 @@ class ParityTests(unittest.TestCase):
         self.assertEqual(v.Validator(self.f.root).fix_anchors("a.md"), 1)
         self.assertEqual(self.f.check(), {})
 
+    def test_arrow_direction_is_preserved(self) -> None:
+        self.f.edit("a.md", "Intro paragraph", "Intro A → B paragraph")
+        self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة A → B افتتاحية")
+        self.assertEqual(self.f.check(), {})
+        self.f.edit("a-ar.md", "A → B", "A ← B")
+        self.assertProblem(self.f.check(), "arrows")
+
     def test_inline_code_identifier_drift(self) -> None:
         self.f.edit("a-ar.md", "`code_id`", "`codeId`")
         self.assertProblem(self.f.check(), "inline-code")

@@ -120,8 +120,8 @@ stateDiagram-v2
     DISPUTED --> CLOSED_NO_FUNDS: قرار الموظف (API-107) بعد انتهاء الأوردر بس، finance.verify، MFA حديث، السبب
     RECONCILE_PENDING --> REFUND_OWED: قرار الموظف (API-107) بعد انتهاء الأوردر بس، finance.verify، MFA حديث، السبب
     RECONCILE_PENDING --> CLOSED_NO_FUNDS: قرار الموظف (API-107) بعد انتهاء الأوردر بس، finance.verify، MFA حديث، السبب
-    REFUND_OWED --> REFUNDED: المطبخ بيبلّغ إن الاسترداد اتبعت
-    RECONCILE_PENDING --> REFUNDED: المطبخ بيبلّغ إن الاسترداد اتبعت
+    REFUND_OWED --> REFUNDED: المطبخ بيبلّغ إن الاسترداد اتبعت (API-108)
+    RECONCILE_PENDING --> REFUNDED: المطبخ بيبلّغ إن الاسترداد اتبعت (API-108)
 ```
 
 السلوكيات الأساسية (كلها في `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/PaymentService.java`؛ الاختبارات `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java` و`PaymentReconciliationIntegrationTest.java`):
@@ -153,7 +153,7 @@ stateDiagram-v2
 
 فيه آليتين منفصلتين؛ ماتخلطش بينهم.
 
-1. **استرداد العربون (فلوس عند المطبخ).** عشان المطبخ ماسك العربون، فـ*المطبخ* هو اللي بيستردّه. المسار: الأوردر بينتهي ⇒ `RECONCILE_PENDING` ⇒ قرار الـ Staff `REFUND_OWED` (أو `CLOSED_NO_FUNDS`) ⇒ المطبخ بيبلّغ بالاسترداد اللي بعته، مع مرجع التحويل ⇒ `REFUNDED`. المنصة بتسجّل الإفادات وبتحتفظ بحالة الدعم؛ ومبتحرّكش الفلوس (E2E-FIN-107 وE2E-FIN-108 وE2E-FIN-115).
+1. **استرداد العربون (فلوس عند المطبخ).** عشان المطبخ ماسك العربون، فـ*المطبخ* هو اللي بيرجّع العربون للعميل. المسار: الأوردر بينتهي ⇒ `RECONCILE_PENDING` ⇒ قرار الـ Staff `REFUND_OWED` (أو `CLOSED_NO_FUNDS`) ⇒ المطبخ بيبلّغ بالاسترداد اللي بعته، مع مرجع التحويل ⇒ `REFUNDED`. المنصة بتسجّل الإفادات وبتحتفظ بحالة الدعم؛ ومبتحرّكش الفلوس (E2E-FIN-107 وE2E-FIN-108 وE2E-FIN-115).
 2. **مسار استرداد المنصة للكاش المتحقَّق منه** (`FinanceOpsService.requestRefund` / `refundAction`، API-084/085، الصلاحية `finance.refund_approve`): ضد تحصيل *متحقَّق منه* بس؛ والمبلغ لازم يكون **كل المبلغ المتبقي القابل للاسترداد** (`verified amount − non-rejected prior refunds`)؛ الحالات `REQUESTED → APPROVED → PAID → VERIFIED` (أو `REJECTED`)؛ مقدّم الطلب ≠ المعتمِد، والدافع ≠ المتحقِّق (`separate(...)`)؛ الموافقة مش معناها إنه اندفع؛ وتسجيل الدفع محتاج مرجع دليل؛ وعند التحقق أي عمولة متسجّلة بتتعكس مرة واحدة (مبلغ صفري لا أثر له تحت عمولة الصفر) (الاختبار `refunds_are_full_bounded_by_verified_collection_and_reverse_commission_once`، `FinanceOperationsIntegrationTest`؛ E2E-FIN-044).
 
 النزاعات من الأنواع التانية (تأخير، وصنف ناقص، وجودة، وسلامة غذاء، وكاش، وتسليم) هي حالات دعم ([دورة حياة الأوردر](order-lifecycle-ar.md#الحالات-الاستثنائية-والنزاعات)). حالات الدعم مبتحرّكش فلوس.

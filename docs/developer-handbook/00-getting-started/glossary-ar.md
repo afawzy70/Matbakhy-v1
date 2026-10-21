@@ -27,7 +27,7 @@
 | I transferred the deposit | حوّلت العربون | ويب العميل `payment.iSent` | بلاغ من العميل؛ معلومة مش دفع |
 | Waiting for deposit | في انتظار تحويل العربون | `WAITING_FOR_DEPOSIT` | حالة الدفع |
 | Kitchen reported receipt | المطبخ أبلغ باستلام العربون | `KITCHEN_RECEIPT_REPORTED` | إفادة المطبخ؛ مش "متحقق منها بنكيًا" أبدًا |
-| Refund owed | المطبخ عليه رد العربون | `REFUND_OWED` | موظفين الدعم قرّروا إن المطبخ لازم يرجّع العربون |
+| Refund owed | المطبخ عليه رد العربون | `REFUND_OWED` | الموظفين قرّروا إن المطبخ لازم يرجّع العربون |
 | Handover code | رمز التسليم | ويب العميل `handoverCode` | كود من ست أرقام بيظهر للعميل، والطبّاخ بيدخله وقت التسليم |
 | Waiting for the kitchen | بانتظار قبول المطبخ | `PENDING_ACCEPTANCE` | حالة الأوردر |
 | Accepted | تم القبول | `ACCEPTED` | حالة الأوردر |

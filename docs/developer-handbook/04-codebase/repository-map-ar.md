@@ -16,9 +16,9 @@
 | `apps/customer-web/` | ويب العميل (React + Vite) | نقطة الدخول `apps/customer-web/src/main.tsx` |
 | `apps/operations-web/` | مساحة عمل الطبّاخ والـ Backoffice بتاع المنصة (React + Vite)، زائد اختبارات Playwright للمتصفح | نقطة الدخول `apps/operations-web/src/main.tsx` |
 | `apps/customer-mobile/` | تطبيق العميل لـ Android/iOS (React Native + Expo) | نقطة الدخول `apps/customer-mobile/index.ts` |
-| `packages/api-client/` | API Client متكتّب ومتولّد من `contracts/openapi.yaml`، زائد مساعدات الفلوس/السعر | اعتمادية `workspace:*` في التطبيقات التلاتة كلها |
+| `packages/api-client/` | API Client معرّف بالـ Types ومتولّد من `contracts/openapi.yaml`، زائد مساعدات الفلوس/السعر | اعتمادية `workspace:*` في التطبيقات التلاتة كلها |
 | `packages/design-tokens/` | توكنز البراند وتوليد الـ CSS واللوجو | مصدر الحقيقة `packages/design-tokens/tokens.json` |
-| `contracts/` | `contracts/openapi.yaml` (العقد المتكتّب) و `contracts/endpoints.json` (سجل الـ Routes) | شوف [عقود الـ API](api-contracts-ar.md) |
+| `contracts/` | `contracts/openapi.yaml` (العقد المعرّف بالـ Types) و `contracts/endpoints.json` (سجل الـ Routes) | شوف [عقود الـ API](api-contracts-ar.md) |
 | `infra/` | Stack التطوير المحلي: `infra/compose.yaml` و Realm الـ Keycloak `infra/identity/matbakhy-realm.json` وملاحظات محاكي التخزين وSQL مطابقة الـ DB | محلي بس |
 | `deploy/web-preview/` | نشر Preview/staging: ملفات Compose وCaddy وسكريبتات النشر وRealm الـ Keycloak للمعاينة والمراقبة (Observability) وتجهيز E2E بتاع المالك | شوف `deploy/web-preview/README.md` بتاعه |
 | `planning/` | حزمة التخطيط المقروءة آليًا: `backlog.json` و `decisions.json` و `rules.json` و `scenarios.json` و `gates.json` و `execution-state.json` و `inventory.json` | حالة `planning/backlog.json` تلميح، مش إثبات |

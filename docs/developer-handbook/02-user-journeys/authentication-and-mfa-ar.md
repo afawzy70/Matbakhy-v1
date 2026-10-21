@@ -42,14 +42,14 @@
 1. **الهدف.** تسجيل الدخول بـ Authorization Code Flow مع PKCE؛ ومايشوفش ولا يخزّن Passwords في التطبيقات أبدًا.
 2. **الطرف.** أي شخص عنده حساب Keycloak.
 3. **المتطلبات المسبقة.** الحساب موجود (مفيش تسجيل ذاتي في القوالب)؛ مواقع الويب موجودة في قوايم سماح الـ CORS والـ `returnTo`.
-4. **البداية.** الويب: رابط "Sign in" ← `{API}/oauth2/authorization/keycloak?returnTo=<url>`. الموبايل: تبويب الحساب "Sign in".
+4. **البداية.** الويب: رابط "Sign in" → `{API}/oauth2/authorization/keycloak?returnTo=<url>`. الموبايل: تبويب الحساب "Sign in".
 5. **الإجراءات.** الـ Authentication عند Keycloak (Password؛ مفيش OTP في المستوى 1 لتسجيل الدخول العادي).
 6. **الاستجابات.** الويب: الـ Callback `/login/oauth2/code/keycloak`، واتعملت Session، وتحويل لـ `returnTo` بعد التحقق منه (أو لرابط ما بعد تسجيل الدخول المضبوط). الموبايل: التطبيق بيستلم `<scheme>://auth/callback?code&state`، وفحص صارم، وتبادل الـ Token، والـ Tokens في تخزين آمن.
 7. **الـ API / الـ Endpoints.** مسارات الـ Framework هي `/oauth2/authorization/keycloak` و`/login/oauth2/code/keycloak`؛ و`GET /api/v1/me`.
 8. **الـ Handlers.** `SecurityConfiguration` (`webChain` و`bearerChain`) و`AccountMapper` و`WebAccountFilter` و`WebReturnTo`؛ وللموبايل `apps/customer-mobile/src/auth.ts` و`redirect.ts`.
 9. **قاعدة البيانات.** `app_user` و`SPRING_SESSION`.
-10. **الانتقالات.** مجهول ← مصادَق عليه؛ لازم `status` للحساب يبقى `ACTIVE` عشان صلاحية `ACCOUNT_ACTIVE` (الحساب اللي طلب حذف ممكن بس يكرر طلب الحذف).
-11. **الأخطاء.** الـ Redirect URI غير المسجّل أو `state`/الكود المزوّر بيترفض (CFG-003 وTC-131)؛ الـ Access Token المنتهي ← 401؛ الحساب المعطّل ← `ACCOUNT_DISABLED`.
+10. **الانتقالات.** مجهول → مصادَق عليه؛ لازم `status` للحساب يبقى `ACTIVE` عشان صلاحية `ACCOUNT_ACTIVE` (الحساب اللي طلب حذف ممكن بس يكرر طلب الحذف).
+11. **الأخطاء.** الـ Redirect URI غير المسجّل أو `state`/الكود المزوّر بيترفض (CFG-003 وTC-131)؛ الـ Access Token المنتهي → 401؛ الحساب المعطّل → `ACCOUNT_DISABLED`.
 12. **الاختبارات.** `IdentityIntegrationTest.java` و`apps/customer-mobile/src/auth.test.ts` و`signIn.test.ts`.
 13. **اختبارات المالك E2E.** CFG-001 وCFG-002 وCFG-003 وCFG-004 وCFG-006 وCFG-036 وCFG-037 وE2E-DISC-003؛ J0.
 14. **الحالة.** IMPLEMENTED.
@@ -61,20 +61,20 @@
 4. البداية: "Sign out". 5. الإجراءات: الويب بيعمل POST على `/api/v1/auth/logout` مع CSRF؛ والموبايل بيلغي الـ Refresh Token (بأفضل جهد) وبيمسح التخزين الآمن.
 6. الاستجابات: الويب بياخد `{"idpLogoutUrl": …}` وبيروح عليه عشان تسجيل الدخول الجاي يطلب بيانات الدخول؛ والموبايل مابيحتفظش بأي Cache خاص.
 7. الـ API: `/api/v1/auth/logout` (تسجيل خروج الـ Framework؛ مش موجود في `contracts/endpoints.json`). 8. الـ Handler: إعدادات الخروج في `SecurityConfiguration` (`idpLogout`)، و`endSession` في `AppContext.tsx`. 9. قاعدة البيانات: صفوف الـ Session بتتحذف.
-10. الانتقالات: Session فعّالة ← منتهية. حالات إنهاء تانية: إيقاف الـ MFA بتاع الشخص نفسه، وإعادة الضبط الإدارية (`ApplicationSessions` بيلاقي صفوف Spring Session بالـ Subject بتاع المزوّد)، وحذف صف Session (CFG-004).
-11. الأخطاء: السيرفر مش متاح ← الويب مابيمسحش الحالة المحلية. 12. الاختبارات: بلوك MBQA-003 في ويب العميل؛ `MfaPolicyIntegrationTest.java`. 13. CFG-002 وCFG-004 وE2E-DISC-003 وE2E-DISC-004. 14. IMPLEMENTED. 15. الـ Access Tokens اللي اتصدرت قبل كده تفضل صالحة لحد مدة صلاحيتها (≤ 5 دقايق) بعد إعادة الضبط أو الإيقاف (`docs/security/mfa-policy.md`، المخاطر المتبقية).
+10. الانتقالات: Session فعّالة → منتهية. حالات إنهاء تانية: إيقاف الـ MFA بتاع الشخص نفسه، وإعادة الضبط الإدارية (`ApplicationSessions` بيلاقي صفوف Spring Session بالـ Subject بتاع المزوّد)، وحذف صف Session (CFG-004).
+11. الأخطاء: السيرفر مش متاح → الويب مابيمسحش الحالة المحلية. 12. الاختبارات: بلوك MBQA-003 في ويب العميل؛ `MfaPolicyIntegrationTest.java`. 13. CFG-002 وCFG-004 وE2E-DISC-003 وE2E-DISC-004. 14. IMPLEMENTED. 15. الـ Access Tokens اللي اتصدرت قبل كده تفضل صالحة لحد مدة صلاحيتها (≤ 5 دقايق) بعد إعادة الضبط أو الإيقاف (`docs/security/mfa-policy.md`، المخاطر المتبقية).
 
 ## AM-3 تسجيل TOTP والـ Step-up
 
 1. الهدف: الحصول على إثبات بمستوى MFA، مع تسجيل تطبيق Authenticator أول مرة.
 2. الطرف: أي حساب لازم أو عايز يستخدم MFA.
 3. المتطلبات المسبقة: السياسة مش DISABLED للحساب (أو الحساب معاه صلاحية Staff: فالـ Step-up بتاع الـ Staff يفضل متاح)؛ والـ Realm فيه Flow اسمه `matbakhy browser` بمستوى الـ OTP و`acr.loa.map` (الـ Migration محتاج موافقة المالك `deploy/web-preview/identity/mfa-migration.kcadm.sh`، الحالات من CFG-028 لـ CFG-032).
-4. البداية: الويب `Account` ← لوحة الأمان ("verify now"/"turn on")، أو رابط التحقق في ويب العمليات، أو طلب تلقائي بعد `403 STEP_UP_REQUIRED`. الموبايل: بانر الـ Step-up.
+4. البداية: الويب `Account` → لوحة الأمان ("verify now"/"turn on")، أو رابط التحقق في ويب العمليات، أو طلب تلقائي بعد `403 STEP_UP_REQUIRED`. الموبايل: بانر الـ Step-up.
 5. الإجراءات: افتح `/oauth2/authorization/keycloak?stepUp=true&returnTo=…`؛ الـ Resolver بيضيف `acr_values` (من `OIDC_MFA_ACR_VALUES`) و`max_age=0`. الموبايل بيضيف `acr_values=mfa 2` و`prompt=login`. Keycloak بيطلب الـ OTP، أو بياخد الحساب اللي ملوش عامل تحقق لتسجيل TOTP (`CONFIGURE_TOTP`).
 6. الاستجابات: Session/Token جديد فيه `acr=mfa`؛ والنداءات المحمية بتنجح.
 7. الـ API: `/oauth2/authorization/keycloak?stepUp=true` و`GET /api/v1/me/security` (112).
 8. الـ Handlers: `stepUpResolver` في `SecurityConfiguration` و`MfaPolicyService.decide` و`StaffAssurance`. 9. قاعدة البيانات: `mfa_policy` و`user_mfa_preference`.
-10. الانتقالات: مستوى الضمان 1 ← 2 جوه الـ Session. 11. الأخطاء: الـ OTP الغلط أو المستخدم قبل كده بيترفض من Keycloak مع الحماية من التخمين (CFG-022)؛ الفئة DISABLED: الـ API مابيطلبش عامل تحقق تاني (CFG-012).
+10. الانتقالات: مستوى الضمان 1 → 2 جوه الـ Session. 11. الأخطاء: الـ OTP الغلط أو المستخدم قبل كده بيترفض من Keycloak مع الحماية من التخمين (CFG-022)؛ الفئة DISABLED: الـ API مابيطلبش عامل تحقق تاني (CFG-012).
 12. الاختبارات: `MfaIdpTest.java` (تسجيل دخول عادي، Step-up، كود غلط، تسجيل، SSO Session).
 13. اختبارات المالك E2E: CFG-102 وCFG-030 وCFG-033 وCFG-104 وCFG-024 لـ CFG-026 وCFG-108 وCFG-109؛ J7، J8.
 14. الحالة: IMPLEMENTED في الكود؛ الـ Migration على الـ Realm الحي والتشغيل على الأجهزة NOT VERIFIED (بيتفحصوا بس من مجموعة اختبارات المالك).

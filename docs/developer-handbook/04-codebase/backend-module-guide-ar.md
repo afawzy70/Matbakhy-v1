@@ -89,7 +89,7 @@ flowchart TD
   `StaffAccessIntegrationTest` و `EgyptianPhoneTest` و `AccountErasureIntegrationTest` (في `backend/app/src/test/java/com/matbakhy/app/identity/` و `.../privacy/`).
 - نقاط التوسعة: صلاحية موظف جديدة (Enum + واجهة المنح + التوثيق)؛ قاعدة تواصل جديدة في `CheckoutContactPolicy`.
 - ماتغيّرش من غير مراجعة: `GrantService` (الحماية من إزالة آخر أدمن ومن رفع الصلاحيات الذاتي، BR-043)،
-  وتشفير الـ OTP (Hashing) وحدوده في `PhoneVerificationService`، ومنطق المسح (V21/V27).
+  وحساب الـ Hash للـ OTP وحدوده في `PhoneVerificationService`، ومنطق المسح (V21/V27).
 
 ## `operations` — التدقيق (Audit)
 
@@ -141,7 +141,7 @@ flowchart TD
 
 ## `orders` — عروض الأسعار والأوردرات ودورة الحياة والدفع والمراجعات والإعدادات
 
-- المسؤولية: عروض الأسعار (Quotes) المعتمدة، والتسجيل الذري (Atomic) مع الـ Idempotency، والـ Snapshots غير القابلة للتعديل، والـ State Machine، وأكواد
+- المسؤولية: عروض الأسعار (Quotes) اللي السيرفر بيحدّدها وبتكون هي المرجع، والتسجيل الذري (Atomic) مع الـ Idempotency، والـ Snapshots غير القابلة للتعديل، والـ State Machine، وأكواد
   التسليم (Handover)، وحالة دفع العربون، وسياسة/إعدادات التجارة، والمراجعات.
 - المصدر: `backend/modules/orders/src/main/java/com/matbakhy/orders/`. نقاط الدخول: `web/QuoteController.java` و
   `OrderController.java` و`CookOrderController.java` و`OpsOrderController.java` و`PaymentController.java` و`ReviewController.java` و

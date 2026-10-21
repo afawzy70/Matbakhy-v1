@@ -7,7 +7,7 @@
 الوسوم بتتبع اصطلاح الدليل (IMPLEMENTED, PARTIALLY IMPLEMENTED, PLANNED, DISABLED, DEPRECATED, NOT VERIFIED).
 **IMPLEMENTED معناها إن الكود موجود وفيه اختبار آلي بيشغّله اتلاقى في الـ Repository.** مش معناها إن الاختبار نجح في الجلسة دي (كتّاب الدليل ماشغّلوش الـ Suites) ولا إن مراجع مستقل قبله، ومعناها أبدًا مش "شغّال فعليًا": مفيش بيئة Production، والفلوس الحقيقية متقفّل عليها بـ Gate (D16)، وبيئة PREVIEW التجريبية بس هي اللي اتنشرت (شوف التعارضات تحت). حالة الـ Story في `planning/backlog.json` وحالة السيناريو في `planning/scenarios.json` تلميحات اتقارنت بغيرها، مش حاجات بنثق فيها.
 
-إزاي اتستخرجت الحالة: الـ Controller موجود والـ Route في `contracts/endpoints.json` مع `implemented: true` (113 من 116 Route)؛ كود الـ Service اتقرا؛ وفصل الاختبار اتلاقى بمعرّف السيناريو أو باسم المنطقة في `backend/app/src/test/java/com/matbakhy/app/`، و`apps/*/src/*.test.tsx`، و`packages/*/test/`؛ والـ Migration موجودة. أعداد الاختبارات أو نتايج النجاح **مش** مؤكَّدة هنا.
+إزاي اتستخرجت الحالة: الـ Controller موجود والـ Route في `contracts/endpoints.json` مع `implemented: true` (113 من 116 Route)؛ كود الـ Service اتقرا؛ والـ Test class اتلاقى بمعرّف السيناريو أو باسم المنطقة في `backend/app/src/test/java/com/matbakhy/app/`، و`apps/*/src/*.test.tsx`، و`packages/*/test/`؛ والـ Migration موجودة. أعداد الاختبارات أو نتايج النجاح **مش** مؤكَّدة هنا.
 
 ## قدرات الـ Backend
 
@@ -25,13 +25,13 @@
 | الـ Slots والسعة (جدولة بتوقيت القاهرة) | IMPLEMENTED | `SlotIntegrationTest`، TC-013..015 |
 | الاكتشاف (Discovery) والمناطق من جهة السيرفر | IMPLEMENTED | `DiscoveryIntegrationTest` |
 | عروض الأسعار (تسعير السيرفر، TTL السياسة 5 دقايق، طبّاخ واحد + Slot واحد) | IMPLEMENTED | `QuoteIntegrationTest`؛ [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) |
-| رفض عرض السعر المنتهي وإعادة التأكيد (D13) | IMPLEMENTED | `PriceChangeIntegrationTest` (TC-154..156)؛ إشعارات الويب والموبايل |
+| رفض عرض السعر اللي مبقاش مواكب للأسعار أو الشروط الحالية وإعادة التأكيد (D13) | IMPLEMENTED | `PriceChangeIntegrationTest` (TC-154..156)؛ إشعارات الويب والموبايل |
 | تسجيل الأوردر الذري، والـ Idempotency على طبقتين، والـ Snapshots، وحجز السعة | IMPLEMENTED | `OrderPlacementIntegrationTest`، V29؛ [تنفيذ الأوردر](../04-codebase/order-implementation-ar.md) |
 | دورة حياة الأوردر، وأكواد التسليم، وـ Job الانتهاء، وإلغاء الاستثناء من العمليات وتجاوز التسليم | IMPLEMENTED | `OrderLifecycleIntegrationTest`، TC-026..031 |
 | الكاش عند الاستلام: تبليغ الطبّاخ، وتحقق المالية، وفصل المهام | IMPLEMENTED | `CashAndLedgerIntegrationTest` |
 | دفتر الأستاذ (Ledger) (متوازن، للإضافة فقط)، والاستردادات، والتسويات، وكشوف الحساب | IMPLEMENTED | `CashAndLedgerIntegrationTest`، `FinanceOperationsIntegrationTest`؛ العمولة 0 عند الإطلاق (`ZeroCommissionIntegrationTest`، D10) |
 | عمولة المنصة ورسوم المنصة على العميل | DISABLED | قدرة نايمة: الـ Database بترفض أي نسبة مش صفر للسياسات غير التجريبية (V23)؛ D10 |
-| مدفوعات العربون (موافقة المطبخ على المستلم، تبليغ العميل، استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **الفلوس الحقيقية متقفّل عليها** (D16، مراجعة قانونية/مزوّد) |
+| مدفوعات العربون (اعتماد مستلم مدفوعات المطبخ، تبليغ العميل، استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **الفلوس الحقيقية متقفّل عليها** (D16، مراجعة قانونية/مزوّد) |
 | بوابة دفع آلية، وتحقق بنكي، وEscrow، وصندوق ضمان | PLANNED (بحث مستقبلي فقط) | `docs/strategy/mvp-direct-deposit-payment.md` بيوسمهم مؤجَّلين |
 | صندوق الإشعارات داخل التطبيق، وـ Outbox Dispatcher بـ Leases/إعادة محاولة/Dead Letters | IMPLEMENTED | `NotificationIntegrationTest` |
 | تسليم Push خارجي (FCM/APNs) | DISABLED | `matbakhy.notifications.push-enabled` قيمته الافتراضية false؛ مفيش Adapter حقيقي (O07) |

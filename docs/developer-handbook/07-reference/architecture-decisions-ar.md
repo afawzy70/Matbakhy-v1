@@ -30,7 +30,7 @@
 | D07 | المفضلة وروابط المشاركة دلوقتي؛ الـ Feed/المتابعة/التعليقات مؤجلة | PROPOSED_DEFAULT | المفضلة أيوه؛ الـ Feed/المتابعة/التعليقات مش منفّذة (O10 مفتوح) | |
 | D08 | OIDC مع Keycloak محلي؛ تليفون متحقَّق منه عند الدفع | PROPOSED_DEFAULT | أيوه | ADR-003؛ جزء MFA للموظفين اتعدّل بـ D18 |
 | D09 | Arabic/English، EGP، Africa/Cairo | PROPOSED_DEFAULT | أيوه | |
-| D10 | عمولة 0%، ومفيش رسوم منصة على العميل، ومفيش إعلانات مدفوعة عند الإطلاق؛ العمولة تفضل قدرة تقنية غير مفعّلة | ACCEPTED | أيوه — CHECK في V23، `ZeroCommissionIntegrationTest` | التزامات المالك بتاريخ 2026-10-13 |
+| D10 | عمولة 0%، ومفيش رسوم منصة على العميل، ومفيش إعلانات مدفوعة عند الإطلاق؛ العمولة تفضل قدرة تقنية غير مفعّلة | ACCEPTED | أيوه — CHECK في V23، `ZeroCommissionIntegrationTest` | Git Commits بتاعة المالك بتاريخ 2026-10-13 |
 | D11 | الفلترة بحجم الحصة مؤجلة من الـ MVP | ACCEPTED | أيوه (الأدوات مخفية) | |
 | D12 | وصف كارت الوجبة اختياري | ACCEPTED | أيوه | |
 | D13 | تغيّر السعر قبل التسجيل: رفض الـ Quote القديم، وإعادة تأكيد صريحة | ACCEPTED | أيوه — [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) | `docs/product/rq-004-stale-quote.md` |

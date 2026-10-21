@@ -57,7 +57,7 @@
 
 ## افتراضات الجغرافيا والحجم
 
-- مصر بس. مناطق الخدمة بيانات إعدادات (`service_zone`، `kitchen_zone`)؛ الـ Repository فيه بس مناطق تطوير تجريبية في `backend/app/src/main/resources/db/devdata/R__dev_service_zones.sql`. مدينة الإطلاق الحقيقية والمناطق قرار مالك مفتوح (O01).
+- مصر بس. مناطق الخدمة بيانات إعدادات (`service_zone`، `kitchen_zone`)؛ الـ Repository فيه بس مناطق تطوير ببيانات اصطناعية في `backend/app/src/main/resources/db/devdata/R__dev_service_zones.sql`. مدينة الإطلاق الحقيقية والمناطق قرار مالك مفتوح (O01).
 - بنفترض تجربة مضبوطة؛ ومفيش ادّعاء بسعة أو حمل غير اللي قاسته قصص الأداء (شوف [تشغيل الاختبارات](../05-developer-workflow/test-execution-ar.md)).
 
 ## القيود المعروفة وفجوات التوثيق

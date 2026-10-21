@@ -84,7 +84,7 @@ sequenceDiagram
 
 ## ربط قبول المالك
 
-المصدر: `docs/quality/owner-acceptance/core-suite.json` والملف المترجم `docs/quality/owner-acceptance/generated/core-owner-acceptance-suite.md`. تعريفات الحالات في `docs/quality/owner-acceptance/cases/*.json`.
+المصدر: `docs/quality/owner-acceptance/core-suite.json` ونسخة العرض المُولَّدة `docs/quality/owner-acceptance/generated/core-owner-acceptance-suite.md`. تعريفات الحالات في `docs/quality/owner-acceptance/cases/*.json`.
 
 | الرحلة | العنوان | الحالات | الصفحة/الصفحات |
 |---|---|---|---|

@@ -64,13 +64,13 @@
 2. **الطرف.** الطبّاخ (مطبخه هو).
 3. **المتطلبات المسبقة.** مطبخ موافَق عليه وفعّال. النشر محتاج إقرار مسببات الحساسية كامل (`CONTAINS` بيطلب أكواد)، وسعر من 1 لـ 1,000,000 قرش (piastres)، وصورة واحدة على الأقل موافَق عليها (بعد الإشراف).
 4. **البداية.** تبويب "meals".
-5. **الإجراءات.** وجبة جديدة (العنوان والوصف بالعربي والإنجليزي (Arabic/English)، التصنيف، السعر بالجنيه (EGP) متحوّل لوحدات صغرى صحيحة بواسطة `egpToMinor` في `apps/operations-web/src/cook/shared.tsx`، مسببات الحساسية، الصور)؛ رفع صورة (تذكرة ← رفع ← إكمال)؛ نشر (Publish)، إيقاف مؤقت (Pause)، أرشفة (Archive)؛ عرض سجل الأسعار.
+5. **الإجراءات.** وجبة جديدة (العنوان والوصف بالعربي والإنجليزي (Arabic/English)، التصنيف، السعر بالجنيه (EGP) متحوّل لوحدات صغرى صحيحة بواسطة `egpToMinor` في `apps/operations-web/src/cook/shared.tsx`، مسببات الحساسية، الصور)؛ رفع صورة (تذكرة → رفع → إكمال)؛ نشر (Publish)، إيقاف مؤقت (Pause)، أرشفة (Archive)؛ عرض سجل الأسعار.
 6. **الاستجابات.** كل متطلب نشر ناقص بيتسمّى (E2E-COOK-101)؛ والعميل بيشوف الوجبة بعد النشر وبعد ما الإشراف يسمح بس (E2E-COOK-051).
 7. **الـ API.** `GET/POST /api/v1/cook/meals` (API-046، API-047)، `PATCH /api/v1/cook/meals/{mealId}` (API-048)، `POST /api/v1/cook/meals/{mealId}/publication` والجسم `{action: PUBLISH|PAUSE|ARCHIVE, expectedVersion}` (API-049)، `GET /api/v1/cook/meals/{mealId}/price-history` (API-099)، الرفع (API-039/040).
 8. **الـ Backend.** `backend/modules/catalog/src/main/java/com/matbakhy/catalog/web/MealController.java` → `catalog/internal/meal/MealService.java`؛ الميديا `catalog/internal/media/MediaService.java`، `MediaInspector.java`.
 9. **قاعدة البيانات.** `meal`، `meal_revision`، `meal_media` (V7)، `media_asset` (V6)، `media_cleanup` (V30)، عمود الإشراف (V16).
 10. **الانتقالات.** الوجبة `DRAFT → PUBLISHED ↔ PAUSED → ARCHIVED` (المؤرشفة للقراءة بس)؛ والـ Staff يقدروا كمان يضبطوا `moderation_state` على `VISIBLE | HIDDEN` من غير ما يلمسوا حالة الطبّاخ (E2E-OPS-056).
-11. **الأخطاء.** `VALIDATION_FAILED` بأكواد الحقول (`PHOTO_NOT_APPROVED`، `ALLERGEN…`)؛ `KITCHEN_UNAVAILABLE` لما المطبخ مايقدرش يبيع؛ معرّف وجبة طبّاخ تاني ← 404 (E2E-COOK-054)؛ أنواع الملفات الغلط والمحتوى المزوّر بيترفضوا (E2E-COOK-102).
+11. **الأخطاء.** `VALIDATION_FAILED` بأكواد الحقول (`PHOTO_NOT_APPROVED`، `ALLERGEN…`)؛ `KITCHEN_UNAVAILABLE` لما المطبخ مايقدرش يبيع؛ معرّف وجبة طبّاخ تاني → 404 (E2E-COOK-054)؛ أنواع الملفات الغلط والمحتوى المزوّر بيترفضوا (E2E-COOK-102).
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/catalog/MealIntegrationTest.java`، `PriceHistoryIntegrationTest.java`، `ModerationIntegrationTest.java`، `MediaIntegrationTest.java`، `apps/operations-web/src/App.test.tsx`.
 13. **اختبارات المالك E2E.** E2E-COOK-051، E2E-COOK-101، E2E-COOK-102، E2E-COOK-103، E2E-COOK-104؛ J6.
 14. **الحالة.** IMPLEMENTED.
