@@ -1,0 +1,891 @@
+{
+  "source_sha": "39b84202b3cb91b641f611e5b87cc7552fef2d5c",
+  "documentation_impact": "Arabic prose and editorial terminology only; no code/business rule/English/control changes required.",
+  "reviewed_pairs": [
+    {
+      "english": "docs/developer-handbook/03-architecture/backend-architecture.md",
+      "arabic": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "english_lines": 118,
+      "arabic_lines": 118,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/database-architecture.md",
+      "arabic": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "english_lines": 112,
+      "arabic_lines": 112,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/diagrams.md",
+      "arabic": "docs/developer-handbook/03-architecture/diagrams-ar.md",
+      "english_lines": 448,
+      "arabic_lines": 448,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/frontend-architecture.md",
+      "arabic": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "english_lines": 102,
+      "arabic_lines": 102,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/identity-and-security.md",
+      "arabic": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "english_lines": 115,
+      "arabic_lines": 115,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/infrastructure-and-deployment.md",
+      "arabic": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "english_lines": 116,
+      "arabic_lines": 116,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/integration-and-events.md",
+      "arabic": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "english_lines": 88,
+      "arabic_lines": 88,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/mobile-architecture.md",
+      "arabic": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "english_lines": 71,
+      "arabic_lines": 71,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/03-architecture/system-overview.md",
+      "arabic": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "english_lines": 95,
+      "arabic_lines": 95,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/api-contracts.md",
+      "arabic": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+      "english_lines": 86,
+      "arabic_lines": 86,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/backend-module-guide.md",
+      "arabic": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "english_lines": 214,
+      "arabic_lines": 213,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/frontend-code-guide.md",
+      "arabic": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "english_lines": 79,
+      "arabic_lines": 79,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/mobile-code-guide.md",
+      "arabic": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "english_lines": 61,
+      "arabic_lines": 61,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/order-implementation.md",
+      "arabic": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "english_lines": 141,
+      "arabic_lines": 104,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/payment-implementation.md",
+      "arabic": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "english_lines": 115,
+      "arabic_lines": 101,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/pricing-implementation.md",
+      "arabic": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "english_lines": 101,
+      "arabic_lines": 85,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/repository-map.md",
+      "arabic": "docs/developer-handbook/04-codebase/repository-map-ar.md",
+      "english_lines": 116,
+      "arabic_lines": 116,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    },
+    {
+      "english": "docs/developer-handbook/04-codebase/shared-libraries.md",
+      "arabic": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "english_lines": 52,
+      "arabic_lines": 52,
+      "review": "Full English and Arabic read; corresponding sections, warnings, implementation states, money, security and code references compared. Final edited wording re-compared with complete source and diff reviewed."
+    }
+  ],
+  "findings": [
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "# معمارية الـ Backend",
+      "old": "تسع موديولات",
+      "new": "تسعة موديولات",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "## الطبقات والوصول للبيانات",
+      "old": "رفيع: بيربط",
+      "new": "مسؤوليته محدودة: بيربط",
+      "severity": "MINOR",
+      "reason": "Thin Controller معناها إن مسؤوليته محدودة، مش وصف حجمه.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "## الطبقات والوصول للبيانات",
+      "old": "SQL مكتوب بإيد",
+      "new": "SQL مكتوب يدويًا",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "## تركيب الـ Maven",
+      "old": "فوق الـ Boot BOM كـ Overrides لتحذيرات الاعتماديات (Dependency advisory)",
+      "new": "متجاوزًا إصدارات الـ Boot BOM لمعالجة التنبيهات الأمنية الخاصة بالاعتماديات (Dependency advisories)",
+      "severity": "MAJOR",
+      "reason": "Above the BOM يوضح تجاوز الإصدارات المُدارة استجابةً لتنبيهات أمنية؛ الصياغة القديمة مبهمة.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "# معمارية قاعدة البيانات",
+      "old": "SQL مكتوب بإيد",
+      "new": "SQL مكتوب يدويًا",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Migrations",
+      "old": "البيانات الاصطناعية (Synthetic) للتطوير",
+      "new": "البيانات التجريبية غير الحقيقية (Synthetic Data) المستخدمة في التطوير",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "# معمارية قاعدة البيانات",
+      "old": "الـ Schema مملوكة لـ Flyway SQL migrations",
+      "new": "بنية الـ Database Schema بتتحدد من خلال Flyway SQL migrations",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Migrations",
+      "old": "صاحب القرار في حالة الرفع",
+      "new": "المرجع المعتمد لحالة الرفع",
+      "severity": "MINOR",
+      "reason": "state authority وصف لمصدر الحالة المعتمد، مش لطرف بياخد قرار.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Migrations",
+      "old": "السياسات الحيّة",
+      "new": "السياسات الفعلية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الكيانات الأساسية والعلاقات",
+      "old": "مبالغ الـ Ledger الحيّة صفر والتسوية خامدة",
+      "new": "مبالغ الـ Ledger للمعاملات الفعلية صفر والتسوية غير مفعّلة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Indexes اللي تستاهل تعرفها",
+      "old": "المسارات الساخنة",
+      "new": "المسارات الأكثر استخدامًا (Hot paths)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## الحزم المشتركة",
+      "old": "اللوحة اللونية والطباعة",
+      "new": "الألوان والخطوط (Typography)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## طبقة الوصول للـ API",
+      "old": "عند حافة العرض بس",
+      "new": "وقت العرض بس",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## ويب العميل (`apps/customer-web`)",
+      "old": "مربعات النيّة (intent tiles)",
+      "new": "مربعات اختيارات المستخدم (intent tiles)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## ويب العميل (`apps/customer-web`)",
+      "old": "أوردر مش متأكد",
+      "new": "أوردر لسه تسجيله مش مؤكّد",
+      "severity": "MAJOR",
+      "reason": "unconfirmed order هنا محاولة تسجيل نتيجتها غير مؤكدة، مش حالة قبول الأوردر من المطبخ.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "ده بسيط بس كتير الكلام",
+      "new": "ده بسيط بس بيولّد طلبات شبكة كتير",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## المبادئ (زي ما هي متنفّذة)",
+      "old": "للكائنات الغريبة",
+      "new": "للموارد اللي تخص حسابات تانية",
+      "severity": "MAJOR",
+      "reason": "foreign objects في Object Authorization معناها موارد حسابات تانية؛ غريبة مبهمة.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## الـ Claims المستخدمة من الـ Token",
+      "old": "Claims الضمان",
+      "new": "Claims مستوى التحقق (Assurance)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## مسارين للـ Authentication",
+      "old": "بأقصى جهد",
+      "new": "بأفضل محاولة ممكنة (best effort)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## سياسة الـ MFA: التخزين والفرض",
+      "old": "بأقصى جهد",
+      "new": "بأفضل محاولة ممكنة (best effort)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## سياسة الـ MFA: التخزين والفرض",
+      "old": "بتفشل بشكل مقفول (fail closed)",
+      "new": "بترفض العملية لو المتطلبات مش متاحة (fail closed)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## ضوابط أمان تانية تستاهل تعرفها",
+      "old": "بوابة فحص بتفشل بشكل مقفول",
+      "new": "بوابة فحص بترفض إتاحة الملف لو الفحص مش متاح أو مش ناجح (fail closed)",
+      "severity": "MAJOR",
+      "reason": "توضيح المعنى الأمني لـ fail closed من غير تخفيف شرط الفحص.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## تأمين المتصفح والـ Proxy",
+      "old": "السكريبتات والستايلات من النفس بس",
+      "new": "السكريبتات والستايلات من نفس الـ Origin بس",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## تأمين المتصفح والـ Proxy",
+      "old": "والصور من النفس و",
+      "new": "والصور من نفس الـ Origin و",
+      "severity": "MAJOR",
+      "reason": "self في CSP معناها نفس الـ Origin، مش ترجمة حرفية للنفس.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## تأمين المتصفح والـ Proxy",
+      "old": "و`connect-src` النفس وHost الـ API",
+      "new": "و`connect-src` بيسمح بنفس الـ Origin وHost الـ API",
+      "severity": "MAJOR",
+      "reason": "توضيح مصادر الاتصالات المسموحة في CSP.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## الـ Sessions",
+      "old": "Sessions الويب هي صفوف في `SPRING_SESSION*` (V2)، فبتعدّي إعادة تشغيل الـ API وتعدد الـ Instances.",
+      "new": "Sessions الويب هي صفوف في `SPRING_SESSION*` (V2)، فبتفضل محفوظة بعد إعادة تشغيل الـ API وبتشتغل مع أكتر من Instance.",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "# البنية التحتية والـ Deployment",
+      "old": "ببيانات اصطناعية (Synthetic)",
+      "new": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## البيئات في نظرة سريعة",
+      "old": "Fixtures اصطناعية",
+      "new": "Fixtures ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## البيئات في نظرة سريعة",
+      "old": "اصطناعية بس، وعربون محاكى",
+      "new": "بيانات تجريبية غير حقيقية بس، وعربون محاكى",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## النسخ الاحتياطي والاسترجاع والـ Rollback",
+      "old": "لو نسخة الـ Schema ماتحركتش، الـ Rollback للصور بس آمن",
+      "new": "لو إصدار الـ Database Schema متغيّرش، الرجوع لإصدار Docker Images سابق بس آمن",
+      "severity": "MAJOR",
+      "reason": "تمييز Docker Images عن صور الميديا وتوضيح معيار إصدار Schema من المصدر.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## النسخ الاحتياطي والاسترجاع والـ Rollback",
+      "old": "ولو اتحركت، الـ Rollback للصور بس آمن بس لو",
+      "new": "ولو إصدارها اتغيّر، الرجوع لإصدار Docker Images سابق بس آمن بشرط إن",
+      "severity": "MAJOR",
+      "reason": "الإبقاء على شرط expand-only لكل Migration والتمييز عن Restore للبيانات.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## حدود جاهزية الـ Production (إيه اللي مش موجود)",
+      "old": "الفلوس الحقيقية مقفولة بالامتثال",
+      "new": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط باستيفاء متطلبات الامتثال",
+      "severity": "MAJOR",
+      "reason": "توضيح إن التفعيل ممنوع قبل متطلبات الامتثال، بدل التعبير المبهم عن قفل الفلوس.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "بيئة اصطناعية",
+      "new": "بيئة بيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "### التسليم: `DeliveryWorker`",
+      "old": "كل إرسال بيشيل",
+      "new": "كل إرسال بيحمل",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "### تشغيل الـ Outbox",
+      "old": "التسليمات الميتة",
+      "new": "عمليات التسليم اللي استنفدت محاولاتها (Dead deliveries)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "## الأنظمة الخارجية اللي الـ Backend بينادي عليها",
+      "old": "الفلوس الحقيقية مقفولة بقرار المالك D16",
+      "new": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بقرار المالك D16",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "## الأنظمة الخارجية اللي الـ Backend بينادي عليها",
+      "old": "بتفشل بشكل مقفول",
+      "new": "بترفض إتاحة الملف لو الفحص مش متاح أو مش ناجح (fail closed)",
+      "severity": "MAJOR",
+      "reason": "توضيح ضابط malware fail closed، مع بقاء منع إتاحة الملف.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## طبقة الـ State والـ Session والشبكة",
+      "old": "وعلم الـ Step-up",
+      "new": "وعلامة الـ Step-up (Flag)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## إشعارات الـ Push",
+      "old": "وعلم الـ Push",
+      "new": "وإعداد تفعيل الـ Push (Flag)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## الكود المشترك مقابل الكود الخاص بكل منصة",
+      "old": "SQL للـ Seed الاصطناعي (Synthetic)",
+      "new": "SQL لبيانات التهيئة التجريبية غير الحقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## طبقة الـ State والـ Session والشبكة",
+      "old": "فشل النقل (Transport) فبيخليها",
+      "new": "فشل الاتصال (Transport) فبيسيب الـ Session شغّالة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "section": "# نظرة عامة على السيستم",
+      "old": "ببيانات اصطناعية (Synthetic)",
+      "new": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "section": "## البيئات",
+      "old": "المعاينة المحدودة الوصول ببيانات اصطناعية",
+      "new": "المعاينة المحدودة الوصول ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "section": "## مين صاحب القرار في إيه",
+      "old": "سعر الوحدة اللي السلة فاكراه",
+      "new": "سعر الوحدة المحفوظ في السلة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+      "section": "# عقود الـ API",
+      "old": "مستند OpenAPI مكتوب بأنواع (Typed)",
+      "new": "مستند OpenAPI بأنواع بيانات محددة (Typed)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+      "section": "## الاتفاقيات اللي كل Endpoint بيمشي عليها",
+      "old": "`cursor` معتّم (Opaque)",
+      "new": "`cursor` قيمته مش مخصّصة للتفسير عند الـ Client (Opaque)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "section": "## `shared` — `backend/shared`",
+      "old": "Hook مسح الخصوصية",
+      "new": "Hook لمسح البيانات الشخصية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "section": "## `catalog` — الوجبات والميديا والاكتشاف والمفضلة والنشاط",
+      "old": "حراس النشر (Publication Guards)",
+      "new": "ضوابط السماح بالنشر (Publication Guards)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "section": "## `identity` — الحسابات وبيانات التواصل والـ Grants",
+      "old": "البيئات الاصطناعية (Synthetic)",
+      "new": "بيئات البيانات التجريبية غير الحقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "## ويب العميل — `apps/customer-web/`",
+      "old": "بانر لبيئات البيانات الاصطناعية/المعاينة",
+      "new": "بانر لبيئات البيانات التجريبية غير الحقيقية/المعاينة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "## ويب العمليات — `apps/operations-web/`",
+      "old": "طابور مطابقة العرابين",
+      "new": "طابور مراجعة وتسوية مدفوعات العربون",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "## تنفّذ فين",
+      "old": "ماتعملش Cast حوالين الأنواع المتولّدة",
+      "new": "ماتستخدمش Type cast عشان تتجاوز الأنواع المتولّدة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "# دليل كود الموبايل (تطبيق العميل)",
+      "old": "قبول الجهاز الفعلي وقارئ الشاشة",
+      "new": "اختبارات القبول على أجهزة فعلية وبقارئ الشاشة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "قبول الجهاز الفعلي وقارئ الشاشة",
+      "new": "اختبارات القبول على أجهزة فعلية وبقارئ الشاشة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "## الـ Authentication وتخزين الـ Session",
+      "old": "حالة شاشة تفضل عايشة",
+      "new": "حالة شاشة تفضل محفوظة من الحساب السابق",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "## كود الطلب",
+      "old": "حاجز الانهيار (Crash Boundary)",
+      "new": "مكوّن احتواء أخطاء العرض (Crash Boundary)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## طبقتين Idempotency (ماتخلطش بينهم)",
+      "old": "بيتختم قدّام بـ 24 ساعة",
+      "new": "بيتحدد بوقت بعد 24 ساعة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "old": "المفتاح الناقص أو الغلط شكله",
+      "new": "المفتاح الناقص أو المكتوب بصيغة غير صحيحة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "old": "حقول بادئتها الطول عشان مفيش قيمة تقلّد فاصل",
+      "new": "حقول بيسبق كل واحد فيها طوله، عشان محتوى أي حقل ميتفهمش على إنه فاصل",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "old": "للـ Fixtures الاصطناعية (Synthetic)",
+      "new": "للـ Fixtures ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "old": "شايل رقم الطلب الحالي",
+      "new": "شايل معرّف طلب الـ API الحالي (Request ID)",
+      "severity": "MAJOR",
+      "reason": "current request id يشير لمعرّف HTTP request، مش رقم الأوردر.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "# شرح تنفيذ الدفع والكاش والـ Ledger",
+      "old": "الفلوس الحقيقية متقفّلة بـ Gate",
+      "new": "التعاملات المالية الحقيقية مش مفعّلة حاليًا وتفعيلها مرتبط بشروط الـ Gate",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "# شرح تنفيذ الدفع والكاش والـ Ledger",
+      "old": "الإطار المنتجي",
+      "new": "منظور المنتج",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ State Machine بتاعة العربون — `PaymentService`",
+      "old": "العربونات",
+      "new": "مدفوعات العربون",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ Gate بتاع الفلوس الحقيقية",
+      "old": "العربونات",
+      "new": "مدفوعات العربون",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ State Machine بتاعة العربون — `PaymentService`",
+      "old": "بيعلّم الفلوس إنها اتستلمت",
+      "new": "بيسجّل إن الفلوس اتستلمت",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ Gate بتاع الفلوس الحقيقية",
+      "old": "حارس المعاينة/البيانات الاصطناعية (Synthetic)",
+      "new": "ضابط بيئات المعاينة/البيانات التجريبية غير الحقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## المبادئ في الكود",
+      "old": "السيرفر هو اللي بيملك كل مبلغ",
+      "new": "السيرفر هو اللي بيحدد كل مبلغ",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## المبادئ في الكود",
+      "old": "الأسعار بتتنسخ في الأوردرات، مبتتشاورش عليها",
+      "new": "الأسعار بتتنسخ جوه الأوردرات، ومبتتخزّنش كمجرد مراجع لقيمها الحالية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## إعادة تأكيد الـ Quote القديم في جهة العميل (D13)",
+      "old": "| النسب |",
+      "new": "| تحديد مصدر التغيير |",
+      "severity": "MAJOR",
+      "reason": "Attribution هنا تحديد المسؤول عن تغيّر السعر، مش نسب حسابية.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "# شرح تنفيذ التسعير",
+      "old": "القيم التجارية (الضريبة، الحدود) اصطناعية (Synthetic)",
+      "new": "القيم التجارية (الضريبة، الحدود) تجريبية وغير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## السعر بييجي منين",
+      "old": "للسياسات الاصطناعية بس",
+      "new": "للسياسات التجريبية غير الحقيقية بس",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "السياسة الاصطناعية",
+      "new": "السياسة التجريبية غير الحقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "سياسة التطوير الاصطناعية",
+      "new": "سياسة التطوير التجريبية غير الحقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/repository-map-ar.md",
+      "section": "## المستوى الأعلى",
+      "old": "حزمة التخطيط المقروءة آليًا",
+      "new": "ملفات التخطيط القابلة للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "section": "## `packages/api-client` — `@matbakhy/api-client`",
+      "old": "والحداثة بيفحصها",
+      "new": "ومطابقة الكود لآخر توليد بيفحصها",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "section": "## `packages/design-tokens` — `@matbakhy/design-tokens`",
+      "old": "وهدف اللمس 44px",
+      "new": "ومساحة التفاعل باللمس 44px",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "section": "## المشاركة بين الويب والموبايل: إيه المشترك وإيه مش مشترك",
+      "old": "تحليل الفلوس (Parsing)",
+      "new": "قراءة القيم المالية والتحقق من صيغتها (Parsing)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "مسارين للـ Authentication",
+      "old": "التطبيق بيلغي الـ Refresh token (بأقصى جهد)",
+      "new": "التطبيق بيحاول يلغي الـ Refresh token بأفضل محاولة ممكنة (best effort)",
+      "severity": "MINOR",
+      "reason": "الإبقاء على best effort بوضوح ومن غير أقواس متداخلة.",
+      "risk": "لا تغيير في السلوك."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "old": "عمليات التسليم اللي استنفدت محاولاتها (Dead deliveries)",
+      "new": "عمليات التسليم المتوقفة نهائيًا (Dead deliveries)",
+      "severity": "MAJOR",
+      "section": "Independent semantic follow-up",
+      "reason": "Independent reviewer: DEAD also includes permanentFailure and inactive-recipient outcomes; do not narrow it to retry exhaustion.",
+      "risk": "Corrects ambiguity introduced during initial editorial revision; English unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "old": "طابور مراجعة وتسوية مدفوعات العربون",
+      "new": "طابور مطابقة مدفوعات العربون",
+      "severity": "MAJOR",
+      "section": "Independent semantic follow-up",
+      "reason": "Independent reviewer: preserve distinction of deposit reconciliation from commission settlement.",
+      "risk": "Corrects ambiguity introduced during initial editorial revision; English unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "old": "إعادة التشغيل (Replay)",
+      "new": "إعادة تنفيذ نفس الأمر (Replay)",
+      "severity": "MAJOR",
+      "section": "Two idempotency layers / Step by step",
+      "reason": "Independent reviewer: distinguish command replay from process restart, and recovery lookup from money refund.",
+      "risk": "No change to idempotency or permanent fingerprint guarantees."
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "old": "**فحص الاسترداد.**",
+      "new": "**فحص استرجاع الأوردر الموجود.**",
+      "severity": "MAJOR",
+      "section": "Two idempotency layers / Step by step",
+      "reason": "Independent reviewer: distinguish command replay from process restart, and recovery lookup from money refund.",
+      "risk": "No change to idempotency or permanent fingerprint guarantees."
+    }
+  ],
+  "limitations": [
+    "AI editorial review is not human approval; GitHub RTL rendering was not visually tested.",
+    "Mermaid fences and labels left unchanged to preserve protected code fences; minor literal phrasing in diagram labels remains (CI أخضر)."
+  ],
+  "checks": {
+    "parity": "Structural rules pass; sync hashes stale for 17 edited pairs, update-sync intentionally left for integration owner after independent review.",
+    "doc001": "PASS 0 problems at 4879c32",
+    "protected": "PASS: fences, inline-code spans, heading lines, link destinations byte-identical across 17 edited pages"
+  },
+  "final_sha": "4879c329b4c50243c835d783e4f53a67f1b13ed2"
+}

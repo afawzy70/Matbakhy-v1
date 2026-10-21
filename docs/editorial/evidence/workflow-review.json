@@ -1,0 +1,721 @@
+{
+  "source_sha": "39b84202b3cb91b641f611e5b87cc7552fef2d5c",
+  "pairs": [
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/branch-maintenance-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/branch-maintenance.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/ci-cd.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/documentation-maintenance.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/documentation-policy-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/documentation-policy.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": false
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/local-environment.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/prerequisites.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/preview-environment.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/run-and-debug.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/test-execution.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "english": "docs/developer-handbook/05-developer-workflow/troubleshooting.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "english": "docs/developer-handbook/06-onboarding-labs/day-1-business.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "english": "docs/developer-handbook/06-onboarding-labs/day-2-applications.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/06-onboarding-labs/day-3-backend-security-ar.md",
+      "english": "docs/developer-handbook/06-onboarding-labs/day-3-backend-security.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/06-onboarding-labs/day-4-development-ar.md",
+      "english": "docs/developer-handbook/06-onboarding-labs/day-4-development.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "english": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    },
+    {
+      "arabic": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "english": "docs/developer-handbook/06-onboarding-labs/final-assessment.md",
+      "review": "Complete English and Arabic read; corresponding sections compared; final changed-section side-by-side review completed.",
+      "changed": true
+    }
+  ],
+  "findings": [
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "# البيئة المحلية",
+      "old": "بيانات اصطناعية (Synthetic)",
+      "new": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic fixtures, distinct from actual data.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## اللي بيوفّره `scripts/dev.sh`",
+      "old": "بيلف حوالين",
+      "new": "بيسهّل تشغيل وإدارة الخدمات المتعرّفة في",
+      "severity": "MINOR",
+      "reason": "Replace literal wraps with script purpose.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## اللي بيوفّره `scripts/dev.sh`",
+      "old": "مصرف بريد",
+      "new": "خدمة بتستقبل رسائل البريد التجريبية محليًا",
+      "severity": "MINOR",
+      "reason": "Mail sink is capture service, not an Arabic drain.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## اللي بيوفّره `scripts/dev.sh`",
+      "old": "بمستخدم وهمي، ودورة رفع خاص موقّع",
+      "new": "بمستخدم تجريبي، واختبار دورة رفع ملف خاص باستخدام رابط موقّع",
+      "severity": "MAJOR",
+      "reason": "Clarify signed private upload round trip.",
+      "technical_semantic_risk": "Reduces ambiguity between signed file and signed upload URL; original round-trip test remains."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## المستخدمين الوهميين",
+      "old": "وسياسة تجارة اصطناعية",
+      "new": "وسياسة تجارية ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic commerce policy.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## المستخدمين الوهميين",
+      "old": "بيتحسبوا بيئات اصطناعية",
+      "new": "بيتحسبوا بيئات ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic environment classification.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## الموبايل (تطبيق العميل)",
+      "old": "التدفقات الـ Native المتسكربتة",
+      "new": "خطوات الـ Native المؤتمتة بالسكريبتات",
+      "severity": "MINOR",
+      "reason": "Remove unnatural translated adjective.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## تشغيل الـ API برّه Docker",
+      "old": "أبسط طريقة مدعومة للتكرار على الـ Backend",
+      "new": "أبسط طريقة مدعومة لتطوير الـ Backend وتجربة التعديلات",
+      "severity": "MINOR",
+      "reason": "Replace literal iterate with development cycle.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "section": "# المتطلبات المسبقة",
+      "old": "ولو الصفحة دي والملفات اختلفوا، صدّق الملفات",
+      "new": "ولو الصفحة دي والملفات اختلفوا، اعتمد على الملفات",
+      "severity": "MINOR",
+      "reason": "Professional source-of-truth instruction.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "section": "## الأدوات المطلوبة",
+      "old": "حتى لو شوية أوامر بدت شغّالة",
+      "new": "حتى لو بعض الأوامر باين إنها شغّالة",
+      "severity": "MINOR",
+      "reason": "Natural Egyptian tense.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "section": "## أنظمة التشغيل",
+      "old": "وشغل iOS الـ Native",
+      "new": "وتشغيل Job بناء iOS الـ Native",
+      "severity": "MINOR",
+      "reason": "Clarify CI job evidence.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## جرد الـ Workflows",
+      "old": "بيستنى Product CI أخضر",
+      "new": "بيستنى نجاح فحوصات Product CI",
+      "severity": "MINOR",
+      "reason": "Explain CI success without color shorthand.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## جرد الـ Workflows",
+      "old": "مالوش Product CI أخضر",
+      "new": "فحوصات Product CI مانجحتش عليه",
+      "severity": "MINOR",
+      "reason": "Explain missing successful CI.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## الـ Rollback والنسخ الاحتياطية",
+      "old": "الـ Rollback للصور بس آمن لما الـ Schema ماتحركتش",
+      "new": "الرجوع لإصدار Docker Images سابق بس آمن لما مفيش تغيير في إصدار أو بنية الـ Database Schema",
+      "severity": "MAJOR",
+      "reason": "Disambiguate Docker image rollback and schema condition.",
+      "technical_semantic_risk": "Preserves alternative expand-only condition and database restore warning."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## من الدمج لبيئة المعاينة",
+      "old": "صورتي `matbakhy-api` و`matbakhy-preview-front`",
+      "new": "الـ Docker Images بتاعة `matbakhy-api` و`matbakhy-preview-front`",
+      "severity": "MINOR",
+      "reason": "Distinguish Docker artifacts from media images.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## حدود الجاهزية للـ Production",
+      "old": "بيئة المعاينة اصطناعية (Synthetic)",
+      "new": "بيئة المعاينة بتستخدم بيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic preview data.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## حدود الجاهزية للـ Production",
+      "old": "ماتوصفش Deployment أخضر",
+      "new": "ماتوصفش Deployment نجح",
+      "severity": "MINOR",
+      "reason": "Replace color shorthand while preserving warning.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## من الدمج لبيئة المعاينة",
+      "old": "والـ Database مابتترجعش تلقائيًا",
+      "new": "والـ Database مابيتعملهاش Rollback تلقائيًا",
+      "severity": "MINOR",
+      "reason": "Specify rollback rather than vague return.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "section": "## قبل ما تفتح PR",
+      "old": "عشان توصل للأخضر",
+      "new": "عشان الفحوصات تنجح",
+      "severity": "MINOR",
+      "reason": "Preserve prohibition in clear technical language.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "section": "## وصف الـ PR",
+      "old": "العقود/الـ Migrations والأسطح",
+      "new": "العقود/الـ Migrations وواجهات التطبيق",
+      "severity": "MINOR",
+      "reason": "Replace literal product surfaces.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "section": "## قواعد الدمج",
+      "old": "فحوصات مطلوبة خضرا",
+      "new": "الفحوصات المطلوبة تكون ناجحة",
+      "severity": "MINOR",
+      "reason": "Describe successful required checks.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/branch-maintenance-ar.md",
+      "section": "## المبادئ",
+      "old": "الشغل الفريد عمره ما بيتحذف",
+      "new": "الشغل اللي لسه مش متدمج في الـ Branch المستهدف عمره ما بيتحذف",
+      "severity": "MINOR",
+      "reason": "Explain unique work in safe-cleanup rule.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/branch-maintenance-ar.md",
+      "section": "## المبادئ",
+      "old": "بقى آمن.",
+      "new": "بقى آمن للحذف.",
+      "severity": "MINOR",
+      "reason": "State safe operation explicitly.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## الملكية (على أساس الدور)",
+      "old": "الأدوار في البداية على أساس الدور مش أشخاص بالاسم.",
+      "new": "المسؤولية في البداية مرتبطة بالأدوار الوظيفية، مش بأشخاص بالاسم.",
+      "severity": "MINOR",
+      "reason": "Remove circular role-based translation.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## مزامنة النسخة العربي",
+      "old": "[ملف الاستثناءات](../translation-exceptions.json) المقروء بالآلة",
+      "new": "[ملف الاستثناءات](../translation-exceptions.json) القابل للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "Natural machine-readable terminology.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## مصفوفة تغيير التوثيق",
+      "old": "\"واحد على الأقل\" هو الحد الأدنى الحتمي.",
+      "new": "\"واحد على الأقل\" هو الحد الأدنى اللي الفحص الآلي بيفرضه.",
+      "severity": "MINOR",
+      "reason": "Clarify deterministic validation floor.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## حالة حماية الـ Branch",
+      "old": "المراجعة الدلالية فضلت واجب بشري أو مراجع مستقل",
+      "new": "مراجعة المعنى لسه مسؤولية إنسان أو مراجع مستقل",
+      "severity": "MINOR",
+      "reason": "Correct tense and unnatural duty wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "# بيئة المعاينة",
+      "old": "ببيانات اصطناعية (Synthetic)",
+      "new": "ببيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic preview classification.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## هي إيه",
+      "old": "وبياناتها اصطناعية",
+      "new": "وبياناتها تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Consistent synthetic data wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## هي إيه",
+      "old": "والكود بيعتبره بيئة اصطناعية",
+      "new": "والكود بيعتبره بيئة ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify environment treatment.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## استخدامها",
+      "old": "الصور الشغّالة، وإصدار الـ Schema",
+      "new": "الـ Docker Images الشغّالة، وإصدار الـ Schema",
+      "severity": "MINOR",
+      "reason": "Avoid confusion with media images.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## استخدامها",
+      "old": "لو في Deployment واقف في الطابور",
+      "new": "لو في Deployment مستني دوره في التنفيذ",
+      "severity": "MINOR",
+      "reason": "Professional natural queue wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "section": "## النداء على الـ API",
+      "old": "الـ Client بتاع TypeScript المتولّد",
+      "new": "الـ Client المتولّد بـ TypeScript",
+      "severity": "MINOR",
+      "reason": "Natural attribution wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "section": "## الـ Debug على الـ Database",
+      "old": "الـ Migrations ملفات في اتجاه واحد بس",
+      "new": "الـ Migrations ملفات بتطبّق تغييرات لقدّام بس",
+      "severity": "MINOR",
+      "reason": "Explain forward-only migrations.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "section": "## الـ Debug على الـ Database",
+      "old": "عادة القراءة بس: استخدم",
+      "new": "خلّي التحقيق للقراءة بس: استخدم",
+      "severity": "MINOR",
+      "reason": "Natural diagnostic instruction.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## قواعد اختبارات الـ Backend (من الكود)",
+      "old": "عشان تجيب أخضر",
+      "new": "عشان الفحوصات تنجح",
+      "severity": "MINOR",
+      "reason": "Remove CI color shorthand.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## الأدلة والتعامل مع العيوب",
+      "old": "الـ CI الأخضر مش معناه",
+      "new": "نجاح فحوصات الـ CI مش معناه",
+      "severity": "MINOR",
+      "reason": "Precise verification limitation.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## كتالوج قبول المالك (200 حالة)",
+      "old": "فصدّق 200",
+      "new": "فاعتمد العدد 200",
+      "severity": "MINOR",
+      "reason": "Professional source-of-truth wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## الـ Fixtures الاصطناعية (Synthetic)",
+      "old": "مفيش غير أطراف وهمية",
+      "new": "مفيش غير حسابات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic actors.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## الأدلة والتعامل مع العيوب",
+      "old": "معرّفات الـ Fixtures الاصطناعية",
+      "new": "معرّفات الـ Fixtures ذات البيانات التجريبية غير الحقيقية",
+      "severity": "MINOR",
+      "reason": "Consistent data terminology.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## الـ Stack المحلي",
+      "old": "بيستنى لحد 300 ثانية للصحة",
+      "new": "بيستنى لحد 300 ثانية عشان فحوصات الصحة تنجح",
+      "severity": "MINOR",
+      "reason": "Remove literal health wait.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## الاختبارات",
+      "old": "تنسيق محدد",
+      "new": "تنسيق حتمي بين العمليات المتزامنة",
+      "severity": "MAJOR",
+      "reason": "Translate deterministic coordination accurately.",
+      "technical_semantic_risk": "Makes race-test synchronization precise without prescribing a new implementation."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## الاختبارات",
+      "old": "لحد ما يبقى أخضر",
+      "new": "لحد ما ينجح",
+      "severity": "MINOR",
+      "reason": "Clear success wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## Git والـ PR والتوثيق",
+      "old": "رغم إن التشغيل المحلي أخضر",
+      "new": "رغم إن الفحوصات المحلية نجحت",
+      "severity": "MINOR",
+      "reason": "Clear local validation result.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## الأهداف",
+      "old": "مين الأطراف وإيه اللي يسمح لكل واحد يعمله",
+      "new": "مين الأطراف وإيه اللي مسموح لكل واحد يعمله",
+      "severity": "MINOR",
+      "reason": "Correct permission grammar.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## الأهداف",
+      "old": "والأسعار بيملكها السيرفر",
+      "new": "والسيرفر هو المسؤول عن تحديد الأسعار",
+      "severity": "MINOR",
+      "reason": "Clarify server authority without literal ownership.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## مهام عملية",
+      "old": "علّم على كل ضلع الطرف المسؤول",
+      "new": "علّم على كل سهم انتقال الطرف المسؤول",
+      "severity": "MINOR",
+      "reason": "Use state-machine edge terminology.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## مهام عملية",
+      "old": "شغل نظام زي انتهاء الصلاحية",
+      "new": "مهمة بيشغّلها النظام زي انتهاء الصلاحية",
+      "severity": "MINOR",
+      "reason": "Clarify system job actor.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## المُخرَج",
+      "old": "شرح مكتوب مختصر للمشي في الرحلات",
+      "new": "شرح مكتوب مختصر لخطوات الرحلات",
+      "severity": "MINOR",
+      "reason": "Natural written walkthrough.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## المُخرَج",
+      "old": "لكل سطح، أهم تلات شاشات",
+      "new": "لكل واجهة تطبيق، أهم تلات شاشات",
+      "severity": "MINOR",
+      "reason": "Replace literal product surface.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## مهام عملية",
+      "old": "أي صورة اصطناعية",
+      "new": "أي صورة تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Consistent synthetic example.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-3-backend-security-ar.md",
+      "section": "## الأهداف",
+      "old": "تتبّع Request واحد من الـ Controller للـ Database والرجوع.",
+      "new": "تتبّع Request واحد من الـ Controller للـ Database، وبعدها تتبّع رجوع النتيجة.",
+      "severity": "MINOR",
+      "reason": "Natural full round-trip tracing.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-4-development-ar.md",
+      "section": "## مهام عملية",
+      "old": "ارجع عن الكسر",
+      "new": "رجّع التنفيذ لحالته السليمة",
+      "severity": "MINOR",
+      "reason": "Remove literal undo break.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-4-development-ar.md",
+      "section": "## مهام عملية",
+      "old": "قبل ما الصور تتبني",
+      "new": "قبل ما الـ Docker Images تتبني",
+      "severity": "MINOR",
+      "reason": "Distinguish deployment artifacts from media.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## الخطوات",
+      "old": "ومحصور في موديول أو سطح واحد",
+      "new": "ومحصور في موديول أو واجهة تطبيق واحدة",
+      "severity": "MINOR",
+      "reason": "Replace literal surface.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## الخطوات",
+      "old": "خلّي القواعد اللي يملكها السيرفر على السيرفر",
+      "new": "خلّي القواعد اللي السيرفر مسؤول عنها على السيرفر",
+      "severity": "MINOR",
+      "reason": "Natural server authority wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## المُخرَج",
+      "old": "فحوصات مطلوبة خضرا",
+      "new": "فحوصات مطلوبة ناجحة",
+      "severity": "MINOR",
+      "reason": "Clear success wording.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## فحص ذاتي",
+      "old": "ماحطيتش إيدي على `main`",
+      "new": "ماعدّلتش `main`",
+      "severity": "MINOR",
+      "reason": "Professional precise change boundary.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "# التقييم النهائي",
+      "old": "بيانات مصطنعة (Synthetic)",
+      "new": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Consistent synthetic-data terminology.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 4. التشغيل والـ Debug",
+      "old": "ويحل عطل واحد محقون",
+      "new": "ويحل عطل واحد المقيّم أدخله عمدًا",
+      "severity": "MINOR",
+      "reason": "Remove literal injected fault.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 4. التشغيل والـ Debug",
+      "old": "نسخة من الـ Terminal",
+      "new": "سجل مخرجات الـ Terminal",
+      "severity": "MINOR",
+      "reason": "Specify terminal transcript.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 6. كتابة الاختبارات وتشغيلها",
+      "old": "مخرجات بتوري أحمر وبعدين أخضر",
+      "new": "مخرجات بتوري فشل الاختبار وبعدين نجاحه",
+      "severity": "MINOR",
+      "reason": "Clarify test evidence.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 9. فهم الـ Deployment لبيئة المعاينة",
+      "old": "لبناء الصور بـ commit SHA",
+      "new": "لبناء الـ Docker Images بـ commit SHA",
+      "severity": "MINOR",
+      "reason": "Distinguish Docker artifacts.",
+      "technical_semantic_risk": "None; technical requirement and protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## من الدمج لبيئة المعاينة",
+      "old": "وبيستنى صحة الـ API",
+      "new": "وبيستنى فحوصات صحة الـ API تنجح",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "technical_semantic_risk": "None; original requirement and protected content preserved."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## المُخرَج",
+      "old": "لقطات شاشة لبيانات اصطناعية بس",
+      "new": "لقطات شاشة لبيانات تجريبية غير حقيقية بس",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "technical_semantic_risk": "None; original requirement and protected content preserved."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 2. شرح مسارات العميل والمطبخ والموبايل والـ Back Office",
+      "old": "كل شاشة/سطح",
+      "new": "كل شاشة/واجهة تطبيق",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "technical_semantic_risk": "None; original requirement and protected content preserved."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## تصنيف الاختبارات (إيه بيثبت إيه)",
+      "old": "الصحة الساكنة",
+      "new": "سلامة الأنواع والكود بالفحص الساكن",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "technical_semantic_risk": "None; original requirement and protected content preserved."
+    }
+  ],
+  "limitations": [
+    "AI editorial self-review; no human approval or GitHub rendering test.",
+    "documentation-policy-ar.md reviewed in full without edits; governance policy and protections left unchanged."
+  ],
+  "checks": {
+    "doc001_docs": "PASS (0 problems)",
+    "diff_check": "PASS",
+    "parity": "FAIL only for 16 stale translation-sync hashes; no structural/content/reference failures. Parent will update combined reviewed-pair registry."
+  }
+}

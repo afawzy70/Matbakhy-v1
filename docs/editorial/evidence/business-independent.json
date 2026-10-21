@@ -1,0 +1,333 @@
+{
+  "reviewed_sha": "cd9403a987ce1d7f33360195ab554401e3e2a122",
+  "reviewer": "Architecture/code editorial agent, independent of business editor",
+  "scope": "Full English sources for all 20 edited files; all edited Arabic sections and complete diff. Read-only independent review.",
+  "files": [
+    {
+      "arabic": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+      "english": "docs/developer-handbook/00-getting-started/glossary.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## مصطلحات الـ Domain والمصطلحات التقنية"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "english": "docs/developer-handbook/00-getting-started/learning-roadmap.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## الخريطة",
+        "## ترتيب القراءة",
+        "## قواعد أساسية أثناء التعلّم",
+        "## لو اتعطّلت"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "english": "docs/developer-handbook/00-getting-started/project-overview.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## التطبيقات والكود",
+        "## المشاكل اللي بيحلّها",
+        "### مقفول بشروط أو مش شغّال"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "english": "docs/developer-handbook/00-getting-started/repository-navigation.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# التنقّل في الـ Repository: ألاقيه فين؟",
+        "## 3. قواعد العمل والـ Authorization والتسعير",
+        "## 5. الشاشات",
+        "## 7. \"أنفّذ تغييري فين؟\""
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "english": "docs/developer-handbook/01-business/actors-and-permissions.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# الأطراف والصلاحيات",
+        "## الأطراف",
+        "## الـ Authorization على مستوى الـ Object (الملكية والعزل بين المطابخ)",
+        "## القيود المعروفة وفجوات التوثيق"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "english": "docs/developer-handbook/01-business/business-rules.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# ملخص قواعد العمل",
+        "## الـ Authentication",
+        "## الـ Authorization وفصل الحسابات",
+        "## حجز السعة (Capacity)"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "english": "docs/developer-handbook/01-business/kitchen-management.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## 2. سجل المطبخ وحالات التشغيل بتاعته",
+        "## 4. الوجبات",
+        "## 8. حذف الحساب للطبّاخ"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "english": "docs/developer-handbook/01-business/marketplace-model.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# نموذج الـ Marketplace",
+        "## المنصة مسؤولة عن إيه",
+        "## الهيكل التلاتي الأطراف"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "english": "docs/developer-handbook/01-business/order-lifecycle.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## الخطوة 3 — التوافر والسعة",
+        "## الخطوة 5 — العرض القديم والانتهاء",
+        "## الخطوة 7 — المطبخ بيقبل أو يرفض",
+        "## الخطوة 8 — التحضير",
+        "## نظرة عامة"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "english": "docs/developer-handbook/01-business/pricing-and-payments.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# التسعير والدفع",
+        "## 1. إزاي السعر بيتبني",
+        "## 2. تغييرات السعر قبل التسجيل (قرار المالك D13)",
+        "## 7. المطابقة والثوابت المالية",
+        "### إصدارات السعر والـ Snapshots"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "english": "docs/developer-handbook/01-business/product-vision.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## مقاييس النجاح (أهداف، مش نتايج)"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/01-business/target-users-ar.md",
+      "english": "docs/developer-handbook/01-business/target-users.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## القيود المعروفة وفجوات التوثيق",
+        "## شرائح العملاء"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/authentication-and-mfa.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# رحلات المستخدم: المصادقة وMFA",
+        "## مكونات الهوية الأساسية"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/backoffice-admin.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## BO-3 متابعة الأوردرات والاستثناءات",
+        "## مفيش \"أدوار\" للـ Staff، فيه صلاحيات ممنوحة بس"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/complete-order-journey.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# رحلات المستخدم: رحلة الأوردر الكاملة",
+        "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+        "## السيناريو C: عربون مباشر 50% (الرحلتين الأساسيتين 3 و4)"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/cook-operations.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## CO-1 التسجيل: التقديم، الإرسال، انتظار القرار",
+        "## CO-6 تقارير الكاش والعربون من المطبخ"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/customer-mobile.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## أندرويد مقابل iOS",
+        "### CM-3 عرض السعر، التسجيل، واسترجاع الأوردر غير المؤكد",
+        "### CM-4 تتبّع الأوردر، تقرير العربون، الإلغاء، التقييم",
+        "### الـ Authentication والـ Redirect والـ Deep Links"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/customer-web.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "## CW-1 اكتشاف الزائر، البحث، والفلترة",
+        "## CW-3 اختيار الوجبة والسلة",
+        "## CW-4 عرض السعر، التحقق من التليفون، وتسجيل الأوردر",
+        "## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم",
+        "## CW-8 الأخطاء والاسترجاع (شامل)",
+        "## المسارات الموجودة"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "english": "docs/developer-handbook/02-user-journeys/finance-and-support.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# رحلات المستخدم: المالية والدعم",
+        "## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    },
+    {
+      "arabic": "docs/developer-handbook/README-ar.md",
+      "english": "docs/developer-handbook/README.md",
+      "english_complete_read": true,
+      "edited_arabic_sections_read": true,
+      "sections": [
+        "# دليل المطوّر لمطبخي (Matbakhy)",
+        "### 07 المراجع"
+      ],
+      "diff_compared": true,
+      "protected_text_unchanged": true,
+      "result": "PASS"
+    }
+  ],
+  "findings": [
+    {
+      "id": "B-IND-001",
+      "severity": "MINOR",
+      "file": "02-user-journeys/customer-web-ar.md",
+      "original": "اختيار اختيار غرض الطلب اختياريًا",
+      "correction": "اختيار كارت لغرض الطلب اختياريًا",
+      "status": "FIXED and independently verified at cd9403a987ce1d7f33360195ab554401e3e2a122",
+      "reason": "Introduced duplicated wording."
+    },
+    {
+      "id": "B-IND-002",
+      "severity": "MAJOR",
+      "file": "02-user-journeys/customer-mobile-ar.md",
+      "original": "ويشيل الـ `state` بتاعنا وكود `code`",
+      "correction": "ويحتوي على الـ `state` بتاعنا وكود `code`",
+      "status": "FIXED and independently verified at cd9403a987ce1d7f33360195ab554401e3e2a122",
+      "reason": "carry must not be read as remove in redirect security check."
+    },
+    {
+      "id": "B-IND-003",
+      "severity": "MAJOR",
+      "file": "02-user-journeys/customer-web-ar.md",
+      "original": "كل طلب بيشيل `Accept-Language`",
+      "correction": "كل طلب بيحتوي على `Accept-Language`",
+      "status": "FIXED and independently verified at cd9403a987ce1d7f33360195ab554401e3e2a122",
+      "reason": "Preserve required header presence."
+    },
+    {
+      "id": "B-IND-004",
+      "severity": "MAJOR",
+      "file": "02-user-journeys/complete-order-journey-ar.md",
+      "original": "كل `POST` بيغيّر أوردر بيشيل `Idempotency-Key` و`expectedVersion`",
+      "correction": "كل `POST` بيغيّر أوردر بيحتوي على `Idempotency-Key` و`expectedVersion`",
+      "status": "FIXED and independently verified at cd9403a987ce1d7f33360195ab554401e3e2a122",
+      "reason": "Preserve required idempotency and concurrency fields."
+    }
+  ],
+  "limitations": [
+    "AI independent review is not a human approval.",
+    "No GitHub RTL browser rendering verification."
+  ],
+  "status": "PASS",
+  "repair_verification": "4044bd1 duplicated intent wording and cd9403a three carry/presence ambiguities verified directly against full English source. No remaining confirmed findings."
+}

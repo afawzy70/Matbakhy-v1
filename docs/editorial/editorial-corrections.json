@@ -1,0 +1,3140 @@
+{
+  "note": "Correction records, including separate follow-up refinements; counts are not unique root-cause counts. Historical old/new values may be further refined in later entries.",
+  "source_sha": "39b84202b3cb91b641f611e5b87cc7552fef2d5c",
+  "counts": {
+    "MINOR": 252,
+    "MAJOR": 61
+  },
+  "findings": [
+    {
+      "file": "docs/developer-handbook/README-ar.md",
+      "section": "# دليل المطوّر لمطبخي (Matbakhy)",
+      "original": "الدليل مخرَج حيّ تحت",
+      "corrected": "الدليل بيتحدّث باستمرار مع تطور المشروع، وبيخضع لـ",
+      "severity": "MINOR",
+      "reason": "Replace literal living-deliverable metaphor with natural Egyptian explanation.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-001"
+    },
+    {
+      "file": "docs/developer-handbook/README-ar.md",
+      "section": "### 07 المراجع",
+      "original": "مقروء بالآلة:",
+      "corrected": "ملفات قابلة للقراءة آليًا:",
+      "severity": "MINOR",
+      "reason": "Describe machine-readable files naturally.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-002"
+    },
+    {
+      "file": "docs/developer-handbook/README-ar.md",
+      "section": "# دليل المطوّر لمطبخي (Matbakhy)",
+      "original": "حالة التنفيذ موسومة في كل صفحة",
+      "corrected": "حالة التنفيذ موضّحة في كل صفحة",
+      "severity": "MINOR",
+      "reason": "Avoid unnatural metadata wording.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-003"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+      "section": "## مصطلحات الـ Domain والمصطلحات التقنية",
+      "original": "سياسة اصطناعية مسموحة بس",
+      "corrected": "سياسة تجريبية غير حقيقية مسموحة بس",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic policy without changing allowed environments.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-004"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+      "section": "## مصطلحات الـ Domain والمصطلحات التقنية",
+      "original": "السجلات الغريبة بترجّع 404",
+      "corrected": "السجلات الخاصة بمستخدم تاني بترجّع 404",
+      "severity": "MAJOR",
+      "reason": "Foreign records means ownership scope, not malformed records.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-005"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## الخريطة",
+      "original": "وأسطح الموبايل",
+      "corrected": "وواجهات الموبايل",
+      "severity": "MINOR",
+      "reason": "Surface means application interface, not literal surface.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-006"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## ترتيب القراءة",
+      "original": "الصفحات الخاصة بكل سطح",
+      "corrected": "الصفحات الخاصة بكل واجهة",
+      "severity": "MINOR",
+      "reason": "Use natural interface terminology.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-007"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## قواعد أساسية أثناء التعلّم",
+      "original": "استخدم بيانات اصطناعية (Synthetic) بس",
+      "corrected": "استخدم بيانات تجريبية غير حقيقية (Synthetic Data) بس",
+      "severity": "MINOR",
+      "reason": "Make fake fixture data explicit.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-008"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## لو اتعطّلت",
+      "original": "الاختبار اللي اسمه على اسم السلوك هو أحسن مواصفات",
+      "corrected": "الاختبار اللي اسمه بيوصف السلوك هو أوضح مرجع للسلوك المتوقع",
+      "severity": "MINOR",
+      "reason": "Remove literal specification phrase.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-009"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "section": "# التنقّل في الـ Repository: ألاقيه فين؟",
+      "original": "السعر بيتـ Validate فين؟",
+      "corrected": "التحقق من السعر بيحصل فين؟",
+      "severity": "MINOR",
+      "reason": "Avoid artificial Arabic/English verb hybrid.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-010"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "section": "## التطبيقات والكود",
+      "original": "| السطح | المجلد | الجمهور |",
+      "corrected": "| الواجهة | المجلد | الجمهور |",
+      "severity": "MINOR",
+      "reason": "Surface means application interface.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-011"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "section": "### مقفول بشروط أو مش شغّال",
+      "original": "**الفلوس الحقيقية مقفولة** بمراجعة قانونية ومراجعة حماية المستهلك ومراجعة حساب المستلم",
+      "corrected": "**التعاملات المالية الحقيقية مش مفعّلة حاليًا**، وتفعيلها مشروط بمراجعة قانونية ومراجعة حماية المستهلك ومراجعة حساب المستلم",
+      "severity": "MINOR",
+      "reason": "State financial gate clearly without weakening prerequisites.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-012"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "section": "## المشاكل اللي بيحلّها",
+      "original": "فلوس اصطناعية (Synthetic) بس",
+      "corrected": "مبالغ تجريبية غير حقيقية (Synthetic) بس",
+      "severity": "MINOR",
+      "reason": "Avoid unnatural synthetic money wording.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-013"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "# نموذج الـ Marketplace",
+      "original": "الـ Marketplace المعاملاتي",
+      "corrected": "عمليات البيع والطلب في الـ Marketplace",
+      "severity": "MINOR",
+      "reason": "Clarify transactional marketplace.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-014"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "# نموذج الـ Marketplace",
+      "original": "أي تسييل (Monetization)",
+      "corrected": "أي تحقيق دخل (Monetization)",
+      "severity": "MAJOR",
+      "reason": "Monetization is revenue generation, not asset liquidation.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-015"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## الهيكل التلاتي الأطراف",
+      "original": "الحقيقة البيزنس الأساسية",
+      "corrected": "الحقيقة الأساسية في نموذج العمل",
+      "severity": "MINOR",
+      "reason": "Natural business phrasing.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-016"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## المنصة مسؤولة عن إيه",
+      "original": "بوابة جودة العرض",
+      "corrected": "ضوابط جودة المطابخ المعروضة",
+      "severity": "MINOR",
+      "reason": "Clarify supply-side approval gate.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-017"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## المنصة مسؤولة عن إيه",
+      "original": "حقيقة التوافر",
+      "corrected": "المرجع الفعلي للتوافر",
+      "severity": "MINOR",
+      "reason": "Avoid literal truth metaphor.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-018"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## المنصة مسؤولة عن إيه",
+      "original": "حقيقة السعر",
+      "corrected": "المرجع الفعلي للسعر",
+      "severity": "MINOR",
+      "reason": "Avoid literal truth metaphor.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-019"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "# الأطراف والصلاحيات",
+      "original": "حزم من المنح بيحملها إنسان",
+      "corrected": "مجموعات صلاحيات ممنوحة لشخص",
+      "severity": "MINOR",
+      "reason": "Avoid literal grant-bundle phrase.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-020"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## الأطراف",
+      "original": "**متقدّم للطبخ**",
+      "corrected": "**متقدّم للعمل كطبّاخ**",
+      "severity": "MINOR",
+      "reason": "Application is for becoming a seller, not cooking an individual meal.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-021"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "section": "## 4. الوجبات",
+      "original": "علامة مراجعة محتوى من الموظفين متعامدة",
+      "corrected": "علامة مستقلة لمراجعة المحتوى من الموظفين",
+      "severity": "MAJOR",
+      "reason": "Orthogonal means independent state, not geometric perpendicularity.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-022"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "section": "## 2. سجل المطبخ وحالات التشغيل بتاعته",
+      "original": "استئناف الطبّاخ، استرجاع الموظفين",
+      "corrected": "استئناف البيع من الطبّاخ، إعادة تفعيل المطبخ من الموظفين",
+      "severity": "MINOR",
+      "reason": "Avoid implying staff accounts are restored.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-023"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "section": "## 8. حذف الحساب للطبّاخ",
+      "original": "**بيتحجز لمراجعة الموظفين**",
+      "corrected": "**حذفه بيتأجّل لحد مراجعة الموظفين**",
+      "severity": "MINOR",
+      "reason": "Account is held for review, not person detained.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-024"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 3 — التوافر والسعة",
+      "original": "بداية الـ Slot − وقت التجهيز",
+      "corrected": "بداية الـ Slot − مهلة الطلب المسبق (lead time)",
+      "severity": "MAJOR",
+      "reason": "Lead time is ordering cutoff interval, not cooking preparation duration.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-025"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 3 — التوافر والسعة",
+      "original": "الـ Slot فيه 3 وجبات متبقية",
+      "corrected": "الـ Slot فيه 3 حصص متبقية",
+      "severity": "MAJOR",
+      "reason": "Portions are capacity units; meal types are distinct.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-026"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 3 — التوافر والسعة",
+      "original": "على آخر وجبة",
+      "corrected": "على آخر حصة",
+      "severity": "MAJOR",
+      "reason": "Preserve distinction between portion capacity and meal type.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-027"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 5 — العرض القديم والانتهاء",
+      "original": "العرض أقدم من موعد انتهائه",
+      "corrected": "مدة صلاحية العرض انتهت",
+      "severity": "MAJOR",
+      "reason": "Quote expiry condition must describe past expiry, not being older than a date.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-028"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 7 — المطبخ بيقبل أو يرفض",
+      "original": "المخزون بيتفرج عنه مرة واحدة",
+      "corrected": "الحصص المحجوزة بترجع متاحة مرة واحدة",
+      "severity": "MINOR",
+      "reason": "Use natural stock-release explanation; no consumed stock restored.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-029"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 8 — التحضير",
+      "original": "بيفرّج عن التخصيص مرة واحدة",
+      "corrected": "بيرجع الحصص المخصّصة متاحة مرة واحدة",
+      "severity": "MINOR",
+      "reason": "Natural allocation-release explanation before preparation.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-030"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## نظرة عامة",
+      "original": "هي عايشة في سجلات منفصلة",
+      "corrected": "بتتسجّل في سجلات منفصلة",
+      "severity": "MINOR",
+      "reason": "Avoid anthropomorphic literal translation.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-031"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "# التسعير والدفع",
+      "original": "منفّذة ومختبرة بفلوس اصطناعية (Synthetic)؛ الفلوس الحقيقية متقفّلة (Gated)",
+      "corrected": "منفّذة ومختبرة بمبالغ تجريبية غير حقيقية (Synthetic)؛ التعاملات المالية الحقيقية مش مفعّلة حاليًا ومشروطة بالمراجعات المطلوبة (Gated)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic amounts and gated real payments.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-032"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "# التسعير والدفع",
+      "original": "**الفلوس الحقيقية متقفّلة.**",
+      "corrected": "**التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة.**",
+      "severity": "MINOR",
+      "reason": "State real-money gate clearly and retain following required reviews.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-033"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "## 1. إزاي السعر بيتبني",
+      "original": "فالـ Overflow بيفشل بصوت عالي",
+      "corrected": "فلو حصل Overflow العملية بتفشل بخطأ واضح",
+      "severity": "MINOR",
+      "reason": "Fail loudly means explicit error, not sound.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-034"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "### إصدارات السعر والـ Snapshots",
+      "original": "صف واحد لكل حساب فيه",
+      "corrected": "صف واحد لكل عملية حساب للسعر، فيه",
+      "severity": "MAJOR",
+      "reason": "Calculation is distinct from user account.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-035"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "## 2. تغييرات السعر قبل التسجيل (قرار المالك D13)",
+      "original": "مفيش خصم صامت ولا إعادة إرسال صامتة",
+      "corrected": "مفيش خصم ولا إعادة إرسال من غير علم العميل",
+      "severity": "MINOR",
+      "reason": "Natural explanation of silent resubmission prohibition.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-036"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "## 7. المطابقة والثوابت المالية",
+      "original": "| تقرير الكاش ≠ المتحقِّق |",
+      "corrected": "| مقدّم تقرير الكاش ≠ المتحقِّق منه |",
+      "severity": "MAJOR",
+      "reason": "Separation of duties compares people, not report to person.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-037"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "section": "## مقاييس النجاح (أهداف، مش نتايج)",
+      "original": "زي تحويل الـ Checkout",
+      "corrected": "زي نسبة إتمام الطلبات في الـ Checkout",
+      "severity": "MAJOR",
+      "reason": "Checkout conversion is a conversion rate, not transfer.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-038"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "البلاطات التلاتة للنية",
+      "corrected": "الاختيارات التلاتة حسب غرض الطلب",
+      "severity": "MINOR",
+      "reason": "Intent tiles are user choices, not literal tiles.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-039"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## الـ Authorization وفصل الحسابات",
+      "original": "الـ Objects الغريبة بترجع 404",
+      "corrected": "الـ Objects الخاصة بمستخدم أو مطبخ تاني بترجع 404",
+      "severity": "MAJOR",
+      "reason": "Foreign means ownership scope, not malformed object.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-040"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## الـ Authorization وفصل الحسابات",
+      "original": "الصلاحيات الملغاة بتوقف شغل",
+      "corrected": "الصلاحيات اللي اتسحبت بتبطل تشتغل",
+      "severity": "MINOR",
+      "reason": "Natural revoked-grant phrasing.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-041"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## حجز السعة (Capacity)",
+      "original": "آخر وجبة مبتتباعش زيادة عن اللازم أبدًا",
+      "corrected": "آخر حصة مينفعش تتباع لأكتر من عميل",
+      "severity": "MAJOR",
+      "reason": "Capacity applies to portions, not meal types.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-042"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+      "section": "# رحلات المستخدم: المصادقة وMFA",
+      "original": "نص السياسة (هو المرجع في النيّة)",
+      "corrected": "نص السياسة (هو المرجع للهدف المقصود)",
+      "severity": "MINOR",
+      "reason": "Intent is policy purpose, not personal intention.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-043"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+      "section": "## مكونات الهوية الأساسية",
+      "original": "SSL مطلوب للخارج",
+      "corrected": "SSL مطلوب للاتصالات الخارجية",
+      "severity": "MINOR",
+      "reason": "Clarify external connection requirement.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-044"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "section": "## مفيش \"أدوار\" للـ Staff، فيه صلاحيات ممنوحة بس",
+      "original": "لسلطة Spring اسمها",
+      "corrected": "لصلاحية Spring اسمها",
+      "severity": "MINOR",
+      "reason": "Use established authority context instead of literal power.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-045"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "# رحلات المستخدم: رحلة الأوردر الكاملة",
+      "original": "هذه الصفحة بتربط",
+      "corrected": "الصفحة دي بتربط",
+      "severity": "MINOR",
+      "reason": "Consistent professional Egyptian prose.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-046"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+      "original": "جهة اتصال مقنّعة",
+      "corrected": "بيانات تواصل مخفية جزئيًا",
+      "severity": "MINOR",
+      "reason": "Masked contact is partially hidden data, not disguised contact.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-047"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+      "original": "| 18 | العميل | المراجعة |",
+      "corrected": "| 18 | العميل | التقييم |",
+      "severity": "MINOR",
+      "reason": "Review here is customer rating, not editorial or operational review.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-048"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+      "original": "| مراجعة واحدة |",
+      "corrected": "| تقييم واحد |",
+      "severity": "MINOR",
+      "reason": "Customer review terminology consistency.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-049"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو C: عربون مباشر 50% (الرحلتين الأساسيتين 3 و4)",
+      "original": "الفلوس الحية مقفولة بشروط",
+      "corrected": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify real-money gate.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-050"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-1 التسجيل: التقديم، الإرسال، انتظار القرار",
+      "original": "علم الاستلام",
+      "corrected": "إعداد إتاحة الاستلام",
+      "severity": "MINOR",
+      "reason": "Flag is a boolean setting, not a literal flag.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-051"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-6 تقارير الكاش والعربون من المطبخ",
+      "original": "الفلوس الحية مقفولة بشروط",
+      "corrected": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify real-money gate.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-052"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "### الـ Authentication والـ Redirect والـ Deep Links",
+      "original": "والمزوّد غير المتاح بيحافظ عليها",
+      "corrected": "ولو المزوّد مش متاح، التطبيق بيحتفظ بالـ Session",
+      "severity": "MAJOR",
+      "reason": "Unreachable provider does not actively preserve session; app does.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-053"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "### CM-3 عرض السعر، التسجيل، واسترجاع الأوردر غير المؤكد",
+      "original": "حتى لو التطبيق مات",
+      "corrected": "حتى لو التطبيق اتقفل فجأة",
+      "severity": "MINOR",
+      "reason": "Professional Egyptian description of app termination.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-054"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "### CM-4 تتبّع الأوردر، تقرير العربون، الإلغاء، التقييم",
+      "original": "Deep Link دافئ وبارد",
+      "corrected": "Deep Link والتطبيق شغّال أو مقفول",
+      "severity": "MINOR",
+      "reason": "Warm/cold links describe application lifecycle, not temperature.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-055"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "## أندرويد مقابل iOS",
+      "original": "مُحترَم؛ بيمنع",
+      "corrected": "بيتطبّق؛ وبيمنع",
+      "severity": "MINOR",
+      "reason": "Honoured option means applied, not respected.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-056"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-3 اختيار الوجبة والسلة",
+      "original": "الـ Slot المستنفد مايتضافش",
+      "corrected": "الـ Slot اللي حصصه خلصت مايتضافش",
+      "severity": "MINOR",
+      "reason": "Natural exhausted-capacity wording.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-057"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-4 عرض السعر، التحقق من التليفون، وتسجيل الأوردر",
+      "original": "الفلوس الحقيقية مقفولة بشروط",
+      "corrected": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify real-money gate.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-058"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم",
+      "original": "تكرار تقرير التحويل Idempotent وإعلامي",
+      "corrected": "تكرار تقرير التحويل Idempotent، وهو للإبلاغ بس",
+      "severity": "MINOR",
+      "reason": "Informational is not media-related.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-059"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم",
+      "original": "المراجعة التانية بتدي 409",
+      "corrected": "التقييم التاني بيرجّع 409",
+      "severity": "MINOR",
+      "reason": "Review means customer rating here.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-060"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-8 الأخطاء والاسترجاع (شامل)",
+      "original": "علم البناء",
+      "corrected": "إعداد الـ Build",
+      "severity": "MINOR",
+      "reason": "Build flag is a configuration switch, not literal flag.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-061"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "# رحلات المستخدم: المالية والدعم",
+      "original": "كل الفلوس بيانات اصطناعية (Synthetic) والفلوس الحية مقفولة بشروط",
+      "corrected": "كل المبالغ تجريبية وغير حقيقية (Synthetic)، والتعاملات المالية الحقيقية مش مفعّلة حاليًا وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic money and real-money gate.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-062"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "# رحلات المستخدم: المالية والدعم",
+      "original": "والطبّاخ والعميل لنصفهم هم",
+      "corrected": "والطبّاخ والعميل كل واحد في الجزء الخاص بيه",
+      "severity": "MINOR",
+      "reason": "Natural explanation of each actor’s part.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-063"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)",
+      "original": "تسجيل استرداد المطبخ للعميل بالكامل للكاش المتحقق منه والمحصّل عند المطبخ",
+      "corrected": "تسجيل ردّ المطبخ للعميل مبلغ الكاش بالكامل، بعد التحقق من تحصيل المطبخ ليه",
+      "severity": "MAJOR",
+      "reason": "Clarify kitchen-to-customer refund direction without implying kitchen receives refund.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-064"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)",
+      "original": "القيود ذات المبلغ صفر مايتحطش في دفعات",
+      "corrected": "القيود اللي مبلغها صفر ماينفعش تتحط في دفعات",
+      "severity": "MINOR",
+      "reason": "Fix plural agreement and readability.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-065"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## الـ Authorization على مستوى الـ Object (الملكية والعزل بين المطابخ)",
+      "original": "فالسجل الغريب ببساطة مش موجود",
+      "corrected": "فالسجل الخاص بحد تاني مش موجود",
+      "severity": "MAJOR",
+      "reason": "Clarify foreign-record ownership scope.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-066"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## الـ Authorization على مستوى الـ Object (الملكية والعزل بين المطابخ)",
+      "original": "المعرّف الغريب بيرجّع",
+      "corrected": "معرّف السجل الخاص بحد تاني بيرجّع",
+      "severity": "MAJOR",
+      "reason": "Clarify cross-owner id rather than malformed id.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-067"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "جدول أدوار خشن",
+      "corrected": "جدول عام للأدوار من غير تفاصيل الصلاحيات",
+      "severity": "MINOR",
+      "reason": "Coarse means broad-grained, not rough texture.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-068"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "section": "## 5. الشاشات",
+      "original": "| السطح | الملفات |",
+      "corrected": "| الواجهة | الملفات |",
+      "severity": "MINOR",
+      "reason": "Use application-interface terminology.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-069"
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "section": "## 7. \"أنفّذ تغييري فين؟\"",
+      "original": "| التغيير | ابدأ من هنا | لمس كمان |",
+      "corrected": "| التغيير | ابدأ من هنا | حدّث كمان |",
+      "severity": "MINOR",
+      "reason": "Natural wording for files also affected.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-070"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## شرائح العملاء",
+      "original": "تلات بلاطات \"نية\"",
+      "corrected": "تلات اختيارات حسب غرض الطلب",
+      "severity": "MINOR",
+      "reason": "Avoid literal intent-tile terminology.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-071"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## شرائح العملاء",
+      "original": "بلاطة النية (النص بالإنجليزي)",
+      "corrected": "اختيار غرض الطلب (النص بالإنجليزي)",
+      "severity": "MINOR",
+      "reason": "Use consistent natural intent terminology.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-072"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## شرائح العملاء",
+      "original": "البلاطات التلاتة **تلميح عرض**",
+      "corrected": "الاختيارات التلاتة **بتوجّه طريقة العرض بس**",
+      "severity": "MINOR",
+      "reason": "Clarify presentation-only behaviour without implying server filtering.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-073"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "section": "## BO-3 متابعة الأوردرات والاستثناءات",
+      "original": "جهة اتصال مقنّعة",
+      "corrected": "بيانات تواصل مخفية جزئيًا",
+      "severity": "MINOR",
+      "reason": "Masked contact means partially hidden personal data.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-074"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "section": "## BO-3 متابعة الأوردرات والاستثناءات",
+      "original": "وفتح جهة اتصال العميل",
+      "corrected": "وفتح بيانات تواصل العميل",
+      "severity": "MINOR",
+      "reason": "Use accurate contact-data wording.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-075"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "# ملخص قواعد العمل",
+      "original": "في صيغة مقروءة للآلة",
+      "corrected": "في صيغة قابلة للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "Natural machine-readable terminology.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-076"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## الـ Authentication",
+      "original": "رقم تليفون مصري متطبَّع ومتحقَّق منه",
+      "corrected": "رقم تليفون مصري بصيغة موحّدة ومتحقَّق منه",
+      "severity": "MINOR",
+      "reason": "Normalized phone means standard format, not literal normalization.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-077"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## المسارات الموجودة",
+      "original": "كروت النية",
+      "corrected": "اختيارات غرض الطلب",
+      "severity": "MINOR",
+      "reason": "Natural intent choices terminology.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-078"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-1 اكتشاف الزائر، البحث، والفلترة",
+      "original": "كارت نية اختياريًا",
+      "corrected": "اختيار غرض الطلب اختياريًا",
+      "severity": "MINOR",
+      "reason": "Natural intent selection wording.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-079"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-1 اكتشاف الزائر، البحث، والفلترة",
+      "original": "عدّ المشاهدات المجهولة، أرسل وانسَ",
+      "corrected": "عدّ مرات الظهور من غير تحديد هوية الزائر، وإرسال الطلب من غير انتظار نتيجته",
+      "severity": "MAJOR",
+      "reason": "Impressions differ from views; explain fire-and-forget precisely.",
+      "risk": "Low: wording clarified; English requirement and protected technical text preserved.",
+      "id": "EA-080"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "# معمارية الـ Backend",
+      "original": "تسع موديولات",
+      "corrected": "تسعة موديولات",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-081"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "## الطبقات والوصول للبيانات",
+      "original": "رفيع: بيربط",
+      "corrected": "مسؤوليته محدودة: بيربط",
+      "severity": "MINOR",
+      "reason": "Thin Controller معناها إن مسؤوليته محدودة، مش وصف حجمه.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-082"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "## الطبقات والوصول للبيانات",
+      "original": "SQL مكتوب بإيد",
+      "corrected": "SQL مكتوب يدويًا",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-083"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "section": "## تركيب الـ Maven",
+      "original": "فوق الـ Boot BOM كـ Overrides لتحذيرات الاعتماديات (Dependency advisory)",
+      "corrected": "متجاوزًا إصدارات الـ Boot BOM لمعالجة التنبيهات الأمنية الخاصة بالاعتماديات (Dependency advisories)",
+      "severity": "MAJOR",
+      "reason": "Above the BOM يوضح تجاوز الإصدارات المُدارة استجابةً لتنبيهات أمنية؛ الصياغة القديمة مبهمة.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-084"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "# معمارية قاعدة البيانات",
+      "original": "SQL مكتوب بإيد",
+      "corrected": "SQL مكتوب يدويًا",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-085"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Migrations",
+      "original": "البيانات الاصطناعية (Synthetic) للتطوير",
+      "corrected": "البيانات التجريبية غير الحقيقية (Synthetic Data) المستخدمة في التطوير",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-086"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "# معمارية قاعدة البيانات",
+      "original": "الـ Schema مملوكة لـ Flyway SQL migrations",
+      "corrected": "بنية الـ Database Schema بتتحدد من خلال Flyway SQL migrations",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-087"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Migrations",
+      "original": "صاحب القرار في حالة الرفع",
+      "corrected": "المرجع المعتمد لحالة الرفع",
+      "severity": "MINOR",
+      "reason": "state authority وصف لمصدر الحالة المعتمد، مش لطرف بياخد قرار.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-088"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Migrations",
+      "original": "السياسات الحيّة",
+      "corrected": "السياسات الفعلية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-089"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الكيانات الأساسية والعلاقات",
+      "original": "مبالغ الـ Ledger الحيّة صفر والتسوية خامدة",
+      "corrected": "مبالغ الـ Ledger للمعاملات الفعلية صفر والتسوية غير مفعّلة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-090"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "## الـ Indexes اللي تستاهل تعرفها",
+      "original": "المسارات الساخنة",
+      "corrected": "المسارات الأكثر استخدامًا (Hot paths)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-091"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## الحزم المشتركة",
+      "original": "اللوحة اللونية والطباعة",
+      "corrected": "الألوان والخطوط (Typography)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-092"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## طبقة الوصول للـ API",
+      "original": "عند حافة العرض بس",
+      "corrected": "وقت العرض بس",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-093"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## ويب العميل (`apps/customer-web`)",
+      "original": "مربعات النيّة (intent tiles)",
+      "corrected": "مربعات اختيارات المستخدم (intent tiles)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-094"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## ويب العميل (`apps/customer-web`)",
+      "original": "أوردر مش متأكد",
+      "corrected": "أوردر لسه تسجيله مش مؤكّد",
+      "severity": "MAJOR",
+      "reason": "unconfirmed order هنا محاولة تسجيل نتيجتها غير مؤكدة، مش حالة قبول الأوردر من المطبخ.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-095"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "ده بسيط بس كتير الكلام",
+      "corrected": "ده بسيط بس بيولّد طلبات شبكة كتير",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-096"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## المبادئ (زي ما هي متنفّذة)",
+      "original": "للكائنات الغريبة",
+      "corrected": "للموارد اللي تخص حسابات تانية",
+      "severity": "MAJOR",
+      "reason": "foreign objects في Object Authorization معناها موارد حسابات تانية؛ غريبة مبهمة.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-097"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## الـ Claims المستخدمة من الـ Token",
+      "original": "Claims الضمان",
+      "corrected": "Claims مستوى التحقق (Assurance)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-098"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## مسارين للـ Authentication",
+      "original": "بأقصى جهد",
+      "corrected": "بأفضل محاولة ممكنة (best effort)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-099"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## سياسة الـ MFA: التخزين والفرض",
+      "original": "بأقصى جهد",
+      "corrected": "بأفضل محاولة ممكنة (best effort)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-100"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## سياسة الـ MFA: التخزين والفرض",
+      "original": "بتفشل بشكل مقفول (fail closed)",
+      "corrected": "بترفض العملية لو المتطلبات مش متاحة (fail closed)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-101"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## ضوابط أمان تانية تستاهل تعرفها",
+      "original": "بوابة فحص بتفشل بشكل مقفول",
+      "corrected": "بوابة فحص بترفض إتاحة الملف لو الفحص مش متاح أو مش ناجح (fail closed)",
+      "severity": "MAJOR",
+      "reason": "توضيح المعنى الأمني لـ fail closed من غير تخفيف شرط الفحص.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-102"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## تأمين المتصفح والـ Proxy",
+      "original": "السكريبتات والستايلات من النفس بس",
+      "corrected": "السكريبتات والستايلات من نفس الـ Origin بس",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-103"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## تأمين المتصفح والـ Proxy",
+      "original": "والصور من النفس و",
+      "corrected": "والصور من نفس الـ Origin و",
+      "severity": "MAJOR",
+      "reason": "self في CSP معناها نفس الـ Origin، مش ترجمة حرفية للنفس.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-104"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## تأمين المتصفح والـ Proxy",
+      "original": "و`connect-src` النفس وHost الـ API",
+      "corrected": "و`connect-src` بيسمح بنفس الـ Origin وHost الـ API",
+      "severity": "MAJOR",
+      "reason": "توضيح مصادر الاتصالات المسموحة في CSP.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-105"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "## الـ Sessions",
+      "original": "Sessions الويب هي صفوف في `SPRING_SESSION*` (V2)، فبتعدّي إعادة تشغيل الـ API وتعدد الـ Instances.",
+      "corrected": "Sessions الويب هي صفوف في `SPRING_SESSION*` (V2)، فبتفضل محفوظة بعد إعادة تشغيل الـ API وبتشتغل مع أكتر من Instance.",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-106"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "# البنية التحتية والـ Deployment",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-107"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## البيئات في نظرة سريعة",
+      "original": "Fixtures اصطناعية",
+      "corrected": "Fixtures ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-108"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## البيئات في نظرة سريعة",
+      "original": "اصطناعية بس، وعربون محاكى",
+      "corrected": "بيانات تجريبية غير حقيقية بس، وعربون محاكى",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-109"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## النسخ الاحتياطي والاسترجاع والـ Rollback",
+      "original": "لو نسخة الـ Schema ماتحركتش، الـ Rollback للصور بس آمن",
+      "corrected": "لو إصدار الـ Database Schema متغيّرش، الرجوع لإصدار Docker Images سابق بس آمن",
+      "severity": "MAJOR",
+      "reason": "تمييز Docker Images عن صور الميديا وتوضيح معيار إصدار Schema من المصدر.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-110"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## النسخ الاحتياطي والاسترجاع والـ Rollback",
+      "original": "ولو اتحركت، الـ Rollback للصور بس آمن بس لو",
+      "corrected": "ولو إصدارها اتغيّر، الرجوع لإصدار Docker Images سابق بس آمن بشرط إن",
+      "severity": "MAJOR",
+      "reason": "الإبقاء على شرط expand-only لكل Migration والتمييز عن Restore للبيانات.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-111"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## حدود جاهزية الـ Production (إيه اللي مش موجود)",
+      "original": "الفلوس الحقيقية مقفولة بالامتثال",
+      "corrected": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط باستيفاء متطلبات الامتثال",
+      "severity": "MAJOR",
+      "reason": "توضيح إن التفعيل ممنوع قبل متطلبات الامتثال، بدل التعبير المبهم عن قفل الفلوس.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-112"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "بيئة اصطناعية",
+      "corrected": "بيئة بيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-113"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "### التسليم: `DeliveryWorker`",
+      "original": "كل إرسال بيشيل",
+      "corrected": "كل إرسال بيحمل",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-114"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "### تشغيل الـ Outbox",
+      "original": "التسليمات الميتة",
+      "corrected": "عمليات التسليم اللي استنفدت محاولاتها (Dead deliveries)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-115"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "## الأنظمة الخارجية اللي الـ Backend بينادي عليها",
+      "original": "الفلوس الحقيقية مقفولة بقرار المالك D16",
+      "corrected": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بقرار المالك D16",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-116"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "## الأنظمة الخارجية اللي الـ Backend بينادي عليها",
+      "original": "بتفشل بشكل مقفول",
+      "corrected": "بترفض إتاحة الملف لو الفحص مش متاح أو مش ناجح (fail closed)",
+      "severity": "MAJOR",
+      "reason": "توضيح ضابط malware fail closed، مع بقاء منع إتاحة الملف.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-117"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## طبقة الـ State والـ Session والشبكة",
+      "original": "وعلم الـ Step-up",
+      "corrected": "وعلامة الـ Step-up (Flag)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-118"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## إشعارات الـ Push",
+      "original": "وعلم الـ Push",
+      "corrected": "وإعداد تفعيل الـ Push (Flag)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-119"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## الكود المشترك مقابل الكود الخاص بكل منصة",
+      "original": "SQL للـ Seed الاصطناعي (Synthetic)",
+      "corrected": "SQL لبيانات التهيئة التجريبية غير الحقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-120"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "section": "## طبقة الـ State والـ Session والشبكة",
+      "original": "فشل النقل (Transport) فبيخليها",
+      "corrected": "فشل الاتصال (Transport) فبيسيب الـ Session شغّالة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-121"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "section": "# نظرة عامة على السيستم",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-122"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "section": "## البيئات",
+      "original": "المعاينة المحدودة الوصول ببيانات اصطناعية",
+      "corrected": "المعاينة المحدودة الوصول ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-123"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "section": "## مين صاحب القرار في إيه",
+      "original": "سعر الوحدة اللي السلة فاكراه",
+      "corrected": "سعر الوحدة المحفوظ في السلة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-124"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+      "section": "# عقود الـ API",
+      "original": "مستند OpenAPI مكتوب بأنواع (Typed)",
+      "corrected": "مستند OpenAPI بأنواع بيانات محددة (Typed)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-125"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+      "section": "## الاتفاقيات اللي كل Endpoint بيمشي عليها",
+      "original": "`cursor` معتّم (Opaque)",
+      "corrected": "`cursor` قيمته مش مخصّصة للتفسير عند الـ Client (Opaque)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-126"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "section": "## `shared` — `backend/shared`",
+      "original": "Hook مسح الخصوصية",
+      "corrected": "Hook لمسح البيانات الشخصية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-127"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "section": "## `catalog` — الوجبات والميديا والاكتشاف والمفضلة والنشاط",
+      "original": "حراس النشر (Publication Guards)",
+      "corrected": "ضوابط السماح بالنشر (Publication Guards)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-128"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "section": "## `identity` — الحسابات وبيانات التواصل والـ Grants",
+      "original": "البيئات الاصطناعية (Synthetic)",
+      "corrected": "بيئات البيانات التجريبية غير الحقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-129"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "## ويب العميل — `apps/customer-web/`",
+      "original": "بانر لبيئات البيانات الاصطناعية/المعاينة",
+      "corrected": "بانر لبيئات البيانات التجريبية غير الحقيقية/المعاينة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-130"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "## ويب العمليات — `apps/operations-web/`",
+      "original": "طابور مطابقة العرابين",
+      "corrected": "طابور مراجعة وتسوية مدفوعات العربون",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-131"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "## تنفّذ فين",
+      "original": "ماتعملش Cast حوالين الأنواع المتولّدة",
+      "corrected": "ماتستخدمش Type cast عشان تتجاوز الأنواع المتولّدة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-132"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "# دليل كود الموبايل (تطبيق العميل)",
+      "original": "قبول الجهاز الفعلي وقارئ الشاشة",
+      "corrected": "اختبارات القبول على أجهزة فعلية وبقارئ الشاشة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-133"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "قبول الجهاز الفعلي وقارئ الشاشة",
+      "corrected": "اختبارات القبول على أجهزة فعلية وبقارئ الشاشة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-134"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "## الـ Authentication وتخزين الـ Session",
+      "original": "حالة شاشة تفضل عايشة",
+      "corrected": "حالة شاشة تفضل محفوظة من الحساب السابق",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-135"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "section": "## كود الطلب",
+      "original": "حاجز الانهيار (Crash Boundary)",
+      "corrected": "مكوّن احتواء أخطاء العرض (Crash Boundary)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-136"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## طبقتين Idempotency (ماتخلطش بينهم)",
+      "original": "بيتختم قدّام بـ 24 ساعة",
+      "corrected": "بيتحدد بوقت بعد 24 ساعة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-137"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "original": "المفتاح الناقص أو الغلط شكله",
+      "corrected": "المفتاح الناقص أو المكتوب بصيغة غير صحيحة",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-138"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "original": "حقول بادئتها الطول عشان مفيش قيمة تقلّد فاصل",
+      "corrected": "حقول بيسبق كل واحد فيها طوله، عشان محتوى أي حقل ميتفهمش على إنه فاصل",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-139"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "original": "للـ Fixtures الاصطناعية (Synthetic)",
+      "corrected": "للـ Fixtures ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-140"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "## خطوة بخطوة",
+      "original": "شايل رقم الطلب الحالي",
+      "corrected": "شايل معرّف طلب الـ API الحالي (Request ID)",
+      "severity": "MAJOR",
+      "reason": "current request id يشير لمعرّف HTTP request، مش رقم الأوردر.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-141"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "# شرح تنفيذ الدفع والكاش والـ Ledger",
+      "original": "الفلوس الحقيقية متقفّلة بـ Gate",
+      "corrected": "التعاملات المالية الحقيقية مش مفعّلة حاليًا وتفعيلها مرتبط بشروط الـ Gate",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-142"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "# شرح تنفيذ الدفع والكاش والـ Ledger",
+      "original": "الإطار المنتجي",
+      "corrected": "منظور المنتج",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-143"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ State Machine بتاعة العربون — `PaymentService`",
+      "original": "العربونات",
+      "corrected": "مدفوعات العربون",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-144"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ Gate بتاع الفلوس الحقيقية",
+      "original": "العربونات",
+      "corrected": "مدفوعات العربون",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-145"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ State Machine بتاعة العربون — `PaymentService`",
+      "original": "بيعلّم الفلوس إنها اتستلمت",
+      "corrected": "بيسجّل إن الفلوس اتستلمت",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-146"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "section": "## الـ Gate بتاع الفلوس الحقيقية",
+      "original": "حارس المعاينة/البيانات الاصطناعية (Synthetic)",
+      "corrected": "ضابط بيئات المعاينة/البيانات التجريبية غير الحقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-147"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## المبادئ في الكود",
+      "original": "السيرفر هو اللي بيملك كل مبلغ",
+      "corrected": "السيرفر هو اللي بيحدد كل مبلغ",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-148"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## المبادئ في الكود",
+      "original": "الأسعار بتتنسخ في الأوردرات، مبتتشاورش عليها",
+      "corrected": "الأسعار بتتنسخ جوه الأوردرات، ومبتتخزّنش كمجرد مراجع لقيمها الحالية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-149"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## إعادة تأكيد الـ Quote القديم في جهة العميل (D13)",
+      "original": "| النسب |",
+      "corrected": "| تحديد مصدر التغيير |",
+      "severity": "MAJOR",
+      "reason": "Attribution هنا تحديد المسؤول عن تغيّر السعر، مش نسب حسابية.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-150"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "# شرح تنفيذ التسعير",
+      "original": "القيم التجارية (الضريبة، الحدود) اصطناعية (Synthetic)",
+      "corrected": "القيم التجارية (الضريبة، الحدود) تجريبية وغير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-151"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## السعر بييجي منين",
+      "original": "للسياسات الاصطناعية بس",
+      "corrected": "للسياسات التجريبية غير الحقيقية بس",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-152"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "السياسة الاصطناعية",
+      "corrected": "السياسة التجريبية غير الحقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-153"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "original": "سياسة التطوير الاصطناعية",
+      "corrected": "سياسة التطوير التجريبية غير الحقيقية",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-154"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/repository-map-ar.md",
+      "section": "## المستوى الأعلى",
+      "original": "حزمة التخطيط المقروءة آليًا",
+      "corrected": "ملفات التخطيط القابلة للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-155"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "section": "## `packages/api-client` — `@matbakhy/api-client`",
+      "original": "والحداثة بيفحصها",
+      "corrected": "ومطابقة الكود لآخر توليد بيفحصها",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-156"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "section": "## `packages/design-tokens` — `@matbakhy/design-tokens`",
+      "original": "وهدف اللمس 44px",
+      "corrected": "ومساحة التفاعل باللمس 44px",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-157"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "section": "## المشاركة بين الويب والموبايل: إيه المشترك وإيه مش مشترك",
+      "original": "تحليل الفلوس (Parsing)",
+      "corrected": "قراءة القيم المالية والتحقق من صيغتها (Parsing)",
+      "severity": "MINOR",
+      "reason": "صياغة مصرية أوضح وأدق مع الحفاظ على معنى المصدر الإنجليزي.",
+      "risk": "لا تغيير في المتطلبات أو السلوك التقني.",
+      "id": "EA-158"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "section": "مسارين للـ Authentication",
+      "original": "التطبيق بيلغي الـ Refresh token (بأقصى جهد)",
+      "corrected": "التطبيق بيحاول يلغي الـ Refresh token بأفضل محاولة ممكنة (best effort)",
+      "severity": "MINOR",
+      "reason": "الإبقاء على best effort بوضوح ومن غير أقواس متداخلة.",
+      "risk": "لا تغيير في السلوك.",
+      "id": "EA-159"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "Independent semantic follow-up",
+      "original": "عمليات التسليم اللي استنفدت محاولاتها (Dead deliveries)",
+      "corrected": "عمليات التسليم المتوقفة نهائيًا (Dead deliveries)",
+      "severity": "MAJOR",
+      "reason": "Independent reviewer: DEAD also includes permanentFailure and inactive-recipient outcomes; do not narrow it to retry exhaustion.",
+      "risk": "Corrects ambiguity introduced during initial editorial revision; English unchanged.",
+      "id": "EA-160"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "Independent semantic follow-up",
+      "original": "طابور مراجعة وتسوية مدفوعات العربون",
+      "corrected": "طابور مطابقة مدفوعات العربون",
+      "severity": "MAJOR",
+      "reason": "Independent reviewer: preserve distinction of deposit reconciliation from commission settlement.",
+      "risk": "Corrects ambiguity introduced during initial editorial revision; English unchanged.",
+      "id": "EA-161"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "Two idempotency layers / Step by step",
+      "original": "إعادة التشغيل (Replay)",
+      "corrected": "إعادة تنفيذ نفس الأمر (Replay)",
+      "severity": "MAJOR",
+      "reason": "Independent reviewer: distinguish command replay from process restart, and recovery lookup from money refund.",
+      "risk": "No change to idempotency or permanent fingerprint guarantees.",
+      "id": "EA-162"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "Two idempotency layers / Step by step",
+      "original": "**فحص الاسترداد.**",
+      "corrected": "**فحص استرجاع الأوردر الموجود.**",
+      "severity": "MAJOR",
+      "reason": "Independent reviewer: distinguish command replay from process restart, and recovery lookup from money refund.",
+      "risk": "No change to idempotency or permanent fingerprint guarantees.",
+      "id": "EA-163"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "# البيئة المحلية",
+      "original": "بيانات اصطناعية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic fixtures, distinct from actual data.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-164"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## اللي بيوفّره `scripts/dev.sh`",
+      "original": "بيلف حوالين",
+      "corrected": "بيسهّل تشغيل وإدارة الخدمات المتعرّفة في",
+      "severity": "MINOR",
+      "reason": "Replace literal wraps with script purpose.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-165"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## اللي بيوفّره `scripts/dev.sh`",
+      "original": "مصرف بريد",
+      "corrected": "خدمة بتستقبل رسائل البريد التجريبية محليًا",
+      "severity": "MINOR",
+      "reason": "Mail sink is capture service, not an Arabic drain.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-166"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## اللي بيوفّره `scripts/dev.sh`",
+      "original": "بمستخدم وهمي، ودورة رفع خاص موقّع",
+      "corrected": "بمستخدم تجريبي، واختبار دورة رفع ملف خاص باستخدام رابط موقّع",
+      "severity": "MAJOR",
+      "reason": "Clarify signed private upload round trip.",
+      "risk": "Reduces ambiguity between signed file and signed upload URL; original round-trip test remains.",
+      "id": "EA-167"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## المستخدمين الوهميين",
+      "original": "وسياسة تجارة اصطناعية",
+      "corrected": "وسياسة تجارية ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic commerce policy.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-168"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## المستخدمين الوهميين",
+      "original": "بيتحسبوا بيئات اصطناعية",
+      "corrected": "بيتحسبوا بيئات ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic environment classification.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-169"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## الموبايل (تطبيق العميل)",
+      "original": "التدفقات الـ Native المتسكربتة",
+      "corrected": "خطوات الـ Native المؤتمتة بالسكريبتات",
+      "severity": "MINOR",
+      "reason": "Remove unnatural translated adjective.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-170"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "## تشغيل الـ API برّه Docker",
+      "original": "أبسط طريقة مدعومة للتكرار على الـ Backend",
+      "corrected": "أبسط طريقة مدعومة لتطوير الـ Backend وتجربة التعديلات",
+      "severity": "MINOR",
+      "reason": "Replace literal iterate with development cycle.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-171"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "section": "# المتطلبات المسبقة",
+      "original": "ولو الصفحة دي والملفات اختلفوا، صدّق الملفات",
+      "corrected": "ولو الصفحة دي والملفات اختلفوا، اعتمد على الملفات",
+      "severity": "MINOR",
+      "reason": "Professional source-of-truth instruction.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-172"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "section": "## الأدوات المطلوبة",
+      "original": "حتى لو شوية أوامر بدت شغّالة",
+      "corrected": "حتى لو بعض الأوامر باين إنها شغّالة",
+      "severity": "MINOR",
+      "reason": "Natural Egyptian tense.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-173"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+      "section": "## أنظمة التشغيل",
+      "original": "وشغل iOS الـ Native",
+      "corrected": "وتشغيل Job بناء iOS الـ Native",
+      "severity": "MINOR",
+      "reason": "Clarify CI job evidence.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-174"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## جرد الـ Workflows",
+      "original": "بيستنى Product CI أخضر",
+      "corrected": "بيستنى نجاح فحوصات Product CI",
+      "severity": "MINOR",
+      "reason": "Explain CI success without color shorthand.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-175"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## جرد الـ Workflows",
+      "original": "مالوش Product CI أخضر",
+      "corrected": "فحوصات Product CI مانجحتش عليه",
+      "severity": "MINOR",
+      "reason": "Explain missing successful CI.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-176"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## الـ Rollback والنسخ الاحتياطية",
+      "original": "الـ Rollback للصور بس آمن لما الـ Schema ماتحركتش",
+      "corrected": "الرجوع لإصدار Docker Images سابق بس آمن لما مفيش تغيير في إصدار أو بنية الـ Database Schema",
+      "severity": "MAJOR",
+      "reason": "Disambiguate Docker image rollback and schema condition.",
+      "risk": "Preserves alternative expand-only condition and database restore warning.",
+      "id": "EA-177"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## من الدمج لبيئة المعاينة",
+      "original": "صورتي `matbakhy-api` و`matbakhy-preview-front`",
+      "corrected": "الـ Docker Images بتاعة `matbakhy-api` و`matbakhy-preview-front`",
+      "severity": "MINOR",
+      "reason": "Distinguish Docker artifacts from media images.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-178"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## حدود الجاهزية للـ Production",
+      "original": "بيئة المعاينة اصطناعية (Synthetic)",
+      "corrected": "بيئة المعاينة بتستخدم بيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic preview data.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-179"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## حدود الجاهزية للـ Production",
+      "original": "ماتوصفش Deployment أخضر",
+      "corrected": "ماتوصفش Deployment نجح",
+      "severity": "MINOR",
+      "reason": "Replace color shorthand while preserving warning.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-180"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## من الدمج لبيئة المعاينة",
+      "original": "والـ Database مابتترجعش تلقائيًا",
+      "corrected": "والـ Database مابيتعملهاش Rollback تلقائيًا",
+      "severity": "MINOR",
+      "reason": "Specify rollback rather than vague return.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-181"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "section": "## قبل ما تفتح PR",
+      "original": "عشان توصل للأخضر",
+      "corrected": "عشان الفحوصات تنجح",
+      "severity": "MINOR",
+      "reason": "Preserve prohibition in clear technical language.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-182"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "section": "## وصف الـ PR",
+      "original": "العقود/الـ Migrations والأسطح",
+      "corrected": "العقود/الـ Migrations وواجهات التطبيق",
+      "severity": "MINOR",
+      "reason": "Replace literal product surfaces.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-183"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+      "section": "## قواعد الدمج",
+      "original": "فحوصات مطلوبة خضرا",
+      "corrected": "الفحوصات المطلوبة تكون ناجحة",
+      "severity": "MINOR",
+      "reason": "Describe successful required checks.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-184"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/branch-maintenance-ar.md",
+      "section": "## المبادئ",
+      "original": "الشغل الفريد عمره ما بيتحذف",
+      "corrected": "الشغل اللي لسه مش متدمج في الـ Branch المستهدف عمره ما بيتحذف",
+      "severity": "MINOR",
+      "reason": "Explain unique work in safe-cleanup rule.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-185"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/branch-maintenance-ar.md",
+      "section": "## المبادئ",
+      "original": "بقى آمن.",
+      "corrected": "بقى آمن للحذف.",
+      "severity": "MINOR",
+      "reason": "State safe operation explicitly.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-186"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## الملكية (على أساس الدور)",
+      "original": "الأدوار في البداية على أساس الدور مش أشخاص بالاسم.",
+      "corrected": "المسؤولية في البداية مرتبطة بالأدوار الوظيفية، مش بأشخاص بالاسم.",
+      "severity": "MINOR",
+      "reason": "Remove circular role-based translation.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-187"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## مزامنة النسخة العربي",
+      "original": "[ملف الاستثناءات](../translation-exceptions.json) المقروء بالآلة",
+      "corrected": "[ملف الاستثناءات](../translation-exceptions.json) القابل للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "Natural machine-readable terminology.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-188"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## مصفوفة تغيير التوثيق",
+      "original": "\"واحد على الأقل\" هو الحد الأدنى الحتمي.",
+      "corrected": "\"واحد على الأقل\" هو الحد الأدنى اللي الفحص الآلي بيفرضه.",
+      "severity": "MINOR",
+      "reason": "Clarify deterministic validation floor.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-189"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## حالة حماية الـ Branch",
+      "original": "المراجعة الدلالية فضلت واجب بشري أو مراجع مستقل",
+      "corrected": "مراجعة المعنى لسه مسؤولية إنسان أو مراجع مستقل",
+      "severity": "MINOR",
+      "reason": "Correct tense and unnatural duty wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-190"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "# بيئة المعاينة",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic preview classification.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-191"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## هي إيه",
+      "original": "وبياناتها اصطناعية",
+      "corrected": "وبياناتها تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Consistent synthetic data wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-192"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## هي إيه",
+      "original": "والكود بيعتبره بيئة اصطناعية",
+      "corrected": "والكود بيعتبره بيئة ببيانات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify environment treatment.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-193"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## استخدامها",
+      "original": "الصور الشغّالة، وإصدار الـ Schema",
+      "corrected": "الـ Docker Images الشغّالة، وإصدار الـ Schema",
+      "severity": "MINOR",
+      "reason": "Avoid confusion with media images.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-194"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "## استخدامها",
+      "original": "لو في Deployment واقف في الطابور",
+      "corrected": "لو في Deployment مستني دوره في التنفيذ",
+      "severity": "MINOR",
+      "reason": "Professional natural queue wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-195"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "section": "## النداء على الـ API",
+      "original": "الـ Client بتاع TypeScript المتولّد",
+      "corrected": "الـ Client المتولّد بـ TypeScript",
+      "severity": "MINOR",
+      "reason": "Natural attribution wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-196"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "section": "## الـ Debug على الـ Database",
+      "original": "الـ Migrations ملفات في اتجاه واحد بس",
+      "corrected": "الـ Migrations ملفات بتطبّق تغييرات لقدّام بس",
+      "severity": "MINOR",
+      "reason": "Explain forward-only migrations.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-197"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+      "section": "## الـ Debug على الـ Database",
+      "original": "عادة القراءة بس: استخدم",
+      "corrected": "خلّي التحقيق للقراءة بس: استخدم",
+      "severity": "MINOR",
+      "reason": "Natural diagnostic instruction.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-198"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## قواعد اختبارات الـ Backend (من الكود)",
+      "original": "عشان تجيب أخضر",
+      "corrected": "عشان الفحوصات تنجح",
+      "severity": "MINOR",
+      "reason": "Remove CI color shorthand.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-199"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## الأدلة والتعامل مع العيوب",
+      "original": "الـ CI الأخضر مش معناه",
+      "corrected": "نجاح فحوصات الـ CI مش معناه",
+      "severity": "MINOR",
+      "reason": "Precise verification limitation.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-200"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## كتالوج قبول المالك (200 حالة)",
+      "original": "فصدّق 200",
+      "corrected": "فاعتمد العدد 200",
+      "severity": "MINOR",
+      "reason": "Professional source-of-truth wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-201"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## الـ Fixtures الاصطناعية (Synthetic)",
+      "original": "مفيش غير أطراف وهمية",
+      "corrected": "مفيش غير حسابات تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic actors.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-202"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## الأدلة والتعامل مع العيوب",
+      "original": "معرّفات الـ Fixtures الاصطناعية",
+      "corrected": "معرّفات الـ Fixtures ذات البيانات التجريبية غير الحقيقية",
+      "severity": "MINOR",
+      "reason": "Consistent data terminology.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-203"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## الـ Stack المحلي",
+      "original": "بيستنى لحد 300 ثانية للصحة",
+      "corrected": "بيستنى لحد 300 ثانية عشان فحوصات الصحة تنجح",
+      "severity": "MINOR",
+      "reason": "Remove literal health wait.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-204"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## الاختبارات",
+      "original": "تنسيق محدد",
+      "corrected": "تنسيق حتمي بين العمليات المتزامنة",
+      "severity": "MAJOR",
+      "reason": "Translate deterministic coordination accurately.",
+      "risk": "Makes race-test synchronization precise without prescribing a new implementation.",
+      "id": "EA-205"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## الاختبارات",
+      "original": "لحد ما يبقى أخضر",
+      "corrected": "لحد ما ينجح",
+      "severity": "MINOR",
+      "reason": "Clear success wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-206"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+      "section": "## Git والـ PR والتوثيق",
+      "original": "رغم إن التشغيل المحلي أخضر",
+      "corrected": "رغم إن الفحوصات المحلية نجحت",
+      "severity": "MINOR",
+      "reason": "Clear local validation result.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-207"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## الأهداف",
+      "original": "مين الأطراف وإيه اللي يسمح لكل واحد يعمله",
+      "corrected": "مين الأطراف وإيه اللي مسموح لكل واحد يعمله",
+      "severity": "MINOR",
+      "reason": "Correct permission grammar.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-208"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## الأهداف",
+      "original": "والأسعار بيملكها السيرفر",
+      "corrected": "والسيرفر هو المسؤول عن تحديد الأسعار",
+      "severity": "MINOR",
+      "reason": "Clarify server authority without literal ownership.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-209"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## مهام عملية",
+      "original": "علّم على كل ضلع الطرف المسؤول",
+      "corrected": "علّم على كل سهم انتقال الطرف المسؤول",
+      "severity": "MINOR",
+      "reason": "Use state-machine edge terminology.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-210"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+      "section": "## مهام عملية",
+      "original": "شغل نظام زي انتهاء الصلاحية",
+      "corrected": "مهمة بيشغّلها النظام زي انتهاء الصلاحية",
+      "severity": "MINOR",
+      "reason": "Clarify system job actor.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-211"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## المُخرَج",
+      "original": "شرح مكتوب مختصر للمشي في الرحلات",
+      "corrected": "شرح مكتوب مختصر لخطوات الرحلات",
+      "severity": "MINOR",
+      "reason": "Natural written walkthrough.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-212"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## المُخرَج",
+      "original": "لكل سطح، أهم تلات شاشات",
+      "corrected": "لكل واجهة تطبيق، أهم تلات شاشات",
+      "severity": "MINOR",
+      "reason": "Replace literal product surface.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-213"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## مهام عملية",
+      "original": "أي صورة اصطناعية",
+      "corrected": "أي صورة تجريبية غير حقيقية",
+      "severity": "MINOR",
+      "reason": "Consistent synthetic example.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-214"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-3-backend-security-ar.md",
+      "section": "## الأهداف",
+      "original": "تتبّع Request واحد من الـ Controller للـ Database والرجوع.",
+      "corrected": "تتبّع Request واحد من الـ Controller للـ Database، وبعدها تتبّع رجوع النتيجة.",
+      "severity": "MINOR",
+      "reason": "Natural full round-trip tracing.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-215"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-4-development-ar.md",
+      "section": "## مهام عملية",
+      "original": "ارجع عن الكسر",
+      "corrected": "رجّع التنفيذ لحالته السليمة",
+      "severity": "MINOR",
+      "reason": "Remove literal undo break.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-216"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-4-development-ar.md",
+      "section": "## مهام عملية",
+      "original": "قبل ما الصور تتبني",
+      "corrected": "قبل ما الـ Docker Images تتبني",
+      "severity": "MINOR",
+      "reason": "Distinguish deployment artifacts from media.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-217"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## الخطوات",
+      "original": "ومحصور في موديول أو سطح واحد",
+      "corrected": "ومحصور في موديول أو واجهة تطبيق واحدة",
+      "severity": "MINOR",
+      "reason": "Replace literal surface.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-218"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## الخطوات",
+      "original": "خلّي القواعد اللي يملكها السيرفر على السيرفر",
+      "corrected": "خلّي القواعد اللي السيرفر مسؤول عنها على السيرفر",
+      "severity": "MINOR",
+      "reason": "Natural server authority wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-219"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## المُخرَج",
+      "original": "فحوصات مطلوبة خضرا",
+      "corrected": "فحوصات مطلوبة ناجحة",
+      "severity": "MINOR",
+      "reason": "Clear success wording.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-220"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+      "section": "## فحص ذاتي",
+      "original": "ماحطيتش إيدي على `main`",
+      "corrected": "ماعدّلتش `main`",
+      "severity": "MINOR",
+      "reason": "Professional precise change boundary.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-221"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "# التقييم النهائي",
+      "original": "بيانات مصطنعة (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "severity": "MINOR",
+      "reason": "Consistent synthetic-data terminology.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-222"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 4. التشغيل والـ Debug",
+      "original": "ويحل عطل واحد محقون",
+      "corrected": "ويحل عطل واحد المقيّم أدخله عمدًا",
+      "severity": "MINOR",
+      "reason": "Remove literal injected fault.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-223"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 4. التشغيل والـ Debug",
+      "original": "نسخة من الـ Terminal",
+      "corrected": "سجل مخرجات الـ Terminal",
+      "severity": "MINOR",
+      "reason": "Specify terminal transcript.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-224"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 6. كتابة الاختبارات وتشغيلها",
+      "original": "مخرجات بتوري أحمر وبعدين أخضر",
+      "corrected": "مخرجات بتوري فشل الاختبار وبعدين نجاحه",
+      "severity": "MINOR",
+      "reason": "Clarify test evidence.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-225"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 9. فهم الـ Deployment لبيئة المعاينة",
+      "original": "لبناء الصور بـ commit SHA",
+      "corrected": "لبناء الـ Docker Images بـ commit SHA",
+      "severity": "MINOR",
+      "reason": "Distinguish Docker artifacts.",
+      "risk": "None; technical requirement and protected text unchanged.",
+      "id": "EA-226"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## من الدمج لبيئة المعاينة",
+      "original": "وبيستنى صحة الـ API",
+      "corrected": "وبيستنى فحوصات صحة الـ API تنجح",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "risk": "None; original requirement and protected content preserved.",
+      "id": "EA-227"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+      "section": "## المُخرَج",
+      "original": "لقطات شاشة لبيانات اصطناعية بس",
+      "corrected": "لقطات شاشة لبيانات تجريبية غير حقيقية بس",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "risk": "None; original requirement and protected content preserved.",
+      "id": "EA-228"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "### 2. شرح مسارات العميل والمطبخ والموبايل والـ Back Office",
+      "original": "كل شاشة/سطح",
+      "corrected": "كل شاشة/واجهة تطبيق",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "risk": "None; original requirement and protected content preserved.",
+      "id": "EA-229"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+      "section": "## تصنيف الاختبارات (إيه بيثبت إيه)",
+      "original": "الصحة الساكنة",
+      "corrected": "سلامة الأنواع والكود بالفحص الساكن",
+      "severity": "MINOR",
+      "reason": "Clarify literal technical wording in its full English section context.",
+      "risk": "None; original requirement and protected content preserved.",
+      "id": "EA-230"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "القرارات موجودة في أربع أماكن",
+      "corrected": "القرارات موجودة في أربعة أماكن",
+      "severity": "MINOR",
+      "reason": "تصحيح العدد مع أماكن.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-231"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "السجل المقروء آليًا",
+      "corrected": "السجل القابل للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "صياغة واضحة لـ machine-readable.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-232"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "السجل البشري",
+      "corrected": "السجل المكتوب للقراءة البشرية",
+      "severity": "MINOR",
+      "reason": "Human register يصف جمهور المستند مش نوع السجل.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-233"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "مستندات موضوعية فيها تفاصيل قرارات بعينها",
+      "corrected": "مستندات متخصصة فيها تفاصيل قرارات بعينها",
+      "severity": "MINOR",
+      "reason": "Topic documents مش مستندات محايدة أو موضوعية.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-234"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "القرار `ACCEPTED` لازم يشيل مرجع موافقة؛ والـ `OPEN` ميكونش ليه قيمة وليه Gate",
+      "corrected": "القرار `ACCEPTED` لازم يكون معاه مرجع موافقة؛ والقرار `OPEN` لازم يكون من غير قيمة وله Gate",
+      "severity": "MINOR",
+      "reason": "إزالة التركيب الملتبس مع إبقاء الشرطين الصريحين.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-235"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "اتحل محله جزئيًا بـ D16",
+      "corrected": "D16 حلّ محل جزء منه",
+      "severity": "MINOR",
+      "reason": "تصحيح تركيب الاستبدال.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-236"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "والفلوس الحقيقية متقفّلة بـ Gate",
+      "corrected": "والتعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل",
+      "severity": "MINOR",
+      "reason": "توضيح live money gated مع إبقاء شرط التفعيل.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-237"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "أيوه (اصطناعي (Synthetic)/معاينة بس)",
+      "corrected": "أيوه (للاستخدام التجريبي غير الحقيقي (Synthetic)/بيئة المعاينة بس)",
+      "severity": "MINOR",
+      "reason": "إزالة تداخل الأقواس والتمييز عن الاستخدام الحقيقي.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-238"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "قيم اصطناعية في الكود",
+      "corrected": "قيم تجريبية غير حقيقية (Synthetic) في الكود",
+      "severity": "MINOR",
+      "reason": "توضيح synthetic policy values دون وصفها ببيانات عملاء.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-239"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## الـ ADRs في `docs/engineering/01-architecture.md`",
+      "original": "موديولات الـ Domain بتتكلم عن طريق حزم",
+      "corrected": "موديولات الـ Domain بتتواصل عن طريق حزم",
+      "severity": "MINOR",
+      "reason": "صياغة هندسية طبيعية للاتصال بين الموديولات.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-240"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## روابط الإحلال والاستبدال اللي ممكن يتحقق منها",
+      "original": "\"MFA للموظفين إلزامي عالميًا\"",
+      "corrected": "\"MFA إلزامي لكل الموظفين\"",
+      "severity": "MAJOR",
+      "reason": "Universally mandatory تعني كل الموظفين مش النطاق الجغرافي.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-241"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/branch-cleanup-audit-2026-10-20-ar.md",
+      "section": "## اللي اتمسح (كل الـ Commits أسلاف لـ `develop` وقتها؛ الاسترجاع بـ `git branch <name> <sha>`)",
+      "original": "الـ Branches السبعة `test/doc001-*` كانت Branches اختبار فرض مؤقتة",
+      "corrected": "الـ Branches السبعة `test/doc001-*` كانت Branches مؤقتة لاختبار تطبيق القواعد",
+      "severity": "MINOR",
+      "reason": "توضيح enforcement tests.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-242"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/branch-cleanup-audit-2026-10-20-ar.md",
+      "section": "## اللي اتمسح (كل الـ Commits أسلاف لـ `develop` وقتها؛ الاسترجاع بـ `git branch <name> <sha>`)",
+      "original": "وفضلت رؤوس الـ PRs على GitHub",
+      "corrected": "وفضلت نسخ الـ Head بتاعة الـ PRs على GitHub",
+      "severity": "MINOR",
+      "reason": "إزالة الترجمة الحرفية لكلمة heads.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-243"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "# خريطة التوثيق والمصادر المرجعية",
+      "original": "للنية → المستندات الموضوعية",
+      "corrected": "لمعرفة السلوك المقصود → المستندات المتخصصة",
+      "severity": "MINOR",
+      "reason": "توضيح intent وtopic documents في ترتيب المصادر.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-244"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "# خريطة التوثيق والمصادر المرجعية",
+      "original": "`docs/product/04-state-machines.md` (النية)",
+      "corrected": "`docs/product/04-state-machines.md` (السلوك المقصود)",
+      "severity": "MINOR",
+      "reason": "توضيح دور مرجع state machines.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-245"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "# خريطة التوثيق والمصادر المرجعية",
+      "original": "`docs/product/06-permissions.md` (النية)",
+      "corrected": "`docs/product/06-permissions.md` (الصلاحيات المقصودة)",
+      "severity": "MINOR",
+      "reason": "توضيح دور مرجع الصلاحيات.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-246"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "## التكرار المعروف",
+      "original": "`docs/product/*` (النية)",
+      "corrected": "`docs/product/*` (السلوك المقصود)",
+      "severity": "MINOR",
+      "reason": "توضيح توثيق intent.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-247"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "## ",
+      "original": "مستندات تاريخية أو لحظية (ماتعتبرهاش حالية)",
+      "corrected": "مستندات تاريخية أو بتسجّل الحالة في وقت معيّن (ماتعتبرهاش حالية)",
+      "severity": "MINOR",
+      "reason": "Point-in-time مش لحظي أو realtime.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-248"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## الإعداد والأدوات",
+      "original": "بيتولّدوا في ملف env بتاعك انت والمتجاهل من git بواسطة",
+      "corrected": "بتتولّد في ملف env خاص بيك وGit بيتجاهله، عن طريق",
+      "severity": "MINOR",
+      "reason": "تصحيح المطابقة وصياغة git-ignored.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-249"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## المنتج والكود",
+      "original": "الفلوس الحقيقية لسه متقفّل عليها بـ Gates",
+      "corrected": "التعاملات المالية الحقيقية لسه مش مفعّلة لحد استيفاء شروط التفعيل",
+      "severity": "MINOR",
+      "reason": "توضيح تعطيل التعاملات مع إبقاء الـ gates.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-250"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## الاختبارات والأدلة",
+      "original": "**الـ CI الأخضر بيثبت إيه؟** بيثبت إن الـ Jobs المذكورة في",
+      "corrected": "**نجاح فحوصات الـ CI بيثبت إيه؟** بيثبت إن الـ Jobs المذكورة في",
+      "severity": "MINOR",
+      "reason": "توضيح green CI بلغة مباشرة.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-251"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## الاختبارات والأدلة",
+      "original": "ببيانات اصطناعية (Synthetic) وLogs متنضّفة",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data) وLogs بعد إزالة المعلومات الحساسة منها",
+      "severity": "MINOR",
+      "reason": "توضيح synthetic وsanitized logs دون تخفيف التحذير.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-252"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## Git والـ PR والـ CI",
+      "original": "وبعدها الـ Images بـ Commit SHA",
+      "corrected": "وبعدها Docker Images متوسمة بالـ Commit SHA",
+      "severity": "MAJOR",
+      "reason": "التمييز بين Docker Images وصور الميديا.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-253"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## Git والـ PR والـ CI",
+      "original": "الـ Database مابترجعش لورا أوتوماتيك",
+      "corrected": "مفيش Rollback تلقائي للـ Database",
+      "severity": "MINOR",
+      "reason": "إزالة التعبير المبهم مع إبقاء عدم الرجوع التلقائي.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-254"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## المعاينة والتشغيل",
+      "original": "لا: بيانات اصطناعية، وبانر Demo",
+      "corrected": "لا: بيانات تجريبية غير حقيقية (Synthetic Data)، وبانر Demo",
+      "severity": "MINOR",
+      "reason": "تمييز بيانات المعاينة عن بيانات العملاء.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-255"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "# محاكاة المطوّر الجديد (الجاهزية للأسبوع الأول)",
+      "original": "والصف الناقص بيفشل بأمان إلى REQUIRED",
+      "corrected": "ولو صف السياسة مش موجود، النظام بيطبّق REQUIRED كاختيار آمن",
+      "severity": "MAJOR",
+      "reason": "fail safe يصف اختيار REQUIRED مش فشل العملية.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-256"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "# محاكاة المطوّر الجديد (الجاهزية للأسبوع الأول)",
+      "original": "CI، Images بـ SHA",
+      "corrected": "CI، Docker Images متوسمة بالـ SHA",
+      "severity": "MINOR",
+      "reason": "توضيح نوع الصور.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-257"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "## عيوب التوثيق اللي اتلاقت واللي اتعمل فيها",
+      "original": "مسارات Truncated/nonexistent في صفحة الفجوات",
+      "corrected": "مسارات ناقصة أو مش موجودة في صفحة الفجوات",
+      "severity": "MINOR",
+      "reason": "إزالة خلط إنجليزي غير ضروري.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-258"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "## المتطلبات المسبقة الخفية اللي اتكشفت",
+      "original": "و`gh` متوثّق",
+      "corrected": "و`gh` مسجّل دخول بحساب مصرح له",
+      "severity": "MINOR",
+      "reason": "Authenticated مش موثّق كمستند.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-259"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "# سجل المراجعات المستقلة (الدليل وDOC-001)",
+      "original": "مقدروش يشغّلوا Stack بتاع Java/Docker",
+      "corrected": "مقدروش يشغّلوا الـ Stack بتاع Java/Docker",
+      "severity": "MINOR",
+      "reason": "إضافة أداة التعريف الناقصة.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-260"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "## الجولة 1 (الـ Commit `6c94a7c`)",
+      "original": "اقتباسات من غير المستندات",
+      "corrected": "الاستشهاد بملفات مش مستندات",
+      "severity": "MAJOR",
+      "reason": "non-doc citations تعني مراجع غير توثيقية.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-261"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "## الجولة 2 (الـ Commit `5238465`)",
+      "original": "سحب موافقة المراجعة بعد تشغيل أخضر مش بيتعاد تقييمه",
+      "corrected": "سحب موافقة المراجعة بعد نجاح الفحص مش بيتعاد تقييمه",
+      "severity": "MINOR",
+      "reason": "توضيح green run.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-262"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "## الجولة 2 (الـ Commit `5238465`)",
+      "original": "فشل لسبب ده",
+      "corrected": "فشل للسبب ده",
+      "severity": "MINOR",
+      "reason": "تصحيح نحوي.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-263"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 2. تعارضات بين التوثيق والكود (مستندات المصدر لسه محتاجة تتصلّح)",
+      "original": "بلاطات النية (\"وجبة ليا/لينا\"، \"كمّل سفرتي\"، \"جهّز تجمّع\")",
+      "corrected": "بطاقات اختيار الغرض من الطلب (\"وجبة ليا/لينا\"، \"كمّل سفرتي\"، \"جهّز عزومة\")",
+      "severity": "MINOR",
+      "reason": "Intent tiles ترجمة حرفية مربكة، وgathering عزومة في سياق المنتج.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-264"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 2. تعارضات بين التوثيق والكود (مستندات المصدر لسه محتاجة تتصلّح)",
+      "original": "مفيش منتج تموين (Catering)",
+      "corrected": "مفيش منتج مخصص لتجهيز أكل المناسبات (Catering)",
+      "severity": "MAJOR",
+      "reason": "تموين قد تفهم كتوريد سلع مدعمة.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-265"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 4. مناطق التغطية الآلية فيها ضعيفة",
+      "original": "واختبارات الـ Proxy بتتخطّى لما صور caddy/python مش موجودة",
+      "corrected": "واختبارات الـ Proxy بتتخطّى لما Docker Images الخاصة بـ caddy/python مش موجودة",
+      "severity": "MINOR",
+      "reason": "تمييز Docker Images عن الميديا.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-266"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 5. اللي NOT VERIFIED في الدليل كله",
+      "original": "وتصحيح الـ IDE لـ API الموجود في Container",
+      "corrected": "وتتبّع أخطاء الـ API اللي شغّال في Container باستخدام الـ IDE",
+      "severity": "MAJOR",
+      "reason": "Debugging مش تصحيح الـ IDE نفسه.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-267"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 6. التكرار",
+      "original": "عشان نتجنب انجراف جديد",
+      "corrected": "عشان نتجنب اختلاف النسخ عن بعض مع الوقت",
+      "severity": "MINOR",
+      "reason": "إزالة الترجمة الحرفية لـ drift.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-268"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "# حالة التنفيذ",
+      "original": "ومعناها أبدًا مش \"شغّال فعليًا\": مفيش بيئة Production، والفلوس الحقيقية متقفّل عليها بـ Gate (D16)، وبيئة PREVIEW ببيانات اصطناعية (Synthetic) بس هي اللي اتنشرت",
+      "corrected": "وعمرها ما تعني \"شغّال في بيئة الإنتاج\": مفيش بيئة Production، والتعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل (D16)، وبيئة PREVIEW ببيانات تجريبية غير حقيقية (Synthetic Data) بس هي اللي اتنشرت",
+      "severity": "MINOR",
+      "reason": "توضيح live وتمييز التنفيذ عن نجاح الاختبارات أو التشغيل الحقيقي.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-269"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وـ Job الانتهاء",
+      "corrected": "والـ Job الخاص بانتهاء المهلة",
+      "severity": "MINOR",
+      "reason": "تصحيح تركيب التعريف وتوضيح expiry job.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-270"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وـ Outbox Dispatcher",
+      "corrected": "والـ Outbox Dispatcher",
+      "severity": "MINOR",
+      "reason": "تصحيح أداة التعريف.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-271"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وـ Feature Flags",
+      "corrected": "والـ Feature Flags",
+      "severity": "MINOR",
+      "reason": "تصحيح أداة التعريف.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-272"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "قدرة نايمة:",
+      "corrected": "إمكانية موجودة تقنيًا لكنها مش مفعّلة:",
+      "severity": "MINOR",
+      "reason": "توضيح dormant capability.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-273"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "**الفلوس الحقيقية متقفّل عليها**",
+      "corrected": "**التعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل**",
+      "severity": "MINOR",
+      "reason": "توضيح التحذير مع الحفاظ على منع التفعيل.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-274"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## البيئات والعمليات",
+      "original": "المعاينة (بيانات اصطناعية،",
+      "corrected": "المعاينة (بيانات تجريبية غير حقيقية (Synthetic Data)،",
+      "severity": "MINOR",
+      "reason": "توحيد معنى بيانات المعاينة.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-275"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## التعارضات اللي اتلاقت بين المستندات والكود",
+      "original": "NOT VERIFIED إزاي بيعمل الـ Native Builds Authentication على المعاينة",
+      "corrected": "NOT VERIFIED إزاي الـ Native Builds بتعمل Authentication على المعاينة",
+      "severity": "MINOR",
+      "reason": "تصحيح ترتيب الفاعل والفعل.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-276"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 2. الـ Authorization (الأدوار والصلاحيات ونطاق الـ Object)",
+      "original": "والـ Objects الغريبة بترد 404",
+      "corrected": "والـ Objects اللي خارج نطاق صلاحية المستخدم بترجّع 404",
+      "severity": "MAJOR",
+      "reason": "Foreign objects تعني خارج نطاق صلاحية المستخدم مش غريبة.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-277"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 2. الـ Authorization (الأدوار والصلاحيات ونطاق الـ Object)",
+      "original": "والأدوار في الـ Claims بتتتجاهل",
+      "corrected": "والأدوار في الـ Claims بيتم تجاهلها",
+      "severity": "MINOR",
+      "reason": "تصحيح صياغة مبنية للمجهول.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-278"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 6. التسعير وعروض الأسعار اللي مبقتش مواكبة للشروط الحالية (Stale quotes)",
+      "original": "BR-019 السيرفر بيحسب الجنيه كأرقام صحيحة",
+      "corrected": "BR-019 السيرفر بيحسب مبالغ EGP بوحدات صحيحة",
+      "severity": "MAJOR",
+      "reason": "إبقاء integer EGP كما في المصدر دون الإيحاء بتقريب لجنيه كامل.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-279"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 7. حجز السعة",
+      "original": "BR-025 آخر حصة متزامنة مابتتباعش زيادة",
+      "corrected": "BR-025 الطلبات المتزامنة على آخر حصة ماينفعش تبيع أكتر من المتاح",
+      "severity": "MAJOR",
+      "reason": "الحصة نفسها مش متزامنة؛ الطلبات هي المتزامنة.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-280"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 7. حجز السعة",
+      "original": "BR-029 الإفراج مرة واحدة بالظبط؛ والمستهلك يفضل مستهلك",
+      "corrected": "BR-029 تحرير المخزون المحجوز مرة واحدة بالظبط؛ والمخزون المستهلك يفضل مستهلك",
+      "severity": "MINOR",
+      "reason": "تمييز release عن الإفراج وتوضيح حالة المخزون.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-281"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 12. MFA",
+      "original": "الصف الناقص بيفشل بأمان إلى REQUIRED",
+      "corrected": "لو صف السياسة مش موجود، النظام بيطبّق REQUIRED كاختيار آمن",
+      "severity": "MAJOR",
+      "reason": "fail safe تعني اختيار السياسة الأشد، مش فشل مجهول.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-282"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 12. MFA",
+      "original": "إعادة ضبط الأدمن بتشيل العامل، وتنهي الجلسات، ومتدقَّقة",
+      "corrected": "إعادة ضبط MFA بواسطة الأدمن بتشيل عامل التحقق، وبتنهي الجلسات، وبتتسجّل في سجل التدقيق",
+      "severity": "MAJOR",
+      "reason": "تمييز إجراء الأدمن عن إعادة ضبط حساب الأدمن وتوضيح audited.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-283"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 5. تسجيل الأوردر",
+      "original": "والرد المجهول بيتحلّ بالبحث",
+      "corrected": "ولو نتيجة الطلب مش معروفة، بيتحقق منها بالبحث",
+      "severity": "MINOR",
+      "reason": "Unknown response مش رد مجهول الهوية.",
+      "risk": "Preserve English meaning; no executable or identifier change.",
+      "id": "EA-284"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "حماية آخر أدمن والتصعيد الذاتي",
+      "corrected": "حماية آخر أدمن ومنع التصعيد الذاتي للصلاحيات",
+      "severity": "MAJOR",
+      "reason": "Independent review: avoid security-control polarity ambiguity.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-285"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وإعادة ضبط الأدمن",
+      "corrected": "وإعادة ضبط MFA بواسطة الأدمن",
+      "severity": "MAJOR",
+      "reason": "Independent review: clarify actor and target of reset.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-286"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 6. التسعير وعروض الأسعار اللي مبقتش مواكبة للشروط الحالية (Stale quotes)",
+      "original": "مبالغ EGP بوحدات صحيحة",
+      "corrected": "مبالغ EGP بالقروش كأرقام صحيحة",
+      "severity": "MAJOR",
+      "reason": "Independent review: full handbook specifies integer piastres.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-287"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "أيوه (للاستخدام التجريبي غير الحقيقي (Synthetic)/بيئة المعاينة بس)",
+      "corrected": "أيوه (للاستخدام ببيانات تجريبية غير حقيقية (Synthetic Data) أو في بيئة المعاينة بس)",
+      "severity": "MINOR",
+      "reason": "Independent review: natural synthetic/preview restriction.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-288"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## حالة حماية الـ Branch",
+      "original": "إلغاء الموافقة بعد تشغيل DOC-001 أخضر",
+      "corrected": "إلغاء الموافقة بعد نجاح فحص DOC-001",
+      "severity": "MINOR",
+      "reason": "Use successful check instead of color shorthand.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-289"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-policy-ar.md",
+      "section": "## 4. التحقق من التوثيق (بيشتغل دايمًا)",
+      "original": "عمرك ما تقرا الفحص الأخضر على إنه شهادة دقة",
+      "corrected": "عمرك ما تعتبر نجاح الفحص شهادة على دقة المحتوى",
+      "severity": "MINOR",
+      "reason": "Explain green check without color shorthand.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-290"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-policy-ar.md",
+      "section": "## 5. حوكمة البوابة نفسها",
+      "original": "فالنتيجة الخضرا ممكن تعيش بعد إلغاء لاحق للموافقة",
+      "corrected": "فنتيجة النجاح ممكن تفضل ظاهرة حتى بعد إلغاء الموافقة",
+      "severity": "MINOR",
+      "reason": "Natural rendering of green result outliving approval dismissal.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-291"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## افتراضات الجغرافيا والحجم",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "Glossary: synthetic development zones are not real service areas.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-292"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "## الرحلات",
+      "original": "(بيانات اصطناعية (Synthetic)، للـ CI بس)",
+      "corrected": "(بيانات تجريبية غير حقيقية (Synthetic Data)، للـ CI بس)",
+      "severity": "MINOR",
+      "reason": "Glossary: distinguish synthetic native seed data.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-293"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "section": "# رؤية المنتج",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "Glossary: synthetic MVP data.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-294"
+    },
+    {
+      "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "section": "## مراحل الإصدار",
+      "original": "المسارات الأساسية ببيانات اصطناعية؛",
+      "corrected": "المسارات الأساسية ببيانات تجريبية غير حقيقية؛",
+      "severity": "MINOR",
+      "reason": "Glossary: synthetic scope before live-money gates.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-295"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-6 تقارير الكاش والعربون من المطبخ",
+      "original": "IMPLEMENTED (بيانات اصطناعية (Synthetic)؛",
+      "corrected": "IMPLEMENTED (بيانات تجريبية غير حقيقية (Synthetic Data)؛",
+      "severity": "MINOR",
+      "reason": "Glossary: synthetic implementation status preserved.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-296"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-2 موافقة الـ Staff وإنشاء المطبخ",
+      "original": "`FORBIDDEN` مراجعة النفس",
+      "corrected": "`FORBIDDEN` لما الشخص يراجع طلبه بنفسه",
+      "severity": "MINOR",
+      "reason": "Clarify self-review refusal.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-297"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "# البيئة المحلية",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-298"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "# بيئة المعاينة",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-299"
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## حدود الجاهزية للـ Production",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-300"
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "# التقييم النهائي",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "severity": "MINOR",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "risk": "English technical meaning preserved; protected text unchanged.",
+      "id": "EA-301"
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد",
+      "corrected": "استلام المطبخ، النزاعات، المطابقة، تبليغ الاسترداد",
+      "severity": "MAJOR",
+      "reason": "Reconciliation of deposit reports is distinct from commission Settlement.",
+      "risk": "Preserve deposit dispute workflow; do not imply money settlement.",
+      "id": "EA-302"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "",
+      "original": "حالات التسوية (Reconciliation)",
+      "corrected": "حالات المطابقة (Reconciliation)",
+      "severity": "MAJOR",
+      "reason": "Payment reconciliation differs from commission settlement.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-303"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "",
+      "original": "وقت التجهيز المسبق",
+      "corrected": "مهلة الطلب المسبق (lead time)",
+      "severity": "MAJOR",
+      "reason": "Lead time sets cutoff before slot; not cooking preparation time.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-304"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "",
+      "original": "سكريبت التسوية",
+      "corrected": "سكريبت مطابقة البيانات",
+      "severity": "MAJOR",
+      "reason": "Counter reconciliation checks allocations; no financial settlement occurs.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-305"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "",
+      "original": "السكريبت `scripts/db-backup.sh` بيكتب",
+      "corrected": "المقصود بالتسوية في عنوان القسم هو مطابقة البيانات (Reconciliation)، مش التسوية المالية (Settlement). السكريبت `scripts/db-backup.sh` بيكتب",
+      "severity": "MAJOR",
+      "reason": "Clarify legacy heading in existing paragraph while preserving its anchor and structural parity.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-306"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "section": "",
+      "original": "كل أعداد التسوية تكون صفر",
+      "corrected": "كل أعداد الاختلافات اللي فحص المطابقة بيطلعها تكون صفر",
+      "severity": "MAJOR",
+      "reason": "Zero applies to reconciliation discrepancies, not settlement counts.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-307"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "",
+      "original": "وتسوية قراءة بس",
+      "corrected": "وفحص مطابقة البيانات للقراءة بس",
+      "severity": "MAJOR",
+      "reason": "Provisioning performs read-only reconciliation, not settlement.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-308"
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "section": "",
+      "original": "وبيعمل له تسوية",
+      "corrected": "وبيفحص مطابقة بياناته",
+      "severity": "MAJOR",
+      "reason": "Restore reconciliation verifies data rather than financial settlement.",
+      "risk": "Clarifies distinct technical concepts without changing behaviour or executable text.",
+      "id": "EA-309"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "Independent follow-up",
+      "original": "اختيار اختيار غرض الطلب اختياريًا",
+      "corrected": "اختيار كارت لغرض الطلب اختياريًا",
+      "severity": "MINOR",
+      "reason": "Introduced duplicated wording.",
+      "risk": "Ambiguous presence/removal of security fields; repaired and independently rechecked.",
+      "id": "EA-310"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "Independent follow-up",
+      "original": "ويشيل الـ `state` بتاعنا وكود `code`",
+      "corrected": "ويحتوي على الـ `state` بتاعنا وكود `code`",
+      "severity": "MAJOR",
+      "reason": "carry must not be read as remove in redirect security check.",
+      "risk": "Ambiguous presence/removal of security fields; repaired and independently rechecked.",
+      "id": "EA-311"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "Independent follow-up",
+      "original": "كل طلب بيشيل `Accept-Language`",
+      "corrected": "كل طلب بيحتوي على `Accept-Language`",
+      "severity": "MAJOR",
+      "reason": "Preserve required header presence.",
+      "risk": "Ambiguous presence/removal of security fields; repaired and independently rechecked.",
+      "id": "EA-312"
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "Independent follow-up",
+      "original": "كل `POST` بيغيّر أوردر بيشيل `Idempotency-Key` و`expectedVersion`",
+      "corrected": "كل `POST` بيغيّر أوردر بيحتوي على `Idempotency-Key` و`expectedVersion`",
+      "severity": "MAJOR",
+      "reason": "Preserve required idempotency and concurrency fields.",
+      "risk": "Ambiguous presence/removal of security fields; repaired and independently rechecked.",
+      "id": "EA-313"
+    }
+  ]
+}
