@@ -94,9 +94,12 @@ sudo usermod -aG users aiagent          # NO sudo and NO docker for aiagent, eve
 # 3. SSH: key-only login for each account that needs it, using public keys you generate for the exercise
 sudo install -d -m 700 -o <user> -g <user> /home/<user>/.ssh
 # append the exercise public key to /home/<user>/.ssh/authorized_keys, then: chmod 600 and chown <user>:<user>
+#    (copy the public key from your laptop to the exercise server first, for example by pasting it; the private key never leaves your laptop)
+#    Keep a working administrator key for yourself on the exercise server until every later step is done; do not delete the only key you use to log in
 # 4. Deployment directory ownership and modes recorded on the live host:
 sudo install -d -m 755 -o devops -g devops /srv/matbakhy-staging
-# the .env file inside deploy/web-preview is created by deploy.sh init-secrets with mode 600 (see the rebuild guide)
+# on the exercise server, the .env file inside deploy/web-preview is created by deploy.sh init-secrets with mode 600 (see the rebuild guide).
+# That is the supported creation method; how the live .env was created is NOT VERIFIED.
 ```
 
 Before using the outline, confirm each line against the [Contabo server inventory](../08-infrastructure/contabo-server-inventory.md) and the rebuild guide. The lines that mirror the recorded accounts are reproduction of observed state, not a recommendation to give devops sudo or docker; deciding whether a new server should use the same pattern is an owner and administrator decision. The numeric uids are the recorded ones (VERIFIED LIVE), which only matter if file ownership must match a restored copy.
@@ -109,7 +112,8 @@ Verification on the exercise server, read-only:
 | `getent group docker` | members: devops only |
 | `getent group sudo` | members: ubuntu and devops |
 | `ls -ld /srv/matbakhy-staging` | 755 devops:devops |
-| `ssh -o PasswordAuthentication=no <user>@<exercise-host> true` | works with the exercise key; password login is refused (the live policy is key-only, VERIFIED LIVE, with the root login value NOT VERIFIED) |
+| `ssh -o PasswordAuthentication=no <user>@<exercise-host> true` | works with the exercise key (this only proves key login works; it does not prove passwords are refused) |
+| `ssh -o PubkeyAuthentication=no -o PreferredAuthentications=password <user>@<exercise-host> true` | the server answers Permission denied without offering a password prompt; this is the check that passwords are refused on the exercise server. For the live host, the readable directives say PasswordAuthentication no, but the effective configuration and the root login value are NOT VERIFIED |
 
 Likely failure: the SSH daemon accepts passwords. Fix the exercise server's SSH configuration and check the effective value with the daemon's own test output on that server.
 
@@ -124,7 +128,7 @@ Read `scripts/db-backup.sh` and `scripts/db-restore.sh` first (VERIFIED IN CODE)
 | 3 | `RESTORE_CONFIRM_TARGET=<new-db> scripts/db-restore.sh <dump> <new-db>` | same | state-changing: creates a new database and restores into it | Exit 0 means reconciled; 1 reconciliation failed; 2 refused (VERIFIED IN CODE) | Compare the restore output with the manifest row counts | "refusing: set RESTORE_CONFIRM_TARGET": set the variable to the same name as the target. Never restore over a database that already has tables; the script refuses |
 | 4 | Drop the throw-away databases and delete the backup files | same | state-changing: destructive, throw-away only | Nothing remains | Listing shows nothing | None expected |
 
-The script comments state the rule that a backup is not accepted until a restore has been reconciled (VERIFIED IN CODE: header of `scripts/db-restore.sh`). The server-side wrapper is `./deploy.sh backup` (also archives the image storage) and `./deploy.sh restore-db <dump>`; those run on a Preview-like server by an authorized operator and are exercised only on the exercise server in Option B.
+The script comments state the rule that a backup is not accepted until a restore has been reconciled (VERIFIED IN CODE: header of `scripts/db-restore.sh`). The server-side wrapper is `./deploy.sh backup` (also archives the image storage) and `./deploy.sh restore-db <dump>`; those run on a Preview-like server by an authorized operator and are exercised only on the exercise server in Option B. Note three limits (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`): `restore-db` accepts only the dump and always restores into a database named matbakhy_restore, so it is a rehearsal and not an application cutover; `backup` stops the storage service, archives its data and starts it again, and if the archive step fails the script exits before the start command, leaving storage stopped until an operator checks the container state and starts it; and nothing in this lab restores Keycloak data, image storage, secrets or the application cutover, which have no rehearsed procedure in this handbook.
 
 ### Task 5. Backup-recovery assessment (reading and reasoning)
 
@@ -138,7 +142,8 @@ Fill in this table from the repository and the live facts. No command runs on th
 | Do backups exist, and how fresh are they? | /srv/matbakhy-backups is 750 devops:devops and not listable by aiagent | unknown | NOT VERIFIED |
 | Has a restore been proven on the live data? | no evidence in this handbook | unknown | NOT VERIFIED |
 | Where are backups stored relative to the server? | the directories are on the same VPS disk (/srv/...); off-server copies are not documented in this handbook | unknown whether off-server | NOT VERIFIED |
-| Is the image storage backed up? | `./deploy.sh backup` archives it (briefly stopping the storage service) | Procedure exists | VERIFIED IN CODE |
+| Is the image storage backed up? | `./deploy.sh backup` archives it (stopping the storage service for the archive; a failed archive leaves it stopped) | Procedure exists | VERIFIED IN CODE |
+| Can Keycloak data, image storage and the application cutover be restored by a rehearsed procedure? | the [server rebuild guide](../08-infrastructure/server-rebuild-guide.md) and `restore-db`, which restores only into matbakhy_restore | No complete rehearsed procedure is documented | NOT VERIFIED |
 | Are certificates and keys recoverable? | Caddy re-issues certificates when its data volume is empty; subject to Let's Encrypt rate limits | Re-issue is possible | DOCUMENTED ONLY |
 | Are the secrets recoverable? | The server .env holds them; whether an off-server record exists is not stated | unknown | NOT VERIFIED |
 | What recovery time and data-loss window apply? | no measured value exists | none claimed | NOT VERIFIED |
@@ -176,6 +181,6 @@ Return to [Infrastructure Day 1](infra-day-1-topology-accounts.md) for the start
 ## Known limitations and documentation gaps
 
 - The exercise and every command in the outline have not been run by the authors; the account outline mirrors the recorded state and must be checked against the rebuild guide.
-- The live backup schedule, backup contents, off-server copies, secret recovery and any recovery time are NOT VERIFIED.
+- The live backup schedule, backup contents, off-server copies, secret recovery and any recovery time are NOT VERIFIED. The handbook does not yet contain a rehearsed end-to-end recovery sequence (all data stores, secrets, ownership, application cutover, validation and rollback); do not treat this lab as proof that a rebuild-based recovery is sufficient.
 - The local stack in Option A is not the Preview stack, so it does not prove that the Preview compose file or the Caddy certificate flow work on a clean server.
 - The Hetzner-era staging documents describe a different host; do not follow them for the Contabo rebuild.

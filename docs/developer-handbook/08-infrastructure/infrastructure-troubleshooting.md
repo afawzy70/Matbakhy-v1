@@ -61,9 +61,9 @@ Every command here only reads. The "Linux user" column says who may run it; "aut
 | D1 | `curl -sS -o /dev/null -w '%{http_code} %{content_type} %{redirect_url}\n' https://<host>.<domain>/<path>` | Your laptop or any machine with curl | Any | Network access; your public IP may matter (see scenario 5) | Status code, content type and redirect target for that path; see the table in [live Preview access](../05-developer-workflow/live-preview-access.md) | Exit code 6 means the name did not resolve (scenario 2); 7 means connection refused; 28 means timeout; 35 or 60 means a TLS failure (scenario 3) |
 | D2 | `curl -sSI https://<host>.<domain>/<path>` | Your laptop | Any | As D1 | Response headers: Strict-Transport-Security, X-Content-Type-Options and X-Robots-Tag come from the Caddyfile headers block (VERIFIED IN CODE) | A response without those headers did not come from this Caddyfile; a different server answered |
 | D3 | `getent hosts <host>.<domain>` | Your laptop | Any | A resolver | The line starts with 167.86.90.174 (VERIFIED LIVE for the Preview names) | No output means no answer for that name; see scenario 2 |
-| D4 | `openssl s_client -connect <host>.<domain>:443 -servername <host>.<domain> </dev/null 2>/dev/null \| openssl x509 -noout -issuer -subject -dates` | Your laptop | Any | OpenSSL installed | Issuer Let's Encrypt, validity about 90 days (VERIFIED LIVE for app: issuer CN YE1, 2026-10-18 to 2027-01-16) | An empty result means the TLS handshake failed; the proxy may not hold a certificate for that name yet |
+| D4 | `openssl s_client -connect <host>.<domain>:443 -servername <host>.<domain> </dev/null 2>/dev/null \| openssl x509 -noout -issuer -subject -dates` | Your laptop | Any | OpenSSL installed | A subject or subjectAltName that covers the host, a trusted issuer and a not-after date in the future. Issuer Let's Encrypt with about 90 days of validity was observed only for the app host (VERIFIED LIVE: issuer CN YE1, 2026-10-18 to 2027-01-16); the other hosts' issuer and dates are NOT VERIFIED LIVE, and the DNS page documents a possible fallback certificate authority, so read the issuer instead of assuming it | An empty result means the TLS handshake failed; the proxy may not hold a certificate for that name yet |
 | D5 | `sh deploy/web-preview/smoke.sh <domain>` (add `SMOKE_OPS=skip` in front when running outside the staff class) | Your laptop or the server | Any (server: whoever may reach the public URLs) | A checkout of the repository; curl | Ends with `PASS: web preview smoke test for <domain>`; the script states that it creates no account, order or upload (VERIFIED IN CODE) | A line starting with `FAIL:` names the broken check; see scenario 22 |
-| D6 | `ssh <admin-user>@<vps-address>` then `cd <deploy-dir>` | Your laptop to the VPS | Authorized administrator | An SSH key authorized for that account (key-only login, VERIFIED LIVE: PasswordAuthentication no) | A shell in the deployment directory | A permission or key error means you are not authorized; stop and ask the owner. Do not work around it |
+| D6 | `ssh <admin-user>@<vps-address>` then `cd <deploy-dir>` | Your laptop to the VPS | Authorized administrator | An SSH key authorized for that account (the readable sshd directive PasswordAuthentication no is VERIFIED LIVE, but the effective sshd configuration is NOT VERIFIED LIVE because a drop-in file is unreadable; an administrator confirms key-only login with `sshd -T` as root) | A shell in the deployment directory | A permission or key error means you are not authorized; stop and ask the owner. Do not work around it |
 | D7 | `./deploy.sh status` | The VPS, in `<deploy-dir>` | Authorized administrator (needs the Docker socket and the .env file) | The .env file exists (mode 600, VERIFIED LIVE; content not read) | Container table with status and image, schema version, the configured RELEASE_COMMIT, API_IMAGE and FRONT_IMAGE, and the last five release rows (VERIFIED IN CODE) | "`.env missing`" means you are in the wrong directory; an empty container table means the stack is not running |
 | D8 | `<compose> ps` | The VPS, in `<deploy-dir>` | Authorized administrator | As D7 | Every service Up; api, postgres and identity show (healthy) | A service Restarting or Exited: read its log with D9 |
 | D9 | `<compose> logs --tail 100 <service>` where service is one of proxy, postgres, identity, storage, api, loki, alloy, prometheus, alertmanager, alert-sink, node-exporter, grafana | The VPS, in `<deploy-dir>` | Authorized administrator | As D7 | Recent log lines. Docker keeps at most 3 files of 10 MB per container (VERIFIED IN CODE, `x-logging`), so old lines may be gone; Loki holds a longer history | Logs may carry request IDs, never copy them into a public place if they might contain personal data |
@@ -90,15 +90,15 @@ Every row changes state. Obtain the owner's authorization before running any of 
 | Code | Command | Machine and Linux user | Warning | Prerequisite | Expected result | Verification and likely failure |
 |---|---|---|---|---|---|---|
 | F1 | `./deploy.sh up` | The VPS, in `<deploy-dir>`, authorized administrator | It takes a verified pre-deploy database backup, renders the generated configuration, pulls missing images, starts the stack and may apply new database migrations. It refuses to run if another change holds the shared lock (`.preview-mutation.lock` in BACKUP_DIR). Do not run it to "see what happens" (VERIFIED IN CODE) | The .env file has no placeholders, image references pinned by digest and a full 40-character RELEASE_COMMIT | Ends with `up: <commit> (schema A -> B)` | D7, then `./deploy.sh smoke`. Failure messages: "`.env still has placeholders`", "must be pinned by digest", "another preview change holds" (wait or find the other operator), "API did not become healthy" (scenario 8) |
-| F2 | `<compose> up -d <service>` or `<compose> restart <service>` | The VPS, authorized administrator | Briefly interrupts that service. Restarting postgres interrupts all API traffic; restarting proxy interrupts all web traffic | The cause is understood and logged | The service returns to Up (healthy where it has a health check) | D8 and D5. If it flaps again, stop and use the scenario's other steps |
+| F2 | `<compose> up -d --force-recreate <service>` (use this after any .env or compose.yaml change) or `<compose> restart <service>` (only when the configuration did not change) | The VPS, in `<deploy-dir>`, authorized administrator | Briefly interrupts that service. `restart` keeps the container's existing environment, so it does not apply a changed .env value or a changed compose file; only recreation does. Run it with the same `<compose>` as `deploy.sh` uses, including `-f <COMPOSE_OVERRIDE>` when the .env file sets one (check with D22), or the recreated container loses the override. Restarting or recreating postgres interrupts all API traffic; proxy interrupts all web traffic | The cause is understood and logged | The service returns to Up (healthy where it has a health check) | D8 and D5. If it flaps again, stop and use the scenario's other steps |
 | F3 | Edit the three release values (RELEASE_COMMIT, API_IMAGE, FRONT_IMAGE) in the .env file to the values printed by D16, then F1 | The VPS, authorized administrator | An image-only rollback is safe only when the database schema has not moved or every later migration is expand-only (scenario 23). Owner authorization required | D16 output saved; verdict read | Previous images running on the current schema | D7 shows the target commit; D5 passes |
-| F4 | `./deploy.sh backup` | The VPS, authorized administrator | Stops the storage service for about a minute while the image archive is written, so uploads pause (VERIFIED IN CODE). It restores the dump into a scratch database to prove it | Free disk space (scenario 18) | `backup verified` and `backups in <backup-dir>` | A newer file in the backup directory; the BackupStale alert clears |
+| F4 | `./deploy.sh backup` | The VPS, authorized administrator | Stops the storage service for about a minute while the object-storage archive (`storage-*.tgz`) is written, so uploads pause (VERIFIED IN CODE). It restores the dump into a scratch database to prove it | Free disk space (scenario 18) | `backup verified` and `backups in <backup-dir>` | A newer file in the backup directory; the BackupStale alert clears |
 | F5 | `./deploy.sh admin-console <status\|enable\|disable\|verify\|create-admin NAME\|rollback>` | The VPS, authorized administrator | enable and create-admin write secret material into a private file under the generated directory; never paste it anywhere. disable closes the console host immediately | The identity container is running | See [Keycloak admin console](../../operations/14-keycloak-admin-console.md) | `status` lists each master account as otp or no-otp |
 | F6 | `docker image prune` (dangling images only) | The VPS, authorized administrator | Never add the flags that also remove volumes. The commands `docker volume prune` and `docker system prune --volumes` can destroy the PostgreSQL, SeaweedFS, Caddy and monitoring data and are forbidden here | `docker system df` read first | Reclaimed space reported | D18 shows more free space; D8 unchanged |
 | F7 | `./deploy.sh prune-qa` (list only) and `./deploy.sh prune-qa --apply` (deletes) | The VPS, authorized administrator | The `--apply` form deletes QA artifacts older than QA_ARTIFACT_RETENTION_DAYS. Always run the list form first (VERIFIED IN CODE, usage text in `deploy/web-preview/deploy.sh`) | A reviewed list | The deleted files are the listed ones | D18 |
 | F8 | `gh run rerun <run id> --failed` or `gh workflow run deploy-preview.yml --ref develop` | Your laptop, a user with write access to the repository | A rerun deploys the commit of that run; a manual run deploys the head of develop. The workflow runs one deployment at a time (concurrency group, VERIFIED IN CODE). Never rerun a deployment because it is slow; rerun only after a failure is understood and fixed | Fix merged or secret corrected | A new run reaches `DEPLOYED <sha>` | D23 and D5 |
 | F9 | Open a pull request that changes the repository file (Caddyfile, compose.yaml, a script or a workflow), let CI pass, merge, and let the deploy workflow ship it | Your laptop | Never edit the files on the server by hand: the pipeline overwrites deploy, infra and scripts from Git on every deployment (VERIFIED IN CODE), so a manual edit is lost or causes drift | A reviewed change with the Documentation Impact declaration | The new image or file is deployed | D17 and D5 |
-| F10 | `./deploy.sh render` | The VPS, in `<deploy-dir>`, authorized administrator | Rewrites the secret-bearing generated configuration (realm import and storage credentials file) and re-applies its modes. It does not restart services (VERIFIED IN CODE). Never print the generated files | The .env file is valid | Files under the generated directory with the modes in scenario 17 | D21 on those files; F2 for the services that read them |
+| F10 | `./deploy.sh render` | The VPS, in `<deploy-dir>`, authorized administrator | Rewrites the secret-bearing generated configuration (realm import and storage credentials file) and re-applies its modes. It does not restart services (VERIFIED IN CODE). Never print the generated files | The .env file is valid | Files under the generated directory with the modes in scenario 17 | D21 on those files; F2 (recreate form) for the services that read them |
 | F11 | Restore from a backup (`./deploy.sh restore-db <dump>` and the steps in [staging deployment and rollback](../../operations/11-staging-deployment-and-rollback.md), section 4.3) | The VPS, authorized administrator | Data written after the backup is lost. Restoring over live data needs the owner's explicit authorization; rehearse on a new isolated server first ([backup, restore and disaster recovery](backup-restore-disaster-recovery.md)) | A verified, checksummed dump; the API stopped | The restored database reconciles (orders, allocations, ledger) | Reconciliation output; D5 |
 
 ## 1. Website unavailable
@@ -157,13 +157,13 @@ Every row changes state. Obtain the owner's authorization before running any of 
 
 **Safe diagnostic commands.** D4 for the failing host; D3; the caller's own clock; D9 for the proxy (authorized administrator).
 
-**Expected diagnostic evidence.** Issuer Let's Encrypt and a not-after date in the future. A subject that does not name the host, or an empty D4 output, means the proxy has no certificate for it. Proxy log lines about obtaining a certificate show progress or the error text (DOCUMENTED ONLY: Caddy logs ACME errors to its standard error output, which Docker captures).
+**Expected diagnostic evidence.** A trusted issuer, a not-after date in the future and a name that covers the host. Only the app certificate was observed (Let's Encrypt, VERIFIED LIVE); do not assume the same issuer or dates for the other hosts (NOT VERIFIED LIVE). A subject that does not name the host, or an empty D4 output, means the proxy has no certificate for it. Proxy log lines about obtaining a certificate show progress or the error text (DOCUMENTED ONLY: Caddy logs ACME errors to its standard error output, which Docker captures).
 
 **Corrective action.** Use the correct host name. Fix the caller's clock. For missing or expired certificates follow scenario 20. Never disable certificate verification (curl -k) outside the local rehearsal that the smoke script documents; and never copy a private key out of the caddy-data volume.
 
 **Risk level.** Medium; the Preview is unusable over HTTPS while it lasts, but nothing is lost.
 
-**Recovery verification.** D4 shows a valid certificate for every host, and D5 passes.
+**Recovery verification.** D4 shows a certificate that covers the host, is trusted and is not expired, for every host, and D5 passes.
 
 ## 4. Caddy not routing
 
@@ -180,7 +180,7 @@ Every row changes state. Obtain the owner's authorization before running any of 
 
 **Expected diagnostic evidence.** Compare the answer with the routing table in [runtime architecture](runtime-architecture.md) and the live behaviour in [live Preview access](../05-developer-workflow/live-preview-access.md). D17 prints "Valid configuration" for a healthy file. The label on the front image shows which commit built it.
 
-**Corrective action.** A wrong rule is fixed in the repository Caddyfile through a pull request (F9). The repository test `scripts/test_proxy_access.py` runs the real Caddyfile in a throwaway container and is the place to add a regression test. A wrong environment value is corrected by the owner or an authorized administrator in the server .env file, followed by F2 for the proxy. Do not edit the Caddyfile on the server.
+**Corrective action.** A wrong rule is fixed in the repository Caddyfile through a pull request (F9). The repository test `scripts/test_proxy_access.py` runs the real Caddyfile in a throwaway container and is the place to add a regression test. A wrong environment value is corrected by the owner or an authorized administrator in the server .env file, followed by F2 in its recreate form for the proxy (a plain restart keeps the old environment). Do not edit the Caddyfile on the server.
 
 **Risk level.** Medium; a bad routing change can expose a path that should be closed. Review every access-class change against the Caddyfile header comments.
 
@@ -199,7 +199,7 @@ Every row changes state. Obtain the owner's authorization before running any of 
 
 **Expected diagnostic evidence.** Caddy's own 403: short plain text "Not available" and no x-amz-request-id. S3's 403: XML content type and x-amz-request-id. API 403: a JSON error body with a requestId (DOCUMENTED ONLY: [operations troubleshooting runbook](../../operations/08-troubleshooting-runbook.md), section 1). The smoke script itself expects 403 from the ops host when run outside the staff class with SMOKE_OPS=skip (VERIFIED IN CODE).
 
-**Corrective action.** Do not widen an access list to make a 403 disappear. If a legitimate tester is blocked, the owner decides whether to add the tester's public address to the allow-list; the change is made in the server .env file by an authorized administrator, then F2 for the proxy. For the media root, no action is needed. For an object that should be public, see scenario 21. For the XSRF case, check WEB_COOKIE_DOMAIN against the Preview domain.
+**Corrective action.** Do not widen an access list to make a 403 disappear. If a legitimate tester is blocked, the owner decides whether to add the tester's public address to the allow-list; the change is made in the server .env file by an authorized administrator, then F2 in its recreate form for the proxy (the Caddyfile reads these values from the container environment). For the media root, no action is needed. For an object that should be public, see scenario 21. For the XSRF case, check WEB_COOKIE_DOMAIN against the Preview domain.
 
 **Risk level.** Medium for any access-list change: it changes who can reach the Preview. Making customer hosts public is explicitly the owner's step.
 
@@ -326,7 +326,7 @@ Real problems that also give 404: the front image is older than expected (scenar
 
 **Expected diagnostic evidence.** The issuer equals https://id.<domain>/realms/matbakhy character for character (the smoke check compares with `[ "$issuer" = "https://id.$d/realms/matbakhy" ]`, VERIFIED IN CODE). Any difference of host, scheme or trailing path is the mismatch.
 
-**Corrective action.** Make PREVIEW_DOMAIN, KC_HOSTNAME and OIDC_ISSUER agree by correcting the .env value (owner or authorized administrator), then F10 and F2 for identity and api. If a domain replacement was intended, follow the full runbook in [DNS and HTTPS](dns-https-sslip-io.md) instead of patching single values.
+**Corrective action.** Make PREVIEW_DOMAIN, KC_HOSTNAME and OIDC_ISSUER agree by correcting the .env value (owner or authorized administrator), then F10 and F2 in its recreate form for identity and api (a restart would keep the old issuer values). If a domain replacement was intended, follow the full runbook in [DNS and HTTPS](dns-https-sslip-io.md) instead of patching single values.
 
 **Risk level.** High; wrong issuer settings lock every user out, and changes to the realm affect accounts.
 
@@ -396,9 +396,9 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 
 **Expected diagnostic evidence.** The failing step name from D23, and its error line. A successful run ends with `DEPLOYED <sha>` in the deploy step.
 
-**Corrective action.** Fix the specific cause (CI, build, secret, host key, server state). Rerun only after the cause is fixed (F8). Do not rerun a healthy running job because it is slow. Never print secrets in a log while debugging. A failed server step already restores the previous .env file but does not roll back the database (scenarios 15 and 23).
+**Corrective action.** Fix the specific cause (CI, build, secret, host key, server state). Rerun only after the cause is fixed (F8). Do not rerun a healthy running job because it is slow. Never print secrets in a log while debugging. The restore of the previous .env file happens in one place only: inside the remote deploy script, when `./deploy.sh up` or `./deploy.sh smoke` fails (VERIFIED IN CODE). A failure before that point (missing .env, registry login, the .env update itself) exits without any restore, and a failure of the later "Publish and verify the Keycloak admin console" step restores nothing: the new images and the new .env stay in place and only the console is closed again. The restore covers the .env file only; the containers are not recreated and the database is not rolled back (scenarios 15 and 23).
 
-**Risk level.** Medium; a half-finished deployment can leave the server on mixed configuration.
+**Risk level.** Medium; a half-finished deployment can leave the server on mixed configuration: after a failed `up` or `smoke` the .env file is the old one while some containers may already run the new images.
 
 **Recovery verification.** A run reaches `DEPLOYED <sha>` and finishes green, and D7 shows that sha as RELEASE_COMMIT.
 
@@ -456,7 +456,7 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 
 **Expected diagnostic evidence.** Compare with the modes above. /srv is root:root 755, /srv/matbakhy-staging is devops:devops 755, /srv/matbakhy-backups is devops:devops 750 (VERIFIED LIVE). A file with the wrong owner or mode is the evidence; "Permission denied" for a non-privileged listing is expected for protected directories and is not itself a fault.
 
-**Corrective action.** Prefer the script that sets the modes: F10 (`./deploy.sh render`), then F2 for the services that read the files. For any other path, an authorized administrator corrects the owner or mode of the named path only, after recording the current values with D21. Do not apply recursive broad permissions (for example mode 777), do not make the generated directory world-readable, and do not add the aiagent account to the docker or sudo group to read these paths.
+**Corrective action.** Prefer the script that sets the modes: F10 (`./deploy.sh render`), then F2 (recreate form) for the services that read the files. For any other path, an authorized administrator corrects the owner or mode of the named path only, after recording the current values with D21. Do not apply recursive broad permissions (for example mode 777), do not make the generated directory world-readable, and do not add the aiagent account to the docker or sudo group to read these paths.
 
 **Risk level.** Medium; permission mistakes can expose secrets or break services.
 
@@ -469,7 +469,7 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 **Likely causes.** On 2026-10-21 the root disk /dev/sda1 had 290 GB with 18 GB used (VERIFIED LIVE), so this is not the current state. Likely growth sources, by configuration (VERIFIED IN CODE unless marked):
 - Container logs: 10 MB times 3 files per container.
 - Loki log store with a proposed 720-hour retention, and Prometheus metrics with 15 days and a 2 GB size cap. Both are proposed defaults, not approved policies.
-- Backups written to BACKUP_DIR, each with a database dump and an image-storage archive, kept until someone removes them (no automatic pruning of backups is visible in the repository; NOT VERIFIED whether a live cron does it, because the crontabs of other users are not readable).
+- Backups written to BACKUP_DIR, each with a database dump and an object-storage archive, kept until someone removes them (no automatic pruning of backups is visible in the repository; NOT VERIFIED whether a live cron does it, because the crontabs of other users are not readable).
 - Old images (every release pulls two new images by digest).
 - QA artifacts (the script `deploy.sh prune-qa` exists for them).
 - Unrelated tools on the same host (the AI supervisor directories exist under /srv, VERIFIED LIVE; they are not part of the Matbakhy runtime).
@@ -498,7 +498,7 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 
 **Expected diagnostic evidence.** OOMKilled true for one named container, with its RestartCount rising; free memory normal at host level.
 
-**Corrective action.** Raise the limit of that service only, through a pull request that changes compose.yaml and is deployed by the pipeline (F9); do not raise unrelated limits. Restart the affected service (F2) to restore service while the change is prepared. Find and fix the cause (for example a long-running query or a memory leak) rather than only increasing limits. Do not run the stack with limits removed.
+**Corrective action.** Raise the limit of that service only, through a pull request that changes compose.yaml and is deployed by the pipeline (F9); do not raise unrelated limits. Restart the affected service (F2, `restart` form, which applies no configuration change) to restore service while the change is prepared. Find and fix the cause (for example a long-running query or a memory leak) rather than only increasing limits. Do not run the stack with limits removed.
 
 **Risk level.** Medium; repeated kills of postgres risk crash recovery time, and of the API, failed requests.
 
@@ -518,13 +518,13 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 
 **Safe diagnostic commands.** D4 for each host, and `openssl s_client -connect app.<domain>:443 -servername app.<domain> </dev/null 2>/dev/null | openssl x509 -noout -checkend 1209600` (exit status 0 means still valid in 14 days); D3; D9 for proxy; D22 for the Preview domain value (D22 deliberately does not print ACME_EMAIL).
 
-**Expected diagnostic evidence.** A not-after date more than 30 days away is normal for a 90-day certificate. The proxy log shows the failing ACME step (challenge type, DNS or connection error).
+**Expected diagnostic evidence.** For the app host, a not-after date more than 30 days away is normal for the 90-day Let's Encrypt certificate that was observed; the other hosts' issuer and dates are NOT VERIFIED LIVE, so read each host's own D4 output. The proxy log shows the failing ACME step (challenge type, DNS or connection error).
 
 **Corrective action.** Restore reachability of ports 80 and 443 and name resolution first; Caddy retries by itself (DOCUMENTED ONLY). If the proxy must be restarted to retry sooner, use F2 for proxy only. Do not delete the caddy-data volume, do not copy certificates by hand, and do not disable HTTPS. If rate limits apply, wait; do not request many new certificates by changing domains.
 
 **Risk level.** Medium to High; an expired certificate makes the Preview unusable in browsers.
 
-**Recovery verification.** D4 shows a new not-after date and issuer Let's Encrypt, and D5 passes.
+**Recovery verification.** D4 shows a new not-after date and a trusted issuer that covers the host, and D5 passes.
 
 ## 21. Broken media URLs
 
@@ -543,7 +543,7 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 
 **Expected diagnostic evidence.** A working image answers 200 with an image content type. 403 with XML and x-amz-request-id means the S3 gateway refused that request. 404 means no such object. A Caddy "Not available" 403 means the caller is outside the customer class.
 
-**Corrective action.** For a missing bucket or object, an authorized administrator re-runs F1 (which recreates the buckets idempotently) or re-uploads through the application; do not write into the storage volume directly. For a wrong URL, fix the environment value through the owner and F2 for the api. For storage down, scenario 7. Restore of image storage uses the archive from F4 and needs the owner.
+**Corrective action.** For a missing bucket or object, an authorized administrator re-runs F1 (which recreates the buckets idempotently) or re-uploads through the application; do not write into the storage volume directly. For a wrong URL, fix the environment value through the owner and F2 in its recreate form for the api. For storage down, scenario 7. Restore of image storage uses the archive from F4 and needs the owner.
 
 **Risk level.** Low to Medium; photos are public marketing data in the Preview, but private documents live in the private bucket and must never be exposed.
 
@@ -568,13 +568,13 @@ The workflow deploys only on pushes to develop and on manual dispatch, one run a
 | kc-admin ... must serve the console or answer 404 | The admin host answers an unexpected code; code 000 only warns | 6, 12 |
 | unexpected sign-in redirect | Login redirect problem | 10 |
 
-Two environmental causes: the machine running the smoke test is not in the allow-list (use SMOKE_OPS=skip for the ops host; for other hosts run from an allowed machine), or the stack was only seconds old (the script retries each request 6 times at 5-second intervals).
+Two environmental causes: the machine running the smoke test is not in the allow-list (use SMOKE_OPS=skip for the ops host; for other hosts run from an allowed machine), or the stack was only seconds old. Retries differ per check (VERIFIED IN CODE): requests made through the script's `get` helper (page, script, configuration, meals and discovery requests) are retried up to 6 times at 5-second intervals; status-code probes (`code`), the security-header request and the final sign-in redirect request are made once with no retry; and the kc-admin probe uses its own loop of up to 18 attempts at 5-second intervals, about 90 seconds. A single failure of a check without retry can therefore be transient, so run D5 once more before treating it as a confirmed fault; a repeated identical failure is real.
 
-**Safe diagnostic commands.** D5 again, once, to rule out a start-up race; D1 on the exact URL in the message; then the commands of the scenario in the table.
+**Safe diagnostic commands.** D5 again, once, to rule out a start-up race in the checks that are not retried; D1 on the exact URL in the message; then the commands of the scenario in the table.
 
 **Expected diagnostic evidence.** The message names the first failing check; the script stops at the first failure.
 
-**Corrective action.** Follow the scenario in the table. Never edit `smoke.sh` to make it pass, and never skip a check; tests are not to be weakened to obtain a green result (project rule). On the server, a failing smoke test after `up` makes the pipeline restore the previous .env file and exit with failure (scenario 15).
+**Corrective action.** Follow the scenario in the table. Never edit `smoke.sh` to make it pass, and never skip a check; tests are not to be weakened to obtain a green result (project rule). On the server, a failing smoke test after `up` makes the remote deploy script restore the previous .env file and exit with failure; containers are not recreated and the database is not rolled back (scenarios 14 and 15).
 
 **Risk level.** Medium; some failures indicate exposure of protected endpoints.
 
@@ -600,7 +600,7 @@ Two environmental causes: the machine running the smoke test is not in the allow
 | A migration is breaking, or data is damaged | Restore the pre-deploy backup (F11). Data written after that backup is lost; tell the testers |
 | The deployment failed half-way | D7, read the api and identity logs, then fix forward or roll back by the rows above. `up` is repeatable |
 
-**Corrective action.** Rollback is a decision for the owner. Record the failing commit, the target commit and the reason. Take a fresh backup first if the database is still readable (F4), unless the disk or the database state makes that unsafe. Then perform F3, or F11 for the restore path (stop the API first; swap databases only with nobody connected; keep the failed database until the cause is understood). Note that the pipeline's own failure handling restores the .env file but performs no automatic database rollback (VERIFIED IN CODE). Rehearse restores on a new isolated server, never first on the live Preview ([backup, restore and disaster recovery](backup-restore-disaster-recovery.md), [rebuild guide](server-rebuild-guide.md)).
+**Corrective action.** Rollback is a decision for the owner. Record the failing commit, the target commit and the reason. Take a fresh backup first if the database is still readable (F4), unless the disk or the database state makes that unsafe. Then perform F3, or F11 for the restore path (stop the API first; swap databases only with nobody connected; keep the failed database until the cause is understood). Note that the pipeline's own failure handling restores the .env file only when `up` or `smoke` fails in the remote script (not when the later admin-console step fails), recreates no container and performs no automatic database rollback (VERIFIED IN CODE, `.github/workflows/deploy-preview.yml`). Rehearse restores on a new isolated server, never first on the live Preview ([backup, restore and disaster recovery](backup-restore-disaster-recovery.md), [rebuild guide](server-rebuild-guide.md)).
 
 **Risk level.** High for any rollback that touches the database; Medium for image-only rollback.
 

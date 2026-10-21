@@ -61,7 +61,7 @@ Explain in your notes why this works: the sslip.io service answers any hostname 
 | Linux user | your own |
 | Kind | read-only (a TLS handshake) |
 | Prerequisite | openssl installed |
-| Expected result | Issuer Let's Encrypt; a notBefore and notAfter about 90 days apart. At the time of observation the app host certificate was valid 2026-10-18 to 2027-01-16 (VERIFIED LIVE); a newer renewal will show later dates |
+| Expected result | Issuer Let's Encrypt; a notBefore and notAfter about 90 days apart. At the time of observation the app host certificate was valid 2026-10-18 to 2027-01-16 (VERIFIED LIVE for the app host only); a newer renewal will show later dates. The issuer and dates of the other hosts (ops, api, id, kc-admin, media) were not recorded: repeat the command for each and treat any difference, including a different certificate authority, as an observation, not an error |
 | Verification | Compute the number of days between the dates. Compare the notAfter date with today's date and write down how many days remain |
 | Likely failure | Empty output means no handshake. The `-servername` flag is required because the proxy selects the certificate by the requested name |
 
@@ -102,7 +102,7 @@ Never open the kc-admin console and never try to sign in as part of this lab. It
 
 | Item | Detail |
 |---|---|
-| Command | `sed -n 1,60p deploy/web-preview/Caddyfile` |
+| Command | `sed -n 1,66p deploy/web-preview/Caddyfile` |
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
@@ -113,16 +113,16 @@ Never open the kc-admin console and never try to sign in as part of this lab. It
 |---|---|---|
 | app | static customer web from /srv/customer-web | customer class |
 | ops | static operations web from /srv/operations-web | staff class |
-| api | api:8080 for /api/*, /oauth2/*, /login/oauth2/*, /logout; everything else 404 | customer class, and staff class for /api/v1/ops and /api/v1/cook |
+| api | api:8080 for /api/*, /oauth2/*, /login/oauth2/*, /logout; everything else 404 | customer class for every request; for /api/v1/ops and /api/v1/cook the staff class is checked first and then the customer class as well, so a staff caller must be in both lists |
 | id | identity:8080, except admin and master realm paths (404) | customer class |
 | kc-admin | identity:8080 for the console paths only, and only while the flag exists | none by address; Keycloak password plus one-time password |
 | media | storage:8333 | customer class |
 
-Then run `python3 scripts/test_proxy_access.py` only if you have the prerequisites it states; otherwise record NOT RUN. Read the head of the script first (it exercises the Caddyfile in the repository, VERIFIED IN CODE). Do not report PASS for a test you did not run.
+Then run `python3 scripts/test_proxy_access.py` only if you have the prerequisites it states: it starts the real Caddyfile in a Caddy container, so Docker and a Caddy image must already be present on your laptop, and without them the test is skipped. A skipped test is NOT RUN, not PASS. Read the head of the script first (it exercises the Caddyfile in the repository, VERIFIED IN CODE). Do not report PASS for a test you did not run.
 
 ### Task 7. Plan (do not run) a domain replacement
 
-Read section 6 of [DNS, HTTPS and sslip.io](../08-infrastructure/dns-https-sslip-io.md), "Domain replacement runbook". Write a half-page plan answering: which variables change, in which files, what must be reachable from the Internet before the certificate can be issued (ports 80 and 443), and how to roll back. Do not execute any step; domain replacement is a state-changing operation for an authorized engineer.
+Read section 6 of [DNS, HTTPS and sslip.io](../08-infrastructure/dns-https-sslip-io.md), "Domain replacement runbook". Write a half-page plan answering: which variables change, in which files, what must be reachable from the Internet before the certificate can be issued (ports 80 and 443), what happens to existing application accounts (the API identifies an account by issuer and subject, so a new OIDC_ISSUER does not match existing accounts unless you migrate them or decide on a reset), in which order the server configuration and the merge to develop must happen (a push to develop deploys automatically with the domain the server .env holds at that moment), and how to roll back, including the Keycloak settings that are stored in Keycloak and are not undone by restoring .env. Do not execute any step; domain replacement is a state-changing operation for an authorized engineer.
 
 ## Verification checkpoints
 

@@ -78,7 +78,7 @@ The 8 required status checks, as recorded in [documentation-maintenance.md](../0
 7. `Android debug APK (Gradle)`
 8. `iOS simulator build (Xcode, unsigned)`
 
-The branch need not be up to date before merging. The path-filtered seed check and the deploy jobs are deliberately not required.
+The branch need not be up to date with `develop` before merging. The path-filtered seed check and the deploy jobs are deliberately not required.
 
 Known limitation, DEFERRED by owner decision (2026-10-20): because DOC-001 runs on the `pull_request` event, a PR that rewrites `.github/workflows/doc001.yml` can neutralise the check (disposable PR #33 passed in 2 seconds). The interim control is owner review of every diff that touches `.github/workflows/`. Nothing in this handbook change remediates it.
 
@@ -113,7 +113,7 @@ Job `deploy` (VERIFIED IN CODE): `needs: build`, runs only when `github.ref` is 
 | SSH setup | fails if any required value is empty; writes the key to `~/.ssh/id_ed25519` with umask 077; writes `known_hosts` as `<host> <host public key>`; every later call uses `StrictHostKeyChecking=yes` and `BatchMode=yes` | VERIFIED IN CODE |
 | Pre-check | over SSH: `test -f /srv/matbakhy-staging/deploy/web-preview/.env && test -w /srv/matbakhy-staging`; the deploy stops here if the server `.env` is missing | VERIFIED IN CODE |
 | Transfer | `tar -cf - deploy infra scripts docs/quality/owner-acceptance/fixtures.json` streamed over SSH into `tar -xf - -C /srv/matbakhy-staging` | VERIFIED IN CODE |
-| `.env` and data preserved | the server `.env` is gitignored (`.gitignore`), so the tar stream never contains it; the archive carries `.env.example`, which does not overwrite it. `tar -x` only adds and replaces files, so files deleted in Git are not deleted on the server | VERIFIED IN CODE |
+| `.env` and data preserved | the workflow runs in a clean checkout, where the gitignored (`.gitignore`) server `.env` does not exist, so the tar stream normally does not contain one; the archive carries `.env.example`, which does not overwrite it. `tar` itself does not read `.gitignore`: an archive made by hand from a working copy that holds a real `.env` (for example during a manual rebuild) would include it, so exclude it explicitly (`--exclude=.env`) or archive tracked files only (`git archive`). `tar -x` only adds and replaces files, so files deleted in Git are not deleted on the server | VERIFIED IN CODE |
 | Remote script | the job writes `remote-deploy.sh` and copies it to `/tmp/matbakhy-cd-<SHA>.sh` on the server, runs it with `bash`, then removes it; the GitHub token is sent on SSH standard input, never as an argument | VERIFIED IN CODE |
 | Registry login on the server | `docker login ghcr.io -u afawzy70 --password-stdin` into a temporary `DOCKER_CONFIG` directory that is deleted on exit; the user name is hard-coded in the script | VERIFIED IN CODE |
 | Pin the release in `.env` | a Python snippet drops any existing `RELEASE_COMMIT=`, `API_IMAGE=` and `FRONT_IMAGE=` lines, appends the three new ones, and sets mode 600 on `.env`; no other line is touched | VERIFIED IN CODE |
@@ -131,10 +131,10 @@ VERIFIED IN CODE (`deploy/web-preview/deploy.sh`, function `up`):
 4. If a PostgreSQL container already runs: takes a pre-deploy database backup and proves it by restoring into a scratch database and reconciling (`backup_db`, `verify_backup`), and records the schema version before.
 5. `compose pull --policy missing`, then `compose up -d`.
 6. `wait_healthy`: polls the API container health every 5 s for up to 90 tries (about 7.5 minutes); on timeout it prints the last 80 log lines of `api` and `identity` and fails.
-7. Creates the two storage buckets (`matbakhy-public`, `matbakhy-private`) idempotently.
+7. Attempts to create the two storage buckets (`matbakhy-public`, `matbakhy-private`) through the SeaweedFS shell. The command is repeatable, but its output is discarded and every failure is ignored (`>/dev/null 2>&1 || true`), so a successful `up` does not prove that either bucket exists. Verify the buckets separately (scenario 21 in [infrastructure-troubleshooting.md](infrastructure-troubleshooting.md) and [admin-readonly-verification.md](admin-readonly-verification.md)).
 8. `record_release`: appends one tab-separated line (time, commit, both digests, schema before and after, backup path) to `releases.log` under `BACKUP_DIR`.
 
-Migrations: Flyway runs forward-only inside the API at start; there is no separate migration step in the workflow (DOCUMENTED ONLY in [06-web-preview.md](../../operations/06-web-preview.md); the container start path was not re-read for this page). The API container health check calls `http://127.0.0.1:8081/actuator/health` inside the container (VERIFIED IN CODE, `deploy/web-preview/compose.yaml`), which is why the public host returns 404 for `/actuator/health` (VERIFIED LIVE).
+Migrations: Flyway runs forward-only inside the API at start; there is no separate migration step in the workflow (DOCUMENTED ONLY in [06-web-preview.md](../../operations/06-web-preview.md); the container start path was not re-read for this page). The API container health check calls `http://127.0.0.1:8081/actuator/health` inside the container (VERIFIED IN CODE, `deploy/web-preview/compose.yaml`), which is separate evidence from the public answer. The public host returns 404 for `/actuator/health` (VERIFIED LIVE) because the Caddyfile proxies only `/api/*`, `/oauth2/*`, `/login/oauth2/*` and `/logout` (VERIFIED IN CODE, `deploy/web-preview/Caddyfile`), not because of the internal health check.
 
 Where `GENERATED_DIR` and `BACKUP_DIR` point on the live host is NOT VERIFIED: `.env.example` defaults to `/srv/matbakhy-preview/generated` and `/srv/matbakhy-backups`, and the live `.env` cannot be read by `aiagent`. An administrator can read the effective values with `grep -E '^(GENERATED_DIR|BACKUP_DIR)=' /srv/matbakhy-staging/deploy/web-preview/.env`, which does not print secrets (see [admin-readonly-verification.md](admin-readonly-verification.md)).
 
@@ -157,7 +157,7 @@ What this means in practice:
 |---|---|---|
 | What is restored automatically? | Only the `.env` file, copied back from a mode-600 temporary copy taken before the three lines were rewritten | VERIFIED IN CODE |
 | Is the database rolled back automatically? | No. The message says so, and no step restores a dump | VERIFIED IN CODE |
-| Are the containers rolled back automatically? | No step restarts the stack after `.env` is restored. If `compose up -d` already replaced containers, they keep running the new images until someone runs `./deploy.sh up` again with the restored or corrected `.env` | VERIFIED IN CODE (absence of a restart step) |
+| Are the containers rolled back automatically? | No step restarts the stack after `.env` is restored. If `compose up -d` already replaced containers, they keep running the new images until someone runs `./deploy.sh up` again with the restored or corrected `.env`. Before restarting with restored image pins, assess whether the older application image can run against a schema that the new release may already have migrated (see the migration row below); do not restart blindly | VERIFIED IN CODE (absence of a restart step) |
 | Does a failed deployment skip the admin console step? | Yes, the workflow step order stops at the first failing step | VERIFIED IN CODE |
 | Does a failed admin console step undo the deployment? | No. The deployment already succeeded; the admin console script closes its own switch on failure | VERIFIED IN CODE |
 | Is the migration reversible? | Flyway is forward-only. Image-only rollback is safe only if the schema did not move or every later migration is expand-only (`scripts/check_migration_compat.py` and CI guardrail tests); otherwise restore the pre-deploy backup and accept loss of data written since | DOCUMENTED ONLY ([11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md), policy written for the Hetzner host) and VERIFIED IN CODE (`rollback_plan` in `deploy.sh`) |
@@ -175,7 +175,7 @@ All commands here are read-only. Run `gh` on your own laptop after `gh auth logi
 
 | Command | Machine and user | Read-only | Expected result | If it fails |
 |---|---|---|---|---|
-| `gh run list --workflow deploy-preview.yml --branch develop --limit 5` | your laptop, your GitHub login | yes | the latest runs with status and head SHA | `gh auth status`; confirm repository access |
+| `gh run list --workflow deploy-preview.yml --branch develop --limit 5` | your laptop, your GitHub login | yes | the latest runs with status and the head commit SHA | `gh auth status`; confirm repository access |
 | `gh run view <run-id> --log` | your laptop | yes | build and deploy step logs; the last deploy line is `DEPLOYED <sha>` on success | find the failing step name and read [infrastructure-troubleshooting.md](infrastructure-troubleshooting.md) |
 | `gh api repos/afawzy70/Matbakhy-v1/rulesets/25447480` | your laptop; needs a token that can read repository rules | yes | JSON with enforcement `active`, no bypass actors, and the required status check contexts | 404 or 403 means the token cannot read rules, which is not proof the rules are gone |
 | `gh pr checks <pr-number>` | your laptop | yes | the required checks of a PR | pending checks are normal while jobs run; do not rerun healthy jobs |
@@ -192,7 +192,7 @@ Finding the deployed commit. What the repository provides, and where it is NOT V
 | `releases.log` under the backup directory | one line per successful `up` | `/srv/matbakhy-backups` is 750 `devops:devops` | VERIFIED LIVE (permissions); content NOT VERIFIED |
 | API log field `service.version` | `MATBAKHY_VERSION`, set from `RELEASE_COMMIT` in `compose.yaml` | needs Docker or the Grafana and Loki stack | VERIFIED IN CODE; not observed |
 | Image label `org.opencontainers.image.revision` | the build commit | `docker image inspect` with Docker access | VERIFIED IN CODE (set by the workflow); not observed |
-| Public endpoint | the public configuration does not carry a commit or version | anyone | VERIFIED LIVE (the keys are `orderingAvailable`, `orderLimits`, `environment`) |
+| Public endpoint | the public configuration does not carry a commit or version | anyone | VERIFIED LIVE (the keys observed were `orderingAvailable`, `orderLimits`, `environment`) |
 
 An administrator with authorized access can confirm the commit with the commands in [admin-readonly-verification.md](admin-readonly-verification.md). Agents and the `aiagent` account must not run them.
 
@@ -200,7 +200,7 @@ An administrator with authorized access can confirm the commit with the commands
 
 - NOT VERIFIED LIVE: the effective SSH user used by the pipeline, the live `.env` values, running containers and digests, whether the last deployed SHA matches the latest successful run, the contents of `releases.log`, and any Contabo rollback.
 - The front image is built for the fixed domain `167-86-90-174.sslip.io`; changing the Preview domain requires editing the workflow and building new images.
-- `deploy.sh` and the remote script hard-code the registry user name `afawzy70`; a repository transfer or a different owner needs a code change.
+- The remote deployment script generated inside `deploy-preview.yml` hard-codes the registry user name `afawzy70` (`deploy.sh` itself contains no registry login); a repository transfer or a different owner needs a workflow change.
 - A failed deployment restores only `.env`; it does not restart containers or roll back the database (quoted above). The manual `rollback-plan` flow is the documented recovery.
 - Required-check names depend on job names. The job `blueprint-integrity` has no `name:` field, so its context is the job id; renaming any of the 8 jobs silently stops it from satisfying the ruleset.
 - Approving reviews required is 0 and independent review cannot currently be satisfied with one GitHub identity; the DOC-001 workflow-neutralisation limitation is DEFERRED by the owner and still open.

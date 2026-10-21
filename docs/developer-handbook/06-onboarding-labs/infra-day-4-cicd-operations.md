@@ -45,7 +45,7 @@
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
-| Expected result | Nine workflow files, including ci.yml, doc001.yml, handbook-parity.yml, native-build.yml, preview-images.yml and deploy-preview.yml. The deploy workflow is named "Deploy Matbakhy preview to Contabo", runs on a push to develop and on manual dispatch, and uses the concurrency group matbakhy-preview-deploy without cancelling an earlier run |
+| Expected result | Nine workflow files, including ci.yml, doc001.yml, handbook-parity.yml, native-build.yml, preview-images.yml and deploy-preview.yml (the count is of the checkout you have; it can change). The deploy workflow is named "Deploy Matbakhy preview to Contabo", runs on a push to develop and on manual dispatch, and uses the concurrency group matbakhy-preview-deploy without cancelling an earlier run |
 | Verification | Write in one line what the concurrency setting means for two merges close together: the second deployment waits for the first (VERIFIED IN CODE: cancel-in-progress is false) |
 
 ### Task 2. Walk the deploy workflow step by step
@@ -57,9 +57,9 @@ Open `.github/workflows/deploy-preview.yml` and fill in the table. All entries a
 | build: wait for passing Product CI | Polls GitHub for a passing ci.yml run at this exact commit before building anything | the built-in workflow token | The build fails or times out; nothing is deployed |
 | build: images | Builds and publishes the two images to the container registry and outputs their references | the built-in token (packages write) | No deployment starts |
 | deploy: configure verified SSH host | Writes the SSH key and the pinned host key and refuses to continue if any required value is empty | STAGING_SSH_HOST, STAGING_SSH_USER, STAGING_SSH_KEY, STAGING_SSH_HOST_PUBKEY | Stops before connecting |
-| deploy: transfer versioned deployment files | Checks the server .env exists and the directory is writable, then streams the deploy, infra, scripts folders and one fixtures file into /srv/matbakhy-staging with tar over SSH | the SSH secrets | Stops; the server .env and data are preserved by design |
-| deploy: deploy digest-pinned images | Updates three lines of the server .env, then runs `./deploy.sh up` and `./deploy.sh smoke`; on failure restores the previous .env and exits non-zero | the SSH secrets and the built-in token for the registry login | The configuration is restored; there is no automatic database rollback |
-| deploy: publish and verify the Keycloak admin console | Runs `./deploy.sh admin-console enable` on the server | the SSH secrets | See the Keycloak admin console document |
+| deploy: transfer versioned deployment files | Checks the server .env exists and the directory is writable, then streams the deploy, infra, scripts folders and one fixtures file into /srv/matbakhy-staging with tar over SSH | the SSH secrets | Stops; the server .env is not overwritten because the workflow checks out only tracked files and archives only the listed paths from that clean checkout (tar itself does not honour .gitignore, so a manual archive taken from a working copy with a local .env would need explicit exclusions) |
+| deploy: deploy digest-pinned images | Updates three lines of the server .env, then runs `./deploy.sh up` and `./deploy.sh smoke`; if either fails it copies the previous .env back and exits non-zero (a failure before that point, such as the registry login, exits without restoring) | the SSH secrets and the built-in token for the registry login (the registry user name is written into the generated remote script) | Only the .env file is restored: containers already recreated keep running the new images until someone reruns `up` with the restored pins, and there is no automatic database rollback. Before restarting with older pins, check that the older application can run against the schema the failed release may already have migrated (use `./deploy.sh rollback-plan`) |
+| deploy: publish and verify the Keycloak admin console | Runs `./deploy.sh admin-console enable` on the server, after the previous step succeeded | the SSH secrets | No .env restoration exists for this step: if it fails, the new images stay deployed and the run is red. The step name states that the console closes itself again if verification fails; that is a claim in the workflow, and the behaviour itself is NOT VERIFIED. The hardening changes settings stored in Keycloak, which restoring .env would not undo. See the Keycloak admin console document |
 
 Questions:
 
@@ -96,20 +96,20 @@ Decision exercise: a deploy run shows the step "Deploy digest-pinned images" run
 
 Also run `curl -sS -o /dev/null -w '%{http_code}\n' https://api.<preview-domain>/actuator/health` and confirm 404, by design.
 
-Optional, only with permission to use the staff class network: `sh deploy/web-preview/smoke.sh <preview-domain>` is read-only and creates no account or order (VERIFIED IN CODE: header of the script). Set SMOKE_OPS=skip when you are outside the staff class. If you do not run it, record NOT RUN.
+Optional, and read-only: `smoke.sh` creates no account or order (VERIFIED IN CODE: header of the script). Use the command that matches your network. From a machine in the staff class: `sh deploy/web-preview/smoke.sh <preview-domain>`. From a machine outside the staff class: `SMOKE_OPS=skip sh deploy/web-preview/smoke.sh <preview-domain>`; without SMOKE_OPS=skip the script requests the operations web, gets 403 and fails, which is an access-policy answer and not a defect. A customer-only run is also not proof that the staff class works. If you do not run it, record NOT RUN.
 
 ### Task 5. Read the monitoring design
 
 | Item | Detail |
 |---|---|
-| Command | `sed -n 1,40p deploy/web-preview/observability/alerts.yml` and `sed -n 277,296p docs/developer-handbook/08-infrastructure/runtime-architecture.md` |
+| Command | `sed -n 1,40p deploy/web-preview/observability/alerts.yml` and `sed -n '/^## 9. Observability/,/^## 10. Deployment path/p' docs/developer-handbook/08-infrastructure/runtime-architecture.md` |
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
-| Expected result | Alert rules and the observability flow: Docker logs to Alloy to Loki; metrics to Prometheus; Alertmanager to a local alert-sink; Grafana on a loopback port |
-| Verification | Answer: who is notified when an alert fires? Nobody: alerts go to alert-sink, a local test receiver (VERIFIED IN CODE). How does an engineer reach Grafana? Through an SSH tunnel to the loopback port by an authorized engineer; Grafana is bound to 127.0.0.1:3000 (VERIFIED IN CODE and listed as a loopback listener, VERIFIED LIVE). Are the monitoring containers healthy now? NOT VERIFIED LIVE |
+| Expected result | Alert rules and the observability flow: Docker logs → Alloy → Loki; metrics → Prometheus; Alertmanager → a local alert-sink; Grafana on a loopback port |
+| Verification | Answer: who is notified when an alert fires? Nobody: alerts go to alert-sink, a local test receiver (VERIFIED IN CODE). How does an engineer reach Grafana? Through an SSH tunnel to the loopback port by an authorized engineer; Grafana is bound to 127.0.0.1:3000 (VERIFIED IN CODE). A listener on 127.0.0.1:3000 exists on the host (VERIFIED LIVE as a socket), but that it is Grafana is NOT VERIFIED because the container list cannot be read. Are the monitoring containers healthy now? NOT VERIFIED LIVE |
 
-Note for later: backup staleness has an alert (no verified backup in 24 hours). Whether any backup job exists on the live host is NOT VERIFIED.
+Note for later: backup staleness has an alert (BackupStale: no verified backup in 24 hours, VERIFIED IN CODE). Whether any backup job exists on the live host is NOT VERIFIED.
 
 ### Task 6. Troubleshooting drills (reading only)
 

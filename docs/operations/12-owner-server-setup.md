@@ -1,5 +1,7 @@
 # Hetzner staging: what the owner does on the server (exact steps)
 
+> **HISTORICAL (OUTDATED / INCORRECT as current instructions).** These owner steps target the Hetzner proposal (a `matbakhy` operating user, `/srv/matbakhy-preview`, a Hetzner cloud firewall). The observed Contabo host has the accounts `ubuntu`, `devops` and `aiagent` and deploys to `/srv/matbakhy-staging`. Use the [server rebuild guide](../developer-handbook/08-infrastructure/server-rebuild-guide.md) and the [Contabo server inventory](../developer-handbook/08-infrastructure/contabo-server-inventory.md). Kept unchanged below for history.
+
 Status: **instructions only. No server access is assumed; the agent has not touched any server, DNS record or account.** Nothing below has been run on the Hetzner host. The commands were checked as far as they could be on a local machine (see [11](11-staging-deployment-and-rollback.md), "What was rehearsed"). Adjust them to the operating system you choose; they assume Ubuntu 24.04 LTS.
 
 Decisions already made (owner, 2026-10-14): the server is a Hetzner VPS with 2 vCPU and 4 GB RAM; the first Internet-accessible staging runs the **PREVIEW** profile (synthetic data, simulated deposits and payments, no real notification, a visible demo notice); push stays off (`PUSH_DELIVERY_ENABLED=false`); the proposed staging retention defaults stay (logs 30 days, debug logs 7 days, QA artifacts 90 days; not production policies).

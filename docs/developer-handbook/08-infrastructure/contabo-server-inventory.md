@@ -28,7 +28,7 @@ The Preview is a synthetic-data environment, not production and not a release en
 | CPU | 8 vCPU | VERIFIED LIVE |
 | Memory | 23 GiB total; about 3.4 GiB used at the time of observation | VERIFIED LIVE |
 | Disk | /dev/sda1, 290 GB, 18 GB used (6 percent) | VERIFIED LIVE |
-| Time zone | Europe/Berlin (CEST). Cron times and log timestamps on the host follow it unless a tool says UTC | VERIFIED LIVE |
+| Time zone | Europe/Berlin (CEST) is the host time zone. Which time zone each scheduler or logger uses is not established: `deploy.sh` writes release-log timestamps in UTC (`deploy/web-preview/deploy.sh`, function record_release), so do not assume Berlin time for cron entries, application logs or container logs | VERIFIED LIVE (host time zone only); VERIFIED IN CODE (release-log timestamps in UTC); cron and log conventions NOT VERIFIED |
 | Docker Engine | 29.9.1 | VERIFIED LIVE (`docker --version`) |
 | Docker Compose plugin | v5.6.0 | VERIFIED LIVE (`docker compose version`) |
 | Installed packages seen | docker-ce, docker-ce-cli, containerd.io, docker-ce-rootless-extras, ufw, unattended-upgrades | VERIFIED LIVE |
@@ -52,7 +52,7 @@ Group memberships that matter:
 
 | Group | Members (verified) | Why it matters |
 |---|---|---|
-| sudo (gid 27) | ubuntu, devops | Can obtain root through sudo. The sudo policy files are unreadable to aiagent, so the exact rules (password required or not, command limits) are NOT VERIFIED. |
+| sudo (gid 27) | ubuntu, devops | Membership conventionally grants sudo access, but the effective privileges are NOT VERIFIED: the sudo policy files are unreadable to aiagent, so the exact rules (password required or not, command limits) are unknown. |
 | docker (gid 988) | devops | Membership is equivalent to root on the host. Only devops is a member. |
 | users (gid 100) | devops, aiagent | No repository file gives this group a meaning. |
 
@@ -71,7 +71,7 @@ The operational responsibility of each account is not established from the accou
 | devops | not established from the account name | Member of sudo and docker. Owns /srv/matbakhy-staging, its .env, the backup directories and /srv/deployments (VERIFIED LIVE). This is circumstantial only: the deployment SSH user is a GitHub repository secret (see below). |
 | aiagent | not established from the account name | Owns /srv/ai-supervisor and /srv/ai-workspaces, which hold AI tooling and are not part of the Matbakhy runtime (VERIFIED LIVE). Has no sudo and no Docker access. |
 
-The Linux user that the deployment workflow connects as is the repository secret `STAGING_SSH_USER` (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`, step "Transfer versioned deployment files"). Its value is NOT VERIFIED. Ownership of /srv/matbakhy-staging by devops fits devops being that user but does not prove it. How to confirm: an administrator reads the last accepted SSH logins (command 13 on the [admin page](admin-readonly-verification.md)), or a repository administrator checks which secret names exist in the repository settings (names only; values cannot be read).
+The Linux user that the deployment workflow connects as is the repository secret `STAGING_SSH_USER` (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`, step "Transfer versioned deployment files"). Its value is NOT VERIFIED. Ownership of /srv/matbakhy-staging by devops fits devops being that user but does not prove it. How to confirm: an administrator correlates the accepted SSH logins (command 13 on the [admin page](admin-readonly-verification.md)) with the timestamp of one known workflow run and reports any remaining ambiguity, because accepted-login records alone do not show which session belonged to GitHub Actions. Checking which secret names exist in the repository settings only shows that `STAGING_SSH_USER` is set; a name reveals no username and values cannot be read.
 
 ## 3. SSH policy
 
@@ -99,7 +99,7 @@ Listing made with `ls -ld` as aiagent. The "purpose" column is from code or docu
 | /srv | root:root 755 | Parent directory. |
 | /srv/matbakhy-staging | devops:devops 755; modified Oct 18 and Oct 20 | Target of continuous deployment: the workflow unpacks deploy, infra, scripts and one owner-acceptance fixture file into it (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`, step "Transfer versioned deployment files"). It holds a repository-like copy (.github, apps, backend, contracts, deploy, docs, infra, scripts and others), VERIFIED LIVE. |
 | /srv/matbakhy-staging/deploy/web-preview | devops:devops 755 | Working directory of every `deploy.sh` command (VERIFIED IN CODE: `deploy/web-preview/deploy.sh` does `cd` to its own directory). Contains compose.yaml, compose.4gb.yaml, Caddyfile, deploy.sh, admin-console.sh, smoke.sh, seed SQL and the directories identity, observability, postgres, storage and e2e-fixtures (VERIFIED LIVE). |
-| /srv/matbakhy-staging/deploy/web-preview/.env | devops:devops 600 | The server-only configuration file with all secrets. Its content was not read and must never be copied (VERIFIED LIVE for existence, owner and mode). Created by `deploy.sh init-secrets` (VERIFIED IN CODE). |
+| /srv/matbakhy-staging/deploy/web-preview/.env | devops:devops 600 | The server-only configuration file with all secrets. Its content was not read and must never be copied (VERIFIED LIVE for existence, owner and mode). `deploy.sh init-secrets` is the supported way to create it (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`); how this particular file was created is NOT VERIFIED. |
 | /srv/matbakhy-staging/generated | owner devops, mode 700 (drwx------); group not recorded | Probably the rendered realm and storage configuration, because `deploy.sh render` creates a mode 700 GENERATED_DIR with identity, storage and flags inside (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function render). That the live .env sets GENERATED_DIR to this path is NOT VERIFIED. Content not read. |
 | /srv/matbakhy-backups | devops:devops 750; 28 entries, not listable by aiagent | Default BACKUP_DIR: database dumps, image-storage archives, the release log and the shared lock (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`, `deploy/web-preview/deploy.sh`). That the live BACKUP_DIR is this path, and what the 28 entries are, is NOT VERIFIED. |
 | /srv/backups | devops 750 (group not recorded) | Purpose not established. No repository file refers to this path. |
@@ -173,7 +173,8 @@ Everything below needs an authorized infrastructure administrator. The command n
 | Certificate files and renewal state in the Caddy volume | Volume path not readable | 10 |
 | Contents of .env (values) | Secret; only a handful of non-secret key names may be checked | 2 |
 | Contents of /srv/matbakhy-backups, /srv/backups, /srv/deployments | Not listable | 11 |
-| Cron entries of devops and other users | Not readable | 12 |
+| Cron entries of devops and other users, and system schedules | Not readable | 12 |
+| Commit, image digests and revision labels actually deployed | Docker socket and .env not accessible to aiagent | 17, 18 |
 | Which user the deployment SSH key logs in as | Secret STAGING_SSH_USER; log evidence needs root | 13 |
 | Number of authorized SSH keys per account | Not readable | 13 |
 | Process owner of the loopback ports 3000, 18080 and 38189 | Not visible to aiagent | 16 |

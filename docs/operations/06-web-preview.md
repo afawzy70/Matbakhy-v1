@@ -1,5 +1,7 @@
 # Web preview on one VPS (prepared, not deployed)
 
+> **PARTLY OUTDATED.** Written before the Contabo deployment; Hetzner and `/srv/matbakhy-preview` statements are historical. Current live addresses and behaviour: [live Preview access](../developer-handbook/05-developer-workflow/live-preview-access.md); infrastructure: [Contabo server inventory](../developer-handbook/08-infrastructure/contabo-server-inventory.md).
+
 **Owner direction (2026-10-12):** try the web application first. Apple Developer, Google Play and TestFlight setup are deferred.
 
 This is an **early web preview** for the owner's own test journeys. It is not the controlled staging environment of MB-040, and it is not a release. Nothing has been purchased, deployed, published or put into DNS.

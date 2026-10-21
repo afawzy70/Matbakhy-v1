@@ -74,13 +74,13 @@ Fill in this table from the file (VERIFIED IN CODE: `deploy/web-preview/compose.
 | Expected result | edge, ops and internal; only internal carries the setting `internal: true` |
 | Verification | Answer: which service is on edge? Which is on ops? What does `internal: true` do? |
 
-Expected answers: the proxy is on edge and internal; grafana is on ops and internal; a Compose network marked internal has no route out to the Internet and is not reachable from outside the Docker host (standard Docker behaviour, DOCUMENTED ONLY). The comment in the file states the intent: only the proxy is published. Whether the live Docker networks match is NOT VERIFIED LIVE; the live facts only show that three bridge networks exist on the host (VERIFIED LIVE: interfaces br-* with the ranges 172.18, 172.19 and 172.20).
+Expected answers: the proxy is on edge and internal; grafana is on ops and internal; a Compose network marked internal has no route out to the Internet and is not reachable from outside the Docker host (standard Docker behaviour, DOCUMENTED ONLY). The comment in the file states the intent: only the proxy is published to the network (Grafana additionally binds the host loopback address 127.0.0.1:3000, which is not reachable from the Internet). Whether the live Docker networks match is NOT VERIFIED LIVE; the live facts only show that three bridge networks exist on the host (VERIFIED LIVE: interfaces br-* with the ranges 172.18, 172.19 and 172.20).
 
 ### Task 3. Map volumes to data and to loss impact
 
 | Item | Detail |
 |---|---|
-| Command | `sed -n '/^volumes:/,$p' deploy/web-preview/compose.yaml` and `grep -n "postgres-data\|storage-data\|caddy-data" deploy/web-preview/compose.yaml` |
+| Command | `sed -n '/^volumes:/,$p' deploy/web-preview/compose.yaml` and `grep -nE "postgres-data\|storage-data\|caddy-data" deploy/web-preview/compose.yaml` |
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
@@ -100,24 +100,24 @@ Where the volumes sit on the VPS disk and how large they are is NOT VERIFIED LIV
 
 | Item | Detail |
 |---|---|
-| Command | `grep -nE '^\s+- (\./|\.\./|/|\$\{)' deploy/web-preview/compose.yaml` |
+| Command | `grep -nE '^\s+- (\./\|\.\./\|/\|\$\{)' deploy/web-preview/compose.yaml` |
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
 | Expected result | Bind mounts: observability configuration files, `infra/db/reconcile.sql`, the generated flags directory mounted read-only into the proxy, host paths used by alloy and node-exporter, and a few more |
 | Verification | For each mount, say whether it is read-only (suffix :ro). Explain why the proxy gets its flags directory read-only |
 
-Why it matters: the flags directory switch controls whether the Keycloak admin console host answers (see the comments in `deploy/web-preview/Caddyfile`). Day 3 covers the routing. The default value of the directory variable in the file points at /srv/matbakhy-preview/generated, the stale copy, so the real value comes from the server .env, which is NOT VERIFIED.
+Why it matters: the flags directory switch controls whether the Keycloak admin console host answers (see the comments in `deploy/web-preview/Caddyfile`; the file is created and removed by `deploy.sh admin-console`). Day 3 covers the routing. The default value of the directory variable in the file points at /srv/matbakhy-preview/generated, the stale copy, so the real value comes from the server .env, which is NOT VERIFIED.
 
 ### Task 5. Resource limits and the 4 GB override
 
 | Item | Detail |
 |---|---|
-| Command | `grep -nE 'mem_limit|cpus' deploy/web-preview/compose.yaml` then `sed -n 1,8p deploy/web-preview/compose.4gb.yaml` |
+| Command | `grep -nE 'mem_limit\|cpus' deploy/web-preview/compose.yaml` then `sed -n 1,8p deploy/web-preview/compose.4gb.yaml` |
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
-| Expected result | Per-service memory ceilings in the main file, and a second file written for a 2 vCPU, 4 GB Hetzner host |
+| Expected result | Per-service memory and CPU ceilings in the main file, and a second file whose header says it is written for a 2 vCPU, 4 GB Hetzner host |
 | Verification | Answer: is compose.4gb.yaml in use on the Contabo host? Correct answer: NOT VERIFIED. It is only used when the server .env sets COMPOSE_OVERRIDE (VERIFIED IN CODE: comment in the file and `deploy/web-preview/deploy.sh`). The live host has 8 vCPU and about 23 GiB RAM (VERIFIED LIVE), so a 4 GB sizing file is historical (OUTDATED / INCORRECT for the host size) unless an administrator confirms it is set |
 
 ### Task 6. Pinned images and no build on the server
@@ -128,7 +128,7 @@ Why it matters: the flags directory switch controls whether the Keycloak admin c
 | Machine | your laptop |
 | Linux user | your own |
 | Kind | read-only |
-| Expected result | Third-party images carry a version and a sha256 digest; our two images come from variables |
+| Expected result | Third-party images are pinned by a sha256 digest (most also carry a version tag; the storage image is pinned by digest only); our two images come from variables |
 | Verification | Explain how API_IMAGE and FRONT_IMAGE get their values. Answer: the deployment workflow writes them into the server .env after CI built and published the images, see [deployment pipeline](../08-infrastructure/deployment-pipeline.md) (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`) |
 
 ### Task 7. The read-only operator view
@@ -140,7 +140,7 @@ Why it matters: the flags directory switch controls whether the Keycloak admin c
 | Linux user | your own |
 | Kind | read-only (reading the file) |
 | Expected result | The list of subcommands: init-secrets, render, up, seed, smoke, backup, restore-db, prune-qa, status, rollback-plan, admin-console, e2e-reset |
-| Verification | Mark which subcommands only read (status and rollback-plan say so in the header; smoke is documented as a smoke test) and which change state (up, seed, backup, restore-db, e2e-reset, prune-qa with --apply, admin-console). Running any of them is the job of an authorized operator on the server, never part of this lab |
+| Verification | Mark which subcommands only read (status and rollback-plan say so in the header; prune-qa without --apply only lists) and which change state (init-secrets creates .env, render writes configuration and secrets into GENERATED_DIR, up, seed, backup, restore-db, e2e-reset, prune-qa with --apply, admin-console). smoke sends HTTPS requests to the public hosts and creates nothing, but it is meant to run on the server and can fail on access policy. Running any of them is the job of an authorized operator on the server, never part of this lab |
 
 Hand-off to an administrator: to see the real container list, images and volumes, ask an authorized administrator to run the Docker commands on the [admin page](../08-infrastructure/admin-readonly-verification.md) and return sanitised output. Never ask for raw `docker inspect` or `docker compose config` output, which print secrets.
 

@@ -68,8 +68,8 @@ Synthetic account names documented for the Preview realm `matbakhy` (DOCUMENTED 
 Each journey below has the same fields. Detailed step lists, error tables and tests are on the linked journey page; this page only adds live entry points.
 
 * Customer Web uses hash routing (`window.location.hash`, VERIFIED IN CODE: `apps/customer-web/src/App.tsx`). Verified routes: `#/`, `#/meal/<uuid>`, `#/kitchen/<slug>`, `#/checkout`, `#/orders`, `#/orders/<uuid>`, `#/account`, `#/support/<uuid>`. Meal and order ids are not stable across environments, so start from the home page and click.
-* Operations Web has no URL routes: after sign-in it shows tabs selected in application state (VERIFIED IN CODE: `apps/operations-web/src/App.tsx`). Navigation is always: open `https://ops.167-86-90-174.sslip.io/`, sign in, click the tab. Which tabs appear depends on what the server allows the account (probe requests), so a missing tab means a missing permission, not a bug.
-* Bottom navigation of Customer Web shows Home, Cart, My orders and My account in English; the last two appear only when signed in (`apps/customer-web/src/i18n.ts`). The language toggle switches Arabic RTL and English LTR.
+* Operations Web has no URL routes: after sign-in it shows tabs selected in application state (VERIFIED IN CODE: `apps/operations-web/src/App.tsx`). Navigation is always: open `https://ops.167-86-90-174.sslip.io/`, sign in, click the tab. Which tabs appear depends on what the server allows the account: the app sends probe requests after sign-in and shows a tab only when its probe succeeds (the Finance tab appears on the 404 answer for an unknown kitchen). A missing tab therefore usually means the account lacks the permission, but a probe that failed on the server or the network hides its tab too. Before reporting a missing permission, reload and read the status and body of the probe requests in the browser's developer tools: a 401 or 403 with an error code is an authorization answer; a 5xx, a timeout, or a 403 with the plain text "Not available" (the staff IP class) is not a permission problem.
+* The top bar of Customer Web holds Cart (and Sign in) and the language toggle; the bottom navigation shows Home and, only when signed in, My orders and My account, in English (VERIFIED IN CODE: `apps/customer-web/src/App.tsx`; labels in `apps/customer-web/src/i18n.ts`). The language toggle switches Arabic RTL and English LTR.
 
 ### J1 Customer registration and login
 
@@ -231,7 +231,7 @@ Each journey below has the same fields. Detailed step lists, error tables and te
 | Navigation | Customer: "My account", support section. Staff: tab "Support" or "Finance". |
 | Steps | Customer opens a case about an order. Support reads the queue, replies, resolves with a code and a reason. Finance opens the payment panels inside "Finance" and approves a recipient or decides a dispute. |
 | Expected result | A resolved case closes only with a resolution code and reason; a customer reply reopens it. A deposit order cannot be prepared before the kitchen reports receipt. |
-| Backend APIs | `GET/POST /api/v1/support/cases`, `/api/v1/ops/cases`, `POST /api/v1/cook/orders/{orderId}/payment/receipt`, `/api/v1/ops/finance/**` |
+| Backend APIs | `GET/POST /api/v1/support/cases`, `/api/v1/ops/cases`. Payments: `POST /api/v1/cook/orders/{orderId}/payment/receipt`, `GET /api/v1/ops/payment-recipients`, `POST /api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval`, `GET /api/v1/ops/payments`, `POST /api/v1/ops/orders/{orderId}/payment/decision`. Statements, refunds and settlements: `/api/v1/ops/finance/**` |
 | Implementation | `apps/operations-web/src/ops/Cases.tsx`, `Finance.tsx`, `Payments.tsx` (same folder), `backend/modules/support/src/main/java/com/matbakhy/support/web/SupportController.java`, `backend/modules/orders/src/main/java/com/matbakhy/orders/web/PaymentController.java` |
 | Related tests | TC-041, TC-032, TC-159, TC-160; `E2E-OPS-105`, `E2E-FIN-103` |
 | Limitations | The finance cash-verification screen is absent from the web (API only). No bank API; a human reconciles deposits. Detail: [Finance and support](../02-user-journeys/finance-and-support.md). |
@@ -276,7 +276,10 @@ The rule: a completed or placed order keeps the price it was created with; a pri
 | `curl -s https://api.167-86-90-174.sslip.io/api/v1/configuration/public` | Your laptop, any user | Yes | JSON with `environment.name` PREVIEW | Same as above |
 | `curl -s -o /dev/null -w "%{http_code} %{redirect_url}\n" https://id.167-86-90-174.sslip.io/` | Your laptop, any user | Yes | 302 and the kc-admin address | Not an error; do not follow it and sign in unless you are an administrator |
 
-The repository's own check is `deploy/web-preview/smoke.sh` (read-only, run on the VPS or from an allow-listed machine; it expects the staff-class refusal from machines outside the class, so run it from the right network).
+The repository's own check is `deploy/web-preview/smoke.sh <preview-domain>` (VERIFIED IN CODE: its header comment says it is read-only and creates no account, order or upload; it was not run for this page). Use the command that matches the machine:
+
+* A machine in both the customer and the staff class (for example the VPS itself): `sh deploy/web-preview/smoke.sh 167-86-90-174.sslip.io`. It loads the operations app and fails on a 403 from `ops.*`.
+* A machine in the customer class but outside the staff class: `SMOKE_OPS=skip sh deploy/web-preview/smoke.sh 167-86-90-174.sslip.io`. With `SMOKE_OPS=skip` the script expects the 403 from `ops.*` instead of loading the operations app.
 
 ## Known limitations and documentation gaps
 

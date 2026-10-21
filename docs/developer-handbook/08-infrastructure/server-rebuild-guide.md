@@ -92,7 +92,7 @@ Prerequisite: SSH access as a sudo-capable administrator.
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
-| `sudo apt-get update` then `sudo apt-get -y upgrade` | VPS, `<admin-user>` with sudo | state-changing | `lsb_release -d` shows Ubuntu 24.04 | held kernel or reboot required: reboot in a quiet window |
+| `sudo apt-get update` then `sudo apt-get -y upgrade` | VPS, `<admin-user>` with sudo | state-changing | `lsb_release -d` shows Ubuntu 24.04 | a kernel package held back by `apt-mark hold`, or a reboot is required: reboot in a quiet window |
 | `sudo apt-get -y install unattended-upgrades ca-certificates curl gnupg openssl python3 tar` | VPS, `<admin-user>` with sudo | state-changing | `command -v openssl python3 curl flock tar` prints five paths | `flock` is in util-linux, normally preinstalled |
 
 Why these packages (VERIFIED IN CODE): `deploy.sh` uses `openssl`, `flock`, `sed`, `awk`; the CD remote script and `admin-console.sh` call `python3`; the CD job streams `tar`; `smoke.sh` uses `curl`. Nothing in the scripts uses `sudo`. `git` is not needed by the CD path (it copies files with `tar`); `docs/operations/12-owner-server-setup.md` installs it only for a manual clone. `unattended-upgrades` is active on the current host (VERIFIED LIVE) but is a convention, not a code requirement. `fail2ban` is not installed on the current host (VERIFIED LIVE) and nothing in the repository requires it. The 2 GiB swap file in the Hetzner-era text was sized for a 4 GB host; whether the current host has swap is NOT VERIFIED and the code does not require it.
@@ -126,14 +126,17 @@ Do not add a non-human or observer account to `sudo` or `docker`. Membership of 
 
 Prerequisite: Step 4. The CD job writes the private key to a file and connects with `BatchMode=yes`, so the key must have no passphrase (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`).
 
-Generate a dedicated key pair on your laptop (never reuse a personal key), then install the public half.
+Generate a dedicated key pair on your laptop (never reuse a personal key), copy only the public half to the VPS and install it. The private key never leaves the laptop except into the GitHub secret in Step 15. Do not delete the local private key until a separate human operator login (your own personal key on `<admin-user>`, from Step 2) is proven, because that key is the only credential this guide installs for the deploy account; without a human login you lose the route for later manual steps, which can go through `<admin-user>` and `sudo -iu <deploy-user>` instead.
 
 ```sh
-# laptop, any user: state-changing (creates a key pair in <keyfile>); the private key goes into the GitHub secret in Step 15 and is then deleted
+# laptop, any user: state-changing (creates a key pair in <keyfile>); the private key goes into the GitHub secret in Step 15 and is deleted only after the operator login is proven
 ssh-keygen -t ed25519 -N "" -C "matbakhy-cd" -f <keyfile>
-# VPS, <admin-user> with sudo: state-changing (installs the public key for the deploy account)
+# laptop, any user: state-changing on the VPS (copies only the PUBLIC key to a temporary file)
+scp <keyfile>.pub <admin-user>@<vps-ip>:/tmp/matbakhy-cd.pub
+# VPS, <admin-user> with sudo: state-changing (installs the public key for the deploy account, then removes the temporary file)
 sudo install -d -m 700 -o <deploy-user> -g <deploy-user> /home/<deploy-user>/.ssh
-sudo install -m 600 -o <deploy-user> -g <deploy-user> /dev/stdin /home/<deploy-user>/.ssh/authorized_keys < <keyfile>.pub
+sudo install -m 600 -o <deploy-user> -g <deploy-user> /dev/stdin /home/<deploy-user>/.ssh/authorized_keys < /tmp/matbakhy-cd.pub
+rm /tmp/matbakhy-cd.pub
 ```
 
 | Verify | Likely failure |
@@ -257,15 +260,15 @@ Prerequisite: Step 12. Edit the file with the editor of your choice as `<deploy-
 |---|---|---|
 | `PREVIEW_DOMAIN` | `<domain>` | `deploy.sh check` refuses `example.invalid` (VERIFIED IN CODE) |
 | `ACME_EMAIL` | a mailbox you control | required by `compose.yaml` |
-| `ALLOWED_CLIENT_IPS` | space-separated addresses or ranges; quote the value when it holds more than one, because the shell sources the file | VERIFIED IN CODE: `.env.example`, `deploy.sh` `load` |
+| `ALLOWED_CLIENT_IPS` | space-separated addresses or ranges; quote the value when it holds more than one, because the shell sources the file. It must also contain the VPS's own public address `<vps-ip>` (and, if you set `CUSTOMER_ALLOWED_IPS` and `STAFF_ALLOWED_IPS`, it must be in both lists), because the first deployment runs `./deploy.sh smoke` on the VPS itself; the address Caddy sees for that request is NOT VERIFIED (Step 26) and cannot be tested before Caddy runs | VERIFIED IN CODE: `.env.example`, `deploy.sh` `load` |
 | `GENERATED_DIR` | `/srv/matbakhy-staging/generated` | see the gap in Step 10 |
 | `BACKUP_DIR`, `QA_ARTIFACT_DIR` | the directories from Step 10 | VERIFIED IN CODE |
-| `CUSTOMER_ALLOWED_IPS`, `STAFF_ALLOWED_IPS` | leave unset to keep everything restricted to `ALLOWED_CLIENT_IPS`; public customers are an explicit owner decision (`0.0.0.0/0 ::/0`) | VERIFIED IN CODE: `.env.example` |
+| `CUSTOMER_ALLOWED_IPS`, `STAFF_ALLOWED_IPS` | leave unset to keep everything restricted to `ALLOWED_CLIENT_IPS`; public customers are an explicit owner decision (`0.0.0.0/0 ::/0`); staff API paths need both classes (see Step 22), so every staff address must also be in the customer list | VERIFIED IN CODE: `.env.example` |
 | `PUSH_DELIVERY_ENABLED` | `false` | VERIFIED IN CODE: deployed environments refuse `true` |
 | `COMPOSE_OVERRIDE` | leave unset on a host of the current size; `compose.4gb.yaml` only for a 4 GB host. Whether the live `.env` sets it is NOT VERIFIED | VERIFIED IN CODE |
 | `RELEASE_COMMIT`, `API_IMAGE`, `FRONT_IMAGE` | leave the placeholders; the CD remote script rewrites these three lines (Step 18). Running `./deploy.sh up` by hand before that fails by design | VERIFIED IN CODE: `deploy.sh check`, workflow |
 
-Verify (read-only, deploy account): `grep -c REPLACE_ME .env` should print 0 once the secrets exist; `grep -v '^#' .env | grep -c 'example.invalid'` should print 0. These commands print counts, not values. Likely failure: a value with a space and no quotes breaks sourcing; quote it.
+Verify (read-only, deploy account): `grep -v '^[[:space:]]*#' .env | grep -c REPLACE_ME` should print 0 once the secrets exist (comment lines are excluded because `.env` keeps the comments of `.env.example`, one of which mentions `REPLACE_ME`, exactly as `deploy.sh check` skips them); `grep -v '^#' .env | grep -c 'example.invalid'` should print 0. These commands print counts, not values. Likely failure: a value with a space and no quotes breaks sourcing; quote it.
 
 ## Phase 4. DNS, GitHub secrets, images, workflow
 
@@ -303,7 +306,7 @@ gh secret set STAGING_SSH_HOST_PUBKEY --env preview --repo <owner>/<repo> < <fil
 
 | Verify | Likely failure |
 |---|---|
-| `gh secret list --env preview --repo <owner>/<repo>` lists the four names (names only, values are never shown) | The environment `preview` must exist first; create it in the repository settings. After setting the key, delete the local `<keyfile>` and its `.pub` if you do not need them. The `gh` flags follow the tool's own manual; confirm with `gh secret set --help` |
+| `gh secret list --env preview --repo <owner>/<repo>` lists the four names (names only, values are never shown) | The environment `preview` must exist first; create it in the repository settings. After setting the key, and only after the human operator login from Step 5 works, delete the local `<keyfile>` and its `.pub` if you do not need them. The `gh` flags follow the tool's own manual; confirm with `gh secret set --help` |
 
 The deploy job aborts with `Missing <name>` when any of the four is empty (VERIFIED IN CODE).
 
@@ -332,7 +335,7 @@ Do not change workflow files without the repository owner's authorization.
 
 ### Step 18. First deploy through CD
 
-Prerequisite: Steps 1 to 17. Trigger: a push to `develop`, or Run workflow on `develop` for `Deploy Matbakhy preview to Contabo` (VERIFIED IN CODE: `workflow_dispatch` exists). Concurrency group `matbakhy-preview-deploy` serialises runs.
+Prerequisite: Steps 1 to 17, including the VPS's own address in the allow-list (Step 13). If smoke gets a 403 because Caddy sees another address, the CD job restores the previous `.env` and fails; correct the allow-list and run again. Trigger: a push to `develop`, or Run workflow on `develop` for `Deploy Matbakhy preview to Contabo` (VERIFIED IN CODE: `workflow_dispatch` exists). Concurrency group `matbakhy-preview-deploy` serialises runs.
 
 What the pipeline does, in order (VERIFIED IN CODE): wait up to 60 times 30 seconds for a passing Product CI run on the exact commit; build the API jar; build and push both images; in the deploy job, check the four secrets, write the key and `known_hosts`, check `.env` exists and the directory is writable, stream `deploy`, `infra`, `scripts` and the fixtures file to `/srv/matbakhy-staging` with `tar`, copy a temporary remote script, rewrite `RELEASE_COMMIT`, `API_IMAGE` and `FRONT_IMAGE` in `.env`, run `./deploy.sh up` and `./deploy.sh smoke`; on failure restore the previous `.env` (containers and data are not rolled back); finally run `./deploy.sh admin-console enable`.
 
@@ -385,7 +388,7 @@ Caddy runs inside the front container, not on the host (VERIFIED IN CODE: `deplo
 |---|---|---|
 | `app.` | customer web | customer |
 | `ops.` | operations web | staff |
-| `api.` | proxies only `/api/*`, `/oauth2/*`, `/login/oauth2/*`, `/logout`; everything else 404 (actuator is not exposed); `/api/v1/ops*` and `/api/v1/cook*` need the staff class | customer, staff for those paths |
+| `api.` | proxies only `/api/*`, `/oauth2/*`, `/login/oauth2/*`, `/logout`; everything else 404 (actuator is not exposed); `/api/v1/ops*` and `/api/v1/cook*` need the staff class, checked first, and then the customer class like every other path of this host | customer; staff and customer for those paths |
 | `id.` | Keycloak, but `/admin*` and `/realms/master*` answer 404 | customer |
 | `kc-admin.` | 404 until the switch file `flags/admin-console-public` exists, then only the console paths | not IP restricted; protected by Keycloak password plus one-time password |
 | `media.` | storage gateway | customer |
@@ -447,7 +450,7 @@ The destructive `./deploy.sh e2e-reset` additionally needs the marker file `.e2e
 
 ### Step 28. Backups
 
-`./deploy.sh backup` writes a custom-format PostgreSQL dump with checksum and manifest into `BACKUP_DIR`, restores it into a scratch database and reconciles it, then stops the storage service briefly and archives its data as `storage-<stamp>.tgz` (uploads pause meanwhile). A backup counts only after the restore check. The pre-deploy backup in `up` uses the same database routine (VERIFIED IN CODE). The repository contains no cron entry or timer for backups; no Matbakhy backup cron was visible to the unprivileged account on the live host, and other users' crontabs are unreadable, so whether scheduled backups exist is NOT VERIFIED.
+`./deploy.sh backup` writes a custom-format PostgreSQL dump with checksum and manifest into `BACKUP_DIR`, restores it into a scratch database and reconciles it, then stops the storage service briefly and archives its data as `storage-<stamp>.tgz` (uploads pause meanwhile). A backup counts only after the restore check. Failure state: `backup` has no recovery trap, so if the archive command fails the script exits before `compose start storage` and the storage service stays stopped (uploads keep failing); check it with `docker compose --env-file .env -f compose.yaml ps storage` and, as the deploy account, restart it with `docker compose --env-file .env -f compose.yaml start storage` (add `-f "$COMPOSE_OVERRIDE"` when `.env` sets it), then investigate the archive error. The pre-deploy backup in `up` uses the same database routine (VERIFIED IN CODE). The repository contains no cron entry or timer for backups; no Matbakhy backup cron was visible to the unprivileged account on the live host, and other users' crontabs are unreadable, so whether scheduled backups exist is NOT VERIFIED.
 
 ```sh
 # VPS, <deploy-user>: state-changing (edits that account's crontab). The schedule is a convention taken from docs/operations/12-owner-server-setup.md section 9, adapted to this install path; server local time applies.
@@ -460,11 +463,11 @@ The destructive `./deploy.sh e2e-reset` additionally needs the marker file `.e2e
 
 ### Step 29. Logging and monitoring
 
-Containers log with the `json-file` driver (10 MB, 3 files); Alloy reads `/var/lib/docker/containers` and ships to Loki; Prometheus, Alertmanager (local test sink only, no real recipients), node-exporter and Grafana run on the internal network; retention is `LOG_RETENTION=720h`, `DEBUG_LOG_RETENTION=168h`, `METRICS_RETENTION=15d` (VERIFIED IN CODE: `compose.yaml`, `.env.example`; proposed defaults, not approved policy). Grafana is published only on `127.0.0.1:3000`; reach it with an SSH tunnel. A loopback listener on port 3000 exists on the current host (VERIFIED LIVE), but the compose-level facts (container list, limits) are NOT VERIFIED LIVE because the unprivileged account cannot read the Docker socket.
+Containers log with the `json-file` driver (10 MB, 3 files); Alloy reads `/var/lib/docker/containers` and ships to Loki; Prometheus, Alertmanager (local test sink only, no real recipients), node-exporter and Grafana run on the internal network; retention is `LOG_RETENTION=720h`, `DEBUG_LOG_RETENTION=168h`, `METRICS_RETENTION=15d` (VERIFIED IN CODE: `compose.yaml`, `.env.example`; proposed defaults, not approved policy). Grafana is published only on `127.0.0.1:3000`; reach it with an SSH tunnel through the human operator login from Step 5, not through the CD key. A loopback listener on port 3000 exists on the current host (VERIFIED LIVE), but the compose-level facts (container list, limits) are NOT VERIFIED LIVE because the unprivileged account cannot read the Docker socket.
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
-| `ssh -N -L 3000:127.0.0.1:3000 <deploy-user>@<vps-ip>` then open `http://127.0.0.1:3000` | laptop | read-only | the Grafana sign-in page opens; user `ops-admin`, password `GRAFANA_ADMIN_PASSWORD` from the server `.env` | port busy on the laptop: use another local port |
+| `ssh -N -L 3000:127.0.0.1:3000 <admin-user>@<vps-ip>` then open `http://127.0.0.1:3000` | laptop | read-only | the Grafana sign-in page opens; user `ops-admin`, password `GRAFANA_ADMIN_PASSWORD` from the server `.env` | port busy on the laptop: use another local port |
 
 ### Step 30. Rollback readiness
 
@@ -489,6 +492,8 @@ Use this part only on a NEW isolated server after Part A steps 1 to 18 produced 
 | Keycloak database | `owner-e2e-provision.sh apply` writes a `pg_dump` of `keycloak` under `BACKUP_DIR/keycloak`; there is no restore script for it. Realm secrets in a restored database must match the new `.env` | NOT VERIFIED procedure |
 | Image storage | `./deploy.sh backup` creates `storage-<stamp>.tgz`; there is no restore script | NOT VERIFIED procedure |
 | Secrets (`.env`) | Not in any backup by design; a lost `.env` cannot be regenerated without breaking existing volumes (Step 12) | VERIFIED IN CODE |
+
+This table is a list of what the code supports, not a rehearsable recovery sequence. Missing from the repository: the Keycloak and storage restore, the cutover of the application to the restored database, ownership and grants of the restored objects, secrets handling, validation and rollback of the cutover. Treat the recovery as NOT VERIFIED and not operationally sufficient until the owner defines and rehearses one sequence covering all stores.
 
 Verification after a restore: `./deploy.sh status` (schema version) and the row-count lines printed by the reconcile step. Do not treat a restore as complete until an authorized administrator has run the recovery page's checks and you have rehearsed the procedure on a throwaway server.
 
