@@ -4,7 +4,7 @@
 > **Status:** PARTIALLY IMPLEMENTED — الـ Local Stack المبني على Docker وخوادم Vite للتطوير موجودين (IMPLEMENTED) والـ CI بيجرّبهم على Linux؛ وإجراءات Windows/macOS وتشغيل الـ API برّه Docker هي NOT VERIFIED.
 > **Language / اللغة:** [English](local-environment.md) · العربية
 
-سطّب الأدوات الأول ([prerequisites.md](prerequisites-ar.md)). كل حاجة هنا بتستخدم بيانات تجريبية غير حقيقية (Synthetic) وSecrets محلية بس.
+سطّب الأدوات الأول ([prerequisites.md](prerequisites-ar.md)). كل حاجة هنا بتستخدم بيانات تجريبية غير حقيقية (Synthetic Data) وSecrets محلية بس.
 
 ## اللي بيوفّره `scripts/dev.sh`
 

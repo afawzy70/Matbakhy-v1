@@ -17,8 +17,8 @@
 | التحقق من Bearer JWT الـ Native (الـ Issuer، الـ Audience) | IMPLEMENTED | `SecurityConfiguration` bearerChain؛ `IdentityIntegrationTest` |
 | ربط الحساب، ورفض الحساب الموقوف، والأدوار من حالة السيرفر بس | IMPLEMENTED | `AccountMapper`، `AccountLifecycleService` |
 | الملف الشخصي، والموبايل المصري الموثّق (أكواد متخزّنة كـ Hash ولاستخدام واحد، مع حدود)، والعناوين | IMPLEMENTED | `ContactIntegrationTest`، TC-003..005؛ مزوّد SMS الحقيقي **PLANNED** (O07؛ فيه Sender وهمي بس) |
-| صلاحيات الموظفين، وحماية آخر أدمن والتصعيد الذاتي، وسجل التدقيق | IMPLEMENTED | `StaffAccessIntegrationTest`، TC-006/007/043 |
-| سياسة MFA قابلة للضبط (Keycloak هو اللي بينفّذ MFA؛ DISABLED/OPTIONAL/REQUIRED لكل فئة)، وفلتر الإنفاذ، وإعادة ضبط الأدمن، وتفضيل المستخدم | IMPLEMENTED | `MfaPolicyService`، `MfaEnforcementFilter`، V31؛ `MfaPolicyIntegrationTest`، `MfaPolicyResolveTest`، `MfaIdpTest`، `MfaResetIntegrationTest`، `MfaResetAuditIntegrationTest`؛ D18. مش Story منفصلة في الـ Backlog (شوف التعارضات) |
+| صلاحيات الموظفين، وحماية آخر أدمن ومنع التصعيد الذاتي للصلاحيات، وسجل التدقيق | IMPLEMENTED | `StaffAccessIntegrationTest`، TC-006/007/043 |
+| سياسة MFA قابلة للضبط (Keycloak هو اللي بينفّذ MFA؛ DISABLED/OPTIONAL/REQUIRED لكل فئة)، وفلتر الإنفاذ، وإعادة ضبط MFA بواسطة الأدمن، وتفضيل المستخدم | IMPLEMENTED | `MfaPolicyService`، `MfaEnforcementFilter`، V31؛ `MfaPolicyIntegrationTest`، `MfaPolicyResolveTest`، `MfaIdpTest`، `MfaResetIntegrationTest`، `MfaResetAuditIntegrationTest`؛ D18. مش Story منفصلة في الـ Backlog (شوف التعارضات) |
 | طلبات الطبّاخين، وقرار المراجع مع Step-up، وإنشاء المطبخ، والإيقاف المؤقت/التعليق | IMPLEMENTED | `CookWorkflowIntegrationTest`، TC-008/009؛ MB-012 DONE |
 | خط الميديا (رفع موقّع، تحقق، فحص، مستندات خاصة، تنظيف) | IMPLEMENTED with fakes | `MediaIntegrationTest`، `MediaCleanupIntegrationTest`؛ فاحص البرمجيات الخبيثة الحقيقي **PLANNED** (O07) |
 | الوجبات، ونسخها (Revisions)، وحراس النشر، والإشراف، وتاريخ الأسعار | IMPLEMENTED | `MealIntegrationTest`، `ModerationIntegrationTest`، `PriceHistoryIntegrationTest`؛ MB-014، MB-048 |
@@ -31,7 +31,7 @@
 | الكاش عند الاستلام: تبليغ الطبّاخ، وتحقق المالية، وفصل المهام | IMPLEMENTED | `CashAndLedgerIntegrationTest` |
 | دفتر الأستاذ (Ledger) (متوازن، للإضافة فقط)، والاستردادات، والتسويات، وكشوف الحساب | IMPLEMENTED | `CashAndLedgerIntegrationTest`، `FinanceOperationsIntegrationTest`؛ العمولة 0 عند الإطلاق (`ZeroCommissionIntegrationTest`، D10) |
 | عمولة المنصة ورسوم المنصة على العميل | DISABLED | إمكانية موجودة تقنيًا لكنها مش مفعّلة: الـ Database بترفض أي نسبة مش صفر للسياسات غير الاصطناعية (non-synthetic) (V23)؛ D10 |
-| مدفوعات العربون (اعتماد مستلم مدفوعات المطبخ، تبليغ العميل، استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **التعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل** (D16، مراجعة قانونية/مزوّد) |
+| مدفوعات العربون (اعتماد مستلم مدفوعات المطبخ، تبليغ العميل، استلام المطبخ، النزاعات، المطابقة، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **التعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل** (D16، مراجعة قانونية/مزوّد) |
 | بوابة دفع آلية، وتحقق بنكي، وEscrow، وصندوق ضمان | PLANNED (بحث مستقبلي فقط) | `docs/strategy/mvp-direct-deposit-payment.md` بيوسمهم مؤجَّلين |
 | صندوق الإشعارات داخل التطبيق، والـ Outbox Dispatcher بـ Leases/إعادة محاولة/Dead Letters | IMPLEMENTED | `NotificationIntegrationTest` |
 | تسليم Push خارجي (FCM/APNs) | DISABLED | `matbakhy.notifications.push-enabled` قيمته الافتراضية false؛ مفيش Adapter حقيقي (O07) |

@@ -52,7 +52,7 @@
 8. **الـ Backend.** `CookReviewController.java` → `CookReviewService.java` (`refuseSelfReview`، `decide`، `createFromApproval` في `KitchenService`).
 9. **قاعدة البيانات.** `cook_application`، `cook_application_revision`، `kitchen`، `kitchen_zone` (V5)، `audit_event` (V4).
 10. **الانتقالات.** زي CO-1؛ `START_REVIEW` من `SUBMITTED` بس؛ والقرارات من `UNDER_REVIEW` بس؛ والمطبخ `operating_state = ACTIVE` عند الإنشاء.
-11. **الأخطاء.** `FORBIDDEN` مراجعة النفس؛ `VERSION_CONFLICT`؛ `STATE_CONFLICT` Revision قديم؛ `STEP_UP_REQUIRED` من غير MFA حديث.
+11. **الأخطاء.** `FORBIDDEN` لما الشخص يراجع طلبه بنفسه؛ `VERSION_CONFLICT`؛ `STATE_CONFLICT` Revision قديم؛ `STEP_UP_REQUIRED` من غير MFA حديث.
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/cooks/CookWorkflowIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/security/StaffAssuranceTest.java`، `apps/operations-web/src/App.test.tsx`.
 13. **اختبارات المالك E2E.** E2E-COOK-049، E2E-OPS-108، E2E-OPS-109، E2E-COOK-111؛ J6 (محتاج الـ Deployment المحدّث وMFA الـ Staff).
 14. **الحالة.** IMPLEMENTED.
@@ -127,7 +127,7 @@
 11. **الأخطاء.** `ORDER_ENDED` (بلّغ عن استرداد بدلها)، `NO_DEPOSIT_WAITING`، تقرير كاش واحد لكل أوردر (E2E-FIN-102)، لازم مبلغ الاستلام يتطابق (E2E-FIN-041).
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `PaymentReconciliationIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/finance/CashAndLedgerIntegrationTest.java`، `ZeroCommissionIntegrationTest.java`، `apps/operations-web/e2e/money-reflow.e2e.ts`.
 13. **اختبارات المالك E2E.** E2E-FIN-038، E2E-FIN-039، E2E-FIN-040، E2E-FIN-043، E2E-FIN-106، E2E-FIN-107، E2E-FIN-108، E2E-FIN-109، E2E-FIN-111، E2E-FIN-102، E2E-COOK-108؛ من J2 لـ J4.
-14. **الحالة.** IMPLEMENTED (بيانات اصطناعية (Synthetic)؛ التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة).
+14. **الحالة.** IMPLEMENTED (بيانات تجريبية غير حقيقية (Synthetic Data)؛ التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة).
 15. **القيود.** تفاصيل تحويل العربون إفادة من المطبخ، مش تأكيد بنكي.
 
 ## CO-7 إعدادات المطبخ، الإيقاف المؤقت، والتعليق

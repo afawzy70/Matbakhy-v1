@@ -66,7 +66,7 @@
 
 ## الرحلات
 
-عناصر مشتركة لكل الرحلات اللي تحت. **الطرف:** زائر أو عميل (Bearer Token؛ سلطة `ACCOUNT_ACTIVE`؛ ملكية على مستوى الكائن). **الـ Backend والجداول:** مطابقة لرحلات الويب؛ شوف الرحلات المرقمة في [ويب العميل](customer-web-ar.md) (من CW-1 لـ CW-7) بدل تكرارها. **الاختبارات (كلها):** jest `apps/customer-mobile/src/App.test.tsx`، `apps/customer-mobile/src/auth.test.ts`، `apps/customer-mobile/src/signIn.test.ts`، `apps/customer-mobile/src/ordering.test.ts`؛ وأداة الـ CI الـ Native فوق؛ وبيانات البذر `apps/customer-mobile/e2e-native/seed.sql` (بيانات اصطناعية (Synthetic)، للـ CI بس). نتايج المجموعات دي للـ Commit الحالي: NOT VERIFIED هنا.
+عناصر مشتركة لكل الرحلات اللي تحت. **الطرف:** زائر أو عميل (Bearer Token؛ سلطة `ACCOUNT_ACTIVE`؛ ملكية على مستوى الكائن). **الـ Backend والجداول:** مطابقة لرحلات الويب؛ شوف الرحلات المرقمة في [ويب العميل](customer-web-ar.md) (من CW-1 لـ CW-7) بدل تكرارها. **الاختبارات (كلها):** jest `apps/customer-mobile/src/App.test.tsx`، `apps/customer-mobile/src/auth.test.ts`، `apps/customer-mobile/src/signIn.test.ts`، `apps/customer-mobile/src/ordering.test.ts`؛ وأداة الـ CI الـ Native فوق؛ وبيانات البذر `apps/customer-mobile/e2e-native/seed.sql` (بيانات تجريبية غير حقيقية (Synthetic Data)، للـ CI بس). نتايج المجموعات دي للـ Commit الحالي: NOT VERIFIED هنا.
 
 ### CM-1 تسجيل الدخول، إعادة التشغيل، تسجيل الخروج، تبديل الحساب
 1. الهدف: Session موبايل مصادَق عليها مابتتسربش بين الناس (BR-048، TC-048).

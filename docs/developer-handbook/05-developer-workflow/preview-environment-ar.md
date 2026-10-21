@@ -1,7 +1,7 @@
 # بيئة المعاينة
 
 > **Owner role:** Infrastructure and deployment
-> **Status:** PARTIALLY IMPLEMENTED — بيئة معاينة ببيانات تجريبية غير حقيقية (Synthetic) على VPS واحد بتتنشر من `develop` بواسطة `.github/workflows/deploy-preview.yml`؛ هي مش Staging ومش Production. حالة السيرفر ماتفحصتش وقت كتابة الصفحة (NOT VERIFIED).
+> **Status:** PARTIALLY IMPLEMENTED — بيئة معاينة ببيانات تجريبية غير حقيقية (Synthetic Data) على VPS واحد بتتنشر من `develop` بواسطة `.github/workflows/deploy-preview.yml`؛ هي مش Staging ومش Production. حالة السيرفر ماتفحصتش وقت كتابة الصفحة (NOT VERIFIED).
 > **Language / اللغة:** [English](preview-environment.md) · العربية
 
 ## هي إيه
