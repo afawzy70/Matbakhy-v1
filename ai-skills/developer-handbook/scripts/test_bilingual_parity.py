@@ -306,6 +306,13 @@ class ParityTests(unittest.TestCase):
         self.f.edit("a-ar.md", 'DB_PASSWORD="Synthetic Secret42" ', "")
         self.assertEqual(self.f.check(), {})
 
+    def test_punctuated_credential_fragments_never_reach_diagnostics(self) -> None:
+        self.f.edit("a.md", "`code_id`", "`code_id` DB_PASSWORD=\"SomeSecret42!\"")
+        problems = self.f.check()
+        flat = json.dumps(problems, ensure_ascii=False)
+        self.assertNotIn("SomeSecret42", flat)
+        self.assertProblem(problems, "secrets")
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")

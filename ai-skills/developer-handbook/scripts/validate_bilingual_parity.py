@@ -164,7 +164,7 @@ class Features:
     """Everything the comparison needs from one parsed page."""
 
     def __init__(self, text: str) -> None:
-        self.text = LANG_LINE_RE.sub("", text)
+        self.text = redact(LANG_LINE_RE.sub("", text))  # credential values never enter the extracted features, so no diagnostic can print a fragment of one
         toks = md_parser().parse(self.text)
         self.headings: list[tuple[int, str]] = []
         self.fences: list[tuple[str, str]] = []
