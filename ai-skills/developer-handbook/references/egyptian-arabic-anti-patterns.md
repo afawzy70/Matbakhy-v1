@@ -47,6 +47,11 @@ Recurring mistakes found while mirroring a real engineering handbook into Egypti
 - Good: "ومن غير" · "اترفض" · "و 3" or "من 1 إلى 3" · long Latin identifiers in code spans · Western digits.
 - Why: breaks readability and tool-based checks.
 
+## A10 A statement of fact turned into an instruction, or an order word read wrongly
+- Bad: "not tested here" → "ماتجرّبش هنا" (reads as "do not test here") · "No permission was changed to produce this page" → "ماتغيّرش أي صلاحية عشان تتكتب الصفحة" (reads as an order to the reader) · "a later drop-in file overrides it" → "ملف أحدث بيلغيه" ("later" is processing order, not newer) · "client" in an SSH context → "عميل" meaning a customer.
+- Good: "لسه مااتجرّبش هنا" or "محدّش جرّب ده هنا" · "ماحصلش أي تغيير في الصلاحيات عشان نكتب الصفحة دي" · "ملف Drop-in بييجي بعده في ترتيب قراءة الإعدادات بيعمل له Override" · "جهاز الـ SSH Client المتصل".
+- Why: the reader may act on the sentence. Decide whether the English reports a fact, gives a recommendation or gives an order, and keep that mood; resolve order words ("later", "last", "client", "head") from the technical context.
+
 ## How these examples are used
 1. During translation: consult the style guide and these categories.
 2. During the native-style editorial review: look for each category by reading, not by search.

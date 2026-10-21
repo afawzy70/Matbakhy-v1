@@ -35,6 +35,7 @@ PHRASES = [
     ("A9-arabic-indic-digits", "A9", r"[٠-٩]", "use Western digits"),
     ("A9-digit-glued-to-prefix", "A9", r"(?<![\w\d])و\d", "number glued to the Arabic 'و'; separate or reword"),
     ("A5-left-arrow", "A5", r"←", "an arrow must keep the source direction (→)"),
+    ("A10-fact-as-prohibition", "A10", r"ما(?:ت|ا)(?:جرّ?ب|نفّ?ذ|ختبر)ش\s+هنا", "check: does the English report a fact ('not tested/done here') or give an order? 'مااتجرّبش' states a fact"),
 ]
 COMPILED = [(i, c, re.compile(p), h) for i, c, p, h in PHRASES]
 

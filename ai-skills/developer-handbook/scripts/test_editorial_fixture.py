@@ -42,6 +42,7 @@ SAMPLES = {  # id: (bad text that must warn, good text that must not)
     "A9-arabic-indic-digits": ("من ١ إلى ٣", "من 1 إلى 3"),
     "A9-digit-glued-to-prefix": ("الخطوات و3", "الخطوات من 1 إلى 3"),
     "A5-left-arrow": ("A ← B", "A → B"),
+    "A10-fact-as-prohibition": ("ده ماتجرّبش هنا", "ده لسه مااتجرّبش هنا"),
 }
 
 
@@ -114,7 +115,7 @@ class EditorialFixture(unittest.TestCase):
     def test_anti_pattern_catalogue_has_bad_and_good_for_every_category(self) -> None:
         text = (SKILL / "references" / "egyptian-arabic-anti-patterns.md").read_text(encoding="utf-8")
         sections = re.split(r"(?m)^## ", text)[1:]
-        categories = [s for s in sections if re.match(r"A\d ", s)]
+        categories = [s for s in sections if re.match(r"A\d+ ", s)]
         self.assertGreaterEqual(len(categories), 9)
         for s in categories:
             title = s.splitlines()[0]
