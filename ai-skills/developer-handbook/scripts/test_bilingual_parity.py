@@ -320,6 +320,15 @@ class ParityTests(unittest.TestCase):
         flat = json.dumps(problems, ensure_ascii=False).lower()
         self.assertNotIn("somesecret42", flat)
 
+    def test_bare_credential_names_are_detected_and_masked(self) -> None:
+        for name in ("PASSWORD", "SECRET", "TOKEN", "KEY"):
+            f = Fixture()
+            self.addCleanup(f._t.cleanup)
+            f.edit("a.md", "`code_id`", f"`code_id` {name}=SyntheticValue42")
+            problems = f.check()
+            self.assertIn("secrets", json.dumps(problems), name)
+            self.assertNotIn("SyntheticValue42", json.dumps(problems), name)
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")

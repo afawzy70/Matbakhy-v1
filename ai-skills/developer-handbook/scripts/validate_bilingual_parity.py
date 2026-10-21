@@ -136,7 +136,7 @@ SECRET_PATTERNS = (
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b"),
 )
-SECRET_ASSIGN_RE = re.compile(r"\b[A-Z][A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)")
+SECRET_ASSIGN_RE = re.compile(r"\b[A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)")
 SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
 
 
