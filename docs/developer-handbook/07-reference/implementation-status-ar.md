@@ -36,7 +36,7 @@
 | صندوق الإشعارات داخل التطبيق، وـ Outbox Dispatcher بـ Leases/إعادة محاولة/Dead Letters | IMPLEMENTED | `NotificationIntegrationTest` |
 | تسليم Push خارجي (FCM/APNs) | DISABLED | `matbakhy.notifications.push-enabled` قيمته الافتراضية false؛ مفيش Adapter حقيقي (O07) |
 | تسليم البريد الإلكتروني الخارجي | PLANNED | الموجود بس `LoggingNotificationChannels` (مابيبعتش حاجة) |
-| حالات الدعم، وردود الموظفين، والملاحظات الخاصة، وطلبات الإلغاء، وحالة الدفع الأوتوماتيكية | IMPLEMENTED | `SupportIntegrationTest`، V17، V28 |
+| حالات الدعم، وردود الموظفين، والملاحظات الخاصة، وطلبات الإلغاء، وحالة دعم خاصة بالدفع بتتفتح تلقائيًا | IMPLEMENTED | `SupportIntegrationTest`، V17، V28 |
 | التقييمات، وبلاغات التقييمات والإشراف عليها؛ والمفضلة | IMPLEMENTED | `ReviewsAndFavoritesIntegrationTest` |
 | طلب حذف الحساب ومسح البيانات الشخصية | IMPLEMENTED with a proposed retention default | `AccountErasureIntegrationTest`؛ فترة السماح 14 يوم قيمة PROPOSED (O06 مفتوح) |
 | عدّادات النشاط العضوي ورؤى الطبّاخ (من غير ترتيب أو حملات أو فواتير) | IMPLEMENTED | `ActivityInsightsIntegrationTest`، D17 |

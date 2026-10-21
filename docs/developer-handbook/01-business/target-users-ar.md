@@ -47,7 +47,7 @@
 | موظف عمليات | يوافق على الطبّاخين ويتعامل مع الأوردرات المتأخرة/الفاشلة والاستثناءات | المنح `cook.review` و`order.ops` و`order.exception_cancel` و`order.handover_override` و`content.moderate` |
 | موظف دعم | يحل شكاوى الأوردر الناقص/المتأخر/الغلط | المنحة `support.case` |
 | مشغّل مالية | يتحقق من الكاش والعربون والاسترداد والتسوية | المنح `finance.read` و`finance.verify` و`finance.refund_approve` و`finance.settlement` |
-| أدمن | يدير المنح والإعدادات والمراجعة وسياسة الـ MFA | المنح `staff.grant` و`audit.read` و`config.read` و`config.write` و`security.mfa_policy` و`security.mfa_reset` |
+| أدمن | يدير المنح والإعدادات وسجل الـ Audit وسياسة الـ MFA | المنح `staff.grant` و`audit.read` و`config.read` و`config.write` و`security.mfa_policy` و`security.mfa_reset` |
 
 في تجربة صغيرة شخص واحد ممكن يحمل منح كتير. السيستم لسه بيمنع بعض التركيبات (مثلًا، الشخص مايقدرش يوافق على طلب الطبّاخ بتاعه هو، أو يتحقق من كاش بلّغ عنه هو، أو يعتمد حساب دفع مطبخه هو؛ حالة المالك E2E-OPS-108).
 

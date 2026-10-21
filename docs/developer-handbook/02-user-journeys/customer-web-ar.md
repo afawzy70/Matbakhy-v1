@@ -11,11 +11,11 @@
 | مسار الـ Hash | المكوّن | محتاج Session | ملاحظات |
 |---|---|---|---|
 | `#/` | `Browse` (`apps/customer-web/src/Browse.tsx`) | لأ | الرئيسية: كروت النية (Intent)، البحث، الفلاتر، التبديل بين الأطباق/المطابخ |
-| `#/meal/<uuid>` | `Meal` (`apps/customer-web/src/Meal.tsx`) | لأ للعرض؛ أيوه للمفضلة والطلب | اختيار الـ Slot، الكمية، الإضافة للسلة، المراجعات |
+| `#/meal/<uuid>` | `Meal` (`apps/customer-web/src/Meal.tsx`) | لأ للعرض؛ أيوه للمفضلة والطلب | اختيار الـ Slot، الكمية، الإضافة للسلة، التقييمات |
 | `#/kitchen/<slug>` | `Kitchen` (`apps/customer-web/src/Kitchen.tsx`) | لأ | ملف المطبخ العام ووجباته |
 | `#/checkout` | `Checkout` (`apps/customer-web/src/Checkout.tsx`) | أيوه لعرض السعر/التسجيل | السلة (مكتوب عليها "cart" في الشريط العلوي)، التحقق من التليفون، العنوان، عرض السعر، تسجيل الأوردر |
 | `#/orders` | `OrderList` (`apps/customer-web/src/Orders.tsx`) | أيوه | أوردراته هو |
-| `#/orders/<uuid>` | `OrderDetail` | أيوه | الجدول الزمني، كود التسليم، الإلغاء، المراجعة، حالة الدفع |
+| `#/orders/<uuid>` | `OrderDetail` | أيوه | الجدول الزمني، كود التسليم، الإلغاء، التقييم، حالة الدفع |
 | `#/account` | `Account` (`apps/customer-web/src/Account.tsx`) | أيوه (بيعرض رابط تسجيل دخول غير كده) | الملف الشخصي، المفضلة، الإشعارات، الدعم، العناوين، الأمان، الحذف |
 | `#/support/<uuid>` | `SupportCaseDetail` | أيوه | محادثة حالة الدعم الخاصة بيه |
 
@@ -100,13 +100,13 @@
 14. **الحالة.** IMPLEMENTED. الفلوس الحقيقية مقفولة بشروط: العربون تحويل يدوي برّه مطبخي؛ والتطبيق عمره ما بيدّعي تحقق بنكي.
 15. **القيود.** نصوص نسخ سياسة الإلغاء والشروط جاية من استجابة عرض السعر؛ ومفيش صفحة سياسات منفصلة (`GET /api/v1/policies/{key}` API-008 معلّم إنه مش متنفّذ في `contracts/endpoints.json`).
 
-## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والمراجعة
+## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم
 
 1. **الهدف.** متابعة الأوردر والتصرف فيه حيث السيرفر يسمح.
 2. **الطرف.** صاحب الأوردر (العميل).
 3. **المتطلبات المسبقة.** أوردر متسجّل.
 4. **البداية.** `#/orders` وبعدين `#/orders/<uuid>`.
-5. **الإجراءات.** قراءة الجدول الزمني؛ لأوردر العربون دوس "I sent the deposit" واديله مرجع اختياريًا؛ الإلغاء وهو `PENDING_ACCEPTANCE`؛ بعد القبول اطلب إلغاء؛ اعرض كود التسليم عند الاستلام أو التوصيل؛ راجع أوردر مكتمل؛ افتح "order again"؛ افتح حالة دعم من صفحة الحساب.
+5. **الإجراءات.** قراءة الجدول الزمني؛ لأوردر العربون دوس "I sent the deposit" واديله مرجع اختياريًا؛ الإلغاء وهو `PENDING_ACCEPTANCE`؛ بعد القبول اطلب إلغاء؛ اعرض كود التسليم عند الاستلام أو التوصيل؛ اكتب تقييم لأوردر مكتمل؛ افتح "order again"؛ افتح حالة دعم من صفحة الحساب.
 6. **الاستجابات.** عرض التفاصيل بيعيد القراءة كل 10 ثواني (`window.setInterval(reload, 10_000)` في `Orders.tsx`) — مفيش Push. الأزرار بتتعرض بس لو السيرفر ذكرها في `allowedActions` (`CANCEL`، `REQUEST_CANCELLATION`). كود التسليم بيتعرض بس لما السيرفر يرجّعه (الحالة `READY` أو `OUT_FOR_DELIVERY`، للمالك بس). نص الدفع بيقول إن المطبخ لسه لازم يؤكد الاستلام؛ ومفيش حاجة بتقول "verified by bank".
 7. **الـ API.** `GET /api/v1/orders` (API-023)، `GET /api/v1/orders/{orderId}` (API-025)، `POST /api/v1/orders/{orderId}/cancel` (API-027)، `POST /api/v1/orders/{orderId}/cancellation-requests` (API-028)، `POST /api/v1/orders/{orderId}/payment/transfer-report` (API-100)، `POST /api/v1/orders/{orderId}/reviews` (API-029). `GET /api/v1/orders/{orderId}/events` (API-026) موجود في العقد؛ والويب بيقرا الأحداث المضمّنة في عرض الأوردر (NOT VERIFIED هل الويب بينادي API-026 — مالقيناش نداء).
 8. **الـ Backend.** `OrderController.java`، `OrderLifecycleService.customerCancel`، `OrderService.get/list`، `PaymentController.java` / `PaymentService.reportTransfer`، `ReviewController.java` / `ReviewService.java`، `backend/modules/support/src/main/java/com/matbakhy/support/web/SupportController.java` (طلب الإلغاء بيعمل حالة دعم).

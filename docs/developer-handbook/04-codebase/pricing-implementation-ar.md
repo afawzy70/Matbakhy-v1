@@ -35,7 +35,7 @@
    - الـ Slot لازم يكون موجود وقابل للطلب بوقت السيرفر (`SLOT_CLOSED`)؛ والمطبخ لازم يكون قادر يبيع (`KITCHEN_UNAVAILABLE`)؛
    - `acceptBy = min(now + acceptanceWindowMinutes, slot cutoff)` ولازم يفضل على الأقل `minAcceptanceMinutes` (`ACCEPTANCE_WINDOW_TOO_SHORT`)؛
    - كل وجبة لازم تكون منشورة وظاهرة، وتابعة لمطبخ الـ Slot (طبّاخ واحد وSlot واحد لكل سلة، `MIXED_KITCHENS_OR_SLOT`)، ومعروضة في الـ Slot ده، وفيها حصص متبقية كفاية (`STOCK_CHANGED`) — الـ Quote مبيحجزش مخزون؛
-   - `line = unitPrice x quantity`، `subtotal = sum`؛ الاستلام لازم يكون مفعّل وميطلبش عنوان؛ والتوصيل محتاج عنوان مملوك وقابل للخدمة وبياخد رسوم المنطقة؛
+   - `line = unitPrice x quantity`، `subtotal = sum`؛ الاستلام لازم يكون مفعّل ومابياخدش عنوان؛ والتوصيل محتاج عنوان مملوك وقابل للخدمة وبياخد رسوم المنطقة؛
    - `tax = round_half_up((subtotal + fee) x taxRateBps / 10000)`، `total = subtotal + fee + tax`.
 5. `payments.terms(...)` بيستنتج شروط deposit/COD للطريقة المختارة (`COD_NOT_ELIGIBLE`، `DEPOSIT_NOT_OFFERED`).
 6. بيدخّل صفوف `quote` و`quote_item` (غير قابلة للتعديل بـ Trigger، V10) وبيرجّع `QuoteResponse` فيه `expiresAt` ونسخ السياسات والتحذيرات (`SYNTHETIC_POLICY`).

@@ -66,7 +66,7 @@
 | Commerce policy | إعدادات بيزنس بإصدارات: الضريبة، العمولة، مدة صلاحية الـ Quote، نوافذ القبول، وإصدارات الشروط والإلغاء | `commerce_policy`، `CommercePolicies` |
 | Synthetic policy | سياسة وهمية مسموحة بس في local/CI/preview؛ السياسات الحقيقية محتاجة مرجع موافقة | `SyntheticPolicyPermission` |
 | Reservation / allocation / consumption | مراحل المخزون التلاتة: الأوردر اتسجّل، الأوردر اتقبل، التحضير بدأ | `SlotInventory.Stage` |
-| Cutoff | بداية الـ Slot ناقص وقت التجهيز؛ بعده مفيش أوردرات جديدة ولا تعديل للسعة | `cook_slot.cutoff_at` |
+| Cutoff | بداية الـ Slot ناقص مهلة الطلب المسبق (lead time)؛ بعده مفيش أوردرات جديدة ولا تعديل للسعة | `cook_slot.cutoff_at` |
 | Acceptance deadline (`acceptBy`) | الوقت اللي الأوردر المعلّق بينتهي فيه | `customer_order.accept_by` |
 | Idempotency key | الـ Header اسمه `Idempotency-Key`؛ النطاق هو المنفّذ + الأمر + المفتاح؛ `expires_at` = +24 h بيتسجّل بس مش بيتطبّق | `JdbcIdempotentCommands` |
 | `clientRequestId` | معرّف بيولّده العميل بيحدد محاولة تسجيل الأوردر بشكل دائم | `customer_order_request_uq` |

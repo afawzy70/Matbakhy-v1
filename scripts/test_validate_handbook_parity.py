@@ -17,7 +17,10 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import validate_handbook_parity as v  # noqa: E402
+try:
+    import validate_handbook_parity as v  # noqa: E402
+except SystemExit as exc:  # markdown-it-py is not installed (for example in the generic script-test job)
+    raise unittest.SkipTest(f"markdown-it-py is required for the handbook parity tests: {exc}")
 
 META = "> **Owner role:** Handbook navigation\n> **Status:** REFERENCE — {m}\n> **Language / اللغة:** {lang}\n"
 EN = """# Title
