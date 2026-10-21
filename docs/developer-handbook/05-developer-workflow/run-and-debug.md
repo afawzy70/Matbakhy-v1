@@ -2,6 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** REFERENCE — how to run the pieces, call the API, read logs and inspect the database and Keycloak. Commands were read from scripts and workflows; they were not executed in the environment that wrote this page (no Docker, Java or pnpm there), so treat them as NOT VERIFIED until you run them.
+> **Language / اللغة:** English · [العربية](run-and-debug-ar.md)
 
 Set up first: [local-environment.md](local-environment.md). Shorthand used below:
 

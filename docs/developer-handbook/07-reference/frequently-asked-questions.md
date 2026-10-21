@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — short answers for developers, each pointing at the page or file that holds the truth.
+> **Language / اللغة:** English · [العربية](frequently-asked-questions-ar.md)
 
 ## Setup and tools
 

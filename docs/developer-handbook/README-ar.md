@@ -1,64 +1,60 @@
-# دليل المطوّر - مدخل بالعربي المصري
+# دليل المطوّر لمطبخي (Matbakhy)
 
 > **Owner role:** Handbook navigation
-> **Status:** REFERENCE — مدخل بالعربي المصري لمحمد، وباقي الصفحات بالإنجليزي.
+> **Status:** REFERENCE — نقطة الدخول الوحيدة للمطوّرين؛ حالة التنفيذ موسومة في كل صفحة
+> **Language / اللغة:** [English](README.md) · العربية
 
-الدليل ده مكتوب علشان أي مطوّر جديد (محمد) يفهم مطبخي كله من الـ repository نفسه من غير أي مساعد ذكاء اصطناعي. الصفحات التقنية بالإنجليزي، والصفحة دي بتشرح الطريق والقواعد.
+أهلًا بيك. الدليل ده بيخلّي أي مطوّر جديد يفهم مطبخي (Matbakhy) — البيزنس، والتطبيقات، والمعمارية، والكود، والتشغيل، ومسار المساهمة — **من الـ Repository لوحده**، من غير مساعد ذكاء اصطناعي ولا معرفة غير موثّقة. فيه نسخة كاملة بالعربي المصري لكل صفحة: ابدأ من [README-ar.md](README-ar.md).
 
-## الدليل ده لمين؟
+**قواعد الدليل ده**
 
-- لأي مطوّر جديد هيشتغل على الباك إند (Spring Boot)، أو الويب (React)، أو الموبايل (Expo/React Native)، أو النشر والاختبار.
-- مفيش افتراض إنك تعرف المشروع. بنبدأ من فهم البيزنس وبعدين الكود.
-- ابدأ من [الصفحة الرئيسية للدليل](README.md)، وبعدها [خريطة التعلّم](00-getting-started/learning-roadmap.md).
+- الكود والـ Migrations والعقود والاختبارات هي مصدر الحقيقة لحالة التنفيذ؛ والدليل بيشرحها وبيربط بيها. كل صفحة بتقول مين مسؤول عنها وحالة تنفيذها (IMPLEMENTED، PARTIALLY IMPLEMENTED، PLANNED، DISABLED، DEPRECATED، NOT VERIFIED؛ وREFERENCE لصفحات العمليات).
+- الدليل مخرَج حيّ تحت **[DOC-001](05-developer-workflow/documentation-policy-ar.md)**: كل تغيير لازم يحدّث الصفحات المتأثرة في نفس الـ PR، والـ Check المطلوب `Documentation Consistency / DOC-001` بيتحقق من البنية والمراجع. لقيت غلطة؟ صلّح الصفحة الأساسية وسجّلها ([الصيانة](05-developer-workflow/documentation-maintenance-ar.md)).
+- الـ Repository عام: ماتضيفش أبدًا Credentials أو بيانات عملاء أو Logs خاصة.
+- **لغتين، دليل واحد.** كل صفحة إنجليزي `X.md` ليها نسخة مطابقة بالعربي المصري `X-ar.md` في نفس المجلد. الإنجليزي هو المرجع، والملفين بيتغيروا مع بعض في نفس الـ PR، وفيه CI Check (`scripts/validate_handbook_parity.py`) بيفشل لو النسخة العربي ناقصة أو بنيتها مختلفة. التفاصيل: [صيانة التوثيق](05-developer-workflow/documentation-maintenance-ar.md)؛ والمراجعة الحالية: [تقرير تطابق الترجمة](translation-parity-report.md).
 
-## خطة الخمس أيام
+## ابدأ من هنا (أول يوم)
 
-| اليوم | الموضوع | الصفحة |
-|---|---|---|
-| 1 | فهم البيزنس: مين الأطراف، دورة الطلب، الفلوس | [اليوم الأول](06-onboarding-labs/day-1-business.md) |
-| 2 | تشغيل التطبيقات وتجربة الرحلات (عميل، مطبخ، إدارة، موبايل) | [اليوم الثاني](06-onboarding-labs/day-2-applications.md) |
-| 3 | الباك إند وقاعدة البيانات والأمان | [اليوم الثالث](06-onboarding-labs/day-3-backend-security.md) |
-| 4 | الاختبارات والـ CI والنشر التجريبي وتصليح عيب تدريبي | [اليوم الرابع](06-onboarding-labs/day-4-development.md) |
-| 5 | أول مساهمة حقيقية (PR صغير) | [اليوم الخامس](06-onboarding-labs/day-5-first-contribution.md) |
-| بعدها | التقييم النهائي (10 معايير) | [التقييم النهائي](06-onboarding-labs/final-assessment.md) |
+1. [نظرة عامة على المشروع](00-getting-started/project-overview-ar.md) → [المصطلحات](00-getting-started/glossary-ar.md) → [خريطة التعلّم](00-getting-started/learning-roadmap-ar.md).
+2. اتبع [التجهيز في خمس أيام](#التجهيز-العملي-labs) وخلّص بـ [التقييم النهائي](06-onboarding-labs/final-assessment-ar.md).
+3. قبل أول PR ليك اقرا [سياسة DOC-001](05-developer-workflow/documentation-policy-ar.md) و[مسار Git والـ PR](05-developer-workflow/git-and-pr-workflow-ar.md).
 
-## أول يوم: اعمل إيه بالظبط؟
+## المحتويات
 
-1. افتح [المتطلبات](05-developer-workflow/prerequisites.md) وركّب الأدوات بالإصدارات المحددة (Node 24.21.0 بالظبط، pnpm 10.34.6، JDK 21، Docker). ويندوز وماك لسه NOT VERIFIED؛ على ويندوز استخدم WSL2.
-2. اعمل clone للمشروع وشغّل: `python3 scripts/validate_blueprint.py` (بيتأكد من سلامة ملفات التخطيط بس، مش من المنتج).
-3. اقرأ بالترتيب: [نظرة عامة على المشروع](00-getting-started/project-overview.md)، [المصطلحات](00-getting-started/glossary.md)، وبعدين صفحات [الأعمال](01-business/product-vision.md) لحد [قواعد العمل](01-business/business-rules.md).
-4. اعمل مهام [اليوم الأول](06-onboarding-labs/day-1-business.md) واكتب ملخص صفحة واحدة بكلامك.
-5. مهم: استخدم بيانات وهمية (synthetic) بس. ماتكتبش باسوردات ولا أرقام تليفونات أو عناوين حقيقية في أي مكان، لأن الـ repository عام (public).
+### 00 البداية
+[نظرة عامة على المشروع](00-getting-started/project-overview-ar.md) · [خريطة التعلّم](00-getting-started/learning-roadmap-ar.md) · [التنقّل في الـ Repository](00-getting-started/repository-navigation-ar.md) · [المصطلحات](00-getting-started/glossary-ar.md)
 
-## قواعد لازم تفتكرها (من أول يوم)
+### 01 البيزنس
+[رؤية المنتج](01-business/product-vision-ar.md) · [المستخدمين المستهدفين](01-business/target-users-ar.md) · [نموذج الـ Marketplace](01-business/marketplace-model-ar.md) · [الأطراف والصلاحيات](01-business/actors-and-permissions-ar.md) · [دورة حياة الأوردر](01-business/order-lifecycle-ar.md) · [التسعير والدفع](01-business/pricing-and-payments-ar.md) · [إدارة المطبخ](01-business/kitchen-management-ar.md) · [قواعد العمل](01-business/business-rules-ar.md)
 
-- مصر، الجنيه المصري (EGP)، توقيت Africa/Cairo، والفلوس أرقام صحيحة بالقرش (piastres).
-- السيرفر هو اللي بيحسب السعر والسعة والصلاحيات وانتقالات حالة الطلب. العميل مايحسبش حاجة يعتمد عليها.
-- الطلب الواحد = مطبخ واحد + ميعاد (slot) واحد. بيانات الطلب بتتحفظ نسخة ثابتة (snapshot) ومابتتغيرش.
-- مفيش عمولة من مطبخي ولا رسوم منصة على العميل في النسخة الأولى (MVP). الدفع: كاش عند الاستلام أو عربون بيتحوّل مباشرة من العميل للمطبخ، والمطبخ هو اللي بيبلّغ إنه استلمه. ماتكتبش أبدًا إن البنك "اتحقق".
-- العربي (RTL) والإنجليزي (LTR) الاتنين مدعومين.
-- موافقة المطبخ معناها تحقق تشغيلي، مش ضمان سلامة غذاء.
+### 02 رحلات المستخدم
+[الويب بتاع العميل](02-user-journeys/customer-web-ar.md) · [موبايل العميل](02-user-journeys/customer-mobile-ar.md) · [عمليات الطبّاخ](02-user-journeys/cook-operations-ar.md) · [الـ Back-office](02-user-journeys/backoffice-admin-ar.md) · [المالية والدعم](02-user-journeys/finance-and-support-ar.md) · [الـ Authentication والـ MFA](02-user-journeys/authentication-and-mfa-ar.md) · [رحلة الأوردر الكاملة](02-user-journeys/complete-order-journey-ar.md)
 
-## تفرّق بين التسميات
+### 03 المعمارية
+[نظرة عامة على السيستم](03-architecture/system-overview-ar.md) · [الـ Backend](03-architecture/backend-architecture-ar.md) · [الـ Frontend](03-architecture/frontend-architecture-ar.md) · [الموبايل](03-architecture/mobile-architecture-ar.md) · [قاعدة البيانات](03-architecture/database-architecture-ar.md) · [الهوية والأمان](03-architecture/identity-and-security-ar.md) · [التكامل والأحداث](03-architecture/integration-and-events-ar.md) · [البنية التحتية والـ Deployment](03-architecture/infrastructure-and-deployment-ar.md) · [**الرسومات (Mermaid)**](03-architecture/diagrams-ar.md)
 
-لما تلاقي في الدليل: IMPLEMENTED يعني موجود في الكود. PLANNED يعني مخطط ومش موجود. DISABLED موجود بس مقفول. NOT VERIFIED يعني ماتأكدش منه. صدّق التسمية، وارجع للكود قبل ما تعتمد على أي حاجة.
+### 04 الكود
+[خريطة الـ Repository](04-codebase/repository-map-ar.md) · [دليل موديولات الـ Backend](04-codebase/backend-module-guide-ar.md) · [دليل كود الـ Frontend](04-codebase/frontend-code-guide-ar.md) · [دليل كود الموبايل](04-codebase/mobile-code-guide-ar.md) · [عقود الـ API](04-codebase/api-contracts-ar.md) · [تنفيذ الأوردر](04-codebase/order-implementation-ar.md) · [تنفيذ التسعير](04-codebase/pricing-implementation-ar.md) · [تنفيذ الدفع](04-codebase/payment-implementation-ar.md) · [المكتبات المشتركة](04-codebase/shared-libraries-ar.md)
 
-## قاعدة التوثيق DOC-001 بكلام بسيط
+### 05 مسار عمل المطوّر
+[المتطلبات المسبقة](05-developer-workflow/prerequisites-ar.md) · [البيئة المحلية](05-developer-workflow/local-environment-ar.md) · [التشغيل والـ Debug](05-developer-workflow/run-and-debug-ar.md) · [تشغيل الاختبارات](05-developer-workflow/test-execution-ar.md) · [مسار Git والـ PR](05-developer-workflow/git-and-pr-workflow-ar.md) · [CI/CD](05-developer-workflow/ci-cd-ar.md) · [بيئة المعاينة](05-developer-workflow/preview-environment-ar.md) · [حل المشاكل](05-developer-workflow/troubleshooting-ar.md) · [**سياسة التوثيق DOC-001**](05-developer-workflow/documentation-policy-ar.md) · [صيانة الفروع](05-developer-workflow/branch-maintenance-ar.md) · [صيانة التوثيق](05-developer-workflow/documentation-maintenance-ar.md)
 
-- الدليل جزء من المنتج، مش حاجة بتتكتب بعدين.
-- أي PR بيغيّر كود في منطقة معينة لازم يغيّر كمان صفحة الدليل المرتبطة بيها، أو يشرح سبب محدد ومقنع إن التوثيق لسه صح.
-- كل PR فيه بلوك إعلان بين `<!-- DOC-001:BEGIN -->` و `<!-- DOC-001:END -->` بيقول: غيّرت إيه في التوثيق ولا لأ، وقارنت إيه بإيه. التفاصيل في [سياسة التوثيق](05-developer-workflow/documentation-policy.md).
-- قبل ما تفتح الـ PR شغّل: `python3 scripts/doc001_check.py docs`. السكريبت بيتأكد من الروابط والمسارات والشكل، لكن مش من صحة المعنى؛ المراجع البشري هو اللي بيحكم على الصحة.
-- ماتخترعش أوامر ولا مسارات. لو مش متأكد اكتب NOT VERIFIED.
+### التجهيز العملي (Labs)
+[اليوم 1 البيزنس](06-onboarding-labs/day-1-business-ar.md) · [اليوم 2 التطبيقات](06-onboarding-labs/day-2-applications-ar.md) · [اليوم 3 الـ Backend وقاعدة البيانات والأمان](06-onboarding-labs/day-3-backend-security-ar.md) · [اليوم 4 مسار التطوير](06-onboarding-labs/day-4-development-ar.md) · [اليوم 5 أول مساهمة](06-onboarding-labs/day-5-first-contribution-ar.md) · [التقييم النهائي](06-onboarding-labs/final-assessment-ar.md)
 
-## تسأل فين، وتسجّل مشاكل التوثيق فين؟
+### 07 المراجع
+[قرارات المعمارية](07-reference/architecture-decisions-ar.md) · [حالة التنفيذ](07-reference/implementation-status-ar.md) · [تتبّع المتطلبات](07-reference/requirements-traceability-ar.md) · [خريطة التوثيق](07-reference/documentation-map-ar.md) · [الأسئلة الشائعة](07-reference/frequently-asked-questions-ar.md) · [الجرد وتقييم الفجوات](07-reference/inventory-and-gaps-ar.md) · [محاكاة المطوّر الجديد](07-reference/fresh-developer-simulation-ar.md) · [سجل المراجعات المستقلة](07-reference/independent-reviews-ar.md) · [تدقيق تنظيف الفروع](07-reference/branch-cleanup-audit-2026-10-20-ar.md)
 
-- اسأل زميل بالأمر اللي كتبته والنتيجة اللي ظهرتلك وإيه اللي جرّبته.
-- مشكلة في الدليل (معلومة غلط، رابط مكسور، حاجة ناقصة): افتح GitHub issue وبعدين صلّحها في PR بنفس القاعدة (DOC-001)؛ شوف [الأسئلة الشائعة](07-reference/frequently-asked-questions.md) و[استكشاف الأخطاء](05-developer-workflow/troubleshooting.md).
-- قرارات المنتج أو الصلاحية على البيئة التجريبية بتاعة المالك: المالك هو اللي بيقرر. وماحدش يعمل merge من غير تفويضه، ومفيش حد بيعدّل على فرع `main`.
-- النشر التجريبي (Preview): [بيئة المعاينة](05-developer-workflow/preview-environment.md) و[CI/CD](05-developer-workflow/ci-cd.md). لو ظهرلك 403 يبقى الـ IP بتاعك مش في القائمة المسموحة؛ اطلب من المالك يضيفه.
-- دليل المالك لتجربة المعاينة بالعربي: [owner-guide-ar.md](../quality/owner-acceptance/owner-guide-ar.md).
+مقروء بالآلة: [doc001-matrix.json](doc001-matrix.json) (أي مناطق كود محتاجة أي توثيق)، و[translation-sync.json](translation-sync.json) (أزواج الصفحات الإنجليزي والعربي اللي اتراجعت)، و[translation-exceptions.json](translation-exceptions.json) (استثناءات التطابق الموثّقة).
 
-## بعد الخمس أيام
+## إجابات سريعة
 
-اعمل [التقييم النهائي](06-onboarding-labs/final-assessment.md). النجاح معناه 24 من 30 على الأقل من غير معيار أقل من 2، وإنك تقدر تشتغل بشكل مستقل: تفهم المنتج، تشغّل وتصلّح، تكتب اختبارات، تفتح PR سليم، وتحدّث الدليل.
+| السؤال | روح فين |
+|---|---|
+| إيه هو المنتج ومين بيستخدمه؟ | [نظرة عامة على المشروع](00-getting-started/project-overview-ar.md)، [الأطراف](01-business/actors-and-permissions-ar.md) |
+| فين X في الكود؟ | [التنقّل في الـ Repository](00-getting-started/repository-navigation-ar.md) |
+| الأوردر بيمشي إزاي من أوله لآخره؟ | [رحلة الأوردر الكاملة](02-user-journeys/complete-order-journey-ar.md)، [دورة حياة الأوردر](01-business/order-lifecycle-ar.md) |
+| أشغّله وأختبره إزاي؟ | [المتطلبات المسبقة](05-developer-workflow/prerequisites-ar.md)، [التشغيل والـ Debug](05-developer-workflow/run-and-debug-ar.md)، [الاختبارات](05-developer-workflow/test-execution-ar.md) |
+| الـ PR بيوصل لبيئة المعاينة إزاي؟ | [CI/CD](05-developer-workflow/ci-cd-ar.md)، [المعاينة](05-developer-workflow/preview-environment-ar.md) |
+| أنهي حالات الـ E2E بتاعة المالك بتغطي الـ Feature بتاعتي؟ | [تتبّع المتطلبات](07-reference/requirements-traceability-ar.md)، `docs/quality/owner-acceptance/README.md` |
+| الـ PR بتاعي لازم يقول إيه عن التوثيق؟ | [سياسة DOC-001](05-developer-workflow/documentation-policy-ar.md) |

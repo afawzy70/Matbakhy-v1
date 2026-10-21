@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — record of the independent Codex reviews of this work; Codex is an AI reviewer, not human approval
+> **Language / اللغة:** English · [العربية](independent-reviews-ar.md)
 
 Reviews ran read-only against the branch docs/developer-handbook-doc001 (branch name) with the Codex CLI, separate from the agents that wrote the pages. Reviewers verified claims against code (each report lists 25–30 verified claims) and could not run the Java/Docker stack. Nothing here is a human approval; the owner's explicit merge approval is still required.
 

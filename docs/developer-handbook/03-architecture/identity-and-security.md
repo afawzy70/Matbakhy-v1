@@ -2,6 +2,7 @@
 
 > **Owner role:** Security and Keycloak
 > **Status:** PARTIALLY IMPLEMENTED — authentication, authorization, MFA policy and proxy controls are implemented; CSP is Report-Only, live Keycloak changes are operator-applied, and no production hardening exists
+> **Language / اللغة:** English · [العربية](identity-and-security-ar.md)
 
 Business view of roles: [actors and permissions](../01-business/actors-and-permissions.md). User-facing sign-in and MFA flows: [authentication and MFA journey](../02-user-journeys/authentication-and-mfa.md). Diagrams: [OIDC](diagrams.md#6-authentication-oidc), [MFA step-up](diagrams.md#7-mfa-step-up). Canonical MFA design: `docs/security/mfa-policy.md`; broader rules: `docs/engineering/04-security.md`.
 

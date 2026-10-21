@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** PARTIALLY IMPLEMENTED — a feature-by-feature state table derived from code and tests, plus the conflicts found between the code and the planning/status documents
+> **Language / اللغة:** English · [العربية](implementation-status-ar.md)
 
 Labels follow the handbook convention (IMPLEMENTED, PARTIALLY IMPLEMENTED, PLANNED, DISABLED, DEPRECATED, NOT VERIFIED).
 **IMPLEMENTED means code exists and an automated test exercising it was found in the repository.** It does not mean the

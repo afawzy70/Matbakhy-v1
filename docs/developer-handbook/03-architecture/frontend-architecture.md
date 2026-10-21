@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** IMPLEMENTED — both web apps run against the API; the Content Security Policy is Report-Only, not enforced
+> **Language / اللغة:** English · [العربية](frontend-architecture-ar.md)
 
 Two single-page apps share one stack and two shared packages. The mobile app is covered in [mobile architecture](mobile-architecture.md); a file-by-file reading guide is [frontend code guide](../04-codebase/frontend-code-guide.md). Diagram: [web architecture](diagrams.md#4-web-architecture).
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — policy for naming, lifecycle and safe cleanup of Git branches and worktrees; deletion is manual, the audit is report-only
+> **Language / اللغة:** English · [العربية](branch-maintenance-ar.md)
 
 ## Principles
 

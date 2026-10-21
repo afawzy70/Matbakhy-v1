@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** IMPLEMENTED — contract toolchain, registry and drift tests exist; 113 of 116 registered routes are served, 3 are designed only
+> **Language / اللغة:** English · [العربية](api-contracts-ar.md)
 
 One REST API (`/api/v1/...`), described twice on purpose: a typed OpenAPI document and a flat route registry. Both live in
 `contracts/`. The three apps consume a client generated from the OpenAPI file. Background: `docs/engineering/03-api-contract.md`

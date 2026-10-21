@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — pricing, deposits, cash and refunds are implemented and tested with synthetic money; live money is gated and platform monetization is PLANNED.
+> **Language / اللغة:** English · [العربية](pricing-and-payments-ar.md)
 
 All money in Matbakhy is **Egyptian pounds as an integer number of piastres** (`1 EGP = 100 piastres`; fields named `*_minor`, `amountMinor`). There is no floating-point money anywhere in the backend. The currency is always `EGP` (database checks such as `currency = 'EGP'` in `backend/app/src/main/resources/db/migration/V13__cash_and_ledger.sql`).
 

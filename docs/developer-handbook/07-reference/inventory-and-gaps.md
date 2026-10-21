@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — snapshot taken while writing the handbook (2026-10-19, `develop` at `d5d6ff5`); each finding names the file to fix
+> **Language / اللغة:** English · [العربية](inventory-and-gaps-ar.md)
 
 Method: the writers read source, migrations, contracts, configs and tests and compared them with the existing Markdown. Where documentation and code disagreed the code was trusted. Findings marked *handbook fixed* are already reflected correctly in the handbook; the *source document* still needs correcting in its own PR (DOC-001 applies to that PR). Nothing here was executed unless stated: no pnpm, Java, Docker or Maven exist on the authoring machine, so build/test commands are **NOT VERIFIED** (read from `package.json`, workflows and scripts).
 

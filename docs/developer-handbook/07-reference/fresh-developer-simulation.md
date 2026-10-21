@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — evidence of a documentation-only walk-through; it proves the docs lead to the right places, not that the build works here
+> **Language / اللغة:** English · [العربية](fresh-developer-simulation-ar.md)
 
 **Method.** A subagent with no project context received a clean clone of the branch at commit `6c94a7c` and was told to use only the repository documentation. The authoring machine has python3 and Node 22 but no pnpm, Java, Maven or a Docker daemon, so everything needing them is **BLOCKED**, never PASS. A PASS below means "completed from the documentation, with the file/line evidence checked", not "ran in production". This is an AI simulation, not a human onboarding; Mohamed's real first week (see [final assessment](../06-onboarding-labs/final-assessment.md)) is the authoritative test.
 

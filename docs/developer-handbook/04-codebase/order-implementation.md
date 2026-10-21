@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** IMPLEMENTED — placement, idempotency, capacity reservation, snapshots, lifecycle and expiry exist and are integration-tested
+> **Language / اللغة:** English · [العربية](order-implementation-ar.md)
 
 A code-level walk through placing an order and moving it through its lifecycle. Line references were read on this branch
 (`path:line`); if code moves, search by the method name. Business meaning:

@@ -2,6 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** REFERENCE — failure modes taken from scripts, CI workflows and the operations runbook; none were reproduced while writing this page.
+> **Language / اللغة:** English · [العربية](troubleshooting-ar.md)
 
 Order, audit, dead-letter and telemetry diagnosis on the preview is in [08-troubleshooting-runbook.md](../../operations/08-troubleshooting-runbook.md) (itself a draft that was not exercised on a deployed environment). This page covers developer-side failures.
 

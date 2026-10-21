@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** IMPLEMENTED — server-side pricing, immutable meal revisions, quote validation, stale-quote refusal and client reconfirmation exist; the commercial values (tax, limits) are synthetic pending owner decision O04
+> **Language / اللغة:** English · [العربية](pricing-implementation-ar.md)
 
 Who decides a price, where it is stored, how it is checked, and what happens when it changes between "customer saw it" and
 "customer pressed order". Business view: [pricing and payments](../01-business/pricing-and-payments.md). Decisions: D10 (no

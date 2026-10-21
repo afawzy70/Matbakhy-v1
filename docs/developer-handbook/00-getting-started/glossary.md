@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** REFERENCE — terms used in the code, the UI and the product documents, with the Arabic strings that exist in the front-end i18n files.
+> **Language / اللغة:** English · [العربية](glossary-ar.md)
 
 Arabic strings below were copied from the i18n files and checked there: `apps/customer-web/src/i18n.ts` (customer web), `apps/customer-mobile/src/i18n.ts` (customer mobile) and `apps/operations-web/src/i18n.ts` (cook workspace and backoffice). Where a term has no UI string it is marked "no UI string". Money is always integer piastres (`1 EGP = 100 piastres`). See also [project overview](project-overview.md) and [business rules](../01-business/business-rules.md).
 

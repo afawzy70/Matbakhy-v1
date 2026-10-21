@@ -2,14 +2,16 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — single entry point for developers; implementation state is labelled per page
+> **Language / اللغة:** English · [العربية](README-ar.md)
 
-Welcome. This handbook lets a new developer understand Matbakhy (مطبخي) — the business, the applications, the architecture, the code, the operations and the contribution workflow — **from the repository alone**, without an AI assistant or undocumented knowledge. Arabic orientation: [README-ar.md](README-ar.md).
+Welcome. This handbook lets a new developer understand Matbakhy (مطبخي) — the business, the applications, the architecture, the code, the operations and the contribution workflow — **from the repository alone**, without an AI assistant or undocumented knowledge. A complete Egyptian Arabic mirror of every page is available: start at [README-ar.md](README-ar.md).
 
 **Rules of this handbook**
 
 - The code, migrations, contracts and tests are the source of implementation truth; the handbook explains and links to them. Every page says who owns it and its implementation status (IMPLEMENTED, PARTIALLY IMPLEMENTED, PLANNED, DISABLED, DEPRECATED, NOT VERIFIED; REFERENCE for process pages).
 - It is a living deliverable under **[DOC-001](05-developer-workflow/documentation-policy.md)**: every change updates the affected pages in the same PR, and the required check `Documentation Consistency / DOC-001` validates structure and references. Found a mistake? Fix the canonical page and record it ([maintenance](05-developer-workflow/documentation-maintenance.md)).
 - The repository is public: never add credentials, customer data or private logs.
+- **Two languages, one handbook.** Every English page `X.md` has an Egyptian Arabic mirror `X-ar.md` in the same directory. English is authoritative; both files change together in the same PR, and a CI check (`scripts/validate_handbook_parity.py`) fails on missing or structurally different mirrors. Details: [documentation maintenance](05-developer-workflow/documentation-maintenance.md); current audit: [translation parity report](translation-parity-report.md).
 
 ## Start here (first day)
 
@@ -43,7 +45,7 @@ Welcome. This handbook lets a new developer understand Matbakhy (مطبخي) —
 ### 07 Reference
 [Architecture decisions](07-reference/architecture-decisions.md) · [Implementation status](07-reference/implementation-status.md) · [Requirements traceability](07-reference/requirements-traceability.md) · [Documentation map](07-reference/documentation-map.md) · [FAQ](07-reference/frequently-asked-questions.md) · [Inventory and gap assessment](07-reference/inventory-and-gaps.md) · [Fresh-developer simulation](07-reference/fresh-developer-simulation.md) · [Independent review record](07-reference/independent-reviews.md) · [Branch cleanup audit](07-reference/branch-cleanup-audit-2026-10-20.md)
 
-Machine-readable: [doc001-matrix.json](doc001-matrix.json) (which code areas require which documentation).
+Machine-readable: [doc001-matrix.json](doc001-matrix.json) (which code areas require which documentation), [translation-sync.json](translation-sync.json) (the reviewed pairs of English and Arabic pages) and [translation-exceptions.json](translation-exceptions.json) (documented parity exceptions).
 
 ## Quick answers
 

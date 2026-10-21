@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** IMPLEMENTED — roles, grants and object-level scoping are enforced by the backend; items marked otherwise in the body.
+> **Language / اللغة:** English · [العربية](actors-and-permissions-ar.md)
 
 The product documents describe seven roles (Anonymous, Customer, Cook, Support, Ops, Finance, Admin) in `docs/product/06-permissions.md`. **The code does not have seven role objects.** It has two mechanisms, and understanding them is the key to the whole authorization model.
 

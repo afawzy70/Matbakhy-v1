@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** IMPLEMENTED — the two React/Vite web apps as they exist in `apps/`
+> **Language / اللغة:** English · [العربية](frontend-code-guide-ar.md)
 
 Two web apps share the same stack and conventions: React 19, TypeScript 6, Vite 8, Vitest, the typed client
 `@matbakhy/api-client`, brand tokens from `@matbakhy/design-tokens`, Cairo font, Arabic RTL default with English LTR

@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** REFERENCE — lab for understanding what Matbakhy is and the rules every change must respect.
+> **Language / اللغة:** English · [العربية](day-1-business-ar.md)
 
 ## Objectives
 

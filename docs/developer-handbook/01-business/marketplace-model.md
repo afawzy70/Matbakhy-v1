@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — the transactional marketplace, discovery, availability and approval are implemented; monetization beyond zero commission is PLANNED.
+> **Language / اللغة:** English · [العربية](marketplace-model-ar.md)
 
 ## Three-sided structure
 

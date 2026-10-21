@@ -2,6 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** PARTIALLY IMPLEMENTED — the Docker-based local stack and Vite dev servers are IMPLEMENTED and exercised by CI on Linux; the Windows/macOS procedures and running the API outside Docker are NOT VERIFIED.
+> **Language / اللغة:** English · [العربية](local-environment-ar.md)
 
 Install the tools first ([prerequisites.md](prerequisites.md)). Everything here uses synthetic data and local-only secrets.
 

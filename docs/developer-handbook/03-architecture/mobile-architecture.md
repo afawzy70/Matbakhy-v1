@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** PARTIALLY IMPLEMENTED — a customer-only Expo app with development identifiers; CI emulator/simulator evidence exists, store identifiers, push and physical-device verification do not
+> **Language / اللغة:** English · [العربية](mobile-architecture-ar.md)
 
 There is one mobile app: `apps/customer-mobile` ("Matbakhy Dev", package and bundle id `com.matbakhy.customer.dev`). Cooks and staff use the operations web; there is no cook or staff mobile app. File-level guide: [mobile code guide](../04-codebase/mobile-code-guide.md). Diagram: [mobile architecture](diagrams.md#5-mobile-architecture). User-facing journeys: [customer mobile journey](../02-user-journeys/customer-mobile.md).
 

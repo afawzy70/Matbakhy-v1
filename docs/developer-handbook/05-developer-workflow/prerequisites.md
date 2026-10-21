@@ -2,6 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** REFERENCE — what a developer must install before building or running Matbakhy, with the versions the repository pins.
+> **Language / اللغة:** English · [العربية](prerequisites-ar.md)
 
 Versions below come from `package.json`, `.node-version`, `backend/pom.xml`, `backend/.mvn/wrapper/maven-wrapper.properties`, `infra/compose.yaml` and `.github/workflows/ci.yml`. The longer rationale is in [toolchain.md](../../engineering/toolchain.md); where that page and the files disagree, trust the files (they are what CI reads).
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** PARTIALLY IMPLEMENTED — a synthetic-data preview on one VPS is deployed from `develop` by `.github/workflows/deploy-preview.yml`; it is not staging and not production. Server state was not inspected while writing (NOT VERIFIED).
+> **Language / اللغة:** English · [العربية](preview-environment-ar.md)
 
 ## What it is
 

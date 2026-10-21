@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** PARTIALLY IMPLEMENTED — most staff sections exist in the operations web; the audit trail, integration/outbox operations, cash-report verification, the operations dashboard and audit export have no screen or no endpoint.
+> **Language / اللغة:** English · [العربية](backoffice-admin-ar.md)
 
 The backoffice is the second group of tabs of `apps/operations-web` (same app as the [cook workspace](cook-operations.md)). Money-specific flows are on [Finance and support](finance-and-support.md); sign-in and MFA on [Authentication and MFA](authentication-and-mfa.md).
 

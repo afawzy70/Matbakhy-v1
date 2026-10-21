@@ -2,6 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** PARTIALLY IMPLEMENTED — local stack and an access-restricted synthetic-data preview exist; there is no staging or production deployment, and the preview is NOT production
+> **Language / اللغة:** English · [العربية](infrastructure-and-deployment-ar.md)
 
 Diagrams: [CI/CD](diagrams.md#13-cicd) and [preview infrastructure](diagrams.md#14-preview-infrastructure). Day-to-day procedures belong to [preview environment](../05-developer-workflow/preview-environment.md) and [CI/CD](../05-developer-workflow/ci-cd.md); this page explains what the pieces are and how they fit.
 

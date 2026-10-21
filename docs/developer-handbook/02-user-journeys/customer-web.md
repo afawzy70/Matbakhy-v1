@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** IMPLEMENTED — the customer web app (`apps/customer-web`) covers browsing, sign-in, basket, quote, placement, tracking, account and MFA preference; cook application and payment-by-card are not part of it.
+> **Language / اللغة:** English · [العربية](customer-web-ar.md)
 
 This page documents only the screens and routes that exist in `apps/customer-web/src`. The app is a single-page React app with **hash routing** (`window.location.hash`, see `apps/customer-web/src/App.tsx`). Cross-cutting facts are in [Frontend architecture](../03-architecture/frontend-architecture.md), [Identity and security](../03-architecture/identity-and-security.md) and [API contracts](../04-codebase/api-contracts.md). The same journeys on a phone are in [Customer mobile](customer-mobile.md); the whole chain is in [Complete order journey](complete-order-journey.md).
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** IMPLEMENTED — modular monolith as described; planned provider adapters are called out in the text
+> **Language / اللغة:** English · [العربية](backend-architecture-ar.md)
 
 The backend lives in `backend/`: Java 21, Spring Boot 4.1.1 (`backend/pom.xml`), Maven wrapper `backend/mvnw`. It is one deployable (`backend/app`) assembled from nine domain modules plus a small shared kernel. Diagram: [backend components](diagrams.md#3-backend-components). A module-by-module reading guide is in [backend module guide](../04-codebase/backend-module-guide.md).
 

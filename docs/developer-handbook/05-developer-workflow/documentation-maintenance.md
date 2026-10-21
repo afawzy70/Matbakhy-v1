@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — ownership, change matrix, decision history and improvement loop that keep the handbook current
+> **Language / اللغة:** English · [العربية](documentation-maintenance-ar.md)
 
 ## Ownership (role-based)
 
@@ -38,6 +39,35 @@ Decisions live in `planning/decisions.json` and [docs/product/01-context-and-dec
 ## Continuous improvement
 
 When anyone finds missing, confusing or wrong documentation: record it as a GitHub issue (title prefix `docs:`), fix the canonical page in the PR that discovered it, and add a validation to `scripts/doc001_check.py` when the defect class is checkable (and a test in `scripts/test_doc001_gate.py`). Mohamed's first-week findings feed this loop ([final assessment](../06-onboarding-labs/final-assessment.md)).
+
+## Arabic mirror synchronisation
+
+The English handbook is the source of truth. Every English page `X.md` has exactly one Egyptian Arabic mirror `X-ar.md` in the same directory (`README.md` and `README-ar.md` are the two entry points). The mirror is a complete translation, not a summary: all paragraphs, warnings, tables, examples, commands, checklists and links are present, while code, commands, identifiers, paths, versions and URLs stay exactly as in English. The only English handbook file without a mirror is the generated [translation parity report](../translation-parity-report.md); the machine-readable [exceptions](../translation-exceptions.json) list it and every other justified difference.
+
+**Review policy.** English and Arabic change together in the same pull request. A change to an English page without the matching Arabic change is not complete, and neither is an Arabic-only edit that changes meaning. Do not paste machine translation: translate by hand, keep the structure identical, and have the Arabic compared with the English side by side before the pair is recorded. Semantic accuracy is a human or independent-reviewer duty; the tooling below checks structure only and never proves that a sentence means the same thing.
+
+| Situation | What to do |
+|---|---|
+| New English page | Create `X-ar.md` next to it, add the language-switch line to both files, link both from the navigation pages (`README.md` and `README-ar.md`). |
+| Edited English page | Make the equivalent edit in `X-ar.md` in the same PR. |
+| Renamed or removed English page | Rename or remove `X-ar.md` in the same PR and fix the links in both languages. |
+| Arabic wording fix | Edit `X-ar.md` only if the English meaning is unchanged; run the validator. |
+| A justified language-specific difference | Add an entry with a reason and a reviewer note to `docs/developer-handbook/translation-exceptions.json`. Unused entries fail the check. |
+
+**Commands** (run from the repository root; the validator needs `markdown-it-py`, installed with `python3 -m pip install 'markdown-it-py==3.0.0'`):
+
+```bash
+python3 scripts/validate_handbook_parity.py                         # every page
+python3 scripts/validate_handbook_parity.py --file 01-business/order-lifecycle.md   # one English page, path relative to the handbook
+python3 scripts/validate_handbook_parity.py --fix-anchors           # rewrite English-style link fragments to the Arabic heading slugs
+python3 scripts/validate_handbook_parity.py --base origin/develop   # also require same-PR Arabic changes
+python3 scripts/validate_handbook_parity.py --update-sync           # record the pair as reviewed together
+python3 scripts/test_validate_handbook_parity.py                    # validator unit tests
+```
+
+The validator compares, for every pair: heading levels, code blocks (language and exact content; Mermaid block structure with labels masked), tables (rows and columns), lists and checklist items, blockquotes, paragraphs, images, link destinations (internal links must point to the Arabic page and to the equivalent Arabic heading), inline-code identifiers, technical tokens and numbers, the `Owner role` and `Status` metadata, and the language-switch line. It also reports English pages without a mirror and Arabic pages without a source. `docs/developer-handbook/translation-sync.json` records a hash of each pair when it was last reviewed together; the check fails if the English changed and the Arabic did not. Run `--update-sync` only after you have really compared both files.
+
+The CI workflow `.github/workflows/handbook-parity.yml` (job `Handbook Arabic parity (structural)`) runs the tests, the full validation, the same-PR rule and `python3 scripts/doc001_check.py docs` when handbook files change. It is not part of the required checks on `develop` (the ruleset is unchanged); a failing run is still a signal to fix before merging. The current audit, including the semantic review and remaining exceptions, is in the [translation parity report](../translation-parity-report.md).
 
 ## Branch protection status
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — directory-by-directory map of the repository as it exists on this branch
+> **Language / اللغة:** English · [العربية](repository-map-ar.md)
 
 This page lists every top-level directory, what lives in it, and how the pieces connect. For task-oriented
 "where do I look for X" answers see [repository navigation](../00-getting-started/repository-navigation.md); for the

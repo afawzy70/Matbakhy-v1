@@ -2,6 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** REFERENCE — lab for building, testing, debugging a defect and preparing a PR locally.
+> **Language / اللغة:** English · [العربية](day-4-development-ar.md)
 
 ## Objectives
 

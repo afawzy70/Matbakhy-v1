@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** IMPLEMENTED — two workspace packages and one backend shared module are in use by every application
+> **Language / اللغة:** English · [العربية](shared-libraries-ar.md)
 
 Code reused across applications. Everything here is `private` (never published to a registry) and consumed by `workspace:*`
 dependencies (`pnpm-workspace.yaml` lists `apps/*` and `packages/*`).

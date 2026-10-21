@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — task-oriented lookup table from a question to the file that answers it
+> **Language / اللغة:** English · [العربية](repository-navigation-ar.md)
 
 Use this page when you know what you are looking for ("where is the price validated?") but not where it lives.
 For the directory layout see [repository map](../04-codebase/repository-map.md). Paths below were checked against
