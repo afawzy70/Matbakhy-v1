@@ -56,7 +56,7 @@ PR [#38](https://github.com/afawzy70/Matbakhy-v1/pull/38) اتفحص قبل ال
 | مقارنة النص المحمي مع baseline | PASS — كل Code Fences بما فيها Mermaid، وكل Inline Code والروابط والأسهم محفوظة حرفيًا في الـ 64 صفحة |
 | الإنجليزي والـ validators والـ exceptions والتطبيقات والـ workflows | بدون تغيير |
 | علامات Bidi جديدة / git diff --check | مفيش علامات اتجاه مخفية جديدة؛ PASS لفحص الـ diff |
-| GitHub PR declaration وCI | قيد المتابعة بعد نشر الفرع؛ النتيجة النهائية تتسجّل تحت |
+| GitHub PR declaration وCI | الحالة الحية في PR #41؛ نشر الفرع وحده مش دليل نجاح |
 | العرض البصري على GitHub وRTL وMermaid renderer | NOT_RUN |
 | اختبارات التطبيق أو النشر الفعلي | NOT_RUN؛ مفيش تغيير تطبيق أو نشر مطلوب في المهمة |
 
@@ -3895,4 +3895,4 @@ PR [#38](https://github.com/afawzy70/Matbakhy-v1/pull/38) اتفحص قبل ال
 
 ## تسليم GitHub والحالة النهائية
 
-PENDING — يتحدّث بعد نشر الفرع وفتح الـ PR وفحص التشغيلات. مفيش طلب مراجعة أو Merge تلقائي.
+اتنشر الفرع واتفتح [PR #41 على develop](https://github.com/afawzy70/Matbakhy-v1/pull/41). المراجعة التحريرية والفحوصات المحلية PASS، والملاحظات المؤكدة اتصلّحت واتراجعت. حالة GitHub الحالية موجودة في [Checks](https://github.com/afawzy70/Matbakhy-v1/pull/41/checks)؛ التقرير الثابت مش بديل للحالة الحية على الـ Head الحالي. الـ PR بيتجهّز كـ Draft أثناء تشغيل الفحوصات، ومايتحوّلش لطلب مراجعة إلا بعد نجاح المطلوب. المالك هو اللي يقرر المراجعة والدمج؛ مفيش Merge تلقائي.
