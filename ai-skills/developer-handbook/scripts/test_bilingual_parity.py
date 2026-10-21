@@ -345,6 +345,14 @@ class ParityTests(unittest.TestCase):
             f.edit("a-ar.md", "`code_id`", f"`code_id` {harmless}")
             self.assertNotIn("secrets", json.dumps(f.check()), harmless)
 
+    def test_unused_exception_reasons_are_masked_in_printed_output(self) -> None:
+        import subprocess as sp
+        exc = self.f.root / v.EXCEPTIONS
+        exc.write_text(json.dumps({"files": {"a.md": {"checks": {"tables": {"reason": "DB_PASSWORD=SyntheticLeak42", "reviewed": "owner"}}}}}))
+        r = sp.run([sys.executable, str(Path(v.__file__)), "--root", str(self.f.root), "--docs-dir", v.HB], capture_output=True, text=True)
+        self.assertIn("unused exception", r.stdout)
+        self.assertNotIn("SyntheticLeak42", r.stdout + r.stderr)
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")

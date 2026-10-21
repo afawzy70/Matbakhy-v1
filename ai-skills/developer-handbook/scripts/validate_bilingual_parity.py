@@ -287,17 +287,21 @@ class Validator:
             return {}
         return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else {}
 
-    def fail(self, page: str, check: str, msg: str) -> None:
-        allowed = self.exc.get(page, {}).get("checks", {})
-        if check in allowed and allowed[check].get("reason", "").strip() and allowed[check].get("reviewed", "").strip():
-            self.used_exc.add((page, check))
-            return
+    def mask(self, msg: str) -> str:
+        """Final masking applied to everything that is printed: pattern-based redaction plus every credential value seen in any page."""
         msg = redact(msg)
         for sv in self.secret_values:  # a value found in any page is masked wherever a diagnostic would print it (tokens, links, code, slugs)
             for variant in {sv, re.sub(r"[^\w]", "", sv)}:
                 if len(variant) >= 4:
                     msg = re.sub(re.escape(variant), "<redacted>", msg, flags=re.I)
-        self.problems.setdefault(page, []).append(f"[{check}] {msg}")
+        return msg
+
+    def fail(self, page: str, check: str, msg: str) -> None:
+        allowed = self.exc.get(page, {}).get("checks", {})
+        if check in allowed and allowed[check].get("reason", "").strip() and allowed[check].get("reviewed", "").strip():
+            self.used_exc.add((page, check))
+            return
+        self.problems.setdefault(page, []).append(f"[{check}] {self.mask(msg)}")
 
     # ------------------------------------------------------------------ one pair
     def compare(self, rel: str) -> None:
@@ -651,7 +655,7 @@ def main() -> int:
         p.write_text(text, encoding="utf-8")
     for page in sorted(v.problems):
         for msg in v.problems[page]:
-            print(f"FAIL  {page}: {msg}")
+            print(f"FAIL  {page}: {v.mask(msg)}")
     failing = len(v.problems)
     print(f"PARITY RESULT: {'FAIL' if failing else 'PASS'} ({len(en)} English page(s) checked, {failing} with problems). "
           "Structural only: passing does not prove semantic equivalence.")
