@@ -2,7 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** <label> — <meaning>
-> **Language / اللغة:** English · [العربية](<name>-ar.md)
+> **Language / اللغة:** English · العربية (`<name>-ar.md`; make this a Markdown link to the mirror page when you fill the template)
 
 ## Lifecycle
 <change → pull request → reviews → CI → merge → build → registry → deploy → health → live> with each step classified automated / manual / required policy / proposed, and a sequence diagram.

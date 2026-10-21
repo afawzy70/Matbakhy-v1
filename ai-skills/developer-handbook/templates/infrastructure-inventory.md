@@ -2,7 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** PARTIALLY IMPLEMENTED — <what this page covers and what is NOT VERIFIED>
-> **Language / اللغة:** English · [العربية](<name>-ar.md)
+> **Language / اللغة:** English · العربية (`<name>-ar.md`; make this a Markdown link to the mirror page when you fill the template)
 
 **Evidence legend:** VERIFIED LIVE (authorized read-only observation, date, observer account) · VERIFIED IN CODE · DOCUMENTED ONLY · OUTDATED / INCORRECT · NOT VERIFIED.
 

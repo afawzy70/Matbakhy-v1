@@ -2,7 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** <label> — <meaning>
-> **Language / اللغة:** English · [العربية](<name>-ar.md)
+> **Language / اللغة:** English · العربية (`<name>-ar.md`; make this a Markdown link to the mirror page when you fill the template)
 
 | Environment | URL | Purpose | Expected HTTP behaviour | Verification (date, from where) | Authentication | Network restrictions | Audience |
 |---|---|---|---|---|---|---|---|

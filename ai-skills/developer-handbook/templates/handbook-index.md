@@ -2,7 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — single entry point; implementation state is labelled per page
-> **Language / اللغة:** English · [العربية](README-ar.md)
+> **Language / اللغة:** English · العربية (`README-ar.md`; make this a Markdown link to the mirror page when you fill the template)
 
 <!-- Replace every <placeholder>. Delete sections for technology the project does not use. Keep the evidence legend. -->
 

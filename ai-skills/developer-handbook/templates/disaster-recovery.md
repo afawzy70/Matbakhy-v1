@@ -2,7 +2,7 @@
 
 > **Owner role:** Infrastructure and deployment
 > **Status:** <label> — <meaning; recoverability is NOT proven by the existence of backup scripts>
-> **Language / اللغة:** English · [العربية](<name>-ar.md)
+> **Language / اللغة:** English · العربية (`<name>-ar.md`; make this a Markdown link to the mirror page when you fill the template)
 
 ## Backups
 | Data | Location | Schedule | Contents | Verification | Retention | Off-machine copy |
