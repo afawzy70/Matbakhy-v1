@@ -283,6 +283,15 @@ The repository's own check is `deploy/web-preview/smoke.sh <preview-domain>` (VE
 * A machine in both the customer and the staff class (for example the VPS itself): `sh deploy/web-preview/smoke.sh 167-86-90-174.sslip.io`. It loads the operations app and fails on a 403 from `ops.*`.
 * A machine in the customer class but outside the staff class: `SMOKE_OPS=skip sh deploy/web-preview/smoke.sh 167-86-90-174.sslip.io`. With `SMOKE_OPS=skip` the script expects the 403 from `ops.*` instead of loading the operations app.
 
+## Readiness checklist before a tester starts
+
+The journeys above assume a ready fixture. No document or tool guarantees one at any given moment, so the person who asks a tester to start confirms the following and records the date:
+
+1. The owner (the only role that can grant access) has told the tester which IP class applies and has supplied the test account credentials through a private channel. Credentials are never written in this repository.
+2. The three safe checks above answer as documented.
+3. For an order journey (J6 to J9): the synthetic seed has been loaded once (see the [backup and recovery page](../08-infrastructure/backup-restore-disaster-recovery.md) for why the seed is not repeatable), the test customer's phone is verified, the kitchen has an open slot with stock, and the payment method offered at checkout is eligible for the chosen kitchen. Whether the live fixture currently satisfies this is NOT VERIFIED.
+4. If an order journey fails at checkout, stop and report the screen, the time and the error text to the owner. Do not retry in a loop and do not create accounts to work around it.
+
 ## Known limitations and documentation gaps
 
 * The owner-e2e accounts and the pre-verified phones are provisioned per run; their presence on the live Preview is NOT VERIFIED LIVE. An authorized administrator can list realm users with the Keycloak admin tooling described in [Keycloak admin console](../../operations/14-keycloak-admin-console.md).

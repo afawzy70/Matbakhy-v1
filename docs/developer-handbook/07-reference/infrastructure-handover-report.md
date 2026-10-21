@@ -8,7 +8,7 @@
 
 ## 1. Verdict
 
-**PARTIAL.** The infrastructure handbook (17 English pages, each with a complete Egyptian Arabic mirror) is written, structurally validated and underwent five AI review rounds with fixes applied afterwards (a sixth round is under way); it has not been re-reviewed after the last fixes, so no review of the corrected revision is recorded as clean. It is **not** a complete handover: complete-service disaster recovery is BLOCKED (no supported, rehearsed multi-store recovery sequence exists in the repository), the rebuild guide is DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED, and every Docker, firewall, sudo and effective SSH fact is NOT VERIFIED because the observing account has no privileges. No human reviewed the English or the Arabic.
+**PARTIAL.** The infrastructure handbook (17 English pages, each with a complete Egyptian Arabic mirror) is written, structurally validated and underwent seven AI review rounds with fixes applied after each; it has not been re-reviewed after the round-7 fixes, so no review of the corrected revision is recorded as clean. It is **not** a complete handover: complete-service disaster recovery is BLOCKED (no supported, rehearsed multi-store recovery sequence exists in the repository; the recovery design is PLANNED, NOT VERIFIED, and no rehearsal was executed because no isolated environment with Docker was available), the rebuild guide is DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED, and every Docker container, image, network, volume and effective-limit fact, and every firewall, sudo and effective SSH fact, is NOT VERIFIED because the observing account has no privileges. The installed Docker and Compose versions are VERIFIED LIVE. No human reviewed the English or the Arabic.
 
 ## 2. What was added
 
@@ -27,7 +27,7 @@ Also changed: the two README entry points (navigation), the test-execution page 
 
 | Check | Result |
 |---|---|
-| Structural parity of every English page and its Arabic mirror (`scripts/validate_handbook_parity.py`) | PASS for all pairs (80 of 80 at the time of writing) |
+| Structural parity of every English page and its Arabic mirror (`scripts/validate_handbook_parity.py`) | PASS for all pairs (81 of 81 at the time of writing; the complete recovery sequence added one pair) |
 | Validator tests (`scripts/test_validate_handbook_parity.py`) | PASS (22 tests, including credential and evidence-label cases) |
 | Documentation checks (`python3 scripts/doc001_check.py docs`) and repository link validation (`python3 scripts/validate_blueprint.py`) | PASS |
 | Egyptian Arabic phrase checker (reading aid only) | 0 warnings on the new Arabic pages at the last run; a clean run is not evidence of natural Arabic |
@@ -45,9 +45,10 @@ Reviewers were separate Codex sessions (AI, not human) that read the pages side 
 | 3 | 14 / 8 | 10 / 21 | a documented `backup` subcommand that does not exist, rollback numbering, rehearsal isolation |
 | 4 | 8 / 7 | 2 / 12 | SSH value wording, seed not idempotent, restore companions, disaster recovery marked BLOCKED |
 | 5 (targeted, 8 pages) | 6 / 7 | 1 / 5 | fixed afterwards; this fix set was not independently re-reviewed |
-| 6 | to be recorded | to be recorded | round-six counts are added by the supervisor after the round; conformance of the rebuild procedure to the observed host was reviewed in this round; its fixes are not independently re-reviewed |
+| 6 | 17 / 9 | 2 / 20 | sums of the per-batch totals, including the recovery design; a separate conformance review of the rebuild procedure against the observed host (30 steps: 12 conform, 6 differ, 12 not verifiable; 9 M / 8 m) is counted apart; fixes applied afterwards |
+| 7 | 6 / 3 | 0 / 9 | CP-03 counting comment lines, console exposure during validation, a hard-coded GitHub environment, totals compared after mutating journeys, health checks, running-image matching; all language findings minor; fixes applied, not independently re-reviewed |
 
-The language-quality gates (naturalness, grammar, clarity, technical accuracy, terminology, completeness, readability, Markdown and right-to-left presentation) were recorded per page by the reviewers; the last full pass left naturalness or terminology FAIL on several pages, all of which received the round-5 wording fixes. They are therefore NOT VERIFIED as clean after those fixes.
+The language-quality gates (naturalness, grammar, clarity, technical accuracy, terminology, completeness, readability, Markdown and right-to-left presentation) were recorded per page by the reviewers; the last full pass left naturalness or terminology FAIL on several pages, all of which received wording fixes in rounds 5 and 7. They are therefore NOT VERIFIED as clean after those fixes.
 
 ## 5. Handover simulation
 
@@ -55,11 +56,11 @@ The language-quality gates (naturalness, grammar, clarity, technical accuracy, t
 |---|---|---|
 | Infrastructure engineer | Independent technical reviewers read the pages as an engineer who had never seen the project, checking commands, flags, paths, labels and missing steps against the repository | Several missing steps were found and added; a clean-server rebuild was **not executed** (DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED); complete disaster recovery stays BLOCKED |
 | Software developer | The live Preview walkthroughs were reviewed for semantic parity and against the application sources | A separate new-developer simulation of the new pages was NOT RUN |
-| Fresh engineer, documentation only | A read-only simulation of a new engineer working only from the pages, without the author context | NOT YET RUN |
+| Fresh engineer, documentation only | A paper-only simulation by an AI session (13 tasks) working only from the English pages without the author context; nothing was executed | 6 tasks fully possible from the documents alone, 7 partly; 22 gaps, 18 material, mostly limitations the pages already acknowledge. The actionable ones were fixed: the compose `exec` rule and the `.env` field classification and the running-image correlation requirement (administrator sheet), certificate inspection paired with validation (DNS page), a tester readiness checklist (live Preview page), an escrow decision (backup page) and, in the recovery design, the points listed in the round-7 row. The governance gaps (documentation policy, Git workflow) are reported to the owner, not changed here. This is not a human or executed handover test |
 
 ## 6. Unverified items and limits
 
-- Docker state (containers, images, networks, volumes, limits), firewall state, sudo policy, the effective SSH configuration, certificate renewal, backup schedules and the account used by the deployment connection: NOT VERIFIED; the administrator command sheet closes these gaps.
+- Docker container state (containers, images, networks, volumes, effective limits), firewall state, sudo policy, the effective SSH configuration, certificate renewal, backup schedules and the account used by the deployment connection: NOT VERIFIED; the administrator command sheet closes these gaps.
 - The recovery gap: no supported sequence restores the application database, the identity database and the object storage together; the owner decides whether to define and rehearse one.
 - The pages under `docs/operations/` remain English-only and are partly historical.
 - Mermaid and right-to-left rendering were not inspected in a browser.
@@ -69,7 +70,7 @@ The language-quality gates (naturalness, grammar, clarity, technical accuracy, t
 ## 7. Follow-up for the owner
 
 1. Run the administrator command sheet and update the NOT VERIFIED rows (a privileged, read-only task).
-2. Decide on and rehearse a complete recovery sequence; until then keep disaster recovery BLOCKED.
+2. Decide on, implement the missing tooling for and rehearse the complete recovery sequence on an isolated environment with Docker; until then keep disaster recovery BLOCKED and the design PLANNED, NOT VERIFIED.
 3. Decide whether to apply the drift fixes listed in the coverage report (server paths and defaults); none was applied here.
 
 ## Known limitations and documentation gaps

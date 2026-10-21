@@ -170,8 +170,8 @@
    "en": "84f16f432a3ffafd6034c8645a87969ad9f17bd09ec5fe9b7978d8bb05ac96b9"
   },
   "05-developer-workflow/live-preview-access.md": {
-   "ar": "99f5dc6b212d33375b2371cc75db1cd3c12cc67e7fd2aad0c49443f2aeded227",
-   "en": "fd776c3b02fc185fb865c156b1da7580bce41da9956cd975129bc5ea3beaa33c"
+   "ar": "ad7dc2b25377aa07460d3e9f0b3d1b2b87c082425da9ce4371bec3ac55421ed4",
+   "en": "bec72701953b48a31becb1753e3548c14ec9a12ced25fc268da2c8610851a372"
   },
   "05-developer-workflow/local-environment.md": {
    "ar": "c577c5d70079dcec4a273d12c92099db6d4665394ffd1ef41ee9b8e15c355b40",
@@ -270,12 +270,12 @@
    "en": "fc1eb7fa8573ec13892da2ac5dc1462a89207df7b0522ef3da3f3fa3764d53ce"
   },
   "07-reference/infrastructure-documentation-coverage.md": {
-   "ar": "afd9eb0108536b16e5b39376adfc75cc08acc285c619d422c03701fd1196fe24",
+   "ar": "1388bacca71c943227902c70b5717b307cdec0104e6fce8b515848ac58b90e8d",
    "en": "b7fabd551d04f034e6f9738acadb85cd53fa311bc04209e5385e935b9fa62499"
   },
   "07-reference/infrastructure-handover-report.md": {
-   "ar": "6389d423794d23f4f5e98963eaec03df4a9befcd99f443d471ba23ee8204c576",
-   "en": "53cb3c5ad38cce236aa7272caf1eb2518decf28c9e9168ca179f434a298a3a11"
+   "ar": "ac8e133ddeab38b0e7b3fd31a11d8caa76c46df864ae9cbf1cf6711149c4c0ec",
+   "en": "3db110312af4afa6eb23cba6679502c80bbfc01b5852a8d93791d86d0382d984"
   },
   "07-reference/inventory-and-gaps.md": {
    "ar": "17fe0aa4271ffaea7035d53009dd37eec61f59ced26cc18025545d564cae926f",
@@ -286,16 +286,16 @@
    "en": "16119ea9f884fec4964ff898d8400a859b554b5b99873954a384a97bc23d6422"
   },
   "08-infrastructure/admin-readonly-verification.md": {
-   "ar": "59f7deca9ca3580a4a68f9a7eccc2b043680ad3bb890fb02621a89462c6ada44",
-   "en": "e2f4b21e52cbf0864707dd3ca36cbe3095f503f86522351cb3e783be6f0ee266"
+   "ar": "7d6748181153ec7da0e8a46146507991ca7d01935fbfb8071b6b8bc1e6744baf",
+   "en": "ede76d54f24b57810a6324c77209d31645a8c27fde0ae6c006cf52336137548e"
   },
   "08-infrastructure/backup-restore-disaster-recovery.md": {
-   "ar": "42f4cb4929ef697057f628c903163341457bdd8a2a817c4d219492bb255c9fc0",
-   "en": "fa49b3939aed84ff6f8e631e32d00f8801b78243047e1bcf72c1987a870520b9"
+   "ar": "7677005ce36685c241a75969fae8f9a39fb0eacd0b9f77e9ab081975bc77a556",
+   "en": "9cae89eb97aa67097a911585f07870cabbff0b4f40e586f260cf52eedd324b59"
   },
   "08-infrastructure/complete-recovery-sequence.md": {
-   "ar": "841eb50dba0757c8efa9121307bf98e63c86ce9fc05151ba909cb15ffcc37469",
-   "en": "d0766a1f05838e58116c47ec1984b3ea3d0f00b9c5fd284ad9a542e6a6936b11"
+   "ar": "91b035da6b9354d0af922e58516e3f5b62db265e5dbbf4cb05e9a1c1c0addf83",
+   "en": "2f6cadf78d61c2167ff55501fc645a6b19874a4a0b74e2fa977e888882cab44b"
   },
   "08-infrastructure/contabo-server-inventory.md": {
    "ar": "fff855a6917ea21e6f8c9fdfa35042d89c68a4c8eb3202e428a6a67a7a76c759",
@@ -306,19 +306,19 @@
    "en": "57c72e4679c9fce3d75f26b4091db3b241b8c872032204936ae8e31dd4412f2b"
   },
   "08-infrastructure/dns-https-sslip-io.md": {
-   "ar": "ceadbfc84d6f4b2e1ab5954f7b6be3adbd7015020609829ec76dab91e6781335",
-   "en": "2981264612a390dba95d7e05d682cda3ed6e71478cc769b908e2f453035b457b"
+   "ar": "14b38aa16b590913ed929d03a3bee0a7faf05608ddb62215882d150d85ecc175",
+   "en": "508b3d1bd7c907b966b049b5f047aee03a39d828cefed14f810ee674f388fdb6"
   },
   "08-infrastructure/infrastructure-troubleshooting.md": {
-   "ar": "817e53ceed85a48df73be761dfc3a5394d2848813d8e2c04ca3e9b0dca285368",
-   "en": "37bc0f33afb2cb2902c054e7a16af6a74afa177d34ee1ab80911192be43783e8"
+   "ar": "98e0123f1015a225f9f0af128c54f4d4a850664dd5885384d1ee2ac910e226ab",
+   "en": "999b090b3fb52517f36771223bb75207d91d2601e86d6087fe8a2355d458b460"
   },
   "08-infrastructure/runtime-architecture.md": {
-   "ar": "db8b8cf4f03bcda5d5f0641630eb66a64fc26ba65a26f871cd68d49a7522812c",
-   "en": "1a4eb3ca40f7f91833373dd9e5b76808d8e90347f9b09bf839fa8637999fad20"
+   "ar": "2cd72b72a14eec679f3e5f979029222607029dcfb3cd7ef35b6cf60c3a12293e",
+   "en": "e02ebb961e32bd9f490977cd5667294dab190e52ecabc326bee38eda9410c5ba"
   },
   "08-infrastructure/server-rebuild-guide.md": {
-   "ar": "f1bb913bd423df11bd875d43fe256d9922e5255cb45c3ff65f9524e678b600bf",
+   "ar": "5e45518b6851f5d89be1e95dc33111e5181f866b0e3afc69a1c98c9e6819515c",
    "en": "8a5fc60599165104b8b0ae92edef5ab9f6d71d5e2e4c04121aa883ad93f68ab0"
   },
   "README.md": {

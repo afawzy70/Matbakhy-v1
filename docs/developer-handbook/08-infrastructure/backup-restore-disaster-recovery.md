@@ -271,6 +271,7 @@ These are proposals for the owner and an authorized administrator; none is appro
 3. Inventory the Keycloak dumps that may already exist under `<backup-dir>/keycloak/` (names and dates only; they hold credentials), then decide whether to add the Keycloak database to the verified backup and add a storage restore command to the scripts, with tests, through a normal pull request.
 4. Decide, as an owner decision, whether a full multi-store recovery (application database, Keycloak database, storage) is required for the Preview. The repository gives: R6 and S1 to S3 for the application database, Keycloak dumps without a restore procedure, and the unrehearsed P2 for storage. It does not give a rehearsed sequence that combines them, in particular a supported bootstrap for the restore-both-databases-before-`up` order that the companion design proposes. That sequence is missing and NOT VERIFIED; nobody should treat B4 to B7 as proven.
 5. Run one complete Scenario B drill on an isolated server and record the measured times and any step that failed here.
+6. Decide, as an owner decision, where the only copy of `.env` is escrowed (which secrets manager, who may retrieve it, how access is audited and what happens if the single holder is lost). Until the owner records that decision, no one can say that the encryption keys in section 4 survive the loss of the server; the documents give no escrow procedure, and none is implied (NOT VERIFIED).
 
 ## Known limitations and documentation gaps
 
