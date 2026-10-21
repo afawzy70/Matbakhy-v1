@@ -198,6 +198,26 @@ class ParityTests(unittest.TestCase):
         self.f.edit("a-ar.md", "A → B", "A ← B")
         self.assertProblem(self.f.check(), "arrows")
 
+    def test_credentials_are_rejected_in_either_language(self) -> None:
+        self.f.edit("a.md", "Intro paragraph", "Intro paragraph with STORAGE_SECRET_KEY=REPLACE_ME and DB_PASSWORD=<set-on-server>")
+        self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة افتتاحية STORAGE_SECRET_KEY=REPLACE_ME و DB_PASSWORD=<set-on-server>")
+        self.assertEqual(self.f.check(), {})
+        self.f.edit("a-ar.md", "DB_PASSWORD=<set-on-server>", "DB_PASSWORD=Sup3rSecretValue99")
+        self.assertProblem(self.f.check(), "secrets")
+        self.f.edit("a-ar.md", "DB_PASSWORD=Sup3rSecretValue99", "DB_PASSWORD=<set-on-server>")
+        self.f.edit("a.md", "REPLACE_ME", "ghp_" + "a" * 30)
+        self.assertProblem(self.f.check(), "secrets")
+
+    def test_infrastructure_pages_need_evidence_labels(self) -> None:
+        (self.f.hb / "08-infrastructure").mkdir()
+        body = "# T\n\n" + META.format(m="x", lang="English · [العربية](p-ar.md)") + "\nClaim without a label.\n"
+        body_ar = "# ت\n\n" + META.format(m="س", lang="[English](p.md) · العربية") + "\nادعاء من غير وسم.\n"
+        self.f.write("08-infrastructure/p.md", body), self.f.write("08-infrastructure/p-ar.md", body_ar)
+        self.assertProblem(self.f.check(), "evidence", "08-infrastructure/p.md")
+        for name, text in (("p.md", "Claim (VERIFIED IN CODE)."), ("p-ar.md", "ادعاء (VERIFIED IN CODE).")):
+            self.f.write("08-infrastructure/" + name, (self.f.hb / "08-infrastructure" / name).read_text().replace("Claim without a label.", text).replace("ادعاء من غير وسم.", text))
+        self.assertEqual(self.f.check(), {})
+
     def test_inline_code_identifier_drift(self) -> None:
         self.f.edit("a-ar.md", "`code_id`", "`codeId`")
         self.assertProblem(self.f.check(), "inline-code")
