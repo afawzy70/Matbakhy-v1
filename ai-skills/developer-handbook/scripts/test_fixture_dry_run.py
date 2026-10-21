@@ -71,19 +71,21 @@ class FixtureDryRun(unittest.TestCase):
         run(str(VALIDATOR), "--root", str(self.repo), "--docs-dir", "docs/handbook", "--update-sync")
         ar = self.repo / "docs/handbook/run-guide-ar.md"
         original = ar.read_text(encoding="utf-8")
-        cases = {
-            "missing mirror": lambda: ar.unlink(),
-            "changed command": lambda: ar.write_text(original.replace("flask --app app.main run", "flask run"), encoding="utf-8"),
-            "dropped table row": lambda: ar.write_text(original.replace("| التشغيل | `flask --app app.main run` | لأ |\n", ""), encoding="utf-8"),
-            "dropped checklist item": lambda: ar.write_text(original.replace("- [ ] الرد فيه `UP`.", "الرد فيه `UP`."), encoding="utf-8"),
-            "changed number": lambda: ar.write_text(original.replace("3.12", "3.11"), encoding="utf-8"),
-            "broken link": lambda: ar.write_text(original.replace("(run-guide.md)", "(missing.md)"), encoding="utf-8"),
+        cases = {  # injected defect -> (how to inject it, the diagnostic category that must report it)
+            "missing mirror": (lambda: ar.unlink(), "[missing]"),
+            "changed command": (lambda: ar.write_text(original.replace("flask --app app.main run", "flask run"), encoding="utf-8"), "[inline-code]"),
+            "dropped table row": (lambda: ar.write_text(original.replace("| التشغيل | `flask --app app.main run` | لأ |\n", ""), encoding="utf-8"), "[tables]"),
+            "dropped checklist item": (lambda: ar.write_text(original.replace("- [ ] الرد فيه `UP`.", "الرد فيه `UP`."), encoding="utf-8"), "[lists]"),
+            "changed number": (lambda: ar.write_text(original.replace("3.12", "3.11"), encoding="utf-8"), "[tokens]"),
+            "broken language-switch link": (lambda: ar.write_text(original.replace("(run-guide.md)", "(missing.md)"), encoding="utf-8"), "[language-link]"),
         }
-        for name, break_it in cases.items():
+        for name, (break_it, category) in cases.items():
             with self.subTest(name):
                 ar.write_text(original, encoding="utf-8")
                 break_it()
-                self.assertEqual(self.validate().returncode, 1, f"{name} must fail the validator")
+                r = self.validate()
+                self.assertEqual(r.returncode, 1, f"{name} must fail the validator")
+                self.assertIn(category, r.stdout, f"{name} must be reported by {category}, not only by the sync record")
 
     def test_other_mirror_suffix_is_supported(self) -> None:
         for p in sorted((self.repo / "docs/handbook").glob("*.md")):

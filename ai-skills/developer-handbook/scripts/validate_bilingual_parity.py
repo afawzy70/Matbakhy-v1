@@ -69,7 +69,10 @@ def heading_texts(text: str) -> list[str]:
     """Heading contents as the Markdown parser sees them (ATX and Setext headings; never headings inside code fences)."""
     from markdown_it import MarkdownIt
     toks = MarkdownIt("commonmark").enable("table").parse(text)
-    return [redact(toks[i + 1].content) for i, t in enumerate(toks) if t.type == "heading_open"]  # credentials never become slugs
+    def rendered(tok) -> str:  # the text a reader sees: entities decoded, emphasis and link markup dropped, code kept
+        return "".join(c.content if c.type in ("text", "code_inline") else (" " if c.type in ("softbreak", "hardbreak") else "")
+                       for c in (tok.children or []))
+    return [redact(rendered(toks[i + 1])) for i, t in enumerate(toks) if t.type == "heading_open"]  # credentials never become slugs
 
 
 def dedup_slugs(texts: list[str]) -> list[str]:

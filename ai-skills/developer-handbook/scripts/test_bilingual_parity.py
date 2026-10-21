@@ -373,6 +373,11 @@ class ParityTests(unittest.TestCase):
         self.assertEqual(r.returncode, 2)
         self.assertEqual(victim.read_text(encoding="utf-8"), before)
 
+    def test_headings_with_entities_slug_by_rendered_text(self) -> None:
+        p = self.f.hb / "entities.md"
+        p.write_text("# Build &amp; deploy\n\n## Build & deploy\n", encoding="utf-8")
+        self.assertEqual(v.heading_slugs(p)[0], v.heading_slugs(p)[1].rsplit("-", 1)[0] if v.heading_slugs(p)[1].endswith("-1") else v.heading_slugs(p)[1])
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")
