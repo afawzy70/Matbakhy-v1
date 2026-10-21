@@ -136,14 +136,19 @@ SECRET_PATTERNS = (
     re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b"),
 )
-SECRET_ASSIGN_RE = re.compile(r"\b[A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)")
+_CRED_NAME = r"(?:[A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*|[\w-]*(?i:password|passwd|secret|token|api[_-]?key|private[_-]?key)[\w-]*)"
+_CRED_VALUE = r"(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)"
+# NAME=value, NAME = value (any spacing) and the JSON form "name": "value"; group 1 is the value in the first form, group 2 in the second
+SECRET_ASSIGN_RE = re.compile(r"\b" + _CRED_NAME + r"[ \t]*=[ \t]*" + _CRED_VALUE + r"|\"" + _CRED_NAME + r"\"[ \t]*:[ \t]*(\"[^\"\n]*\")")
 SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
 
 
 def unsafe_secret_value(raw: str) -> str | None:
     """The assigned value (quotes stripped) when it looks like a real credential, else None (placeholders are fine)."""
     v = raw.strip("\"'")
-    return v if v and not SAFE_SECRET_VALUE_RE.match(v) else None
+    if not v or SAFE_SECRET_VALUE_RE.match(v) or v.lower() in {"no", "yes", "true", "false", "none", "off", "on", "null", "0", "1"}:
+        return None  # placeholders and plain option values (for example a configuration flag set to "no") are not credentials
+    return v
 CHECKS = ("outside", "same-pr", "sync", "missing", "orphan", "exceptions", "evidence", "secrets", "arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
           "anchors")
 
@@ -263,7 +268,7 @@ def redact(text: str) -> str:
     """Diagnostics go to CI logs: never print credential-shaped values, whatever check found them."""
     for pat in SECRET_PATTERNS:
         text = pat.sub("<redacted>", text)
-    return SECRET_ASSIGN_RE.sub(lambda m: m.group(0).split("=", 1)[0] + "=<redacted>" if unsafe_secret_value(m.group(1)) else m.group(0), text)
+    return SECRET_ASSIGN_RE.sub(lambda m: re.sub(r"(=[ \t]*|:[ \t]*)(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)$", r"\1<redacted>", m.group(0)) if unsafe_secret_value(m.group(1) or m.group(2)) else m.group(0), text)
 
 
 class Validator:
@@ -307,7 +312,7 @@ class Validator:
         en_text, ar_text = en_p.read_text(encoding="utf-8"), ar_p.read_text(encoding="utf-8")
         for t in (en_text, ar_text):
             for m in SECRET_ASSIGN_RE.finditer(t):
-                sv = unsafe_secret_value(m.group(1))
+                sv = unsafe_secret_value(m.group(1) or m.group(2))
                 if sv:  # mask the whole value and every fragment of it that a token diagnostic could print on its own
                     self.secret_values.add(sv)
                     self.secret_values.update(w for w in re.split(r"\s+", sv) if len(w) >= 4)
@@ -392,9 +397,9 @@ class Validator:
             if any(pat.search(text) for pat in SECRET_PATTERNS):
                 kind = "a private key header or a token-shaped string"
             else:
-                m = next((m for m in SECRET_ASSIGN_RE.finditer(text) if unsafe_secret_value(m.group(1))), None)
+                m = next((m for m in SECRET_ASSIGN_RE.finditer(text) if unsafe_secret_value(m.group(1) or m.group(2))), None)
                 if m:
-                    kind = f"a real-looking value assigned to {m.group(0).split('=', 1)[0]}"
+                    kind = "a real-looking value assigned to a credential-named variable or key"
             if kind:  # never echo the value: diagnostics are printed to CI logs
                 self.fail(rel, "secrets", f"{lang} page contains something that looks like a credential ({kind}); value redacted")
 

@@ -329,6 +329,22 @@ class ParityTests(unittest.TestCase):
             self.assertIn("secrets", json.dumps(problems), name)
             self.assertNotIn("SyntheticValue42", json.dumps(problems), name)
 
+    def test_credential_forms_with_spacing_case_and_json_are_detected_and_masked(self) -> None:
+        forms = ["PASSWORD = SyntheticValue42", "password=SyntheticValue42", '"password": "SyntheticValue42"', "API_KEY='SyntheticValue42 x'"]
+        for text in forms:
+            f = Fixture()
+            self.addCleanup(f._t.cleanup)
+            f.edit("a.md", "`code_id`", f"`code_id` {text}")
+            problems = f.check()
+            self.assertIn("secrets", json.dumps(problems), text)
+            self.assertNotIn("SyntheticValue42", json.dumps(problems), text)
+        for harmless in ("key=value", "Secret: see section 3", "DB_PASSWORD=<set-on-server>", "STORAGE_SECRET_KEY=REPLACE_ME"):
+            f = Fixture()
+            self.addCleanup(f._t.cleanup)
+            f.edit("a.md", "`code_id`", f"`code_id` {harmless}")
+            f.edit("a-ar.md", "`code_id`", f"`code_id` {harmless}")
+            self.assertNotIn("secrets", json.dumps(f.check()), harmless)
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")
