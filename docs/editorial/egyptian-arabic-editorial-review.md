@@ -2385,9 +2385,17 @@ PR [#38](https://github.com/afawzy70/Matbakhy-v1/pull/38) اتفحص قبل ال
 
 الملف: [docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md](../../docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md). القسم: ## مزامنة النسخة العربي.
 
-| قبل | بعد |
-|---|---|
-| [ملف الاستثناءات](../translation-exceptions.json) المقروء بالآلة | [ملف الاستثناءات](../translation-exceptions.json) القابل للقراءة آليًا |
+قبل:
+
+```markdown
+[ملف الاستثناءات](../translation-exceptions.json) المقروء بالآلة
+```
+
+بعد:
+
+```markdown
+[ملف الاستثناءات](../translation-exceptions.json) القابل للقراءة آليًا
+```
 
 السبب: Natural machine-readable terminology.
 
