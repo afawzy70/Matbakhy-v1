@@ -29,11 +29,11 @@
    python3 scripts/doc001_check.py docs
    ```
    استخدم `scripts/check_workspace.sh` لتشغيل على Clone نضيف من الـ HEAD اللي عملتله Commit.
-3. اختبار وحدة. في `packages/api-client/test/money.test.ts` شوف إزاي تنسيق الفلوس بيتختبر. ضيف حالة جديدة واحدة لقيمة تختارها (مثلًا صفر قرش ومبلغ كبير)، وشغّل `pnpm --filter @matbakhy/api-client test`، وتأكد إنها بتنجح. وبعدين اكسر التنفيذ عن قصد، وشوف الاختبار بيفشل، وارجع عن الكسر.
+3. اختبار وحدة. في `packages/api-client/test/money.test.ts` شوف إزاي تنسيق الفلوس بيتختبر. ضيف حالة جديدة واحدة لقيمة تختارها (مثلًا صفر قرش ومبلغ كبير)، وشغّل `pnpm --filter @matbakhy/api-client test`، وتأكد إنها بتنجح. وبعدين اكسر التنفيذ عن قصد، وشوف الاختبار بيفشل، ورجّع التنفيذ لحالته السليمة.
 4. اختبار Backend. اختار Class واحد من `backend/app/src/test/java/com/matbakhy/app/orders`. شغّله لوحده بـ `scripts/check_backend_suite.sh <ClassName>`. اقرا المخرجات "PASS: <class> (n tests)". غيّر وسيط اسم الـ Class لحاجة غلط واقرا رسالة الفشل.
 5. العيب التدريبي. أدخل Bug صغير ومقصود في مكان ليه اختبارات (مثلًا غيّر مقارنة في مكوّن ويب تحت `apps/customer-web/src` يغطيه `*.test.tsx`). شغّل الاختبارات، ودوّر على أنهي اختبار مسكه، واشرح ليه، وصلّحه. لو مفيش اختبار مسكه، اكتب الاختبار الناقص الأول وورّي إنه بيفشل.
 6. E2E في المتصفح: اقرا `apps/operations-web/e2e/money-reflow.e2e.ts` ولو Docker وChromium متاحين، شغّل `scripts/dev.sh e2e` (طويل؛ بيستخدم Stack مؤقت). غير كده سجّله NOT RUN.
-7. قراءة الـ CI: افتح `.github/workflows/ci.yml` و`.github/workflows/deploy-preview.yml`. جاوب كتابةً: أنهي Job بيثبت إن الـ Stack المحلي بيقوم؟ إيه اللي لازم يتحقق قبل ما الصور تتبني؟ إيه اللي الـ Pipeline مابيعملوش له Rollback؟
+7. قراءة الـ CI: افتح `.github/workflows/ci.yml` و`.github/workflows/deploy-preview.yml`. جاوب كتابةً: أنهي Job بيثبت إن الـ Stack المحلي بيقوم؟ إيه اللي لازم يتحقق قبل ما الـ Docker Images تتبني؟ إيه اللي الـ Pipeline مابيعملوش له Rollback؟
 8. بيئة المعاينة: اطلب من المالك يضيفك في القايمة المسموحة لو احتجت، وبعدين شغّل `sh deploy/web-preview/smoke.sh <PREVIEW_DOMAIN>` على بيئة المعاينة (للقراءة بس). سجّل أنهي فحوصات بيغطيها.
 9. تجربة DOC-001: عدّل جملة واحدة في الدليل على الـ Branch التدريبي بتاعك، وشغّل `python3 scripts/doc001_check.py docs`، وبعدين اكتب (من غير ما تقدّم) كتلة إقرار الـ PR من صفحة السياسة.
 10. تخلّص من الشغل التدريبي: `git switch develop && git branch -D fix/day4-practice` (الـ Branch بتاعك انت بس).

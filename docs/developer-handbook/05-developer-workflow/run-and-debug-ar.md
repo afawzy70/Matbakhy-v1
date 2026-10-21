@@ -25,7 +25,7 @@ set -a; . infra/.env; set +a     # loads ports, POSTGRES_*, DEV_USER_PASSWORD in
 
 ## النداء على الـ API
 
-العقد هو `contracts/openapi.yaml` (قايمة العمليات في `contracts/endpoints.json`)؛ والـ Client بتاع TypeScript المتولّد موجود في `packages/api-client`. شوف [api-contracts.md](../04-codebase/api-contracts-ar.md).
+العقد هو `contracts/openapi.yaml` (قايمة العمليات في `contracts/endpoints.json`)؛ والـ Client المتولّد بـ TypeScript موجود في `packages/api-client`. شوف [api-contracts.md](../04-codebase/api-contracts-ar.md).
 
 - الـ Endpoints العامة مش محتاجة Session، مثلًا `GET /api/v1/configuration/public` و`GET /api/v1/meals?limit=5` (الـ Smoke Test بتاع بيئة المعاينة بينادي على الاتنين).
 - أي حاجة خاصة محتاجة الـ Session Cookie من تسجيل الدخول OIDC على الويب، ولو الطلب بيغيّر حالة محتاجة كمان CSRF Header: الأمر `scripts/dev.sh smoke` بيوريك التسلسل الشغّال بـ curl (cookie jar، وCookie `XSRF-TOKEN` منسوخة في `X-XSRF-TOKEN`). اقرا دالة `smoke` في `scripts/dev.sh` وأعد استخدامها بدل ما تخمّن.
@@ -59,10 +59,10 @@ $DC exec postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
 SELECT version, description, success FROM flyway_schema_history ORDER BY installed_rank DESC LIMIT 10;
 ```
 
-- الـ Migrations ملفات في اتجاه واحد بس `backend/app/src/main/resources/db/migration/V<n>__*.sql`. ماتعدّلش Migration اتطبّقت أبدًا؛ ضيف واحدة جديدة. الـ Migrations اللي بعد الـ Baseline لازم تكون Expand-only أو تحتوي على تعليق `-- rollback-compat:`، وده بيفرضه `scripts/check_migration_compat.py` ([ci-cd.md](ci-cd-ar.md)).
+- الـ Migrations ملفات بتطبّق تغييرات لقدّام بس `backend/app/src/main/resources/db/migration/V<n>__*.sql`. ماتعدّلش Migration اتطبّقت أبدًا؛ ضيف واحدة جديدة. الـ Migrations اللي بعد الـ Baseline لازم تكون Expand-only أو تحتوي على تعليق `-- rollback-compat:`، وده بيفرضه `scripts/check_migration_compat.py` ([ci-cd.md](ci-cd-ar.md)).
 - صفوف الأوردر Snapshots غير قابلة للتعديل و`order_event` للإضافة بس؛ وصفوف الـ Audit مينفعش تتعدّل ولا تتمسح (Triggers في الـ Database، حسب `docs/operations/08-troubleshooting-runbook.md`). ماتصلّحش البيانات بتعديل الجداول دي؛ دوّر على السبب في الكود.
 - السكريبتات `scripts/db-backup.sh` و`scripts/db-restore.sh` بتاخد نسخة احتياطية منطقية وبتتحقق منها؛ ولازم مجلد المخرجات يكون برّه أي git working tree لأن الـ Dumps فيها بيانات شخصية.
-- عادة القراءة بس: استخدم `SELECT` وانت بتحقق. لو لازم تغيّر بيانات محلية عشان تعمل Reproduce، اعمل ده على Stack مؤقت (على طريقة `scripts/dev.sh verify`) أو بعد `scripts/dev.sh reset`.
+- خلّي التحقيق للقراءة بس: استخدم `SELECT` وانت بتحقق. لو لازم تغيّر بيانات محلية عشان تعمل Reproduce، اعمل ده على Stack مؤقت (على طريقة `scripts/dev.sh verify`) أو بعد `scripts/dev.sh reset`.
 
 ## الـ Debug على Keycloak
 
