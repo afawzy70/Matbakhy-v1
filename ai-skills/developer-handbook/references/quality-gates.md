@@ -1,0 +1,24 @@
+# Quality gates (Stages F and G)
+
+## F1 Structural parity (automated)
+Use `scripts/validate_bilingual_parity.py` (or the project's equivalent). It compares per pair: missing/orphan mirrors, heading levels, code blocks (language and exact content), Mermaid structure with labels masked, tables (rows, columns), lists and checklists, blockquotes/paragraphs/rules/HTML blocks, images, link destinations and anchors, inline-code identifiers, protected tokens and numbers, arrow direction, language-switch line, secret patterns, optional metadata and evidence labels, a reviewed-pair record (`translation-sync.json`), a same-PR rule (`--base`) and a documented-exception file. Word counts are never a quality metric.
+
+**Validate the validator.** Keep positive tests (a faithful pair passes) and negative tests (each defect class fails). Run `scripts/test_bilingual_parity.py`.
+
+## F2 Documentation reference checks
+The project's own documentation checks (links, anchors, source-path references, identifiers existing in their registries, metadata, navigation reachability). Reuse them; do not weaken them.
+
+## F3 CI integration
+Add a documentation-only workflow limited to documentation paths: install the parser pinned, run the validator tests, the validator, the same-PR rule on pull requests, and the project's documentation checks. Do not change existing required checks, branch protection or deployment workflows; recommend, but do not apply, making the new check required.
+
+## F4 Independent semantic review (mandatory when any reviewer is available)
+Use a reviewer that did not translate the pages (another agent or session, or a human). Read each pair side by side; report material findings (omission, meaning change, wrong number/command/identifier/warning, attribution or direction reversal, dropped qualifier) and minor findings, with file, section, evidence and suggested fix. Fix, then re-review; repeat until a full pass reports no material finding. Use different page groupings per round and include the known defect classes in later rounds. Say plainly that the reviewers were AI sessions if they were; do not call that a human approval. A structural pass never proves semantic equivalence.
+
+## G Handover simulation
+Two walk-throughs by reviewers who have not seen the project:
+- **Software engineer**: understand the business, navigate the code, run locally, change something small, run tests, prepare a pull request, trace deployment, open the live application, verify.
+- **Infrastructure engineer**: understand the topology, identify accounts and permissions, rebuild from a clean machine, configure DNS and TLS, understand the CI/CD deployment, monitor, diagnose, restore, verify health.
+Record every missing step and unresolved assumption, fix them, repeat. If no isolated rebuild was executed, classify the rebuild as `DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED`.
+
+## Verdict rules
+PASS only when every claim above has evidence in the verification report. PARTIAL when documented limits remain (no human review, not executed rebuild, NOT VERIFIED runtime facts). BLOCKED when access or an input is missing. List remaining exceptions, risks and unverified assumptions.
