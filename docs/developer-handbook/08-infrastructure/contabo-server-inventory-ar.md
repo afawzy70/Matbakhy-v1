@@ -84,7 +84,7 @@
 | PubkeyAuthentication | yes | VERIFIED LIVE (نص الملف) |
 | UsePAM | yes | VERIFIED LIVE (نص الملف) |
 | X11Forwarding | yes | VERIFIED LIVE (نص الملف). مش مطلوب لـ Matbakhy؛ ومراجعة تقوية الأمان (Hardening) ممكن تقفله. |
-| PermitRootLogin | no في النص المقروء، لكن سطر أسبق بيقول yes وملف Drop-in بييجي بعده في ترتيب قراءة الإعدادات (مش بالضرورة ملف أحدث) بيعمل له Override | القيمة الفعلية NOT VERIFIED. الملف /etc/ssh/sshd_config.d/50-cloud-init.conf مش مقروء للـ aiagent وممكن يكون بيظبطها تاني. أكّدها بـ `sshd -T` بصلاحية root (الأمر 1 في صفحة الأدمن). |
+| PermitRootLogin | النص المقروء فيه القيمتين (no و yes) | القيمة الفعّالة منهم NOT VERIFIED. كلام دليل إعادة البناء إن أول قيمة بتتقرا هي اللي بتتطبّق DOCUMENTED ONLY. الملف /etc/ssh/sshd_config.d/50-cloud-init.conf مش مقروء للـ aiagent وممكن يكون بيظبطها تاني. لازم أدمن يأكّدها بـ `sshd -T` بصلاحية root (الأمر 1 في صفحة الأدمن). |
 
 الحاجات دي مش مقروءة للـ aiagent وبالتالي NOT VERIFIED: 50-cloud-init.conf، وكل ملفات authorized_keys، والمفاتيح الخاصة بالـ Host، و/etc/sudoers.d. عدد المفاتيح المصرّح بيها لكل حساب، وأنهي مفتاح بتاع أنهي شخص أو بتاع GitHub Actions، مجهول، ومصدر المفاتيح الفعلي (AuthorizedKeysFile أو AuthorizedKeysCommand) كمان مجهول.
 

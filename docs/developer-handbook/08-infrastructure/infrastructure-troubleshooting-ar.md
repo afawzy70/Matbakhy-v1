@@ -59,7 +59,7 @@
 | الكود | الأمر | الجهاز | مستخدم لينكس | المتطلب المسبق | النتيجة المتوقعة | الفشل المحتمل والإجراء |
 |---|---|---|---|---|---|---|
 | D1 | `curl -sS -o /dev/null -w '%{http_code} %{content_type} %{redirect_url}\n' https://<host>.<domain>/<path>` | جهازك أو أي جهاز عليه curl | أي مستخدم | وصول للشبكة؛ ممكن الـ IP العام بتاعك يفرق (شوف السيناريو 5) | كود الحالة ونوع المحتوى ووجهة الـ Redirect للمسار ده؛ شوف الجدول في [الوصول للـ Preview الحي](../05-developer-workflow/live-preview-access-ar.md) | Exit code 6 معناه إن الاسم ماتحلّش (السيناريو 2)؛ و 7 معناه إن الاتصال اترفض؛ و 28 معناه Timeout؛ و 35 أو 60 معناه فشل TLS (السيناريو 3) |
-| D2 | `curl -sSI https://<host>.<domain>/<path>` | جهازك | أي مستخدم | زي D1 | هيدرز الرد: Strict-Transport-Security وX-Content-Type-Options وX-Robots-Tag جايين من بلوك الهيدرز في الـ Caddyfile (VERIFIED IN CODE) | رد من غير الهيدرز دي مجاش من الـ Caddyfile ده؛ سيرفر تاني هو اللي ردّ |
+| D2 | `curl -sSI https://<host>.<domain>/<path>` | جهازك | أي مستخدم | زي D1 | هيدرز الرد: Strict-Transport-Security وX-Content-Type-Options وX-Robots-Tag جايين من بلوك الهيدرز في الـ Caddyfile (VERIFIED IN CODE) | غياب الهيدرز عَرَض لمشكلة في الإعدادات أو التوجيه، مش دليل إن سيرفر تاني هو اللي ردّ: الـ Caddyfile بيعرّف الهيدرز جوّه مسارات كل Host لوحده، فأي Host أو مسار بيعدّي على مسار تاني ممكن يطلع من غيرها. أكّد بالشهادة (D3 وD1) وعنوان الوجهة والـ Image الشغّال (D14) ولوجات الـ Proxy (D9) |
 | D3 | `getent hosts <host>.<domain>` | جهازك | أي مستخدم | Resolver | السطر بيبدأ بـ 167.86.90.174 (VERIFIED LIVE لأسماء الـ Preview) | مفيش مخرجات معناه مفيش رد للاسم ده؛ شوف السيناريو 2 |
 | D4 | الفحص: `openssl s_client -connect <host>.<domain>:443 -servername <host>.<domain> </dev/null 2>/dev/null \| openssl x509 -noout -issuer -subject -dates -ext subjectAltName`. التحقق: `curl -sS -o /dev/null -w '%{http_code} verify=%{ssl_verify_result}\n' https://<host>.<domain>/` | جهازك | أي مستخدم | OpenSSL 1.1.1 أو أحدث وcurl متسطّبين | أمر الفحص بيطبع الشهادة اللي السيرفر بيقدّمها بس، ومابيتحقّقش منها. اقرا سطر subjectAltName للتأكد إن اسم المضيف متغطّي، وشوف الـ Issuer وتاريخ not-after في المستقبل. أمر التحقق بيسيب التحقق من TLS شغّال: بيخرج بـ 0 وبيطبع `verify=0` بس لما سلسلة الشهادات واسم المضيف يتحقّقوا (كود HTTP ممكن يبقى 403 كرد سياسة وصول وده عادي)؛ الخروج بـ 60 أو قيمة verify مش صفر معناه فشل في الشهادة. الـ Issuer هو Let's Encrypt بصلاحية حوالي 90 يوم اتلاحظ لمضيف app بس (VERIFIED LIVE: الـ Issuer CN هو YE1، من 2026-10-18 لحد 2027-01-16)؛ أما Issuer وتواريخ المضيفين التانيين فهي NOT VERIFIED LIVE، وصفحة الـ DNS موثّقة إن ممكن تتستخدم جهة إصدار بديلة، فاقرا الـ Issuer بدل ما تفترضه | نتيجة فحص فاضية معناها إن الـ TLS Handshake فشل؛ ممكن الـ Proxy لسه معندوش شهادة للاسم ده. ماتستبدلش أمر التحقق بـ `curl -k` |
 | D5 | `sh deploy/web-preview/smoke.sh <domain>` (ضيف `SMOKE_OPS=skip` قبله لما تشغّله برّه فئة الـ Staff) | جهازك أو السيرفر | أي مستخدم (على السيرفر: أي حد يقدر يوصل للروابط العامة) | نسخة Checkout من الـ Repository؛ وcurl | بينتهي بـ `PASS: web preview smoke test for <domain>`؛ السكريبت بيقول إنه مابيعملش حساب ولا أوردر ولا Upload (VERIFIED IN CODE) | سطر بيبدأ بـ `FAIL:` بيحدد الفحص اللي باظ؛ شوف السيناريو 22 |
@@ -99,7 +99,7 @@
 | F8 | `gh run rerun <run id> --failed` أو `gh workflow run deploy-preview.yml --ref develop` | جهازك، مستخدم عنده صلاحية كتابة على الـ Repository | إعادة التشغيل بتعمل Deploy للـ Commit بتاع التشغيلة دي؛ والتشغيل اليدوي بيعمل Deploy لآخر Commit في develop. الـ Workflow بيشغّل Deployment واحد في المرة (Concurrency Group، VERIFIED IN CODE). ماتعيدش Deployment عشان هو بطيء؛ أعد التشغيل بعد ما الفشل يتفهم ويتصلّح بس | الإصلاح اتعمله Merge أو الـ Secret اتصحّح | تشغيلة جديدة بتوصل لـ `DEPLOYED <sha>` | D23 وD5 |
 | F9 | افتح Pull Request بيغيّر ملف الـ Repository (الـ Caddyfile أو compose.yaml أو سكريبت أو Workflow)، سيب الـ CI ينجح، اعمل Merge، وسيب الـ Deploy Workflow يشحنه | جهازك | ماتعدّلش الملفات على السيرفر بنفسك أبدًا: الـ Pipeline بيكتب فوق deploy وinfra وscripts من Git في كل Deployment (VERIFIED IN CODE)، فالتعديل اليدوي بيضيع أو بيعمل Drift | تغيير اتراجع ومعاه إقرار Documentation Impact | الـ Image أو الملف الجديد اتعمله Deploy | D17 وD5 |
 | F10 | `./deploy.sh render` | الـ VPS، داخل `<deploy-dir>`، أدمن مصرّح له | بيعيد كتابة الإعدادات المولّدة اللي فيها أسرار (استيراد الـ Realm وملف بيانات اعتماد الـ Storage) ويعيد تطبيق الـ Modes بتاعتها. مابيعيدش تشغيل الخدمات (VERIFIED IN CODE). ماتطبعش الملفات المولّدة أبدًا | ملف .env سليم | ملفات تحت المجلد المولّد بالـ Modes المذكورة في السيناريو 17 | D21 على الملفات دي؛ وF2 (صيغة إعادة الإنشاء) للخدمات اللي بتقراها |
-| F11 | استعادة من نسخة احتياطية (`./deploy.sh restore-db <dump>` والخطوات في [الـ Deployment والـ Rollback للـ Staging](../../operations/11-staging-deployment-and-rollback.md)، القسم 4.3) | الـ VPS، أدمن مصرّح له | البيانات المكتوبة بعد النسخة الاحتياطية بتضيع. الاستعادة فوق بيانات حيّة محتاجة تصريح صريح من المالك؛ جرّب على سيرفر جديد معزول الأول ([النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)) | Dump متحقق منه وله Checksum؛ والـ API واقف | قاعدة البيانات المستعادة بتتطابق في فحص المطابقة (Reconciliation) (الأوردرات والتخصيصات والـ Ledger) | مخرجات المطابقة؛ وD5 |
+| F11 | استعادة من نسخة احتياطية (`./deploy.sh restore-db <dump>` والخطوات في [الـ Deployment والـ Rollback للـ Staging](../../operations/11-staging-deployment-and-rollback.md)، القسم 4.3) | الـ VPS، أدمن مصرّح له | البيانات المكتوبة بعد النسخة الاحتياطية بتضيع. الاستعادة فوق بيانات حيّة محتاجة تصريح صريح من المالك؛ جرّب على سيرفر جديد معزول الأول ([النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)) | Dump متحقق منه وله Checksum موضوع على الـ Host تحت BACKUP_DIR (الـ Container بتاع postgres شايف المجلد ده باسم /backups، فمرّر مسار /backups، مثلًا `/backups/db-<stamp>/matbakhy-<stamp>.dump`)، وجنبه ملف `.dump.sha256`، وللقبول كمان ملف `.manifest` المطابق؛ والـ API واقف | قاعدة البيانات المستعادة بتتطابق في فحص المطابقة (Reconciliation) (الأوردرات والتخصيصات والـ Ledger). `scripts/db-restore.sh` بيرفض الـ Checksum الغلط، لكن من غير الـ Manifest المطابق بيطبع تحذير وبيتخطى مقارنة عدد الصفوف وممكن يطبع RECONCILED برضه؛ ماتقبلش استعادة غير بوجود الـ Manifest وبدون أي سطر MISMATCH (VERIFIED IN CODE) | مخرجات المطابقة؛ وD5 |
 
 ## 1. الموقع مش متاح
 
@@ -129,7 +129,7 @@
 
 **الأسباب المحتملة.**
 - الـ Resolver بتاع الـ Caller مش قادر يوصل لخدمة sslip.io أو بيفلترها. الأسماء تحت 167-86-90-174.sslip.io بتتحلّ لـ 167.86.90.174 بالتصميم: sslip.io بيرد بعنوان الـ IP المكتوب جوّه الاسم (DOCUMENTED ONLY، شوف [الـ DNS والـ HTTPS](dns-https-sslip-io-ar.md)). كل الأسماء الستة اتحلّت للعنوان ده لما اتلاحظت من السيرفر (VERIFIED LIVE).
-- غلطة كتابة في الاسم، مثلًا نقطة بدل شرطة في جزء الـ IP.
+- غلطة كتابة في الاسم، مثلًا رقم غلط في جزء الـ IP. هل الأشكال التانية للعنوان المدمج، زي النقط بدل الشرطات، بتتحلّ ولا لأ NOT VERIFIED.
 - دومين الـ Preview اتغيّر في الـ Repository أو Image الـ Front بس العنوان اللي وراه ماتغيّرش (استبدال الدومين متوصّف في [الـ DNS والـ HTTPS](dns-https-sslip-io-ar.md)).
 - sslip.io نفسه مش متاح (برّه الـ Repository؛ NOT VERIFIED).
 
@@ -288,7 +288,7 @@
 
 **مستوى الخطورة.** عالي؛ فيه كل بيانات التطبيق. إجراءات الاستعادة خطورتها عالية وتحتاج المالك.
 
-**التحقق من التعافي.** D11 accepting connections، وD12 بيظهر نسخة الـ Schema المتوقعة، والـ api سليم، و`./deploy.sh smoke` بينجح. بعد الاستعادة، استعلام المطابقة في `./deploy.sh restore-db` بيبلّغ إن كل الفحوص OK.
+**التحقق من التعافي.** D11 accepting connections، وD12 بيظهر نسخة الـ Schema المتوقعة، والـ api سليم، و`./deploy.sh smoke` بينجح. بعد الاستعادة، استعلام المطابقة في `./deploy.sh restore-db` بيبلّغ إن كل الفحوص OK؛ والاستعادة من غير الـ Manifest المطابق ماتتقبلش حتى لو اتطبع RECONCILED، لأن عدد الصفوف ماتقارنش.
 
 ## 10. فشل Redirect تسجيل الدخول في Keycloak
 
@@ -430,7 +430,7 @@
 - Migration جديد فيه خطأ أو بيتعارض مع بيانات موجودة.
 - Flyway بيتصل بدور المالك matbakhy (SPRING_FLYWAY_USER) بينما الـ API بيشتغل بدور matbakhy_app الأقل صلاحية؛ وأي Grant ناقص بيتطبّق بواسطة الـ Callback اسمه afterMigrate (VERIFIED IN CODE، تعليق compose.yaml). فخطأ صلاحيات غالبًا بيشاور على كلمة سر المالك.
 - Migration اتغيّر بعد ما اتطبّق (عدم تطابق Checksum، DOCUMENTED ONLY: سلوك Flyway القياسي).
-- نقص قرص أو ذاكرة أثناء الـ Migration (السيناريوهات 18 و 19).
+- نقص في مساحة القرص أو الذاكرة أثناء الـ Migration (السيناريوهات 18 و 19).
 
 **أوامر التشخيص الآمنة.** D9 لـ api، وD12، وD16، وD15، وD11.
 
@@ -501,7 +501,7 @@
 
 **الإجراء التصحيحي.** ارفع حد الخدمة دي بس، عن طريق Pull Request بيغيّر compose.yaml ويتعمل له Deploy بالـ Pipeline (F9)؛ وماترفعش حدود مالهاش علاقة. أعد تشغيل الخدمة المتأثرة (F2، صيغة `restart` اللي مابتطبّقش أي تغيير في الإعدادات) عشان ترجّع الخدمة أثناء تجهيز التغيير. دوّر على السبب وصلّحه (مثلًا استعلام طويل أو Memory Leak) بدل ما ترفع الحدود بس. ماتشغّلش الـ Stack من غير حدود.
 
-**مستوى الخطورة.** متوسط؛ تكرار قتل postgres معناه وقت أطول في استرداد الانهيار (Crash Recovery)، وقتل الـ API بيعرّض لطلبات فاشلة.
+**مستوى الخطورة.** متوسط؛ تكرار قتل postgres ممكن يطوّل وقت التعافي بعد الانهيار (Crash Recovery)، وقتل الـ API ممكن يسبب فشل الطلبات.
 
 **التحقق من التعافي.** D20 بيظهر OOMKilled false وRestartCount ثابت، وأوقات الرد طبيعية، وD5 بينجح.
 

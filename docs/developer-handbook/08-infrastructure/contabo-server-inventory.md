@@ -84,7 +84,7 @@ Readable parts of /etc/ssh/sshd_config and /etc/ssh/sshd_config.d were read by a
 | PubkeyAuthentication | yes | VERIFIED LIVE (file text) |
 | UsePAM | yes | VERIFIED LIVE (file text) |
 | X11Forwarding | yes | VERIFIED LIVE (file text). Not required by Matbakhy; a hardening review may turn it off. |
-| PermitRootLogin | no in the readable text, but an earlier line says yes and a drop-in that is read after it in the processing order (not a newer file) overrides it | The effective value is NOT VERIFIED. /etc/ssh/sshd_config.d/50-cloud-init.conf is unreadable to aiagent and may set it again. Confirm with `sshd -T` as root (command 1 on the admin page). |
+| PermitRootLogin | the readable text contains both values (no and yes) | Which value is effective is NOT VERIFIED. The rebuild guide's statement that the first obtained value wins is DOCUMENTED ONLY. /etc/ssh/sshd_config.d/50-cloud-init.conf is unreadable to aiagent and may set it again. An administrator must confirm with `sshd -T` as root (command 1 on the admin page). |
 
 Not readable by aiagent and therefore NOT VERIFIED: 50-cloud-init.conf, every authorized_keys file, the host private keys, and /etc/sudoers.d. The number of authorized keys per account and which key belongs to which person or to GitHub Actions are unknown, and so is the effective key source (AuthorizedKeysFile or AuthorizedKeysCommand).
 

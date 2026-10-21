@@ -22,7 +22,7 @@
 
 ## How to read this guide
 
-- Part A is a clean installation (steps 1 to 30). Part B is a restore onto a rebuilt server and only points to the recovery page.
+- Part A is a clean installation (steps 1 to 30). Part B is a restore onto a rebuilt server; complete-service recovery is BLOCKED there (see the status box at the top of Part B).
 - Every step lists its prerequisite, then a command table. The columns are: command, machine and Linux user, read-only or state-changing, how to verify, likely failure and response. Commands that need a pipe or several lines are in the code block under the table.
 - Placeholders are in angle brackets: `<domain>` (Preview base domain), `<deploy-user>`, `<admin-user>`, `<vps-ip>`, `<owner>` and `<repo>` (GitHub owner and repository). Never write a secret value into this repository, a ticket or a chat.
 - Hetzner-era documents ([Hetzner staging preparation](../../operations/09-staging-hetzner-preparation.md), [owner server setup](../../operations/12-owner-server-setup.md)) were written for a proposed 2 vCPU / 4 GB Hetzner host that was not the running one. Their commands are adapted here only where the code confirms them; Hetzner specifics are marked OUTDATED / INCORRECT. The current host is described in [Contabo server inventory](contabo-server-inventory.md).
@@ -149,7 +149,7 @@ rm /tmp/matbakhy-cd.pub
 
 Prerequisite: Step 5 verified from a second terminal. Keep your current session open until the new settings are proven.
 
-Observed (VERIFIED LIVE): password and keyboard-interactive login are off, public-key login is on, and the effective value of `PermitRootLogin` is NOT VERIFIED because `/etc/ssh/sshd_config.d/50-cloud-init.conf` was not readable. The Hetzner-era `sed` edit of `sshd_config` in `docs/operations/12-owner-server-setup.md` is not reused: cloud images ship drop-in files that can override it.
+Observed (VERIFIED LIVE): the readable SSH configuration text contains `PasswordAuthentication no`, `KbdInteractiveAuthentication no` and `PubkeyAuthentication yes`. This is file text, not the effective setting, because `/etc/ssh/sshd_config.d/50-cloud-init.conf` was not readable. The readable files contain both `PermitRootLogin no` and `PermitRootLogin yes`; which value is effective is NOT VERIFIED and needs `sshd -T` run by an administrator. The Hetzner-era `sed` edit of `sshd_config` in `docs/operations/12-owner-server-setup.md` is not reused: cloud images ship drop-in files that can override it.
 
 ```sh
 # VPS, <admin-user> with sudo: state-changing. The 00- prefix makes this file the first one read, ahead of 50-cloud-init.conf.
@@ -348,7 +348,7 @@ What `./deploy.sh up` does on the server (VERIFIED IN CODE): validates `.env`; t
 
 | Verify | Likely failure |
 |---|---|
-| The workflow run ends green with `DEPLOYED <sha>`. On the VPS as `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` lists the containers, the schema version and the last release | `Missing STAGING_SSH_*`: Step 15. `Host key verification failed`: the host key secret differs from the server key. `.env still has placeholders`: Step 13. `API did not become healthy`: read the printed API and identity logs. Product CI failed or timed out: nothing is built |
+| The workflow run ends green with `DEPLOYED <sha>` (supporting evidence of what was deployed, not proof of what runs now). On the VPS as `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` lists the containers, the schema version and the last release | `Missing STAGING_SSH_*`: Step 15. `Host key verification failed`: the host key secret differs from the server key. `.env still has placeholders`: Step 13. `API did not become healthy`: read the printed API and identity logs. Product CI failed or timed out: nothing is built |
 
 ## Phase 6. Verify the running pieces
 
@@ -428,11 +428,11 @@ The last step of the CD job runs `./deploy.sh admin-console enable`: it backs up
 
 ### Step 25. Synthetic accounts and demo catalogue
 
-CD does not seed data (VERIFIED IN CODE: no `seed` in the workflow). Run once after the first deploy:
+CD does not seed data (VERIFIED IN CODE: no `seed` in the workflow). This is a one-time operation, run once after the first deploy. `./deploy.sh seed` is NOT idempotent: `seed-preview.sql` has `ON CONFLICT` only on the `app_user` insert; the `cook_application`, `kitchen`, `meal` and later inserts have no conflict handling, so a repeat can fail and roll back its transaction (VERIFIED IN CODE: `deploy/web-preview/seed-preview.sql`, `deploy.sh`). To tell whether it already ran, an authorized administrator can run this read-only query on the VPS as `<deploy-user>`: `docker compose --env-file .env -f compose.yaml exec -T postgres psql -U matbakhy -d matbakhy -At -c "select count(*) from kitchen where public_slug = 'preview-kitchen'"` (add `-f <override-file>` when `.env` sets `COMPOSE_OVERRIDE`). A result of `1` means the seed kitchen exists; the query is built from the seed file and was not run, and whether the seed ran on the live host is NOT VERIFIED.
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
-| `./deploy.sh seed` | VPS, `<deploy-user>` | state-changing (inserts synthetic rows; idempotent through `ON CONFLICT`) | `curl -s 'https://api.<domain>/api/v1/meals?limit=3'` returns an `items` list | SQL error: the schema is not migrated yet |
+| `./deploy.sh seed` | VPS, `<deploy-user>` | state-changing (inserts synthetic rows; one-time, not idempotent) | `curl -s 'https://api.<domain>/api/v1/meals?limit=3'` returns an `items` list | SQL error: the schema is not migrated yet, or the seed already ran and a repeat failed and rolled back |
 
 Realm users come from the rendered realm file: `preview-customer-1`, `preview-customer-2`, `preview-cook-1`, `preview-ops-1`, `preview-ops-2` (VERIFIED IN CODE: `deploy/web-preview/identity/matbakhy-realm.preview.json`), all sharing `PREVIEW_USER_PASSWORD` from the server `.env`. An authorized engineer reads that value on the server; it is never copied into documents. `preview-ops-1` is the bootstrap staff administrator through `STAFF_BOOTSTRAP_SUBJECT`.
 
@@ -489,18 +489,20 @@ Rollback rules: an image-only rollback is safe when no database schema change wa
 
 # Part B. Restore from backup onto a rebuilt server
 
+> **Status of Part B: BLOCKED for complete-service recovery.** What exists: the application-database restore into a scratch database (`restore-db`), the dump and storage-archive writers, and the Keycloak dump writers. What is missing: a supported, rehearsed multi-store sequence covering the Keycloak bootstrap or restore, the storage restore, the application cutover to the restored database, ownership and grants of the restored objects, and validation. Owner decision needed: define and authorize one sequence and rehearse it on a throwaway server. This page does not invent one. The clean installation in Part A stays DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED.
+
 Use this part only on a NEW isolated server after Part A steps 1 to 18 produced a healthy empty stack, and only with backups you copied from an earlier host. The full decision logic, data-loss statements and scenarios are in [backup, restore and disaster recovery](backup-restore-disaster-recovery.md); this section lists only what the code supports.
 
 | Item | What the code does | Status |
 |---|---|---|
-| Application database | `./deploy.sh restore-db <dump>` runs `scripts/db-restore.sh` inside the postgres container with `RESTORE_CONFIRM_TARGET=matbakhy_restore`: checksum check, creates the database `matbakhy_restore` if absent, refuses a non-empty target, `pg_restore`, then reconcile. It does NOT overwrite the live `matbakhy` database; pointing the application at the restored one is a manual owner step | VERIFIED IN CODE: `deploy.sh`, `scripts/db-restore.sh` |
+| Application database | `./deploy.sh restore-db <dump>` runs `scripts/db-restore.sh` inside the postgres container with `RESTORE_CONFIRM_TARGET=matbakhy_restore`: checksum check, creates the database `matbakhy_restore` if absent, refuses a non-empty target, `pg_restore`, then reconcile. It does NOT overwrite the live `matbakhy` database; pointing the application at the restored one is a manual owner step. Dump path: the argument is passed unchanged into the postgres container, so it must be a path visible there. The host `BACKUP_DIR` is mounted at `/backups`, so place the dump under `BACKUP_DIR` on the host and pass the `/backups/...` path. The script needs the `<dump>.sha256` companion next to the dump (without it the checksum check refuses) and reads an optional `.manifest` companion (same name with `.manifest` instead of `.dump`). Without the manifest the script prints `WARNING: no manifest ...; row counts not compared` and can still print `RECONCILED`, so accept a restore only when the matching manifest was present and the row counts matched | VERIFIED IN CODE: `deploy.sh`, `scripts/db-restore.sh` |
 | Keycloak database | Three scripts write a `pg_dump` of `keycloak` under `BACKUP_DIR/keycloak`: `admin-console.sh enable` (its internal backup function; the script's dispatcher has no `backup` subcommand), `migrate-mfa.sh` (`backup`, `apply`) and `owner-e2e-provision.sh apply`; their execution on the live host, the recency of the dumps and whether they restore are NOT VERIFIED LIVE. There is no restore script for it (`migrate-mfa.sh` only names `pg_restore` into an empty `keycloak` database while identity is stopped, as a comment-level instruction). Realm secrets in a restored database must match the new `.env` | NOT VERIFIED procedure |
 | Image storage | `./deploy.sh backup` creates `storage-<stamp>.tgz`; there is no restore script | NOT VERIFIED procedure |
 | Secrets (`.env`) | Not in any backup by design; a lost `.env` cannot be regenerated without breaking existing volumes (Step 12) | VERIFIED IN CODE |
 
 This table is a list of what the code supports, not a rehearsable recovery sequence. Missing from the repository: the Keycloak and storage restore, the cutover of the application to the restored database, ownership and grants of the restored objects, matching of realm secrets to the new environment settings, and setting the front image and the realm clients' redirect URIs to the new domain (recreating the proxy with a new `PREVIEW_DOMAIN` removes the old host names, so a domain cutover has downtime unless dual-domain routing is separately designed and rehearsed), secrets handling, validation and rollback of the cutover. The repository therefore provides recovery building blocks for the application database only; it does not provide a rehearsable multi-store sequence, and this page does not invent one. Treat the recovery as NOT VERIFIED and not rehearsed. Owner decision needed: define one authorised sequence covering the application database, the Keycloak database, the storage archive and the application cutover, then rehearse it on a throwaway server.
 
-Verification after a restore: `./deploy.sh status` (schema version) and the row-count lines printed by the reconcile step. Do not treat a restore as complete until an authorized administrator has run the recovery page's checks and you have rehearsed the procedure on a throwaway server.
+Verification after a restore: `./deploy.sh status` (schema version) and the row-count lines printed by the reconcile step; `RECONCILED` alone is not acceptance when the manifest was missing. Do not treat a restore as complete until an authorized administrator has run the recovery page's checks and you have rehearsed the procedure on a throwaway server.
 
 ## Known limitations and documentation gaps
 
@@ -509,5 +511,6 @@ Verification after a restore: `./deploy.sh status` (schema version) and the row-
 - The deploy workflow hard-codes the domain `167-86-90-174.sslip.io` and the GHCR login name `afawzy70`; a rebuild on another IP needs a reviewed workflow change (Step 17).
 - Not verified live: effective `PermitRootLogin`, sudo policy, `ufw` state and rules, Docker containers, networks and volumes, host locations of the Docker named volumes (not established by `compose.yaml`; inspect them with a volume check by an authorized administrator), ownership of container-written backup files, the value of `STAGING_SSH_USER`, whether backup cron exists, certificate renewal, whether the Compose override is used.
 - Contabo ordering and panel-level firewall steps are not documented anywhere in the repository.
-- No restore procedure exists in code for the Keycloak database or the storage archive.
+- No restore procedure exists in code for the Keycloak database or the storage archive. Complete-service recovery is BLOCKED (see the status box at the top of Part B).
+- Effective SSH authentication settings (including `PasswordAuthentication` and `KbdInteractiveAuthentication`) are NOT VERIFIED: only configuration file text was readable.
 - Administrator commands that would settle several of the items above are collected in [admin read-only verification](admin-readonly-verification.md); an agent account must not run them.

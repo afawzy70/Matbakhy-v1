@@ -22,7 +22,7 @@
 
 ## إزاي تقرا الدليل ده
 
-- الجزء A تثبيت نظيف (الخطوات من 1 لـ 30). الجزء B استعادة على سيرفر اتعمله إعادة بناء، وبيشاور على صفحة الاستعادة بس.
+- الجزء A تثبيت نظيف (الخطوات من 1 لـ 30). الجزء B استعادة على سيرفر اتعمله إعادة بناء؛ والتعافي الكامل للخدمة هناك BLOCKED (شوف الصندوق في أول الجزء B).
 - كل خطوة بتذكر المتطلب المسبق بتاعها، وبعدين جدول أوامر. الأعمدة هي: الأمر، الجهاز وحساب Linux، للقراءة فقط ولا بيغيّر الحالة، إزاي تتحقق، الفشل المحتمل والتصرف. الأوامر اللي محتاجة Pipe أو كذا سطر موجودة في كتلة الكود تحت الجدول.
 - الـ Placeholders بين أقواس زاوية: `<domain>` (الدومين الأساسي للـ Preview)، `<deploy-user>`، `<admin-user>`، `<vps-ip>`، `<owner>` و`<repo>` (مالك GitHub والـ Repository). ماتكتبش قيمة Secret في الـ Repository ولا في تذكرة ولا في شات.
 - مستندات وقت Hetzner ([تجهيز Hetzner للـ Staging](../../operations/09-staging-hetzner-preparation.md)، [إعداد سيرفر المالك](../../operations/12-owner-server-setup.md)) اتكتبت لسيرفر Hetzner مقترح 2 vCPU / 4 GB ماكانش هو السيرفر الشغّال. الأوامر دي اتعدّلت هنا بس لما الكود يأكدها؛ وتفاصيل Hetzner موسومة OUTDATED / INCORRECT. السيرفر الحالي متوصّف في [جرد سيرفر Contabo](contabo-server-inventory-ar.md).
@@ -149,7 +149,7 @@ rm /tmp/matbakhy-cd.pub
 
 المتطلب المسبق: الخطوة 5 متحقق منها من Terminal تاني. سيب الـ Session الحالية مفتوحة لحد ما الإعدادات الجديدة تثبت.
 
-اللي اتلاحظ (VERIFIED LIVE): الـ Login بالباسورد وبـ keyboard-interactive مقفولين، والـ Login بالمفتاح العام مفتوح، والقيمة الفعلية لـ `PermitRootLogin` NOT VERIFIED لأن `/etc/ssh/sshd_config.d/50-cloud-init.conf` ماكانش مقروء. تعديل `sed` على `sshd_config` من وقت Hetzner في `docs/operations/12-owner-server-setup.md` مابنعيدش استخدامه: صور السحابة بتيجي بملفات Drop-in ممكن تلغي مفعوله.
+اللي اتلاحظ (VERIFIED LIVE): نص إعدادات الـ SSH المقروء فيه `PasswordAuthentication no` و`KbdInteractiveAuthentication no` و`PubkeyAuthentication yes`. ده نص ملف مش القيمة الفعلية، لأن `/etc/ssh/sshd_config.d/50-cloud-init.conf` ماكانش مقروء. الملفات المقروءة فيها `PermitRootLogin no` و`PermitRootLogin yes` الاتنين؛ القيمة الفعلية منهم NOT VERIFIED ومحتاجة `sshd -T` يشغّله أدمن. تعديل `sed` على `sshd_config` من وقت Hetzner في `docs/operations/12-owner-server-setup.md` مابنعيدش استخدامه: صور السحابة بتيجي بملفات Drop-in ممكن تلغي مفعوله.
 
 ```sh
 # VPS, <admin-user> with sudo: state-changing. The 00- prefix makes this file the first one read, ahead of 50-cloud-init.conf.
@@ -348,7 +348,7 @@ gh secret set STAGING_SSH_HOST_PUBKEY --env preview --repo <owner>/<repo> < <fil
 
 | التحقق | الفشل المحتمل |
 |---|---|
-| الـ Workflow بينجح وبيخلص بـ `DEPLOYED <sha>`. على الـ VPS كـ `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` بيعرض الحاويات ونسخة الـ Schema وآخر إصدار | `Missing STAGING_SSH_*`: الخطوة 15. `Host key verification failed`: قيمة الـ Secret بتاع مفتاح الـ Host مختلفة عن مفتاح السيرفر. `.env still has placeholders`: الخطوة 13. `API did not become healthy`: اقرا لوجات الـ API والـ Identity المطبوعة. Product CI فشل أو انتهت مهلته: مفيش حاجة اتبنت |
+| الـ Workflow بينجح وبيخلص بـ `DEPLOYED <sha>` (دليل مساعد على اللي اتنشر، مش إثبات للي شغّال دلوقتي). على الـ VPS كـ `<deploy-user>`: `cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh status` بيعرض الحاويات ونسخة الـ Schema وآخر إصدار | `Missing STAGING_SSH_*`: الخطوة 15. `Host key verification failed`: قيمة الـ Secret بتاع مفتاح الـ Host مختلفة عن مفتاح السيرفر. `.env still has placeholders`: الخطوة 13. `API did not become healthy`: اقرا لوجات الـ API والـ Identity المطبوعة. Product CI فشل أو انتهت مهلته: مفيش حاجة اتبنت |
 
 ## المرحلة 6. تحقق من الأجزاء الشغّالة
 
@@ -428,11 +428,11 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### الخطوة 25. حسابات تجريبية غير حقيقية وكتالوج تجريبي
 
-الـ CD مابيعملش Seed للبيانات (VERIFIED IN CODE: مفيش `seed` في الـ Workflow). شغّل مرة واحدة بعد أول Deployment:
+الـ CD مابيعملش Seed للبيانات (VERIFIED IN CODE: مفيش `seed` في الـ Workflow). ده إجراء بيتعمل مرة واحدة بس، بعد أول Deployment. أمر `./deploy.sh seed` مش Idempotent: ملف `seed-preview.sql` فيه `ON CONFLICT` على إدخال `app_user` بس؛ إدخالات `cook_application` و`kitchen` و`meal` وبعدها مفيهاش معالجة تعارض، فالتكرار ممكن يفشل ويعمل Rollback للـ Transaction بتاعته (VERIFIED IN CODE: `deploy/web-preview/seed-preview.sql` و`deploy.sh`). عشان تعرف لو اتشغّل قبل كده، أدمن مصرّح له يقدر يشغّل الاستعلام ده للقراءة بس على الـ VPS كـ `<deploy-user>`: `docker compose --env-file .env -f compose.yaml exec -T postgres psql -U matbakhy -d matbakhy -At -c "select count(*) from kitchen where public_slug = 'preview-kitchen'"` (زوّد `-f <override-file>` لو `.env` بيظبط `COMPOSE_OVERRIDE`). النتيجة `1` معناها إن مطبخ الـ Seed موجود؛ الاستعلام مبني من ملف الـ Seed وماتشغّلش، وهل الـ Seed اتشغّل على السيرفر الشغّال NOT VERIFIED.
 
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
-| `./deploy.sh seed` | VPS، `<deploy-user>` | بيغيّر الحالة (بيضيف صفوف بيانات تجريبية غير حقيقية (Synthetic Data)؛ Idempotent عن طريق `ON CONFLICT`) | `curl -s 'https://api.<domain>/api/v1/meals?limit=3'` بيرجع قائمة `items` | خطأ SQL: الـ Schema لسه ماعملتش Migration |
+| `./deploy.sh seed` | VPS، `<deploy-user>` | بيغيّر الحالة (بيضيف صفوف بيانات تجريبية غير حقيقية (Synthetic Data)؛ مرة واحدة بس، مش Idempotent) | `curl -s 'https://api.<domain>/api/v1/meals?limit=3'` بيرجع قائمة `items` | خطأ SQL: الـ Schema لسه ماعملتش Migration، أو الـ Seed اتشغّل قبل كده والتكرار فشل وعمل Rollback |
 
 المستخدمين التجريبيين غير الحقيقيين في الـ Realm بييجوا من ملف الـ Realm اللي اتولّد بالـ render: `preview-customer-1` و`preview-customer-2` و`preview-cook-1` و`preview-ops-1` و`preview-ops-2` (VERIFIED IN CODE: `deploy/web-preview/identity/matbakhy-realm.preview.json`)، وكلهم بيشتركوا في `PREVIEW_USER_PASSWORD` من `.env` بتاع السيرفر. مهندس مُصرَّح له يقرا القيمة دي على السيرفر؛ عمرها ما بتتنسخ في مستندات. `preview-ops-1` هو أدمن الموظفين الأولي عن طريق `STAFF_BOOTSTRAP_SUBJECT`.
 
@@ -489,18 +489,20 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 # الجزء B. الاستعادة من نسخة احتياطية على سيرفر اتعمله إعادة بناء
 
+> **حالة الجزء B: BLOCKED للتعافي الكامل للخدمة.** الموجود: استعادة Database التطبيق في Database مؤقتة (`restore-db`)، وكاتبو الـ Dump وأرشيف التخزين، وكاتبو Dump الـ Keycloak. الناقص: تسلسل مدعوم ومتجرَّب على أكتر من مخزن يغطي تجهيز أو استعادة Keycloak، واستعادة التخزين، وتحويل التطبيق للـ Database المستعادة، وملكية وصلاحيات الكائنات المستعادة، والتحقق. قرار مطلوب من المالك: يحدد ويصرّح بتسلسل واحد ويجرّبه على سيرفر مؤقت. الصفحة دي مابتخترعش واحد. التثبيت النظيف في الجزء A فاضل DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED.
+
 استخدم الجزء ده على سيرفر جديد ومعزول بس بعد ما خطوات الجزء A من 1 لـ 18 تطلّع Stack سليم فاضي، ومعاك نسخ احتياطية نسختها من سيرفر سابق. منطق القرار الكامل وتفاصيل البيانات اللي ممكن تضيع والسيناريوهات في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)؛ والقسم ده بيسرد اللي الكود بيدعمه بس.
 
 | البند | الكود بيعمل إيه | الحالة |
 |---|---|---|
-| Database التطبيق | `./deploy.sh restore-db <dump>` بيشغّل `scripts/db-restore.sh` جوه حاوية postgres مع `RESTORE_CONFIRM_TARGET=matbakhy_restore`: فحص Checksum، يعمل Database `matbakhy_restore` لو مش موجودة، يرفض هدف غير فاضي، `pg_restore`، وبعدين مطابقة. مابيكتبش فوق Database `matbakhy` الشغّالة؛ تحويل التطبيق لاستخدام الـ Database المستعادة خطوة يدوية من المالك | VERIFIED IN CODE: `deploy.sh`، `scripts/db-restore.sh` |
+| Database التطبيق | `./deploy.sh restore-db <dump>` بيشغّل `scripts/db-restore.sh` جوه حاوية postgres مع `RESTORE_CONFIRM_TARGET=matbakhy_restore`: فحص Checksum، يعمل Database `matbakhy_restore` لو مش موجودة، يرفض هدف غير فاضي، `pg_restore`، وبعدين مطابقة. مابيكتبش فوق Database `matbakhy` الشغّالة؛ تحويل التطبيق لاستخدام الـ Database المستعادة خطوة يدوية من المالك. مسار الـ Dump: الـ Argument بيتبعت زي ما هو لجوه حاوية postgres، فلازم يبقى مسار ظاهر هناك. الـ `BACKUP_DIR` على الـ Host متركّب على `/backups`، فحط الـ Dump تحت `BACKUP_DIR` على الـ Host وابعت المسار اللي بيبدأ بـ `/backups/...`. السكريبت محتاج ملف `<dump>.sha256` جنب الـ Dump (من غيره فحص الـ Checksum بيرفض)، وبيقرا ملف `.manifest` اختياري (نفس الاسم بـ `.manifest` بدل `.dump`). من غير الـ Manifest السكريبت بيطبع `WARNING: no manifest ...; row counts not compared` وممكن برضه يطبع `RECONCILED`، فاقبل الاستعادة بس لو الـ Manifest المطابق كان موجود وأعداد الصفوف طابقت | VERIFIED IN CODE: `deploy.sh`، `scripts/db-restore.sh` |
 | Database الـ Keycloak | تلات سكريبتات بتكتب `pg_dump` لـ `keycloak` تحت `BACKUP_DIR/keycloak`: `admin-console.sh enable` (بيشغّل دالة النسخ الاحتياطي الداخلية؛ والـ Dispatcher بتاع السكريبت مفيهوش أمر فرعي `backup`) و`migrate-mfa.sh` (`backup` و`apply`) و`owner-e2e-provision.sh apply`؛ تنفيذها على السيرفر الشغّال وحداثة الـ Dumps وهل بتتستعاد NOT VERIFIED LIVE. مفيش سكريبت استعادة ليها (`migrate-mfa.sh` بس بيذكر `pg_restore` جوه Database `keycloak` فاضية والـ Identity واقف، كتعليمة في تعليق). لازم Secrets الـ Realm في Database مستعادة تطابق `.env` الجديد | إجراء NOT VERIFIED |
 | تخزين الصور | `./deploy.sh backup` بيعمل `storage-<stamp>.tgz`؛ مفيش سكريبت استعادة | إجراء NOT VERIFIED |
 | الـ Secrets (`.env`) | مش في أي نسخة احتياطية عن قصد؛ `.env` مفقود مايتولّدش تاني من غير ما يكسر الـ Volumes الموجودة (الخطوة 12) | VERIFIED IN CODE |
 
-الجدول ده قايمة باللي الكود بيدعمه، مش تسلسل استعادة ينفع يتعمل عليه تمرين. الناقص في الـ Repository: استعادة Keycloak والتخزين، تحويل التطبيق للـ Database المستعادة، ملكية وصلاحيات الكائنات المستعادة، مطابقة Secrets الـ Realm مع إعدادات البيئة الجديدة، وضبط الـ Front Image وعناوين الـ Redirect URIs للـ Clients في الـ Realm على الدومين الجديد (إعادة إنشاء الـ Proxy بـ `PREVIEW_DOMAIN` جديد بتشيل أسماء الـ Hosts القديمة، فتحويل الدومين فيه Downtime إلا لو اتصمّم وجُرّب تمرين على توجيه بدومينين لوحده)، التعامل مع الـ Secrets، والتحقق والـ Rollback للتحويل ده. يعني الـ Repository بيدّي لبنات استعادة لـ Database التطبيق بس، ومش بيدّي تسلسل يتعمل عليه تمرين يغطي أكتر من مخزن، والصفحة دي مابتخترعوش. اعتبر الاستعادة NOT VERIFIED ومش متجرّبة. قرار مطلوب من المالك: يحدد تسلسل واحد مُصرَّح بيه يغطي Database التطبيق وDatabase الـ Keycloak وأرشيف التخزين وتحويل التطبيق، وبعدين يجرّبه على سيرفر مؤقت.
+الجدول ده قايمة باللي الكود بيدعمه، مش تسلسل استعادة ينفع يتعمل عليه تمرين. الناقص في الـ Repository: استعادة Keycloak والتخزين، تحويل التطبيق للـ Database المستعادة، ملكية وصلاحيات الكائنات المستعادة، مطابقة Secrets الـ Realm مع إعدادات البيئة الجديدة، وضبط الـ Front Image وعناوين الـ Redirect URIs للـ Clients في الـ Realm على الدومين الجديد (إعادة إنشاء الـ Proxy بـ `PREVIEW_DOMAIN` جديد بتشيل أسماء الـ Hosts القديمة، فتحويل الدومين فيه Downtime إلا لو توجيه الطلبات باستخدام دومينين اتصمّم واتجرّب بشكل منفصل)، التعامل مع الـ Secrets، والتحقق والـ Rollback للتحويل ده. يعني الـ Repository بيدّي لبنات استعادة لـ Database التطبيق بس، ومش بيدّي تسلسل يتعمل عليه تمرين يغطي أكتر من مخزن، والصفحة دي مابتخترعوش. اعتبر الاستعادة NOT VERIFIED ومش متجرّبة. قرار مطلوب من المالك: يحدد تسلسل واحد مُصرَّح بيه يغطي Database التطبيق وDatabase الـ Keycloak وأرشيف التخزين وتحويل التطبيق، وبعدين يجرّبه على سيرفر مؤقت.
 
-التحقق بعد الاستعادة: `./deploy.sh status` (نسخة الـ Schema) وأسطر عدد الصفوف اللي بتطبعها خطوة المطابقة. ماتعتبرش الاستعادة مكتملة لحد ما أدمن مُصرَّح له يشغّل فحوصات صفحة الاستعادة وانت تجرّب الإجراء على سيرفر مؤقت.
+التحقق بعد الاستعادة: `./deploy.sh status` (نسخة الـ Schema) وأسطر عدد الصفوف اللي بتطبعها خطوة المطابقة؛ `RECONCILED` لوحدها مش قبول لو الـ Manifest كان ناقص. ماتعتبرش الاستعادة مكتملة لحد ما أدمن مُصرَّح له يشغّل فحوصات صفحة الاستعادة وانت تجرّب الإجراء على سيرفر مؤقت.
 
 ## القيود المعروفة وفجوات التوثيق
 
@@ -509,5 +511,6 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 - الـ Deploy Workflow بيكتب الدومين `167-86-90-174.sslip.io` واسم الـ Login على GHCR `afawzy70` بشكل ثابت؛ إعادة بناء على IP تاني محتاجة تعديل بيعدّي على Review في الـ Workflow (الخطوة 17).
 - مش متحقق منه على السيرفر الشغّال: القيمة الفعلية لـ `PermitRootLogin`، سياسة sudo، حالة وقواعد `ufw`، حاويات Docker والشبكات والـ Volumes، أماكن الـ Named Volumes بتاعة Docker على الـ Host (الـ `compose.yaml` مابيحددهاش؛ فحصها بيتم بفحص Volumes على إيد أدمن مُصرَّح له)، ملكية ملفات النسخ الاحتياطي اللي بتكتبها الحاويات، قيمة `STAGING_SSH_USER`، هل فيه Cron للنسخ الاحتياطي، تجديد الشهادات، هل الـ Compose Override بيتستخدم.
 - خطوات الطلب من Contabo والـ Firewall على مستوى اللوحة مش متوثقة في أي مكان في الـ Repository.
-- مفيش إجراء استعادة في الكود لـ Database الـ Keycloak ولا لأرشيف الـ Storage.
+- مفيش إجراء استعادة في الكود لـ Database الـ Keycloak ولا لأرشيف الـ Storage. التعافي الكامل للخدمة BLOCKED (شوف الصندوق في أول الجزء B).
+- إعدادات المصادقة الفعلية في الـ SSH (منها `PasswordAuthentication` و`KbdInteractiveAuthentication`) NOT VERIFIED: اللي كان مقروء نص ملفات الإعدادات بس.
 - أوامر الأدمن اللي هتحسم كذا بند من اللي فوق متجمّعة في [التحقق للقراءة فقط للأدمن](admin-readonly-verification-ar.md)؛ حساب الـ Agent ماينفعش يشغّلها أبدًا.

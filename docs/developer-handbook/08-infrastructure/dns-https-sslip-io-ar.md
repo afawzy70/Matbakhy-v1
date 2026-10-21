@@ -10,7 +10,7 @@
 
 | الوسم | المعنى |
 |---|---|
-| VERIFIED LIVE | اتلاحظ يوم 2026-10-21 بواسطة مستخدم Linux غير المميّز aiagent على الـ Contabo VPS نفسه (قراءة فقط، من غير sudo ومن غير Docker socket). الحقائق الموجودة في سجل الحقائق الحية (live-facts record) بس هي اللي بتتحسب. |
+| VERIFIED LIVE | اتلاحظ يوم 2026-10-21 بواسطة مستخدم Linux aiagent اللي معندوش صلاحيات إدارية على الـ Contabo VPS نفسه (قراءة فقط، من غير sudo ومن غير Docker socket). الحقائق الموجودة في سجل الحقائق الحية (live-facts record) بس هي اللي بتتحسب. |
 | VERIFIED IN CODE | اتقرا في الـ Repository دي (اسم الملف مكتوب جنب الادّعاء). |
 | DOCUMENTED ONLY | مستند أو دليل المورّد بيقول كده؛ ماتأكدش هنا ولا على السيرفر الحي. |
 | OUTDATED / INCORRECT | بيتعارض مع دليل أحدث، مثلًا النص بتاع فترة Hetzner. |
@@ -143,7 +143,7 @@ Caddy بيجدّد الشهادات تلقائيًا قبل ما تنتهي، و
 | الـ Headers على كل Host | Strict-Transport-Security max-age=31536000، X-Content-Type-Options nosniff، Referrer-Policy strict-origin-when-cross-origin، X-Robots-Tag noindex وnofollow، وHeader اسمه Server متشال | VERIFIED IN CODE: Caddyfile، الـ Snippet اسمه headers |
 | الـ Customer Class | المتغيّر CUSTOMER_ALLOWED_IPS. بيتطبّق على app وid وmedia، وعلى كل طلب في api (بعد فحص الـ Staff على المسارات الخاصة بيه). المتصلين من برّه بياخدوا 403 "Not available". | VERIFIED IN CODE: Caddyfile، الـ Snippet اسمه customer_access |
 | الـ Staff Class | المتغيّر STAFF_ALLOWED_IPS. بيتطبّق على ops وعلى `/api/v1/ops` و`/api/v1/cook` في api. على ops هو الـ Class الوحيد. وعلى مسارات api دي بيتفحص الأول، وبعدها الـ Customer Class بيتطبّق على نفس الطلب، فمتصل الـ Staff API لازم يكون موجود في STAFF_ALLOWED_IPS وCUSTOMER_ALLOWED_IPS مع بعض (التقاطع)؛ خلّي كل عنوان Staff موجود في قايمة العملاء كمان. التعليق في الـ Caddyfile اللي بيقول إن المسارات دي بترد "للـ Staff Class بس" بيوصف الفحص الأول، مش التاني (السطر `import customer_access` اللي بعده). | VERIFIED IN CODE: Caddyfile، الـ Snippet اسمه staff_access وSite الـ api |
-| الافتراضيات | الاتنين افتراضيًا بياخدوا قيمة ALLOWED_CLIENT_IPS، فمفيش حاجة عامة لحد ما المالك يظبط CUSTOMER_ALLOWED_IPS على "0.0.0.0/0 ::/0" | VERIFIED IN CODE: `deploy/web-preview/compose.yaml`، `deploy/web-preview/.env.example` |
+| الافتراضيات | الاتنين افتراضيًا بياخدوا قيمة ALLOWED_CLIENT_IPS، فمفيش Host من فئة العميل (app وid وmedia وapi) عام لحد ما المالك يظبط CUSTOMER_ALLOWED_IPS على "0.0.0.0/0 ::/0". الـ Host بتاع kc-admin مستثنى: هو مش في أي فئة من الاتنين، وهل بيرد ولا لأ بيتوقف على ملف التفعيل (Flag File) admin-console-public (شوف صف kc-admin في القسم 2) | VERIFIED IN CODE: `deploy/web-preview/compose.yaml`، `deploy/web-preview/.env.example` |
 | القيم الحية الحالية | NOT VERIFIED (ملف `.env` صلاحيته 600 وماتقراش). الأدمن يقدر يقراه بالإجراء الموجود في [التحقق للقراءة فقط من الأدمن](admin-readonly-verification-ar.md). | VERIFIED LIVE لصلاحية الملف بس |
 | Content Security Policy | بتتبعت كـ Content-Security-Policy-Report-Only على app وops؛ وبتشير لـ https://media.<domain> للصور ولـ https://api.<domain> للاتصالات، فالاتنين بيتبعوا المتغيّر PREVIEW_DOMAIN وقت تشغيل الـ Container. الترقية لسياسة Enforcing مخططة في `docs/security/csp-rollout.md`. | VERIFIED IN CODE: Caddyfile، الـ Snippet اسمه web_csp |
 | اختبارات الوصول | `scripts/test_proxy_access.py` بيشغّل الـ Caddyfile الحقيقي في Container مؤقت مع Upstreams وهمية وعناوين عملاء ثابتة؛ وبيتخطّى لو Docker أو صورة Caddy مش موجودين أصلًا | VERIFIED IN CODE |
@@ -181,7 +181,7 @@ Caddy بيجدّد الشهادات تلقائيًا قبل ما تنتهي، و
 | الأمر | الجهاز | مستخدم Linux | النوع | النتيجة المتوقعة | لو فشل |
 |---|---|---|---|---|---|
 | `dig +short A app.<preview-domain>` | اللابتوب بتاعك أو الـ VPS | أي مستخدم | read-only | بيطبع 167.86.90.174 للـ Preview الحالي | مخرجات فاضية: الاسم مش بيرجع عنوان؛ راجع الإملاء، أو الـ IP المضمَّن في الاسم، أو الـ Resolver (أعد المحاولة بأمر nslookup اللي تحت، وده بيستخدم Resolver تاني) |
-| `dig +short AAAA app.<preview-domain>` | اللابتوب بتاعك أو الـ VPS | أي مستخدم | read-only | مجهول للـ Preview (NOT VERIFIED). المخرجات الفاضية محتملة لاسم متبني من عنوان IPv4، بس ماتفحصش | لو ظهر رد IPv6، اتأكد إن السيرفر فعلًا بيسمع على العنوان ده |
+| `dig +short AAAA app.<preview-domain>` | اللابتوب بتاعك أو الـ VPS | أي مستخدم | read-only | مجهول للـ Preview (NOT VERIFIED). المخرجات الفاضية محتملة لاسم متبني من عنوان IPv4، بس ده لسه مااتعملوش فحص | لو ظهر رد IPv6، اتأكد إن السيرفر فعلًا بيسمع على العنوان ده |
 | `nslookup app.<preview-domain> 1.1.1.1` | اللابتوب بتاعك | أي مستخدم | read-only | الاسم بيرجع نفس العنوان عن طريق Resolver عام مستقل | رد مختلف: سجل أقدم متخزّن في الـ Cache؛ استنى الـ TTL |
 | `curl -sS -I https://app.<preview-domain>/` | اللابتوب بتاعك | أي مستخدم | read-only | HTTP 200 مع الـ Security Headers بتاعة القسم 3 لما المتصل جوه الـ Customer Class؛ و 403 "Not available" من برّاه | خطأ شهادة: شوف أمر openssl؛ Timeout: الـ Host أو بورت 443 مش متاح |
 | `curl -sS -I https://id.<preview-domain>/` | اللابتوب بتاعك | أي مستخدم | read-only | 302 مع Location لـ Host الـ kc-admin (لما Host الـ id مسموح لعنوانك) | 403: انت برّه الـ Customer Class |
@@ -213,7 +213,7 @@ Caddy بيجدّد الشهادات تلقائيًا قبل ما تنتهي، و
 | 2 | اتأكد إن بورتات 80 و 443 بتوصل للسيرفر من الإنترنت (Firewall المزوّد وufw؛ الاتنين NOT VERIFIED LIVE للسيرفر الحالي). | الأدمن على الـ VPS بـ sudo | فحص read-only الأول |
 | 3 | اعمل تغييرات الكود المذكورة في القسم 6.3 في Pull Request. | اللابتوب بتاعك | تغيير كود |
 | 4 | ابني صورة الـ Front للدومين الجديد. يا إما تدمج الـ Pull Request في develop (الـ Workflow بتاع الـ Deployment بيبنيها وبينشرها كمان، شوف تحذير الترتيب تحت) يا إما تشغّل الـ Workflow اليدوي `.github/workflows/preview-images.yml` بمُدخل preview_domain، وده بيبني بس. | GitHub | بيغيّر الحالة (بينشر صور) |
-| 5 | اظبط PREVIEW_DOMAIN وDigests الصور الجديدة في `.env` على السيرفر؛ وشغّل `./deploy.sh render` عشان يعيد كتابة ملف استيراد الـ Realm بالـ Redirect URIs الجديدة. | مستخدم الـ Deployment على الـ VPS (STAGING_SSH_USER، وأنهي حساب بالظبط NOT VERIFIED) | بيغيّر الحالة |
+| 5 | اظبط PREVIEW_DOMAIN وRELEASE_COMMIT وAPI_IMAGE وFRONT_IMAGE في `.env` على السيرفر، وقيم الإصدار التلاتة كلها من نفس الـ Build (الـ `deploy.sh` بيطلب الـ Commit والصورتين المثبّتتين بـ Digest؛ والـ Workflow بتاع الصور بيطلّع التلاتة)؛ وشغّل `./deploy.sh render` عشان يعيد كتابة ملف استيراد الـ Realm بالـ Redirect URIs الجديدة. | مستخدم الـ Deployment على الـ VPS (STAGING_SSH_USER، وأنهي حساب بالظبط NOT VERIFIED) | بيغيّر الحالة |
 | 6 | Keycloak: ملف استيراد الـ Realm بيتقرا لما Keycloak يشتغل بـ --import-realm. السلوك الموثّق في Keycloak إن الـ Realm الموجود بالفعل بيتخطّاه الاستيراد (DOCUMENTED ONLY؛ لسه ماتجرّبش عمليًا هنا)، فلازم تحدّث صراحةً الـ Redirect URI وروابط ما بعد تسجيل الخروج المتخزّنة بتاعة الـ Client اسمه matbakhy-web في Console الأدمن (أو بطريقة تانية اتجرّبت قبل كده)؛ ماتعتمدش على الاستيراد في تغييرهم. | أدمن Keycloak المصرّح له | بيغيّر الحالة |
 | 7 | شغّل `./deploy.sh up`، وبعدها استنى الـ proxy لحد ما يجيب الشهادات (أول الطلبات ممكن تظهر خطأ شهادة لفترة قصيرة). | مستخدم الـ Deployment على الـ VPS | بيغيّر الحالة |
 | 8 | Console الأدمن: `./deploy.sh admin-console enable` بيعيد التحصين والتحقق على الـ Host الجديد. | مستخدم الـ Deployment على الـ VPS | بيغيّر الحالة |
