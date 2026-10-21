@@ -163,7 +163,7 @@ Search used: the dashed form 167-86-90-174 across the whole repository, excludin
 | `docs/quality/owner-acceptance/cases/config-security.json:4994` and `:5223` | Review notes that mention the former hardcoded value | Documentation only (history); no change needed |
 | `docs/quality/owner-acceptance/generated/review-findings.md:9` and `:34` | Generated review findings that mention it | Documentation only (history); no change needed |
 
-Everything else takes the domain from the variable PREVIEW_DOMAIN at run time (VERIFIED IN CODE):
+Everything else takes the domain from the variable PREVIEW_DOMAIN, at run time for the Caddyfile, compose.yaml, the rendered realm file (rendered by `deploy.sh render`), smoke.sh, admin-console.sh and the identity scripts, and at build time for front.Dockerfile and preview-images.yml (VERIFIED IN CODE):
 
 | Consumer | How it uses the domain |
 |---|---|

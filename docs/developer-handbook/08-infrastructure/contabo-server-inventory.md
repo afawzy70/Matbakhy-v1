@@ -187,7 +187,7 @@ The first infrastructure documents were written for a proposed Hetzner Cloud hos
 | Source | Hetzner-era statement | Status for the live host |
 |---|---|---|
 | `docs/operations/09-staging-hetzner-preparation.md` | Hetzner project, cloud firewall, 2 vCPU and 4 GB plan | OUTDATED / INCORRECT for the host (Contabo, 8 vCPU, 23 GiB). Still useful as a design rationale. |
-| `docs/operations/12-owner-server-setup.md` | Operating user named matbakhy, package under /srv/matbakhy-preview/src, Hetzner console firewall, `sudo ufw status` "not used" | OUTDATED / INCORRECT: no matbakhy account exists on the live host (accounts above), the deployment directory is /srv/matbakhy-staging, and the firewall arrangement is NOT VERIFIED. |
+| `docs/operations/12-owner-server-setup.md` | Operating user named matbakhy, package under /srv/matbakhy-preview/src, Hetzner console firewall, `sudo ufw status` "not used" | OUTDATED / INCORRECT: no matbakhy account appeared in the recorded inventory of accounts with uid 1000 or higher (accounts above); complete absence of such an account (for example with a lower uid) is NOT VERIFIED, the deployment directory is /srv/matbakhy-staging, and the firewall arrangement is NOT VERIFIED. |
 | `deploy/web-preview/compose.4gb.yaml` and the 4 GB notes in `deploy/web-preview/README.md` | Memory ceilings for a 4 GB machine | OUTDATED / INCORRECT for sizing; whether the override is still selected is NOT VERIFIED. |
 | `deploy/web-preview/.env.example` | GENERATED_DIR under /srv/matbakhy-preview | Differs from the live directory; see [section 7](#7-the-stale-srvmatbakhy-preview-copy). |
 

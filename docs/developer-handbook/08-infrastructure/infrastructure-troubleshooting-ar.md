@@ -50,7 +50,7 @@
 | [11](#11-عدم-تطابق-الـ-issuer-في-oidc) | عدم تطابق الـ Issuer في OIDC | [23](#23-deployment-فاشل-محتاج-rollback) | Deployment فاشل محتاج Rollback |
 | [12](#12-مشاكل-mfa-لأدمن-keycloak) | مشاكل MFA لأدمن Keycloak | | |
 
-الـ Brief الخاص بالصفحة دي بيسمّي المجموعة 22 سيناريو بس بيسرد 23 عنوان؛ كل الـ 23 اتحفظوا واترقّموا.
+وصف المطلوب للصفحة دي بيسمّي المجموعة 22 سيناريو بس بيسرد 23 عنوان؛ كل الـ 23 اتحفظوا واترقّموا.
 
 ## كتالوج أوامر التشخيص (قراءة فقط)
 
@@ -157,7 +157,7 @@
 
 **أوامر التشخيص الآمنة.** D4 للمضيف الفاشل؛ وD3؛ وساعة الـ Caller نفسها؛ وD9 للـ Proxy (أدمن مصرّح له).
 
-**دليل التشخيص المتوقع.** subjectAltName بيغطي المضيف، وتاريخ not-after في المستقبل، وأمر التحقق (D4) بيخرج بـ 0 مع verify=0، وده اللي بيثبت إن الـ Issuer موثوق. شهادة app بس هي اللي اتلاحظت (Let's Encrypt، VERIFIED LIVE)؛ ماتفترضش نفس الـ Issuer أو التواريخ للمضيفين التانيين (NOT VERIFIED LIVE). الـ Subject اللي مابيذكرش المضيف، أو مخرجات D4 الفاضية، معناها إن الـ Proxy معندوش شهادة له. سطور Log الـ Proxy عن الحصول على شهادة بتظهر التقدّم أو نص الخطأ (DOCUMENTED ONLY: Caddy بيكتب أخطاء ACME على خرج الأخطاء القياسي، وDocker بيلتقطه).
+**دليل التشخيص المتوقع.** subjectAltName بيغطي المضيف، وتاريخ not-after في المستقبل، وأمر التحقق (D4) بيخرج بـ 0 مع verify=0، وده اللي بيثبت إن الـ Issuer موثوق. شهادة app بس هي اللي اتلاحظت (Let's Encrypt، VERIFIED LIVE)؛ ماتفترضش نفس الـ Issuer أو التواريخ للمضيفين التانيين (NOT VERIFIED LIVE). مخرجات D4 الفاضية، أو subjectAltName مابيغطيش المضيف، أو فحص اسم المضيف في التحقق بيفشل، معناها إن الـ Proxy معندوش شهادة صالحة له؛ ماتحكمش على تغطية اسم المضيف من الـ Subject. سطور Log الـ Proxy عن الحصول على شهادة بتظهر التقدّم أو نص الخطأ (DOCUMENTED ONLY: Caddy بيكتب أخطاء ACME على خرج الأخطاء القياسي، وDocker بيلتقطه).
 
 **الإجراء التصحيحي.** استخدم اسم المضيف الصح. صحّح ساعة الـ Caller. للشهادات الناقصة أو المنتهية اتبع السيناريو 20. ماتعطّلش التحقق من الشهادة أبدًا (curl -k) إلا في التجربة المحلية اللي سكريبت الـ Smoke موثّقها؛ وماتنسخش أي مفتاح خاص (Private Key) من الـ Volume بتاع caddy-data أبدًا.
 
@@ -388,7 +388,7 @@
 | Configure verified SSH host | Secret مطلوب فاضي: الخطوة بتسمّي المتغيّر الناقص من بين HOST وUSER وSSH_KEY وHOST_PUBKEY وAPI_IMAGE وFRONT_IMAGE |
 | Transfer versioned deployment files | الفحص عن بُعد `test -f .env && test -w /srv/matbakhy-staging` فشل (مفيش ملف .env، أو الحساب المتصل مش قادر يكتب في المجلد)، أو فشل التحقق من مفتاح مضيف SSH (الـ Workflow بيستخدم StrictHostKeyChecking=yes مع المفتاح العام للمضيف المخزّن) |
 | Deploy digest-pinned images, wait for health, HTTPS smoke | `./deploy.sh up` أو `./deploy.sh smoke` فشل على السيرفر (السيناريوهات 8 و 13 و 16 و 22) |
-| Publish and verify the Keycloak admin console | `./deploy.sh admin-console enable` فشل وقفل الـ Console تاني (Fail closed، DOCUMENTED ONLY في [كونسول أدمن Keycloak](../../operations/14-keycloak-admin-console.md)) |
+| Publish and verify the Keycloak admin console | `./deploy.sh admin-console enable` فشل. الفشل قبل ما الـ Switch يتفتح بيقفل الـ Console تاني (Fail closed، DOCUMENTED ONLY في [كونسول أدمن Keycloak](../../operations/14-keycloak-admin-console.md))؛ لكن `admin-console.sh` بيفتح الـ Switch قبل `create-admin` الاختياري، فلو إنشاء الأدمن فشل بعد كده الـ Exit Trap بيسيب الـ Console مفتوح (VERIFIED IN CODE: `deploy/web-preview/admin-console.sh`). بعد أي فشل في الخطوة دي شغّل `./deploy.sh admin-console status`، ولو الـ Console مفتوح ومش عايزه شغّل `./deploy.sh admin-console disable` |
 
 الـ Workflow بيعمل Deploy على الـ Push لـ develop وعلى التشغيل اليدوي بس، تشغيلة واحدة في المرة (Concurrency Group اسمه matbakhy-preview-deploy، وcancel-in-progress قيمته false)، فالتشغيلة اللي في الطابور بتستنى اللي قبلها. قيم الـ Secrets (STAGING_SSH_HOST وSTAGING_SSH_USER وSTAGING_SSH_KEY وSTAGING_SSH_HOST_PUBKEY) مش في الـ Repository والحساب المتصل NOT VERIFIED.
 
@@ -396,7 +396,7 @@
 
 **دليل التشخيص المتوقع.** اسم الخطوة الفاشلة من D23، وسطر الخطأ بتاعها. التشغيلة الناجحة بتنتهي بـ `DEPLOYED <sha>` في خطوة الـ Deploy. آخر تشغيلة ناجحة مش دليل على اللي شغّال دلوقتي: ممكن تشغيلة أحدث تكون نشرت Images جديدة وبعدين فشلت في خطوة الـ Admin Console، وده بيسيب الـ Images دي شغّالة. قارن D7 بقائمة التشغيلات (D23) قبل ما تسمّي الإصدار الحالي.
 
-**الإجراء التصحيحي.** صلّح السبب المحدد (CI أو بناء أو Secret أو مفتاح مضيف أو حالة السيرفر). أعد التشغيل بعد ما السبب يتصلّح بس (F8). ماتعيدش تشغيل Job سليم شغّال عشان هو بطيء. ماتطبعش أسرار في Log أثناء الـ Debug أبدًا. استعادة ملف .env السابق بتحصل في مكان واحد بس: جوّه سكريبت الـ Deploy عن بُعد، لما `./deploy.sh up` أو `./deploy.sh smoke` يفشل (VERIFIED IN CODE). أي فشل قبل كده (ملف .env ناقص، تسجيل الدخول للـ Registry، تعديل .env نفسه) بيخرج من غير أي استعادة، وفشل خطوة "Publish and verify the Keycloak admin console" اللي بعدها مابيستعيدش أي حاجة: الـ Images الجديدة و.env الجديد بيفضلوا زي ما هم والـ Console بس هو اللي بيتقفل تاني. الاستعادة بتخص ملف .env بس؛ الحاويات مابتتعملهاش إعادة إنشاء وقاعدة البيانات مابتتعملهاش Rollback (السيناريوهات 15 و 23).
+**الإجراء التصحيحي.** صلّح السبب المحدد (CI أو بناء أو Secret أو مفتاح مضيف أو حالة السيرفر). أعد التشغيل بعد ما السبب يتصلّح بس (F8). ماتعيدش تشغيل Job سليم شغّال عشان هو بطيء. ماتطبعش أسرار في Log أثناء الـ Debug أبدًا. استعادة ملف .env السابق بتحصل في مكان واحد بس: جوّه سكريبت الـ Deploy عن بُعد، لما `./deploy.sh up` أو `./deploy.sh smoke` يفشل (VERIFIED IN CODE). أي فشل قبل كده (ملف .env ناقص، تسجيل الدخول للـ Registry، تعديل .env نفسه) بيخرج من غير أي استعادة، وفشل خطوة "Publish and verify the Keycloak admin console" اللي بعدها مابيستعيدش أي حاجة: الـ Images الجديدة و.env الجديد بيفضلوا زي ما هم، والـ Console ممكن يفضل مفتوح (اتأكد بـ `./deploy.sh admin-console status` وقفله بـ `./deploy.sh admin-console disable` لو مش عايزه). الاستعادة بتخص ملف .env بس؛ الحاويات مابتتعملهاش إعادة إنشاء وقاعدة البيانات مابتتعملهاش Rollback (السيناريوهات 15 و 23).
 
 **مستوى الخطورة.** متوسط؛ Deployment نصف مكتمل ممكن يسيب السيرفر على إعدادات مختلطة: بعد فشل `up` أو `smoke` ملف .env بيبقى القديم وفي نفس الوقت ممكن بعض الحاويات تكون شغّالة بالـ Images الجديدة.
 
@@ -613,7 +613,7 @@
 
 - حالة Docker أثناء التشغيل (الحاويات والـ Images والـ Volumes والحدود) NOT VERIFIED LIVE لأن حساب aiagent مش قادر يقرا الـ Docker socket. كل تشخيص قائم على Docker في الصفحة دي NOT VERIFIED LIVE لحد ما أدمن مصرّح له يشغّله ([التحقق للقراءة فقط من الأدمن](admin-readonly-verification-ar.md)).
 - القيم الحية لـ GENERATED_DIR وBACKUP_DIR وCOMPOSE_OVERRIDE NOT VERIFIED LIVE. الافتراضي في compose و`.env.example` لسه بيسمّوا /srv/matbakhy-preview/generated، وده بيطابق نسخة قديمة موجودة على الجهاز، بينما الـ Deployment في /srv/matbakhy-staging (فجوة توثيق: أكّد بـ D22).
-- الـ Brief الخاص بالصفحة دي بيقول 22 سيناريو بس بيسرد 23؛ كل الـ 23 موجودين.
+- وصف المطلوب للصفحة دي بيقول 22 سيناريو بس بيسرد 23؛ كل الـ 23 موجودين.
 - `compose.4gb.yaml`، ومستند تجهيز Hetzner ([تجهيز الـ Staging على Hetzner](../../operations/09-staging-hetzner-preparation.md)) وأجزاء من مستندات التشغيل التانية بتوصف جهاز Hetzner مقترح وهي OUTDATED / INCORRECT لجهاز Contabo (8 vCPU، حوالي 23 GiB RAM). لما تتعارض مع الصفحة دي، الصفحة دي و[جرد السيرفر](contabo-server-inventory-ar.md) هما المرجع.
 - دليل حل المشاكل في التشغيل بيقول إن النسخ الاحتياطية في مجلد backups جوّه مجلد الـ Deployment بينما `deploy.sh` وcompose.yaml الافتراضي عندهم BACKUP_DIR هو /srv/matbakhy-backups (VERIFIED IN CODE)؛ وده تعارض في المستند الأقدم. والـ Runbook التشغيلي نفسه بيقول إنه ماتجرّبش على بيئة منشورة.
 - قواعد الـ Firewall (ufw)، وإعدادات sshd الفعّالة، وسياسة sudo، وجداول Cron بتاعة المستخدمين التانيين، والـ Docker data root، وتجديد الشهادة نفسه NOT VERIFIED LIVE؛ ومحتاجين root أو وصول Docker.

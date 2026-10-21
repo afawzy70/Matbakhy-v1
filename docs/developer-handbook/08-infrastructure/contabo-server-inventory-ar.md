@@ -187,7 +187,7 @@ VERIFIED IN CODE (`deploy/web-preview/compose.yaml`, project name matbakhy-previ
 | المصدر | الكلام اللي كان مكتوب في فترة Hetzner | الحالة بالنسبة للـ Host الشغّال |
 |---|---|---|
 | `docs/operations/09-staging-hetzner-preparation.md` | مشروع Hetzner، Cloud Firewall، خطة 2 vCPU و 4 GB | OUTDATED / INCORRECT بالنسبة للـ Host (Contabo، 8 vCPU، 23 GiB). لسه مفيدة كتبرير للتصميم. |
-| `docs/operations/12-owner-server-setup.md` | اسم المستخدم المشغّل matbakhy، والحزمة تحت /srv/matbakhy-preview/src، Firewall من كونسول Hetzner، `sudo ufw status` "not used" | OUTDATED / INCORRECT: مفيش حساب matbakhy على الـ Host الشغّال (الحسابات فوق)، ومجلد الـ Deployment هو /srv/matbakhy-staging، وترتيب الـ Firewall NOT VERIFIED. |
+| `docs/operations/12-owner-server-setup.md` | اسم المستخدم المشغّل matbakhy، والحزمة تحت /srv/matbakhy-preview/src، Firewall من كونسول Hetzner، `sudo ufw status` "not used" | OUTDATED / INCORRECT: مفيش حساب matbakhy ظهر في الجرد المسجَّل للحسابات اللي الـ uid بتاعها 1000 أو أكتر (الحسابات فوق)؛ إن مفيش حساب كده خالص (مثلًا بـ uid أقل) NOT VERIFIED، ومجلد الـ Deployment هو /srv/matbakhy-staging، وترتيب الـ Firewall NOT VERIFIED. |
 | `deploy/web-preview/compose.4gb.yaml` وملاحظات الـ 4 GB في `deploy/web-preview/README.md` | حدود ذاكرة لجهاز 4 GB | OUTDATED / INCORRECT بالنسبة للحجم؛ إن الـ Override لسه متختار، ده NOT VERIFIED. |
 | `deploy/web-preview/.env.example` | GENERATED_DIR تحت /srv/matbakhy-preview | مختلف عن المجلد الشغّال؛ شوف [القسم 7](#7-نسخة-srvmatbakhy-preview-القديمة). |
 
