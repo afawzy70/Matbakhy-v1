@@ -1,7 +1,7 @@
 # دليل المطوّر لمطبخي (Matbakhy)
 
 > **Owner role:** Handbook navigation
-> **Status:** REFERENCE — نقطة الدخول الوحيدة للمطوّرين؛ حالة التنفيذ موسومة في كل صفحة
+> **Status:** REFERENCE — نقطة الدخول الوحيدة للمطوّرين؛ حالة التنفيذ موضّحة في كل صفحة
 > **Language / اللغة:** [English](README.md) · العربية
 
 أهلًا بيك. الدليل ده بيخلّي أي مطوّر جديد يفهم مطبخي (Matbakhy) — البيزنس، والتطبيقات، والمعمارية، والكود، والتشغيل، ومسار المساهمة — **من الـ Repository لوحده**، من غير مساعد ذكاء اصطناعي ولا معرفة غير موثّقة. فيه نسخة كاملة بالعربي المصري لكل صفحة: ابدأ من [README-ar.md](README-ar.md).
@@ -9,7 +9,7 @@
 **قواعد الدليل ده**
 
 - الكود والـ Migrations والعقود والاختبارات هي مصدر الحقيقة لحالة التنفيذ؛ والدليل بيشرحها وبيربط بيها. كل صفحة بتقول مين مسؤول عنها وحالة تنفيذها (IMPLEMENTED، PARTIALLY IMPLEMENTED، PLANNED، DISABLED، DEPRECATED، NOT VERIFIED؛ وREFERENCE لصفحات العمليات).
-- الدليل مخرَج حيّ تحت **[DOC-001](05-developer-workflow/documentation-policy-ar.md)**: كل تغيير لازم يحدّث الصفحات المتأثرة في نفس الـ PR، والـ Check المطلوب `Documentation Consistency / DOC-001` بيتحقق من البنية والمراجع. لقيت غلطة؟ صلّح الصفحة الأساسية وسجّلها ([الصيانة](05-developer-workflow/documentation-maintenance-ar.md)).
+- الدليل بيتحدّث باستمرار مع تطور المشروع، وبيخضع لـ **[DOC-001](05-developer-workflow/documentation-policy-ar.md)**: كل تغيير لازم يحدّث الصفحات المتأثرة في نفس الـ PR، والـ Check المطلوب `Documentation Consistency / DOC-001` بيتحقق من البنية والمراجع. لقيت غلطة؟ صلّح الصفحة الأساسية وسجّلها ([الصيانة](05-developer-workflow/documentation-maintenance-ar.md)).
 - الـ Repository عام: ماتضيفش أبدًا Credentials أو بيانات عملاء أو Logs خاصة.
 - **لغتين، دليل واحد.** كل صفحة إنجليزي `X.md` ليها نسخة مطابقة بالعربي المصري `X-ar.md` في نفس المجلد. الإنجليزي هو المرجع، والملفين بيتغيروا مع بعض في نفس الـ PR، وفيه CI Check (`scripts/validate_handbook_parity.py`) بيفشل لو النسخة العربي ناقصة أو بنيتها مختلفة. التفاصيل: [صيانة التوثيق](05-developer-workflow/documentation-maintenance-ar.md)؛ والمراجعة الحالية: [تقرير تطابق الترجمة](translation-parity-report.md).
 
@@ -45,7 +45,7 @@
 ### 07 المراجع
 [قرارات المعمارية](07-reference/architecture-decisions-ar.md) · [حالة التنفيذ](07-reference/implementation-status-ar.md) · [تتبّع المتطلبات](07-reference/requirements-traceability-ar.md) · [خريطة التوثيق](07-reference/documentation-map-ar.md) · [الأسئلة الشائعة](07-reference/frequently-asked-questions-ar.md) · [الجرد وتقييم الفجوات](07-reference/inventory-and-gaps-ar.md) · [محاكاة المطوّر الجديد](07-reference/fresh-developer-simulation-ar.md) · [سجل المراجعات المستقلة](07-reference/independent-reviews-ar.md) · [تدقيق تنظيف الفروع](07-reference/branch-cleanup-audit-2026-10-20-ar.md)
 
-مقروء بالآلة: [doc001-matrix.json](doc001-matrix.json) (أي مناطق كود محتاجة أي توثيق)، و[translation-sync.json](translation-sync.json) (أزواج الصفحات الإنجليزي والعربي اللي اتراجعت)، و[translation-exceptions.json](translation-exceptions.json) (استثناءات التطابق الموثّقة).
+ملفات قابلة للقراءة آليًا: [doc001-matrix.json](doc001-matrix.json) (أي مناطق كود محتاجة أي توثيق)، و[translation-sync.json](translation-sync.json) (أزواج الصفحات الإنجليزي والعربي اللي اتراجعت)، و[translation-exceptions.json](translation-exceptions.json) (استثناءات التطابق الموثّقة).
 
 ## إجابات سريعة
 

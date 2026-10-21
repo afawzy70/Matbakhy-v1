@@ -10,7 +10,7 @@
 
 | مسار الـ Hash | المكوّن | محتاج Session | ملاحظات |
 |---|---|---|---|
-| `#/` | `Browse` (`apps/customer-web/src/Browse.tsx`) | لأ | الرئيسية: كروت النية (Intent)، البحث، الفلاتر، التبديل بين الأطباق/المطابخ |
+| `#/` | `Browse` (`apps/customer-web/src/Browse.tsx`) | لأ | الرئيسية: اختيارات غرض الطلب (Intent)، البحث، الفلاتر، التبديل بين الأطباق/المطابخ |
 | `#/meal/<uuid>` | `Meal` (`apps/customer-web/src/Meal.tsx`) | لأ للعرض؛ أيوه للمفضلة والطلب | اختيار الـ Slot، الكمية، الإضافة للسلة، التقييمات |
 | `#/kitchen/<slug>` | `Kitchen` (`apps/customer-web/src/Kitchen.tsx`) | لأ | ملف المطبخ العام ووجباته |
 | `#/checkout` | `Checkout` (`apps/customer-web/src/Checkout.tsx`) | أيوه لعرض السعر/التسجيل | السلة (مكتوب عليها "cart" في الشريط العلوي)، التحقق من التليفون، العنوان، عرض السعر، تسجيل الأوردر |
@@ -34,9 +34,9 @@
 2. **الطرف / الصلاحيات.** زائر أو عميل؛ Endpoints عامة (`PUBLIC_GET` في `SecurityConfiguration`).
 3. **المتطلبات المسبقة.** مطبخ واحد على الأقل موافَق عليه وفعّال وفيه وجبة منشورة وظاهرة عشان تتعرض. من غير Slot مفتوح مؤهل الوجبة ممكن تتعرض لكنها بتتعلّم `UNAVAILABLE` ومايتطلبش منها؛ فلتر التاريخ أو الـ Slot بس هو اللي بيحتاج Slot قابل للطلب عشان يطابق (`DiscoveryService`، `MealOffers`).
 4. **شاشة البداية.** `#/` (`Browse`).
-5. **إجراءات المستخدم.** فتح التطبيق؛ اختيار كارت نية اختياريًا (لنفسي / مكمّل / تجمّع) واللي بيظهر فلتر ميزانية؛ الكتابة في خانة البحث؛ اختيار شريحة تصنيف؛ اختيار المنطقة؛ تغيير الترتيب (`NEWEST`، `PRICE_ASC`، `PRICE_DESC`)؛ مسح الفلاتر؛ التبديل بين "dishes" و"kitchens"؛ فتح وجبة أو مطبخ.
+5. **إجراءات المستخدم.** فتح التطبيق؛ اختيار اختيار غرض الطلب اختياريًا (لنفسي / مكمّل / تجمّع) واللي بيظهر فلتر ميزانية؛ الكتابة في خانة البحث؛ اختيار شريحة تصنيف؛ اختيار المنطقة؛ تغيير الترتيب (`NEWEST`، `PRICE_ASC`، `PRICE_DESC`)؛ مسح الفلاتر؛ التبديل بين "dishes" و"kitchens"؛ فتح وجبة أو مطبخ.
 6. **الاستجابات المتوقعة.** كروت الأكل المتراصة بتتحدّث من نتيجة السيرفر؛ السعر معروض بالجنيه (EGP) منسّق بـ `Intl.NumberFormat` (`formatMoney` في `apps/customer-web/src/api.ts`)؛ حالات الفراغ والخطأ جاية من `Status` في `apps/customer-web/src/shared.tsx`؛ وبانر عدم الاتصال بيظهر لما `navigator.onLine` يبقى false. الفلاتر هي Query Parameters على السيرفر؛ والعميل عمره ما بيفلتر ولا بيرتّب ولا بيسعّر (تعليق في `Browse.tsx`). فلاتر حجم الحصة مؤجلة (قرار D11).
-7. **الـ API.** `GET /api/v1/zones` (API-002)، `GET /api/v1/meals` مع `q, zoneId, categoryId, maxPriceMinor, sort, limit` (API-003)، `GET /api/v1/meals/{mealId}` (API-004)، `GET /api/v1/kitchens/{slug}` (API-005)، `GET /api/v1/kitchens/{kitchenId}/slots` (API-006، بتستخدمها صفحة الوجبة)، `GET /api/v1/configuration/public` (API-001)، `POST /api/v1/activity` (API-110، عدّ المشاهدات المجهولة، أرسل وانسَ).
+7. **الـ API.** `GET /api/v1/zones` (API-002)، `GET /api/v1/meals` مع `q, zoneId, categoryId, maxPriceMinor, sort, limit` (API-003)، `GET /api/v1/meals/{mealId}` (API-004)، `GET /api/v1/kitchens/{slug}` (API-005)، `GET /api/v1/kitchens/{kitchenId}/slots` (API-006، بتستخدمها صفحة الوجبة)، `GET /api/v1/configuration/public` (API-001)، `POST /api/v1/activity` (API-110، عدّ مرات الظهور من غير تحديد هوية الزائر، وإرسال الطلب من غير انتظار نتيجته).
 8. **الـ Backend.** `backend/modules/catalog/src/main/java/com/matbakhy/catalog/web/DiscoveryController.java` → `backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/discovery/DiscoveryService.java`؛ تفاصيل الوجبة `MealController.java` / `MealService.java`؛ المطبخ `backend/modules/cooks/src/main/java/com/matbakhy/cooks/web/KitchenPublicController.java`؛ الـ Slots `backend/modules/availability/src/main/java/com/matbakhy/availability/web/SlotController.java`؛ النشاط `backend/modules/catalog/src/main/java/com/matbakhy/catalog/web/ActivityController.java`.
 9. **قاعدة البيانات.** `meal`، `meal_revision`، `meal_media`، `media_asset` (V6، V7)، `meal_slot`، `cook_slot` (V8)، `kitchen`، `kitchen_zone` (V5)، `service_zone` (V3)، `activity_daily` (V26)، `review` (V20). الـ Migrations: `backend/app/src/main/resources/db/migration`.
 10. **انتقالات الحالة.** مفيش للعميل. الظهور بيعتمد على الوجبة `status = PUBLISHED`، و`moderation_state = VISIBLE` (V16)، والمطبخ `operating_state = ACTIVE`، والـ Slot `state = OPEN`.
@@ -44,7 +44,7 @@
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/catalog/DiscoveryIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/catalog/MealIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/insights/ActivityInsightsIntegrationTest.java`، في الويب `apps/customer-web/src/App.test.tsx`، `apps/operations-web/e2e/customer-journey.e2e.ts`.
 13. **اختبارات المالك E2E.** E2E-DISC-001، E2E-DISC-006، E2E-DISC-101، E2E-DISC-102، E2E-DISC-103، E2E-DISC-008، E2E-DISC-112، E2E-DISC-113، E2E-DISC-117؛ المجموعة الأساسية J0 (شوف [رحلة الأوردر الكاملة](complete-order-journey-ar.md#ربط-قبول-المالك)).
 14. **الحالة.** IMPLEMENTED.
-15. **القيود.** مفيش واجهة تقسيم صفحات: الويب بيطلب `limit: 50` مرة واحدة (`Browse.tsx`)، فأكتر من 50 نتيجة مش ممكن توصلها من الويب (NOT VERIFIED هل فيه زرار "المزيد" في مكان تاني؛ مالقيناش في `Browse.tsx`). كروت النية بتظهر فلتر ميزانية بس، ومابتغيّرش الاستعلام غير كده.
+15. **القيود.** مفيش واجهة تقسيم صفحات: الويب بيطلب `limit: 50` مرة واحدة (`Browse.tsx`)، فأكتر من 50 نتيجة مش ممكن توصلها من الويب (NOT VERIFIED هل فيه زرار "المزيد" في مكان تاني؛ مالقيناش في `Browse.tsx`). اختيارات غرض الطلب بتظهر فلتر ميزانية بس، ومابتغيّرش الاستعلام غير كده.
 
 ## CW-2 تسجيل الدخول والخروج وتبديل الحساب
 
@@ -76,7 +76,7 @@
 8. **الـ Backend.** `PublicConfigurationController.java`، `CommercePolicies.java` (`backend/modules/orders/src/main/java/com/matbakhy/orders/`)، `FavoriteController.java` / `FavoriteService.java` (`backend/modules/catalog/...`)، `ReviewController.java` / `ReviewService.java`.
 9. **قاعدة البيانات.** `commerce_policy` (V10)، `favorite`، `review`، `review_report` (V20).
 10. **الانتقالات.** مفيش على السيرفر؛ السلة على العميل بس. مطبخ واحد وSlot واحد متفروضين في الواجهة وتاني وقت عرض السعر (E2E-BASKET-021).
-11. **الأخطاء.** الـ Slot المستنفد مايتضافش (MBQA-002، E2E-BASKET-012)؛ سطر فوق الحد المخفّض بيمنع عرض السعر لحد ما يتقلل (E2E-BASKET-024)؛ التخزين غير المتاح (الوضع الخاص) بيخلي المسار شغّال جوه الصفحة (`cart.ts`).
+11. **الأخطاء.** الـ Slot اللي حصصه خلصت مايتضافش (MBQA-002، E2E-BASKET-012)؛ سطر فوق الحد المخفّض بيمنع عرض السعر لحد ما يتقلل (E2E-BASKET-024)؛ التخزين غير المتاح (الوضع الخاص) بيخلي المسار شغّال جوه الصفحة (`cart.ts`).
 12. **الاختبارات.** `apps/customer-web/src/App.test.tsx` (بلوكات basket rules، CW05، Q1)، `backend/app/src/test/java/com/matbakhy/app/orders/ReviewsAndFavoritesIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/orders/PublicConfigurationIntegrationTest.java`.
 13. **اختبارات المالك E2E.** E2E-BASKET-009، E2E-BASKET-010، E2E-BASKET-011، E2E-BASKET-012، E2E-BASKET-030، E2E-DISC-107؛ J1، J5.
 14. **الحالة.** IMPLEMENTED.
@@ -97,7 +97,7 @@
 11. **الأخطاء.** `QUOTE_EXPIRED`، `PRICE_CHANGED`، `STOCK_CHANGED`، `SLOT_CLOSED`، `KITCHEN_UNAVAILABLE`، `IDEMPOTENCY_CONFLICT`، `STATE_CONFLICT` مع `QUOTE_ALREADY_USED` (الأكواد في `backend/shared/src/main/java/com/matbakhy/shared/error/ErrorCode.java`؛ النصوص المترجمة في `apps/customer-web/src/i18n.ts`). خطأ 5xx أو شبكة بعد الإرسال بيحتفظ بـ `matbakhy.pendingPlacement` (نفس `clientRequestId` و`Idempotency-Key`) عشان إعادة المحاولة ماتعملش تكرار؛ و4xx نهائي بيمسحه. تغيير الوضع أو العنوان أو طريقة الدفع بيلغي عرض السعر المعروض (E2E-BASKET-019).
 12. **الاختبارات.** الـ Backend: `backend/app/src/test/java/com/matbakhy/app/orders/QuoteIntegrationTest.java`، `OrderPlacementIntegrationTest.java`، `PriceChangeIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/identity/ContactIntegrationTest.java`. الويب: `apps/customer-web/src/App.test.tsx` (D13، OBS-001، MB-053). المتصفح: `apps/operations-web/e2e/customer-journey.e2e.ts`.
 13. **اختبارات المالك E2E.** E2E-DISC-105، E2E-DISC-106، E2E-DISC-007، E2E-BASKET-013، E2E-BASKET-014، E2E-BASKET-015، E2E-BASKET-019، E2E-BASKET-020، E2E-BASKET-028، E2E-ORDER-021، E2E-ORDER-022، E2E-ORDER-024، E2E-ORDER-123، E2E-FIN-103، E2E-FIN-104، E2E-FIN-105؛ من J1 لـ J5.
-14. **الحالة.** IMPLEMENTED. الفلوس الحقيقية مقفولة بشروط: العربون تحويل يدوي برّه مطبخي؛ والتطبيق عمره ما بيدّعي تحقق بنكي.
+14. **الحالة.** IMPLEMENTED. التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة: العربون تحويل يدوي برّه مطبخي؛ والتطبيق عمره ما بيدّعي تحقق بنكي.
 15. **القيود.** نصوص نسخ سياسة الإلغاء والشروط جاية من استجابة عرض السعر؛ ومفيش صفحة سياسات منفصلة (`GET /api/v1/policies/{key}` API-008 معلّم إنه مش متنفّذ في `contracts/endpoints.json`).
 
 ## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم
@@ -112,7 +112,7 @@
 8. **الـ Backend.** `OrderController.java`، `OrderLifecycleService.customerCancel`، `OrderService.get/list`، `PaymentController.java` / `PaymentService.reportTransfer`، `ReviewController.java` / `ReviewService.java`، `backend/modules/support/src/main/java/com/matbakhy/support/web/SupportController.java` (طلب الإلغاء بيعمل حالة دعم).
 9. **قاعدة البيانات.** `customer_order`، `order_event`، `handover_challenge`، `handover_attempt` (V12)، `order_payment`، `payment_event`، `review` (V20)، `support_case` (V17)، `notification` (V14).
 10. **الانتقالات.** `PENDING_ACCEPTANCE → CANCELLED` (العميل)، `→ EXPIRED` (النظام عند الموعد النهائي للقبول عن طريق `OrderExpiryJob`)، والحالات اللي بعد كده بيحركها الطبّاخ/الـ Staff. الدفع `WAITING_FOR_DEPOSIT → CUSTOMER_TRANSFER_REPORTED`. حالات الأوردر النهائية: `COMPLETED, REJECTED, EXPIRED, CANCELLED, DELIVERY_FAILED` (`OrderLifecycleService.TERMINAL`).
-11. **الأخطاء.** معرّف أوردر عميل تاني بيرجّع 404 (E2E-ORDER-120)؛ `expectedVersion` قديم بيرجّع `VERSION_CONFLICT`؛ زرار الإلغاء بيختفي لو الأوردر اتحرك (الواجهة بتعتبر `STATE_CONFLICT` "اتعمل قبل كده")؛ تكرار تقرير التحويل Idempotent وإعلامي (E2E-FIN-042)؛ المراجعة التانية بتدي 409 (E2E-DISC-110).
+11. **الأخطاء.** معرّف أوردر عميل تاني بيرجّع 404 (E2E-ORDER-120)؛ `expectedVersion` قديم بيرجّع `VERSION_CONFLICT`؛ زرار الإلغاء بيختفي لو الأوردر اتحرك (الواجهة بتعتبر `STATE_CONFLICT` "اتعمل قبل كده")؛ تكرار تقرير التحويل Idempotent، وهو للإبلاغ بس (E2E-FIN-042)؛ التقييم التاني بيرجّع 409 (E2E-DISC-110).
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/orders/OrderLifecycleIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/orders/ReviewsAndFavoritesIntegrationTest.java`، `apps/customer-web/src/App.test.tsx`.
 13. **اختبارات المالك E2E.** E2E-ORDER-027، E2E-ORDER-030، E2E-ORDER-031، E2E-ORDER-033، E2E-ORDER-035، E2E-ORDER-117، E2E-ORDER-120، E2E-FIN-039، E2E-FIN-042، E2E-DISC-110؛ من J1 لـ J4.
 14. **الحالة.** IMPLEMENTED.
@@ -163,7 +163,7 @@
 | 401 على نداء محمي | `onSignedOut` بيمسح الملف الشخصي؛ ورابط تسجيل الدخول بيظهر (`shared.tsx`) |
 | 403 `STEP_UP_REQUIRED` | رسالة بتشاور على صفحة الحساب (`i18n.ts`، `shared.tsx`) |
 | Version قديم | رسالة `VERSION_CONFLICT` مع Reload |
-| بيئة Demo/preview (العرض/المعاينة) | إشعار دائم من `GET /api/v1/configuration/public` `environment.demo` أو علم البناء (`EnvironmentNotice.tsx`؛ E2E-DISC-117) |
+| بيئة Demo/preview (العرض/المعاينة) | إشعار دائم من `GET /api/v1/configuration/public` `environment.demo` أو إعداد الـ Build (`EnvironmentNotice.tsx`؛ E2E-DISC-117) |
 
 ## القيود المعروفة وفجوات التوثيق
 

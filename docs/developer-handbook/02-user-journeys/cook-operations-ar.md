@@ -28,7 +28,7 @@
 2. **الطرف / الصلاحيات.** أي حساب فعّال (`COOK_APPLICANT` في `contracts/endpoints.json`)؛ وجانب الـ Staff محتاج `cook.review`.
 3. **المتطلبات المسبقة.** مسجّل دخول. تليفون الطلب بيستخدم النمط `+20 1[0125]xxxxxxxx` (قيد CHECK في V5).
 4. **شاشة البداية.** مفيش شاشة بتبدأ الطلب. API بس: `PUT /api/v1/cook/application`. ويب العمليات بيعرض الحالة بعد كده (`Onboarding.tsx`). حالة النموذج: واجهة PLANNED (التعليق في `Onboarding.tsx` بيقول إن التعديل "a later customer-web/mobile flow"؛ ومفيش نداء لـ `/cook/application` في `apps/customer-web/src` ولا `apps/customer-mobile/src`).
-5. **إجراءات المستخدم.** حفظ مسودة (الاسم، النبذة، تليفون التواصل، الموقع الخاص، علم الاستلام، معرّفات المناطق، معرّفات رفع المستندات، `expectedVersion`)؛ رفع مستندات خاصة من خلال `POST /api/v1/uploads` + `POST /api/v1/uploads/{uploadId}/complete`؛ الإرسال.
+5. **إجراءات المستخدم.** حفظ مسودة (الاسم، النبذة، تليفون التواصل، الموقع الخاص، إعداد إتاحة الاستلام، معرّفات المناطق، معرّفات رفع المستندات، `expectedVersion`)؛ رفع مستندات خاصة من خلال `POST /api/v1/uploads` + `POST /api/v1/uploads/{uploadId}/complete`؛ الإرسال.
 6. **الاستجابات.** المسودة بترجّع الحالة والتاريخ؛ والإرسال بيعمل Revision رقم 1؛ والمسودات الناقصة بترجّع `VALIDATION_FAILED` بتسمّي الحقول الناقصة؛ والمتقدّم بيفضل غير طبّاخ لحد الموافقة (E2E-COOK-048).
 7. **الـ API.** `GET/PUT /api/v1/cook/application` (API-042، API-043)، `POST /api/v1/cook/application/submit` (API-044)، الرفع (من API-039 لـ API-041).
 8. **الـ Backend.** `backend/modules/cooks/src/main/java/com/matbakhy/cooks/web/CookApplicationController.java` → `internal/CookApplicationService.java`؛ المستندات `internal/ApplicationDocumentAccess.java`؛ الرفع `backend/modules/catalog/src/main/java/com/matbakhy/catalog/web/UploadController.java`.
@@ -127,7 +127,7 @@
 11. **الأخطاء.** `ORDER_ENDED` (بلّغ عن استرداد بدلها)، `NO_DEPOSIT_WAITING`، تقرير كاش واحد لكل أوردر (E2E-FIN-102)، لازم مبلغ الاستلام يتطابق (E2E-FIN-041).
 12. **الاختبارات.** `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `PaymentReconciliationIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/finance/CashAndLedgerIntegrationTest.java`، `ZeroCommissionIntegrationTest.java`، `apps/operations-web/e2e/money-reflow.e2e.ts`.
 13. **اختبارات المالك E2E.** E2E-FIN-038، E2E-FIN-039، E2E-FIN-040، E2E-FIN-043، E2E-FIN-106، E2E-FIN-107، E2E-FIN-108، E2E-FIN-109، E2E-FIN-111، E2E-FIN-102، E2E-COOK-108؛ من J2 لـ J4.
-14. **الحالة.** IMPLEMENTED (بيانات اصطناعية (Synthetic)؛ الفلوس الحية مقفولة بشروط).
+14. **الحالة.** IMPLEMENTED (بيانات اصطناعية (Synthetic)؛ التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة).
 15. **القيود.** تفاصيل تحويل العربون إفادة من المطبخ، مش تأكيد بنكي.
 
 ## CO-7 إعدادات المطبخ، الإيقاف المؤقت، والتعليق
