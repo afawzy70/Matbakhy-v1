@@ -32,8 +32,8 @@ Run the stages in order; load a reference only when you reach the stage that nee
 | C Infrastructure handbook | Hosting reality, accounts and permissions, network, containers/storage, rebuild, secrets, DNS/TLS, CI/CD hookup, monitoring, troubleshooting, backup, restore, rollback, disaster recovery | `references/infrastructure-handover.md`, `references/deployment-and-recovery.md`, `templates/infrastructure-inventory.md`, `templates/deployment-runbook.md`, `templates/disaster-recovery.md` |
 | D Interactive documentation | Real environment URLs (safely verified), roles, test-account names without passwords, navigation, journeys with expected results | `references/interactive-documentation.md`, `templates/live-environments.md` |
 | E Bilingual mirror | Complete second-language pages next to each source page, language-switch navigation | `references/bilingual-parity.md`, `references/egyptian-arabic-style-guide.md` |
-| E2 Egyptian Arabic editorial QA (mandatory) | Native-style review, anti-pattern pass, terminology check, re-compare with the source, language-quality gates | `references/egyptian-arabic-style-guide.md`, `references/egyptian-arabic-anti-patterns.md`, `scripts/check_arabic_style.py`, `templates/language-quality-report.md` |
-| F Quality assurance | Parity validator with positive and negative tests, link/identifier/diagram checks, CI integration, independent semantic review | `references/quality-gates.md`, `scripts/` |
+| E2 Egyptian Arabic editorial QA (mandatory) | Native-style review, anti-pattern pass, terminology check, re-compare with the source, language-quality gates | `references/egyptian-arabic-style-guide.md`, `references/egyptian-arabic-anti-patterns.md`, `./scripts/check_arabic_style.py`, `templates/language-quality-report.md` |
+| F Quality assurance | Parity validator with positive and negative tests, link/identifier/diagram checks, CI integration, independent semantic review | `references/quality-gates.md`, `./scripts/` |
 | G Handover simulation | Two fresh-engineer walk-throughs, every gap recorded and fixed, review repeated | `references/quality-gates.md`, `templates/verification-report.md` |
 | H Delivery | Branch, meaningful commits, pull request, completion and verification report | `templates/verification-report.md` |
 
@@ -44,13 +44,13 @@ English handbook generation or update; a complete Egyptian Arabic mirror; termin
 
 ## Inputs to establish first
 
-Detect, then confirm only what cannot be detected: documentation directory (default `docs/handbook`), source language, mirror language and suffix (default `-ar`), development branch, whether authorized read-only access to a running environment exists, and which existing pages must be preserved. Record decisions in the verification report.
+Detect, then confirm only what cannot be detected: documentation directory (default `<repo>/docs/handbook`), source language, mirror language and suffix (default `-ar`), development branch, whether authorized read-only access to a running environment exists, and which existing pages must be preserved. Record decisions in the verification report.
 
 ## Tools bundled here
 
-- `scripts/validate_bilingual_parity.py`: structural parity validator (markdown-it-py based; options `--docs-dir`, `--suffix=-ar`, `--require-metadata`, `--evidence-dir`, `--fix-anchors`, `--update-sync`, `--base`). `scripts/test_bilingual_parity.py` are its positive and negative tests.
-- `scripts/scan_handbook_facts.py`: read-only repository fact scanner that lists detected stacks, workflows, container files and documentation, so discovery starts from evidence.
-- `scripts/check_arabic_style.py`: warns on catalogued literal-translation phrases (warnings only, never a quality verdict). `scripts/test_editorial_fixture.py` and `examples/arabic-editorial-fixture/` show a literal translation corrected without touching any command or identifier.
+- `./scripts/validate_bilingual_parity.py`: structural parity validator (markdown-it-py based; options `--docs-dir`, `--suffix=-ar`, `--require-metadata`, `--evidence-dir`, `--fix-anchors`, `--update-sync`, `--base`). `./scripts/test_bilingual_parity.py` are its positive and negative tests.
+- `./scripts/scan_handbook_facts.py`: read-only repository fact scanner that lists detected stacks, workflows, container files and documentation, so discovery starts from evidence.
+- `./scripts/check_arabic_style.py`: warns on catalogued literal-translation phrases (warnings only, never a quality verdict). `./scripts/test_editorial_fixture.py` and `examples/arabic-editorial-fixture/` show a literal translation corrected without touching any command or identifier.
 - `templates/`: skeletons to copy and fill (never leave placeholder text in delivered pages).
 - `examples/`: a tiny fixture project used by the skill's dry-run test.
 

@@ -1,6 +1,6 @@
 # Egyptian Arabic anti-patterns (sanitized regression examples)
 
-Recurring mistakes found while mirroring a real engineering handbook into Egyptian Arabic, with project facts removed. Use them as a review checklist and as regression cases. Every category gives a **Bad** (negative) and a **Good** (positive) example. They are *examples*, not search-and-replace rules: always judge the sentence in context and keep the technical distinction. `scripts/check_arabic_style.py` flags a few of the phrases as *warnings only*; it never decides quality.
+Recurring mistakes found while mirroring a real engineering handbook into Egyptian Arabic, with project facts removed. Use them as a review checklist and as regression cases. Every category gives a **Bad** (negative) and a **Good** (positive) example. They are *examples*, not search-and-replace rules: always judge the sentence in context and keep the technical distinction. `./scripts/check_arabic_style.py` flags a few of the phrases as *warnings only*; it never decides quality.
 
 ## A1 Literal translation of an English expression
 - Bad: "الدليل مخرَج حيّ" · "الفلوس الحقيقية متقفّلة" · "الـ CI أخضر" · "ملفات مقروء بالآلة" (word for word from "living deliverable", "live money is gated", "CI is green", "machine-readable").

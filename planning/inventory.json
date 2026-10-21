@@ -157,6 +157,18 @@
       "state": "PRESENT",
       "owner_story": "MB-040",
       "purpose": "Deployment packages; web-preview is an early, access-restricted synthetic-data preview (owner direction 2026-10-12), not MB-040 staging"
+    },
+    {
+      "path": ".claude",
+      "state": "PRESENT",
+      "owner_story": "MB-008",
+      "purpose": "Claude Code project skill discovery adapter (relative symlink to ai-skills/developer-handbook; no second copy)"
+    },
+    {
+      "path": "ai-skills",
+      "state": "PRESENT",
+      "owner_story": "MB-008",
+      "purpose": "Owner-controlled reusable AI skills library (README, registry, developer-handbook skill with tests)"
     }
   ]
 }

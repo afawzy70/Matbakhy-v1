@@ -3,7 +3,7 @@
 Goal: build an evidence-classified inventory before writing any page. Nothing in the handbook may rest on memory or on a guess.
 
 ## Order of work
-1. Run `scripts/scan_handbook_facts.py --root <repo>` for a read-only starting inventory (technologies, CI/CD files, container and IaC files, test locations, documentation trees, git conventions). Its output is `VERIFIED IN CODE`.
+1. Run `./scripts/scan_handbook_facts.py --root <repo>` for a read-only starting inventory (technologies, CI/CD files, container and IaC files, test locations, documentation trees, git conventions). Its output is `VERIFIED IN CODE`.
 2. Read, in this order: top-level README and contribution/agent instruction files, architecture and decision records, the dependency manifests, the CI/CD definitions, deployment and infrastructure files, database migrations and schema, API contracts (OpenAPI, GraphQL, protobuf), configuration templates (names only, never secret values), test directories.
 3. Inventory existing documentation: for each file record purpose, audience, accuracy, implementation status, last relevant change (`git log -1 --format=%cs -- <file>`), whether it describes a superseded platform or provider, whether a translation exists, whether its links resolve, whether it suffices for independent handover.
 4. Read the code that implements the documented behaviour before describing it. Where documents and code disagree, trust the code, record the conflict, and do not silently fix the source text.

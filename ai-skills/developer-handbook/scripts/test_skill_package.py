@@ -64,7 +64,7 @@ class SkillPackage(unittest.TestCase):
     def test_skill_md_is_concise_and_references_exist(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         self.assertLess(len(text.splitlines()), 120, "keep SKILL.md concise; put detail in references")
-        for ref in set(re.findall(r"`((?:references|templates|scripts|examples)/[A-Za-z0-9_./-]+)`", text)):
+        for ref in set(re.findall(r"`(?:\./)?((?:references|templates|scripts|examples)/[A-Za-z0-9_./-]+)`", text)):
             self.assertTrue((SKILL / ref.rstrip("/")).exists(), f"SKILL.md mentions a missing file: {ref}")
         for folder, names in EXPECTED.items():
             for n in names:
