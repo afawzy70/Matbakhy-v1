@@ -15,8 +15,8 @@ SKILL = Path(__file__).resolve().parent.parent
 LIBRARY = SKILL.parent
 EXPECTED = {
     "references": ["discovery-methodology", "developer-handover", "infrastructure-handover", "deployment-and-recovery", "interactive-documentation",
-                   "bilingual-parity", "quality-gates"],
-    "templates": ["handbook-index", "infrastructure-inventory", "deployment-runbook", "disaster-recovery", "live-environments", "verification-report"],
+                   "bilingual-parity", "quality-gates", "egyptian-arabic-style-guide", "egyptian-arabic-anti-patterns"],
+    "templates": ["handbook-index", "infrastructure-inventory", "deployment-runbook", "disaster-recovery", "live-environments", "verification-report", "language-quality-report"],
 }
 DESCRIPTION = ("Create, audit, maintain, and validate a complete bilingual software engineering and infrastructure handover handbook for any "
                "software repository, including architecture, business rules, development workflow, CI/CD, deployment, infrastructure "
@@ -38,7 +38,10 @@ class SkillPackage(unittest.TestCase):
             for n in names:
                 self.assertTrue((SKILL / folder / f"{n}.md").is_file(), f"{folder}/{n}.md")
         for rel in ("scripts/validate_bilingual_parity.py", "scripts/test_bilingual_parity.py", "scripts/scan_handbook_facts.py",
-                    "scripts/test_fixture_dry_run.py", "examples/fixture-project/README.md"):
+                    "scripts/test_fixture_dry_run.py", "scripts/check_arabic_style.py", "scripts/test_editorial_fixture.py",
+                    "examples/fixture-project/README.md", "examples/arabic-editorial-fixture/README.md",
+                    "examples/arabic-editorial-fixture/before/deploy-notes.md", "examples/arabic-editorial-fixture/before/deploy-notes-ar.md",
+                    "examples/arabic-editorial-fixture/after/deploy-notes-ar.md"):
             self.assertTrue((SKILL / rel).is_file(), rel)
         self.assertTrue((LIBRARY / "README.md").is_file() and (LIBRARY / "registry.yaml").is_file())
 
@@ -105,6 +108,20 @@ class SkillPackage(unittest.TestCase):
             self.assertIn(phrase, parity, phrase)
         for phrase in ("never proves semantic equivalence", "Validate the validator", "negative tests", "Independent semantic review", "Handover simulation"):
             self.assertIn(phrase.lower(), gates.lower(), phrase)
+
+    def test_egyptian_arabic_editorial_qa_is_mandatory_and_automatic(self) -> None:
+        skill = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        gates = (SKILL / "references/quality-gates.md").read_text(encoding="utf-8")
+        for phrase in ("egyptian-arabic-style-guide.md", "egyptian-arabic-anti-patterns.md", "Stage E2", "no separate request needed",
+                       "A passing script never marks a language gate PASS", "never described as human verification"):
+            self.assertIn(phrase.lower(), skill.lower(), phrase)
+        for gate in ("Naturalness", "Grammar", "Clarity", "Technical accuracy", "Terminology consistency", "Completeness", "Readability", "Markdown/RTL"):
+            self.assertIn(gate.lower(), skill.lower() + gates.lower(), gate)
+        for phrase in ("PASS, FAIL or NOT VERIFIED", "keyword matching", "AI-only review"):
+            self.assertIn(phrase.lower(), gates.lower(), phrase)
+        guide = (SKILL / "references/egyptian-arabic-style-guide.md").read_text(encoding="utf-8")
+        for phrase in ("ملفات قابلة للقراءة آليًا", "كل فحوصات الـ CI نجحت", "Synthetic Data", "Preview vs Staging vs Production", "Rollback vs Database Restore"):
+            self.assertIn(phrase, guide, phrase)
 
     def test_non_destructive_defaults_and_owner_control(self) -> None:
         readme = (LIBRARY / "README.md").read_text(encoding="utf-8")

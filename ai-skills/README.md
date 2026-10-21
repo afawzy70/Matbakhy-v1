@@ -24,7 +24,7 @@ Pick one (do not keep two diverging copies):
 Then install the parser used by the validator: `python3 -m pip install 'markdown-it-py==3.0.0'`, and run `python3 .claude/skills/developer-handbook/scripts/test_skill_package.py` to check the copy.
 
 ## Tests
-`python3 ai-skills/developer-handbook/scripts/test_skill_package.py` (files, metadata, internal references, no project-specific dependencies, safety and bilingual rules), `test_bilingual_parity.py` (validator positive and negative tests), `test_fixture_dry_run.py` (isolated end-to-end dry run on a small fixture project). They prove packaging and the validator's behaviour; they do not prove that an AI session will follow the skill perfectly.
+`python3 ai-skills/developer-handbook/scripts/test_skill_package.py` (files, metadata, internal references, no project-specific dependencies, safety and bilingual rules), `test_bilingual_parity.py` (validator positive and negative tests), `test_fixture_dry_run.py` (isolated end-to-end dry run on a small fixture project), `test_editorial_fixture.py` (a literal Egyptian Arabic translation corrected without changing any technical content, phrase-checker positive/negative samples). They prove packaging and the validator's behaviour; they do not prove that an AI session will follow the skill perfectly.
 
 ## Provenance
 The method was extracted from a real bilingual handbook delivery (English/Egyptian Arabic mirror with a structural parity validator, five independent semantic review rounds, and an infrastructure handover). Only the reusable method is included; no project facts.

@@ -15,6 +15,7 @@ skills:
       packaging_tests: ai-skills/developer-handbook/scripts/test_skill_package.py
       validator_tests: ai-skills/developer-handbook/scripts/test_bilingual_parity.py
       behavioral_dry_run: ai-skills/developer-handbook/scripts/test_fixture_dry_run.py
+      editorial_regression: ai-skills/developer-handbook/scripts/test_editorial_fixture.py
       claude_code_invocation: not verified in this environment
     dependencies:
       - reference implementation: the handbook delivered in pull requests #38 (English/Arabic mirror) and the infrastructure handbook pull request

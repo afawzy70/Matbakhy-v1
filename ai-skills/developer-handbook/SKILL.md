@@ -31,10 +31,16 @@ Run the stages in order; load a reference only when you reach the stage that nee
 | B Developer handbook | Business, journeys, architecture, codebase map, local setup, tests, PR workflow, deployment verification, onboarding labs | `references/developer-handover.md`, `templates/handbook-index.md` |
 | C Infrastructure handbook | Hosting reality, accounts and permissions, network, containers/storage, rebuild, secrets, DNS/TLS, CI/CD hookup, monitoring, troubleshooting, backup, restore, rollback, disaster recovery | `references/infrastructure-handover.md`, `references/deployment-and-recovery.md`, `templates/infrastructure-inventory.md`, `templates/deployment-runbook.md`, `templates/disaster-recovery.md` |
 | D Interactive documentation | Real environment URLs (safely verified), roles, test-account names without passwords, navigation, journeys with expected results | `references/interactive-documentation.md`, `templates/live-environments.md` |
-| E Bilingual mirror | Complete second-language pages next to each source page, language-switch navigation | `references/bilingual-parity.md` |
+| E Bilingual mirror | Complete second-language pages next to each source page, language-switch navigation | `references/bilingual-parity.md`, `references/egyptian-arabic-style-guide.md` |
+| E2 Egyptian Arabic editorial QA (mandatory) | Native-style review, anti-pattern pass, terminology check, re-compare with the source, language-quality gates | `references/egyptian-arabic-style-guide.md`, `references/egyptian-arabic-anti-patterns.md`, `scripts/check_arabic_style.py`, `templates/language-quality-report.md` |
 | F Quality assurance | Parity validator with positive and negative tests, link/identifier/diagram checks, CI integration, independent semantic review | `references/quality-gates.md`, `scripts/` |
 | G Handover simulation | Two fresh-engineer walk-throughs, every gap recorded and fixed, review repeated | `references/quality-gates.md`, `templates/verification-report.md` |
 | H Delivery | Branch, meaningful commits, pull request, completion and verification report | `templates/verification-report.md` |
+
+## What every invocation includes (no separate request needed)
+English handbook generation or update; a complete Egyptian Arabic mirror; terminology validation against the style guide; the native-style editorial review (stage E2); technical semantic review; structural parity validation; a final quality report with the language-quality gates. Do not ask the owner to request Arabic corrections separately.
+
+**Stage E2 pipeline:** (1) read the complete English page; (2) write the complete Egyptian Arabic page; (3) run structural parity; (4) do the native-style editorial review; (5) list unnatural phrases and literal translations; (6) fix grammar, punctuation, clarity and terminology; (7) compare the corrected Arabic with the English again; (8) confirm technical meaning and completeness; (9) rerun parity and link validation; (10) get an independent final review where available. Record Naturalness, Grammar, Clarity, Technical accuracy, Terminology consistency, Completeness, Readability and Markdown/RTL presentation as PASS, FAIL or NOT VERIFIED per document. A passing script never marks a language gate PASS, and AI-only review is never described as human verification.
 
 ## Inputs to establish first
 
@@ -44,9 +50,10 @@ Detect, then confirm only what cannot be detected: documentation directory (defa
 
 - `scripts/validate_bilingual_parity.py`: structural parity validator (markdown-it-py based; options `--docs-dir`, `--suffix=-ar`, `--require-metadata`, `--evidence-dir`, `--fix-anchors`, `--update-sync`, `--base`). `scripts/test_bilingual_parity.py` are its positive and negative tests.
 - `scripts/scan_handbook_facts.py`: read-only repository fact scanner that lists detected stacks, workflows, container files and documentation, so discovery starts from evidence.
+- `scripts/check_arabic_style.py`: warns on catalogued literal-translation phrases (warnings only, never a quality verdict). `scripts/test_editorial_fixture.py` and `examples/arabic-editorial-fixture/` show a literal translation corrected without touching any command or identifier.
 - `templates/`: skeletons to copy and fill (never leave placeholder text in delivered pages).
 - `examples/`: a tiny fixture project used by the skill's dry-run test.
 
 ## Completion criteria
 
-Report PASS only with evidence: every source page has a mirror; the validator and its tests pass; links resolve; documentation checks of the project pass; an independent semantic review was run (or its absence is stated); two handover simulations are recorded; nothing outside documentation changed; live systems untouched. Otherwise report PARTIAL or BLOCKED with the exact blocker. Recommend, but never create, further skills without owner approval.
+Report PASS only with evidence: every source page has a mirror; the language-quality gates are recorded; the validator and its tests pass; links resolve; documentation checks of the project pass; an independent semantic review was run (or its absence is stated); two handover simulations are recorded; nothing outside documentation changed; live systems untouched. Otherwise report PARTIAL or BLOCKED with the exact blocker. Recommend, but never create, further skills without owner approval.

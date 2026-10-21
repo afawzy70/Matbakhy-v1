@@ -13,6 +13,8 @@
 | Validator tests (positive and negative) | <n passed> |
 | Link and documentation checks | <result> |
 | Independent semantic review | <rounds, reviewer type (AI or human), findings fixed, remaining> |
+| Egyptian Arabic editorial QA (per document: naturalness, grammar, clarity, technical accuracy, terminology, completeness, readability, Markdown/RTL; PASS/FAIL/NOT VERIFIED) | <summary and link to the language-quality table> |
+| Language reviewers (AI or human) | <who; AI-only review is not human verification> |
 | Developer handover simulation | <result and gaps> |
 | Infrastructure handover simulation | <result and gaps> |
 | Rebuild classification | DOCUMENTATION VERIFIED / EXECUTION VERIFIED / NOT EXECUTION VERIFIED |
