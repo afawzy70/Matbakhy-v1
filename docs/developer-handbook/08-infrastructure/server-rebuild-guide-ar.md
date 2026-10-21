@@ -8,6 +8,8 @@
 
 **النطاق والأمان.** الدليل ده بيبني سيرفر جديد ومعزول بيشغّل الـ Preview ببيانات تجريبية غير حقيقية (Synthetic Data) (`APP_ENV=PREVIEW`). مش إجراء يتنفّذ أبدًا على سيرفر الـ Preview الشغّال. مفيش حاجة هنا يُسمح لحساب Agent ذكاء اصطناعي إنه ينفّذها؛ الخطوات اللي محتاجة root أو Docker بتبقى لأدمن بشري مُصرَّح له. ماتستخدمش قسم الاستعادة على سيرفر فيه بيانات عايز تحتفظ بيها.
 
+**شرط العزل.** الأتمتة في الـ Repository (`deploy-preview.yml` و`owner-e2e-provision.yml`) بتشتغل في بيئة GitHub اسمها `preview` وبتنشر على السيرفر اللي Secrets البيئة دي بتحدده، عند أي Push على `develop`. لو ضبطت الـ Secrets دي لسيرفر إعادة البناء، أو عدّلت الـ Workflow في الـ Repository الشغّال، أتمتة الـ Preview الشغّال هتتحوّل لسيرفر إعادة البناء. عشان كده التمرين (Rehearsal) محتاج Repository منفصل (أو نسخة معزولة من الـ Workflows) ليه بيئته وSecrets بتاعته وConcurrency Groups بتاعته. تحويل الـ Preview الشغّال لسيرفر معاد بناؤه (Cutover) الدليل ده مابيوصفوش؛ ده NOT VERIFIED ولسه ماتجرّبش عمليًا، ومحتاج إجراء مُصرَّح بيه صراحةً من المالك (قرار مطلوب من المالك).
+
 ## مفتاح الأدلة
 
 | الوسم | المعنى |
@@ -93,7 +95,7 @@ flowchart TD
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
 | `sudo apt-get update` then `sudo apt-get -y upgrade` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `lsb_release -d` بيعرض Ubuntu 24.04 | حزمة Kernel تحديثها متوقّف بـ `apt-mark hold`، أو محتاج إعادة تشغيل: أعد التشغيل في وقت هادي |
-| `sudo apt-get -y install unattended-upgrades ca-certificates curl gnupg openssl python3 tar` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `command -v openssl python3 curl flock tar` بيطبع خمس مسارات | `flock` جزء من util-linux، وغالبًا بيبقى متسطّب |
+| `sudo apt-get -y install unattended-upgrades ca-certificates curl gnupg openssl python3 tar` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `command -v openssl python3 curl flock tar` بيطبع خمسة مسارات | `flock` جزء من util-linux، وغالبًا بيبقى متسطّب |
 
 ليه الحزم دي (VERIFIED IN CODE): `deploy.sh` بيستخدم `openssl` و`flock` و`sed` و`awk`؛ سكريبت الـ CD البعيد و`admin-console.sh` بيستدعوا `python3`؛ الـ CD Job بيبعت `tar` Stream؛ و`smoke.sh` بيستخدم `curl`. مفيش حاجة في السكريبتات بتستخدم `sudo`. مسار الـ CD مش محتاج `git` (بينسخ الملفات بـ `tar`)؛ و`docs/operations/12-owner-server-setup.md` بيسطّبه للـ Clone اليدوي بس. `unattended-upgrades` شغّال على السيرفر الحالي (VERIFIED LIVE) لكنه مجرد عُرف مش متطلب في الكود. `fail2ban` مش متسطّب على السيرفر الحالي (VERIFIED LIVE) ومفيش حاجة في الـ Repository بتتطلبه. ملف الـ Swap بحجم 2 GiB في نص وقت Hetzner كان متحجّم لسيرفر 4 GB؛ هل السيرفر الحالي فيه swap NOT VERIFIED والكود مابيتطلبوش.
 
@@ -224,6 +226,9 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 |---|---|---|---|---|
 | `sudo install -d -m 755 -o <deploy-user> -g <deploy-user> /srv/matbakhy-staging` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `ls -ld /srv/matbakhy-staging` بيعرض المالك | `/srv` مش موجود: اعمله كـ root |
 | `sudo install -d -m 750 -o <deploy-user> -g <deploy-user> /srv/matbakhy-backups /srv/matbakhy-qa-artifacts` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `ls -ld` على الاتنين | مفيش فشل متوقع |
+| `sudo install -d -m 755 -o <deploy-user> -g <deploy-user> /srv/matbakhy-backups/metrics` | VPS، `<admin-user>` مع sudo | بيغيّر الحالة | `ls -ld /srv/matbakhy-backups/metrics` بيبيّن إن حساب الـ Deploy هو المالك | مفيش فشل متوقع |
+
+اعمل `BACKUP_DIR/metrics` **قبل** أول تشغيل لـ Compose: الـ `compose.yaml` بيربطه Bind Mount جوه node-exporter (VERIFIED IN CODE: سطر `${BACKUP_DIR}/metrics:/textfile:ro` في `compose.yaml`)، ولو مش موجود Docker بيعمله بملكية root؛ وبعدين `deploy.sh backup` بيكتب `matbakhy_backup.prom` فيه بحساب الـ Deploy، فالكتابة بتفشل وممكن توقّف الـ Deployments اللي بعدها. الـ Mode 755 بيخلّي حاوية node-exporter تقدر تقراه؛ أما رقم المستخدم اللي node-exporter بيشتغل بيه فهو NOT VERIFIED، فبعد أول نسخة احتياطية اتأكد إن ملف الـ Metrics مقروء (الخطوة 28).
 
 فجوة مهمة: `.env.example` و`compose.yaml` و`admin-console.sh` الافتراضي لـ `GENERATED_DIR` فيهم هو المسار القديم `/srv/matbakhy-preview/generated`، بينما الـ CD بينشر في `/srv/matbakhy-staging`. لازم إعادة البناء تضبط `GENERATED_DIR` صراحةً في الخطوة 13. إزاي `.env` الشغّال بيضبطه NOT VERIFIED (Mode 600 وماتقراش)؛ المجلد الموجود `/srv/matbakhy-staging/generated` بيوحي إنه بيشاور هناك.
 
@@ -231,11 +236,11 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 
 ### الخطوة 11. حط ملفات الـ Deployment على السيرفر (أول مرة بس)
 
-المتطلب المسبق: الخطوة 10 وإنك اخترت الـ Commit بتاع الإصدار. الـ CD Job عادةً بينسخ الملفات، لكنه الأول بيتطلب إن `.env` يكون موجود (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`، VERIFIED IN CODE)، و`.env` بيتعمل من `.env.example` اللي بيوصل مع الملفات. فأول نسخة بتبقى يدوية. وصفة الـ Bootstrap دي بتعيد استخدام أمر `tar` بتاع الـ CD Job نفسه؛ ماتنفّذتش (NOT VERIFIED).
+المتطلب المسبق: الخطوة 10 وإنك اخترت الـ Commit بتاع الإصدار. الـ CD Job عادةً بينسخ الملفات، لكنه الأول بيتطلب إن `.env` يكون موجود (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`، VERIFIED IN CODE)، و`.env` بيتعمل من `.env.example` اللي بيوصل مع الملفات. فأول نسخة بتبقى يدوية. وصفة الـ Bootstrap دي بتبعت الملفات المتتبَّعة (Tracked) بتاعة الـ Commit بتاع الإصدار بس عن طريق `git archive`، ومش بتبعت `.env` ولا الملفات المتولّدة أبدًا (`.gitignore` بيخفيهم، فـ `git status` النضيف مابيثبتش إن `tar` عادي على مجلد الشغل خالي منهم)؛ ماتنفّذتش (NOT VERIFIED).
 
 ```sh
-# laptop, in a clean checkout of the release commit (git status clean), as your own user: state-changing on the VPS
-tar -cf - deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh -i <keyfile> <deploy-user>@<vps-ip> 'tar -xf - -C /srv/matbakhy-staging'
+# laptop, in a checkout of the repository, as your own user: state-changing on the VPS. git archive exports only tracked files of <release-commit>
+git archive --format=tar <release-commit> deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh -i <keyfile> <deploy-user>@<vps-ip> 'tar -xf - -C /srv/matbakhy-staging'
 ```
 
 | التحقق | الفشل المحتمل |
@@ -264,7 +269,7 @@ tar -cf - deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh
 | `GENERATED_DIR` | `/srv/matbakhy-staging/generated` | راجع الفجوة في الخطوة 10 |
 | `BACKUP_DIR`، `QA_ARTIFACT_DIR` | المجلدات من الخطوة 10 | VERIFIED IN CODE |
 | `CUSTOMER_ALLOWED_IPS`، `STAFF_ALLOWED_IPS` | سيبهم من غير ضبط عشان كل حاجة تفضل مقيّدة بـ `ALLOWED_CLIENT_IPS`؛ العملاء العامين قرار صريح من المالك (`0.0.0.0/0 ::/0`)؛ مسارات الـ API الخاصة بالموظفين محتاجة الفئتين (راجع الخطوة 22)، فأي عنوان موظف لازم يكون في قايمة العملاء كمان | VERIFIED IN CODE: `.env.example` |
-| `PUSH_DELIVERY_ENABLED` | `false` | VERIFIED IN CODE: البيئات المنشورة بترفض `true` |
+| `PUSH_DELIVERY_ENABLED` | `false` | VERIFIED IN CODE: `ProviderConfiguration.pushSender` بينده `requireLocal` اللي بيفحص `environment.synthetic()`؛ و`MatbakhyProperties` بتعتبر PREVIEW بيئة Synthetic، فـ `true` في `APP_ENV=PREVIEW` مش بيترفض وبيختار مزوّد Push تجريبي (Simulated)، أما STAGING وPRODUCTION فبيرفضوه. خلّيه `false` كإعداد تشغيلي |
 | `COMPOSE_OVERRIDE` | سيبه من غير ضبط على سيرفر بالحجم الحالي؛ `compose.4gb.yaml` لسيرفر 4 GB بس. هل `.env` الشغّال بيضبطه NOT VERIFIED | VERIFIED IN CODE |
 | `RELEASE_COMMIT`، `API_IMAGE`، `FRONT_IMAGE` | سيب الـ Placeholders؛ السكريبت البعيد بتاع الـ CD بيعيد كتابة الأسطر التلاتة دي (الخطوة 18). تشغيل `./deploy.sh up` يدويًا قبل كده بيفشل عن قصد | VERIFIED IN CODE: `deploy.sh check`، الـ Workflow |
 
@@ -287,7 +292,7 @@ tar -cf - deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh
 
 ### الخطوة 15. بيئة GitHub والـ Secrets
 
-المتطلب المسبق: الخطوتين 5 و 6. الاتنين `deploy-preview.yml` و`owner-e2e-provision.yml` بيشتغلوا في بيئة GitHub اسمها `preview` وبيقروا أربع Secrets (VERIFIED IN CODE). هل هي مخزّنة كـ Environment Secrets ولا Repository Secrets، وإيه قواعد الحماية على البيئة NOT VERIFIED (راجع Settings, Environments، كأدمن على الـ Repository).
+المتطلب المسبق: الخطوتين 5 و 6. الاتنين `deploy-preview.yml` و`owner-e2e-provision.yml` بيشتغلوا في بيئة GitHub اسمها `preview` وبيقروا أربع Secrets (VERIFIED IN CODE). **اعمل ده في Repository تمرين منفصل ليه بيئة `preview` بتاعته بس (شوف شرط العزل في أول الصفحة).** ضبط الـ Secrets دي في بيئة `preview` بتاعة الـ Repository الشغّال بيوجّه أتمتة الـ Preview الشغّال للسيرفر الجديد. هل هي مخزّنة كـ Environment Secrets ولا Repository Secrets، وإيه قواعد الحماية على البيئة NOT VERIFIED (راجع Settings, Environments، كأدمن على الـ Repository).
 
 | اسم الـ Secret | المحتوى | إزاي تجيبه من غير ما تكشفه |
 |---|---|---|
@@ -329,13 +334,13 @@ gh secret set STAGING_SSH_HOST_PUBKEY --env preview --repo <owner>/<repo> < <fil
 | `/srv/matbakhy-staging/deploy/web-preview` | خطوة النقل، السكريبت البعيد، خطوة كونسول الأدمن | تختار مسار تثبيت مختلف |
 | بيشتغل على push إلى `develop` وعلى `workflow_dispatch`؛ والـ Deploy Job على `develop` بس | المحفّزات | عايز Branch تاني |
 
-ماتغيّرش ملفات الـ Workflow من غير تصريح من مالك الـ Repository.
+ماتغيّرش ملفات الـ Workflow من غير تصريح من مالك الـ Repository. في Repository التمرين، إدّي كمان للـ Workflows المنسوخة Concurrency Groups خاصة بيها بدل `matbakhy-preview-deploy` و`matbakhy-preview-owner-e2e`، عشان التمرين مايتحطش في طابور ورا الـ Workflows الشغّالة ولا يلغيها. تعديل الـ Workflow في الـ Repository الشغّال لدومين جديد ده خطوة من الـ Cutover، مش من التمرين.
 
 ## المرحلة 5. أول Deployment
 
 ### الخطوة 18. أول Deployment عن طريق الـ CD
 
-المتطلب المسبق: الخطوات من 1 لـ 17، بما فيها عنوان الـ VPS نفسه في قايمة السماح (الخطوة 13). لو الـ Smoke خد 403 لأن Caddy شايف عنوان تاني، الـ CD Job بيستعيد `.env` السابق ويفشل؛ صحّح قايمة السماح وشغّل تاني. المحفّز: push إلى `develop`، أو Run workflow على `develop` لـ `Deploy Matbakhy preview to Contabo` (VERIFIED IN CODE: `workflow_dispatch` موجود). مجموعة الـ Concurrency اسمها `matbakhy-preview-deploy` وبتخلّي التشغيلات تمشي واحد ورا التاني.
+المتطلب المسبق: الخطوات من 1 لـ 17، بما فيها عنوان الـ VPS نفسه في قايمة السماح (الخطوة 13). لو الـ Smoke خد 403 لأن Caddy شايف عنوان تاني، الـ CD Job بيستعيد `.env` السابق ويفشل؛ صحّح قايمة السماح وشغّل تاني. المحفّز: push إلى `develop`، أو Run workflow على `develop` لـ `Deploy Matbakhy preview to Contabo` (VERIFIED IN CODE: `workflow_dispatch` موجود). مجموعة الـ Concurrency اسمها `matbakhy-preview-deploy` وبتخلّي التشغيلات تمشي واحد ورا التاني. الـ Job بيطبع `DEPLOYED <sha>` قبل آخر خطوة فيه (`admin-console enable`)، فممكن تشغيل أحدث ينشر وبعدين يفشل في الخطوة دي؛ يعني آخر تشغيل ناجح ممكن يكون أقدم من اللي شغّال فعلًا. لما تحتاج الـ Commit المنشور، بُص كمان على التشغيلات الأحدث الفاشلة وشوف إن كانت خطوة النشر فيها خلصت، وأكّد بـ `./deploy.sh status` على السيرفر.
 
 الـ Pipeline بيعمل إيه، بالترتيب (VERIFIED IN CODE): بيستنى لحد 60 مرة × 30 ثانية لتشغيل ناجح لـ Product CI على نفس الـ Commit بالظبط؛ يبني Jar الـ API؛ يبني ويرفع الصورتين؛ في الـ Deploy Job، يفحص الـ Secrets الأربعة، يكتب المفتاح و`known_hosts`، يفحص إن `.env` موجود والمجلد قابل للكتابة، يبعت `deploy` و`infra` و`scripts` وملف الـ Fixtures لـ `/srv/matbakhy-staging` بـ `tar`، ينسخ سكريبت بعيد مؤقت، يعيد كتابة `RELEASE_COMMIT` و`API_IMAGE` و`FRONT_IMAGE` في `.env`، يشغّل `./deploy.sh up` و`./deploy.sh smoke`؛ عند الفشل يستعيد `.env` السابق (الحاويات والبيانات مابترجعش)؛ وأخيرًا يشغّل `./deploy.sh admin-console enable`.
 
@@ -378,7 +383,7 @@ docker compose --env-file .env -f compose.yaml exec -T storage sh -c 'echo s3.bu
 |---|---|
 | الناتج بيعرض `matbakhy-public` و`matbakhy-private` (نفس الفحص بيتستخدم في `scripts/rehearse-preview.sh persist`) | Buckets مش موجودة: `up` بيتجاهل خطأ الإنشاء؛ أعد تشغيل `./deploy.sh up` أو اعملها بأسطر `s3.bucket.create` الظاهرة في `deploy.sh` |
 
-أضف `-f "$COMPOSE_OVERRIDE"` للأمر لما `.env` يضبط `COMPOSE_OVERRIDE`.
+لو `.env` بيضبط `COMPOSE_OVERRIDE`، أضف `-f <override-file>` للأمر (مثلًا `-f compose.4gb.yaml`). الـ `--env-file` بيدّي قيم للـ Interpolation بتاع Compose بس، ومابيحمّلش `COMPOSE_OVERRIDE` في الـ Shell بتاعك، فـ `$COMPOSE_OVERRIDE` لو اتكتب زي ما هو هيبقى فاضي. اقرا القيمة بـ `grep '^COMPOSE_OVERRIDE=' .env` (مش Secret).
 
 ### الخطوة 22. بروكسي Caddy والتوجيه
 
@@ -450,7 +455,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 ### الخطوة 28. النسخ الاحتياطية
 
-`./deploy.sh backup` بيكتب Dump بصيغة custom لـ PostgreSQL مع Checksum وManifest في `BACKUP_DIR`، ويستعيده في Database مؤقتة ويطابقه، وبعدين يوقف خدمة التخزين لفترة قصيرة ويؤرشف بياناتها كـ `storage-<stamp>.tgz` (الرفع بيتوقف في الأثناء). النسخة الاحتياطية مابتتحسبش إلا بعد فحص الاستعادة. حالة الفشل: `backup` ملوش Recovery Trap، فلو أمر الأرشفة فشل السكريبت بيخرج قبل `compose start storage` وخدمة التخزين بتفضل واقفة (الرفع بيفضل يفشل)؛ اتأكد بـ `docker compose --env-file .env -f compose.yaml ps storage` وشغّلها تاني بحساب الـ Deploy بـ `docker compose --env-file .env -f compose.yaml start storage` (أضف `-f "$COMPOSE_OVERRIDE"` لما `.env` يضبطه)، وبعدين دوّر على سبب خطأ الأرشفة. النسخة الاحتياطية قبل الـ Deploy في `up` بتستخدم نفس روتين الـ Database (VERIFIED IN CODE). الـ Repository مفيهوش Cron ولا Timer للنسخ الاحتياطية؛ ومفيش Cron لنسخ Matbakhy الاحتياطية كان ظاهر للحساب من غير صلاحيات على السيرفر الشغّال، وملفات crontab بتاعة المستخدمين التانيين مش مقروءة، فهل فيه نسخ احتياطية مجدولة NOT VERIFIED.
+`./deploy.sh backup` بيكتب Dump بصيغة custom لـ PostgreSQL مع Checksum وManifest في `BACKUP_DIR`، ويستعيده في Database مؤقتة ويطابقه، وبعدين يوقف خدمة التخزين لفترة قصيرة ويؤرشف بياناتها كـ `storage-<stamp>.tgz` (الرفع بيتوقف في الأثناء). النسخة الاحتياطية مابتتحسبش إلا بعد فحص الاستعادة. حالة الفشل: `backup` ملوش Recovery Trap، فلو أمر الأرشفة فشل السكريبت بيخرج قبل `compose start storage` وخدمة التخزين بتفضل واقفة (الرفع بيفضل يفشل)؛ اتأكد بـ `docker compose --env-file .env -f compose.yaml ps storage` وشغّلها تاني بحساب الـ Deploy بـ `docker compose --env-file .env -f compose.yaml start storage` (أضف `-f <override-file>` لما `.env` يضبط `COMPOSE_OVERRIDE`؛ الـ `--env-file` مابيحمّلوش في الـ Shell، شوف الخطوة 21)، وبعدين دوّر على سبب خطأ الأرشفة. النسخة الاحتياطية قبل الـ Deploy في `up` بتستخدم نفس روتين الـ Database (VERIFIED IN CODE). الـ Repository مفيهوش Cron ولا Timer للنسخ الاحتياطية؛ ومفيش Cron لنسخ Matbakhy الاحتياطية كان ظاهر للحساب من غير صلاحيات على السيرفر الشغّال، وملفات crontab بتاعة المستخدمين التانيين مش مقروءة، فهل فيه نسخ احتياطية مجدولة NOT VERIFIED.
 
 ```sh
 # VPS, <deploy-user>: state-changing (edits that account's crontab). The schedule is a convention taken from docs/operations/12-owner-server-setup.md section 9, adapted to this install path; server local time applies.
@@ -475,7 +480,7 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 
 | الأمر | الجهاز والمستخدم | النوع | التحقق | الفشل المحتمل |
 |---|---|---|---|---|
-| `./deploy.sh rollback-plan` | VPS، `<deploy-user>` | للقراءة فقط (بيطبع بس) | مع مدخلين على الأقل في `releases.log` بيطبع الـ Commit الهدف ونتيجة التقييم (Verdict)؛ ومع مدخل واحد بيقول `only 1 release(s) recorded` | مفيش سجل: ماحصلش `up` مكتمل لسه |
+| `./deploy.sh rollback-plan` | VPS، `<deploy-user>` | للقراءة فقط (بيطبع بس) | مع مدخلين على الأقل في `releases.log` بيطبع الـ Commit الهدف ونتيجة التقييم (Verdict)؛ ومع مدخل واحد بيقول `only 1 release(s) recorded` | مفيش سجل: ماحصلش `up` مكتمل لسه. الرقم N بيعدّ أسطر `releases.log`، واللي فيه الإصدارات الناجحة المسجّلة بس؛ `up` الفاشل مابيسيبش سطر. عشان تلاقي الهدف الصح اعرض السجل الأول (`cut -f1,2 /srv/matbakhy-backups/releases.log \| nl -ba`، للقراءة فقط: الوقت والـ Commit؛ و N = عدد الأسطر ناقص رقم سطر الإصدار المطلوب) وطابق الـ Commits مع تشغيلات الـ Workflow |
 | `./deploy.sh status` | VPS، `<deploy-user>` | للقراءة فقط | الصور المضبوطة بتطابق الشغّالة | عدم تطابق: Deployment فاشل |
 
 قواعد الـ Rollback: الرجوع لإصدار Docker Images سابق من غير استرجاع قاعدة البيانات آمن لما مفيش أي تغيير في بنية الـ Database Schema اتطبّق بعد الإصدار المستهدف أو كل Migration لاحق هو expand-only (`scripts/check_migration_compat.py` بيفرض الـ Annotation في الـ CI)؛ غير كده استعد النسخة الاحتياطية المأخوذة قبل أول Deployment طبّقهم (البيانات المكتوبة من وقتها بتضيع). الـ CD Job بيستعيد `.env` بس عند الفشل، عمره ما بيستعيد الـ Database. جداول القرار في [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md) و[الـ Pipeline بتاع الـ Deployment](deployment-pipeline-ar.md).
@@ -489,20 +494,20 @@ openssl s_client -connect <vps-ip>:443 -servername app.<domain> </dev/null 2>/de
 | البند | الكود بيعمل إيه | الحالة |
 |---|---|---|
 | Database التطبيق | `./deploy.sh restore-db <dump>` بيشغّل `scripts/db-restore.sh` جوه حاوية postgres مع `RESTORE_CONFIRM_TARGET=matbakhy_restore`: فحص Checksum، يعمل Database `matbakhy_restore` لو مش موجودة، يرفض هدف غير فاضي، `pg_restore`، وبعدين مطابقة. مابيكتبش فوق Database `matbakhy` الشغّالة؛ تحويل التطبيق لاستخدام الـ Database المستعادة خطوة يدوية من المالك | VERIFIED IN CODE: `deploy.sh`، `scripts/db-restore.sh` |
-| Database الـ Keycloak | تلات سكريبتات بتكتب `pg_dump` لـ `keycloak` تحت `BACKUP_DIR/keycloak`: `admin-console.sh` (`enable` و`backup`) و`migrate-mfa.sh` (`backup` و`apply`) و`owner-e2e-provision.sh apply`؛ تنفيذها على السيرفر الشغّال وحداثة الـ Dumps وهل بتتستعاد NOT VERIFIED LIVE. مفيش سكريبت استعادة ليها (`migrate-mfa.sh` بس بيذكر `pg_restore` جوه Database `keycloak` فاضية والـ Identity واقف، كتعليمة في تعليق). لازم Secrets الـ Realm في Database مستعادة تطابق `.env` الجديد | إجراء NOT VERIFIED |
+| Database الـ Keycloak | تلات سكريبتات بتكتب `pg_dump` لـ `keycloak` تحت `BACKUP_DIR/keycloak`: `admin-console.sh enable` (بيشغّل دالة النسخ الاحتياطي الداخلية؛ والـ Dispatcher بتاع السكريبت مفيهوش أمر فرعي `backup`) و`migrate-mfa.sh` (`backup` و`apply`) و`owner-e2e-provision.sh apply`؛ تنفيذها على السيرفر الشغّال وحداثة الـ Dumps وهل بتتستعاد NOT VERIFIED LIVE. مفيش سكريبت استعادة ليها (`migrate-mfa.sh` بس بيذكر `pg_restore` جوه Database `keycloak` فاضية والـ Identity واقف، كتعليمة في تعليق). لازم Secrets الـ Realm في Database مستعادة تطابق `.env` الجديد | إجراء NOT VERIFIED |
 | تخزين الصور | `./deploy.sh backup` بيعمل `storage-<stamp>.tgz`؛ مفيش سكريبت استعادة | إجراء NOT VERIFIED |
 | الـ Secrets (`.env`) | مش في أي نسخة احتياطية عن قصد؛ `.env` مفقود مايتولّدش تاني من غير ما يكسر الـ Volumes الموجودة (الخطوة 12) | VERIFIED IN CODE |
 
-الجدول ده قايمة باللي الكود بيدعمه، مش تسلسل استعادة ينفع يتعمل عليه تمرين. الناقص في الـ Repository: استعادة Keycloak والتخزين، تحويل التطبيق للـ Database المستعادة، ملكية وصلاحيات الكائنات المستعادة، مطابقة Secrets الـ Realm وعناوين الـ Redirect URIs للـ Front Image والـ Client في الـ Realm مع الدومين الجديد، التعامل مع الـ Secrets، والتحقق والـ Rollback للتحويل ده. يعني الـ Repository بيدّي لبنات استعادة لـ Database التطبيق بس، ومش بيدّي تسلسل يتعمل عليه تمرين يغطي أكتر من مخزن، والصفحة دي مابتخترعوش. اعتبر الاستعادة NOT VERIFIED ومش متجرّبة. قرار مطلوب من المالك: يحدد تسلسل واحد مُصرَّح بيه يغطي Database التطبيق وDatabase الـ Keycloak وأرشيف التخزين وتحويل التطبيق، وبعدين يجرّبه على سيرفر مؤقت.
+الجدول ده قايمة باللي الكود بيدعمه، مش تسلسل استعادة ينفع يتعمل عليه تمرين. الناقص في الـ Repository: استعادة Keycloak والتخزين، تحويل التطبيق للـ Database المستعادة، ملكية وصلاحيات الكائنات المستعادة، مطابقة Secrets الـ Realm مع إعدادات البيئة الجديدة، وضبط الـ Front Image وعناوين الـ Redirect URIs للـ Clients في الـ Realm على الدومين الجديد (إعادة إنشاء الـ Proxy بـ `PREVIEW_DOMAIN` جديد بتشيل أسماء الـ Hosts القديمة، فتحويل الدومين فيه Downtime إلا لو اتصمّم وجُرّب تمرين على توجيه بدومينين لوحده)، التعامل مع الـ Secrets، والتحقق والـ Rollback للتحويل ده. يعني الـ Repository بيدّي لبنات استعادة لـ Database التطبيق بس، ومش بيدّي تسلسل يتعمل عليه تمرين يغطي أكتر من مخزن، والصفحة دي مابتخترعوش. اعتبر الاستعادة NOT VERIFIED ومش متجرّبة. قرار مطلوب من المالك: يحدد تسلسل واحد مُصرَّح بيه يغطي Database التطبيق وDatabase الـ Keycloak وأرشيف التخزين وتحويل التطبيق، وبعدين يجرّبه على سيرفر مؤقت.
 
 التحقق بعد الاستعادة: `./deploy.sh status` (نسخة الـ Schema) وأسطر عدد الصفوف اللي بتطبعها خطوة المطابقة. ماتعتبرش الاستعادة مكتملة لحد ما أدمن مُصرَّح له يشغّل فحوصات صفحة الاستعادة وانت تجرّب الإجراء على سيرفر مؤقت.
 
 ## القيود المعروفة وفجوات التوثيق
 
-- الدليل ده NOT EXECUTION VERIFIED. الـ Bootstrap في الخطوة 11 (النسخ اليدوي الأول) وأوامر الصلاحيات مشتقة من الكود وماتشغّلتش.
+- الدليل ده NOT EXECUTION VERIFIED. الـ Bootstrap في الخطوة 11 (النسخ اليدوي الأول) وأوامر الصلاحيات مشتقة من الكود وماتشغّلتش. خطوات تحويل أتمتة الـ Preview الشغّال لسيرفر معاد بناؤه (الـ Secrets وقيم الـ Workflow وتغيير الدومين) مفيش ليها تسلسل مُصرَّح بيه ومجرَّب في الـ Repository؛ قرار مطلوب من المالك.
 - `GENERATED_DIR` افتراضيه `/srv/matbakhy-preview/generated` في `.env.example` و`compose.yaml` و`admin-console.sh`، بينما الـ CD بينشر في `/srv/matbakhy-staging`؛ القيمة الشغّالة NOT VERIFIED. تعارض في التوثيق: `deploy/web-preview/README.md` و`docs/operations/09-staging-hetzner-preparation.md` لسه بيوصفوا سيرفر Hetzner بمواصفات 2 vCPU / 4 GB، و`docs/operations/12-owner-server-setup.md` بيعدّد خمس Hosts DNS (من غير `kc-admin`) والمسار `/srv/matbakhy-preview` (كلهم OUTDATED / INCORRECT لسيرفر Contabo).
 - الـ Deploy Workflow بيكتب الدومين `167-86-90-174.sslip.io` واسم الـ Login على GHCR `afawzy70` بشكل ثابت؛ إعادة بناء على IP تاني محتاجة تعديل بيعدّي على Review في الـ Workflow (الخطوة 17).
-- مش متحقق منه على السيرفر الشغّال: القيمة الفعلية لـ `PermitRootLogin`، سياسة sudo، حالة وقواعد `ufw`، حاويات Docker والشبكات والـ Volumes، ملكية ملفات النسخ الاحتياطي اللي بتكتبها الحاويات، قيمة `STAGING_SSH_USER`، هل فيه Cron للنسخ الاحتياطي، تجديد الشهادات، هل الـ Compose Override بيتستخدم.
+- مش متحقق منه على السيرفر الشغّال: القيمة الفعلية لـ `PermitRootLogin`، سياسة sudo، حالة وقواعد `ufw`، حاويات Docker والشبكات والـ Volumes، أماكن الـ Named Volumes بتاعة Docker على الـ Host (الـ `compose.yaml` مابيحددهاش؛ فحصها بيتم بفحص Volumes على إيد أدمن مُصرَّح له)، ملكية ملفات النسخ الاحتياطي اللي بتكتبها الحاويات، قيمة `STAGING_SSH_USER`، هل فيه Cron للنسخ الاحتياطي، تجديد الشهادات، هل الـ Compose Override بيتستخدم.
 - خطوات الطلب من Contabo والـ Firewall على مستوى اللوحة مش متوثقة في أي مكان في الـ Repository.
 - مفيش إجراء استعادة في الكود لـ Database الـ Keycloak ولا لأرشيف الـ Storage.
 - أوامر الأدمن اللي هتحسم كذا بند من اللي فوق متجمّعة في [التحقق للقراءة فقط للأدمن](admin-readonly-verification-ar.md)؛ حساب الـ Agent ماينفعش يشغّلها أبدًا.

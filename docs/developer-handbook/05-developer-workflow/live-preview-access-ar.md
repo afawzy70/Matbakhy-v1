@@ -60,7 +60,7 @@
 | `preview-customer-1`, `preview-customer-2` | عميل | رقم التليفون متحقَّق منه مسبقًا في الـ Seed |
 | `preview-cook-1` | طبّاخ المطبخ اللي اتضاف بالـ Seed "مطبخ المعاينة" | استلام وتوصيل لـ Test zone A؛ ملف دفع بعربون 50%؛ وجبتين |
 | `preview-ops-1` | أول أدمن موظفين | بياخد بس `staff.grant` و`audit.read` من إعداد الـ Bootstrap |
-| `preview-ops-2` | حساب بأسلوب الموظفين من غير صلاحيات ممنوحة | مابيشوفش أي تاب للموظفين |
+| `preview-ops-2` | حساب من نوع حسابات الموظفين، من غير أي صلاحيات ممنوحة | مابيشوفش أي تاب للموظفين |
 | `owner-e2e-support`, `owner-e2e-ops`, `owner-e2e-finance`, `owner-e2e-admin-b`, `owner-e2e-cook-b`, `owner-e2e-cook-pending`, `owner-e2e-multirole`, `owner-e2e-cust-new-<n>` | حسابات اختبار إضافية للمالك | موجودة بس بعد ما مشغّل يجهّزها بالخطوات في [fixtures.md](../../quality/owner-acceptance/fixtures.md)؛ حالة التجهيز على الـ Preview الحي NOT VERIFIED |
 
 **كلمات السر مابتتكتبش أبدًا في الـ Repository ده.** المستخدمين اللي في الـ Seed بيشتركوا في قيمة `PREVIEW_USER_PASSWORD` في ملف `.env` الخاص على السيرفر (VERIFIED IN CODE: `deploy/web-preview/deploy.sh` بيولّدها بـ `init-secrets`). المستخدمين المصرّح لهم بياخدوها من المالك. حسابات owner-e2e ليها كلمات سر متولّدة لكل حساب لوحده وبتتسلّم بنفس الطريقة.
@@ -213,7 +213,7 @@
 | الحقل | المحتوى |
 |---|---|
 | الميزة والغرض | الموظفين بيوافقوا على الطبّاخين، وبيشرفوا على المحتوى (Moderation)، وبيراقبوا الأوردرات، وبيمنحوا الصلاحيات. في الكود مفيش أدوار موظفين، فيه بس منح صلاحيات. |
-| الدور والحساب | `preview-ops-1` معاه بس `staff.grant` و`audit.read`، فبيشوف تاب Staff permissions وتاب Security (تفضيل الخطوتين بتاعه هو؛ وأدوات السياسة والـ Reset محتاجة صلاحيات MFA، واللي الحساب ده مش معاه). مراجعة الطبّاخين والإشراف على المحتوى ومراقبة الأوردرات محتاجين `owner-e2e-ops` أو حساب اتمنح الصلاحيات دي (التجهيز NOT VERIFIED LIVE). |
+| الدور والحساب | `preview-ops-1` معاه بس `staff.grant` و`audit.read`، فبيشوف تاب Staff permissions وتاب Security (إعداد التحقق بخطوتين الخاص بالحساب نفسه؛ وأدوات السياسة والـ Reset محتاجة صلاحيات MFA، واللي الحساب ده مش معاه). مراجعة الطبّاخين والإشراف على المحتوى ومراقبة الأوردرات محتاجين `owner-e2e-ops` أو حساب اتمنح الصلاحيات دي (التجهيز NOT VERIFIED LIVE). |
 | الـ URL | `https://ops.167-86-90-174.sslip.io/` |
 | التنقّل | سجّل دخول، وبعدها التابات: Cook applications وCatalogue moderation وOrder monitoring وOperating configuration وStaff permissions وSecurity (كل واحد بس لو مسموح). |
 | الخطوات | 1. سجّل دخول كموظف. 2. "Cook applications": ابدأ المراجعة، وبعدها وافق أو اطلب تعديلات أو ارفض، دايمًا بسبب. 3. "Staff permissions": امنح أو اسحب صلاحية من حساب تاني. |

@@ -84,9 +84,9 @@ Readable parts of /etc/ssh/sshd_config and /etc/ssh/sshd_config.d were read by a
 | PubkeyAuthentication | yes | VERIFIED LIVE (file text) |
 | UsePAM | yes | VERIFIED LIVE (file text) |
 | X11Forwarding | yes | VERIFIED LIVE (file text). Not required by Matbakhy; a hardening review may turn it off. |
-| PermitRootLogin | no in the readable text, but an earlier line says yes and a later drop-in overrides it | The effective value is NOT VERIFIED. /etc/ssh/sshd_config.d/50-cloud-init.conf is unreadable to aiagent and may set it again. Confirm with `sshd -T` as root (command 1 on the admin page). |
+| PermitRootLogin | no in the readable text, but an earlier line says yes and a drop-in that is read after it in the processing order (not a newer file) overrides it | The effective value is NOT VERIFIED. /etc/ssh/sshd_config.d/50-cloud-init.conf is unreadable to aiagent and may set it again. Confirm with `sshd -T` as root (command 1 on the admin page). |
 
-Not readable by aiagent and therefore NOT VERIFIED: 50-cloud-init.conf, every authorized_keys file, the host private keys, and /etc/sudoers.d. The number of authorized keys per account and which key belongs to which person or to GitHub Actions are unknown.
+Not readable by aiagent and therefore NOT VERIFIED: 50-cloud-init.conf, every authorized_keys file, the host private keys, and /etc/sudoers.d. The number of authorized keys per account and which key belongs to which person or to GitHub Actions are unknown, and so is the effective key source (AuthorizedKeysFile or AuthorizedKeysCommand).
 
 The deployment workflow pins the server's host key from the secret `STAGING_SSH_HOST_PUBKEY` and connects with `StrictHostKeyChecking=yes` (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`, step "Configure verified SSH host").
 
@@ -101,7 +101,7 @@ Listing made with `ls -ld` as aiagent. The "purpose" column is from code or docu
 | /srv/matbakhy-staging/deploy/web-preview | devops:devops 755 | Working directory of every `deploy.sh` command (VERIFIED IN CODE: `deploy/web-preview/deploy.sh` does `cd` to its own directory). Contains compose.yaml, compose.4gb.yaml, Caddyfile, deploy.sh, admin-console.sh, smoke.sh, seed SQL and the directories identity, observability, postgres, storage and e2e-fixtures (VERIFIED LIVE). |
 | /srv/matbakhy-staging/deploy/web-preview/.env | devops:devops 600 | The server-only configuration file with all secrets. Its content was not read and must never be copied (VERIFIED LIVE for existence, owner and mode). `deploy.sh init-secrets` is the supported way to create it (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`); how this particular file was created is NOT VERIFIED. |
 | /srv/matbakhy-staging/generated | owner devops, mode 700 (drwx------); group not recorded | Probably the rendered realm and storage configuration, because `deploy.sh render` creates a mode 700 GENERATED_DIR with identity, storage and flags inside (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function render). That the live .env sets GENERATED_DIR to this path is NOT VERIFIED. Content not read. |
-| /srv/matbakhy-backups | devops:devops 750; 28 entries, not listable by aiagent | Default BACKUP_DIR: database dumps, image-storage archives, the release log and the shared lock (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`, `deploy/web-preview/deploy.sh`). That the live BACKUP_DIR is this path, and what the 28 entries are, is NOT VERIFIED. |
+| /srv/matbakhy-backups | devops:devops 750; 28 entries, not listable by aiagent | Default BACKUP_DIR: database dumps, image-storage archives, the release log and the shared lock (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`, `deploy/web-preview/deploy.sh`). That the live BACKUP_DIR is this path, and what the 28 entries are, is NOT VERIFIED. compose.yaml also bind-mounts `BACKUP_DIR/metrics` read-only into node-exporter (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`), so that subdirectory must exist with suitable ownership before the first start; whether it exists here is NOT VERIFIED. |
 | /srv/backups | devops 750 (group not recorded) | Purpose not established. No repository file refers to this path. |
 | /srv/deployments | devops 750 (group not recorded); not listable | Purpose not established. No repository file refers to this path. |
 | /srv/matbakhy-preview | devops:devops 775 | Stale copy of the deploy files from Oct 17 to 18; see [section 7](#7-the-stale-srvmatbakhy-preview-copy). |
@@ -110,7 +110,7 @@ Listing made with `ls -ld` as aiagent. The "purpose" column is from code or docu
 | /srv/flags | does not exist on the host filesystem | The name appears only inside the proxy container: the Caddyfile reads /srv/flags/admin-console-public and compose.yaml mounts GENERATED_DIR/flags there read-only (VERIFIED IN CODE: `deploy/web-preview/Caddyfile`, `deploy/web-preview/compose.yaml`). Its location on the host is under the generated directory and is NOT VERIFIED. |
 | /srv/matbakhy-qa-artifacts | not in the observed listing | Default QA_ARTIFACT_DIR (VERIFIED IN CODE: `deploy/web-preview/.env.example`). Whether the directory exists on this host is NOT VERIFIED. |
 
-Docker volumes are not directories under /srv. Their names, locations and sizes are NOT VERIFIED LIVE. The volumes the compose file declares are listed in the next section.
+Docker volume locations are NOT VERIFIED LIVE; establish them by inspecting the volumes (commands 8 and 9 on the admin page). Their names and sizes are NOT VERIFIED LIVE too. The volumes the compose file declares are listed in the next section.
 
 ### Volumes declared by the compose file
 
@@ -176,7 +176,7 @@ Everything below needs an authorized infrastructure administrator. The command n
 | Cron entries of devops and other users, and system schedules | Not readable | 12 |
 | Commit, image digests and revision labels actually deployed | Docker socket and .env not accessible to aiagent | 17, 18 |
 | Which user the deployment SSH key logs in as | Secret STAGING_SSH_USER; log evidence needs root | 13 |
-| Number of authorized SSH keys per account | Not readable | 13 |
+| Number of authorized SSH keys per account (command 13 gives a line count only) and the effective key source | Not readable | 1, 13 |
 | Process owner of the loopback ports 3000, 18080 and 38189 | Not visible to aiagent | 16 |
 | Tailnet membership and purpose | Not visible | not covered (tailnet admin console) |
 

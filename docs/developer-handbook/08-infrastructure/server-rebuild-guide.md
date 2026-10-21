@@ -8,6 +8,8 @@
 
 **Scope and safety.** This guide builds a NEW, isolated server that runs the synthetic-data Preview (`APP_ENV=PREVIEW`). It is never a procedure to run on the live Preview host. Nothing here may be executed by an AI agent account; steps that need root or Docker belong to an authorized human administrator. Do not use the Restore section on a host that already holds data you want to keep.
 
+**Isolation requirement.** The repository's automation (`deploy-preview.yml`, `owner-e2e-provision.yml`) runs in the GitHub environment `preview` and deploys to the host named by that environment's secrets, from a push to `develop`. Setting those secrets for a rebuild server, or editing the workflow in the live repository, would redirect the live Preview automation to the rebuild server. A rehearsal therefore needs a SEPARATE repository (or an isolated copy of the workflows) with its own environment, its own secrets and its own concurrency groups. Switching the live Preview to a rebuilt server (a cutover) is not described by this guide; it is NOT VERIFIED, not rehearsed, and needs an explicit owner-authorised procedure (owner decision needed).
+
 ## Evidence legend
 
 | Label | Meaning |
@@ -224,6 +226,9 @@ What the code requires:
 |---|---|---|---|---|
 | `sudo install -d -m 755 -o <deploy-user> -g <deploy-user> /srv/matbakhy-staging` | VPS, `<admin-user>` with sudo | state-changing | `ls -ld /srv/matbakhy-staging` shows the owner | `/srv` missing: create it as root |
 | `sudo install -d -m 750 -o <deploy-user> -g <deploy-user> /srv/matbakhy-backups /srv/matbakhy-qa-artifacts` | VPS, `<admin-user>` with sudo | state-changing | `ls -ld` on both | none expected |
+| `sudo install -d -m 755 -o <deploy-user> -g <deploy-user> /srv/matbakhy-backups/metrics` | VPS, `<admin-user>` with sudo | state-changing | `ls -ld /srv/matbakhy-backups/metrics` shows the deploy account as owner | none expected |
+
+Create `BACKUP_DIR/metrics` BEFORE the first Compose start: `compose.yaml` bind-mounts it into node-exporter (VERIFIED IN CODE: `compose.yaml` line `${BACKUP_DIR}/metrics:/textfile:ro`), and if it is missing Docker creates it owned by root; `deploy.sh backup` later writes `matbakhy_backup.prom` there as the deploy account, which then fails and can block later deployments. Mode 755 lets the node-exporter container read it; which numeric user node-exporter runs as is NOT VERIFIED, so check after the first backup that the metric file is readable (Step 28).
 
 Important gap: `.env.example`, `compose.yaml` and `admin-console.sh` default `GENERATED_DIR` to the legacy `/srv/matbakhy-preview/generated`, while CD deploys into `/srv/matbakhy-staging`. A rebuild must set `GENERATED_DIR` explicitly in Step 13. How the live `.env` sets it is NOT VERIFIED (it is mode 600 and was not read); the existing `/srv/matbakhy-staging/generated` directory suggests it points there.
 
@@ -231,11 +236,11 @@ Container-written files: the PostgreSQL container writes dumps into `/backups` (
 
 ### Step 11. Put the deployment files on the server (first time only)
 
-Prerequisite: Step 10 and the release commit chosen. The CD job normally copies the files, but it first requires `.env` to exist (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`, VERIFIED IN CODE), and `.env` is created from `.env.example`, which arrives with the files. So the first copy is manual. This bootstrap recipe reuses the CD job's own `tar` command; it has not been executed (NOT VERIFIED).
+Prerequisite: Step 10 and the release commit chosen. The CD job normally copies the files, but it first requires `.env` to exist (`test -f /srv/matbakhy-staging/deploy/web-preview/.env`, VERIFIED IN CODE), and `.env` is created from `.env.example`, which arrives with the files. So the first copy is manual. This bootstrap recipe sends only the TRACKED files of the release commit with `git archive`, never `.env` or generated files (`.gitignore` hides those, so a clean `git status` does not prove a plain `tar` of the working tree is free of them); it has not been executed (NOT VERIFIED).
 
 ```sh
-# laptop, in a clean checkout of the release commit (git status clean), as your own user: state-changing on the VPS
-tar -cf - deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh -i <keyfile> <deploy-user>@<vps-ip> 'tar -xf - -C /srv/matbakhy-staging'
+# laptop, in a checkout of the repository, as your own user: state-changing on the VPS. git archive exports only tracked files of <release-commit>
+git archive --format=tar <release-commit> deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh -i <keyfile> <deploy-user>@<vps-ip> 'tar -xf - -C /srv/matbakhy-staging'
 ```
 
 | Verify | Likely failure |
@@ -264,7 +269,7 @@ Prerequisite: Step 12. Edit the file with the editor of your choice as `<deploy-
 | `GENERATED_DIR` | `/srv/matbakhy-staging/generated` | see the gap in Step 10 |
 | `BACKUP_DIR`, `QA_ARTIFACT_DIR` | the directories from Step 10 | VERIFIED IN CODE |
 | `CUSTOMER_ALLOWED_IPS`, `STAFF_ALLOWED_IPS` | leave unset to keep everything restricted to `ALLOWED_CLIENT_IPS`; public customers are an explicit owner decision (`0.0.0.0/0 ::/0`); staff API paths need both classes (see Step 22), so every staff address must also be in the customer list | VERIFIED IN CODE: `.env.example` |
-| `PUSH_DELIVERY_ENABLED` | `false` | VERIFIED IN CODE: deployed environments refuse `true` |
+| `PUSH_DELIVERY_ENABLED` | `false` | VERIFIED IN CODE: `ProviderConfiguration.pushSender` calls `requireLocal`, which checks `environment.synthetic()`; `MatbakhyProperties` counts PREVIEW as synthetic, so in `APP_ENV=PREVIEW` the value `true` is NOT refused and selects the simulated push provider, while STAGING and PRODUCTION refuse it. Keep `false` as the operational setting |
 | `COMPOSE_OVERRIDE` | leave unset on a host of the current size; `compose.4gb.yaml` only for a 4 GB host. Whether the live `.env` sets it is NOT VERIFIED | VERIFIED IN CODE |
 | `RELEASE_COMMIT`, `API_IMAGE`, `FRONT_IMAGE` | leave the placeholders; the CD remote script rewrites these three lines (Step 18). Running `./deploy.sh up` by hand before that fails by design | VERIFIED IN CODE: `deploy.sh check`, workflow |
 
@@ -287,7 +292,7 @@ Prerequisite: Step 1. The six hosts must resolve to the VPS before the first sta
 
 ### Step 15. GitHub environment and secrets
 
-Prerequisite: Steps 5 and 6. Both `deploy-preview.yml` and `owner-e2e-provision.yml` run in the GitHub environment `preview` and read four secrets (VERIFIED IN CODE). Whether they are stored as environment secrets or repository secrets, and what protection rules the environment has, is NOT VERIFIED (check Settings, Environments, as a repository admin).
+Prerequisite: Steps 5 and 6. Both `deploy-preview.yml` and `owner-e2e-provision.yml` run in the GitHub environment `preview` and read four secrets (VERIFIED IN CODE). **Do this only in a SEPARATE rehearsal repository with its own `preview` environment (see the isolation requirement at the top).** Setting these secrets in the live repository's `preview` environment points the live Preview automation at the new server. Whether they are stored as environment secrets or repository secrets, and what protection rules the environment has, is NOT VERIFIED (check Settings, Environments, as a repository admin).
 
 | Secret name | Content | How to obtain without exposing it |
 |---|---|---|
@@ -329,13 +334,13 @@ Prerequisite: a pull request process you control. These values are hard-coded in
 | `/srv/matbakhy-staging/deploy/web-preview` | transfer step, remote script, admin console step | you choose a different install path |
 | runs on push to `develop` and `workflow_dispatch`; deploy job only on `develop` | triggers | you want another branch |
 
-Do not change workflow files without the repository owner's authorization.
+Do not change workflow files without the repository owner's authorization. In the rehearsal repository, also give the copied workflows their own concurrency groups instead of `matbakhy-preview-deploy` and `matbakhy-preview-owner-e2e`, so a rehearsal cannot queue behind or cancel the live ones. Editing the workflow in the live repository for a new domain is a cutover step, not a rehearsal step.
 
 ## Phase 5. First deploy
 
 ### Step 18. First deploy through CD
 
-Prerequisite: Steps 1 to 17, including the VPS's own address in the allow-list (Step 13). If smoke gets a 403 because Caddy sees another address, the CD job restores the previous `.env` and fails; correct the allow-list and run again. Trigger: a push to `develop`, or Run workflow on `develop` for `Deploy Matbakhy preview to Contabo` (VERIFIED IN CODE: `workflow_dispatch` exists). Concurrency group `matbakhy-preview-deploy` serialises runs.
+Prerequisite: Steps 1 to 17, including the VPS's own address in the allow-list (Step 13). If smoke gets a 403 because Caddy sees another address, the CD job restores the previous `.env` and fails; correct the allow-list and run again. Trigger: a push to `develop`, or Run workflow on `develop` for `Deploy Matbakhy preview to Contabo` (VERIFIED IN CODE: `workflow_dispatch` exists). Concurrency group `matbakhy-preview-deploy` serialises runs. The job prints `DEPLOYED <sha>` before its last step (`admin-console enable`), so a newer run can deploy and then fail that step; the latest SUCCESSFUL run can therefore predate what is actually running. When you need the deployed commit, also look at newer failed runs for a completed deploy step and confirm with `./deploy.sh status` on the server.
 
 What the pipeline does, in order (VERIFIED IN CODE): wait up to 60 times 30 seconds for a passing Product CI run on the exact commit; build the API jar; build and push both images; in the deploy job, check the four secrets, write the key and `known_hosts`, check `.env` exists and the directory is writable, stream `deploy`, `infra`, `scripts` and the fixtures file to `/srv/matbakhy-staging` with `tar`, copy a temporary remote script, rewrite `RELEASE_COMMIT`, `API_IMAGE` and `FRONT_IMAGE` in `.env`, run `./deploy.sh up` and `./deploy.sh smoke`; on failure restore the previous `.env` (containers and data are not rolled back); finally run `./deploy.sh admin-console enable`.
 
@@ -378,7 +383,7 @@ docker compose --env-file .env -f compose.yaml exec -T storage sh -c 'echo s3.bu
 |---|---|
 | The output lists `matbakhy-public` and `matbakhy-private` (the same check is used in `scripts/rehearse-preview.sh persist`) | Buckets absent: `up` ignores the creation error; rerun `./deploy.sh up` or create them with the `s3.bucket.create` lines shown in `deploy.sh` |
 
-Add `-f "$COMPOSE_OVERRIDE"` to the command when `.env` sets `COMPOSE_OVERRIDE`.
+If `.env` sets `COMPOSE_OVERRIDE`, add `-f <override-file>` (for example `-f compose.4gb.yaml`) to the command. `--env-file` only supplies values for Compose interpolation; it does not load `COMPOSE_OVERRIDE` into your shell, so a literal `$COMPOSE_OVERRIDE` would be empty. Read the value with `grep '^COMPOSE_OVERRIDE=' .env` (not a secret).
 
 ### Step 22. Caddy proxy and routing
 
@@ -450,7 +455,7 @@ The destructive `./deploy.sh e2e-reset` additionally needs the marker file `.e2e
 
 ### Step 28. Backups
 
-`./deploy.sh backup` writes a custom-format PostgreSQL dump with checksum and manifest into `BACKUP_DIR`, restores it into a scratch database and reconciles it, then stops the storage service briefly and archives its data as `storage-<stamp>.tgz` (uploads pause meanwhile). A backup counts only after the restore check. Failure state: `backup` has no recovery trap, so if the archive command fails the script exits before `compose start storage` and the storage service stays stopped (uploads keep failing); check it with `docker compose --env-file .env -f compose.yaml ps storage` and, as the deploy account, restart it with `docker compose --env-file .env -f compose.yaml start storage` (add `-f "$COMPOSE_OVERRIDE"` when `.env` sets it), then investigate the archive error. The pre-deploy backup in `up` uses the same database routine (VERIFIED IN CODE). The repository contains no cron entry or timer for backups; no Matbakhy backup cron was visible to the unprivileged account on the live host, and other users' crontabs are unreadable, so whether scheduled backups exist is NOT VERIFIED.
+`./deploy.sh backup` writes a custom-format PostgreSQL dump with checksum and manifest into `BACKUP_DIR`, restores it into a scratch database and reconciles it, then stops the storage service briefly and archives its data as `storage-<stamp>.tgz` (uploads pause meanwhile). A backup counts only after the restore check. Failure state: `backup` has no recovery trap, so if the archive command fails the script exits before `compose start storage` and the storage service stays stopped (uploads keep failing); check it with `docker compose --env-file .env -f compose.yaml ps storage` and, as the deploy account, restart it with `docker compose --env-file .env -f compose.yaml start storage` (add `-f <override-file>` when `.env` sets `COMPOSE_OVERRIDE`; `--env-file` does not load it into the shell, see Step 21), then investigate the archive error. The pre-deploy backup in `up` uses the same database routine (VERIFIED IN CODE). The repository contains no cron entry or timer for backups; no Matbakhy backup cron was visible to the unprivileged account on the live host, and other users' crontabs are unreadable, so whether scheduled backups exist is NOT VERIFIED.
 
 ```sh
 # VPS, <deploy-user>: state-changing (edits that account's crontab). The schedule is a convention taken from docs/operations/12-owner-server-setup.md section 9, adapted to this install path; server local time applies.
@@ -475,7 +480,7 @@ Before declaring the server ready, confirm the rollback tools work (VERIFIED IN 
 
 | Command | Machine and user | Type | Verify | Likely failure |
 |---|---|---|---|---|
-| `./deploy.sh rollback-plan` | VPS, `<deploy-user>` | read-only (prints only) | with at least two entries in `releases.log` it prints the target commit and a verdict; with one entry it says `only 1 release(s) recorded` | no log: no `up` has completed yet |
+| `./deploy.sh rollback-plan` | VPS, `<deploy-user>` | read-only (prints only) | with at least two entries in `releases.log` it prints the target commit and a verdict; with one entry it says `only 1 release(s) recorded` | no log: no `up` has completed yet. The number N counts lines of `releases.log`, which holds only recorded successful releases; a failed `up` leaves no line. To find the right target, list the log first (`cut -f1,2 /srv/matbakhy-backups/releases.log \| nl -ba`, read-only: time and commit; N is the line count minus the line number of the wanted release) and match commits against the workflow runs |
 | `./deploy.sh status` | VPS, `<deploy-user>` | read-only | configured versus running images match | mismatch: a failed deploy |
 
 Rollback rules: an image-only rollback is safe when no database schema change was applied since the target release or every later migration is expand-only (`scripts/check_migration_compat.py` enforces the annotation in CI); otherwise restore the backup taken before the first deploy that applied them (data written since is lost). The CD job restores only `.env` on failure, never the database. Decision tables are in [backup, restore and disaster recovery](backup-restore-disaster-recovery.md) and [deployment pipeline](deployment-pipeline.md).
@@ -489,20 +494,20 @@ Use this part only on a NEW isolated server after Part A steps 1 to 18 produced 
 | Item | What the code does | Status |
 |---|---|---|
 | Application database | `./deploy.sh restore-db <dump>` runs `scripts/db-restore.sh` inside the postgres container with `RESTORE_CONFIRM_TARGET=matbakhy_restore`: checksum check, creates the database `matbakhy_restore` if absent, refuses a non-empty target, `pg_restore`, then reconcile. It does NOT overwrite the live `matbakhy` database; pointing the application at the restored one is a manual owner step | VERIFIED IN CODE: `deploy.sh`, `scripts/db-restore.sh` |
-| Keycloak database | Three scripts write a `pg_dump` of `keycloak` under `BACKUP_DIR/keycloak`: `admin-console.sh` (`enable`, `backup`), `migrate-mfa.sh` (`backup`, `apply`) and `owner-e2e-provision.sh apply`; their execution on the live host, the recency of the dumps and whether they restore are NOT VERIFIED LIVE. There is no restore script for it (`migrate-mfa.sh` only names `pg_restore` into an empty `keycloak` database while identity is stopped, as a comment-level instruction). Realm secrets in a restored database must match the new `.env` | NOT VERIFIED procedure |
+| Keycloak database | Three scripts write a `pg_dump` of `keycloak` under `BACKUP_DIR/keycloak`: `admin-console.sh enable` (its internal backup function; the script's dispatcher has no `backup` subcommand), `migrate-mfa.sh` (`backup`, `apply`) and `owner-e2e-provision.sh apply`; their execution on the live host, the recency of the dumps and whether they restore are NOT VERIFIED LIVE. There is no restore script for it (`migrate-mfa.sh` only names `pg_restore` into an empty `keycloak` database while identity is stopped, as a comment-level instruction). Realm secrets in a restored database must match the new `.env` | NOT VERIFIED procedure |
 | Image storage | `./deploy.sh backup` creates `storage-<stamp>.tgz`; there is no restore script | NOT VERIFIED procedure |
 | Secrets (`.env`) | Not in any backup by design; a lost `.env` cannot be regenerated without breaking existing volumes (Step 12) | VERIFIED IN CODE |
 
-This table is a list of what the code supports, not a rehearsable recovery sequence. Missing from the repository: the Keycloak and storage restore, the cutover of the application to the restored database, ownership and grants of the restored objects, matching of realm secrets and the front image and realm client redirect URIs to the new domain, secrets handling, validation and rollback of the cutover. The repository therefore provides recovery building blocks for the application database only; it does not provide a rehearsable multi-store sequence, and this page does not invent one. Treat the recovery as NOT VERIFIED and not rehearsed. Owner decision needed: define one authorised sequence covering the application database, the Keycloak database, the storage archive and the application cutover, then rehearse it on a throwaway server.
+This table is a list of what the code supports, not a rehearsable recovery sequence. Missing from the repository: the Keycloak and storage restore, the cutover of the application to the restored database, ownership and grants of the restored objects, matching of realm secrets to the new environment settings, and setting the front image and the realm clients' redirect URIs to the new domain (recreating the proxy with a new `PREVIEW_DOMAIN` removes the old host names, so a domain cutover has downtime unless dual-domain routing is separately designed and rehearsed), secrets handling, validation and rollback of the cutover. The repository therefore provides recovery building blocks for the application database only; it does not provide a rehearsable multi-store sequence, and this page does not invent one. Treat the recovery as NOT VERIFIED and not rehearsed. Owner decision needed: define one authorised sequence covering the application database, the Keycloak database, the storage archive and the application cutover, then rehearse it on a throwaway server.
 
 Verification after a restore: `./deploy.sh status` (schema version) and the row-count lines printed by the reconcile step. Do not treat a restore as complete until an authorized administrator has run the recovery page's checks and you have rehearsed the procedure on a throwaway server.
 
 ## Known limitations and documentation gaps
 
-- This guide is not execution verified. The bootstrap in Step 11 (manual first copy) and the permission commands are derived from the code and were not run.
+- This guide is not execution verified. The bootstrap in Step 11 (manual first copy) and the permission commands are derived from the code and were not run. The steps that switch the live Preview automation to a rebuilt server (secrets, workflow values, domain change) have no authorised, rehearsed sequence in the repository; owner decision needed.
 - `GENERATED_DIR` defaults to `/srv/matbakhy-preview/generated` in `.env.example`, `compose.yaml` and `admin-console.sh`, while CD deploys into `/srv/matbakhy-staging`; the live value is NOT VERIFIED. Documentation conflict: `deploy/web-preview/README.md` and `docs/operations/09-staging-hetzner-preparation.md` still describe a Hetzner server sized 2 vCPU / 4 GB, `docs/operations/12-owner-server-setup.md` lists five DNS hosts (no `kc-admin`) and the path `/srv/matbakhy-preview` (all OUTDATED / INCORRECT for the Contabo host).
 - The deploy workflow hard-codes the domain `167-86-90-174.sslip.io` and the GHCR login name `afawzy70`; a rebuild on another IP needs a reviewed workflow change (Step 17).
-- Not verified live: effective `PermitRootLogin`, sudo policy, `ufw` state and rules, Docker containers, networks and volumes, ownership of container-written backup files, the value of `STAGING_SSH_USER`, whether backup cron exists, certificate renewal, whether the Compose override is used.
+- Not verified live: effective `PermitRootLogin`, sudo policy, `ufw` state and rules, Docker containers, networks and volumes, host locations of the Docker named volumes (not established by `compose.yaml`; inspect them with a volume check by an authorized administrator), ownership of container-written backup files, the value of `STAGING_SSH_USER`, whether backup cron exists, certificate renewal, whether the Compose override is used.
 - Contabo ordering and panel-level firewall steps are not documented anywhere in the repository.
 - No restore procedure exists in code for the Keycloak database or the storage archive.
 - Administrator commands that would settle several of the items above are collected in [admin read-only verification](admin-readonly-verification.md); an agent account must not run them.

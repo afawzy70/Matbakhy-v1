@@ -84,9 +84,9 @@
 | PubkeyAuthentication | yes | VERIFIED LIVE (نص الملف) |
 | UsePAM | yes | VERIFIED LIVE (نص الملف) |
 | X11Forwarding | yes | VERIFIED LIVE (نص الملف). مش مطلوب لـ Matbakhy؛ ومراجعة تقوية الأمان (Hardening) ممكن تقفله. |
-| PermitRootLogin | no في النص المقروء، لكن سطر أسبق بيقول yes وملف Drop-in أحدث بيلغيه | القيمة الفعلية NOT VERIFIED. الملف /etc/ssh/sshd_config.d/50-cloud-init.conf مش مقروء للـ aiagent وممكن يكون بيظبطها تاني. أكّدها بـ `sshd -T` بصلاحية root (الأمر 1 في صفحة الأدمن). |
+| PermitRootLogin | no في النص المقروء، لكن سطر أسبق بيقول yes وملف Drop-in بييجي بعده في ترتيب قراءة الإعدادات (مش بالضرورة ملف أحدث) بيعمل له Override | القيمة الفعلية NOT VERIFIED. الملف /etc/ssh/sshd_config.d/50-cloud-init.conf مش مقروء للـ aiagent وممكن يكون بيظبطها تاني. أكّدها بـ `sshd -T` بصلاحية root (الأمر 1 في صفحة الأدمن). |
 
-الحاجات دي مش مقروءة للـ aiagent وبالتالي NOT VERIFIED: 50-cloud-init.conf، وكل ملفات authorized_keys، والمفاتيح الخاصة بالـ Host، و/etc/sudoers.d. عدد المفاتيح المصرّح بيها لكل حساب، وأنهي مفتاح بتاع أنهي شخص أو بتاع GitHub Actions، مجهول.
+الحاجات دي مش مقروءة للـ aiagent وبالتالي NOT VERIFIED: 50-cloud-init.conf، وكل ملفات authorized_keys، والمفاتيح الخاصة بالـ Host، و/etc/sudoers.d. عدد المفاتيح المصرّح بيها لكل حساب، وأنهي مفتاح بتاع أنهي شخص أو بتاع GitHub Actions، مجهول، ومصدر المفاتيح الفعلي (AuthorizedKeysFile أو AuthorizedKeysCommand) كمان مجهول.
 
 الـ Workflow بتاع الـ Deployment بيثبّت مفتاح الـ Host بتاع السيرفر من الـ Secret `STAGING_SSH_HOST_PUBKEY` وبيتصل بـ `StrictHostKeyChecking=yes` (VERIFIED IN CODE: `.github/workflows/deploy-preview.yml`, step "Configure verified SSH host").
 
@@ -101,7 +101,7 @@
 | /srv/matbakhy-staging/deploy/web-preview | devops:devops 755 | مجلد التشغيل لكل أوامر `deploy.sh` (VERIFIED IN CODE: الملف `deploy/web-preview/deploy.sh` بيعمل `cd` لمجلده هو). فيه compose.yaml وcompose.4gb.yaml وCaddyfile وdeploy.sh وadmin-console.sh وsmoke.sh وملفات SQL بتاعة الـ Seed والمجلدات identity وobservability وpostgres وstorage وe2e-fixtures (VERIFIED LIVE). |
 | /srv/matbakhy-staging/deploy/web-preview/.env | devops:devops 600 | ملف الإعدادات الخاص بالسيرفر بس وفيه كل الأسرار. محتواه ماتقراش ومينفعش يتنسخ أبدًا (VERIFIED LIVE للوجود والمالك والـ Mode). الأمر `deploy.sh init-secrets` هو الطريقة المدعومة لإنشائه (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`)؛ أما إزاي الملف ده بالذات اتعمل فده NOT VERIFIED. |
 | /srv/matbakhy-staging/generated | المالك devops، الـ Mode 700 (drwx------)؛ المجموعة غير مسجّلة | غالبًا فيه إعدادات الـ Realm والـ Storage بعد الـ Render، لأن `deploy.sh render` بيعمل GENERATED_DIR بـ Mode 700 وجواه identity وstorage وflags (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`, function render). إن ملف .env الشغّال بيظبط GENERATED_DIR على المسار ده، ده NOT VERIFIED. المحتوى ماتقراش. |
-| /srv/matbakhy-backups | devops:devops 750؛ 28 عنصر، ومش ممكن aiagent يعرض محتواها | قيمة BACKUP_DIR الافتراضية: Dumps الـ Database وأرشيفات تخزين الصور وسجل الإصدارات (Release Log) والـ Lock المشترك (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`, `deploy/web-preview/deploy.sh`). إن BACKUP_DIR الشغّال هو المسار ده، وإيه هي الـ 28 عنصر دول، ده NOT VERIFIED. |
+| /srv/matbakhy-backups | devops:devops 750؛ 28 عنصر، ومش ممكن aiagent يعرض محتواها | قيمة BACKUP_DIR الافتراضية: Dumps الـ Database وأرشيفات تخزين الصور وسجل الإصدارات (Release Log) والـ Lock المشترك (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`, `deploy/web-preview/deploy.sh`). إن BACKUP_DIR الشغّال هو المسار ده، وإيه هي الـ 28 عنصر دول، ده NOT VERIFIED. وcompose.yaml كمان بيعمل Bind Mount لـ `BACKUP_DIR/metrics` للقراءة بس جوه node-exporter (VERIFIED IN CODE: `deploy/web-preview/compose.yaml`)، فالمجلد الفرعي ده لازم يكون موجود بملكية مناسبة قبل أول تشغيل؛ وجوده هنا NOT VERIFIED. |
 | /srv/backups | devops 750 (المجموعة غير مسجّلة) | الغرض مش متحدّد. مفيش ملف في الـ Repository بيشير للمسار ده. |
 | /srv/deployments | devops 750 (المجموعة غير مسجّلة)؛ ومش ممكن عرض محتواه | الغرض مش متحدّد. مفيش ملف في الـ Repository بيشير للمسار ده. |
 | /srv/matbakhy-preview | devops:devops 775 | نسخة قديمة من ملفات الـ Deploy من Oct 17 إلى 18؛ شوف [القسم 7](#7-نسخة-srvmatbakhy-preview-القديمة). |
@@ -110,7 +110,7 @@
 | /srv/flags | مش موجود على نظام ملفات الـ Host | الاسم ظاهر جوه الـ Container بتاع الـ Proxy بس: الـ Caddyfile بيقرا /srv/flags/admin-console-public وcompose.yaml بيعمل Mount لـ GENERATED_DIR/flags هناك للقراءة بس (VERIFIED IN CODE: `deploy/web-preview/Caddyfile`, `deploy/web-preview/compose.yaml`). مكانه على الـ Host تحت مجلد generated وهو NOT VERIFIED. |
 | /srv/matbakhy-qa-artifacts | مش في القائمة اللي اتلاحظت | قيمة QA_ARTIFACT_DIR الافتراضية (VERIFIED IN CODE: `deploy/web-preview/.env.example`). إن المجلد موجود على الـ Host ده، ده NOT VERIFIED. |
 
-الـ Docker Volumes مش مجلدات تحت /srv. أسماؤها ومواقعها وأحجامها NOT VERIFIED LIVE. الـ Volumes اللي ملف الـ Compose بيعلنها مذكورة في القسم الجاي.
+مواقع الـ Docker Volumes على الـ Host NOT VERIFIED LIVE؛ اتأكد منها بفحص الـ Volumes (الأمرين 8 و 9 في صفحة الأدمن). أسماؤها وأحجامها كمان NOT VERIFIED LIVE. الـ Volumes اللي ملف الـ Compose بيعلنها مذكورة في القسم الجاي.
 
 ### الـ Volumes اللي ملف الـ Compose بيعلنها
 
@@ -176,7 +176,7 @@ VERIFIED IN CODE (`deploy/web-preview/compose.yaml`, project name matbakhy-previ
 | مدخلات Cron بتاعة devops والمستخدمين التانيين، وجداول النظام | مش مقروءة | 12 |
 | الـ Commit والـ Image Digests وعلامات الـ Revision المنشورة فعلًا | الـ Docker socket وملف .env مش متاحين للـ aiagent | 17, 18 |
 | أنهي مستخدم بيدخل بيه مفتاح SSH بتاع الـ Deployment | الـ Secret اسمه STAGING_SSH_USER؛ ودليل الـ Log محتاج root | 13 |
-| عدد مفاتيح SSH المصرّح بيها لكل حساب | مش مقروء | 13 |
+| عدد مفاتيح SSH المصرّح بيها لكل حساب (الأمر 13 بيدّي عدد سطور بس) ومصدر المفاتيح الفعلي | مش مقروء | 1 و 13 |
 | مالك العملية على منافذ الـ Loopback رقم 3000 و 18080 و 38189 | مش ظاهر للـ aiagent | 16 |
 | عضوية الـ tailnet والغرض منها | مش ظاهرة | مش مغطّى (لوحة أدمن الـ tailnet) |
 

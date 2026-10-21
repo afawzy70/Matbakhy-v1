@@ -38,7 +38,8 @@ The documentation authors did not run the Day 5 exercise. No clean server was bu
 3. Do not reuse any secret, SSH key, .env file or backup from the live Preview. Do not copy a backup of real data into the exercise (backups hold personal data, see the header of `scripts/db-backup.sh`).
 4. Do not point the exercise at the repository secrets STAGING_SSH_HOST, STAGING_SSH_USER, STAGING_SSH_KEY or STAGING_SSH_HOST_PUBKEY. Do not run the deployment workflow for the exercise.
 5. Destroy the throw-away server or stack at the end and record the destruction.
-6. The trainee still never uses sudo, Docker or another user on the live host. On the exercise server the trainee is the administrator of that disposable machine only.
+6. The rehearsal must not be able to redirect the live Preview automation. The deployment workflow and the owner E2E provisioning workflow in this repository use the repository's `preview` environment and its secrets. Do not set secrets in that environment and do not edit those workflows for the exercise, whatever a rebuild step says about repository secrets or workflows. A rehearsal that needs the deployment workflow uses a separate repository (or fork) with its own environment, secrets and concurrency group. The cutover of the real Preview to a rebuilt server is a separate, explicitly authorized procedure: it is not rehearsed and not described by this lab (NOT VERIFIED; owner decision needed).
+7. The trainee still never uses sudo, Docker or another user on the live host. On the exercise server the trainee is the administrator of that disposable machine only.
 
 ## Isolation options
 
@@ -104,6 +105,13 @@ sudo install -d -m 755 -o devops -g devops /srv/matbakhy-staging
 
 Before using the outline, confirm each line against the [Contabo server inventory](../08-infrastructure/contabo-server-inventory.md) and the rebuild guide. The lines that mirror the recorded accounts are reproduction of observed state, not a recommendation to give devops sudo or docker; deciding whether a new server should use the same pattern is an owner and administrator decision. The numeric uids are the recorded ones (VERIFIED LIVE), which only matter if file ownership must match a restored copy.
 
+Traps to check against the rebuild guide before you follow it (VERIFIED IN CODE unless marked; none of this was rehearsed):
+
+- The bootstrap archive must contain tracked files only, taken from a chosen commit with `git archive`. A raw `tar` of a working copy includes `.env` and generated files even when `git status` is clean, because they are git-ignored.
+- Create `BACKUP_DIR/metrics` yourself, with ownership suitable for the deploy account, before the first Compose start (see Day 2), and verify the ownership.
+- `docker compose --env-file` only supplies values for interpolation inside the Compose file. It does not set shell variables, so a manual command sequence that uses `$COMPOSE_OVERRIDE` must name the override file explicitly with `-f` or set the variable in the shell first.
+- `PUSH_DELIVERY_ENABLED=false` stays the required operational value. STAGING and PRODUCTION refuse `true`; a Preview environment does not refuse it, because Preview counts as synthetic and selects the simulated push provider.
+
 Verification on the exercise server, read-only:
 
 | Command | Expected result |
@@ -128,7 +136,7 @@ Read `scripts/db-backup.sh` and `scripts/db-restore.sh` first (VERIFIED IN CODE)
 | 3 | `RESTORE_CONFIRM_TARGET=<new-db> scripts/db-restore.sh <dump> <new-db>` | same | state-changing: creates a new database and restores into it | Exit 0 means reconciled; 1 reconciliation failed; 2 refused (VERIFIED IN CODE) | Compare the restore output with the manifest row counts | "refusing: set RESTORE_CONFIRM_TARGET": set the variable to the same name as the target. Never restore over a database that already has tables; the script refuses |
 | 4 | Drop the throw-away databases and delete the backup files | same | state-changing: destructive, throw-away only | Nothing remains | Listing shows nothing | None expected |
 
-The script comments state the rule that a backup is not accepted until a restore has been reconciled (VERIFIED IN CODE: header of `scripts/db-restore.sh`). The server-side wrapper is `./deploy.sh backup` (also archives the image storage) and `./deploy.sh restore-db <dump>`; those run on a Preview-like server by an authorized operator and are exercised only on the exercise server in Option B. Note three limits (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`): `restore-db` accepts only the dump and always restores into a database named matbakhy_restore, so it is a rehearsal and not an application cutover; `backup` stops the storage service, archives its data and starts it again, and if the archive step fails the script exits before the start command, leaving storage stopped until an operator checks the container state and starts it; and nothing in this lab restores Keycloak data, image storage, secrets or the application cutover, which have no rehearsed procedure in this handbook.
+The script comments state the rule that a backup is not accepted until a restore has been reconciled (VERIFIED IN CODE: header of `scripts/db-restore.sh`). The server-side wrapper is `./deploy.sh backup` (also archives the image storage) and `./deploy.sh restore-db <dump>`; those run on a Preview-like server by an authorized operator and are exercised only on the exercise server in Option B. Note three limits (VERIFIED IN CODE: `deploy/web-preview/deploy.sh`): `restore-db` accepts only the dump and always restores into a database named matbakhy_restore, so it is a rehearsal and not an application cutover; `backup` stops the storage service, archives its data and starts it again, and if the archive step fails the script exits before the start command, leaving storage stopped until an operator checks the container state and starts it; the Keycloak database dump is produced by the internal backup function that `admin-console.sh enable` calls (`admin-console.sh` has no `backup` subcommand), while `migrate-mfa.sh` does have `backup` and `apply` subcommands (VERIFIED IN CODE); and nothing in this lab restores Keycloak data, image storage, secrets or the application cutover, which have no rehearsed procedure in this handbook.
 
 ### Task 5. Backup-recovery assessment (reading and reasoning)
 

@@ -92,9 +92,9 @@
 | postgres-data | مجلد بيانات PostgreSQL | كل بيانات التطبيق: الأوردرات والحسابات والكتالوج. ممكن تتسترجع من نسخة احتياطية متحقق منها بس |
 | storage-data | مجلد بيانات SeaweedFS | الصور المرفوعة. ممكن تتسترجع من أرشيف الـ Storage اللي بيعمله أمر النسخ الاحتياطي بس |
 | caddy-data | مجلد بيانات Caddy، اللي بتتحفظ فيه الشهادات والمفاتيح (DOCUMENTED ONLY: الوضع المعتاد في Caddy) | الشهادات؛ وCaddy بيطلب شهادات جديدة عند البدء، في حدود معدّل الطلبات المسموح بيه عند Let's Encrypt (Rate Limits)، شوف [الـ DNS والـ HTTPS](../08-infrastructure/dns-https-sslip-io-ar.md) |
-| loki-data, prometheus-data, alertmanager-data, alloy-data, alert-sink-data, grafana-data | حالة الـ Logs والـ Metrics والـ Dashboards | التاريخ بس؛ والتطبيق بيفضل شغّال |
+| loki-data, prometheus-data, alertmanager-data, alloy-data, alert-sink-data, grafana-data | حالة الـ Logs والـ Metrics والـ Dashboards | السجلات والبيانات التاريخية بس (الـ Logs والـ Metrics والـ Dashboards)؛ والتطبيق بيفضل شغّال |
 
-مكان الـ Volumes على قرص الـ VPS وأحجامها NOT VERIFIED LIVE؛ والأدمن يقدر يعرفهم بأوامر موجودة في صفحة الأدمن.
+مكان الـ Volumes على قرص الـ VPS وأحجامها NOT VERIFIED LIVE؛ والأدمن يقدر يعرفهم بأوامر موجودة في صفحة الأدمن. وبعيد عن الـ Named Volumes، ملف `compose.yaml` بيعمل Bind-mount لمجلد على السيرفر نفسه هو `BACKUP_DIR/metrics` (الافتراضي `/srv/matbakhy-backups/metrics`) للقراءة بس جوّه node-exporter (VERIFIED IN CODE). المجلد ده مجلد عادي على السيرفر مش Named Volume، فلازم يكون موجود بملكية تناسب حساب الـ Deploy قبل أول تشغيل، وإلا Docker ممكن ينشئه بملكية root.
 
 ### المهمة 4. أنهي ملفات بتتعمل لها Mount من مجلد الـ Host
 

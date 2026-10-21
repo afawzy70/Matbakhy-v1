@@ -116,7 +116,7 @@ Notes to keep: the content of .env and of /srv/matbakhy-staging/generated was de
 | Linux user | your own |
 | Kind | read-only |
 | Expected result | The readable SSH directives (PasswordAuthentication no, PubkeyAuthentication yes). They are readable directives only; the effective configuration is NOT VERIFIED |
-| Verification | Explain why the effective PermitRootLogin value is NOT VERIFIED even though a readable line says no. Answer: a later drop-in can override an earlier line, one drop-in file is unreadable to the unprivileged user, and only the root command that prints the effective configuration can settle it (it is on the admin page) |
+| Verification | Explain why the effective PermitRootLogin value is NOT VERIFIED even though a readable line says no. Answer: a drop-in file that sshd reads later in its processing order can override an earlier line ("later" means later in that reading order, not newer), one drop-in file is unreadable to the unprivileged user, and only the root command that prints the effective configuration can settle it (it is on the admin page) |
 
 ### Task 6. Separate Hetzner from Contabo
 

@@ -92,9 +92,9 @@ Expected answers: the proxy is on edge and internal; grafana is on ops and inter
 | postgres-data | PostgreSQL data directory | All application data: orders, accounts, catalogue. Recoverable only from a verified backup |
 | storage-data | SeaweedFS data directory | Uploaded images. Recoverable only from the storage archive made by the backup command |
 | caddy-data | Caddy data directory, where certificates and keys are kept (DOCUMENTED ONLY: Caddy convention) | Certificates; Caddy requests new ones on start, subject to Let's Encrypt rate limits, see [DNS and HTTPS](../08-infrastructure/dns-https-sslip-io.md) |
-| loki-data, prometheus-data, alertmanager-data, alloy-data, alert-sink-data, grafana-data | Logs, metrics and dashboards state | History only; the application keeps working |
+| loki-data, prometheus-data, alertmanager-data, alloy-data, alert-sink-data, grafana-data | Logs, metrics and dashboards state | Only the logs, metrics and dashboard history; the application keeps working |
 
-Where the volumes sit on the VPS disk and how large they are is NOT VERIFIED LIVE; an administrator can read that with commands on the admin page.
+Where the volumes sit on the VPS disk and how large they are is NOT VERIFIED LIVE; an administrator can read that with commands on the admin page. Separately from the named volumes, `compose.yaml` bind-mounts the host directory `BACKUP_DIR/metrics` (default `/srv/matbakhy-backups/metrics`) read-only into node-exporter (VERIFIED IN CODE). That is a host directory, not a named volume, so it must exist with ownership suitable for the deploy account before the first start, otherwise Docker may create it as root.
 
 ### Task 4. Which files are mounted from the host directory
 
