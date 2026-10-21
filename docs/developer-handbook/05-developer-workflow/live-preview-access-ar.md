@@ -112,7 +112,7 @@
 | الـ URL | `#/meal/<uuid>` مسار متحقَّق منه، لكن الـ uuid بيانات بيئة: ماتكتبهوش ثابت في الكود (Hard-coded). |
 | التنقّل | Home، اضغط على كارت وجبة. |
 | الخطوات | 1. افتح كارت. 2. شوف الصورة واقرا الوصف والسعر والتقييمات. 3. اختار Slot؛ الكمية محدودة بالأصغر بين حد السيرفر والحصص المتبقية. |
-| النتيجة المتوقعة | الصفحة بتعرض بس الـ Slots المفتوحة اللي لسه فيها حصص. الـ Slot المستنفد مينفعش يتضاف. |
+| النتيجة المتوقعة | الصفحة ممكن تفضل تعرض Slot مفيهوش حصص، لكن الـ Slot المستنفد مينفعش يتضاف. |
 | الـ Backend APIs | `GET /api/v1/meals/{mealId}`, `GET /api/v1/kitchens/{kitchenId}/slots`, `GET /api/v1/kitchens/{kitchenId}/reviews` |
 | التنفيذ | `apps/customer-web/src/Meal.tsx`, `backend/modules/catalog/src/main/java/com/matbakhy/catalog/web/MealController.java` |
 | الاختبارات المرتبطة | `E2E-BASKET-012`, `E2E-DISC-107`؛ `backend/app/src/test/java/com/matbakhy/app/catalog/MealIntegrationTest.java` |
@@ -202,7 +202,7 @@
 | الـ URL | `https://ops.167-86-90-174.sslip.io/` |
 | التنقّل | سجّل دخول، التاب "Orders" (أو الاختصار في Home). |
 | الخطوات | 1. افتح الأوردر المعلّق قبل موعده واضغط قبول (أو ارفض مع سبب). 2. لأوردر بعربون، بلّغ إن العربون اتستلم قبل التحضير. 3. حضّر، وبعدها Ready. 4. الاستلام: اكتب كود التسليم بتاع العميل المكوّن من 6 أرقام. التوصيل: ابعت الأوردر (Dispatch) مع مرجع المندوب، وبعدها الكود. |
-| النتيجة المتوقعة | صفحة تتبّع العميل بتلحق في حدود 10 ثواني تقريبًا. خمس أكواد غلط بتقفل تحدّي التسليم وبتحتاج إجراء استرجاع (Recovery) من فريق العمليات. |
+| النتيجة المتوقعة | التحديث بيظهر على صفحة تتبّع العميل خلال حوالي 10 ثواني. خمس أكواد غلط بتقفل تحدّي التسليم وبتحتاج إجراء استرجاع (Recovery) من فريق العمليات. |
 | الـ Backend APIs | `GET /api/v1/cook/orders`, `POST /api/v1/cook/orders/{orderId}/accept`, `.../prepare`, `.../ready`, `.../dispatch`, `.../handover`, `.../payment/receipt` |
 | التنفيذ | `apps/operations-web/src/cook/Orders.tsx`, `backend/modules/orders/src/main/java/com/matbakhy/orders/web/CookOrderController.java` |
 | الاختبارات المرتبطة | TC-026, TC-027, TC-029, TC-031, TC-159؛ `E2E-ORDER-025`, `E2E-ORDER-033`؛ `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java` |

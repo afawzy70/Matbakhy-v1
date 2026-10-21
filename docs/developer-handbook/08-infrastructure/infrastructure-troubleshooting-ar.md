@@ -6,7 +6,7 @@
 
 الصفحة دي هي النظير الخاص بالبنية التحتية لـ [صفحة حل المشاكل](../05-developer-workflow/troubleshooting-ar.md) الخاصة بالمطوّر، واللي بتغطي مشاكل الـ Toolchain والاختبارات والبيئة المحلية، ومش بنكرّرها هنا. تشخيص الأوردرات والـ Audit والـ Dead-letter والـ Telemetry موجود في [دليل حل المشاكل التشغيلي](../../operations/08-troubleshooting-runbook.md)، والـ Runbooks الأصلية في [الـ Runbooks التشغيلية](../../operations/02-runbooks.md). صفحات ليها علاقة: [جرد السيرفر](contabo-server-inventory-ar.md)، [التحقق للقراءة فقط من الأدمن](admin-readonly-verification-ar.md)، [معمارية التشغيل](runtime-architecture-ar.md)، [مسار الـ Deployment](deployment-pipeline-ar.md)، [الـ DNS والـ HTTPS](dns-https-sslip-io-ar.md)، [النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)، [دليل إعادة البناء](server-rebuild-guide-ar.md) و[الوصول للـ Preview الحي](../05-developer-workflow/live-preview-access-ar.md).
 
-## دليل الأوسمة
+## دليل وسوم الأدلة
 
 | الوسم | المعنى |
 |---|---|
@@ -99,7 +99,7 @@
 | F8 | `gh run rerun <run id> --failed` أو `gh workflow run deploy-preview.yml --ref develop` | جهازك، مستخدم عنده صلاحية كتابة على الـ Repository | إعادة التشغيل بتعمل Deploy للـ Commit بتاع التشغيلة دي؛ والتشغيل اليدوي بيعمل Deploy لآخر Commit في develop. الـ Workflow بيشغّل Deployment واحد في المرة (Concurrency Group، VERIFIED IN CODE). ماتعيدش Deployment عشان هو بطيء؛ أعد التشغيل بعد ما الفشل يتفهم ويتصلّح بس | الإصلاح اتعمله Merge أو الـ Secret اتصحّح | تشغيلة جديدة بتوصل لـ `DEPLOYED <sha>` | D23 وD5 |
 | F9 | افتح Pull Request بيغيّر ملف الـ Repository (الـ Caddyfile أو compose.yaml أو سكريبت أو Workflow)، سيب الـ CI ينجح، اعمل Merge، وسيّب الـ Deploy Workflow ينشر التغيير | جهازك | ماتعدّلش الملفات على السيرفر بنفسك أبدًا: الـ Pipeline بيكتب فوق deploy وinfra وscripts من Git في كل Deployment (VERIFIED IN CODE)، فالتعديل اليدوي بيضيع أو بيعمل Drift | تغيير اتراجع ومعاه إقرار Documentation Impact | الـ Image أو الملف الجديد اتعمله Deploy | D17 وD5 |
 | F10 | `./deploy.sh render` | الـ VPS، داخل `<deploy-dir>`، أدمن مصرّح له | بيعيد كتابة الإعدادات المولّدة اللي فيها أسرار (استيراد الـ Realm وملف بيانات اعتماد الـ Storage) ويعيد تطبيق الـ Modes بتاعتها. مابيعيدش تشغيل الخدمات (VERIFIED IN CODE). ماتطبعش الملفات المولّدة أبدًا | ملف .env سليم | ملفات تحت المجلد المولّد بالـ Modes المذكورة في السيناريو 17 | D21 على الملفات دي؛ وF2 (صيغة إعادة الإنشاء) للخدمات اللي بتقراها |
-| F11 | استعادة من نسخة احتياطية (`./deploy.sh restore-db <dump>` والخطوات في [الـ Deployment والـ Rollback للـ Staging](../../operations/11-staging-deployment-and-rollback.md)، القسم 4.3) | الـ VPS، أدمن مصرّح له | البيانات المكتوبة بعد النسخة الاحتياطية بتضيع. الاستعادة فوق بيانات حيّة محتاجة تصريح صريح من المالك؛ جرّب على سيرفر جديد معزول الأول ([النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)) | Dump متحقق منه وله Checksum موضوع على الـ Host تحت BACKUP_DIR (الـ Container بتاع postgres شايف المجلد ده باسم /backups، فمرّر مسار /backups، مثلًا `/backups/db-<stamp>/matbakhy-<stamp>.dump`)، وجنبه ملف `.dump.sha256`، وللقبول كمان ملف `.manifest` المطابق؛ والـ API واقف | قاعدة البيانات المستعادة بتتطابق في فحص المطابقة (Reconciliation) (الأوردرات والتخصيصات والـ Ledger). `scripts/db-restore.sh` بيرفض الـ Checksum الغلط، لكن من غير الـ Manifest المطابق بيطبع تحذير وبيتخطى مقارنة عدد الصفوف وممكن يطبع RECONCILED برضه؛ ماتقبلش استعادة غير بوجود الـ Manifest وبدون أي سطر MISMATCH (VERIFIED IN CODE) | مخرجات المطابقة؛ وD5 |
+| F11 | استعادة من نسخة احتياطية (`./deploy.sh restore-db <dump>` والخطوات في [الـ Deployment والـ Rollback للـ Staging](../../operations/11-staging-deployment-and-rollback.md)، القسم 4.3) | الـ VPS، أدمن مصرّح له | البيانات المكتوبة بعد النسخة الاحتياطية بتضيع. الاستعادة فوق بيانات حيّة (Rollback مستوى 3 على السيرفر الحالي) مسموحة بس لما المالك يصرّح بيها صراحةً بعد تجربة ناجحة على سيرفر جديد معزول ([النسخ الاحتياطي والاستعادة والتعافي من الكوارث](backup-restore-disaster-recovery-ar.md)) | Dump متحقق منه وله Checksum موضوع على الـ Host تحت BACKUP_DIR (الـ Container بتاع postgres شايف المجلد ده باسم /backups، فمرّر مسار /backups، مثلًا `/backups/db-<stamp>/matbakhy-<stamp>.dump`)، وجنبه ملف `.dump.sha256`، وللقبول كمان ملف `.manifest` المطابق؛ والـ API واقف | قاعدة البيانات المستعادة بتتطابق في فحص المطابقة (Reconciliation) (الأوردرات والتخصيصات والـ Ledger). `scripts/db-restore.sh` بيرفض الـ Checksum الغلط، لكن من غير الـ Manifest المطابق بيطبع تحذير وبيتخطى مقارنة عدد الصفوف وممكن يطبع RECONCILED برضه؛ ماتقبلش استعادة غير بوجود الـ Manifest وبدون أي سطر MISMATCH (VERIFIED IN CODE) | مخرجات المطابقة؛ وD5 |
 
 ## 1. الموقع مش متاح
 
@@ -245,7 +245,7 @@
 
 **مستوى الخطورة.** متوسط.
 
-**التحقق من التعافي.** D1 بيرجّع الكود الموثّق على المضيف المتأثر، وD8 بيظهر كل الخدمات سليمة، وD5 بينجح.
+**التحقق من التعافي.** D1 بيرجّع الكود الموثّق على المضيف المتأثر، وD8 بيظهر الخدمات التلاتة اللي ليها Health Check (postgres وidentity وapi) سليمة (healthy)، وباقي الخدمات شغّالة، وفحوصات الوظيفة المعنية بتنجح، وD5 بينجح.
 
 ## 8. حاوية الـ Backend مش سليمة (Unhealthy)
 

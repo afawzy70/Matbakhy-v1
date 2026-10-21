@@ -112,7 +112,7 @@ Each journey below has the same fields. Detailed step lists, error tables and te
 | URL | `#/meal/<uuid>` is a verified route, but the uuid is environment data: do not hard-code it. |
 | Navigation | Home, click a meal card. |
 | Steps | 1. Open a card. 2. Read photo, description, price and reviews. 3. Choose a slot; the quantity is bounded by the smaller of the server limit and remaining portions. |
-| Expected result | The page shows only open slots with portions left. An exhausted slot cannot be added. |
+| Expected result | The page can still show a slot with no portions left, but an exhausted slot cannot be added. |
 | Backend APIs | `GET /api/v1/meals/{mealId}`, `GET /api/v1/kitchens/{kitchenId}/slots`, `GET /api/v1/kitchens/{kitchenId}/reviews` |
 | Implementation | `apps/customer-web/src/Meal.tsx`, `backend/modules/catalog/src/main/java/com/matbakhy/catalog/web/MealController.java` |
 | Related tests | `E2E-BASKET-012`, `E2E-DISC-107`; `backend/app/src/test/java/com/matbakhy/app/catalog/MealIntegrationTest.java` |

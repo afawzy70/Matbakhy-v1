@@ -170,8 +170,8 @@
    "en": "84f16f432a3ffafd6034c8645a87969ad9f17bd09ec5fe9b7978d8bb05ac96b9"
   },
   "05-developer-workflow/live-preview-access.md": {
-   "ar": "ad7dc2b25377aa07460d3e9f0b3d1b2b87c082425da9ce4371bec3ac55421ed4",
-   "en": "bec72701953b48a31becb1753e3548c14ec9a12ced25fc268da2c8610851a372"
+   "ar": "24643ca30ef46246e1986ce8f7aaa2e68ea3dee3f046f012387249753f305837",
+   "en": "a5f13c00b86d7539eba6c1e2f69711d07d7b11bac3ef8b656bce45f7ce781594"
   },
   "05-developer-workflow/local-environment.md": {
    "ar": "c577c5d70079dcec4a273d12c92099db6d4665394ffd1ef41ee9b8e15c355b40",
@@ -290,12 +290,12 @@
    "en": "ede76d54f24b57810a6324c77209d31645a8c27fde0ae6c006cf52336137548e"
   },
   "08-infrastructure/backup-restore-disaster-recovery.md": {
-   "ar": "7677005ce36685c241a75969fae8f9a39fb0eacd0b9f77e9ab081975bc77a556",
-   "en": "9cae89eb97aa67097a911585f07870cabbff0b4f40e586f260cf52eedd324b59"
+   "ar": "4d00bbc295ad4d339aa840190fbd2218446f13255fcbd11b61ed76a4191bada3",
+   "en": "ea5d02df1541dd6094d4599a806ba926337df4fa0da841cc8e8490294bc12058"
   },
   "08-infrastructure/complete-recovery-sequence.md": {
-   "ar": "6aa4505ebb05f66eaddbac9fdb89d3a24c7ff247da69386f43661b1233db6254",
-   "en": "2f6cadf78d61c2167ff55501fc645a6b19874a4a0b74e2fa977e888882cab44b"
+   "ar": "22e5def730eaf229843aef60260055877416b68002855ce459802932b59f7604",
+   "en": "99c28d89746c425a0445c46741215cc216eb2965be197b925162d51e56c2c092"
   },
   "08-infrastructure/contabo-server-inventory.md": {
    "ar": "fff855a6917ea21e6f8c9fdfa35042d89c68a4c8eb3202e428a6a67a7a76c759",
@@ -310,11 +310,11 @@
    "en": "508b3d1bd7c907b966b049b5f047aee03a39d828cefed14f810ee674f388fdb6"
   },
   "08-infrastructure/infrastructure-troubleshooting.md": {
-   "ar": "98e0123f1015a225f9f0af128c54f4d4a850664dd5885384d1ee2ac910e226ab",
-   "en": "999b090b3fb52517f36771223bb75207d91d2601e86d6087fe8a2355d458b460"
+   "ar": "cfae4a6a9f5255ef362daecc3339ccd794388994e5376669d3c6ec4182932820",
+   "en": "668742269336abbd45abe088d0212edf7b421704e0b5414a1ab18c71892a85e9"
   },
   "08-infrastructure/runtime-architecture.md": {
-   "ar": "2cd72b72a14eec679f3e5f979029222607029dcfb3cd7ef35b6cf60c3a12293e",
+   "ar": "59a234a6fb9c8ddd71780245e0719a894ea29acdd5acb4dcd4147e50dc831f5a",
    "en": "e02ebb961e32bd9f490977cd5667294dab190e52ecabc326bee38eda9410c5ba"
   },
   "08-infrastructure/server-rebuild-guide.md": {

@@ -20,7 +20,7 @@ Hetzner note: [09-staging-hetzner-preparation.md](../../operations/09-staging-he
 
 ## 1. Safety rules for this page
 
-- **Never run any state-changing command on this page against the live Preview** unless an authorized administrator has decided to, with the owner's knowledge. Restore, rebuild and swap steps are for a new, isolated server.
+- **Never run any state-changing command on this page against the live Preview** unless an authorized administrator has decided to, with the owner's knowledge. Restore, rebuild and swap steps are for a new, isolated server or for a rehearsal. The only exception is a level-3 rollback on the existing server (section 8.1), allowed only when the owner explicitly authorizes it after a successful rehearsal.
 - Agents and the `aiagent` account do not run these commands. They need Docker access and read access to the server `.env`; `aiagent` must not receive either.
 - Backups hold personal data in a real environment. Keep them outside any Git working tree (`scripts/db-backup.sh` refuses an output directory inside one only when `git` is installed in the environment where it runs and its directory check succeeds, VERIFIED IN CODE; that protection is conditional, so the operator must check the backup destination independently) and never paste backup files, `.env` contents or key values into an issue, a pull request or a chat.
 - Do not describe this page as proof of recovery. Section 9 lists exactly what is only scripted or documented.
@@ -133,7 +133,7 @@ Use this to create a new, empty Preview. There is nothing to restore, and every 
 
 ## 7. Scenario B: disaster recovery on a replacement VPS
 
-Use this when the Contabo host is lost or untrustworthy and a new server must take over. Always build the replacement as a **new, isolated server** first. Do not point production names at it before verification, and never restore over the surviving server.
+Use this when the Contabo host is lost or untrustworthy and a new server must take over. Always build the replacement as a **new, isolated server** first. Do not point production names at it before verification, and do not restore over the surviving server in a disaster-recovery scenario. A level-3 rollback of a bad release on a healthy existing server (section 8.1) is a different case and needs the owner's explicit authorization after a successful rehearsal.
 
 > **STATUS: BLOCKED for complete-service recovery.** A proposed design and rehearsal plan exist in [complete-recovery-sequence.md](complete-recovery-sequence.md), but the design remains BLOCKED and NOT VERIFIED until it is implemented and rehearsed with evidence. No supported, rehearsed multi-store sequence exists for Keycloak bootstrap or restore, storage restore, application cutover, runtime grants and validation. **Exists (VERIFIED IN CODE):** the application-database restore R6 into a scratch database (S1 to S3 is an unrehearsed manual sequence whose swap is DOCUMENTED ONLY), Keycloak dump creation (section 2), the realm import at first start of Keycloak, and the scripted `deploy.sh up`. **Missing:** a restore procedure for a Keycloak dump; a supported bootstrap that starts PostgreSQL alone (the companion design proposes restoring both databases before the first `deploy.sh up`, which also avoids the expected stop of the pre-deploy backup that an empty application database would cause, see B4; that order is PROPOSED and unrehearsed); a storage restore command (P2 is proposed, not in the repository); a tested cutover and validation sequence; any off-host copy. **Owner decision needed:** whether the Preview must keep users and images across a rebuild, and who builds and rehearses the missing sequence (section 10, item 4). The steps below are separate fragments to read to understand what exists, not a recovery procedure. Clean installation (Scenario A) is DOCUMENTATION VERIFIED, NOT EXECUTION VERIFIED.
 
@@ -171,7 +171,7 @@ The diagram reads top to bottom. The decision at B3 is the one that cannot be un
 | B9 | Reconnect GitHub Actions, see below | VERIFIED IN CODE for the secret names |
 | B10 | Run R8 (`smoke`), the journeys in [live-preview-access.md](../05-developer-workflow/live-preview-access.md), then R3 (`backup`) so the new server has its own verified backup | VERIFIED IN CODE for the scripts; the outcome is NOT VERIFIED until someone does it |
 
-Database swap commands for step B5 (new isolated server only). Run in `<deploy-dir>` after R6 printed "RECONCILED matbakhy_restore":
+Database swap commands for step B5 (new isolated server or rehearsal; on the existing server only for an owner-authorized level-3 rollback, section 8.1). Run in `<deploy-dir>` after R6 printed "RECONCILED matbakhy_restore":
 
 | ID | Command | Machine and user | Type | Prerequisite | Expected result and verification | Likely failure and action |
 |---|---|---|---|---|---|---|
@@ -224,7 +224,7 @@ Rollback is about a bad release on a healthy server. It is a different problem f
 | 0 | Fix forward: new commit, new image, deploy | None | VERIFIED IN CODE (the pipeline) |
 | 1 | Image-only rollback: take the three values from R2, put them in `.env`, run R7 | None; data is kept | VERIFIED IN CODE: `rollback_plan` |
 | 2 | Image-only rollback after the schema moved, with only expand-only migrations in between | None, if the older API really tolerates the newer schema | VERIFIED IN CODE: `scripts/check_migration_compat.py`; rehearsed only on a laptop in [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) (older API on schema 28 started); Contabo NOT VERIFIED |
-| 3 | Restore the pre-deploy backup on the same server (R6, S1 to S3) | **Data written after that backup is lost** | VERIFIED IN CODE (restore); swap DOCUMENTED ONLY |
+| 3 | Restore the pre-deploy backup on the same server (R6, S1 to S3), only when the owner explicitly authorizes it after a successful rehearsal on an isolated server | **Data written after that backup is lost** | VERIFIED IN CODE (restore); swap DOCUMENTED ONLY |
 | 4 | Disaster recovery on a new server (section 7) | Data since the last off-host backup is lost | Not rehearsed |
 
 ### 8.2 Migration compatibility
