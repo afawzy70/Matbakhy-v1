@@ -5,7 +5,7 @@
 > **Language / اللغة:** [English](implementation-status.md) · العربية
 
 الوسوم بتتبع اصطلاح الدليل (IMPLEMENTED, PARTIALLY IMPLEMENTED, PLANNED, DISABLED, DEPRECATED, NOT VERIFIED).
-**IMPLEMENTED معناها إن الكود موجود وفيه اختبار آلي بيشغّله اتلاقى في الـ Repository.** مش معناها إن الاختبار نجح في الجلسة دي (كتّاب الدليل ماشغّلوش الـ Suites) ولا إن مراجع مستقل قبله، ومعناها أبدًا مش "شغّال فعليًا": مفيش بيئة Production، والفلوس الحقيقية متقفّل عليها بـ Gate (D16)، وبيئة PREVIEW ببيانات اصطناعية (Synthetic) بس هي اللي اتنشرت (شوف التعارضات تحت). حالة الـ Story في `planning/backlog.json` وحالة السيناريو في `planning/scenarios.json` تلميحات اتقارنت بغيرها، مش حاجات بنثق فيها.
+**IMPLEMENTED معناها إن الكود موجود وفيه اختبار آلي بيشغّله اتلاقى في الـ Repository.** مش معناها إن الاختبار نجح في الجلسة دي (كتّاب الدليل ماشغّلوش الـ Suites) ولا إن مراجع مستقل قبله، وعمرها ما تعني "شغّال في بيئة الإنتاج": مفيش بيئة Production، والتعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل (D16)، وبيئة PREVIEW ببيانات تجريبية غير حقيقية (Synthetic Data) بس هي اللي اتنشرت (شوف التعارضات تحت). حالة الـ Story في `planning/backlog.json` وحالة السيناريو في `planning/scenarios.json` تلميحات اتقارنت بغيرها، مش حاجات بنثق فيها.
 
 إزاي اتستخرجت الحالة: الـ Controller موجود والـ Route في `contracts/endpoints.json` مع `implemented: true` (113 من 116 Route)؛ كود الـ Service اتقرا؛ والـ Test class اتلاقى بمعرّف السيناريو أو باسم المنطقة في `backend/app/src/test/java/com/matbakhy/app/`، و`apps/*/src/*.test.tsx`، و`packages/*/test/`؛ والـ Migration موجودة. أعداد الاختبارات أو نتايج النجاح **مش** مؤكَّدة هنا.
 
@@ -27,20 +27,20 @@
 | عروض الأسعار (تسعير السيرفر، TTL السياسة 5 دقايق، طبّاخ واحد + Slot واحد) | IMPLEMENTED | `QuoteIntegrationTest`؛ [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) |
 | رفض عرض السعر اللي مبقاش مواكب للأسعار أو الشروط الحالية وإعادة التأكيد (D13) | IMPLEMENTED | `PriceChangeIntegrationTest` (TC-154..156)؛ إشعارات الويب والموبايل |
 | تسجيل الأوردر الذري، والـ Idempotency على طبقتين، والـ Snapshots، وحجز السعة | IMPLEMENTED | `OrderPlacementIntegrationTest`، V29؛ [تنفيذ الأوردر](../04-codebase/order-implementation-ar.md) |
-| دورة حياة الأوردر، وأكواد التسليم، وـ Job الانتهاء، وإلغاء الاستثناء من العمليات وتجاوز التسليم | IMPLEMENTED | `OrderLifecycleIntegrationTest`، TC-026..031 |
+| دورة حياة الأوردر، وأكواد التسليم، والـ Job الخاص بانتهاء المهلة، وإلغاء الاستثناء من العمليات وتجاوز التسليم | IMPLEMENTED | `OrderLifecycleIntegrationTest`، TC-026..031 |
 | الكاش عند الاستلام: تبليغ الطبّاخ، وتحقق المالية، وفصل المهام | IMPLEMENTED | `CashAndLedgerIntegrationTest` |
 | دفتر الأستاذ (Ledger) (متوازن، للإضافة فقط)، والاستردادات، والتسويات، وكشوف الحساب | IMPLEMENTED | `CashAndLedgerIntegrationTest`، `FinanceOperationsIntegrationTest`؛ العمولة 0 عند الإطلاق (`ZeroCommissionIntegrationTest`، D10) |
-| عمولة المنصة ورسوم المنصة على العميل | DISABLED | قدرة نايمة: الـ Database بترفض أي نسبة مش صفر للسياسات غير الاصطناعية (non-synthetic) (V23)؛ D10 |
-| مدفوعات العربون (اعتماد مستلم مدفوعات المطبخ، تبليغ العميل، استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **الفلوس الحقيقية متقفّل عليها** (D16، مراجعة قانونية/مزوّد) |
+| عمولة المنصة ورسوم المنصة على العميل | DISABLED | إمكانية موجودة تقنيًا لكنها مش مفعّلة: الـ Database بترفض أي نسبة مش صفر للسياسات غير الاصطناعية (non-synthetic) (V23)؛ D10 |
+| مدفوعات العربون (اعتماد مستلم مدفوعات المطبخ، تبليغ العميل، استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد) | IMPLEMENTED for synthetic/preview use | `DepositPaymentIntegrationTest`، `PaymentReconciliationIntegrationTest`؛ **التعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل** (D16، مراجعة قانونية/مزوّد) |
 | بوابة دفع آلية، وتحقق بنكي، وEscrow، وصندوق ضمان | PLANNED (بحث مستقبلي فقط) | `docs/strategy/mvp-direct-deposit-payment.md` بيوسمهم مؤجَّلين |
-| صندوق الإشعارات داخل التطبيق، وـ Outbox Dispatcher بـ Leases/إعادة محاولة/Dead Letters | IMPLEMENTED | `NotificationIntegrationTest` |
+| صندوق الإشعارات داخل التطبيق، والـ Outbox Dispatcher بـ Leases/إعادة محاولة/Dead Letters | IMPLEMENTED | `NotificationIntegrationTest` |
 | تسليم Push خارجي (FCM/APNs) | DISABLED | `matbakhy.notifications.push-enabled` قيمته الافتراضية false؛ مفيش Adapter حقيقي (O07) |
 | تسليم البريد الإلكتروني الخارجي | PLANNED | الموجود بس `LoggingNotificationChannels` (مابيبعتش حاجة) |
 | حالات الدعم، وردود الموظفين، والملاحظات الخاصة، وطلبات الإلغاء، وحالة دعم خاصة بالدفع بتتفتح تلقائيًا | IMPLEMENTED | `SupportIntegrationTest`، V17، V28 |
 | التقييمات، وبلاغات التقييمات والإشراف عليها؛ والمفضلة | IMPLEMENTED | `ReviewsAndFavoritesIntegrationTest` |
 | طلب حذف الحساب ومسح البيانات الشخصية | IMPLEMENTED with a proposed retention default | `AccountErasureIntegrationTest`؛ فترة السماح 14 يوم قيمة PROPOSED (O06 مفتوح) |
 | عدّادات النشاط العضوي ورؤى الطبّاخ (من غير ترتيب أو حملات أو فواتير) | IMPLEMENTED | `ActivityInsightsIntegrationTest`، D17 |
-| إصدارات إعدادات التجارة، وـ Feature Flags، ومفتاح استقبال الأوردرات | IMPLEMENTED | `ConfigurationIntegrationTest`، `PublicConfigurationIntegrationTest` |
+| إصدارات إعدادات التجارة، والـ Feature Flags، ومفتاح استقبال الأوردرات | IMPLEMENTED | `ConfigurationIntegrationTest`، `PublicConfigurationIntegrationTest` |
 | API قراءة التدقيق | IMPLEMENTED | `AuditController`؛ التصدير (API-095) **PLANNED** |
 | لوحة العمليات (API-066)، ومستندات السياسات (API-008) | PLANNED | الـ Routes مسجّلة بـ `implemented: false` ومفيش Controller |
 | الـ Observability: معرّفات الطلب، والتنقيح (Redaction)، ومقاييس Management Port، ودور الـ Database وقت التشغيل | IMPLEMENTED locally | `OperationalMetricsIntegrationTest`، `ManagementPortIntegrationTest`، `LogRedactionIntegrationTest`؛ جاهزية النشر (AUD-01/LOG-01/OPS-01..03) NOT VERIFIED |
@@ -69,7 +69,7 @@
 | البند | الحالة | الدليل |
 |---|---|---|
 | الـ Stack المحلي (`scripts/dev.sh`، `infra/compose.yaml`) | IMPLEMENTED | MB-008 DONE |
-| المعاينة (بيانات اصطناعية، `APP_ENV=PREVIEW`) | IMPLEMENTED (اتنشرت مرة؛ الحالة الحالية NOT VERIFIED) | `deploy/web-preview/`؛ `docs/quality/owner-acceptance/run-2026-10-19.md` بيسجّل تطبيق Fixtures على إصدار معاينة |
+| المعاينة (بيانات تجريبية غير حقيقية (Synthetic Data)، `APP_ENV=PREVIEW`) | IMPLEMENTED (اتنشرت مرة؛ الحالة الحالية NOT VERIFIED) | `deploy/web-preview/`؛ `docs/quality/owner-acceptance/run-2026-10-19.md` بيسجّل تطبيق Fixtures على إصدار معاينة |
 | مجموعة قبول المالك (200 حالة) | NOT VERIFIED | `docs/quality/owner-acceptance/generated/traceability.json`: 192 NOT_RUN، 8 BLOCKED |
 | بيئات الـ Staging والـ Production | PLANNED | MB-040، MB-044 TODO؛ `APP_ENV=STAGING` بيرفض يشتغل من غير مزوّدين حقيقيين |
 | بوابات الأدلة (مرشّح الإصدار) | PLANNED | MB-043 TODO |
@@ -89,7 +89,7 @@
 | 9 | `planning/decisions.json` D05 "Cash at delivery or pickup" | مستند السجل + D16 + الكود: العربون موجود | السجل + الكود |
 | 10 | `docs/product/01-context-and-decisions.md` سطر 82: "D01-D10 remain PROPOSED_DEFAULT" | جدول نفس الملف و`planning/decisions.json`: D10 ACCEPTED | الجدول والـ JSON |
 | 11 | `docs/quality/owner-acceptance/generated/traceability.json` فيه `scenarios_uncovered: []` | 39 بس من 200 حالة للمالك بتسرد معرّفات سيناريوهات في `case_to_scenarios`؛ والباقي `[]` | العدّ بالسيناريو مش بالحالة؛ ماتقراش على إن "كل حالة مغطّاة" |
-| 12 | `deploy/web-preview/identity/matbakhy-realm.preview.json` (الـ Clients هما `matbakhy-web`، `matbakhy-admin`) | الـ Realm المحلي بيعرّف كمان `matbakhy-mobile`؛ و`apps/customer-mobile/src/config.ts` بيحط الـ Client id الافتراضي `matbakhy-mobile` | NOT VERIFIED إزاي بيعمل الـ Native Builds Authentication على المعاينة |
+| 12 | `deploy/web-preview/identity/matbakhy-realm.preview.json` (الـ Clients هما `matbakhy-web`، `matbakhy-admin`) | الـ Realm المحلي بيعرّف كمان `matbakhy-mobile`؛ و`apps/customer-mobile/src/config.ts` بيحط الـ Client id الافتراضي `matbakhy-mobile` | NOT VERIFIED إزاي الـ Native Builds بتعمل Authentication على المعاينة |
 
 ## فين تتأكد من الحالة الحالية بنفسك
 

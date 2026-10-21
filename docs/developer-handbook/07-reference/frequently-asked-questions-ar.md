@@ -16,7 +16,7 @@
 
 **أشغّل كل حاجة محليًا إزاي؟** `scripts/dev.sh up` وبعدها `scripts/dev.sh smoke`، ومعاهم Vite dev servers. شوف [البيئة المحلية](../05-developer-workflow/local-environment-ar.md).
 
-**فين كلمات السر المحلية؟** بيتولّدوا في ملف env بتاعك انت والمتجاهل من git بواسطة `scripts/dev.sh`. ماتنسخهمش أبدًا في Issues أو شات أو Commits.
+**فين كلمات السر المحلية؟** بتتولّد في ملف env خاص بيك وGit بيتجاهله، عن طريق `scripts/dev.sh`. ماتنسخهمش أبدًا في Issues أو شات أو Commits.
 
 ## المنتج والكود
 
@@ -28,7 +28,7 @@
 
 **فيه عمولة أو رسوم للمنصة؟** لا، في الـ MVP: صفر عمولة لمطبخي ومفيش رسوم منصة على العميل. مزايا النمو المؤجلة هي بحث مش تنفيذ ([حالة التنفيذ](implementation-status-ar.md)).
 
-**الدفع بيشتغل إزاي؟** كاش عند الاستلام لما يكون مؤهَّل، أو عربون يدوي مباشر من العميل للمطبخ والمطبخ هو اللي بيبلّغ إنه استلمه. المنصة عمرها ما بتدّعي تحقق بنكي. الفلوس الحقيقية لسه متقفّل عليها بـ Gates. شوف [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md).
+**الدفع بيشتغل إزاي؟** كاش عند الاستلام لما يكون مؤهَّل، أو عربون يدوي مباشر من العميل للمطبخ والمطبخ هو اللي بيبلّغ إنه استلمه. المنصة عمرها ما بتدّعي تحقق بنكي. التعاملات المالية الحقيقية لسه مش مفعّلة لحد استيفاء شروط التفعيل. شوف [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md).
 
 **فين الـ State Machine بتاع الأوردر؟** المرجع الأساسي: [04-state-machines.md](../../product/04-state-machines.md)؛ الملخص: [دورة حياة الأوردر](../01-business/order-lifecycle-ar.md)؛ الكود: [تنفيذ الأوردر](../04-codebase/order-implementation-ar.md).
 
@@ -38,13 +38,13 @@
 
 ## الاختبارات والأدلة
 
-**الـ CI الأخضر بيثبت إيه؟** بيثبت إن الـ Jobs المذكورة في [CI/CD](../05-developer-workflow/ci-cd-ar.md) عدّت على الـ Commit ده. مش بيثبت كل السيناريوهات، ولا سلوك الأجهزة الـ Native، ولا بيئة المعاينة المنشورة.
+**نجاح فحوصات الـ CI بيثبت إيه؟** بيثبت إن الـ Jobs المذكورة في [CI/CD](../05-developer-workflow/ci-cd-ar.md) عدّت على الـ Commit ده. مش بيثبت كل السيناريوهات، ولا سلوك الأجهزة الـ Native، ولا بيئة المعاينة المنشورة.
 
 **فيه كام حالة قبول للمالك، وهل نجحت؟** مصادر الـ JSON فيها 200 حالة؛ وكل واحدة NOT_RUN أو BLOCKED لحد ما سجل تشغيل معاه دليل يقول غير كده ([تشغيل الاختبارات](../05-developer-workflow/test-execution-ar.md)). آخر ملاحظات التشغيل في `docs/quality/owner-acceptance/run-2026-10-19.md`.
 
 **ينفع أكتب PASS في تقرير لو ماشغّلتش الاختبار؟** لا. استخدم NOT_RUN أو NOT VERIFIED.
 
-**أبلّغ عن Bug فين؟** GitHub Issue باستخدام `.github/ISSUE_TEMPLATE/defect.md`، ببيانات اصطناعية (Synthetic) وLogs متنضّفة.
+**أبلّغ عن Bug فين؟** GitHub Issue باستخدام `.github/ISSUE_TEMPLATE/defect.md`، ببيانات تجريبية غير حقيقية (Synthetic Data) وLogs بعد إزالة المعلومات الحساسة منها.
 
 ## Git والـ PR والـ CI
 
@@ -52,7 +52,7 @@
 
 **أقدر أعمل Merge للـ PR بتاعي بنفسي؟** لأ، إلا لو المالك أو سياسة الـ Repository سمحت صراحةً؛ والـ Agents عمرهم ما بيعملوا كده.
 
-**بيحصل إيه لما `develop` يتغيّر؟** الـ Product CI، وبعدها الـ Images بـ Commit SHA، وبعدها Deployment على بيئة المعاينة في Contabo وSmoke ([CI/CD](../05-developer-workflow/ci-cd-ar.md)). الـ Database مابترجعش لورا أوتوماتيك.
+**بيحصل إيه لما `develop` يتغيّر؟** الـ Product CI، وبعدها Docker Images متوسمة بالـ Commit SHA، وبعدها Deployment على بيئة المعاينة في Contabo وSmoke ([CI/CD](../05-developer-workflow/ci-cd-ar.md)). مفيش Rollback تلقائي للـ Database.
 
 **إيه هو إقرار DOC-001؟** Block في وصف الـ PR بيوضّح أثر التغيير على التوثيق؛ القواعد في [سياسة التوثيق](../05-developer-workflow/documentation-policy-ar.md)، وبيتفحص بـ `python3 scripts/doc001_check.py`.
 
@@ -60,7 +60,7 @@
 
 **ليه بيجيلي 403 على بيئة المعاينة؟** الـ IP بتاعك مش في الـ allow-list الخاصة بفئة الـ Host دي ([بيئة المعاينة](../05-developer-workflow/preview-environment-ar.md)).
 
-**بيئة المعاينة هي الـ Production؟** لا: بيانات اصطناعية، وبانر Demo، ومزوّدين وهميين، وسيرفر واحد.
+**بيئة المعاينة هي الـ Production؟** لا: بيانات تجريبية غير حقيقية (Synthetic Data)، وبانر Demo، ومزوّدين وهميين، وسيرفر واحد.
 
 **فين الـ Runbooks التشغيلية؟** `docs/operations/` (ابدأ بـ [08-troubleshooting-runbook.md](../../operations/08-troubleshooting-runbook.md) و[11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md)).
 

@@ -49,7 +49,7 @@
 | fix/doc001-pull-request-trigger | `d8de1eb32da4c557378ec103fbceacb0b652811d` | PR اتعمله Merge | deleted-remote |
 | docs/branch-maintenance | `994456625b58f00d3184980527128719a345305e` | PR اتعمله Merge | deleted-remote |
 
-الـ Branches السبعة `test/doc001-*` كانت Branches اختبار فرض مؤقتة (Commit واحد للاختبار بس لكل واحد، والـ PRs اتقفلت من غير Merge، وفضلت رؤوس الـ PRs على GitHub)؛ نسخها المحلية احتاجت `git branch -D` لأنها عمرها ما اتعملها Merge — المسح الإجباري الوحيد، ومبرره ده.
+الـ Branches السبعة `test/doc001-*` كانت Branches مؤقتة لاختبار تطبيق القواعد (Commit واحد للاختبار بس لكل واحد، والـ PRs اتقفلت من غير Merge، وفضلت نسخ الـ Head بتاعة الـ PRs على GitHub)؛ نسخها المحلية احتاجت `git branch -D` لأنها عمرها ما اتعملها Merge — المسح الإجباري الوحيد، ومبرره ده.
 
 ## اللي اتحفظ
 
