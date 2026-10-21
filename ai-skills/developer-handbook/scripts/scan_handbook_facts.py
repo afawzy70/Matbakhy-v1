@@ -34,23 +34,28 @@ CI_PATTERNS = {"GitHub Actions": ".github/workflows/*.y*ml", "GitLab CI": ".gitl
 
 
 def walk(root: Path):
+    """Yield file paths, plus directory paths with a trailing slash (some project markers, such as Xcode bundles, are directories)."""
     for dirpath, dirs, files in os.walk(root):
         dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+        for d in dirs:
+            yield (Path(dirpath) / d).relative_to(root).as_posix() + "/"
         for f in files:
             yield (Path(dirpath) / f).relative_to(root).as_posix()
 
 
 def match(path: str, pattern: str) -> bool:
     from fnmatch import fnmatchcase
-    return fnmatchcase(path.rsplit("/", 1)[-1], pattern) if "/" not in pattern else fnmatchcase(path, pattern)
+    name = path.rstrip("/").rsplit("/", 1)[-1]
+    return fnmatchcase(name, pattern) if "/" not in pattern else fnmatchcase(path, pattern)
 
 
 def scan(root: Path) -> dict:
-    files = sorted(walk(root))
+    entries = sorted(walk(root))
+    files = [e for e in entries if not e.endswith("/")]
     out: dict = {"root": str(root), "file_count": len(files), "technologies": {}, "ci": {}, "secret_like_files_listed_by_name_only": [],
                  "documentation": {}, "tests": [], "git": {}}
     for tech, pats in MARKERS.items():
-        hits = [f for f in files if any(match(f, p) for p in pats)]
+        hits = [f.rstrip("/") for f in entries if any(match(f, p) for p in pats)]
         if hits:
             out["technologies"][tech] = hits[:8]
     for ci, pat in CI_PATTERNS.items():

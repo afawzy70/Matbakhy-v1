@@ -47,6 +47,11 @@ class FixtureDryRun(unittest.TestCase):
             self.assertNotIn(absent, data["technologies"], f"{absent} must not be invented")
         self.assertEqual(data["secret_like_files_listed_by_name_only"], [])  # .env.example is a template
 
+    def test_scanner_detects_directory_markers_such_as_xcode_bundles(self) -> None:
+        (self.repo / "ios" / "App.xcodeproj").mkdir(parents=True)
+        data = json.loads(run(str(SCANNER), "--root", str(self.repo), "--json").stdout)
+        self.assertIn("iOS / Xcode", data["technologies"])
+
     def test_scanner_lists_secret_like_files_by_name_only(self) -> None:
         (self.repo / ".env").write_text("NOTES_API_TOKEN=do-not-print-me\n")
         r = run(str(SCANNER), "--root", str(self.repo))

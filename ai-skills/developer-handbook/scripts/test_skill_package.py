@@ -13,6 +13,7 @@ from pathlib import Path
 
 SKILL = Path(__file__).resolve().parent.parent
 LIBRARY = SKILL.parent
+IN_LIBRARY = LIBRARY.name == "ai-skills"  # the owner-controlled library layout; false when the skill folder was copied on its own
 EXPECTED = {
     "references": ["discovery-methodology", "developer-handover", "infrastructure-handover", "deployment-and-recovery", "interactive-documentation",
                    "bilingual-parity", "quality-gates", "egyptian-arabic-style-guide", "egyptian-arabic-anti-patterns"],
@@ -43,7 +44,8 @@ class SkillPackage(unittest.TestCase):
                     "examples/arabic-editorial-fixture/before/deploy-notes.md", "examples/arabic-editorial-fixture/before/deploy-notes-ar.md",
                     "examples/arabic-editorial-fixture/after/deploy-notes-ar.md"):
             self.assertTrue((SKILL / rel).is_file(), rel)
-        self.assertTrue((LIBRARY / "README.md").is_file() and (LIBRARY / "registry.yaml").is_file())
+        if IN_LIBRARY:  # a standalone copy (only the skill folder installed in another repository) has no library files
+            self.assertTrue((LIBRARY / "README.md").is_file() and (LIBRARY / "registry.yaml").is_file())
 
     def test_frontmatter_is_valid(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -124,6 +126,8 @@ class SkillPackage(unittest.TestCase):
             self.assertIn(phrase, guide, phrase)
 
     def test_non_destructive_defaults_and_owner_control(self) -> None:
+        if not IN_LIBRARY:
+            self.skipTest("standalone copy: library README and registry are not installed with the skill")
         readme = (LIBRARY / "README.md").read_text(encoding="utf-8")
         registry = (LIBRARY / "registry.yaml").read_text(encoding="utf-8")
         self.assertIn("Only the owner authorizes a new skill", readme)

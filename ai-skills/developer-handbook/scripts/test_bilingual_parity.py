@@ -219,6 +219,35 @@ class ParityTests(unittest.TestCase):
             self.f.write("08-infrastructure/" + name, (self.f.hb / "08-infrastructure" / name).read_text().replace("Claim without a label.", text).replace("ادعاء من غير وسم.", text))
         self.assertEqual(self.f.check(), {})
 
+    def test_links_that_leave_the_repository_are_rejected_not_read(self) -> None:
+        self.f.edit("a-ar.md", "(b-ar.md)", "(../../../../../../etc/passwd)")
+        self.assertProblem(self.f.check(), "anchors")
+        self.f.edit("a-ar.md", "(../../../../../../etc/passwd)", "(../../../../../../etc/hostname#x)")
+        self.assertProblem(self.f.check(), "anchors")
+
+    def test_setext_headings_provide_anchors(self) -> None:
+        t = v.heading_slugs
+        p = self.f.hb / "setext.md"
+        p.write_text("Title\n=====\n\nSecond part\n-----------\n", encoding="utf-8")
+        self.assertEqual(t(p), ["title", "second-part"])
+
+    def test_configure_resets_a_custom_language_marker(self) -> None:
+        v.configure("docs/handbook", "-ar", True, (), "Lang")
+        v.configure("docs/handbook", "-ar", True, (), None)
+        self.assertIsNotNone(v.LANG_LINE_RE.search("> **Language / اللغة:** English · [x](y.md)"))
+
+    def test_missing_directory_and_empty_set_never_pass(self) -> None:
+        import subprocess as sp
+        base = [sys.executable, str(Path(v.__file__)), "--root", str(self.f.root)]
+        r = sp.run(base + ["--docs-dir", "does/not/exist"], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 2, r.stdout)
+        self.assertNotIn("PARITY RESULT: PASS", r.stdout)
+        empty = self.f.root / "docs" / "empty"
+        empty.mkdir(parents=True)
+        r = sp.run(base + ["--docs-dir", "docs/empty"], capture_output=True, text=True)
+        self.assertEqual(r.returncode, 2, r.stdout)
+        self.assertNotIn("PARITY RESULT: PASS", r.stdout)
+
     def test_inline_code_identifier_drift(self) -> None:
         self.f.edit("a-ar.md", "`code_id`", "`codeId`")
         self.assertProblem(self.f.check(), "inline-code")

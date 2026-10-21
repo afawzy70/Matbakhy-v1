@@ -65,19 +65,30 @@ def slug(heading: str) -> str:
     return h.replace(" ", "-")
 
 
-def anchors_of(path: Path) -> set[str]:
-    out: set[str] = set()
-    text = path.read_text(encoding="utf-8", errors="replace")
-    for _, line in strip_fences(text):
-        m = HEAD_RE.match(line)
-        if not m:
-            continue
-        base = slug(m.group(2))
+def heading_texts(text: str) -> list[str]:
+    """Heading contents as the Markdown parser sees them (ATX and Setext headings; never headings inside code fences)."""
+    from markdown_it import MarkdownIt
+    toks = MarkdownIt("commonmark").enable("table").parse(text)
+    return [toks[i + 1].content for i, t in enumerate(toks) if t.type == "heading_open"]
+
+
+def dedup_slugs(texts: list[str]) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    for t in texts:
+        base = slug(t)
         cand, n = base, 0
-        while cand in out:
+        while cand in seen:
             n += 1
             cand = f"{base}-{n}"
-        out.add(cand)
+        seen.add(cand)
+        out.append(cand)
+    return out
+
+
+def anchors_of(path: Path) -> set[str]:
+    text = path.read_text(encoding="utf-8", errors="replace")
+    out: set[str] = set(dedup_slugs(heading_texts(text)))
     for m in re.finditer(r"<a\s+(?:name|id)=[\"']([^\"']+)[\"']", text, re.I):
         out.add(m.group(1).lower())
     return out
@@ -97,9 +108,9 @@ def configure(docs_dir: str, suffix: str, require_metadata: bool, evidence_dirs:
     global HB, LANG_SUFFIX, REQUIRE_METADATA, EVIDENCE_DIRS, EXCEPTIONS, SYNC, REPORT, LANG_LINE_RE
     HB, LANG_SUFFIX, REQUIRE_METADATA, EVIDENCE_DIRS = docs_dir.strip("/"), suffix, require_metadata, evidence_dirs
     EXCEPTIONS, SYNC, REPORT = f"{HB}/translation-exceptions.json", f"{HB}/translation-sync.json", f"{HB}/translation-parity-report.md"
-    if lang_marker:
-        LANG_LINE_RE = re.compile(r"^> \*\*" + re.escape(lang_marker) + r"\*\*.*$", re.M)
-LANG_LINE_RE = re.compile(r"^> \*\*Language / اللغة:\*\*.*$", re.M)
+    LANG_LINE_RE = re.compile(r"^> \*\*" + re.escape(lang_marker) + r"\*\*.*$", re.M) if lang_marker else DEFAULT_LANG_LINE_RE
+DEFAULT_LANG_LINE_RE = re.compile(r"^> \*\*Language / اللغة:\*\*.*$", re.M)
+LANG_LINE_RE = DEFAULT_LANG_LINE_RE
 STATUS_LABELS = ("IMPLEMENTED", "PARTIALLY IMPLEMENTED", "PLANNED", "DISABLED", "DEPRECATED", "NOT VERIFIED", "REFERENCE")
 STATUS_WORDS = {"IMPLEMENTED", "PLANNED", "DISABLED", "DEPRECATED", "VERIFIED", "REFERENCE", "PARTIALLY", "NOT_RUN", "BLOCKED"}
 KNOWN_IDENTIFIERS = {"Africa/Cairo"}
@@ -239,20 +250,7 @@ def ar_name(rel: str) -> str:
 
 
 def heading_slugs(path: Path) -> list[str]:
-    out: list[str] = []
-    seen: set[str] = set()
-    for _, line in strip_fences(path.read_text(encoding="utf-8")):
-        m = HEAD_RE.match(line)
-        if not m:
-            continue
-        base = slug(m.group(2))
-        cand, n = base, 0
-        while cand in seen:
-            n += 1
-            cand = f"{base}-{n}"
-        seen.add(cand)
-        out.append(cand)
-    return out
+    return dedup_slugs(heading_texts(path.read_text(encoding="utf-8")))
 
 
 class Validator:
@@ -385,6 +383,14 @@ class Validator:
         if not en_line or f"]({ar_n})" not in en_line.group(0):
             self.fail(rel, "language-link", f"English page needs a '> **Language / اللغة:**' line linking to {ar_n}")
 
+    def inside(self, p: Path) -> bool:
+        """Link targets are untrusted input: only paths that stay inside the repository (after resolving symlinks) may be read."""
+        try:
+            p.resolve().relative_to(self.root.resolve())
+            return True
+        except ValueError:
+            return False
+
     def anchors(self, rel: str, en_text: str, ar_text: str) -> None:
         """Every internal link in the Arabic page must resolve, and its anchor must be the SAME heading as the English link's."""
         ar_path = self.hb / ar_name(rel)
@@ -393,7 +399,9 @@ class Validator:
         for h in ar_links:
             file_part, _, frag = h.partition("#")
             dest = ar_path if not file_part else (ar_path.parent / file_part).resolve()
-            if not dest.exists():
+            if not self.inside(dest):
+                self.fail(rel, "anchors", f"Arabic link leaves the repository: {h}")
+            elif not dest.exists():
                 self.fail(rel, "anchors", f"Arabic link does not resolve: {h}")
             elif frag and dest.suffix == ".md" and frag.lower() not in anchors_of(dest):
                 self.fail(rel, "anchors", f"Arabic link anchor not found: {h}")
@@ -404,13 +412,13 @@ class Validator:
             if not frag:
                 continue
             en_dest = en_path if not file_part else (en_path.parent / file_part).resolve()
-            if not en_dest.is_file() or en_dest.suffix != ".md":
+            if not self.inside(en_dest) or not en_dest.is_file() or en_dest.suffix != ".md":
                 continue
             slugs = heading_slugs(en_dest)
             if frag.lower() not in slugs:
                 continue
             ar_dest = ar_path if not file_part else (ar_path.parent / self.expected_link(rel, file_part)).resolve()
-            if not ar_dest.is_file():
+            if not self.inside(ar_dest) or not ar_dest.is_file():
                 continue
             ar_slugs = heading_slugs(ar_dest)
             idx = slugs.index(frag.lower())
@@ -439,13 +447,13 @@ class Validator:
             if re.match(r"^[a-zA-Z][a-zA-Z0-9+.-]*:", file_part):
                 return m.group(0)
             ar_dest = here if not file_part else (here.parent / file_part).resolve()
-            if not ar_dest.is_file() or ar_dest.suffix != ".md":
+            if not self.inside(ar_dest) or not ar_dest.is_file() or ar_dest.suffix != ".md":
                 return m.group(0)
             ar_slugs = heading_slugs(ar_dest)
             if frag.lower() in ar_slugs:
                 return m.group(0)
             en_dest = ar_dest.with_name(ar_dest.name[:-(len(LANG_SUFFIX) + 3)] + ".md")
-            if not en_dest.is_file():
+            if not self.inside(en_dest) or not en_dest.is_file():
                 return m.group(0)
             en_slugs = heading_slugs(en_dest)
             if frag.lower() in en_slugs and en_slugs.index(frag.lower()) < len(ar_slugs):
@@ -552,6 +560,14 @@ def main() -> int:
     a = ap.parse_args()
     configure(a.docs_dir, a.suffix, a.require_metadata, tuple(a.evidence_dir), a.lang_marker)
     root = Path(a.root).resolve()
+    if not (root / HB).is_dir():
+        print(f"FAIL  documentation directory not found: {HB} (relative to {root})")
+        print("PARITY RESULT: FAIL (nothing was validated)")
+        return 2
+    if not a.update_sync and not a.file and not en_pages(root):
+        print(f"FAIL  no source pages found under {HB}; refusing to report PASS for an empty set")
+        print("PARITY RESULT: FAIL (0 English page(s) checked)")
+        return 2
     v = Validator(root)
     if a.update_sync:
         return v.update_sync()
