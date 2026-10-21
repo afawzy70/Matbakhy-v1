@@ -68,7 +68,14 @@ def protected_token(tok: str) -> bool:
         return bool("." in tok and re.search(r"\d", tok))
     return tok in STATUS_WORDS or bool(re.search(r"[a-z][A-Z]", tok)) or bool(re.search(r"[A-Za-z]\d|\d[A-Za-z]", tok))
 ARROW_RE = re.compile(r"→|←|↔|⇒|⇐|⇔|=>|->|<-")
-CHECKS = ("arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
+EVIDENCE_RE = re.compile(r"VERIFIED LIVE|VERIFIED IN CODE|DOCUMENTED ONLY|NOT VERIFIED|OUTDATED / INCORRECT")
+SECRET_PATTERNS = (
+    re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b"),
+)
+SECRET_ASSIGN_RE = re.compile(r"\b[A-Z][A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=([^\s#`]+)")
+SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|\"|'|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
+CHECKS = ("evidence", "secrets", "arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
           "anchors")
 
 
@@ -267,6 +274,13 @@ class Validator:
         if lost:
             self.fail(rel, "tokens", f"technical tokens/numbers from English missing in Arabic: {sorted(lost)[:10]}")
         self.metadata(rel, en_text, ar_text)
+        self.secrets(rel, en_text, ar_text)
+        if rel.startswith("08-infrastructure/"):
+            en_ev, ar_ev = collections.Counter(EVIDENCE_RE.findall(en_text)), collections.Counter(EVIDENCE_RE.findall(ar_text))
+            if not en_ev:
+                self.fail(rel, "evidence", "infrastructure pages must label their claims with the evidence classes (VERIFIED LIVE, VERIFIED IN CODE, DOCUMENTED ONLY, NOT VERIFIED, OUTDATED / INCORRECT)")
+            elif en_ev != ar_ev:
+                self.fail(rel, "evidence", f"evidence labels differ between languages (they stay in English): {dict(en_ev)} vs {dict(ar_ev)}")
         self.language_link(rel, en_text, ar_text)
         self.anchors(rel, en_text, ar_text)
 
@@ -287,6 +301,15 @@ class Validator:
         if r.endswith(".md") and not r.endswith("-ar.md") and r not in EXCLUDED_FROM_MIRROR:
             return file_part[:-3] + "-ar.md"
         return file_part
+
+    def secrets(self, rel: str, en_text: str, ar_text: str) -> None:
+        """No credentials in the public repository: private keys, token shapes and NAME=value secret assignments with a real-looking value."""
+        for lang, text in (("English", en_text), ("Arabic", ar_text)):
+            hit = next((m.group(0)[:30] for pat in SECRET_PATTERNS for m in pat.finditer(text)), None)
+            if not hit:
+                hit = next((m.group(0)[:50] for m in SECRET_ASSIGN_RE.finditer(text) if not SAFE_SECRET_VALUE_RE.match(m.group(1))), None)
+            if hit:
+                self.fail(rel, "secrets", f"{lang} page contains something that looks like a credential: {hit!r}")
 
     def metadata(self, rel: str, en_text: str, ar_text: str) -> None:
         def meta(t: str) -> tuple[str | None, str | None]:
