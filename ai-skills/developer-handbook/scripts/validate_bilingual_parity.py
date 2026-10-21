@@ -137,9 +137,9 @@ SECRET_PATTERNS = (
     re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b"),
 )
 _CRED_NAME = r"(?:[A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*|[\w-]*(?i:password|passwd|secret|token|api[_-]?key|private[_-]?key)[\w-]*)"
-_CRED_VALUE = r"(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)"
+_CRED_VALUE = r"(\"(?:\\.|[^\"\\\n])*\"?|'(?:\\.|[^'\\\n])*'?|[^\s#`]+)"  # quoted values may contain escapes; an unclosed quote runs to the end of the line
 # NAME=value, NAME = value (any spacing) and the JSON form "name": "value"; group 1 is the value in the first form, group 2 in the second
-SECRET_ASSIGN_RE = re.compile(r"\b" + _CRED_NAME + r"[ \t]*=[ \t]*" + _CRED_VALUE + r"|\"" + _CRED_NAME + r"\"[ \t]*:[ \t]*(\"[^\"\n]*\")")
+SECRET_ASSIGN_RE = re.compile(r"\b" + _CRED_NAME + r"[ \t]*=[ \t]*" + _CRED_VALUE + r"|\"" + _CRED_NAME + r"\"[ \t]*:[ \t]*(\"(?:\\.|[^\"\\\n])*\"?)")
 SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
 
 
@@ -268,7 +268,7 @@ def redact(text: str) -> str:
     """Diagnostics go to CI logs: never print credential-shaped values, whatever check found them."""
     for pat in SECRET_PATTERNS:
         text = pat.sub("<redacted>", text)
-    return SECRET_ASSIGN_RE.sub(lambda m: re.sub(r"(=[ \t]*|:[ \t]*)(\"[^\"\n]*\"|'[^'\n]*'|[^\s#`]+)$", r"\1<redacted>", m.group(0)) if unsafe_secret_value(m.group(1) or m.group(2)) else m.group(0), text)
+    return SECRET_ASSIGN_RE.sub(lambda m: re.sub(r"(=[ \t]*|:[ \t]*)[^\s=:].*$", r"\1<redacted>", m.group(0), flags=re.S) if unsafe_secret_value(m.group(1) or m.group(2)) else m.group(0), text)
 
 
 class Validator:
@@ -483,6 +483,10 @@ class Validator:
     def fix_anchors(self, rel: str) -> int:
         """Rewrite fragments that still use the English heading slug to the slug of the equivalent Arabic heading."""
         ar_path = self.hb / ar_name(rel)
+        try:
+            ar_path.resolve().relative_to(self.hb.resolve())
+        except ValueError:
+            return 0  # repairs only touch pages inside the documentation directory
         if not ar_path.is_file() or not self.inside(ar_path):
             return 0  # never read or rewrite a file that resolves outside the repository
         lines = ar_path.read_text(encoding="utf-8").split("\n")
@@ -637,6 +641,10 @@ def main() -> int:
     v = Validator(root)
     if a.update_sync:
         return v.update_sync()
+    if a.file and (Path(a.file).is_absolute() or ".." in Path(a.file).parts or not a.file.endswith(".md")):
+        print(f"FAIL  --file must be a relative .md path inside {HB}: {a.file!r}")
+        print("PARITY RESULT: FAIL (invalid --file)")
+        return 2
     if a.fix_anchors:
         n = sum(v.fix_anchors(r) for r in ([a.file] if a.file else en_pages(root)))
         print(f"rewrote {n} link anchor(s)")

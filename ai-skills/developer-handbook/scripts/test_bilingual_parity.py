@@ -353,6 +353,26 @@ class ParityTests(unittest.TestCase):
         self.assertIn("unused exception", r.stdout)
         self.assertNotIn("SyntheticLeak42", r.stdout + r.stderr)
 
+    def test_escaped_and_unclosed_quotes_are_fully_masked(self) -> None:
+        for text in ['"password": "Synthetic\\"LeakedSecret42"', 'API_KEY="Synthetic\\"LeakedSecret42 more', "PASSWORD='it\\'s LeakedSecret42'"]:
+            f = Fixture()
+            self.addCleanup(f._t.cleanup)
+            f.edit("a.md", "`code_id`", f"`code_id` {text}")
+            problems = f.check()
+            self.assertNotIn("LeakedSecret42", json.dumps(problems), text)
+            self.assertIn("secrets", json.dumps(problems), text)
+
+    def test_repair_with_traversal_argument_writes_nothing(self) -> None:
+        import subprocess as sp
+        victim = self.f.root / "outside-ar.md"
+        victim.write_text("# x\n[a](a.md#intro)\n", encoding="utf-8")
+        (self.f.root / "outside.md").write_text("# x\n", encoding="utf-8")
+        before = victim.read_text(encoding="utf-8")
+        r = sp.run([sys.executable, str(Path(v.__file__)), "--root", str(self.f.root), "--docs-dir", v.HB, "--file", "../../outside.md", "--fix-anchors"],
+                   capture_output=True, text=True)
+        self.assertEqual(r.returncode, 2)
+        self.assertEqual(victim.read_text(encoding="utf-8"), before)
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")
