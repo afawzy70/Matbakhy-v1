@@ -66,7 +66,7 @@
 | `kc-admin` بيرد 404 | مفتاح اللوحة مقفول؛ المسؤول عن التشغيل يشغّل `./deploy.sh admin-console status` |
 | الـ Deployment workflow واقف عند "Wait for passing Product CI" | الـ Product CI عند الـ Commit ده لسه مستني أو فشل؛ صلّح الـ CI الأول |
 | الـ Deploy فشل، والـ `.env` السابق اترجّع | الـ Database **ماترجعتش**؛ المسؤول عن التشغيل يستخدم `./deploy.sh rollback-plan` وجدول القرار في [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md) |
-| الصفحة الرئيسية فاضية | الـ Slots المزروعة انتهت؛ `refresh-slots.sql` (جزء من `apply` بتاع E2E المالك) |
+| الصفحة الرئيسية فاضية | الـ Slots اللي اتضافت بالـ Seed انتهت؛ `refresh-slots.sql` (جزء من `apply` بتاع E2E المالك) |
 | الـ Workflow بتاع `owner-e2e-provision` بيرفض | أول كلمة في ملف الطلب لازم تكون `plan` أو `apply`؛ و`apply` كمان محتاج `APP_ENV=PREVIEW` للـ API والـ Schema على الأقل V31 |
 | محتاج تتتبّع أوردر فشل | الـ request id من جسم الخطأ أو `X-Request-Id`، وبعدين الـ Logs/الـ Audit زي ما في [08-troubleshooting-runbook.md](../../operations/08-troubleshooting-runbook.md) |
 

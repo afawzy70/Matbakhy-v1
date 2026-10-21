@@ -23,7 +23,7 @@ sequenceDiagram
 ```
 
 - **المسودة.** طلب واحد لكل حساب (`cook_application`). المسودة فيها الاسم العام، والنبذة، وموبايل التواصل (متحوّل لرقم مصري موحّد، `EgyptianPhone`)، وموقع الإنتاج الخاص، وهل الاستلام متاح، ومناطق الخدمة، ومعرّفات المستندات. حفظ المسودة مبيغيّرش حاجة في حالة الشخص: هو **مش** طبّاخ (حالة المالك E2E-COOK-048). الملفات: `backend/modules/cooks/src/main/java/com/matbakhy/cooks/internal/CookApplicationService.java`.
-- **التقديم** بيحتاج مسودة كاملة وبيعمل `cook_application_revision` غير قابلة للتعديل (Trigger في الـ Database اسمه `cook_revision_immutable`، في `backend/app/src/main/resources/db/migration/V5__cook_applications_and_kitchens.sql`). المسودة الناقصة بتترفض مع قائمة بالحقول الناقصة وومن غير ما تتعمل نسخة طلب (revision). المناطق اللي اتعطّلت بعد المسودة بتمنع التقديم.
+- **التقديم** بيحتاج مسودة كاملة وبيعمل `cook_application_revision` غير قابلة للتعديل (Trigger في الـ Database اسمه `cook_revision_immutable`، في `backend/app/src/main/resources/db/migration/V5__cook_applications_and_kitchens.sql`). المسودة الناقصة بتترفض مع قائمة بالحقول الناقصة ومن غير ما تتعمل نسخة طلب (revision). المناطق اللي اتعطّلت بعد المسودة بتمنع التقديم.
 - **المراجعة** (`CookReviewService`): القرارات هي `START_REVIEW` و`APPROVE` و`REQUEST_CHANGES` و`REJECT`. القواعد:
   - محتاجة `cook.review` **و**MFA حديث (`CookReviewController`)؛
   - `START_REVIEW` لازم تيجي الأول؛ والقرار بيحدد **نسخة الطلب** (revision) و**إصدار** الطلب اللي بيخصّه؛ السبب مطلوب؛ وتأثير واحد لكل Idempotency key؛
