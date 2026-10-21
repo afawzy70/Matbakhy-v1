@@ -80,7 +80,7 @@
 
 أما `./deploy.sh up` نفسه: بيفحص الصور المثبّتة والأسرار، وبياخد قفل التغيير المشترك (`flock` على `.preview-mutation.lock` في مجلد الـ Backup)، وبيعمل Render للإعدادات، وبياخد **Backup للـ Database قبل الـ Deployment** لو الـ Database موجودة، وبيعمل Pull للصور الناقصة، و`compose up -d`، وبيستنى الـ Health، وبيعمل الـ Buckets، وبيضيف سطر لسجل الإصدارات (`releases.log` في مجلد الـ Backup) فيه الـ Commit وDigests الصور ونسخة الـ Schema قبل وبعد ومسار الـ Backup. وحاوية الـ API بتطبّق Flyway migrations عند البدء.
 
-الـ Workflow اسمه `owner-e2e-provision.yml` بيتفاعل مع تغييرات `deploy/web-preview/owner-e2e-run.request` على `develop`: بعد Deployment نفس الـ Commit، بيشغّل تجهيز E2E بتاع المالك على المعاينة (الخطة = قراءة بس؛ والتطبيق = Backup متحقق منه، وPartial import لـ Keycloak، وSQL seeds، وتحديث الـ Slots، وتسوية قراءة بس) تحت مجموعة التزامن الخاصة بيه؛ و`flock` على السيرفر بيسلسله مع الـ Deployments والـ Admin console.
+الـ Workflow اسمه `owner-e2e-provision.yml` بيتفاعل مع تغييرات `deploy/web-preview/owner-e2e-run.request` على `develop`: بعد Deployment نفس الـ Commit، بيشغّل تجهيز E2E بتاع المالك على المعاينة (الخطة = قراءة بس؛ والتطبيق = Backup متحقق منه، وPartial import لـ Keycloak، وSQL seeds، وتحديث الـ Slots، وفحص مطابقة البيانات للقراءة بس) تحت مجموعة التزامن الخاصة بيه؛ و`flock` على السيرفر بيسلسله مع الـ Deployments والـ Admin console.
 
 عنوان الـ Workflow بيقول "Contabo" بينما مستندات العمليات بتوصف سيرفر Hetzner؛ شوف الفجوة تحت.
 
@@ -91,7 +91,7 @@
 ## النسخ الاحتياطي والاسترجاع والـ Rollback
 
 * **الـ Backup** (`deploy.sh backup`، وكمان قبل كل Deployment): `pg_dump` بصيغة Custom مع Checksum بـ SHA-256 وManifest، ومتحقق منه بالاسترجاع في Database مؤقتة وتشغيل `infra/db/reconcile.sql`، بالإضافة لأرشيف لتخزين الصور. الناتج بيروح لـ `BACKUP_DIR` (برّه Git). وعمر الـ Backup بيتصدّر كـ Metric وعليه تنبيه (`BackupStale`).
-* **الاسترجاع** (`deploy.sh restore-db <dump>`): بيسترجع في `matbakhy_restore` وبيعمل له تسوية؛ وتحويل التطبيق ليه خطوة يدوية على المالك. البيانات اللي اتكتبت بعد الـ Backup بتضيع.
+* **الاسترجاع** (`deploy.sh restore-db <dump>`): بيسترجع في `matbakhy_restore` وبيفحص مطابقة بياناته؛ وتحويل التطبيق ليه خطوة يدوية على المالك. البيانات اللي اتكتبت بعد الـ Backup بتضيع.
 * **الـ Rollback** (`deploy.sh rollback-plan [N]`، قراءة بس): بيطبع قيم `.env` التلاتة للإصدار اللي قبل بـ N مرحلة وحُكم. لو إصدار الـ Database Schema متغيّرش، الرجوع لإصدار Docker Images سابق بس آمن (عدّل `.env`، و`./deploy.sh up`). ولو إصدارها اتغيّر، الرجوع لإصدار Docker Images سابق بس آمن بشرط إن كل Migration في النص هي expand-only؛ و`scripts/check_migration_compat.py` بيجبر كاتبي الـ Migrations بعد V28 إنهم يعلّموا بـ `-- rollback-compat: breaking|tightening|expand-only`، والـ CI بيفرض ده. غير كده استرجع الـ Backup بتاع ما قبل الـ Deployment. الـ Runbook: `docs/operations/11-staging-deployment-and-rollback.md`؛ والتدريب: `scripts/rehearse-preview.sh rollback`.
 * **إعادة ضبط الـ E2E** (`deploy.sh e2e-reset`): بيمسح Database التطبيق؛ وبيرفض إلا لو الـ Host عليه ملف علامة E2E، وHosts العملاء مش عامة، والمشغّل كتب الدومين؛ وبياخد Backup الأول.
 * الاختبارات: `backend/app/src/test/java/com/matbakhy/app/reliability/BackupRestoreIntegrationTest.java` و`scripts/test_preview_backup.py` و`scripts/test_preview_release.py`.

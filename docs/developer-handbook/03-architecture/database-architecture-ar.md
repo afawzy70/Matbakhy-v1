@@ -44,7 +44,7 @@
 | `V22__outbox_request_id.sql` | `outbox_event.request_id` | MB-039 |
 | `V23__launch_commission.sql` | Check: السياسات الفعلية لازم عمولتها صفر | قرار المالك D10 |
 | `V24__deposit_payments.sql` | `kitchen_payment_profile`، `order_payment`، و`payment_event` اللي بيتضاف عليه بس، وشروط الدفع على `quote` | MB-051, D16 |
-| `V25__payment_reconciliation.sql` | حالات التسوية (Reconciliation)، `payment_event.note` | MB-052 |
+| `V25__payment_reconciliation.sql` | حالات المطابقة (Reconciliation)، `payment_event.note` | MB-052 |
 | `V26__organic_activity.sql` | `activity_daily` (زائر متعمل له Hash، لكل يوم) | MB-054, D17 |
 | `V27__erasure_on_append_only_history.sql` | Triggers بتسمح بتعديل المسح الوحيد على `case_message` / `payment_event` | MB-039 |
 | `V28__payment_support_case.sql` | تصنيف حالة الدعم `PAYMENT`، وحالة دفع مفتوحة واحدة لكل أوردر | MB-052 |
@@ -60,7 +60,7 @@
 
 **جانب العرض (Supply).** `cook_application` (+ `cook_application_revision` اللي مبيتعدلش) بتوصّل لـ `kitchen` (ومعاها `kitchen_zone` للمناطق اللي بيخدمها، والنسخة الموافق عليها كـ Foreign key). والـ `meal` بتتبع مطبخ؛ وكل تعديل في المحتوى أو السعر بيضيف `meal_revision(meal_id, revision, snapshot, price_minor)` مبيتعدلش؛ والوجبات بتتأرشف ومبتتمسحش أبدًا (Trigger). و`kitchen_payment_profile` (صف واحد لكل مطبخ) فيه نسبة العربون وحد الـ COD والمستلم الموافق عليه من الموظفين.
 
-**السعة (Capacity).** `cook_slot` (المطبخ، البداية/النهاية، وقت التجهيز المسبق، `max_portions`، العدّادات) و`meal_slot` (السعة لكل وجبة لكل Slot، العدّادات). العدّادات `reserved` و`allocated` و`consumed` بتتحرك مع صفوف `stock_allocation`: التسجيل بيزوّد `reserved`، والقبول بينقل لـ `allocated`، والتحضير بينقل لـ `consumed`، والتحرير بينقّص. القيود `reserved + allocated + consumed <= max_portions` (في الـ Slot) و`<= capacity` (في meal slot) بتخلّي البيع الزيادة عن المتاح مستحيل حتى لو كود التطبيق غلط. وTrigger بيمنع meal slot لوجبة بتتبع مطبخ مختلف. سكريبت التسوية `infra/db/reconcile.sql` بيتأكد إن العدّادات بتساوي مجموع الـ Allocations؛ وبيشتغل بعد كل استرجاع (Restore) من Backup.
+**السعة (Capacity).** `cook_slot` (المطبخ، البداية/النهاية، مهلة الطلب المسبق (lead time)، `max_portions`، العدّادات) و`meal_slot` (السعة لكل وجبة لكل Slot، العدّادات). العدّادات `reserved` و`allocated` و`consumed` بتتحرك مع صفوف `stock_allocation`: التسجيل بيزوّد `reserved`، والقبول بينقل لـ `allocated`، والتحضير بينقل لـ `consumed`، والتحرير بينقّص. القيود `reserved + allocated + consumed <= max_portions` (في الـ Slot) و`<= capacity` (في meal slot) بتخلّي البيع الزيادة عن المتاح مستحيل حتى لو كود التطبيق غلط. وTrigger بيمنع meal slot لوجبة بتتبع مطبخ مختلف. سكريبت مطابقة البيانات `infra/db/reconcile.sql` بيتأكد إن العدّادات بتساوي مجموع الـ Allocations؛ وبيشتغل بعد كل استرجاع (Restore) من Backup.
 
 **Snapshots التسعير.** `commerce_policy` بنسخ (نسبة الضريبة، وصلاحية الـ Quote، ونافذة القبول، والحد الأقصى لكل بند، وإصدارات الشروط وسياسة الإلغاء؛ وصف `ACTIVE` واحد بالظبط عن طريق Unique partial index). والـ `quote` بتخزّن نسخة السياسة والإجماليات اللي اتحسبت بيها، بالإضافة لشروط الدفع؛ ومبتحجزش مخزون وبتنتهي. و`customer_order` بتنسخ الإجماليات و`policy_version` و`commission_bps_snapshot` وإصدارات الشروط و`address_snapshot` / `contact_snapshot` بصيغة JSON؛ و`order_item` بتنسخ الكمية وسعر الوحدة ونسخة الوجبة كلها كـ `meal_snapshot jsonb`، وليها Foreign key على `(meal_id, revision)`. فأي تعديل لاحق في السعر أو العنوان عمره ما بيغيّر أوردر اتسجّل. و`customer_order.quote_id` هو `UNIQUE`، فالـ Quote ممكن تتستخدم مرة واحدة.
 
@@ -102,11 +102,11 @@
 
 ## النسخ الاحتياطي والاسترجاع والتسوية
 
-السكريبت `scripts/db-backup.sh` بيكتب `pg_dump` بصيغة Custom مع Checksum بـ SHA-256 وManifest بأعداد الصفوف وبيرفض الكتابة جوه Git working tree؛ و`scripts/db-restore.sh` بيسترجع وبيشغّل `infra/db/reconcile.sql`، والـ Backup بيتقبل بس لما كل أعداد التسوية تكون صفر. المعاينة بتغلّف دول في `deploy/web-preview/deploy.sh backup` و`restore-db`، وبتاخد Backup قبل كل Deployment. الاختبارات: `backend/app/src/test/java/com/matbakhy/app/reliability/BackupRestoreIntegrationTest.java`. تفاصيل التشغيل: [البنية التحتية والـ Deployment](infrastructure-and-deployment-ar.md#النسخ-الاحتياطي-والاسترجاع-والـ-rollback).
+المقصود بالتسوية في عنوان القسم هو مطابقة البيانات (Reconciliation)، مش التسوية المالية (Settlement). السكريبت `scripts/db-backup.sh` بيكتب `pg_dump` بصيغة Custom مع Checksum بـ SHA-256 وManifest بأعداد الصفوف وبيرفض الكتابة جوه Git working tree؛ و`scripts/db-restore.sh` بيسترجع وبيشغّل `infra/db/reconcile.sql`، والـ Backup بيتقبل بس لما كل أعداد الاختلافات اللي فحص المطابقة بيطلعها تكون صفر. المعاينة بتغلّف دول في `deploy/web-preview/deploy.sh backup` و`restore-db`، وبتاخد Backup قبل كل Deployment. الاختبارات: `backend/app/src/test/java/com/matbakhy/app/reliability/BackupRestoreIntegrationTest.java`. تفاصيل التشغيل: [البنية التحتية والـ Deployment](infrastructure-and-deployment-ar.md#النسخ-الاحتياطي-والاسترجاع-والـ-rollback).
 
 ## القيود المعروفة وفجوات التوثيق
 
 * مفيش توثيق على مستوى الجدول غير تعليقات الـ Migrations و`docs/engineering/02-data-model.md`؛ والصفحة دي مبتسردش كل عمود. اقرا الـ Migration بتاعة الجدول اللي هتلمسه.
 * `V23` بيضيف قيد العمولة بتاعه كـ `NOT VALID`، فالصفوف اللي اتعملت قبله مبتتراجعش تاني (تعليق في الملف).
 * الاحتفاظ (Retention) بـ `activity_daily` والجداول التانية القريبة من البيانات الشخصية لسه مش متقرر (قرار المالك O06)؛ ومفيش Job حذف لـ `activity_daily`.
-* سكريبت التسوية والحمايات المبنية على الـ Triggers متختبرة على PostgreSQL عن طريق Testcontainers؛ وقاعدة بيانات المعاينة الفعلية ماتفحصتش للصفحة دي (NOT VERIFIED إن صلاحيات الدور المنشور مطابقة).
+* سكريبت مطابقة البيانات والحمايات المبنية على الـ Triggers متختبرة على PostgreSQL عن طريق Testcontainers؛ وقاعدة بيانات المعاينة الفعلية ماتفحصتش للصفحة دي (NOT VERIFIED إن صلاحيات الدور المنشور مطابقة).
