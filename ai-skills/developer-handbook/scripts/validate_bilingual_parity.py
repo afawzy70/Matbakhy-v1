@@ -137,7 +137,13 @@ SECRET_PATTERNS = (
     re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}|\bAKIA[0-9A-Z]{16}\b"),
 )
 SECRET_ASSIGN_RE = re.compile(r"\b[A-Z][A-Z0-9_]*(?:PASSWORD|SECRET|TOKEN|KEY|PEPPER)[A-Z0-9_]*=([^\s#`]+)")
-SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|\"|'|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
+SAFE_SECRET_VALUE_RE = re.compile(r"^(?:<|\$|REPLACE|\.\.\.|\*{3}|changeme|x{3,}|\{|%|\[)", re.I)
+
+
+def unsafe_secret_value(raw: str) -> str | None:
+    """The assigned value (quotes stripped) when it looks like a real credential, else None (placeholders are fine)."""
+    v = raw.strip("\"'")
+    return v if v and not SAFE_SECRET_VALUE_RE.match(v) else None
 CHECKS = ("outside", "same-pr", "sync", "missing", "orphan", "exceptions", "evidence", "secrets", "arrows", "headings", "fences", "tables", "lists", "blocks", "images", "links", "inline-code", "tokens", "metadata", "language-link",
           "anchors")
 
@@ -257,7 +263,7 @@ def redact(text: str) -> str:
     """Diagnostics go to CI logs: never print credential-shaped values, whatever check found them."""
     for pat in SECRET_PATTERNS:
         text = pat.sub("<redacted>", text)
-    return SECRET_ASSIGN_RE.sub(lambda m: m.group(0).split("=", 1)[0] + "=<redacted>" if not SAFE_SECRET_VALUE_RE.match(m.group(1)) else m.group(0), text)
+    return SECRET_ASSIGN_RE.sub(lambda m: m.group(0).split("=", 1)[0] + "=<redacted>" if unsafe_secret_value(m.group(1)) else m.group(0), text)
 
 
 class Validator:
@@ -265,6 +271,7 @@ class Validator:
         self.root = root
         self.hb = root / HB
         self.used_exc: set[tuple[str, str]] = set()
+        self.secret_values: set[str] = set()
         self.problems: dict[str, list[str]] = {}
         self.exc = self._load(EXCEPTIONS).get("files", {})
 
@@ -280,7 +287,10 @@ class Validator:
         if check in allowed and allowed[check].get("reason", "").strip() and allowed[check].get("reviewed", "").strip():
             self.used_exc.add((page, check))
             return
-        self.problems.setdefault(page, []).append(f"[{check}] {redact(msg)}")
+        msg = redact(msg)
+        for sv in self.secret_values:  # a value found in any page is masked wherever a diagnostic would print it (tokens, links, code)
+            msg = msg.replace(sv, "<redacted>")
+        self.problems.setdefault(page, []).append(f"[{check}] {msg}")
 
     # ------------------------------------------------------------------ one pair
     def compare(self, rel: str) -> None:
@@ -293,6 +303,8 @@ class Validator:
             self.fail(rel, "missing", f"no Arabic counterpart {ar_name(rel)}")
             return
         en_text, ar_text = en_p.read_text(encoding="utf-8"), ar_p.read_text(encoding="utf-8")
+        for t in (en_text, ar_text):
+            self.secret_values.update(sv for m in SECRET_ASSIGN_RE.finditer(t) if (sv := unsafe_secret_value(m.group(1))))
         en, ar = Features(en_text), Features(ar_text)
         if not ar_text.strip() or len(ar_text.strip()) < 0.2 * len(en_text.strip()):
             self.fail(rel, "headings", "Arabic file is empty or implausibly short")
@@ -374,7 +386,7 @@ class Validator:
             if any(pat.search(text) for pat in SECRET_PATTERNS):
                 kind = "a private key header or a token-shaped string"
             else:
-                m = next((m for m in SECRET_ASSIGN_RE.finditer(text) if not SAFE_SECRET_VALUE_RE.match(m.group(1))), None)
+                m = next((m for m in SECRET_ASSIGN_RE.finditer(text) if unsafe_secret_value(m.group(1))), None)
                 if m:
                     kind = f"a real-looking value assigned to {m.group(0).split('=', 1)[0]}"
             if kind:  # never echo the value: diagnostics are printed to CI logs
@@ -544,6 +556,9 @@ class Validator:
                 print(f"REFUSED {rel}: English changed but the Arabic page did not; translate the change first")
                 return 1
             pairs[rel] = now
+        if not self.inside(self.root / SYNC):
+            print(f"REFUSED {SYNC} resolves outside the repository; nothing was written")
+            return 2
         (self.root / SYNC).write_text(json.dumps({"schema_version": 1, "note": "sha256 of both files when the pair was last reviewed together; "
                                                   "maintained by scripts/validate_handbook_parity.py --update-sync", "pairs": pairs},
                                                  indent=1, ensure_ascii=False, sort_keys=True) + "\n", encoding="utf-8")

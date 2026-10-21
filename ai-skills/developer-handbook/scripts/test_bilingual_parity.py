@@ -279,6 +279,24 @@ class ParityTests(unittest.TestCase):
         (self.f.root / v.EXCEPTIONS).symlink_to(outside)  # an external exceptions file must not crash initialisation
         self.assertTrue(any("[outside]" in m for ms in v.Validator(self.f.root).problems.values() for m in ms))
 
+    def test_english_only_and_quoted_credentials_are_masked_in_every_diagnostic(self) -> None:
+        self.f.edit("a.md", "`code_id`", "`code_id` and DB_PASSWORD=Sup3rSecretValue99")
+        self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة افتتاحية و API_TOKEN='QuotedSecret1234567'")
+        problems = self.f.check()
+        flat = json.dumps(problems, ensure_ascii=False)
+        self.assertNotIn("Sup3rSecretValue99", flat)
+        self.assertNotIn("QuotedSecret1234567", flat)
+        self.assertProblem(problems, "secrets")
+
+    def test_update_sync_never_writes_through_an_external_symlink(self) -> None:
+        outside = Path(tempfile.mkdtemp()) / "translation-sync.json"
+        outside.write_text("{}", encoding="utf-8")
+        self.addCleanup(lambda: shutil.rmtree(outside.parent, ignore_errors=True))
+        (self.f.root / v.SYNC).symlink_to(outside)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(v.Validator(self.f.root).update_sync(), 2)
+        self.assertEqual(outside.read_text(encoding="utf-8"), "{}")
+
     def test_file_option_rejects_traversal(self) -> None:
         val = v.Validator(self.f.root)
         val.run("../../etc/passwd.md")
