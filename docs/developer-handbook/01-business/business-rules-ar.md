@@ -36,7 +36,7 @@
 
 ## الـ Authentication
 
-- **BR-001 — بس الحسابات المسجّلة والنشطة هي اللي تعمل العمليات الخاصة؛ التصفّح مفتوح للجميع من غير تسجيل.**
+- **BR-001 — بس الحسابات النشطة اللي مسجّلة دخولها هي اللي تعمل العمليات الخاصة؛ التصفّح مفتوح للجميع من غير تسجيل.**
   - Impl: `backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java` (`PUBLIC_GET`, `.requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)`), `backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java`.
   - Tx / API: كل نداء على `/api/**`. DB: `app_user.status` (V1).
   - Test: `identity/IdentityIntegrationTest.java` (`anonymous_private_calls_get_401_without_private_data`, `public_browsing_stays_anonymous`, `suspended_account_is_denied_with_scoped_error_and_no_profile`).

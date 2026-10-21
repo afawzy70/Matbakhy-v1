@@ -11,7 +11,7 @@
 1. **مزوّد الهوية بيعمل Authentication؛ والتطبيق بيعمل Authorization.** Keycloak بيثبت المستخدم مين. أما المسموح للمستخدم بيه فبيتحدد من قاعدة بيانات التطبيق بس (`app_user` و`user_grant` و`kitchen` و`mfa_policy`). الـ Role claims اللي في الـ Token بتتتجاهل (Javadoc بتاع `SecurityConfiguration`).
 2. **الرفض هو الأصل (Deny by default).** سلسلتين الـ Filters بيخلصوا بـ `anyRequest().denyAll()`؛ و`/api/**` بيطلب صلاحية `ACCOUNT_ACTIVE` ما عدا قايمة GET عامة صريحة وEndpoint النشاط المجهول.
 3. **فحوصات على مستوى الـ Object في الـ Services، و404 للكائنات الغريبة.** شوف [معمارية الـ Backend](backend-architecture-ar.md#الـ-validation-ومعالجة-الأخطاء).
-4. **حالة السيرفر هي الصلاحية الوحيدة** للأسعار والسعة والانتقالات؛ والـ Clients عمرها ما بتبعتها.
+4. **حالة السيرفر هي المرجع الوحيد المعتمد** للأسعار والسعة والانتقالات؛ والـ Clients عمرها ما بتبعتها.
 
 ## استخدام Keycloak
 

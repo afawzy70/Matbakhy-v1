@@ -40,7 +40,7 @@
 | `src/Account.tsx` | البروفايل والمفضلة وصندوق الإشعارات وحالات الدعم (`SupportCaseDetail`) والعناوين وطلب الحذف |
 | `src/Security.tsx` | تفضيل التحقق بخطوتين ورابط الـ Step-up (`/oauth2/authorization/keycloak?stepUp=true`) |
 | `src/activity.ts` | نشاط تصفح مجهول الهوية ومنزوع التكرار (`POST /api/v1/activity`) |
-| `src/EnvironmentNotice.tsx` | بانر للبيئات التجريبية/المعاينة |
+| `src/EnvironmentNotice.tsx` | بانر لبيئات البيانات الاصطناعية/المعاينة |
 | `src/App.test.tsx` | اختبارات Vitest + Testing Library بـ `fetch` وهمي (جدول Routes بصيغة `"METHOD /path": () => response`) |
 
 تفاصيل عن التسجيل تستاهل تعرفها: التسجيل المعلّق `{clientRequestId, idempotencyKey, quoteId, terms, cancellation}` بيتكتب

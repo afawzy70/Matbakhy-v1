@@ -16,9 +16,9 @@ sequenceDiagram
   A->>API: PUT /cook/application (مسودة خاصة، API-043)
   A->>API: رفع المستندات (API-039/040)، خاصة
   A->>API: POST /cook/application/submit (API-044)
-  API-->>A: المراجعة رقم 1 غير قابلة للتعديل، الحالة SUBMITTED
+  API-->>A: نسخة الطلب رقم 1 غير قابلة للتعديل، الحالة SUBMITTED
   R->>API: القرار START_REVIEW (API-069)
-  R->>API: APPROVE / REQUEST_CHANGES / REJECT + السبب + المراجعة + الإصدار
+  R->>API: APPROVE / REQUEST_CHANGES / REJECT + السبب + نسخة الطلب (revision) + الإصدار (version)
   API-->>A: APPROVED => إنشاء صف المطبخ؛ المتقدّم بيبقى طبّاخ
 ```
 
@@ -26,11 +26,11 @@ sequenceDiagram
 - **التقديم** بيحتاج مسودة كاملة وبيعمل `cook_application_revision` غير قابلة للتعديل (Trigger في الـ Database اسمه `cook_revision_immutable`، في `backend/app/src/main/resources/db/migration/V5__cook_applications_and_kitchens.sql`). المسودة الناقصة بتترفض مع قائمة بالحقول الناقصة وبدون ما تتعمل مراجعة. المناطق اللي اتعطّلت بعد المسودة بتمنع التقديم.
 - **المراجعة** (`CookReviewService`): القرارات هي `START_REVIEW` و`APPROVE` و`REQUEST_CHANGES` و`REJECT`. القواعد:
   - محتاجة `cook.review` **و**MFA حديث (`CookReviewController`)؛
-  - `START_REVIEW` لازم تيجي الأول؛ والقرار بيحدد **المراجعة** (revision) و**إصدار** الطلب اللي بيخصّه؛ السبب مطلوب؛ وتأثير واحد لكل Idempotency key؛
-  - المراجع عمره ما يقدر يقرّر في طلبه هو (المحاولة بتتسجّل في المراجعة؛ حالة المالك E2E-OPS-108)؛
+  - `START_REVIEW` لازم تيجي الأول؛ والقرار بيحدد **نسخة الطلب** (revision) و**إصدار** الطلب اللي بيخصّه؛ السبب مطلوب؛ وتأثير واحد لكل Idempotency key؛
+  - المراجع عمره ما يقدر يقرّر في طلبه هو (المحاولة بتتسجّل في سجل الـ Audit؛ حالة المالك E2E-OPS-108)؛
   - المستندات الخاصة بيقراها المالك وموظفين المراجعة بس، وكل قراءة من الموظف بتتسجّل (E2E-COOK-053)؛
   - `APPROVE` بيعمل `kitchen` واحد بالظبط (الموافقات المتزامنة برضه بتنتج واحد؛ الاختبار `concurrent_approvals_create_exactly_one_kitchen`، `backend/app/src/test/java/com/matbakhy/app/cooks/CookWorkflowIntegrationTest.java`)؛
-  - `REQUEST_CHANGES` بيرجّع المتقدّم يعدّل ويقدّم تاني كمراجعة تالية؛ و`REJECT` بيحتفظ بكل التاريخ وعمره ما بينشئ مطبخ (E2E-COOK-111).
+  - `REQUEST_CHANGES` بيرجّع المتقدّم يعدّل ويقدّم تاني كنسخة تالية من الطلب؛ و`REJECT` بيحتفظ بكل التاريخ وعمره ما بينشئ مطبخ (E2E-COOK-111).
 - **الموافقة تشغيلية.** معناها إن الموظفين راجعوا نسخة كاملة وسجّلوا مين قرّر وليه. مش شهادة سلامة غذاء، والـ DTOs العامة بتعرض التسمية المحايدة `OPERATIONALLY_VERIFIED`.
 
 حالات المالك: E2E-COOK-048، E2E-COOK-049، E2E-COOK-111، E2E-OPS-109.
@@ -48,7 +48,7 @@ sequenceDiagram
 
 (من `KitchenDirectory.KitchenStatus.canAcceptOrders` / `canFulfillAcceptedOrders` في `backend/modules/cooks/src/main/java/com/matbakhy/cooks/api/KitchenDirectory.java` و`KitchenService`.)
 
-الأوامر: الموظفين `PAUSE` و`SUSPEND` و`RESTORE` (API-070)؛ إيقاف الطبّاخ واستئنافه عن طريق `PATCH /api/v1/cook/settings` (API-065). الإيقاف اللي حطّه الموظفين الطبّاخ مايقدرش يلغيه (E2E-COOK-107). الموظفين مايقدروش يغيّروا حالة مطبخهم هم (متسجّل في المراجعة، `KitchenService`). مطبخ الطبّاخ الموقوف أو غير المعتمد مش ظاهر للعملاء ومايتعملوش له Quote (E2E-DISC-104)؛ والإيقاف بيوقف المبيعات الجديدة والقبول بس بيسيب الأوردرات المقبولة تخلص (E2E-COOK-050).
+الأوامر: الموظفين `PAUSE` و`SUSPEND` و`RESTORE` (API-070)؛ إيقاف الطبّاخ واستئنافه عن طريق `PATCH /api/v1/cook/settings` (API-065). الإيقاف اللي حطّه الموظفين الطبّاخ مايقدرش يلغيه (E2E-COOK-107). الموظفين مايقدروش يغيّروا حالة مطبخهم هم (متسجّل في سجل الـ Audit، `KitchenService`). مطبخ الطبّاخ الموقوف أو غير المعتمد مش ظاهر للعملاء ومايتعملوش له Quote (E2E-DISC-104)؛ والإيقاف بيوقف المبيعات الجديدة والقبول بس بيسيب الأوردرات المقبولة تخلص (E2E-COOK-050).
 
 ## 3. إعدادات المطبخ
 

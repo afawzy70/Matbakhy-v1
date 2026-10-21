@@ -11,12 +11,12 @@
 
 | البند | التفصيل |
 |---|---|
-| الغرض | Client واحد متكتّب لعقد الـ API، بيستخدمه `apps/customer-web` و `apps/operations-web` و `apps/customer-mobile` |
+| الغرض | Client واحد بأنواع محددة (Typed) لعقد الـ API، بيستخدمه `apps/customer-web` و `apps/operations-web` و `apps/customer-mobile` |
 | نقطة الدخول | `packages/api-client/src/index.ts`: `createApiClient(options)` (بيغلّف `openapi-fetch`)، وإعادة تصدير الأنواع (`components` و `operations` و `paths` و `ApiError`)، و `parseMoney` و `MalformedMoneyError` و `priceChanges` |
 | الكود المتولّد | `packages/api-client/src/generated/schema.ts` من `contracts/openapi.yaml` (`pnpm --filter @matbakhy/api-client run generate`)؛ والحداثة بيفحصها `check:drift` |
 | مساعد الفلوس | `packages/api-client/src/money.ts` — `parseMoney` بتقبل بالظبط `{amountMinor, currency}` بمبلغ Safe Integer وعملة `EGP`؛ وبترفض الكسور العشرية والنصوص الرقمية والحقول الزيادة |
 | مساعد تغيّر السعر | `packages/api-client/src/priceChanges.ts` — بيقارن بين عرضين للسعر لإشعار إعادة التأكيد D13 ([تنفيذ التسعير](pricing-implementation-ar.md)) |
-| الاختبارات | `packages/api-client/test/client.test.ts` (المسارات المتكتّبة بتتعمل Compile/بتفشل) و `money.test.ts` (TC-107) و `priceChanges.test.ts` و `registry.test.ts` (العقد مقابل الـ Registry مقابل `ErrorCode`) |
+| الاختبارات | `packages/api-client/test/client.test.ts` (المسارات ذات الأنواع المحددة (Typed paths) بتتعمل Compile/بتفشل) و `money.test.ts` (TC-107) و `priceChanges.test.ts` و `registry.test.ts` (العقد مقابل الـ Registry مقابل `ErrorCode`) |
 | الـ Authentication | مش في الحزمة دي: كل تطبيق بيبني إعدادات الـ fetch بتاعته (كوكي + CSRF للويب، و Bearer للموبايل) وبيمرّرها كـ `ClientOptions` |
 
 قواعد التغيير: ماتعدّلش `schema.ts` بإيدك؛ غيّر `contracts/openapi.yaml` وولّد من جديد واعمل Commit للاتنين. شوف [عقود الـ API](api-contracts-ar.md).

@@ -1,7 +1,7 @@
 # اليوم 3 - الـ Backend وقاعدة البيانات والأمان
 
 > **Owner role:** Backend architecture
-> **Status:** REFERENCE — Lab لتتبّع Request جوّه الـ Backend وفهم الـ Authorization وقواعد البيانات.
+> **Status:** REFERENCE — Lab لتتبّع Request جوّه الـ Backend وفهم الـ Authorization والقواعد اللي بتحكم التعامل مع البيانات.
 > **Language / اللغة:** [English](day-3-backend-security.md) · العربية
 
 ## الأهداف

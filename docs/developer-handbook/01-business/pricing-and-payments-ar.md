@@ -62,7 +62,7 @@ platform fee    = none
 |---|---|
 | إعادة التحقق وأكواد الأسباب (`MEAL_CHANGED` و`TOTAL_CHANGED` و`POLICY_CHANGED` و`ADDRESS_CHANGED` و`PAYMENT_CHANGED`) | `QuoteService.requireValid` في `backend/modules/orders/src/main/java/com/matbakhy/orders/internal/QuoteService.java` |
 | تسلسل تحديثات السعر مقابل التسجيل | `commerce_policy ... FOR SHARE` زائد `meals.lockPricing(...)` جوه `requireValid` |
-| نسب التغيير للعميل | `priceChanges` في `packages/api-client/src/priceChanges.ts`؛ والواجهة في `apps/customer-web/src/Checkout.tsx` وCheckout الموبايل |
+| توضيح مصدر التغيير للعميل | `priceChanges` في `packages/api-client/src/priceChanges.ts`؛ والواجهة في `apps/customer-web/src/Checkout.tsx` وCheckout الموبايل |
 | الاختبارات الآلية | `backend/app/src/test/java/com/matbakhy/app/orders/PriceChangeIntegrationTest.java` (رفع/خفض، تعديل سعر حقيقي من الطبّاخ، تغيير رسوم التوصيل بس، سباقات التحديث-الأول والتسجيل-الأول، استرجاع الرد الضايع) |
 | حالات E2E للمالك | E2E-BASKET-014, E2E-BASKET-015, E2E-BASKET-022, E2E-ORDER-112, E2E-OPS-106 |
 
@@ -131,7 +131,7 @@ stateDiagram-v2
 - الوصول لـ `DISPUTED` أو `RECONCILE_PENDING` أو `REFUND_OWED` بيفتح حالة دعم `PAYMENT` واحدة بخطورة HIGH لكل أوردر (Partial Unique Index، V28) في نفس الـ Transaction؛ ونصها مفيهوش رقم حساب ولا مرجع ولا مبلغ (E2E-FIN-040).
 - الطرف التاني بيتبلّغ داخل التطبيق عن طريق الـ Outbox (مجموعة `NOTIFIED`)؛ وفشل الإشعار مبيغيّرش حالة الدفع أبدًا.
 - العربون **مش** قيد في الدفتر (Ledger)؛ ومبيظهرش أبدًا في `ledger_entry` (حالة المالك E2E-FIN-045).
-- مطبخ تاني مينفعش يستلم أو يتنازع أو يسترد عربون أوردر غريب (الاختبار `another_approved_kitchen_cannot_receipt_report_a_problem_or_refund_a_foreign_deposit`).
+- مطبخ تاني مينفعش يبلّغ باستلام عربون أوردر مش تابع له، أو يفتح نزاع عليه، أو يرجّعه للعميل (الاختبار `another_approved_kitchen_cannot_receipt_report_a_problem_or_refund_a_foreign_deposit`).
 
 ## 5. تحصيل الكاش والتحقق منه
 

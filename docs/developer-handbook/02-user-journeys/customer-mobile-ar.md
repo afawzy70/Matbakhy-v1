@@ -16,7 +16,7 @@
 | تبويبات سفلية | Account | `apps/customer-mobile/src/screens/Account.tsx` | تسجيل دخول/خروج، تبديل الحساب، روابط الإشعارات والدعم، اللغة، كارت إذن تنبيهات التليفون |
 | Stack | Meal | `screens/Meal.tsx` | الـ Slot، الكمية، الإضافة للسلة |
 | Stack | Cart | `screens/Cart.tsx` | السلة، التحقق من التليفون، عرض السعر، التسجيل، الاسترجاع |
-| Stack | Order | `screens/Orders.tsx` (`OrderScreen`) | التتبّع، الإلغاء، المراجعة، حالة الدفع |
+| Stack | Order | `screens/Orders.tsx` (`OrderScreen`) | التتبّع، الإلغاء، التقييم، حالة الدفع |
 | Stack | Notifications | `screens/Notifications.tsx` | صندوق الوارد داخل التطبيق |
 | Stack | Support | `screens/Support.tsx` | حالات عن أوردر |
 | (عناصر الدفع) | `screens/Payment.tsx` | شروط/حالة العربون جوه Cart وOrder |
@@ -100,9 +100,9 @@
 12. الاختبارات: `ordering.test.ts` (بلوك placement)، `App.test.tsx` ("the unconfirmed order stays reachable…"، "repeated Check and retry"، "D13 on native")، الـ CI: `OrderingTests.swift` testA/B/C/H، `order-roundtrip-android.sh` (إيقاف أثناء استجابة بطيئة باستخدام `e2e-native/slow_proxy.py`، وعدّ في قاعدة البيانات لأوردر واحد بالظبط).
 13. اختبارات المالك E2E: E2E-ORDER-107، E2E-ORDER-122، E2E-ORDER-024، E2E-BASKET-026؛ J8. 14. IMPLEMENTED (محاكي/Simulator)؛ الجهاز NOT VERIFIED. 15. مفيش إشعار Push عند تغيّر الحالة.
 
-### CM-4 تتبّع الأوردر، تقرير العربون، الإلغاء، المراجعة
+### CM-4 تتبّع الأوردر، تقرير العربون، الإلغاء، التقييم
 1. الهدف: متابعة الأوردر والإبلاغ عن العربون بأمانة. 2. الطرف: صاحب الأوردر. 3. المتطلب المسبق: أوردر.
-4. البداية: تبويب Orders أو Deep Link `<scheme>://orders/<id>`. 5. الإجراءات: فتح الأوردر؛ "I sent the deposit"؛ إلغاء / طلب إلغاء؛ مراجعة أوردر مكتمل.
+4. البداية: تبويب Orders أو Deep Link `<scheme>://orders/<id>`. 5. الإجراءات: فتح الأوردر؛ "I sent the deposit"؛ إلغاء / طلب إلغاء؛ تقييم أوردر مكتمل.
 6. الاستجابات: التحديث كل 10 ثواني؛ كود التسليم بيظهر لما السيرفر يرجّعه؛ نص العربون بيذكر إن المطبخ لازم يؤكد الاستلام.
 7. الـ API: `GET /api/v1/orders`، `GET /api/v1/orders/{orderId}`، `POST …/cancel`، `POST …/cancellation-requests`، `POST …/payment/transfer-report`، `POST …/reviews`.
 8–9. زي CW-5. 10. زي CW-5. 11. معرّف أوردر حساب تاني → شاشة "not found".

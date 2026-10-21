@@ -16,12 +16,12 @@
 | تسجيل دخول OIDC على الويب، وجلسات PostgreSQL، وCSRF، وCORS allowlist، وتسجيل الخروج | IMPLEMENTED | `SecurityConfiguration` webChain؛ `IdentityIntegrationTest`، `CsrfCookie*IntegrationTest`؛ MB-009 DONE |
 | التحقق من Bearer JWT الـ Native (الـ Issuer، الـ Audience) | IMPLEMENTED | `SecurityConfiguration` bearerChain؛ `IdentityIntegrationTest` |
 | ربط الحساب، ورفض الحساب الموقوف، والأدوار من حالة السيرفر بس | IMPLEMENTED | `AccountMapper`، `AccountLifecycleService` |
-| الملف الشخصي، والموبايل المصري الموثّق (أكواد مُجزّأة لاستخدام واحد، مع حدود)، والعناوين | IMPLEMENTED | `ContactIntegrationTest`، TC-003..005؛ مزوّد SMS الحقيقي **PLANNED** (O07؛ فيه Sender وهمي بس) |
+| الملف الشخصي، والموبايل المصري الموثّق (أكواد متخزّنة كـ Hash ولاستخدام واحد، مع حدود)، والعناوين | IMPLEMENTED | `ContactIntegrationTest`، TC-003..005؛ مزوّد SMS الحقيقي **PLANNED** (O07؛ فيه Sender وهمي بس) |
 | صلاحيات الموظفين، وحماية آخر أدمن والتصعيد الذاتي، وسجل التدقيق | IMPLEMENTED | `StaffAccessIntegrationTest`، TC-006/007/043 |
 | سياسة MFA قابلة للضبط (Keycloak هو اللي بينفّذ MFA؛ DISABLED/OPTIONAL/REQUIRED لكل فئة)، وفلتر الإنفاذ، وإعادة ضبط الأدمن، وتفضيل المستخدم | IMPLEMENTED | `MfaPolicyService`، `MfaEnforcementFilter`، V31؛ `MfaPolicyIntegrationTest`، `MfaPolicyResolveTest`، `MfaIdpTest`، `MfaResetIntegrationTest`، `MfaResetAuditIntegrationTest`؛ D18. مش Story منفصلة في الـ Backlog (شوف التعارضات) |
 | طلبات الطبّاخين، وقرار المراجع مع Step-up، وإنشاء المطبخ، والإيقاف المؤقت/التعليق | IMPLEMENTED | `CookWorkflowIntegrationTest`، TC-008/009؛ MB-012 DONE |
 | خط الميديا (رفع موقّع، تحقق، فحص، مستندات خاصة، تنظيف) | IMPLEMENTED with fakes | `MediaIntegrationTest`، `MediaCleanupIntegrationTest`؛ فاحص البرمجيات الخبيثة الحقيقي **PLANNED** (O07) |
-| الوجبات، والمراجعات (Revisions)، وحراس النشر، والإشراف، وتاريخ الأسعار | IMPLEMENTED | `MealIntegrationTest`، `ModerationIntegrationTest`، `PriceHistoryIntegrationTest`؛ MB-014، MB-048 |
+| الوجبات، ونسخها (Revisions)، وحراس النشر، والإشراف، وتاريخ الأسعار | IMPLEMENTED | `MealIntegrationTest`، `ModerationIntegrationTest`، `PriceHistoryIntegrationTest`؛ MB-014، MB-048 |
 | الـ Slots والسعة (جدولة بتوقيت القاهرة) | IMPLEMENTED | `SlotIntegrationTest`، TC-013..015 |
 | الاكتشاف (Discovery) والمناطق من جهة السيرفر | IMPLEMENTED | `DiscoveryIntegrationTest` |
 | عروض الأسعار (تسعير السيرفر، TTL السياسة 5 دقايق، طبّاخ واحد + Slot واحد) | IMPLEMENTED | `QuoteIntegrationTest`؛ [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) |
@@ -61,7 +61,7 @@
 | التحقق من إمكانية الوصول والتجاوب | PARTIALLY IMPLEMENTED | فيه اختبارات keyboard/RTL؛ اختبار قارئ الشاشة ماتعملش: TC-047 BLOCKED، MB-029 BLOCKED (BLK-003)؛ MB-030 (رحلات كاملة آلية) TODO |
 | موبايل العميل: تسجيل الدخول (PKCE، تخزين آمن)، الاكتشاف، السلة، الأوردر، Checkout العربون، صندوق الإشعارات، الدعم | IMPLEMENTED on emulator/simulator | `apps/customer-mobile/src/*.test.ts(x)`؛ التشغيلات الـ Native متسجّلة تحت `verification/runs/`؛ MB-031/032 DONE |
 | Push دورة حياة الموبايل، وتوجيه Push بالـ Deep Link، والنص الديناميكي وقارئات الشاشة | PARTIALLY IMPLEMENTED | MB-033 IN_PROGRESS؛ الـ Push متعطّل (O07) |
-| مرشّحات إصدار Android و iOS، وتقديم المتاجر | PLANNED | MB-034، MB-035، MB-045 TODO؛ TC-051/052/063 NOT_RUN |
+| نسخ Android و iOS المرشّحة للإصدار، وتقديم المتاجر | PLANNED | MB-034، MB-035، MB-045 TODO؛ TC-051/052/063 NOT_RUN |
 | التحقق على الأجهزة الفعلية | NOT VERIFIED | BLK-004 في `docs/status/latest.md` |
 
 ## البيئات والعمليات

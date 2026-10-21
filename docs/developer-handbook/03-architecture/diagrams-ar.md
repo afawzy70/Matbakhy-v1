@@ -285,7 +285,7 @@ stateDiagram-v2
 sequenceDiagram
     autonumber
     participant K as "المطبخ (ويب الطبّاخ)"
-    participant C as "عميل الزبون"
+    participant C as "تطبيق العميل (Customer client)"
     participant S as "السيرفر"
     participant D as PostgreSQL
     C->>S: POST quote
@@ -427,7 +427,7 @@ flowchart TB
             prom["prometheus + node-exporter"]
             am["alertmanager + alert-sink"]
         end
-        graf["grafana (Profile أدوات، 127.0.0.1:3000 بس)"]
+        graf["grafana (الـ Profile اسمه tools، 127.0.0.1:3000 بس)"]
     end
     proxy -->|"app. / ops. ملفات ثابتة"| proxy
     proxy -->|"api.* /api /oauth2 /login/oauth2"| api
