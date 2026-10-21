@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** REFERENCE — lab for running the applications and walking each user journey.
+> **Language / اللغة:** English · [العربية](day-2-applications-ar.md)
 
 ## Objectives
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** PARTIALLY IMPLEMENTED — cash on receipt, kitchen-reported deposits, reconciliation and the ledger exist; live money is gated and no payment gateway, bank verification or automated reconciliation exists (by decision)
+> **Language / اللغة:** English · [العربية](payment-implementation-ar.md)
 
 What the code does with money. Product framing: [pricing and payments](../01-business/pricing-and-payments.md), `docs/strategy/mvp-direct-deposit-payment.md`,
 `docs/product/09-deposit-payment-states.md`. Decisions: D05 (cash-first), D10 (zero commission), D16 (manual deposit paid directly to the

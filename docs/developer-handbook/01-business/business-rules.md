@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — a navigable digest of the rules that matter most; the rule text itself stays in the canonical documents.
+> **Language / اللغة:** English · [العربية](business-rules-ar.md)
 
 This page does **not** copy the 64 rules. It groups them by domain and, for the significant ones, tells you where to find the requirement, the implementing code, the database effect, the automated test and the owner end-to-end case.
 

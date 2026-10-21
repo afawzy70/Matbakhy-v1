@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** PARTIALLY IMPLEMENTED — diagrams show what the code does today; planned or disabled parts are marked in the node text
+> **Language / اللغة:** English · [العربية](diagrams-ar.md)
 
 All diagrams are Mermaid text. Edit them in place; GitHub renders them. Every diagram has a caption naming the files it was derived from, so a change in those files is a reason to re-check the diagram (policy: [documentation maintenance](../05-developer-workflow/documentation-maintenance.md)). Prose for each area lives in the architecture pages: [system overview](system-overview.md), [backend](backend-architecture.md), [frontend](frontend-architecture.md), [mobile](mobile-architecture.md), [database](database-architecture.md), [identity and security](identity-and-security.md), [integration and events](integration-and-events.md), [infrastructure](infrastructure-and-deployment.md).
 

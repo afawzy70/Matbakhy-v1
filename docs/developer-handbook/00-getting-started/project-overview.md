@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — describes what Matbakhy is and what exists today; the future items are labelled PLANNED.
+> **Language / اللغة:** English · [العربية](project-overview-ar.md)
 
 Read this page first. It explains the product to someone who has never heard of it, then points to the pages that go deeper.
 

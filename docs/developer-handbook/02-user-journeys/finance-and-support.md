@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — deposit reconciliation, refunds, settlements, statements and support cases have API and screens; cash-report verification has an API but no screen; all money is synthetic and live money is gated.
+> **Language / اللغة:** English · [العربية](finance-and-support-ar.md)
 
 Money rules to keep in mind: zero Matbakhy commission and no customer platform fee in the MVP; Matbakhy never holds customer money; a deposit is a manual direct transfer from the customer to the kitchen's approved recipient and the kitchen **reports** receipt (never "bank verified"). Background: [Pricing and payments](../01-business/pricing-and-payments.md), `docs/product/09-deposit-payment-states.md`, [Payment implementation](../04-codebase/payment-implementation.md). Staff permissions: [Backoffice administration](backoffice-admin.md).
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** PARTIALLY IMPLEMENTED — the cook workspace (orders, meals, slots, settings, payment profile, statement, insights) and the staff approval flow work through API and web; the cook application form has an API but no screen.
+> **Language / اللغة:** English · [العربية](cook-operations-ar.md)
 
 The cook workspace is the first group of tabs of the **operations web app** (`apps/operations-web`), shared with the staff tabs ([Backoffice administration](backoffice-admin.md)). Who is a cook is decided on the server: an account that **owns an approved kitchen** (`KitchenService.ownedBy` in `backend/modules/cooks/src/main/java/com/matbakhy/cooks/internal/KitchenService.java`). There is no cook role claim in tokens (`AccountMapper` ignores token roles). Business background: [Kitchen management](../01-business/kitchen-management.md) and [Order lifecycle](../01-business/order-lifecycle.md).
 

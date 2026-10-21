@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — checklist and scoring rubric that decide whether a new developer is ready to work independently.
+> **Language / اللغة:** English · [العربية](final-assessment-ar.md)
 
 The assessor is a maintainer (not the candidate). The candidate works without an AI assistant, using only the repository and the handbook. Every item needs the evidence listed; claims without evidence score 0. Use synthetic data only.
 

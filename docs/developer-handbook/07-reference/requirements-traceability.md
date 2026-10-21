@@ -2,6 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** PARTIALLY IMPLEMENTED — matrix for 13 critical paths with real file references; coverage gaps are marked GAP and listed at the end
+> **Language / اللغة:** English · [العربية](requirements-traceability-ar.md)
 
 Chain traced per row: **requirement** (`BR-nnn` in `planning/rules.json`, decision `Dnn` in `planning/decisions.json`) -> **user journey page** ->
 **API operation** (id in `contracts/endpoints.json`) -> **implementation file** -> **DB entity / migration** -> **automated test** -> **owner E2E case**

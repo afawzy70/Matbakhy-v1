@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** PARTIALLY IMPLEMENTED — customer discovery, ordering and deposit flows exist; push delivery, physical-device and screen-reader acceptance do not
+> **Language / اللغة:** English · [العربية](mobile-code-guide-ar.md)
 
 The customer Android/iOS app is `apps/customer-mobile/`: React Native 0.86 + Expo 57 with React Navigation
 (versions from `apps/customer-mobile/package.json`). There is **no mobile app for cooks or staff**; those use the operations web.

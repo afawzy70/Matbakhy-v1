@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — branch, commit, PR, review and merge rules as practised in this repository.
+> **Language / اللغة:** English · [العربية](git-and-pr-workflow-ar.md)
 
 Authority: [CLAUDE.md](../../../CLAUDE.md), [AGENTS.md](../../../AGENTS.md), [progress reporting contract](../../delivery/05-progress-reporting.md), [execution protocol](../../delivery/02-execution-protocol.md).
 

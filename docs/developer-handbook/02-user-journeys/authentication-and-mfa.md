@@ -2,6 +2,7 @@
 
 > **Owner role:** Security and Keycloak
 > **Status:** PARTIALLY IMPLEMENTED — OIDC sign-in, policy-driven TOTP step-up, preference, reset and session invalidation are implemented; applying the realm migration to the live realm and phone-device verification are owner-gated and NOT VERIFIED.
+> **Language / اللغة:** English · [العربية](authentication-and-mfa-ar.md)
 
 Keycloak (realm `matbakhy`) authenticates people; Spring Boot authorises. The backend has no password or OTP code. Design: [Identity and security](../03-architecture/identity-and-security.md). Policy text (authoritative for intent): `docs/security/mfa-policy.md`. Keycloak admin console: `docs/operations/14-keycloak-admin-console.md`.
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — index of where decisions are recorded, their status and the supersession links that can be found in the repository
+> **Language / اللغة:** English · [العربية](architecture-decisions-ar.md)
 
 There is no `adr/` folder. Decisions live in four places, with different roles:
 

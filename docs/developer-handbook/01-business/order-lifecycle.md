@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** IMPLEMENTED — every state and command below exists in `backend/modules/orders`; items outside that (live payments, courier tracking) are labelled in the body.
+> **Language / اللغة:** English · [العربية](order-lifecycle-ar.md)
 
 This page follows one order from discovery to completion, using the real state machine. It answers: *what does the business expect to happen at each step, what does the server enforce, and what error does a client get when it breaks the rule?* The canonical product-level definition is `docs/product/04-state-machines.md`; where this page differs, the code is the source of truth and the difference is listed at the bottom.
 

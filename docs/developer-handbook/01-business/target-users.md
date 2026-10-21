@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — customer and cook journeys are implemented; catering as a separate product is PLANNED only.
+> **Language / اللغة:** English · [العربية](target-users-ar.md)
 
 This page describes who the product serves and which of their needs the code meets today. For the technical roles and permissions see [actors and permissions](actors-and-permissions.md).
 

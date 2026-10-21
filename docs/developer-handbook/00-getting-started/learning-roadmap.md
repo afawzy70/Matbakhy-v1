@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — the five-day path for a new developer, with links to each day's lab.
+> **Language / اللغة:** English · [العربية](learning-roadmap-ar.md)
 
 The goal after five days: you can explain the product, run and debug the system, find where a business rule is implemented, write and run tests, fix a defect and submit a pull request that follows DOC-001, without an AI assistant. Progress is judged by the [final assessment](../06-onboarding-labs/final-assessment.md).
 

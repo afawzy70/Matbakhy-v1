@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** PARTIALLY IMPLEMENTED — the vision is owner-confirmed; the MVP slice is implemented with synthetic data, growth and live money are PLANNED or gated.
+> **Language / اللغة:** English · [العربية](product-vision-ar.md)
 
 ## Vision in one paragraph
 

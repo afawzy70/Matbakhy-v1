@@ -2,6 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** PARTIALLY IMPLEMENTED — every step below exists in code; backend tests cover the steps individually, browser automation covers only the customer ordering and cook actions (`customer-journey.e2e.ts`) and a finance statement layout (`money-reflow.e2e.ts`); finance verification, refund decisions and the administrator audit read have no browser automation (owner acceptance or API only); the owner acceptance run on the live preview and physical devices is not recorded as passed here (NOT VERIFIED).
+> **Language / اللغة:** English · [العربية](complete-order-journey-ar.md)
 
 This page stitches the single-actor journeys into one walk-through: **customer orders, kitchen fulfils, operations, finance and the administrator inspect**. Each step links to the page that details it: [Customer web](customer-web.md), [Customer mobile](customer-mobile.md), [Cook operations](cook-operations.md), [Backoffice administration](backoffice-admin.md), [Finance and support](finance-and-support.md), [Authentication and MFA](authentication-and-mfa.md). State machines: [Order lifecycle](../01-business/order-lifecycle.md).
 

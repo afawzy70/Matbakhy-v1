@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — dated audit with recovery SHAs; the repository state changes after this date
+> **Language / اللغة:** English · [العربية](branch-cleanup-audit-2026-10-20-ar.md)
 
 Executed under the owner's authorization of 2026-10-20 (delete only conclusively verified-safe branches and worktrees). Method: `git fetch --prune`, per-branch ancestry check against `origin/develop` (`git merge-base --is-ancestor`), patch check (`git cherry`), pull-request list (open and closed, head and base), worktree list, workflow references. Only branches whose every commit is an ancestor of `origin/develop` and that had no open PR, worktree, workflow reference or open-PR base were deleted. Deletion used `git push origin --delete` and `git branch -d` (never `-D`). No tags, releases, backups or `main` were touched.
 

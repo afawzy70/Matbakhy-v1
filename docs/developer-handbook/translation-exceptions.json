@@ -1,0 +1,17 @@
+{
+ "schema_version": 1,
+ "purpose": "Justified exceptions to the structural parity checks in scripts/validate_handbook_parity.py. Each check entry needs a reason and a reviewer note; unused or unknown entries fail the validator. The English page is authoritative.",
+ "excluded_from_mirror": {
+  "translation-parity-report.md": "Generated audit artifact (its structural section is rewritten by scripts/validate_handbook_parity.py --update-report); it is written for the owner and reviewers and is linked from both READMEs."
+ },
+ "files": {
+  "05-developer-workflow/documentation-policy.md": {
+   "checks": {
+    "language-link": {
+     "reason": "This English page is a DOC-001 governance file: any edit needs the governance approval and owner authorization described in the page itself, so the language-switch line was not added to the English file. The Arabic page links back to the English source and the Arabic README lists it.",
+     "reviewed": "Proposed in the translation PR; owner review pending in that PR."
+    }
+   }
+  }
+ }
+}

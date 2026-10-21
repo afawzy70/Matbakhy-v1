@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** IMPLEMENTED — describes the nine domain modules, `shared` and `app` as they exist in `backend/`
+> **Language / اللغة:** English · [العربية](backend-module-guide-ar.md)
 
 The backend is one Spring Boot application built from a Maven multi-module project (`backend/pom.xml`). Domain modules
 are libraries; only `app` is runnable. Architecture background: [backend architecture](../03-architecture/backend-architecture.md).

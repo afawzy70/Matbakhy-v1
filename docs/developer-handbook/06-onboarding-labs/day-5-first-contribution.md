@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — lab for delivering one small real change end to end under the repository's rules.
+> **Language / اللغة:** English · [العربية](day-5-first-contribution-ar.md)
 
 ## Objectives
 

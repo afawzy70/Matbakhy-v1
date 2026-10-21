@@ -2,6 +2,7 @@
 
 > **Owner role:** Business documentation
 > **Status:** IMPLEMENTED — cook application, approval, operating states, meals, slots and the cook workspace exist in the backend and `apps/operations-web`; native cook app is not planned for the MVP.
+> **Language / اللغة:** English · [العربية](kitchen-management-ar.md)
 
 A "kitchen" is the selling identity of one approved cook. This page covers how someone becomes a seller, what a kitchen can do, and what staff can do to it. The cook-side screens are described in the [cook operations journey](../02-user-journeys/cook-operations.md), the staff side in the [backoffice journey](../02-user-journeys/backoffice-admin.md).
 

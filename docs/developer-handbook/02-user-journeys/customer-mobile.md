@@ -2,6 +2,7 @@
 
 > **Owner role:** Frontend and mobile
 > **Status:** PARTIALLY IMPLEMENTED — the Expo app (`apps/customer-mobile`) implements browsing, sign-in, basket, ordering, tracking, notifications, support and step-up; it has no MFA settings screen, no cook features, and no physical-device verification is recorded.
+> **Language / اللغة:** English · [العربية](customer-mobile-ar.md)
 
 The customer app is one React Native (Expo) code base for both platforms (`apps/customer-mobile/package.json`: Expo 57, React Navigation 7). **There is no `Platform.OS` branching in `apps/customer-mobile/src`** (searched); Android versus iOS differences come from the operating system's browser session, secure store and the CI harnesses, listed in [Android versus iOS](#android-versus-ios). Architecture: [Mobile architecture](../03-architecture/mobile-architecture.md), code walk-through: [Mobile code guide](../04-codebase/mobile-code-guide.md). Web equivalent: [Customer web](customer-web.md).
 

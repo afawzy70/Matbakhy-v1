@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** REFERENCE — lab for tracing a request through the backend and understanding authorization and data rules.
+> **Language / اللغة:** English · [العربية](day-3-backend-security-ar.md)
 
 ## Objectives
 

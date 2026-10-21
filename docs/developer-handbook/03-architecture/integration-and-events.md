@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** PARTIALLY IMPLEMENTED — the transactional outbox, in-app inbox and retry machinery work; external email, SMS and push providers are fake or disabled, and there is no payment provider integration
+> **Language / اللغة:** English · [العربية](integration-and-events-ar.md)
 
 This page covers how work leaves a transaction (events), how notifications reach people, and which external systems the backend really talks to. The system context is in [system overview](system-overview.md#external-integrations-what-really-exists); the table and column definitions are in [database architecture](database-architecture.md).
 

@@ -1,0 +1,262 @@
+{
+ "note": "sha256 of both files when the pair was last reviewed together; maintained by scripts/validate_handbook_parity.py --update-sync",
+ "pairs": {
+  "00-getting-started/glossary.md": {
+   "ar": "470d9bd5d1b42d6e2105fa0619609819d1f4ec808c8009f219ea7a94e88eb6fd",
+   "en": "aed0c67a0a257770410a8e0f85f9df9f148ef480a3f5d767012251120e40c453"
+  },
+  "00-getting-started/learning-roadmap.md": {
+   "ar": "2eafc05d864bdd50b802be8de54e130fcb595acdf0aaaa01c632194f53fe5ae6",
+   "en": "8d6718cae7df2873bbf1b2f5d2ee3f0c87a49b82bddf4d05994ff78b4f367a18"
+  },
+  "00-getting-started/project-overview.md": {
+   "ar": "7b6446b1f54fcc62280878fb823b65e2f6b5a50c1ee0da94a7f8a24c790deed7",
+   "en": "75e34cf3acf7cb5c571cf20e45fde41569b2239f798c0da92d9d6812da0097e1"
+  },
+  "00-getting-started/repository-navigation.md": {
+   "ar": "13de4e6a15eb4941b66d64c5e3e4e77e487451f896e98a08369d714c446319c9",
+   "en": "7b28931b0032a7bacea57adec6c0e3c84a824fd686bd268dead097ec2e5f8f68"
+  },
+  "01-business/actors-and-permissions.md": {
+   "ar": "677943c2e1072e3828b188eee4d91900046662c486c3fadfafd58eef7ccd756a",
+   "en": "0e1798ba78d7655f8a5d0d8aba95ae46854287fdb29856dbcff168864abc6bdb"
+  },
+  "01-business/business-rules.md": {
+   "ar": "0abf941f5692d1653bc170ac7fbf74e179059c26156aacc70c32a306a266dc6f",
+   "en": "9e38d40dba3d5ec78be8d3af8fb4059c1d3e43b548f392e534e986731f403593"
+  },
+  "01-business/kitchen-management.md": {
+   "ar": "bcebd0d523c3addf0f93a1a5a6f3cbbc1381e59d7bda87ace751211ee89f302b",
+   "en": "d75a309b6b5feed9b7ed2a7b5ada7bc42eb37ca6eab523b0ae31c24398a97a4b"
+  },
+  "01-business/marketplace-model.md": {
+   "ar": "620de563b99543e7b4fc53823c2b53306b49fcc61cee56fd739c55919ba7b083",
+   "en": "bb8e8e03630c7fb3c335d00ef19f28867ccc9b7580ef4b557b45f9a5f701c44e"
+  },
+  "01-business/order-lifecycle.md": {
+   "ar": "acfbdd7413a4874e0d1b98a91478ddd6d995f4981c46e4c6eeea1c7b7b57bb4d",
+   "en": "81f58eeb447f4ef18d18825722a1a309944a08bb743aa9eee4e78bff7d2297f0"
+  },
+  "01-business/pricing-and-payments.md": {
+   "ar": "fa4e803a7b9397509e0c1a0fabff8e297992c6bb578798b26e8be8ca82ca8065",
+   "en": "ac3597ada33fb793b0f0632f2c075ac526fe0bfd9525eea81a84b66d248bc845"
+  },
+  "01-business/product-vision.md": {
+   "ar": "6348b8750e8812d39df61b4a3e458b7d87ed4446072d1394cec77d31b71e1c07",
+   "en": "f434bf7ca2b0fb25d99655b3a189e6cf64ef816e0d284cec7eea19917389733d"
+  },
+  "01-business/target-users.md": {
+   "ar": "a2b1cf73ee3d762d0a529931f4e8b0a19d6832d83ec4455c9453ffae512032d2",
+   "en": "5b6e84f3d2e94f6cabae0a72c56e45a41ff447ac2a1867ada5d0e811cd8ba865"
+  },
+  "02-user-journeys/authentication-and-mfa.md": {
+   "ar": "c44f5cb555ea69b92b8c393f02ecb800e86c7d4a852f5bea51adedeeda904412",
+   "en": "9b14e49a98f63ff695c8ba6e9c8aa851ee9a1dd00c8045192bb9578a60aab020"
+  },
+  "02-user-journeys/backoffice-admin.md": {
+   "ar": "6271588c88b22346b90ed844f827cf82dc82879d0cf7ec4a44f3a982b162090e",
+   "en": "eec19fc9986161134f80e161a712d396be98f21ed0da9f51cbcf05e9394e2d93"
+  },
+  "02-user-journeys/complete-order-journey.md": {
+   "ar": "b775ef2454791c8d424105a563f47a191dbfb1179a7808f5947bec341f90f173",
+   "en": "7b521dac61208d2f613bf9b2e76bea3b3cf68f2fc3b75e520a14230f936c49bf"
+  },
+  "02-user-journeys/cook-operations.md": {
+   "ar": "760b88b12e9c42a15831cc6034a30a4872dadec3775f971fb724eb8b9db6cdbd",
+   "en": "77536d44ad830d7536b71ebd9cf8f81afdd04c15bb2e6f68d859eeae8dfa4045"
+  },
+  "02-user-journeys/customer-mobile.md": {
+   "ar": "c9b7ffa8b0c67fcbca7c5fabbefb82983715e1d746be37a869af7499666a2123",
+   "en": "744c8e70e83c62acd5ab5591377b3890460f600172f3e2d7843c7cff5127b24a"
+  },
+  "02-user-journeys/customer-web.md": {
+   "ar": "1f519b25a8d244111dc9030eedf731e46e4b74790037697b4f6b1456ffb86ff7",
+   "en": "38b5fbdc5bce48d43bd92f2380d6a197a45701e7daeebe6ed05345c99c39b7de"
+  },
+  "02-user-journeys/finance-and-support.md": {
+   "ar": "6348efaeb7797dc861a5694b75d28527b0e559b6b7b00d91d3db2dbc530b78ec",
+   "en": "0bff89f03d1536506a191317977554463b47ac0770564da0ab8a9e7571522db2"
+  },
+  "03-architecture/backend-architecture.md": {
+   "ar": "bab18c64c5545e04b68d79863477684ee7e7fc614ea55d79007e75b9e50c6138",
+   "en": "4913e723c9e2cbec325d32d2da7af69581d798d8ad0a347499d3232deb5456cf"
+  },
+  "03-architecture/database-architecture.md": {
+   "ar": "22bc8bf34430f9e11fc08f646cf1dccb230138797c0e8a0ffcf1fb4df2809330",
+   "en": "f46a99cc4e43709642f0f34cad3f9aa9f5e392f8f3d4413be08284bd75b53ec8"
+  },
+  "03-architecture/diagrams.md": {
+   "ar": "8417e8f3ec90521e98ac988ab875e949239be2d59b01b6331c000e1ec57f0675",
+   "en": "fe0ef62356931a16d7835f32f78abf8857cbbdbe0a0801c6b20d52276daee5b8"
+  },
+  "03-architecture/frontend-architecture.md": {
+   "ar": "a89665c712dab660328f4e108a6fc0380b47b1889e4cf4c1638754b2eb7c6452",
+   "en": "fcbced81024f9e77f72537519c7a319ebf723fa4761483739ed66a3a71890c15"
+  },
+  "03-architecture/identity-and-security.md": {
+   "ar": "2b09fc0c47230f3895b3db28d1db5ec1df4f4b8b67ae1306463f1ef5569deef7",
+   "en": "bc644a73299bbe47317b0d4287aaec63ba2fda2dbd5f315b565dbc93d632efb0"
+  },
+  "03-architecture/infrastructure-and-deployment.md": {
+   "ar": "fe120d2160f53171ad0a7a262c1e208e68522046605a77782b8974310ed6af52",
+   "en": "dc93c9c1e85441673e37c17ad6cfb5afbbf03c8bd54076346860d41cbaf6e751"
+  },
+  "03-architecture/integration-and-events.md": {
+   "ar": "4b083b6c4c50b2b7d135e65cb807ae21f888ac2aa86b708fbfd9d4a1724ca505",
+   "en": "86faf02643f38025070ac3ce17ea85116f9fa4c143b9a9fc270594499348d649"
+  },
+  "03-architecture/mobile-architecture.md": {
+   "ar": "8cb30e9ba271fe5038c9d6f17748700120c1d36fad76cc20b2365b86ce611fcc",
+   "en": "16ad76ad8f36c931b4ca6f287269507f3a5aab29a272e3d8efed4a619660ff70"
+  },
+  "03-architecture/system-overview.md": {
+   "ar": "46eedb9b7d486c281a36b357cab472654472876bc312388fb9c0caf1b2b542ba",
+   "en": "2696ec470ed27c5333ac956af6159096a2631bd2a37707b63fa4cc9fb1583537"
+  },
+  "04-codebase/api-contracts.md": {
+   "ar": "38378e1a11e79346a6e667f87aa849cfc8036500bc5a2288a905d056ee271991",
+   "en": "57717352636662338bbefc939b99932b84f43529e2b1e45c6e5eda04b607d439"
+  },
+  "04-codebase/backend-module-guide.md": {
+   "ar": "b80a6280f3842397d1803ecfb076fd294a73e6a6835a66db79e93deed969f788",
+   "en": "87ec42dd959c0dce6ebe2e8e90b1a8e18bfc8ce726d229799970bf299baf4bbd"
+  },
+  "04-codebase/frontend-code-guide.md": {
+   "ar": "34aa61caad758c469c8ab5070bccf5646f1c5650e1f6d729c9ef92f029406e5f",
+   "en": "32f911eed37dd956c027b634954b547f6c80fd844247e00c890edb38a295efd8"
+  },
+  "04-codebase/mobile-code-guide.md": {
+   "ar": "bb9b7879daed9651ecdce7c990e1e7fa8d7efc084b52f4f5c46856513058d67d",
+   "en": "0aa231e4ca61efa50e961e4e46f54365bd5c4f6c7486d8b1afbdeab0cfb1ad70"
+  },
+  "04-codebase/order-implementation.md": {
+   "ar": "420caf46833675fe2bea06ac0e68b9ba894dfbc01af56f4acdbf3e20db13f5a6",
+   "en": "c7f5fcda33b9b92ceadaa02cee9fcc6f90858896459bf4ecab55428c0886641d"
+  },
+  "04-codebase/payment-implementation.md": {
+   "ar": "30d761ac9ba9aa75d4c9f4ce8e6df1cc396b1b225eda59602e3bdbfb114ba9a8",
+   "en": "2170e7af85a3796b1a09c954802c796b6b0380f56dd2dfb949b60dcd43ca5cca"
+  },
+  "04-codebase/pricing-implementation.md": {
+   "ar": "24209df5b17c6b2b213160a763b218c860a752e16f7e8f1e4dadcf53fcb19015",
+   "en": "8c17cacfbcdf4f4b62762e8b6fcc468b5b5dc131e263aa6d895c56a7f87d1452"
+  },
+  "04-codebase/repository-map.md": {
+   "ar": "d074820af56c3a077e33437e8cbe49e56cf0153000a91c0e4b67102dcfb95180",
+   "en": "228c777e9918eed8befbf624faaf72a25f65880652e4b6a28a125ecb69490a08"
+  },
+  "04-codebase/shared-libraries.md": {
+   "ar": "ad35e810a0e692093628dd6c999cfa584cbba6bd263f9935808e9cc228193635",
+   "en": "ae8060292d65a2e43a32b72d248c96e8b65c241d172d1049367dc509e2c13e75"
+  },
+  "05-developer-workflow/branch-maintenance.md": {
+   "ar": "de2038645943345630e4c76c5afde172e4b02e7b91cf371d7ac35f26b43fce36",
+   "en": "d47aeba669fdb12c8bd4bda9bb73472882f92d24356b25029516e2ac18d820a0"
+  },
+  "05-developer-workflow/ci-cd.md": {
+   "ar": "5b20bfa654150b5fe26ae26953f6dee40e29637a8906ad92b11802b0cb8ffcea",
+   "en": "1268359b88838b6be61daff11603cfa0daa04a83f6f1b1216c2ff16274181ee4"
+  },
+  "05-developer-workflow/documentation-maintenance.md": {
+   "ar": "9202b865427fb75a088bc6ffdf27078e9abd4cfb08686567c240fe90b7d7d279",
+   "en": "ecd36ab480515d39487287c5350506afd26f0878b4829d3415437f3a18dcd336"
+  },
+  "05-developer-workflow/documentation-policy.md": {
+   "ar": "b93be593f6c4b154336d70e73bfd8541fcae45d2d224f30a0118318669e9c6ed",
+   "en": "9148fd74de8ef69eb0557cc0543d5f769e7cf15f7991abfeb2377da6b800078e"
+  },
+  "05-developer-workflow/git-and-pr-workflow.md": {
+   "ar": "11c73c0f9c1e2898515df2299dc5a4c8ea2e5554f8bc1d71e1708a9e4713d1f8",
+   "en": "84f16f432a3ffafd6034c8645a87969ad9f17bd09ec5fe9b7978d8bb05ac96b9"
+  },
+  "05-developer-workflow/local-environment.md": {
+   "ar": "c577c5d70079dcec4a273d12c92099db6d4665394ffd1ef41ee9b8e15c355b40",
+   "en": "71f42315f6575259007f25c5ec649d8426b919abc0982e842206e4826330db99"
+  },
+  "05-developer-workflow/prerequisites.md": {
+   "ar": "68c70d65bebe295920bd157508ec2f12a9d5113c2c05c98f6ef1bcf80342c1c1",
+   "en": "d431c92969a4b32ac6a49c5a0bd10ab4a3bbb0a7020f51f4d2a9f3be7931eb61"
+  },
+  "05-developer-workflow/preview-environment.md": {
+   "ar": "c4d16d75f4043afd4ccd9b8bb47cb5d1a44eceb38806333b35c2d989b5a2b30c",
+   "en": "99b312565f0d65268538f715934b26dc9bb6e7b533924e0a3808c112bc0e59f7"
+  },
+  "05-developer-workflow/run-and-debug.md": {
+   "ar": "82f3d752fd1f8cf1eab7814e3da9ab9ea0e01246b47cf078cc8eaceb01759d22",
+   "en": "a6fea03dc752bd934b38bcb8ed8a05d62da938030436677134bb7eddbe78beec"
+  },
+  "05-developer-workflow/test-execution.md": {
+   "ar": "fe59deaef8ea5ce949f3d3393878a3104908d5e7bc915e1a9319fabe6b931a35",
+   "en": "8c09bf8f8b8839c6d60a3a5658e52e04ab02b73793377ecac50621e42633833b"
+  },
+  "05-developer-workflow/troubleshooting.md": {
+   "ar": "3b42395fbba501e985f8808d7d3e885e5ef5a5c1a8097a9a5abfc5432af52ee0",
+   "en": "058eeb22177e188a2c9a60fecc6b17d1bfb0aa81f4cb9aaa50e7fe6f3aed66b6"
+  },
+  "06-onboarding-labs/day-1-business.md": {
+   "ar": "a9639670b3818c6845b1dbd76a5ba23a793c1bf6ecc277881ac5de518ebc0be4",
+   "en": "4748b642f78b553ab9239be1a2abf9539ad9d0bda159aa727402c23d4d0d0555"
+  },
+  "06-onboarding-labs/day-2-applications.md": {
+   "ar": "77aca9a1bdeb0152f918ff796293c93cbf29f6a4e8d8c127ebd7af73efbf9a0b",
+   "en": "cb3102a763110994a24d55df4bc31cce8f9d28bf08027585285eadc9714bf6a2"
+  },
+  "06-onboarding-labs/day-3-backend-security.md": {
+   "ar": "f0f1fccdccbe094119a26c8ac195eb8dfbf59353280e277a47322e7196ec734d",
+   "en": "29edd446298676795f6080d22a1c1c332274b6386ecbba30cdbc1e492bce5235"
+  },
+  "06-onboarding-labs/day-4-development.md": {
+   "ar": "57633037b799139af24a71bad44b72ccc28db5aecb068f98611fcd201380e4b6",
+   "en": "b829d862aee864e615812ab22865fc85e970eb030b9420d627f42d4bf3765ce9"
+  },
+  "06-onboarding-labs/day-5-first-contribution.md": {
+   "ar": "e6f44ded0b8064cda4b4d3702b5efc1168e5cb3de8d460a1cbff23a855a76d78",
+   "en": "1d549a18868eed69859bc75eaf988ef40085b0ddfa825ee2a16ac6a326a272b0"
+  },
+  "06-onboarding-labs/final-assessment.md": {
+   "ar": "ee88fed241db83fcb19cc6fc68801cd5ac3b4d1bc7b1a61935aba3f2f686e3e8",
+   "en": "1671bf9d80ce53ce3ddb51cd5c834c4708a439def68ba3c6c12cba1aecea40a2"
+  },
+  "07-reference/architecture-decisions.md": {
+   "ar": "ceb46cd4ba227a4f61faede508420e56ac93c3216ae262126166870180334be1",
+   "en": "da67cbfc0f1177e15d1985a38332682bfc6d5b175cea32f1a298df64d8ae9b4b"
+  },
+  "07-reference/branch-cleanup-audit-2026-10-20.md": {
+   "ar": "9af3f88af2388f814d8247f70126cfb3d7c68744b521eecd72d360e1535eb907",
+   "en": "547c18f827af0b004675fba4bab9928290b8be949e0250a94eff13aab0b7e2b7"
+  },
+  "07-reference/documentation-map.md": {
+   "ar": "bb1a78fce20f84b14f90c7d7d4031b00490cd741920dae0d0faeea667f63433f",
+   "en": "df521d217709476535f85b2e511788c5a2008ad5b42683c2cf316aa3e6ca7d1d"
+  },
+  "07-reference/frequently-asked-questions.md": {
+   "ar": "ae4da742a6ee149e62ae52e7c423f9a689cb2358c9774f8a34108e4f9d16e866",
+   "en": "b26d3ce5ada09997686d3a4370811cb6c2bfffc8705edbeccca5e1e5295508a2"
+  },
+  "07-reference/fresh-developer-simulation.md": {
+   "ar": "89fe30410083a9ce0890116d8320a4f2f42e3f505cc54551670d854da3fb8e00",
+   "en": "6c517eca50250d23851e6aa13c8173e77b1be5f69dc375cdd7e07f4ed6f8c11e"
+  },
+  "07-reference/implementation-status.md": {
+   "ar": "dcac5cc73307e0ea4d1e93d6867606d38b31d67e3081564b389460a68f038aaf",
+   "en": "fdb405becfb3e2f4e4cccecc6bfde5b2cbb2e9ea210ae6f094c44865fa05833c"
+  },
+  "07-reference/independent-reviews.md": {
+   "ar": "809738bd0ff2ae966feda4a7f67f775fac459286e6801453f82c43977422e5e8",
+   "en": "fc1eb7fa8573ec13892da2ac5dc1462a89207df7b0522ef3da3f3fa3764d53ce"
+  },
+  "07-reference/inventory-and-gaps.md": {
+   "ar": "17fe0aa4271ffaea7035d53009dd37eec61f59ced26cc18025545d564cae926f",
+   "en": "406329e3474bb204d57a82599424f179c3cb21fa5d35ae1a6e97d4d8cd3ac95d"
+  },
+  "07-reference/requirements-traceability.md": {
+   "ar": "5960f0413c4b925293947114c39ef88660520b56361def01bddca085aec91964",
+   "en": "16119ea9f884fec4964ff898d8400a859b554b5b99873954a384a97bc23d6422"
+  },
+  "README.md": {
+   "ar": "ef3d487ec440d41350ad957b8a763d722338678566e0d9488a57413b5b1ffc29",
+   "en": "d43bfa36d38d59b7a2ca827010daef328caee24941d4e8299eace60f9b3d0f46"
+  }
+ },
+ "schema_version": 1
+}

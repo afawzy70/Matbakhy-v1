@@ -2,6 +2,7 @@
 
 > **Owner role:** Testing and QA
 > **Status:** PARTIALLY IMPLEMENTED — unit, integration, contract, browser and native suites are IMPLEMENTED and run in CI; owner acceptance cases are specifications that are NOT_RUN until a run records evidence; commands here are NOT VERIFIED in the environment that wrote this page.
+> **Language / اللغة:** English · [العربية](test-execution-ar.md)
 
 Background: [01-verification.md](../../quality/01-verification.md) (levels and what each proves), [02-release-gates.md](../../quality/02-release-gates.md).
 
@@ -46,6 +47,8 @@ pnpm --filter @matbakhy/customer-mobile test      # jest --ci
 ## Documentation gate tests
 
 `python3 scripts/test_doc001_gate.py` exercises the DOC-001 gate (`scripts/doc001_check.py`) through its command line against throw-away git repositories: the 12 required positive/negative cases plus hardening cases (declaration hiding, whitespace-only edits, comment/approval handling, matrix coverage of every tracked file). It runs with the other `scripts/test_*.py` in the Blueprint integrity workflow. Run `python3 scripts/doc001_check.py docs` for the documentation validation alone.
+
+`python3 scripts/test_validate_handbook_parity.py` exercises the Arabic-mirror validator (`scripts/validate_handbook_parity.py`) on throw-away handbooks: missing and orphan mirrors, heading, code-block, table, list, image, link and identifier drift, Mermaid label translation versus structural change, broken anchors, documented exceptions, the reviewed-pair record and the same-PR rule. It needs `markdown-it-py` (`python3 -m pip install 'markdown-it-py==3.0.0'`). It proves the structural checks work; it does not prove that any translation is semantically correct ([documentation maintenance](documentation-maintenance.md#arabic-mirror-synchronisation)).
 
 `python3 scripts/test_branch_audit.py` tests the report-only branch audit (`scripts/branch_audit.py`, see [branch maintenance](branch-maintenance.md)).
 

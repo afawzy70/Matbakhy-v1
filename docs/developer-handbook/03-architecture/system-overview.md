@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** PARTIALLY IMPLEMENTED — core ordering platform runs on a synthetic-data preview; real providers, push, live money and production deployment do not exist
+> **Language / اللغة:** English · [العربية](system-overview-ar.md)
 
 This page is the map. It names every deployable piece, what talks to what, which integrations are real and which are not. Details are in the sibling pages; business meaning is in [marketplace model](../01-business/marketplace-model.md).
 

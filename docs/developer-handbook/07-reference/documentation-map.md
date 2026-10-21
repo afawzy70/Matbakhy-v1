@@ -2,6 +2,7 @@
 
 > **Owner role:** Handbook navigation
 > **Status:** REFERENCE — which document is authoritative for what, and how the handbook relates to the older documents
+> **Language / اللغة:** English · [العربية](documentation-map-ar.md)
 
 The handbook explains and links; it does not replace the authoritative documents below. When two documents disagree, the order of trust is: **running code, migrations, contracts and tests** (implementation truth) → the owner decision record (`planning/decisions.json`, `docs/product/01-context-and-decisions.md`, `docs/delivery/07-owner-decisions-implementation-sequence.md`) for intent → the topic documents → status reports (historical snapshots).
 

@@ -2,6 +2,7 @@
 
 > **Owner role:** Backend architecture
 > **Status:** IMPLEMENTED — 31 forward-only Flyway migrations define the whole schema; no ORM, SQL is hand-written in services
+> **Language / اللغة:** English · [العربية](database-architecture-ar.md)
 
 The database is **PostgreSQL 16.15** (pinned image digest in `backend/pom.xml` and the compose files). The schema is owned by Flyway SQL migrations in `backend/app/src/main/resources/db/migration` (`V1` to `V31`, plus the callback `afterMigrate.sql`). Access is plain JDBC; see [backend architecture](backend-architecture.md#layers-and-data-access). Entity relationship diagram: [database relationships](diagrams.md#12-database-relationships). The older design document is `docs/engineering/02-data-model.md` (context only; the SQL below is the truth).
 
