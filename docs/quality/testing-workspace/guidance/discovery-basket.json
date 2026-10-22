@@ -1,0 +1,1701 @@
+{
+  "E2E-DISC-001": {
+    "title": "تصفّح الأكلات والمطابخ من غير حساب",
+    "purpose": "الزائر يقدر يشوف الأكلات المنشورة ويبدّل اللغة من غير كشف بيانات المطبخ الخاصة",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح رابط الصفحة الرئيسية المكتوب في الخطوة الأصلية من نافذة خاصة.",
+        "expected": "الصفحة تفتح بالعربي من غير تسجيل دخول."
+      },
+      {
+        "n": 2,
+        "instruction": "راجع تنبيه البيئة التجريبية والعنوان والشريط العلوي والسفلي.",
+        "expected": "يظهر تسجيل الدخول وEnglish والسلة؛ التنقل السفلي للزائر فيه الرئيسية بس."
+      },
+      {
+        "n": 3,
+        "instruction": "قارن كروت الكشري والمحشي والملوخية بالأسماء والأسعار والحصص المكتوبة تحت الخطوة.",
+        "expected": "كل كارت يعرض سعره بالجنيه والمطبخ وموعده وزر عرض التفاصيل."
+      },
+      {
+        "n": 4,
+        "instruction": "اضغط «المطابخ».",
+        "expected": "يظهر مطبخان؛ الأول فيه أكلتان والتاني فيه أكلة واحدة في بيانات البداية."
+      },
+      {
+        "n": 5,
+        "instruction": "من مطبخ المعاينة اضغط «عرض المطبخ».",
+        "expected": "يفتح #/kitchen/preview-kitchen بأكلاته فقط وتنبيه المراجعة التشغيلية."
+      },
+      {
+        "n": 6,
+        "instruction": "وأنت في صفحة المطبخ اضغط English.",
+        "expected": "النصوص تتحول للإنجليزي واتجاه الصفحة يبقى LTR."
+      },
+      {
+        "n": 7,
+        "instruction": "اضغط Home من شريط التنقل.",
+        "expected": "القائمة ترجع تعرض الأكلات الثلاثة."
+      },
+      {
+        "n": 8,
+        "instruction": "افتح DevTools ثم Console ونفّذ طلب fetch الأصلي من غير تسجيل دخول.",
+        "expected": "يرجع JSON عام؛ طابق الحقول وغياب البيانات الخاصة مع نتائج API أسفل السيناريو."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact Arabic-Indic digit/spacing rendering of Intl 'ar-EG' EGP currency (e.g. ٧٥٫٠٠ ج.م.) depends on the browser ICU; compare digits and currency only.",
+      "غير متحقق في المصدر: Whether the card time pill reads '1:00 م' or '١:٠٠ م' (Intl dateStyle medium/timeStyle short, Africa/Cairo)."
+    ]
+  },
+  "E2E-DISC-002": {
+    "title": "إنشاء حساب عميل جديد — متوقف حاليًا",
+    "purpose": "تحديد سبب عدم إمكانية التسجيل الذاتي بدل تسجيل نجاح غير حقيقي",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح الرئيسية واضغط «تسجيل الدخول» وابحث عن رابط التسجيل فقط؛ ما تغيّرش إعدادات Keycloak الحية.",
+        "expected": "الحالة BLOCKED: التسجيل الذاتي مقفول ومزوّد التحقق غير مجهّز؛ ما تسجلش PASS."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "سبب التوقف في المصدر: deploy/web-preview/identity/matbakhy-realm.preview.json:6 and infra/identity/matbakhy-realm.json:6 set registrationAllowed=false; verifyEmail=true (line 9) with no SMTP server in the preview realm, and the phone code is only kept in memory by FakePhoneVerificationSender.java:14-18 (never logged or returned). Self-sign-up cannot be exercised by a tester in any current environment. The verification gate itself is covered by E2E-DISC-105.",
+      "متطلب ناقص حسب الكتالوج: BLOCKED: neither the preview realm nor the local realm allows self-registration, and a new account could not complete the e-mail or phone verification afterwards.",
+      "غير متحقق في المصدر: Keycloak registration page labels (no registration page exists today)."
+    ]
+  },
+  "E2E-DISC-003": {
+    "title": "الدخول والخروج ومسح بيانات الجلسة",
+    "purpose": "التأكد إن الخروج يقفل جلسة العميل وما يرجّعش بياناته بزر الرجوع",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من الرئيسية اضغط «تسجيل الدخول».",
+        "expected": "المتصفح ينتقل لمسار OAuth ثم صفحة Keycloak."
+      },
+      {
+        "n": 2,
+        "instruction": "اكتب preview-customer-1 وكلمة السر من المصدر الخاص؛ ما تضيفهاش للأدلة.",
+        "expected": "ترجع للتطبيق بحساب العميل A."
+      },
+      {
+        "n": 3,
+        "instruction": "افتح «حسابي» ونفّذ GET /api/v1/me بالمساعد الأصلي.",
+        "expected": "تظهر أقسام الحساب؛ API يرجع العميل الصحيح والتحقق من الهاتف من غير صلاحيات موظفين."
+      },
+      {
+        "n": 4,
+        "instruction": "اضغط «تسجيل الخروج».",
+        "expected": "تنتهي الجلسة؛ يظهر تسجيل الدخول تاني."
+      },
+      {
+        "n": 5,
+        "instruction": "في نفس التبويب افتح account ثم orders واضغط رجوع ثلاث مرات.",
+        "expected": "ما تظهرش بيانات العميل؛ لو الطلبات فضلت على التحميل سجّل عيب."
+      },
+      {
+        "n": 6,
+        "instruction": "أعد تعريف المساعد في Console ونفّذ طلبات me وorders وfavorites الأصلية.",
+        "expected": "كل طلب يرجع 401 UNAUTHENTICATED من غير بيانات خاصة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Keycloak login form field labels (not in this repo).",
+      "غير متحقق في المصدر: Where the IdP logout lands (post-logout redirect target not verified here).",
+      "غير متحقق في المصدر: spring_session.principal_name equals the OIDC subject (inferred from IdentityIntegrationTest.web_sessions_are_indexed_by_the_provider_subject).",
+      "غير متحقق في المصدر: The loading-forever state on #/orders after sign-out is inferred from apps/customer-web/src/shared.tsx:40-43 (401 returns without setting state); if confirmed it contradicts BR-045 'denied state with actionable recovery' and should be logged as a defect."
+    ]
+  },
+  "E2E-DISC-004": {
+    "title": "تبديل العميل من غير تسريب بياناته",
+    "purpose": "فصل سلة وطلبات وحساب A عن B مع استعادة المخزون",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "ادخل بالحساب A وافتح الكشري واختار أول موعد وكمية 1 ثم أضف للسلة.",
+        "expected": "تظهر رسالة تمت الإضافة إلى السلة."
+      },
+      {
+        "n": 2,
+        "instruction": "من السلة اختار الاستلام والدفع عند الاستلام واحسب الإجمالي ووافق على الشروط وأكّد؛ احتفظ بمعرّف الطلب.",
+        "expected": "تفتح صفحة الطلب ورقمه؛ ما تسجلش بيانات جلسة."
+      },
+      {
+        "n": 3,
+        "instruction": "أضف محشي بنفس الموعد عشان السلة تبقى فيها صنف ثم اخرج.",
+        "expected": "الخروج يتم من غير تحذير طلب معلّق."
+      },
+      {
+        "n": 4,
+        "instruction": "في نفس النافذة ادخل preview-customer-2 وراجع السلة والطلبات والحساب.",
+        "expected": "ما تظهرش سلة A أو طلباته؛ الاسم Preview Customer 2."
+      },
+      {
+        "n": 5,
+        "instruction": "من جلسة B اطلب طلب A بالمعرّف؛ نفّذ by-request فقط لو المرجع معروف.",
+        "expected": "يرجع 404 من غير كشف ملكية الطلب."
+      },
+      {
+        "n": 6,
+        "instruction": "ارجع لعنوان طلب A بزر الرجوع وراجع Local Storage للأصل الصحيح.",
+        "expected": "ما تظهرش بيانات A؛ مفاتيح cart وpendingPlacement ما تحتفظش بيها."
+      },
+      {
+        "n": 7,
+        "instruction": "اخرج من B وادخل A وافتح الطلب واضغط «إلغاء الطلب» طالما بانتظار القبول.",
+        "expected": "الطلب يبقى ملغي والمخزون يرجع."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact wording of the 'not found' state for an order URL of another customer (errors.NOT_FOUND = 'غير موجود.' is verified in i18n.ts; whether the page shows it or the sign-in link depends on session timing).",
+      "غير متحقق في المصدر: Order ids are visible only in the URL; the clientRequestId of A is held in A's localStorage until the order is confirmed and then cleared, so step 5 second request is optional."
+    ]
+  },
+  "E2E-DISC-005": {
+    "title": "إخفاء المسودة والمطبخ المتوقف",
+    "purpose": "اختبار حالة النشر وحالة المطبخ من واجهة الطباخ لواجهة العميل",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من ops ادخل preview-cook-1 ثم الأطباق وأنشئ مسودة DR1 بالقيم الأصلية؛ ما تنشرهاش واحفظ معرّفها ومعرّف موعد الكشري قبل الإيقاف.",
+        "expected": "تظهر مسودة؛ مفيش تغيير في الأكلات المنشورة."
+      },
+      {
+        "n": 2,
+        "instruction": "من نافذة عميل خاصة ابحث DR1 وافتح رابط المسودة المباشر.",
+        "expected": "المسودة ما تظهرش كأكلة متاحة."
+      },
+      {
+        "n": 3,
+        "instruction": "نفّذ طلبي fetch الأصليين لمعرّف المسودة والبحث.",
+        "expected": "التفاصيل الخاصة غير متاحة وقائمة البحث ما تحتويش المسودة."
+      },
+      {
+        "n": 4,
+        "instruction": "من إعدادات الطباخ اضغط «إيقاف البيع مؤقتًا» بعد تنسيق استخدام البيئة.",
+        "expected": "حالة المطبخ تتحول لمتوقف مؤقتًا."
+      },
+      {
+        "n": 5,
+        "instruction": "حدّث قائمة العميل وروابط المطبخ والكشري ونفّذ طلبي API الأصليين.",
+        "expected": "أكلات المطبخ تختفي؛ صفحة المطبخ نفسها تعرض عدم استقبال طلبات حسب النتائج الأصلية."
+      },
+      {
+        "n": 6,
+        "instruction": "ادخل كعميل ونفّذ طلب quote الأصلي باستخدام الموعد اللي حفظته قبل الإيقاف.",
+        "expected": "السيرفر يرفض عرض السعر للمطبخ المتوقف؛ راجع كود الخطأ في النتائج الأصلية."
+      },
+      {
+        "n": 7,
+        "instruction": "من إعدادات الطباخ اضغط «استئناف البيع» وحدّث الرئيسية.",
+        "expected": "أكلات المطبخ ترجع؛ ما توقفش الأكلات المزروعة نفسها لأن صورها ناقصة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Cook meal form field labels other than titleAr/titleEn/price/portion/ingredients/allergens/photo (create requires only draft-valid fields: titles 2-120 chars, descriptions >=10 chars when given).",
+      "غير متحقق في المصدر: Whether the meal page shows 'غير موجود.' or another message for a 404 (errors.NOT_FOUND in customer i18n)."
+    ]
+  },
+  "E2E-DISC-104": {
+    "title": "المطبخ الموقوف إداريًا أو غير الموافق عليه",
+    "purpose": "اختبار إخفاء المطبخ وصلاحية إنشاء عرض السعر ثم استعادة حالته",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "اقرأ قائمة أكلات COOK-B واحفظ معرّف الأكلة وslug والموعد.",
+        "expected": "عند عدم وجود fixture المطلوبة سجّل BLOCKED قبل أي تعديل."
+      },
+      {
+        "n": 2,
+        "instruction": "من جلسة موظف العمليات افتح المطبخ واستخدم إجراء الإيقاف بالسبب والقيمة expectedVersion الأصليين.",
+        "expected": "المطبخ يتوقف إداريًا؛ يحتاج صلاحيات وMFA حسب الإعداد."
+      },
+      {
+        "n": 3,
+        "instruction": "حدّث الرئيسية وابحث الأكلة وافتح رابط المطبخ.",
+        "expected": "الأكلات تختفي؛ رابط المطبخ يفضل متاح برسالة إنه مش بياخد طلبات دلوقتي."
+      },
+      {
+        "n": 4,
+        "instruction": "من حساب العميل نفّذ quote للأكلة والموعد المسجلين.",
+        "expected": "الطلب مرفوض؛ مفيش حجز مخزون."
+      },
+      {
+        "n": 5,
+        "instruction": "اطلب رابط المطبخ المفترض ونتائج اسم الطباخ غير الموافق عليه.",
+        "expected": "الطلب المعلّق ما عندوش مطبخ عام."
+      },
+      {
+        "n": 6,
+        "instruction": "استعد مطبخ B بإجراء «استعادة» وسبب E2E restore.",
+        "expected": "القائمة ترجع تعرض أكلته."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "fixture مطلوبة ولازم تأكيد تجهيزها: FX-COOK-B",
+      "fixture مطلوبة ولازم تأكيد تجهيزها: FX-COOK-PENDING",
+      "fixture مطلوبة ولازم تأكيد تجهيزها: FX-STAFF-OPS",
+      "غير متحقق في المصدر: Which operations-web screen lists kitchens with the Suspend/Restore buttons (labels kitchenAction PAUSE/SUSPEND/RESTORE = 'إيقاف مؤقت'/'إيقاف'/'استعادة' confirmed in i18n.ts:249; screen not opened).",
+      "غير متحقق في المصدر: audit_event column names and the resource key used by operating-state audits."
+    ]
+  },
+  "E2E-DISC-006": {
+    "title": "البحث والسعر والترتيب ومسح الفلاتر",
+    "purpose": "مقارنة نتائج السيرفر بأسعار بيانات البداية",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "ابحث عن كشري من حقل البحث واضغط زر البحث.",
+        "expected": "الطلب يحتوي q=كشري ويعرض الكشري."
+      },
+      {
+        "n": 2,
+        "instruction": "بدّل البحث إلى كشرى واضغط بحث.",
+        "expected": "اختلاف الألف المقصورة ما يمنعش نفس النتيجة."
+      },
+      {
+        "n": 3,
+        "instruction": "جرّب Preview mahshi ثم اسم المطبخ التاني ثم علامة %.",
+        "expected": "قارن كل نتيجة بما هو مطلوب في النتائج الأصلية؛ ما تعتبرش % أمر SQL."
+      },
+      {
+        "n": 4,
+        "instruction": "امسح البحث وافتح تصفية النتائج واضبط أقصى سعر 100 ثم عرض النتائج.",
+        "expected": "تظهر الأكلات اللي سعرها لا يزيد عن 100 جنيه."
+      },
+      {
+        "n": 5,
+        "instruction": "كرّر بالسعر 121 ثم 200 ثم abc.",
+        "expected": "النتائج تتوسع حسب السعر؛ القيمة النصية تظهر خطأ وتعطّل التنفيذ."
+      },
+      {
+        "n": 6,
+        "instruction": "مع أقصى سعر 200 جرّب ترتيب الأقل ثم الأعلى سعرًا.",
+        "expected": "الترتيب يطابق 75 ثم 120.25 ثم 180 أو العكس."
+      },
+      {
+        "n": 7,
+        "instruction": "اختار أقصى سعر 1 ثم اضغط «مسح الفلاتر» من الحالة الفارغة.",
+        "expected": "تظهر الحالة الفارغة ثم ترجع القائمة بعد المسح."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact currency string format for the empty-state price tokens is not asserted; compare numeric digits only.",
+      "غير متحقق في المصدر: The web client never sends minPriceMinor, date or slotId: those API filters have no UI (see findings)."
+    ]
+  },
+  "E2E-DISC-101": {
+    "title": "فلتر المنطقة في الأكلات والمطابخ",
+    "purpose": "النتائج لازم تحترم مناطق توصيل المطبخ",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح تصفية النتائج وراجع خيارات «منطقتك».",
+        "expected": "تظهر المناطق الفعالة؛ ما تظهرش المنطقة المعطلة."
+      },
+      {
+        "n": 2,
+        "instruction": "اختار منطقة تجريبية أ ثم عرض النتائج.",
+        "expected": "تظهر النتائج المسموح بتوصيلها للمنطقة أ."
+      },
+      {
+        "n": 3,
+        "instruction": "اضغط «المطابخ».",
+        "expected": "المطابخ المعروضة تطابق نفس فلتر المنطقة."
+      },
+      {
+        "n": 4,
+        "instruction": "بدّل للمنطقة ب وطبّق.",
+        "expected": "القائمة تستبعد المطابخ اللي ما بتخدمهاش."
+      },
+      {
+        "n": 5,
+        "instruction": "اختار القيمة الفاضية «اختر المنطقة» وطبّق.",
+        "expected": "يرجع العرض من غير قيد المنطقة."
+      },
+      {
+        "n": 6,
+        "instruction": "نفّذ fetch لكل zoneId في المتطلبات وسجّل items.length.",
+        "expected": "قارن النتائج بالقيم الأصلية؛ إعداد الخدمة مخزّن في التطبيق مش Keycloak."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Behaviour of zoneId for an inactive zone id (assumed to return no meals; the zone list excludes it)."
+    ]
+  },
+  "E2E-DISC-102": {
+    "title": "فلترة فئات الأكلات",
+    "purpose": "تمييز بيانات preview من بيانات التجربة المعزولة",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "على preview اضغط أطباق رئيسية ثم حلويات كل واحدة لوحدها.",
+        "expected": "القائمة فاضية لأن الأكلات المزروعة من غير فئة."
+      },
+      {
+        "n": 2,
+        "instruction": "على البيئة المعزولة فقط بعد تجهيز UPDATEs افتح أطباق رئيسية.",
+        "expected": "تظهر الأكلات اللي اتعيّنت للفئة في تجهيز السيناريو."
+      },
+      {
+        "n": 3,
+        "instruction": "اضغط حلويات وبعدها الكل.",
+        "expected": "الفئة تتغير ثم يرجع العرض الكامل."
+      },
+      {
+        "n": 4,
+        "instruction": "اطلب categoryId=SOUPS ثم NOPE من API.",
+        "expected": "قارن الفئة الصحيحة والفئة المرفوضة بالنتائج الأصلية."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا.",
+      "غير متحقق في المصدر: Error code for an invalid categoryId enum value (not covered by a test)."
+    ]
+  },
+  "E2E-DISC-103": {
+    "title": "تقسيم قائمة الأكلات بـ cursor",
+    "purpose": "اختبار API لأن واجهة الويب ما فيهاش زر تحميل صفحات",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "نفّذ طلب limit=2 واحفظ p1.",
+        "expected": "ترجع أول صفحة ومعها nextCursor لو فيه تكملة."
+      },
+      {
+        "n": 2,
+        "instruction": "نفّذ طلب p2 بالـ cursor المرمّز من p1.",
+        "expected": "ترجع الصفحة التالية من غير إعادة أول صفحة."
+      },
+      {
+        "n": 3,
+        "instruction": "قارن معرّفات الصفحتين وجرّب limit=0 و101 وcursor=garbage.",
+        "expected": "مفيش تكرار؛ المدخلات غير المقبولة تترفض بالكود المتوقع."
+      },
+      {
+        "n": 4,
+        "instruction": "ابدأ من جديد بترتيب PRICE_DESC وكمل كل cursors.",
+        "expected": "كل الأسعار مرتبة تنازليًا عبر الصفحات."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact fieldError for an invalid public-listing cursor (the cook/ops listings use code INVALID; the public DiscoveryService was not read to the end)."
+    ]
+  },
+  "E2E-DISC-007": {
+    "title": "رفض توصيل خارج خدمة المطبخ",
+    "purpose": "رفض عرض سعر التوصيل مع استمرار إتاحة الاستلام",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من السلة اختار توصيل ثم عنوان جديد واملأ بيانات Zone B test الأصلية واحفظ.",
+        "expected": "العنوان يظهر كاختيار؛ استخدم بيانات الاختبار فقط."
+      },
+      {
+        "n": 2,
+        "instruction": "اختار العنوان واضغط احسب الإجمالي.",
+        "expected": "يرفض التوصيل؛ الرسالة الحالية عامة «تحقق من البيانات»."
+      },
+      {
+        "n": 3,
+        "instruction": "بدّل إلى استلام من المطبخ واحسب تاني.",
+        "expected": "عرض سعر الاستلام ينجح لنفس السلة."
+      },
+      {
+        "n": 4,
+        "instruction": "جرّب POST عنوان بالـ zoneId المعطل المكتوب في الخطوة الأصلية.",
+        "expected": "API يرفض المنطقة المعطلة."
+      },
+      {
+        "n": 5,
+        "instruction": "من حسابي ثم عناويني احذف Zone B test.",
+        "expected": "العنوان ما يعودش ظاهر في القائمة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Address list item text in checkout is '{label} · {street} {building}' (Checkout.tsx) - confirmed in code; the Arabic labels for the address fields come from i18n addressFields (confirmed).",
+      "غير متحقق في المصدر: Whether the phone field on the address form needs the +20 prefix: both +2010... and 010... normalise (EgyptianPhone.normalize)."
+    ]
+  },
+  "E2E-DISC-008": {
+    "title": "اللغة والاتجاه والأرقام",
+    "purpose": "تبديل لغة الشاشة مستقل عن لغة رسائل الحساب",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح الرئيسية بالعربي وشغّل Preserve log في Network ثم English.",
+        "expected": "اتجاه الصفحة LTR والطلبات تحمل اللغة المختارة."
+      },
+      {
+        "n": 2,
+        "instruction": "افتح Preview koshari واقرأ الموعد والحساسية.",
+        "expected": "نصوص التفاصيل بالإنجليزي مع توقيت القاهرة."
+      },
+      {
+        "n": 3,
+        "instruction": "اضغط العربية واقرأ نفس التفاصيل.",
+        "expected": "dir=rtl وlang=ar؛ اختلاف شكل أرقام المتصفح مش فشل لو القيمة صحيحة."
+      },
+      {
+        "n": 4,
+        "instruction": "افتح صفحة المطبخ باللغتين واقرأ ملاحظة المراجعة التشغيلية.",
+        "expected": "الملاحظة موجودة ومعناها ما بيدّعيش شهادة سلامة غذاء."
+      },
+      {
+        "n": 5,
+        "instruction": "ادخل وأضف الكشري بالإنجليزي واحسب في السلة ثم بدّل للعربي.",
+        "expected": "العناوين تتبدل؛ اسم سطر السلة يحتفظ باللغة وقت إضافته."
+      },
+      {
+        "n": 6,
+        "instruction": "من تفضيل لغة الرسائل اختار English واحفظ ثم افتح الشاشة بالعربي.",
+        "expected": "التفضيل محفوظ على السيرفر ومنفصل عن لغة الشاشة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact ICU output of EGP currency in en-EG ('EGP 75.00' vs 'E£75.00')."
+    ]
+  },
+  "E2E-DISC-113": {
+    "title": "استخدام لوحة المفاتيح وإرجاع التركيز",
+    "purpose": "تصفّح وإضافة للسلة وإلغاء استبدالها من غير ماوس",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من الرئيسية استخدم Tab لعرض التفاصيل للكشري ثم Enter.",
+        "expected": "تركيز واضح وترتيب تنقل مفهوم."
+      },
+      {
+        "n": 2,
+        "instruction": "اختار الموعد بالمسافة أو الأسهم ومرّ على الكمية ثم أضف بـ Enter.",
+        "expected": "تظهر رسالة الإضافة مع role=status."
+      },
+      {
+        "n": 3,
+        "instruction": "ارجع وافتح الملوخية واختار موعدها وأضف بلوحة المفاتيح.",
+        "expected": "يفتح حوار استبدال السلة."
+      },
+      {
+        "n": 4,
+        "instruction": "راجع التركيز الأول على خليك على سلتك الحالية ثم اضغط Escape.",
+        "expected": "الحوار يقفل ويرجع التركيز لمصدره."
+      },
+      {
+        "n": 5,
+        "instruction": "كرّر الإضافة واضغط Enter على خليك على سلتك الحالية.",
+        "expected": "السلة القديمة تفضل كما هي والتركيز يرجع."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Screen-reader announcements and 200 % text-size layout (browser zoom 200 %) are observations to record, not asserted by code."
+    ]
+  },
+  "E2E-DISC-105": {
+    "title": "التحقق من الهاتف ومنع المحاولات المتكررة",
+    "purpose": "رفض الطلبات للحساب غير المتحقق وحدود رمز التحقق",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "استخدم B غير متحقق في البيئة المخصصة وافتح سلة كشري.",
+        "expected": "يظهر قسم التحقق من الهاتف بدل إكمال الشراء."
+      },
+      {
+        "n": 2,
+        "instruction": "نفّذ quote الأصلي بمعرّف موعد فعلي.",
+        "expected": "يرفض السيرفر العميل غير المتحقق."
+      },
+      {
+        "n": 3,
+        "instruction": "اكتب الرقم الأرضي التجريبي الأصلي واضغط إرسال الرمز.",
+        "expected": "يرفض الرقم كرقم موبايل مصري."
+      },
+      {
+        "n": 4,
+        "instruction": "استخدم رقم fixture الأصلي وأرسل مرتين خلال 60 ثانية.",
+        "expected": "الإرسال المتكرر يتقيّد؛ ما تغيّرش هاتف fixture المشتركة."
+      },
+      {
+        "n": 5,
+        "instruction": "أدخل رمزًا خاطئًا خمس مرات حسب الخطوة الأصلية.",
+        "expected": "الحساب ما يتوثقش؛ الرمز الحقيقي مش متاح للمختبر."
+      },
+      {
+        "n": 6,
+        "instruction": "جرّب التحقق للمرة السادسة.",
+        "expected": "تظهر نتيجة تقييد المحاولات المتوقعة؛ ما تدّعيش تحقق ناجح."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا.",
+      "غير متحقق في المصدر: The UI shows the generic error for a 429 (errors map has no RATE_LIMITED entry -> 'حدث خطأ.' / 'Something went wrong.'); record the exact text.",
+      "غير متحقق في المصدر: Completing a successful verification is impossible for a manual tester in every environment: FakePhoneVerificationSender keeps the code in memory only. Use the DB fixture customer_phone_verified.sql to re-verify."
+    ]
+  },
+  "E2E-DISC-106": {
+    "title": "خصوصية العناوين والتحقق من بياناتها",
+    "purpose": "العنوان لصاحبه فقط وتعارض النسخة والحذف بيتعاملوا بأمان",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من جلسة A نفّذ POST العنوان التجريبي واحفظ ADDR.",
+        "expected": "ينشأ عنوان A؛ ما تنسخش بيانات جلسة للأدلة."
+      },
+      {
+        "n": 2,
+        "instruction": "من ملف متصفح B نفّذ قراءة العناوين ثم تعديل وحذف ADDR.",
+        "expected": "ما يظهرش عنوان A ولا يتعدل أو يتحذف بواسطة B."
+      },
+      {
+        "n": 3,
+        "instruction": "من A جرّب كل بديل غير صالح في طلب مستقل بباقي بيانات الخطوة الأولى.",
+        "expected": "كل طلب غير صالح يترفض من غير إنشاء عنوان مشوّه."
+      },
+      {
+        "n": 4,
+        "instruction": "عدّل floor بنسخة 0 ثم كرّر نفس expectedVersion.",
+        "expected": "أول تعديل ينجح والتاني يرجع تعارض نسخة."
+      },
+      {
+        "n": 5,
+        "instruction": "من عناويني احذف E2E home ثم اقرأ القائمة.",
+        "expected": "العنوان يختفي من القائمة؛ الحذف أرشفة حسب نتائج DB."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Which fieldError field name the phone failure uses (test asserts only status 422; address phone field is 'phone' in the request)."
+    ]
+  },
+  "E2E-DISC-107": {
+    "title": "المفضلة منفصلة لكل عميل",
+    "purpose": "الإضافة والحذف المتكررين آمنين والأكلة غير المتاحة ما تختفيش بلا تفسير",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "وأنت خارج الحساب افتح الكشري وجرّب API المفضلة.",
+        "expected": "مفيش زر مفضلة للزائر وAPI يرفض الوصول الخاص."
+      },
+      {
+        "n": 2,
+        "instruction": "ادخل وأضف الكشري للمفضلة.",
+        "expected": "الزر يتحول لإزالة من المفضلة."
+      },
+      {
+        "n": 3,
+        "instruction": "نفّذ PUT مرتين ثم GET المفضلة.",
+        "expected": "عنصر واحد بس؛ التكرار ما يعملش نسخ."
+      },
+      {
+        "n": 4,
+        "instruction": "افتح مفضلة B في ملف متصفح منفصل.",
+        "expected": "ما تظهرش مفضلة A."
+      },
+      {
+        "n": 5,
+        "instruction": "من إعدادات المطبخ أوقف البيع مؤقتًا بعد تنسيق التجربة.",
+        "expected": "المطبخ يتوقف؛ الاختبار يؤثر على غيرك في البيئة المشتركة."
+      },
+      {
+        "n": 6,
+        "instruction": "حدّث مفضلة A.",
+        "expected": "تفضل الأكلة مع علامة عدم الإتاحة حسب النتائج الأصلية."
+      },
+      {
+        "n": 7,
+        "instruction": "استأنف البيع من إعدادات المطبخ.",
+        "expected": "الإتاحة ترجع."
+      },
+      {
+        "n": 8,
+        "instruction": "احذف من القائمة ثم DELETE مرتين من API.",
+        "expected": "الحذف المتكرر ينجح من غير نسخ أو أخطاء ملكية."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Whether Favorite.title and priceMinor stay populated for an unavailable meal (both are nullable in the contract; the integration test asserts only available=false).",
+      "غير متحقق في المصدر: Arabic digits in the price of the favorites list (formatMoney ar-EG)."
+    ]
+  },
+  "E2E-DISC-108": {
+    "title": "إشعارات الطلب وقراءتها وخصوصيتها",
+    "purpose": "قبول الطلب يوصل إشعار واحد للعميل",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "اعمل طلب كشري واحد استلام ودفع عند الاستلام وسجّل رقم الطلب.",
+        "expected": "طلب جديد جاهز لقبول المطبخ."
+      },
+      {
+        "n": 2,
+        "instruction": "من حساب الطباخ افتح الطلب في تبويب الطلبات واضغط قبول.",
+        "expected": "حالة الطلب ACCEPTED."
+      },
+      {
+        "n": 3,
+        "instruction": "من حساب العميل افتح الإشعارات وانتظر حتى 60 ثانية وحدّث.",
+        "expected": "إشعار قبول واحد برقم الطلب؛ مفيش إشعار إنشاء لنفس العميل."
+      },
+      {
+        "n": 4,
+        "instruction": "اضغط تمت القراءة وحدّث.",
+        "expected": "الإشعار يتعلّم مقروء ويختفي زر القراءة."
+      },
+      {
+        "n": 5,
+        "instruction": "نفّذ GET الإشعارات ثم unreadOnly=true.",
+        "expected": "readAt محفوظ والإشعار المقروء مستبعد من غير المقروء."
+      },
+      {
+        "n": 6,
+        "instruction": "من حساب B حاول تعليم إشعار A مقروء.",
+        "expected": "404 NOT_FOUND."
+      },
+      {
+        "n": 7,
+        "instruction": "ألغِ الطلب لو مسموح أو أكمل تنظيفه بسير عمل الطباخ.",
+        "expected": "سجّل حالة التنظيف الفعلية؛ ما تغيّرش قاعدة البيانات الحية."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Whether the dispatcher puts payload.state=ACCEPTED in params (the web renders t.state[params.state] else the type name 'ORDER_ACCEPTED'); record which text you see.",
+      "غير متحقق في المصدر: Status B receives when reading A's notification (404 inferred from 'marks read per owner' test name only)."
+    ]
+  },
+  "E2E-DISC-109": {
+    "title": "حفظ الاسم وتعارض النسخة",
+    "purpose": "منع تغيير الحقول الحساسة من صفحة البيانات الشخصية",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من البيانات الشخصية غيّر الاسم إلى E2E Name واحفظ.",
+        "expected": "تم الحفظ والاسم يستمر بعد التحديث."
+      },
+      {
+        "n": 2,
+        "instruction": "اقرأ me ثم جرّب PATCH بنسخة أقل بواحد.",
+        "expected": "409 VERSION_CONFLICT."
+      },
+      {
+        "n": 3,
+        "instruction": "جرّب PATCH بحقول status وphoneE164 الأصلية.",
+        "expected": "400 MALFORMED_REQUEST؛ مفيش تغيير في الهاتف أو الحالة."
+      },
+      {
+        "n": 4,
+        "instruction": "جرّب اسمًا بطول 121 حرفًا.",
+        "expected": "422 VALIDATION_FAILED لحقل displayName."
+      },
+      {
+        "n": 5,
+        "instruction": "استعد Preview Customer 1 من الواجهة.",
+        "expected": "الاسم الأصلي محفوظ."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: The 121-character case is not covered by a test; 422 is derived from ProfileController @Size(max=120) and ApiExceptionHandler.invalid (web/ApiExceptionHandler.java:41-47)."
+    ]
+  },
+  "E2E-DISC-110": {
+    "title": "تقييم الطلب المكتمل مرة واحدة",
+    "purpose": "التقييم لصاحب الطلب المكتمل فقط ويظهر من غير هويته",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من B جرّب تقييم طلب A عبر API.",
+        "expected": "404 NOT_FOUND."
+      },
+      {
+        "n": 2,
+        "instruction": "من A افتح الطلب المكتمل واختار 4 واكتب E2E review text وأرسل.",
+        "expected": "تظهر شكرًا على تقييمك."
+      },
+      {
+        "n": 3,
+        "instruction": "كرّر التقييم ثم جرّب rating=6.",
+        "expected": "التكرار 409 والقيمة غير الصالحة 422."
+      },
+      {
+        "n": 4,
+        "instruction": "كزائر افتح تفاصيل الكشري واقرأ التقييمات.",
+        "expected": "التقييم ظاهر من غير اسم العميل أو رقم الطلب؛ العدد يعتمد على بيانات البداية."
+      },
+      {
+        "n": 5,
+        "instruction": "اعمل طلبًا معلّقًا لـ A وجرّب تقييمه.",
+        "expected": "409 STATE_CONFLICT لأن الطلب مش مكتمل."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Status code for a rating outside 1..5 (assumed 422 VALIDATION_FAILED).",
+      "غير متحقق في المصدر: Average rendering: ratingOf uses toLocaleString; exact string in each language not asserted."
+    ]
+  },
+  "E2E-DISC-111": {
+    "title": "الإبلاغ عن تقييم ظاهر",
+    "purpose": "الإبلاغ محتاج حساب والتكرار ما ينشئش بلاغين",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "كزائر افتح التقييم.",
+        "expected": "مفيش عنصر إبلاغ."
+      },
+      {
+        "n": 2,
+        "instruction": "ادخل B وافتح التقييم واختار إبلاغ ثم مسيء.",
+        "expected": "رسالة تم الإبلاغ؛ التقييم يفضل ظاهر."
+      },
+      {
+        "n": 3,
+        "instruction": "اقرأ معرّف التقييم وجرّب بلاغ SPAM لنفس العميل.",
+        "expected": "204 تاني لكن صف بلاغ واحد."
+      },
+      {
+        "n": 4,
+        "instruction": "جرّب reasonCode=NOPE.",
+        "expected": "422 VALIDATION_FAILED؛ السبب غير مسموح."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: The hourly report cap (REPORTS_PER_HOUR) value was not read."
+    ]
+  },
+  "E2E-DISC-112": {
+    "title": "قياس التصفح من غير بيانات هوية",
+    "purpose": "كل نشاط بيتحسب مرة لكل زائر في اليوم بتوقيت القاهرة",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "على قاعدة اختبار بتصريح قراءة فقط نفّذ استعلام baseline الأصلي.",
+        "expected": "احفظ الأعداد قبل التنفيذ من غير تصدير بيانات خاصة."
+      },
+      {
+        "n": 2,
+        "instruction": "كزائر افتح القائمة ثم الكشري واختار موعدًا وأضف وانتظر 3 ثوانٍ.",
+        "expected": "Network يعرض POST activity للأحداث المجمعة."
+      },
+      {
+        "n": 3,
+        "instruction": "حدّث الأكلة ثلاث مرات وأضف تاني.",
+        "expected": "إعادة النشاط ما تزودش عدّ نفس النوع لنفس الزائر واليوم."
+      },
+      {
+        "n": 4,
+        "instruction": "افتح صفحة المطبخ مرة.",
+        "expected": "ينرسل KITCHEN_VIEW."
+      },
+      {
+        "n": 5,
+        "instruction": "أعد baseline واعرض أعمدة activity_daily.",
+        "expected": "الزيادات حسب النتائج الأصلية؛ مفيش user id أو IP أو نص حر."
+      },
+      {
+        "n": 6,
+        "instruction": "أرسل الحدث للمعرّف المجهول حسب الكود الأصلي؛ لو 403 راجع CSRF بالمساعد.",
+        "expected": "202 من غير كشف وجود الأكلة؛ ما يتسجلش صف للمعرّف المجهول."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Whether the anonymous POST needs the XSRF header on the preview (the SPA sends it when the cookie exists)."
+    ]
+  },
+  "E2E-DISC-114": {
+    "title": "طلب حذف الحساب — fixture مخصصة فقط",
+    "purpose": "تعطيل الحساب فور الطلب ومنع أثر التكرار",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "على الحساب القابل للحذف فقط راجع الزر ثم علّم التأكيد واضغط طلب حذف الحساب.",
+        "expected": "الزر مقفول قبل التأكيد ثم الطلب يتسجل؛ لا تستخدم A أو B المشتركة."
+      },
+      {
+        "n": 2,
+        "instruction": "اقرأ الرسالة ثم حدّث الصفحة.",
+        "expected": "الحساب يتعطل حسب نتائج السيناريو؛ سجّل الرسالة الفعلية."
+      },
+      {
+        "n": 3,
+        "instruction": "نفّذ طلبات API الأصلية إن كانت الجلسة لسه متاحة.",
+        "expected": "راجع رفض عدم التأكيد وتكرار الطلب وحالة me؛ ما تدّعيش تنفيذًا لو الجلسة انتهت."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا.",
+      "غير متحقق في المصدر: The policyVersion sent by the web ('retention-policy-draft') is a draft string; the retention policy is not approved (open item O06)."
+    ]
+  },
+  "E2E-DISC-117": {
+    "title": "تنبيه إن البيئة تجريبية",
+    "purpose": "العميل يعرف إن البيانات والدفع للتجربة",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح الرئيسية واقرأ التنبيه العلوي.",
+        "expected": "تنبيه بيئة تجريبية ظاهر بدور note."
+      },
+      {
+        "n": 2,
+        "instruction": "بدّل English وافتح صفحة المطبخ والسلة.",
+        "expected": "التنبيه يفضل ظاهر باللغتين وعبر الصفحات."
+      },
+      {
+        "n": 3,
+        "instruction": "اقرأ configuration/public بالكود الأصلي.",
+        "expected": "environment.name=PREVIEW وdemo=true في البيئة المجهزة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: maxLinesPerOrder value 20 (QuoteService MAX_ITEMS / CommercePolicies.MAX_LINES_PER_ORDER); policyVersion 1 assumes the preview kept the synthetic policy version 1."
+    ]
+  },
+  "E2E-DISC-115": {
+    "title": "تصفح وبحث الموبايل وانقطاع الشبكة",
+    "purpose": "تجربة Android وiOS مطلوبة ومش بديلها متصفح موبايل",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "شغّل التطبيق الأصلي الموقّع خارج الحساب واقرأ اكتشف.",
+        "expected": "قائمة السيرفر وحقل البحث ظاهرين."
+      },
+      {
+        "n": 2,
+        "instruction": "ابحث عن كشري.",
+        "expected": "النتائج تطابق البحث."
+      },
+      {
+        "n": 3,
+        "instruction": "افتح كارت الأكلة واقرأ المواعيد والكمية والمكونات والحساسية.",
+        "expected": "تفاصيل الأكلة متاحة."
+      },
+      {
+        "n": 4,
+        "instruction": "شغّل وضع الطيران وحدّث أو افتح اكتشف تاني.",
+        "expected": "رسالة انقطاع واضحة بدل ادعاء بيانات حديثة."
+      },
+      {
+        "n": 5,
+        "instruction": "اقفل وضع الطيران واضغط إعادة المحاولة لو موجود.",
+        "expected": "البيانات ترجع بعد اتصال الشبكة."
+      },
+      {
+        "n": 6,
+        "instruction": "كرّر على iOS وسجّل دليل مستقل لكل منصة.",
+        "expected": "ما تسجلش PASS للمنصتين لو جهاز واحد بس اتجرّب."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم جهاز Android وجهاز iOS وبنية أصلية موقّعة حسب متطلبات السيناريو؛ الويب مش دليل على اجتياز التطبيق الأصلي.",
+      "غير متحقق في المصدر: Behaviour of pull-to-refresh vs reopen (not read); English search label is 'Search dishes or kitchens'.",
+      "غير متحقق في المصدر: The Arabic offline banner wording was read from apps/customer-mobile/src/i18n.ts:17 only."
+    ]
+  },
+  "E2E-BASKET-009": {
+    "title": "إضافة وتعديل وحذف السلة",
+    "purpose": "الحساب بالقروش الصحيحة والسلة تفضل بعد تحديث الصفحة من غير حجز مخزون",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح رابط الكشري من غير اختيار موعد.",
+        "expected": "زر الإضافة معطّل."
+      },
+      {
+        "n": 2,
+        "instruction": "اختار أول موعد واضغط زوّد مرة للكمية 2 ثم أضف.",
+        "expected": "السطر إجماليه 150 جنيه وتظهر رسالة الإضافة."
+      },
+      {
+        "n": 3,
+        "instruction": "افتح السلة واقرأ المطبخ والموعد والسطر والتقدير والملاحظة.",
+        "expected": "الكمية 2 والتقدير 150 جنيه؛ السعر النهائي لسه محتاج quote."
+      },
+      {
+        "n": 4,
+        "instruction": "زوّد الكشري إلى 3 ثم قلله إلى 2 ثم زوّده إلى 3.",
+        "expected": "التقدير يتحدث مع الكمية من غير كسور حسابية خاطئة."
+      },
+      {
+        "n": 5,
+        "instruction": "افتح المحشي واختار نفس الموعد وكمية 1 وأضف.",
+        "expected": "نفس المطبخ والموعد يندمجوا من غير حوار استبدال؛ التقدير 405 جنيه."
+      },
+      {
+        "n": 6,
+        "instruction": "حدّث صفحة السلة.",
+        "expected": "السطران والكمية والموعد مستمرين."
+      },
+      {
+        "n": 7,
+        "instruction": "أضف كشري واحد بنفس الموعد تاني.",
+        "expected": "يندمج في سطر الكشري؛ التقدير 480 جنيه."
+      },
+      {
+        "n": 8,
+        "instruction": "احذف المحشي ثم الكشري.",
+        "expected": "السلة تبقى فاضية؛ الإضافة وحدها ما حجزتش مخزون."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact label of the Arabic increase/decrease buttons on the checkout rows: 'زيادة الكمية: {title}' / 'تقليل الكمية: {title}' per i18n increaseOf/decreaseOf (the meal page uses 'زوّد'/'قلّل').",
+      "غير متحقق في المصدر: Intl rendering of currency digits."
+    ]
+  },
+  "E2E-BASKET-010": {
+    "title": "تأكيد استبدال السلة لمطبخ أو موعد مختلف",
+    "purpose": "العميل لازم يوافق قبل فقد محتوى السلة",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "أضف كشري واحد من موعد اليوم الأول.",
+        "expected": "السلة فيها كشري المطبخ الأول وموعده."
+      },
+      {
+        "n": 2,
+        "instruction": "افتح الملوخية من المطبخ التاني واختار موعدًا وأضف.",
+        "expected": "يفتح حوار الاستبدال بدل دمج المطبخين."
+      },
+      {
+        "n": 3,
+        "instruction": "اضغط خليك على سلتك الحالية وافتح السلة.",
+        "expected": "الكشري يفضل والملوخية ما تتضافش."
+      },
+      {
+        "n": 4,
+        "instruction": "أعد إضافة الملوخية ووافق على استبدال السلة.",
+        "expected": "السلة فيها الملوخية فقط."
+      },
+      {
+        "n": 5,
+        "instruction": "فضّي السلة وأضف كشري اليوم الأول ثم حاول إضافة كشري اليوم التاني.",
+        "expected": "يفتح حوار الاستبدال لاختلاف الموعد."
+      },
+      {
+        "n": 6,
+        "instruction": "اضغط استبدال السلة وافتحها.",
+        "expected": "موعد السلة يبقى اليوم التاني فقط."
+      },
+      {
+        "n": 7,
+        "instruction": "أضف محشي بنفس موعد اليوم التاني.",
+        "expected": "ينضم من غير استبدال لأن المطبخ والموعد متطابقين."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: The dialog is rendered inline (role=alertdialog), not as a modal overlay; focus trapping is not implemented in code, only initial focus on 'keep' and focus return."
+    ]
+  },
+  "E2E-BASKET-021": {
+    "title": "السيرفر يرفض سلة غير متوافقة",
+    "purpose": "اختبار المطابخ والمواعيد والتكرار حتى لو الواجهة اتجاوزت",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "نفّذ quote للكشري بموعد المطبخ التاني M بعد تعريف المساعد والمتغيرات من المتطلبات.",
+        "expected": "الطلب يترفض حسب نتيجة API الأصلية."
+      },
+      {
+        "n": 2,
+        "instruction": "نفّذ quote فيه كشري وملوخية على موعد K.",
+        "expected": "خلط المطبخين مرفوض."
+      },
+      {
+        "n": 3,
+        "instruction": "أرسل سطرين لنفس معرّف الكشري.",
+        "expected": "التكرار مرفوض؛ ما يعتبرهمش سطرًا واحدًا ضمنيًا."
+      },
+      {
+        "n": 4,
+        "instruction": "من حساب الطباخ أنشئ موعد ONLYMAHSHI بالقيم المطلوبة وافتحه ثم احفظ معرّفه.",
+        "expected": "الموعد فيه محشي فقط؛ ما تستخدمش وقت بداية موجود لنفس المطبخ."
+      },
+      {
+        "n": 5,
+        "instruction": "جرّب عرض سعر الكشري على ONLYMAHSHI.",
+        "expected": "يرفض أكلة مش مطروحة في الموعد."
+      },
+      {
+        "n": 6,
+        "instruction": "جرّب قائمة فاضية ثم قائمة كشري ومحشي صحيحة على K.",
+        "expected": "الفاضية تترفض والصحيحة تنجح؛ قارن الأكواد الأصلية."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Status/code for items:[] (Bean Validation @Size(min=1) -> expected 422 VALIDATION_FAILED, code 'Size')."
+    ]
+  },
+  "E2E-BASKET-011": {
+    "title": "حد كمية السطر من سياسة السيرفر",
+    "purpose": "فصل الحد العام عن مخزون الموعد",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "اختار موعد الكشري وزوّد لحد توقف الزيادة ثم اكتب 99 واخرج من الحقل.",
+        "expected": "الواجهة تلتزم بالحد العام 10 على preview."
+      },
+      {
+        "n": 2,
+        "instruction": "أضف الكمية 10 واحسب إجمالي الاستلام.",
+        "expected": "عرض السعر يحسب 10 حصص لو المخزون متاح."
+      },
+      {
+        "n": 3,
+        "instruction": "من Console جرّب كميات 11 ثم 0 ثم 10 على K.",
+        "expected": "11 و0 مرفوضتين؛ 10 مقبولة حسب المخزون."
+      },
+      {
+        "n": 4,
+        "instruction": "أنشئ موعدًا جديدًا بسعة إجمالية 15 وكشري 15 من نموذج المواعيد وافتحه.",
+        "expected": "المخزون أعلى من حد السطر عشان نفصل السببين."
+      },
+      {
+        "n": 5,
+        "instruction": "اختار الموعد الجديد وجرّب الزيادة ثم quote لكمية 11.",
+        "expected": "الحد يفضل 10 رغم مخزون 15؛ API يرفض 11."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Preview policy limit 10 is stated in docs/operations/06-web-preview.md 'Verified locally'; confirm with step 0 on the live preview."
+    ]
+  },
+  "E2E-BASKET-029": {
+    "title": "عرض السعر ما يحجزش مخزون",
+    "purpose": "الحجز يحصل عند إنشاء الطلب بس وعرض السعر ثابت",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "سجّل المتبقي في الموعد K وأنشئ quote لـ 10 حصص باسم A واحفظه.",
+        "expected": "عرض السعر ينجح؛ ما ينقصش المخزون."
+      },
+      {
+        "n": 2,
+        "instruction": "حدّث الأكلة ومن جلسة B اعمل quote لـ 10.",
+        "expected": "B يقدر يعمل عرض سعر لنفس الحصص قبل الطلب."
+      },
+      {
+        "n": 3,
+        "instruction": "نفّذ place(q) باسم A.",
+        "expected": "طلب A ينشأ ويحجز الحصص."
+      },
+      {
+        "n": 4,
+        "instruction": "حدّث الأكلة وحاول تنفيذ عرض B.",
+        "expected": "المخزون نقص وطلب B يترفض؛ مفيش بيع فوق السعة."
+      },
+      {
+        "n": 5,
+        "instruction": "ألغِ طلب A من صفحته.",
+        "expected": "المخزون يرجع."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: UI text B sees for STOCK_CHANGED: the customer errors map has no STOCK_CHANGED entry, so 'حدث خطأ.' / 'Something went wrong.' is expected."
+    ]
+  },
+  "E2E-BASKET-012": {
+    "title": "موعد نفد مخزونه وموعد تاني لسه متاح",
+    "purpose": "الرفض عند نفاد الكمية والاستعادة بعد الإلغاء",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "اطلب كشري 10 من أول يوم باستلام ودفع عند الاستلام واحسب ووافق وأكّد.",
+        "expected": "إجمالي 750 جنيه وحجز حصص الموعد."
+      },
+      {
+        "n": 2,
+        "instruction": "افتح الكشري واقرأ أول موعد وحاول اختياره.",
+        "expected": "الموعد النافد غير قابل للإضافة."
+      },
+      {
+        "n": 3,
+        "instruction": "اختار موعد اليوم التاني.",
+        "expected": "يفضل قابل للطلب لو مخزونه متاح."
+      },
+      {
+        "n": 4,
+        "instruction": "نفّذ quote لحصة واحدة من الموعد النافد.",
+        "expected": "API يرفض بسبب المخزون؛ الواجهة قد تعرض خطأ عامًا."
+      },
+      {
+        "n": 5,
+        "instruction": "افتح الرئيسية وراجع كارت الكشري والمحشي.",
+        "expected": "الإتاحة تعكس المواعيد الباقية ومخزون كل أكلة."
+      },
+      {
+        "n": 6,
+        "instruction": "ألغِ الطلب ثم حدّث التفاصيل من جلسة B.",
+        "expected": "حصص الموعد ترجع."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Whether the home card for a meal sold out in every slot shows the pill 'نفدت الكمية' (code path availability SOLD_OUT) - not exercised here because stock remains in other slots."
+    ]
+  },
+  "E2E-BASKET-023": {
+    "title": "موعد إغلاق الحجز قبل بداية الطبخ",
+    "purpose": "الوقت الحقيقي بيغيّر صلاحية quote والطلب",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من حساب الطباخ أنشئ موعد اليوم بعد 45 دقيقة وباقي القيم الأصلية ثم افتحه واحسب CUTOFF.",
+        "expected": "الإغلاق بعد حوالي 15 دقيقة؛ استخدم توقيت القاهرة."
+      },
+      {
+        "n": 2,
+        "instruction": "قبل CUTOFF بأكثر من 6 دقائق اعمل quote لحصة وسجّل acceptanceDeadlinePreview.",
+        "expected": "عرض السعر ينجح في الوقت المسموح."
+      },
+      {
+        "n": 3,
+        "instruction": "بين CUTOFF-4:59 وCUTOFF-0:01 اطلب quote تاني.",
+        "expected": "طابق النتيجة وحد قبول المطبخ مع النتائج الأصلية."
+      },
+      {
+        "n": 4,
+        "instruction": "بعد CUTOFF حدّث الأكلة واطلب quote وحاول place لعرض الخطوة 2.",
+        "expected": "الموعد يختفي من الاختيارات والطلبات المتأخرة تترفض."
+      },
+      {
+        "n": 5,
+        "instruction": "راجع حالة الموعد من تبويب المواعيد.",
+        "expected": "سجّل الحالة الفعلية؛ اختفاءه من قائمة العميل مش دليل تغيير الحالة المخزنة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Slot creation fields 'localDate/localStart/localEnd/timezone/maxPortions/leadMinutes/mealCapacities' (cook Slots.tsx) are confirmed; the cook UI's response when the chosen time is within an existing slot is not.",
+      "غير متحقق في المصدر: The web UI text for SLOT_CLOSED: the customer errors map has no SLOT_CLOSED entry (generic 'حدث خطأ.')."
+    ]
+  },
+  "E2E-BASKET-013": {
+    "title": "انتهاء عرض السعر بعد خمس دقايق",
+    "purpose": "الانتظار حقيقي لأن preview ما فيهاش ساعة اختبار",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "احسب إجمالي الاستلام وسجّل T0 وexpiresAt من استجابة Network.",
+        "expected": "يتكوّن عرض سعر بمدة السياسة الحالية، 300 ثانية في تجهيز السيناريو."
+      },
+      {
+        "n": 2,
+        "instruction": "سيب الصفحة مفتوحة من غير لمس لمدة 5 دقايق و10 ثواني.",
+        "expected": "عرض السعر يعدّي وقت انتهاءه؛ ما تعملش تحديث."
+      },
+      {
+        "n": 3,
+        "instruction": "وافق على الشروط واضغط تأكيد الطلب.",
+        "expected": "السيرفر يرفض العرض المنتهي من غير إنشاء طلب."
+      },
+      {
+        "n": 4,
+        "instruction": "احسب الإجمالي من جديد ووافق وأكّد.",
+        "expected": "عرض جديد صالح يسمح بالطلب لو باقي الشروط متاحة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Quote expiry is not shown as a countdown anywhere in the web UI (only acceptanceDeadlinePreview in the deposit text)."
+    ]
+  },
+  "E2E-BASKET-014": {
+    "title": "السعر اتغيّر بعد حساب الإجمالي",
+    "purpose": "عرض الإجمالي الجديد وموافقة صريحة قبل إنشاء الطلب",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "أضف PX1 بكمية 2 على الموعد المجهز واحسب الاستلام وسيب الصفحة مفتوحة.",
+        "expected": "الإجمالي 80 جنيه؛ لازم أكلة اختبار منشورة بصورة، مش أكلة seed ناقصة الصورة."
+      },
+      {
+        "n": 2,
+        "instruction": "من الأطباق ثم PX1 ثم تغيير السعر اكتب 50 واضغط تغيير السعر.",
+        "expected": "السعر الحالي 50 والسابق 40 في التاريخ."
+      },
+      {
+        "n": 3,
+        "instruction": "ارجع لتبويب العميل القديم ووافق وأكّد.",
+        "expected": "PRICE_CHANGED؛ يعاد الحساب تلقائيًا ويظهر تنبيه الإجمالي الجديد."
+      },
+      {
+        "n": 4,
+        "instruction": "من غير زر الموافقة على الإجمالي الجديد جرّب تأكيد الشروط والطلب.",
+        "expected": "ما يتعملش طلب قبل الموافقة الصريحة."
+      },
+      {
+        "n": 5,
+        "instruction": "اضغط أوافق على الإجمالي الجديد ثم الشروط ثم تأكيد.",
+        "expected": "ينشأ الطلب بسعر 100 جنيه."
+      },
+      {
+        "n": 6,
+        "instruction": "افتح تفاصيل الطلب وقائمة الطلبات.",
+        "expected": "السعر والإجمالي الجديد ظاهرين ومتطابقين."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Operations-web UI path for changing the price (labels 'تغيير السعر' / 'السعر الجديد (جنيه)' come from i18n.ts; the screen layout was not opened).",
+      "غير متحقق في المصدر: Variant to run after this case: lower the price (50 -> 45): the same notice must appear with 'الإجمالي كان … وأصبح …' (decrease also needs confirmation, D13)."
+    ]
+  },
+  "E2E-BASKET-015": {
+    "title": "الطلب يحافظ على السعر المتفق عليه",
+    "purpose": "تغيير سعر الأكلة لاحقًا ما يغيّرش صورة الطلب المحفوظة",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "افتح ORDER واقرأ الإجمالي واحفظ رد GET كـ before.",
+        "expected": "قيم الطلب قبل التغيير متاحة للمقارنة."
+      },
+      {
+        "n": 2,
+        "instruction": "من صفحة PX1 غيّر السعر إلى 60.",
+        "expected": "السعر الحالي للأكلة يتحدث؛ ما تعدّلش الطلب."
+      },
+      {
+        "n": 3,
+        "instruction": "حدّث تفاصيل الطلب والقائمة وأعد GET.",
+        "expected": "سعر سطر الطلب وإجماليه يفضلوا زي before."
+      },
+      {
+        "n": 4,
+        "instruction": "اضغط اطلب مرة أخرى بالسعر الحالي.",
+        "expected": "يروح لصفحة الأكلة بسعرها الحالي؛ مش إعادة استخدام السعر القديم."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Field names unitPrice/lineTotal inside OrderView items are taken from the web code (Orders.tsx uses lineTotal.amountMinor); unitPrice name not read."
+    ]
+  },
+  "E2E-BASKET-016": {
+    "title": "سباق عميلين على آخر حصة",
+    "purpose": "نجاح طلب واحد بالظبط من غير زيادة بيع",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من ملف A اعمل quote لحصة على LAST1.",
+        "expected": "عرض السعر ينجح."
+      },
+      {
+        "n": 2,
+        "instruction": "من ملف B اعمل quote لنفس الحصة.",
+        "expected": "ينجح لأن quote ما بيحجزش."
+      },
+      {
+        "n": 3,
+        "instruction": "جدول place لعرض A عند T بالطريقة الأصلية في المتطلبات.",
+        "expected": "الطلب يتنفذ عند الوقت المشترك؛ سجّل النتيجة الفعلية."
+      },
+      {
+        "n": 4,
+        "instruction": "جدول place لعرض B عند نفس T في الملف المنفصل.",
+        "expected": "طلبا التنفيذ يتنافسوا على نفس المخزون."
+      },
+      {
+        "n": 5,
+        "instruction": "قارن الردين واقرأ متبقي LAST1.",
+        "expected": "طلب واحد فقط ناجح والتاني مرفوض؛ المتبقي صفر ومش سالب."
+      },
+      {
+        "n": 6,
+        "instruction": "كرّر على LAST2 وLAST3 وبدّل ترتيب بدء العميلين.",
+        "expected": "الثلاث جولات تحقق نفس القاعدة؛ يلزم تجهيز معزول لكل جولة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا.",
+      "غير متحقق في المصدر: Browser-timer synchronisation is accurate to tens of milliseconds only; the automated 20-customer race is the stronger proof."
+    ]
+  },
+  "E2E-BASKET-017": {
+    "title": "سعة الموعد الكلية مع أكلتين",
+    "purpose": "السعة الإجمالية بتمنع تجاوزها حتى لو مخزون كل صنف متاح",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "جرّب quote بكشري ومحشي على AGG1 اللي سعته الكلية حصة.",
+        "expected": "يرفض مجموع حصتين."
+      },
+      {
+        "n": 2,
+        "instruction": "من A اعمل quote بكشري واحد.",
+        "expected": "ينجح قبل الحجز."
+      },
+      {
+        "n": 3,
+        "instruction": "من B اعمل quote بمحشي واحد.",
+        "expected": "ينجح قبل الحجز."
+      },
+      {
+        "n": 4,
+        "instruction": "جدول تنفيذ عرض A عند T.",
+        "expected": "احفظ رد التنفيذ."
+      },
+      {
+        "n": 5,
+        "instruction": "جدول تنفيذ عرض B عند نفس T.",
+        "expected": "الطلبان بيتنافسوا على سعة الموعد الكلية."
+      },
+      {
+        "n": 6,
+        "instruction": "قارن الردود وكرّر ثلاث جولات بمواعيد AGG جديدة.",
+        "expected": "طلب واحد فقط ينجح في كل جولة؛ مجموع الحجز ما يزيدش عن حصة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا."
+    ]
+  },
+  "E2E-BASKET-018": {
+    "title": "طلب متعدد السطور يا كله يا بلاش",
+    "purpose": "لو سطر نفد ما يتحجزش باقي الطلب جزئيًا",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "أضف كشري ومحشي واحد لكل منهم من LIM واحسب الاستلام.",
+        "expected": "الإجمالي 255 جنيه."
+      },
+      {
+        "n": 2,
+        "instruction": "من B اعمل quote وplace لآخر حصة محشي في LIM.",
+        "expected": "B يحجز المحشي الأخير."
+      },
+      {
+        "n": 3,
+        "instruction": "من A وافق على الشروط وأكّد العرض القديم.",
+        "expected": "الطلب يترفض بالكامل بسبب تغير المخزون."
+      },
+      {
+        "n": 4,
+        "instruction": "حدّث السلة واقرأ سطر الكشري والمتبقي في LIM.",
+        "expected": "الكشري ما اتحجزش جزئيًا بواسطة المحاولة المرفوضة."
+      },
+      {
+        "n": 5,
+        "instruction": "ألغِ طلب B.",
+        "expected": "مخزون المحشي يرجع."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Exact UI text after a STOCK_CHANGED refusal (see above)."
+    ]
+  },
+  "E2E-BASKET-019": {
+    "title": "إعادة حساب الإجمالي بعد تغيير اختيارات الطلب",
+    "purpose": "الاستلام والتوصيل والعنوان وطريقة الدفع والكمية يعيدوا التسعير",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من السلة اختار الاستلام واحسب الإجمالي.",
+        "expected": "ملخص الاستلام ظاهر بالقيم الأصلية."
+      },
+      {
+        "n": 2,
+        "instruction": "بدّل لتوصيل وأنشئ Zone A home بالقيم الأصلية واختاره واحسب.",
+        "expected": "الملخص القديم يختفي قبل الحساب ويظهر ملخص التوصيل برسومه."
+      },
+      {
+        "n": 3,
+        "instruction": "اختار عربون يحوّل للمطبخ مباشرة ثم احسب من جديد.",
+        "expected": "الملخص يختفي ثم يرجع بتفصيل العربون؛ ده مش تحقق بنكي."
+      },
+      {
+        "n": 4,
+        "instruction": "زوّد كمية السطر إلى 3.",
+        "expected": "التقدير يتغير وعرض السعر السابق يبطل لحد إعادة الحساب."
+      },
+      {
+        "n": 5,
+        "instruction": "من عناويني احذف Zone A home.",
+        "expected": "تنظيف عنوان الاختبار يتم."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Arabic label of the deposit recipient method 'إنستاباي' is from i18n pay.methods; the identifier shown is the seed's demo-kitchen@instapay.invalid."
+    ]
+  },
+  "E2E-BASKET-020": {
+    "title": "رفض تزوير السعر والإجمالي والهوية",
+    "purpose": "السيرفر صاحب السعر والهوية وسياسة التأكيد",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "أرسل كل طلب quote مزوّر في الخطوة الأصلية لوحده: total وdeliveryFee وunitPriceMinor وunitPrice.",
+        "expected": "الحقول غير المسموحة تترفض؛ مفيش قبول سعر من العميل."
+      },
+      {
+        "n": 2,
+        "instruction": "أنشئ quote صحيح واحفظ q.",
+        "expected": "الإجمالي 7500 قرش لحصة الكشري في تجهيز السيناريو."
+      },
+      {
+        "n": 3,
+        "instruction": "جرّب طلبات place المزوّرة بالإجمالي والحالة وcustomerId كل واحدة لوحدها.",
+        "expected": "الحقول تترفض؛ لا إنشاء طلب بهوية أو سعر مزوّر."
+      },
+      {
+        "n": 4,
+        "instruction": "جرّب من غير Idempotency-Key ثم بإصدار شروط قديم.",
+        "expected": "السيرفر يرفض كل محاولة بالكود الأصلي."
+      },
+      {
+        "n": 5,
+        "instruction": "من B جرّب place لعرض A.",
+        "expected": "يرفض عرض السعر المملوك لعميل تاني."
+      },
+      {
+        "n": 6,
+        "instruction": "من A نفّذ place الصحيح واقرأ o.total.",
+        "expected": "الإجمالي يساوي إجمالي السيرفر في q."
+      },
+      {
+        "n": 7,
+        "instruction": "ألغِ طلب الاختبار من صفحته.",
+        "expected": "المخزون يرجع حسب حالة الإلغاء."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "غير متحقق في المصدر: Error code for the missing Idempotency-Key header (test asserts status 400 only)."
+    ]
+  },
+  "E2E-BASKET-028": {
+    "title": "عرض سعر واحد ما يعملش طلبين",
+    "purpose": "حتى لو clientRequestId وIdempotency-Key اتغيروا",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "أنشئ q ثم نفّذ place واحفظ رد o.",
+        "expected": "طلب واحد ينشأ."
+      },
+      {
+        "n": 2,
+        "instruction": "نفّذ place(q) تاني بمرجع ومفتاح جديدين حسب المساعد.",
+        "expected": "ما ينشأش طلب تاني لنفس quote؛ راجع الرد المحدد في النتائج الأصلية."
+      },
+      {
+        "n": 3,
+        "instruction": "ألغِ الطلب الوحيد من صفحته.",
+        "expected": "المخزون يرجع مرة واحدة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": []
+  },
+  "E2E-BASKET-030": {
+    "title": "الزائر يرجع للسلة بعد الدخول",
+    "purpose": "سلة الزائر تستمر خلال تحويل تسجيل الدخول",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "خارج الحساب أضف كشري 2 من أول موعد وافتح السلة.",
+        "expected": "السلة محتفظة بالسطر والكمية."
+      },
+      {
+        "n": 2,
+        "instruction": "اقرأ الجزء تحت السلة واضغط تسجيل الدخول منه.",
+        "expected": "يبدأ الدخول مع مسار الرجوع للسلة."
+      },
+      {
+        "n": 3,
+        "instruction": "ادخل preview-customer-1 من Keycloak بالسر من المصدر الخاص.",
+        "expected": "الدخول يرجع للتطبيق من غير فقد السلة."
+      },
+      {
+        "n": 4,
+        "instruction": "راجع العنوان وصفحة الدفع بعد الرجوع.",
+        "expected": "#/checkout والسطر والكمية موجودين؛ ما تدّعيش إنشاء طلب."
+      }
+    ],
+    "reviewed": false,
+    "blockers": []
+  },
+  "E2E-BASKET-022": {
+    "title": "تغير رسوم التوصيل بعد عرض السعر",
+    "purpose": "شرح فرق الرسوم من غير نسبته لسعر المطبخ",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "على البيئة المعزولة اختار توصيل والعنوان المجهز واحسب.",
+        "expected": "الإجمالي 105 جنيه: 75 أكلة و30 توصيل."
+      },
+      {
+        "n": 2,
+        "instruction": "من جلسة عمليات مخولة نفّذ إنشاء إصدار zone الأصلي برسوم 3500 وexpectedVersion الفعلي.",
+        "expected": "رسوم المنطقة تصبح 35 جنيه؛ إعداد في قاعدة التطبيق، مش Keycloak."
+      },
+      {
+        "n": 3,
+        "instruction": "ارجع للعرض القديم ووافق وأكّد.",
+        "expected": "تنبيه تغير الرسوم وإجمالي جديد قبل التأكيد."
+      },
+      {
+        "n": 4,
+        "instruction": "وافق على الإجمالي الجديد ثم الشروط وأكّد.",
+        "expected": "طلب بالإجمالي الجديد 110 جنيه."
+      },
+      {
+        "n": 5,
+        "instruction": "أنشئ إصدار استعادة برسوم 3000 ونسخة محدثة.",
+        "expected": "رسوم الاختبار ترجع 30 جنيه؛ لا تنفذ على خدمة حية من غير موافقة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا.",
+      "غير متحقق في المصدر: How a tester obtains the staff session for a direct API call (staff web uses the operations web session); the operations web Configuration screen (ops/Configuration.tsx) may offer this change without the console.",
+      "غير متحقق في المصدر: Whether zone:{id} changes are permitted for the PREVIEW profile (synthetic-policy restriction applies only to commerce-policy)."
+    ]
+  },
+  "E2E-BASKET-024": {
+    "title": "خفض حد كمية السطر بعد ملء السلة",
+    "purpose": "السلة القديمة لازم تتصحح قبل قبول عرض السعر",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "على البيئة المعزولة افتح سلة كشري 8 وسيب التبويب مفتوح.",
+        "expected": "السلة موجودة قبل تغيير السياسة."
+      },
+      {
+        "n": 2,
+        "instruction": "من جلسة عمليات مخولة أنشئ إصدار commerce-policy بالقيم الأصلية وحد 5.",
+        "expected": "السياسة الجديدة synthetic وفي LOCAL/CI فقط؛ صفر عمولة وضريبة حسب القيم الأصلية."
+      },
+      {
+        "n": 3,
+        "instruction": "روح الرئيسية ثم ارجع للسلة لإعادة قراءة الحد.",
+        "expected": "السطر فوق الحد وزر الحساب ما يسمحش بالاستمرار."
+      },
+      {
+        "n": 4,
+        "instruction": "جرّب quote بكمية 8 من API.",
+        "expected": "رفض بسبب حد الكمية الجديد."
+      },
+      {
+        "n": 5,
+        "instruction": "قلّل الكمية لحد 5 واحسب.",
+        "expected": "عرض السعر ينجح لو المخزون متاح."
+      },
+      {
+        "n": 6,
+        "instruction": "استعد الحد 10 بإصدار جديد وexpectedVersion الفعلي.",
+        "expected": "السياسة ترجع لحالة الاختبار السابقة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم تجهيز البيئة المعزولة المذكورة في المتطلبات؛ ما تنفّذش تعديل إعدادات أو بيانات حية من هنا.",
+      "غير متحقق في المصدر: Staff session mechanics for the direct API call (see BASKET-022)."
+    ]
+  },
+  "E2E-BASKET-026": {
+    "title": "سلة الموبايل وتأكيد السعر الجديد",
+    "purpose": "اختبار الاستبدال وتغير السعر على Android وiOS",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "من اكتشف افتح الكشري واختار موعدًا وأضف للسلة.",
+        "expected": "رسالة تمت الإضافة."
+      },
+      {
+        "n": 2,
+        "instruction": "افتح الملوخية واختار موعدًا وأضف.",
+        "expected": "حوار استبدال السلة يظهر."
+      },
+      {
+        "n": 3,
+        "instruction": "اختار احتفظ بالسلة وراجعها ثم كرّر واختار استبدل السلة.",
+        "expected": "أول مرة الكشري يفضل؛ تاني مرة الملوخية تحل محله."
+      },
+      {
+        "n": 4,
+        "instruction": "أضف PX1 بكمية 2 واحسب ثم غيّر الطباخ السعر من ops وجرّب تأكيد الطلب.",
+        "expected": "تنبيه السعر الجديد يمنع التنفيذ قبل الموافقة."
+      },
+      {
+        "n": 5,
+        "instruction": "اضغط موافق على الإجمالي الجديد ثم أكّد.",
+        "expected": "الطلب ينشأ بالسعر الجديد."
+      },
+      {
+        "n": 6,
+        "instruction": "كرّر على جهاز iOS وسجّل أدلته منفصلة.",
+        "expected": "ما تعتبرش اختبار الويب أو Android دليل iOS."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم جهاز Android وجهاز iOS وبنية أصلية موقّعة حسب متطلبات السيناريو؛ الويب مش دليل على اجتياز التطبيق الأصلي.",
+      "غير متحقق في المصدر: Platform differences in the system sign-in sheet.",
+      "غير متحقق في المصدر: Arabic wording of the native price-change sentences (mobile i18n lines 66-80 not fully read; the English texts equal the web ones)."
+    ]
+  },
+  "E2E-BASKET-027": {
+    "title": "تبديل حساب الموبايل من غير بيانات قديمة",
+    "purpose": "مسح السلة والطلب المعلّق والشاشات عند تغيير الهوية",
+    "steps": [
+      {
+        "n": 1,
+        "instruction": "ادخل A وأضف كشري واحد وافتح الطلبات والمفضلة لتحميل بياناته.",
+        "expected": "بيانات A محمّلة قبل التبديل."
+      },
+      {
+        "n": 2,
+        "instruction": "من الحساب اختار تبديل الحساب وادخل B من متصفح النظام.",
+        "expected": "تتغير الجلسة لحساب B."
+      },
+      {
+        "n": 3,
+        "instruction": "راجع السلة والطلبات والمفضلة والتحية.",
+        "expected": "السلة فارغة والتحية Preview Customer 2؛ مفيش أي بيانات A."
+      },
+      {
+        "n": 4,
+        "instruction": "اقفل التطبيق بالكامل وافتحه تاني بحساب B وراجع السلة.",
+        "expected": "تفضل فارغة وما ترجعش بيانات A المخزنة."
+      },
+      {
+        "n": 5,
+        "instruction": "كرّر الخطوات على iOS.",
+        "expected": "أدلة مستقلة لكل منصة؛ البنية الموقعة المطلوبة لازم تكون متاحة."
+      }
+    ],
+    "reviewed": false,
+    "blockers": [
+      "يلزم جهاز Android وجهاز iOS وبنية أصلية موقّعة حسب متطلبات السيناريو؛ الويب مش دليل على اجتياز التطبيق الأصلي.",
+      "غير متحقق في المصدر: Whether the earlier (develop) native build already cleared the cart on switch; the PR #9 hardening concerns late responses and stored pending placements."
+    ]
+  }
+}
