@@ -2,7 +2,7 @@
 
 Upstream: [Agency Agents](https://github.com/msitarzewski/agency-agents), pinned commit `f99f6aa910a442b0197b768ce0ea7751e35e2060`. The original researcher and architect Markdown bodies, identities and descriptions are retained verbatim. Project responsibilities are appended to `developer_instructions`. The upstream license is retained in [UPSTREAM-LICENSE](UPSTREAM-LICENSE).
 
-Reviewed upstream files: `design/design-ux-researcher.md`, `design/design-ux-architect.md`, `integrations/codex/README.md`, Codex conversion and selection/installation paths in `scripts/convert.sh`, `scripts/install.sh` and shared helpers. Official source-only frontmatter metadata is intentionally omitted by its converter. Display names remain **UX Researcher** and **UX Architect**. The install identifiers are **ux-researcher** and **ux-architect**, confirmed with `./scripts/install.sh --list agents` before installation.
+Reviewed upstream files: `design/design-ux-researcher.md`, `design/design-ux-architect.md`, `integrations/codex/README.md`, Codex conversion and selection/installation paths in the upstream converter and installer scripts (`convert.sh`, `install.sh` in the upstream repository's scripts folder) and shared helpers. Official source-only frontmatter metadata is intentionally omitted by its converter. Display names remain **UX Researcher** and **UX Architect**. The install identifiers are **ux-researcher** and **ux-architect**, confirmed with `./scripts/install.sh --list agents` before installation.
 
 Commands executed in the pinned upstream checkout:
 
