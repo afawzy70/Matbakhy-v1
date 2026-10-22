@@ -61,6 +61,29 @@ class TestingWorkspaceTest(unittest.TestCase):
         self.assertFalse(self.data['live_verified'])
         self.assertTrue(all(c['status'] == 'NOT_RUN' for c in self.data['cases']))
 
+    def test_flow_preserves_all_canonical_steps_and_required_tutorial_fields(self):
+        self.assertEqual(sum(len(c['steps']) for c in self.data['cases']), 1005)
+        self.assertEqual(sum(sum(s['kind'] == 'canonical' for s in c['flow']) for c in self.data['cases']), 1005)
+        for c in self.data['cases']:
+            with self.subTest(case=c['id']):
+                self.assertEqual([s['canonical_n'] for s in c['flow'] if s['kind'] == 'canonical'], [s['n'] for s in c['steps']])
+                self.assertEqual(len({s['key'] for s in c['flow']}), len(c['flow']))
+                self.assertTrue(all(s['actor'] and s['url'] and s['instruction'] and s['expected'] for s in c['flow']))
+                if c['guidance_complete']:
+                    self.assertTrue(c['tutorial_reviewed'])
+                    for step in c['flow']:
+                        for field in ('goal','configuration','data','verification','troubleshooting'):
+                            self.assertTrue(step[field], (c['id'], step['key'], field))
+
+    def test_approved_reference_is_exact_and_canonical_catalog_unchanged(self):
+        import hashlib
+        ref = ROOT / 'docs/quality/testing-workspace/reference'
+        manifest = json.loads((ref / 'provenance.json').read_text())
+        self.assertEqual(hashlib.sha256((ref / 'approved-prototype.html').read_bytes()).hexdigest(), manifest['sha256'])
+        for path in (ROOT / 'docs/quality/owner-acceptance/cases').glob('*.json'):
+            original = subprocess.check_output(['git','show',self.data['source_sha']+':'+str(path.relative_to(ROOT))],cwd=ROOT)
+            self.assertEqual(path.read_bytes(), original)
+
     def test_frontend_logic(self):
         subprocess.run(['node', '--test', 'scripts/testing-workspace/core.test.mjs'], cwd=ROOT, check=True, capture_output=True)
 

@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {matches, persisted, report, sanitize} from './core.mjs';
+import {matches, persisted, report, sanitize, executionIssues} from './core.mjs';
 
 test('search combines Arabic, canonical ID, actor, readiness and result filters',()=>{
   const c={id:'CFG-001',title:'OIDC',guidance:{title:'تسجيل الدخول'},actors:['FX-GUEST'],surface:['identity'],domain:'config-security',guidance_complete:false};
@@ -27,4 +27,23 @@ test('reports redact all session credential history and disclose missing resumed
   assert.equal(sanitize('password=synthetic-value'),'password=[REDACTED]');
   assert.equal(sanitize('demo-value', ['d','de','dem','demo-value']), '[REDACTED]');
   assert.equal(sanitize('a.*[b]', ['a','a.*[b]']), '[REDACTED]');
+});
+
+test('export independently rejects stale PASS and preserves each case release',()=>{
+  const c={id:'A',guidance_complete:true,flow:[{key:'pre:0'},{key:'step:1'}]};
+  const d={...c,id:'B'};
+  const rows={A:{status:'PASS',checks:['pre:0','step:1','verify:outcomes']},B:{status:'PASS',checks:['pre:0','step:1','verify:outcomes']}};
+  const notes={A:{evidence:'local evidence A',run:{release:'a'.repeat(40),environment:'isolated-A'}},B:{evidence:'local evidence B',run:{release:'b'.repeat(40),environment:'isolated-B'}}};
+  const dataset={cases:[c,d]};
+  let result=report(dataset,rows,notes,[],{release:'campaign-new-release',environment:'campaign'});
+  assert.equal(result.results[0].status,'PASS');
+  assert.equal(result.results[0].release,'a'.repeat(40));
+  assert.equal(result.results[1].release,'b'.repeat(40));
+  rows.A.checks=['step:1','verify:outcomes'];
+  result=report(dataset,rows,notes,[],{release:'campaign-new-release',environment:'campaign'});
+  assert.equal(result.results[0].status,'BLOCKED');
+  assert.equal(result.results[0].recorded_status,'PASS');
+  assert.ok(result.results[0].execution_issues.includes('INCOMPLETE_EXECUTION'));
+  c.guidance_complete=false;
+  assert.ok(executionIssues(c,rows.A,notes.A,notes.A.run).includes('GUIDANCE_NOT_COMPLETE'));
 });

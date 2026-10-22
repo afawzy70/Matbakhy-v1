@@ -1,5 +1,5 @@
 /* global document, window, navigator, localStorage, location, history */
-import {matches, persisted, report, statuses} from './core.mjs';
+import {matches, persisted, report, statuses, executionIssues} from './core.mjs';
 
 const main = document.querySelector('main');
 const secretHistory = new Set();
@@ -17,20 +17,11 @@ const technical = value => `<div class="technical" dir="ltr">${esc(typeof value 
 const list = values => `<ul class="list">${(values || []).map(v=>`<li>${technical(v)}</li>`).join('')}</ul>`;
 const badge = value => `<span class="badge">${esc(value)}</span>`;
 const caseHref = id => `#/case/${encodeURIComponent(id)}`;
-const status = id => records[id]?.status || 'NOT_RUN';
+const status = id => {const r=records[id];const c=data?.cases.find(c=>c.id===id);return r?.status==='PASS'&&c&&executionIssues(c,r,notes[id],notes[id]?.run).length?'BLOCKED':r?.status||'NOT_RUN';};
 const record = id => records[id] ||= {status:'NOT_RUN',checks:[]};
 function save() { try { localStorage.setItem(storageKey, JSON.stringify(persisted(records))); } catch { toast('المتصفح مش بيسمح بالحفظ. صدّر التقرير قبل ما تقفل.'); } }
 function toast(message) { document.querySelector('#toast').textContent=message; setTimeout(()=>document.querySelector('#toast').textContent='',4500); }
-function check(id,key,label) { return `<label class="check"><input type="checkbox" data-check="${esc(key)}" data-case="${esc(id)}" ${record(id).checks.includes(key)?'checked':''}><span>${label}</span></label>`; }
 function copy(value) { return `<button class="copy" data-copy="${esc(value)}" type="button">نسخ القيمة غير السرية</button>`; }
-function documentBlock(key,title) { const doc=data.documents[key];return `<details><summary>${esc(title)} · متاح هنا بالكامل</summary><p class="source">المصدر: ${sourceLink(doc.path)} — محتوى مرجعي؛ راجع تصحيحات المصدر في أول الحالة.</p>${technical(doc.text)}</details>`; }
-function correction(c) {
-  const text=JSON.stringify(c);
-  const items=[];
-  if (/V31|MfaController|PR #9|origin\/develop/.test(text)) items.push('تصحيح من فحص المصدر: ملفات V31 وMfaController وتدفق MFA موجودة في النسخة المرجعية. أي جملة قديمة بتقول إنها مش موجودة مش وصف للحالة الحالية. تطبيقها على السيرفر لسه NOT VERIFIED؛ سجّل RELEASE_COMMIT وإصدار قاعدة البيانات قبل التنفيذ.');
-  if (/psql|database|SQL/.test(text)) items.push('فيه دلوقتي قناة fixtures محددة بالأسماء في e2e-fixture.sh، ومقفولة بعلامة تمكين. وجود الأداة مش تفويض بتشغيل تعديل على بيئة مشتركة. استخدم قراءة فقط بموافقة المشغّل، وأي تعديل اختباري على بيئة معزولة.');
-  return items.length?`<div class="notice"><h3>تصحيحات مهمة قبل التنفيذ</h3>${items.map(s=>`<p>${s}</p>`).join('')}<p class="source">${sourceLink('backend/app/src/main/java/com/matbakhy/app/mfa/MfaController.java')} · ${sourceLink('deploy/web-preview/e2e-fixture.sh')}</p></div>`:'';
-}
 function card(c) { return `<article class="card">${badge(c.id)}<h3><a href="${caseHref(c.id)}">${esc(c.guidance.title || c.title)}</a></h3><small>${esc(arDomains[c.domain])} · ${esc(c.priority)}</small><div class="inline-values">${badge(status(c.id))}${badge(c.guidance_complete?'الدليل مكتمل':'الدليل محتاج مراجعة')}</div><a href="${caseHref(c.id)}">افتح خطوات الحالة ←</a></article>`; }
 function home() {
   const done=data.cases.filter(c=>status(c.id)!=='NOT_RUN').length;
@@ -44,23 +35,120 @@ function cases(params) {
   function filter(){const q=main.querySelector('#search').value,d=main.querySelector('#domain').value,r=main.querySelector('#readiness').value,s=main.querySelector('#result').value;const found=data.cases.filter(c=>matches(c,q,d,r,s,records));main.querySelector('#count').textContent=`${found.length} حالة من 200`;main.querySelector('#cards').innerHTML=found.length?found.map(card).join(''):'<p class="empty">مفيش حالات مطابقة. جرّب رقم الحالة أو امسح الفلاتر.</p>';const p=new URLSearchParams();if(q)p.set('q',q);if(d)p.set('domain',d);if(r)p.set('readiness',r);if(s)p.set('result',s);history.replaceState(null,'',`#/cases${p.size?'?'+p:''}`);}
   main.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',filter));filter();
 }
-function accounts(c) {
-  const keys=[...new Set([...c.actors,...(c.readiness.needs_fixtures||[])])];
-  return keys.map(key=>{const a=data.actors.find(a=>a.key===key);if(!a)return `<p>${esc(key)} — مش حساب في سجل fixtures؛ اتبع دور المشغّل المذكور في الخطوة.</p>`;return `<article class="panel"><h3><bdi>${esc(a.key)}</bdi></h3>${a.username?`${technical(a.username)}${copy(a.username)}`:'<p>مش حساب دخول؛ متطلب بيئة أو جهاز.</p>'}${technical(a.note)}${a.grants?`<p>الصلاحيات في قاعدة بيانات التطبيق، مش أدوار Keycloak:</p>${technical(a.grants.join(', '))}`:''}${a.username?`<label>باسورد خاص للجلسة دي بس<input class="private-input" type="password" autocomplete="off" data-secret="${esc(a.key)}" aria-label="باسورد ${esc(a.key)}"></label><small>مش بيتحفظ، ومش بيدخل في التقرير. قفل الصفحة أو إعادة تحميلها بيمسحه.</small>`:''}</article>`;}).join('');
+function accountName(key) {
+  const actor=data.actors.find(a=>a.key===key);
+  return actor?.username || key;
+}
+function actorLabel(key) {
+  if(key.includes('COOK'))return '👨‍🍳 الطباخ';
+  if(key.includes('CUST'))return '👤 العميل';
+  if(key.includes('FINANCE'))return 'الموظف المالي';
+  if(key.includes('STAFF'))return 'موظف العمليات / Back-office';
+  if(key==='FX-GUEST')return 'زائر من غير تسجيل دخول';
+  return key;
+}
+function passwordSource(key) {
+  const actor=data.actors.find(a=>a.key===key);
+  if(!actor?.username)return '';
+  return actor.username.startsWith('preview-')
+    ? 'الباسورد: قيمة PREVIEW_USER_PASSWORD في ملف إعداد السيرفر الخاص؛ اطلبها من المشغّل المصرّح له عبر مدير كلمات مرور. مش موجودة في GitHub.'
+    : 'الباسورد: credentials.private.json الخاص بالتجهيز في BACKUP_DIR/owner-e2e-private/<run>/، عن طريق المشغّل وقناة خاصة. الحساب الموجود قبل كده بيحتفظ بباسورده القديم.';
+}
+function accountCards(c) {
+  const keys=c.guidance.actors||c.actors;
+  return `<div class="account-grid">${keys.map(key=>{
+    const actor=data.actors.find(a=>a.key===key);
+    return `<div class="who"><b>${esc(actorLabel(key))}</b><code>${esc(accountName(key))}</code><p class="account-note">${esc(passwordSource(key)||actor?.note||'راجع دور المشغّل في الخطوة.')}</p>${actor?.grants?`<p class="account-note">منح التطبيق: <bdi>${esc(actor.grants.join(', '))}</bdi>. المطلوبة فعلًا في كل خطوة مكتوبة جنبها.</p>`:''}${actor?.username?`<label class="field account-credentials"><span>إدخال خاص اختياري · ذاكرة التبويب فقط</span><input class="private-input" type="password" autocomplete="off" data-secret="${esc(key)}" aria-label="باسورد ${esc(key)}"></label>`:''}</div>`;
+  }).join('')}</div>`;
+}
+function field(title,text,className='') {
+  return text?`<div class="step-field ${className}"><b>${title}</b><p>${esc(text)}</p></div>`:'';
+}
+function executionStep(c,step,index) {
+  const account=data.actors.find(a=>a.key===step.actor);
+  const original=c.steps.find(s=>s.n===step.canonical_n);
+  const kind=step.kind==='canonical'?`خطوة أصلية ${step.canonical_n} · ${c.id}`:step.kind==='verification'?'تحقق إضافي · مش خطوة أصلية':'تجهيز إضافي · مش خطوة أصلية';
+  return `<article class="visible-step ${step.kind==='canonical'?'step':''}" data-flow-key="${esc(step.key)}" ${original?`data-canonical="${original.n}"`:''}>
+    <div class="vs-top"><span class="circle">${index+1}</span><div><strong>${esc(step.title)}</strong><div class="mutedline">${esc(actorLabel(step.actor))}</div><div class="kind">${esc(kind)}</div></div><label class="vs-check"><input class="stepdone" type="checkbox" data-check="${esc(step.key)}" data-case="${esc(c.id)}" ${record(c.id).checks.includes(step.key)?'checked':''}> خلصت</label></div>
+    <div class="vs-body">
+      ${field('الهدف',step.goal)}
+      <div class="step-field"><b>الدور / الحساب</b><p><bdi>${esc(accountName(step.actor))}</bdi>${account?.username?` — ${esc(passwordSource(step.actor))}`:''}</p></div>
+      <div class="step-field"><b>افتح هنا</b><a class="btn" href="${esc(step.url)}" rel="noopener noreferrer" target="_blank">افتح التطبيق ↗</a><a class="url" href="${esc(step.url)}" rel="noopener noreferrer" target="_blank">${esc(step.url)}</a></div>
+      ${field('الإعداد المطلوب · ومكانه',step.configuration)}
+      ${field('بيانات الاختبار',step.data,'compact-data')}
+      ${field('اعمل إيه بالضبط؟',step.instruction)}
+      ${step.precode?`<div class="step-field"><b>أمر فتح قناة القراءة · عند المشغّل</b>${technical(step.precode)}${copy(step.precode)}</div>`:''}
+      ${step.code?`<div class="step-field"><b>القيم / الأوامر المطلوبة</b>${step.code.startsWith('https://')?`<a class="url" href="${esc(step.code)}" target="_blank" rel="noopener noreferrer">${esc(step.code)}</a>`:technical(step.code)}${copy(step.code)}</div>`:''}
+      <div class="success"><b>النتيجة المتوقعة</b><p>${esc(step.expected)}</p></div>
+      ${field('إزاي تتأكد؟',step.verification)}
+      ${field('لو حاجة وقفت',step.troubleshooting,'warning')}
+      ${step.original?`<div class="canonical-source"><b>التفاصيل الأصلية المطلوبة للتنفيذ · ${esc(c.id)} / ${original.n}</b>${technical(step.original)}</div>`:''}
+    </div>
+  </article>`;
 }
 function scenario(id) {
-  const c=data.cases.find(x=>x.id===id);if(!c){main.innerHTML='<h1>الحالة مش موجودة</h1><a href="#/cases">ارجع لكل الحالات</a>';return;}
-  const g=c.guidance, r=record(id), flags=c.readiness;
-  const requirements=[['env','اتأكد إنك على PREVIEW ببيانات وهمية وسجّلت RELEASE_COMMIT، إصدار قاعدة البيانات، ووقت التنفيذ.'],['access','فتحت روابط التطبيقات المطلوبة والـ IP مسموح؛ مفيش 403 من بوابة الوصول.'],...(flags.needs_updated_deploy?[['deploy','قارنت النسخة المنشورة بكود الميزة المطلوبة؛ وجود الكود في المستودع وحده مش كفاية.']]:[]),...(flags.needs_isolated_stack||c.destructive?[['isolated','البيئة معزولة وقابلة للمسح، ومفيش مستخدمين تانيين أو بيانات حقيقية عليها.']]:[]),...(flags.needs_device?[['device','الجهاز الحقيقي والنسخة الموقعة متاحين؛ سجّل نظام التشغيل ورقم البناء.']]:[]),...(flags.needs_fixtures?.length?[['fixtures','الحسابات والبيانات المطلوبة موجودة واتراجعت من غير كشف أسرار.']]:[])];
-  const sections=[['prepare','البيئة والحسابات'],['setup','التجهيز والبيانات'],['execute','نفّذ الخطوات'],['expected','النتايج التفصيلية'],['troubleshoot','لو حاجة وقفت'],['record','سجّل النتيجة']];
-  main.innerHTML=`<p class="breadcrumb"><a href="#/cases">كل الحالات</a> / <bdi>${esc(id)}</bdi></p><div class="case-layout"><aside class="case-nav"><b>مسار التنفيذ</b><div class="links">${sections.map(([id,t])=>`<a href="#${id}" data-scroll="${id}">${t}</a>`).join('')}</div><p id="step-progress"></p><progress id="step-bar" max="${c.steps.length}" value="0" aria-label="خطوات الحالة المكتملة"></progress><p>${badge(status(id))}</p>${status(id)!=='NOT_RUN'&&!notes[id]?.evidence?'<p class="notice">نتيجة محفوظة من غير دليل في التبويب ده. أعد ربط دليل التشغيل قبل مشاركة التقرير.</p>':''}</aside><div><div class="eyebrow">${esc(arDomains[c.domain])} · ${esc(c.priority)}</div><h1>${esc(g.title||c.title)}</h1><p>${esc(g.purpose||'الدليل العربي التفصيلي للحالة دي لسه محتاج مراجعة. تفاصيل الاختبار الأصلية متاحة تحت كل خطوة؛ لو مش واضحة سجّل BLOCKED بسبب نقص الدليل.')}</p><p class="source">الهدف الأصلي: <bdi>${esc(c.title)}</bdi></p>${badge(c.guidance_complete?'الدليل مكتمل':'NOT VERIFIED · الدليل قيد المراجعة')}${correction(c)}<section id="prepare" class="panel"><h2>1. البيئة والحسابات</h2><p>الروابط الجاية موثقة في دليل المالك وإعدادات النشر، لكن الموقع ده ما فحصش اتصالها أو حالتها الحية.</p><div class="actions">${[['app','العميل'],['ops','المطبخ والعمليات'],['api','إعدادات API العامة'],['id','Keycloak']].filter(([host])=>host==='api'||host==='id'&&/identity|CFG/.test(JSON.stringify(c.surface)+id)||host==='app'&&/customer|web|guest/i.test(JSON.stringify(c))||host==='ops'&&/COOK|OPS|FIN|staff/i.test(JSON.stringify(c))).map(([host,t])=>`<a class="button secondary" href="https://${host}.167-86-90-174.sslip.io${host==='api'?'/api/v1/configuration/public':''}" target="_blank" rel="noopener noreferrer">${t} ↗</a>`).join('')}</div><p class="notice">كل حساب في Browser Profile مستقل. النوافذ الخاصة في نفس المتصفح ممكن تشارك نفس الكوكيز. قبل أي خطوة اتأكد من هوية الحساب بـ GET /api/v1/me.</p>${requirements.map(([key,t])=>check(id,'ready:'+key,t)).join('')}<p>مصدر الباسورد: الحسابات preview-* من PREVIEW_USER_PASSWORD في ملف السيرفر الخاص عن طريق مدير كلمات مرور. حسابات owner-e2e-* الجديدة من credentials.private.json في مجلد BACKUP_DIR/owner-e2e-private الخاص بالتشغيل. اطلبه من المشغّل عبر قناة خاصة؛ ماتطبعش الملف أو محتواه في لوج أو GitHub. الحسابات القديمة اللي الاستيراد تجاهلها بتفضل بباسوردها القديم.</p>${accounts(c)}</section><section id="setup" class="panel"><h2>2. جهّز المطلوب للحالة دي</h2><p>المتطلبات الأصلية بالتفاصيل. الملاحظات القديمة عن نسخ الفروع تتقارن بتصحيحات المصدر فوق.</p>${c.prerequisites.map((p,i)=>check(id,'pre:'+i,technical(p))).join('')}${c.fixture_data&&Object.keys(c.fixture_data).length?`<h3>قيم وبيانات الحالة</h3>${technical(c.fixture_data)}`:''}${flags.needs_fixtures?.length?`<h3>تجهيز الحسابات والبيانات الناقصة</h3><p>مكان الإعداد: أدوات النشر عند المشغّل. plan للقراءة، وapply بيغير Keycloak وقاعدة البيانات. تشغيله على بيئة مشتركة محتاج موافقة المالك. على نسخة معزولة جديدة: راجع النسخة V31+، خطة التجهيز، النسخ الاحتياطية، وبعدها نفّذ الخطوات المرفقة واتأكد من reconciliation. ماتكررش seed الأساسي على قاعدة مستهلكة.</p>${technical('cd deploy/web-preview\n./owner-e2e-provision.sh plan\n# بعد موافقة مالك البيئة المشتركة أو على بيئة معزولة فقط:\n./owner-e2e-provision.sh apply')}${documentBlock('fixtures','خطوات التجهيز والاسترجاع وقيود الحسابات المستهلكة')}`:''}${flags.needs_isolated_stack?`${documentBlock('local','تشغيل البيئة المحلية المعزولة')}<div class="notice">لو لسه مفيش طريقة متحققة لتجهيز الحالة على النسخة المعزولة، ماتنقلش أوامر المعاينة إليها بالتخمين. سجّل BLOCKED باسم المتطلب الناقص.</div>`:''}${/MFA|Keycloak|realm|CFG/.test(JSON.stringify(c))?`<h3>Keycloak والتحقق بخطوتين</h3><p>حساب إدارة Keycloak مختلف عن موظف التطبيق. إعداد التدفق والـ clients في Keycloak، سياسة MFA وصلاحيات staff في قاعدة التطبيق، والـ hosts والقوائم المسموحة في إعدادات النشر. ماتغيرش واحد بدل التاني. السياسات الافتراضية OPTIONAL. سجّل الحالة السابقة واسترجعها زي خطوات الحالة؛ ما تطبقش تغيير حي من غير الموافقة المطلوبة.</p>${documentBlock('keycloak','فتح كونسول الإدارة والحساب وشاشات التحقق')}${/MFA|mfa|OTP|step.up/.test(JSON.stringify(c))?documentBlock('mfa','خطوات migration والتحقق والاسترجاع'):''}`:''}${Object.keys(c.conventions).length?`<h3>أدوات API والقيم المشتركة المطلوبة هنا</h3><p>انسخ مساعد API في تبويب التطبيق المسجّل بالحساب المطلوب بس. المسارات والقيم دي من الكتالوج؛ استبدل PREVIEW_DOMAIN بالدومين الموثق فوق. أوامر التعديل للاختبار التجريبي فقط.</p>${Object.entries(c.conventions).map(([key,value])=>`<details ${key==='api_helper'||key==='api_helper_usage'?'open':''}><summary><bdi>${esc(key)}</bdi></summary>${technical(value)}${key==='api_helper'?copy(value.replaceAll('<PREVIEW_DOMAIN>','167-86-90-174.sslip.io')):''}</details>`).join('')}`:''}</section><section id="execute"><h2>3. نفّذ واختبر خطوة بخطوة</h2><p>المعرّفات والأوامر والقيم الأصلية ظاهرة مع شرح الخطوة. ماتعتبرش علامة الإتمام نتيجة PASS.</p>${c.steps.map(s=>{const translated=g.steps?.find(x=>x.n===s.n);return `<article class="step"><h3><span class="step-number">${s.n}</span><bdi>${esc(s.actor)}</bdi></h3>${translated?`<p>${esc(translated.instruction)}</p>`:'<p class="notice">الشرح العربي للخطوة لسه مش متراجع. لو التعليمات الأصلية مش كفاية، سجّل نقص الدليل بدل التخمين.</p>'}<p class="source-note">التنفيذ والقيم الأصلية من الكتالوج</p>${technical(s.action)}${s.data?`<p><b>القيم / ملاحظات التنفيذ</b></p>${technical(s.data)}`:''}<div class="expected"><b>المتوقع بعد الخطوة</b><p>${esc(translated?.expected||'الربط بين الخطوة والنتيجة لسه محتاج مراجعة؛ راجع النتايج التفصيلية تحت قبل ما تسجّل النتيجة.')}</p></div>${check(id,'step:'+s.n,'نفّذت الخطوة وقارنت اللي حصل بالنتيجة المطلوبة')}</article>`;}).join('')}</section><section id="expected" class="panel"><h2>4. قارن النتايج التفصيلية</h2>${Object.entries(c.expected).map(([key,values])=>`<h3>${({ui:'الواجهة',api:'الـ API',database:'قاعدة البيانات · قراءة فقط'})[key]||esc(key)}</h3>${list(values)}`).join('')}<p>SQL اختياري لو مذكور كدليل إضافي؛ لو النتيجة المطلوبة تعتمد عليه ومفيش قناة قراءة معتمدة، سجّل BLOCKED. ماتستخدمش كلمة سر قاعدة بيانات في الموقع.</p></section><section id="troubleshoot" class="panel"><h2>5. لو حاجة وقفت</h2><ul><li>403 وNot available: افحص عنوان التطبيق والـ IP المسموح مع المشغّل؛ ده حظر بوابة الوصول، مش إثبات على صلاحيات التطبيق.</li><li>401: اتأكد إنك مسجّل بالحساب الصحيح في Profile مستقل.</li>${/MFA|STEP_UP|mfa/.test(JSON.stringify(c))?'<li>STEP_UP_REQUIRED: استخدم إعادة التحقق من الواجهة، وبعد الرجوع كرر الإجراء بنفس القيم. لو تدفق Keycloak مش متطبق سجّل BLOCKED.</li>':''}${/slot|capacity|portion/i.test(JSON.stringify(c))?'<li>المواعيد أو الكمية مش متاحة: افحص الـ slots وavailablePortions للوجبة والمطبخ. refresh-slots.sql بيضيف مواعيد ومش بيرجع مخزون مستهلك؛ استخدم موعد متاح أو نسخة معزولة جديدة.</li>':''}<li>صلاحية ناقصة: راجع user_grant للحساب المطلوب؛ حساب الأدمن مش معناه كل صلاحيات التطبيق.</li><li>أي قيمة أو زر مش موجود: سجّل الشاشة ورقم النسخة ومعرّف الحالة من غير أسرار، واعتبر الخطوة BLOCKED لحد التصحيح.</li></ul>${c.unverified?.length?`<h3>ملاحظات لم تُتحقق حيًا من الكتالوج</h3>${list(c.unverified)}`:''}${c.guidance_gaps.length?`<h3>نواقص اكتمال الدليل</h3>${list(c.guidance_gaps)}`:''}<p class="source">مصدر الحالة: ${sourceLink(c.source)}</p>${c.automated_coverage?.length?`<h3>اختبارات آلية مرتبطة · وجودها مش نتيجة تنفيذ</h3>${list(c.automated_coverage)}`:''}</section><section id="record" class="panel"><h2>6. سجّل اللي حصل</h2><p>الخطوات والحالة بتتحفظ محليًا على الجهاز. الأدلة والملاحظات بتفضل في ذاكرة التبويب لحد التصدير؛ إعادة التحميل بتمسحها. سجّل IDs تجريبية وروابط أدلة منقّحة بس.</p><label>سبب التعطيل أو ملحوظة التنفيذ<textarea data-note="reason">${esc(notes[id]?.reason||'')}</textarea></label><label>الدليل: رابط آمن أو وصف النتيجة الفعلية<textarea data-note="evidence">${esc(notes[id]?.evidence||'')}</textarea></label><label>العيب: المتوقع، الفعلي، خطوات التكرار، request ID منقّح<textarea data-note="defect">${esc(notes[id]?.defect||'')}</textarea></label><p>قبل التصدير راجع التقرير المنقّح. ماتكتبش باسورد، token، OTP، بيانات دفع، أو بيانات شخصية في الأدلة.</p><div class="actions">${statuses.map(s=>`<button data-status="${s}" data-case="${id}" class="${s===r.status?'':'secondary'}">${s}</button>`).join('')}<button data-export class="secondary">تصدير التقرير</button></div><div id="record-message" role="status"></div></section></div></div>`;
-  function progress(){const n=record(id).checks.filter(k=>k.startsWith('step:')).length;main.querySelector('#step-progress').textContent=`${n} من ${c.steps.length} خطوة`;main.querySelector('#step-bar').value=n;}progress();
-  main.querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',()=>{const r=record(id);r.checks=el.checked?[...new Set([...r.checks,el.dataset.check])]:r.checks.filter(x=>x!==el.dataset.check);r.updated=new Date().toISOString();save();progress();}));
-  main.querySelectorAll('[data-secret]').forEach(el=>el.addEventListener('input',()=>{if(el.value)secrets.set(el.dataset.secret,el.value);else secrets.delete(el.dataset.secret); if(el.value)secretHistory.add(el.value);}));
+  const c=data.cases.find(x=>x.id===id);
+  if(!c){main.innerHTML='<h1>الحالة مش موجودة</h1><a href="#/cases">ارجع لكل الحالات</a>';return;}
+  const flow=c.flow,r=record(id),g=c.guidance;
+  notes[id]||={};const run=notes[id].run||={environment:'',release:''};
+  const total=flow.length+1;
+  main.innerHTML=`
+    <header class="header">
+      <span class="pillwhite">تجربة خطوة بخطوة · <bdi>${esc(id)}</bdi></span>
+      <h1>${esc(g.title||c.title)}</h1>
+      <p>${esc(g.purpose||c.title)}</p>
+      <span id="progressLabel"></span><div class="progressline" role="progressbar" aria-label="خطوات السيناريو المكتملة" aria-valuemin="0" aria-valuemax="${total}"><div id="bar"></div></div>
+      <p class="canonical-count">${c.steps.length} خطوات أصلية محفوظة بمعرّفاتها · التجهيز والتحقق الإضافي مميزين بوضوح · <bdi id="scenario-status">${esc(status(id))}</bdi></p>
+    </header>
+    <section class="cardx"><h2>🧭 السيناريو اللي هنجربه</h2><p>${esc(g.purpose||c.title)}</p>
+      <div class="warning"><b>قبل أي خطوة:</b> البيانات كلها تجريبية، لكن السيرفر فعلي. افحص الأول؛ أي تغيير مستخدم أو منحة أو Realm أو قاعدة بيانات في Preview المشتركة يحتاج موافقة المالك وتسجيل الحالة السابقة. الموقع مش بيشغّل الأوامر أو بيفحص السيرفر تلقائيًا.</div>
+      <div class="columns"><div class="who"><b>الحالة الأصلية</b><code>${esc(id)}</code><small>اختبار يدوي · NOT_RUN لحد التنفيذ الفعلي بدليل</small></div><div class="who"><b>${g.summary?'الإجمالي المرجعي':'مراجعة الدليل'}</b><code>${esc(g.summary||(c.guidance_complete?'دليل تنفيذي متراجع من المصدر':'NOT VERIFIED · لسه محتاج مراجعة'))}</code><small>اكتمال الدليل مش نتيجة نجاح الاختبار</small></div></div>
+      ${c.guidance_gaps.length?`<div class="warning"><b>الدليل غير مكتمل:</b> ${esc(c.guidance_gaps.join(' · '))}</div>`:''}
+      ${c.readiness.needs_isolated_stack||c.destructive?'<div class="warning"><b>بيئة معزولة فقط:</b> الحالة تغيّر بيانات مشتركة أو تختبر عطل/سباق. لو البيئة المطلوبة مش متاحة سجّل BLOCKED؛ ماتطبقهاش على Preview المشتركة.</div>':''}
+      ${c.readiness.needs_device?'<div class="warning"><b>جهاز فعلي مطلوب:</b> نسخة iPhone/Android موقعة وجهاز حقيقي. معاينة المتصفح مش بديل، ولو مش متاحين الحالة BLOCKED.</div>':''}
+    </section>
+    <section class="cardx"><h2>1. هتدخل بمين؟</h2>${accountCards(c)}<p class="muted">استخدم Browser Profile مستقل لكل حساب. ما تفتحش حسابين في نفس مخزن الكوكيز؛ نافذتان Incognito ممكن يشاركوا الجلسة. دخول الأدمن في Keycloak مختلف عن موظف التطبيق.</p></section>
+    <section id="execute" class="cardx"><h2>2. نفّذ السيناريو خطوة بخطوة</h2><p class="muted">كل الخطوات ظاهرة قدامك. نفّذ من فوق لتحت، قارن النتيجة، وبعدها علّم «خلصت». العلامات بتتحفظ على نفس الجهاز.</p>
+      <div id="steps">${flow.map((s,i)=>executionStep(c,s,i)).join('')}
+        <article class="visible-step" data-flow-key="verify:outcomes"><div class="vs-top"><span class="circle">${total}</span><div><strong>قارن كل النتايج الأصلية وسجّل الدليل</strong><div class="mutedline">المالك / المختبِر · تحقق إضافي</div></div><label class="vs-check"><input type="checkbox" class="stepdone" data-check="verify:outcomes" ${r.checks.includes('verify:outcomes')?'checked':''}> خلصت</label></div><div class="vs-body" id="expected">
+        <p>النتايج دي جزء من معيار الحالة الأصلية، ومش دليل إن أي حاجة حصلت فعلًا. تحقق منها بالقنوات المسموحة؛ أي تحقق إلزامي ناقص يمنع PASS.</p>
+        ${Object.entries(c.expected).map(([key,values])=>`<h3>${({ui:'الواجهة',api:'استجابات API',database:'قاعدة البيانات · SELECT فقط عبر المشغّل'})[key]||esc(key)}</h3>${list(values)}`).join('')}
+        ${c.unverified?.length?`<div class="warning"><b>نقاط مصدرية لسه مش متحققة حيًا</b>${list(c.unverified)}</div>`:''}
+        ${c.guidance.blockers?.length?`<div class="warning"><b>نواقص محددة</b>${list(c.guidance.blockers)}</div>`:''}
+        <p class="source-note">المبالغ والأكواد والنتايج الأصلية محفوظة؛ التفاصيل الإنجليزية التقنية في الحالات غير المتراجعة لسه محتاجة إكمال عربي.</p>
+        <details><summary>مراجع المصدر والاختبارات الآلية · تشخيص اختياري</summary><p>${sourceLink(c.source)}</p><ul class="source-list">${(g.source_refs||[]).map(p=>`<li>${sourceLink(p)}</li>`).join('')}</ul>${list(c.automated_coverage)}</details>
+        </div></article>
+      </div>
+    </section>
+    <section id="record" class="cardx"><h2>3. هل التجربة نجحت؟</h2><div class="success">علّم PASS بس بعد تنفيذ كل المطلوب ومقارنة النتايج وحفظ دليل منقّح. اكتمال العلامات مش إثبات إن المنتج نجح.</div>
+      <label class="field"><span>رقم النسخة المنشورة اللي اختبرتها · RELEASE_COMMIT</span><input id="run-release" dir="ltr" value="${esc(run.release)}" placeholder="SHA من deploy.sh status"></label>
+      <label class="field"><span>اسم البيئة · من غير أسرار</span><input id="run-env" value="${esc(run.environment)}" placeholder="Preview أو بيئة معزولة محددة"></label>
+      <label class="field"><span>رقم الطلب / معرّف بيانات الاختبار التجريبية</span><input data-note="order" value="${esc(notes[id]?.order||'')}" placeholder="MB-… لو الحالة بتعمل طلب"></label>
+      <label class="field"><span>سبب التعطيل أو مشكلة التنفيذ</span><textarea data-note="reason">${esc(notes[id]?.reason||'')}</textarea></label>
+      <label class="field"><span>الدليل المنقّح · رابط آمن أو وصف النتيجة الفعلية</span><textarea data-note="evidence">${esc(notes[id]?.evidence||'')}</textarea></label>
+      <label class="field"><span>العيب: المتوقع، الفعلي، خطوات التكرار وrequest ID منقّح</span><textarea data-note="defect">${esc(notes[id]?.defect||'')}</textarea></label>
+      <p class="mutedline">العلامات والحالة بتتحفظ محليًا. كلمات السر والملاحظات والأدلة ورقم النسخة في ذاكرة التبويب فقط؛ Reload بيمسحها. النتيجة المستكملة من غير دليل بتظهر غير موثّقة، والتقرير لا يصدرها PASS.</p>
+      <div class="result-controls">${statuses.map(s=>`<button class="btn secondary" data-status="${s}" aria-pressed="${s===r.status}">${s}</button>`).join('')}</div>
+      <div class="actions"><button class="btn" data-export>راجع ونزّل نتيجة التجربة</button><a class="smallbtn" href="#/cases">ارجع لكل الحالات</a></div>
+      <p class="record-state" id="record-message" role="status">${esc(status(id))}${status(id)!=='NOT_RUN'&&!notes[id]?.evidence?' · نتيجة محفوظة، الدليل محتاج يتربط من جديد':''}</p>
+    </section><p class="mutedline">الموقع لا يتصل تلقائيًا بتطبيق مطبخي أو Keycloak ولا يطبق أي إعدادات. كل نتائج التشغيل مدخلة يدويًا بواسطة المختبِر.</p>`;
+  function refreshStatus(){main.querySelector('#scenario-status').textContent=status(id);main.querySelectorAll('[data-status]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.status===status(id)));}
+  function progress(){const keys=new Set([...flow.map(s=>s.key),'verify:outcomes']);const n=r.checks.filter(k=>keys.has(k)).length;main.querySelector('#progressLabel').textContent=`${n} من ${total} خطوة خلصت`;main.querySelector('#bar').style.width=`${n/total*100}%`;main.querySelector('[role=progressbar]').setAttribute('aria-valuenow',n);}
+  progress();
+  main.querySelectorAll('[data-check]').forEach(el=>el.addEventListener('change',()=>{r.checks=el.checked?[...new Set([...r.checks,el.dataset.check])]:r.checks.filter(x=>x!==el.dataset.check);r.updated=new Date().toISOString();if(r.status==='PASS'&&executionIssues(c,r,notes[id],run).length){r.status='BLOCKED';main.querySelector('#record-message').textContent='اتغيّرت الخطوات المطلوبة؛ النتيجة بقت BLOCKED لحد إعادة التحقق.';}save();progress();refreshStatus();}));
+  main.querySelectorAll('[data-secret]').forEach(el=>el.addEventListener('input',()=>{if(el.value){secrets.set(el.dataset.secret,el.value);secretHistory.add(el.value);}else secrets.delete(el.dataset.secret);}));
   main.querySelectorAll('[data-note]').forEach(el=>el.addEventListener('input',()=>{notes[id]||={};notes[id][el.dataset.note]=el.value;}));
-  main.querySelectorAll('[data-status]').forEach(el=>el.addEventListener('click',()=>{const next=el.dataset.status;const note=notes[id]||{};if(next==='PASS'&&(!note.evidence?.trim()||c.steps.some(s=>!r.checks.includes('step:'+s.n))||requirements.some(([key])=>!r.checks.includes('ready:'+key))||c.prerequisites.some((_,i)=>!r.checks.includes('pre:'+i)))){toast('PASS محتاج كل المتطلبات والخطوات وتأكيد البيئة ودليل فعلي.');return;}if((next==='FAIL'||next==='BLOCKED')&&!note.reason?.trim()){toast('اكتب سبب الفشل أو التعطيل الأول.');return;}r.status=next;r.updated=new Date().toISOString();save();main.querySelector('#record-message').textContent=`اتسجّلت ${next} للحالة ${id}. دي نتيجة مدخلة من المختبِر.`;el.parentElement.querySelectorAll('[data-status]').forEach(b=>b.classList.toggle('secondary',b!==el));}));
+  main.querySelector('#run-release').oninput=e=>run.release=e.target.value;
+  main.querySelector('#run-env').oninput=e=>run.environment=e.target.value;
+  main.querySelectorAll('[data-status]').forEach(el=>el.addEventListener('click',()=>{
+    const next=el.dataset.status,note=notes[id]||{};
+    if(next==='PASS'&&(executionIssues(c,r,note,run).length)){toast('PASS محتاج دليل مكتمل المراجعة، تنفيذ كل الخطوات، RELEASE_COMMIT ودليل فعلي.');return;}
+    if((next==='FAIL'||next==='BLOCKED')&&!note.reason?.trim()){toast('اكتب سبب الفشل أو التعطيل الأول.');return;}
+    r.status=next;r.updated=new Date().toISOString();save();refreshStatus();main.querySelector('#record-message').textContent=`اتسجّلت ${next} — نتيجة مدخلة من المختبِر، مش تحقق تلقائي.`;main.querySelectorAll('[data-status]').forEach(b=>b.setAttribute('aria-pressed',b===el));
+  }));
 }
-function results(){main.innerHTML=`<div class="eyebrow">سجلّك على الجهاز ده</div><h1>التقدّم والنتايج</h1><div class="grid">${statuses.map(s=>`<div class="card"><b>${s}</b><h2>${data.cases.filter(c=>status(c.id)===s).length}</h2></div>`).join('')}</div><div class="panel"><label>اسم بيئة التنفيذ · من غير أسرار<input id="run-env" value="${esc(metadata.environment)}"></label><label>RELEASE_COMMIT الفعلي اللي اختبرته<input id="run-release" dir="ltr" value="${esc(metadata.release)}"></label><p>بيانات النسخة والأدلة مش بتتحفظ تلقائيًا. التقرير بيضم كل الحالات بما فيها NOT_RUN. التصدير ملوش كلمات سر الحسابات الخاصة.</p><button data-export>راجع وصدّر التقرير</button><details><summary>معاينة التقرير المنقّح</summary><pre id="report-preview" class="technical"></pre></details></div><div class="table-scroll"><table><thead><tr><th>الحالة</th><th>النتيجة</th><th>اكتمال الدليل</th></tr></thead><tbody>${data.cases.map(c=>`<tr><td><a href="${caseHref(c.id)}"><bdi>${c.id}</bdi></a></td><td>${status(c.id)}</td><td>${c.guidance_complete?'مكتمل':'NOT VERIFIED'}</td></tr>`).join('')}</tbody></table></div>`;main.querySelector('#run-env').oninput=e=>metadata.environment=e.target.value;main.querySelector('#run-release').oninput=e=>metadata.release=e.target.value;}
+
+function results(){main.innerHTML=`<div class="eyebrow">سجلّك على الجهاز ده</div><h1>التقدّم والنتايج</h1><div class="grid">${statuses.map(s=>`<div class="card"><b>${s}</b><h2>${data.cases.filter(c=>status(c.id)===s).length}</h2></div>`).join('')}</div><div class="panel"><label>اسم بيئة التنفيذ · من غير أسرار<input id="run-env" value="${esc(metadata.environment)}"></label><label>ملحوظة عامة للدفعة · مش بديل رقم نسخة كل حالة<input id="run-release" dir="ltr" value="${esc(metadata.release)}"></label><p>بيانات النسخة والأدلة مش بتتحفظ تلقائيًا. التقرير بيضم كل الحالات بما فيها NOT_RUN. التصدير ملوش كلمات سر الحسابات الخاصة.</p><button data-export>راجع وصدّر التقرير</button><details><summary>معاينة التقرير المنقّح</summary><pre id="report-preview" class="technical"></pre></details></div><div class="table-scroll"><table><thead><tr><th>الحالة</th><th>النتيجة</th><th>اكتمال الدليل</th></tr></thead><tbody>${data.cases.map(c=>`<tr><td><a href="${caseHref(c.id)}"><bdi>${c.id}</bdi></a></td><td>${status(c.id)}</td><td>${c.guidance_complete?'مكتمل':'NOT VERIFIED'}</td></tr>`).join('')}</tbody></table></div>`;main.querySelector('#run-env').oninput=e=>metadata.environment=e.target.value;main.querySelector('#run-release').oninput=e=>metadata.release=e.target.value;}
 function exportReport(){
   pendingExport=JSON.stringify(report(data,records,notes,[...secretHistory],metadata),null,2);
   let review=document.querySelector('#export-review');if(!review){review=document.createElement('section');review.id='export-review';review.className='panel';main.append(review);}

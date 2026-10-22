@@ -48,6 +48,9 @@ def run():
             page.goto(url + '#/case/' + case['id'])
             page.locator('#execute').wait_for()
             assert page.locator('.step').count() == len(case['steps']), case['id']
+            assert page.locator('.visible-step').count() == len(case['flow'])+1
+            assert page.locator('.visible-step .vs-body').evaluate_all('(nodes)=>nodes.every(n=>n.checkVisibility())')
+            assert page.locator('.step .url').count() == len(case['steps'])
             assert page.locator('#record').count() == 1
             assert page.locator('#expected').count() == 1
             # Every in-page link resolves to a rendered target.
@@ -61,6 +64,8 @@ def run():
         page.locator('[data-status="PASS"]').click()
         assert page.evaluate("JSON.parse(localStorage.getItem('matbakhy-testing-v1')||'{}')['CFG-002']?.status||'NOT_RUN'") == 'NOT_RUN'
         page.locator('[data-check="step:1"]').check()
+        page.locator('[data-status="FAIL"]').click()
+        assert 'FAIL' in page.locator('#record-message').inner_text()
         page.locator('[data-status="BLOCKED"]').click()
         stored = page.evaluate("localStorage.getItem('matbakhy-testing-v1')")
         assert 'synthetic-private' not in stored
@@ -76,11 +81,30 @@ def run():
         assert page.locator('[data-check="step:1"]').is_checked()
         assert page.locator('[data-secret]').first.input_value() == ''
         assert page.locator('[data-note="evidence"]').input_value() == ''
+        page.goto(url + '#/case/E2E-ORDER-101')
+        page.locator('#execute').wait_for()
+        assert page.locator('[data-canonical="2"] .url').get_attribute('href').endswith('#/checkout')
+        page.locator('[data-check="setup:preview"]').check()
+        page.reload()
+        page.locator('#execute').wait_for()
+        assert page.locator('[data-check="setup:preview"]').is_checked()
+        # Exercise website status validation with synthetic local-only input; this is not a live order run.
+        page.locator('[data-status="PASS"]').click()
+        assert page.evaluate("JSON.parse(localStorage.getItem('matbakhy-testing-v1'))['E2E-ORDER-101'].status") != 'PASS'
+        for box in page.locator('[data-check]').all():
+            box.check()
+        page.locator('#run-release').fill('a'*40)
+        page.locator('#run-env').fill('LOCAL-UI-REGRESSION-ONLY')
+        page.locator('[data-note="evidence"]').fill('Synthetic UI validator regression only; no live product execution.')
+        page.locator('[data-status="PASS"]').click()
+        assert page.evaluate("JSON.parse(localStorage.getItem('matbakhy-testing-v1'))['E2E-ORDER-101'].status") == 'PASS'
+        page.locator('[data-check="step:1"]').uncheck()
+        assert page.evaluate("JSON.parse(localStorage.getItem('matbakhy-testing-v1'))['E2E-ORDER-101'].status") == 'BLOCKED'
         page.goto(url + '#/case/%')
         page.get_by_role('heading', name='الحالة مش موجودة').wait_for()
         for width in (1440, 390, 320):
             page.set_viewport_size({'width': width, 'height': 844})
-            for route in ('#/', '#/cases', '#/case/CFG-001', '#/results'):
+            for route in ('#/', '#/cases', '#/case/CFG-001', '#/case/E2E-ORDER-101', '#/results'):
                 page.goto(url + route)
                 page.wait_for_function('document.querySelector("main h1") !== null')
                 assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (width, route)

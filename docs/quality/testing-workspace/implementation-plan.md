@@ -20,3 +20,9 @@ Completeness is separate from case representation, prerequisites and execution r
 ## Safe integration
 
 Use Python standard library for generation and local HTTP serving, native browser modules and CSS. Keep private passwords only in a JavaScript Map. Persist only step IDs, readiness acknowledgements and result status; evidence and defect text remain in memory and need deliberate sanitized export. No auto-provisioning, live SQL, Keycloak changes or deployment.
+
+## Owner prototype correction — 2026-10-22
+
+The attached approved prototype replaces the earlier inferred terracotta dashboard design for this workspace. Preserve its 940px centered single-column tutorial, ivory background, dark-green header, Cairo typography, white cards and visible numbered steps. Archive the supplied bytes and SHA256. Remove the prototype's separate developer details and collapsed essential configuration: the owner's newer execution-flow requirement overrides those elements. Keep original canonical catalog bytes unchanged. Add distinct setup/verification steps around canonical steps, never renumber canonical identity.
+
+Documentation impact before implementation: update this plan, workspace README, handbook test-execution English/Arabic, coverage matrix and status/evidence; add independent review and reference-comparison record. No backend/deployment/permission/contract change. Tests cover all 200 cases / 1005 steps, visibility, adjacent actor/configuration/URL, progress migration/resume, outcome guards, credentials and desktop/mobile visual tokens. Guidance completion needs explicit case review of the rich chronological tutorial; draft projections remain incomplete.
