@@ -6,7 +6,7 @@
 
 ## المبادئ
 
-1. **الشغل الفريد عمره ما بيتحذف.** أي Branch فيه Commits الـ Patches بتاعتها مش موجودة في `develop` (أو الـ Base بتاع الـ PR) بتتحفظ، مهما كان عمرها أو حالة الـ PR بتاعها. إقفال الـ PR مش معناه إن الـ Branch بتاعه بقى آمن.
+1. **الشغل اللي لسه مش متدمج في الـ Branch المستهدف عمره ما بيتحذف.** أي Branch فيه Commits الـ Patches بتاعتها مش موجودة في `develop` (أو الـ Base بتاع الـ PR) بتتحفظ، مهما كان عمرها أو حالة الـ PR بتاعها. إقفال الـ PR مش معناه إن الـ Branch بتاعه بقى آمن للحذف.
 2. **الحذف عملية مقصودة ومتسجّلة.** سجّل اسم الـ Branch وآخر SHA وحالة الدمج والسبب في تقرير Audit (مثال: [Audit تنضيف الـ Branches بتاريخ 2026-10-20](../07-reference/branch-cleanup-audit-2026-10-20-ar.md)). الـ SHA المسجّل هو وسيلة الاسترجاع: `git branch <name> <sha>` بيرجّع الـ Branch طول ما الـ Commit لسه موجود في الـ Remote أو في نسخة Clone (GitHub بيحتفظ بالـ Commits غير المتصلة بأي Branch لفترة محدودة؛ ماتعتمدش على ده).
 3. **مفيش حاجة تلقائية بتحذف Branches.** `scripts/branch_audit.py` بيطلّع تقرير بس. أي حذف تلقائي في المستقبل لازم يتحصر في الـ Branches اللي اتأكدنا إنها اتدمجت (كل الـ Commits بتاعتها أسلاف للهدف)، ولازم يتخطى الـ Branches المحمية وأطراف الـ PR المفتوحة (Head وBase) والـ Branches المشغولة بـ Worktree والـ Branches اللي الـ Workflows بتشير لها، ولازم يكون ليه قرار من المالك متسجّل في [قرارات المعمارية](../07-reference/architecture-decisions-ar.md).
 4. ماتستخدمش `git reset --hard` ولا `git clean -fd` ولا `git branch -D` ولا `git worktree remove --force` ولا `git push --force` كاختصارات للتنضيف. ماتلمسش الـ Tags ولا الـ Releases ولا ملفات الـ Deployment ولا النسخ الاحتياطية. المشروع ده مابيعدّلش `main`؛ و`develop` هو الـ Branch بتاع التكامل والـ Deploy.

@@ -4,7 +4,7 @@
 > **Status:** REFERENCE — جدول بحث موجّه بالمهام، من السؤال للملف اللي بيجاوب عليه
 > **Language / اللغة:** [English](repository-navigation.md) · العربية
 
-استخدم الصفحة دي لما تكون عارف انت بتدوّر على إيه ("السعر بيتـ Validate فين؟") بس مش عارف مكانه.
+استخدم الصفحة دي لما تكون عارف انت بتدوّر على إيه ("التحقق من السعر بيحصل فين؟") بس مش عارف مكانه.
 لتوزيع المجلدات شوف [خريطة الـ Repository](../04-codebase/repository-map-ar.md). المسارات اللي تحت اتراجعت
 على الشجرة الموجودة في الـ Branch ده.
 
@@ -38,7 +38,7 @@
 | صلاحيات الموظفين | الـ enum `backend/modules/identity/src/main/java/com/matbakhy/identity/api/Permission.java`؛ بتتفحص بـ `@PreAuthorize("hasAuthority('PERM_...')")` على الـ Controllers؛ وفحص الـ MFA الحديث بـ `@staffAssurance.recentMfa(authentication)` (`backend/app/src/main/java/com/matbakhy/app/security/StaffAssurance.java`) |
 | الـ Authorization على مستوى الـ Object (المالك / المطبخ / نطاق الحالة) | تحديد النطاق في SQL داخل الخدمات (مثلًا `customer_id = ?`، `kitchen_id = ?` في استعلامات القفل) و`AccessPolicy` (`backend/modules/identity/src/main/java/com/matbakhy/identity/api/AccessPolicy.java`) اللي ينفّذها `backend/app/src/main/java/com/matbakhy/app/security/ScopedAccessPolicy.java`؛ أي Object بتاع حد تاني بيرجّع 404 |
 | تطبيق سياسة الـ MFA | `backend/app/src/main/java/com/matbakhy/app/security/MfaEnforcementFilter.java` + `backend/app/src/main/java/com/matbakhy/app/mfa/MfaPolicyService.java` |
-| السعر بيتـ Validate فين؟ | وقت الـ Quote بيعمل `QuoteService.terms` (`backend/modules/orders/src/main/java/com/matbakhy/orders/internal/QuoteService.java:206`) إعادة حساب من الوجبات المنشورة؛ وعند تسجيل الأوردر `QuoteService.requireValid` (`:146`) بيعيد الحساب تاني وبيرفض الـ Quote القديمة بـ `PRICE_CHANGED`. أسعار العميل عمرها ما بتتقرا. الشرح التفصيلي: [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) |
+| التحقق من السعر بيحصل فين؟ | وقت الـ Quote بيعمل `QuoteService.terms` (`backend/modules/orders/src/main/java/com/matbakhy/orders/internal/QuoteService.java:206`) إعادة حساب من الوجبات المنشورة؛ وعند تسجيل الأوردر `QuoteService.requireValid` (`:146`) بيعيد الحساب تاني وبيرفض الـ Quote القديمة بـ `PRICE_CHANGED`. أسعار العميل عمرها ما بتتقرا. الشرح التفصيلي: [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) |
 | الأوردر بيتسجّل فين؟ | `OrderService.place` (`backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java:131`) واللي بيناديها `OrderController.place` (`backend/modules/orders/src/main/java/com/matbakhy/orders/web/OrderController.java:61`). الشرح التفصيلي: [تنفيذ الأوردر](../04-codebase/order-implementation-ar.md) |
 | العربون / الكاش / الـ Ledger فين؟ | [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md) |
 
@@ -60,7 +60,7 @@
 
 ## 5. الشاشات
 
-| السطح | الملفات |
+| الواجهة | الملفات |
 |---|---|
 | ويب العميل | التصفّح والفلاتر `apps/customer-web/src/Browse.tsx`؛ الوجبة `Meal.tsx`؛ المطبخ `Kitchen.tsx`؛ السلة + الـ Quote + تسجيل الأوردر `Checkout.tsx`؛ حالة العربون `Payment.tsx`؛ الأوردرات `Orders.tsx`؛ الملف الشخصي والعناوين والمفضّلة والصندوق وحالات الدعم `Account.tsx` (التحقق من الموبايل بيحصل جوه `Checkout.tsx`)؛ التحقق بخطوتين `Security.tsx`؛ الـ Hash Routes في `App.tsx` (`/`، `/meal/:id`، `/kitchen/:slug`، `/checkout`، `/orders`، `/orders/:id`، `/account`، `/support/:id`) |
 | مساحة الطبّاخ | `apps/operations-web/src/cook/` — `Dashboard.tsx`، `Orders.tsx`، `Meals.tsx`، `Slots.tsx`، `Payments.tsx`، `Statement.tsx`، `Insights.tsx`، `Settings.tsx`، `Onboarding.tsx` |
@@ -87,7 +87,7 @@
 
 ## 7. "أنفّذ تغييري فين؟"
 
-| التغيير | ابدأ من هنا | لمس كمان |
+| التغيير | ابدأ من هنا | حدّث كمان |
 |---|---|---|
 | Endpoint جديد أو متغيّر | الـ Controller في حزمة `web/` بتاعة الموديول المالك؛ والـ Service في `internal/` | `contracts/endpoints.json`، `contracts/openapi.yaml`، أعد توليد `packages/api-client/src/generated/schema.ts`، أضف Annotation الصلاحية، أضف اختبار تكامل، وصفحات الدليل حسب [سياسة التوثيق](../05-developer-workflow/documentation-policy-ar.md) |
 | قاعدة تسعير أو Quote أو تسجيل أوردر | `QuoteService` / `OrderService` | `PriceChangeIntegrationTest`، `QuoteIntegrationTest`، `OrderPlacementIntegrationTest`؛ بيحتاج مراجعة معمارية (فلوس) |

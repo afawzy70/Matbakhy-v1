@@ -49,3 +49,4 @@ ab514a810cb07b3d3a40648af172a3e68d611197:docs/quality/testing-workspace/referenc
 
 # Owner-approved directory-scan equivalent of the reviewed prototype namespace.
 /repo/docs/quality/testing-workspace/reference/approved-prototype.html:generic-api-key:24
+# Reviewed false positives (ai-skills developer-handbook redaction tests, intermediate commits): generic-api-key matched deliberately synthetic test strings that prove the validator masks credential values; no real credential. Exactly these three fingerprints (the third is the first version of this comment, which quoted the strings).

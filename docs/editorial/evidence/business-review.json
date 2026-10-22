@@ -1,0 +1,915 @@
+{
+  "source_sha": "39b8420",
+  "reviewer": "independent business editorial agent",
+  "reviewed_pairs": [
+    {
+      "english": "docs/developer-handbook/README.md",
+      "arabic": "docs/developer-handbook/README-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/00-getting-started/glossary.md",
+      "arabic": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/00-getting-started/learning-roadmap.md",
+      "arabic": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/00-getting-started/project-overview.md",
+      "arabic": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/00-getting-started/repository-navigation.md",
+      "arabic": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/actors-and-permissions.md",
+      "arabic": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/business-rules.md",
+      "arabic": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/kitchen-management.md",
+      "arabic": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/marketplace-model.md",
+      "arabic": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/order-lifecycle.md",
+      "arabic": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/pricing-and-payments.md",
+      "arabic": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/product-vision.md",
+      "arabic": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/01-business/target-users.md",
+      "arabic": "docs/developer-handbook/01-business/target-users-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/authentication-and-mfa.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/backoffice-admin.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/complete-order-journey.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/cook-operations.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/customer-mobile.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/customer-web.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    },
+    {
+      "english": "docs/developer-handbook/02-user-journeys/finance-and-support.md",
+      "arabic": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "english_full_read": true,
+      "arabic_full_read": true,
+      "section_comparison": true,
+      "final_diff_review": true
+    }
+  ],
+  "findings": [
+    {
+      "file": "docs/developer-handbook/README-ar.md",
+      "section": "# دليل المطوّر لمطبخي (Matbakhy)",
+      "old": "الدليل مخرَج حيّ تحت",
+      "new": "الدليل بيتحدّث باستمرار مع تطور المشروع، وبيخضع لـ",
+      "severity": "MINOR",
+      "reason": "Replace literal living-deliverable metaphor with natural Egyptian explanation.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/README-ar.md",
+      "section": "### 07 المراجع",
+      "old": "مقروء بالآلة:",
+      "new": "ملفات قابلة للقراءة آليًا:",
+      "severity": "MINOR",
+      "reason": "Describe machine-readable files naturally.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/README-ar.md",
+      "section": "# دليل المطوّر لمطبخي (Matbakhy)",
+      "old": "حالة التنفيذ موسومة في كل صفحة",
+      "new": "حالة التنفيذ موضّحة في كل صفحة",
+      "severity": "MINOR",
+      "reason": "Avoid unnatural metadata wording.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+      "section": "## مصطلحات الـ Domain والمصطلحات التقنية",
+      "old": "سياسة اصطناعية مسموحة بس",
+      "new": "سياسة تجريبية غير حقيقية مسموحة بس",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic policy without changing allowed environments.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+      "section": "## مصطلحات الـ Domain والمصطلحات التقنية",
+      "old": "السجلات الغريبة بترجّع 404",
+      "new": "السجلات الخاصة بمستخدم تاني بترجّع 404",
+      "severity": "MAJOR",
+      "reason": "Foreign records means ownership scope, not malformed records.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## الخريطة",
+      "old": "وأسطح الموبايل",
+      "new": "وواجهات الموبايل",
+      "severity": "MINOR",
+      "reason": "Surface means application interface, not literal surface.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## ترتيب القراءة",
+      "old": "الصفحات الخاصة بكل سطح",
+      "new": "الصفحات الخاصة بكل واجهة",
+      "severity": "MINOR",
+      "reason": "Use natural interface terminology.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## قواعد أساسية أثناء التعلّم",
+      "old": "استخدم بيانات اصطناعية (Synthetic) بس",
+      "new": "استخدم بيانات تجريبية غير حقيقية (Synthetic Data) بس",
+      "severity": "MINOR",
+      "reason": "Make fake fixture data explicit.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+      "section": "## لو اتعطّلت",
+      "old": "الاختبار اللي اسمه على اسم السلوك هو أحسن مواصفات",
+      "new": "الاختبار اللي اسمه بيوصف السلوك هو أوضح مرجع للسلوك المتوقع",
+      "severity": "MINOR",
+      "reason": "Remove literal specification phrase.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "section": "# التنقّل في الـ Repository: ألاقيه فين؟",
+      "old": "السعر بيتـ Validate فين؟",
+      "new": "التحقق من السعر بيحصل فين؟",
+      "severity": "MINOR",
+      "reason": "Avoid artificial Arabic/English verb hybrid.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "section": "## التطبيقات والكود",
+      "old": "| السطح | المجلد | الجمهور |",
+      "new": "| الواجهة | المجلد | الجمهور |",
+      "severity": "MINOR",
+      "reason": "Surface means application interface.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "section": "### مقفول بشروط أو مش شغّال",
+      "old": "**الفلوس الحقيقية مقفولة** بمراجعة قانونية ومراجعة حماية المستهلك ومراجعة حساب المستلم",
+      "new": "**التعاملات المالية الحقيقية مش مفعّلة حاليًا**، وتفعيلها مشروط بمراجعة قانونية ومراجعة حماية المستهلك ومراجعة حساب المستلم",
+      "severity": "MINOR",
+      "reason": "State financial gate clearly without weakening prerequisites.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+      "section": "## المشاكل اللي بيحلّها",
+      "old": "فلوس اصطناعية (Synthetic) بس",
+      "new": "مبالغ تجريبية غير حقيقية (Synthetic) بس",
+      "severity": "MINOR",
+      "reason": "Avoid unnatural synthetic money wording.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "# نموذج الـ Marketplace",
+      "old": "الـ Marketplace المعاملاتي",
+      "new": "عمليات البيع والطلب في الـ Marketplace",
+      "severity": "MINOR",
+      "reason": "Clarify transactional marketplace.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "# نموذج الـ Marketplace",
+      "old": "أي تسييل (Monetization)",
+      "new": "أي تحقيق دخل (Monetization)",
+      "severity": "MAJOR",
+      "reason": "Monetization is revenue generation, not asset liquidation.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## الهيكل التلاتي الأطراف",
+      "old": "الحقيقة البيزنس الأساسية",
+      "new": "الحقيقة الأساسية في نموذج العمل",
+      "severity": "MINOR",
+      "reason": "Natural business phrasing.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## المنصة مسؤولة عن إيه",
+      "old": "بوابة جودة العرض",
+      "new": "ضوابط جودة المطابخ المعروضة",
+      "severity": "MINOR",
+      "reason": "Clarify supply-side approval gate.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## المنصة مسؤولة عن إيه",
+      "old": "حقيقة التوافر",
+      "new": "المرجع الفعلي للتوافر",
+      "severity": "MINOR",
+      "reason": "Avoid literal truth metaphor.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+      "section": "## المنصة مسؤولة عن إيه",
+      "old": "حقيقة السعر",
+      "new": "المرجع الفعلي للسعر",
+      "severity": "MINOR",
+      "reason": "Avoid literal truth metaphor.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "# الأطراف والصلاحيات",
+      "old": "حزم من المنح بيحملها إنسان",
+      "new": "مجموعات صلاحيات ممنوحة لشخص",
+      "severity": "MINOR",
+      "reason": "Avoid literal grant-bundle phrase.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## الأطراف",
+      "old": "**متقدّم للطبخ**",
+      "new": "**متقدّم للعمل كطبّاخ**",
+      "severity": "MINOR",
+      "reason": "Application is for becoming a seller, not cooking an individual meal.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "section": "## 4. الوجبات",
+      "old": "علامة مراجعة محتوى من الموظفين متعامدة",
+      "new": "علامة مستقلة لمراجعة المحتوى من الموظفين",
+      "severity": "MAJOR",
+      "reason": "Orthogonal means independent state, not geometric perpendicularity.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "section": "## 2. سجل المطبخ وحالات التشغيل بتاعته",
+      "old": "استئناف الطبّاخ، استرجاع الموظفين",
+      "new": "استئناف البيع من الطبّاخ، إعادة تفعيل المطبخ من الموظفين",
+      "severity": "MINOR",
+      "reason": "Avoid implying staff accounts are restored.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+      "section": "## 8. حذف الحساب للطبّاخ",
+      "old": "**بيتحجز لمراجعة الموظفين**",
+      "new": "**حذفه بيتأجّل لحد مراجعة الموظفين**",
+      "severity": "MINOR",
+      "reason": "Account is held for review, not person detained.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 3 — التوافر والسعة",
+      "old": "بداية الـ Slot − وقت التجهيز",
+      "new": "بداية الـ Slot − مهلة الطلب المسبق (lead time)",
+      "severity": "MAJOR",
+      "reason": "Lead time is ordering cutoff interval, not cooking preparation duration.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 3 — التوافر والسعة",
+      "old": "الـ Slot فيه 3 وجبات متبقية",
+      "new": "الـ Slot فيه 3 حصص متبقية",
+      "severity": "MAJOR",
+      "reason": "Portions are capacity units; meal types are distinct.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 3 — التوافر والسعة",
+      "old": "على آخر وجبة",
+      "new": "على آخر حصة",
+      "severity": "MAJOR",
+      "reason": "Preserve distinction between portion capacity and meal type.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 5 — العرض القديم والانتهاء",
+      "old": "العرض أقدم من موعد انتهائه",
+      "new": "مدة صلاحية العرض انتهت",
+      "severity": "MAJOR",
+      "reason": "Quote expiry condition must describe past expiry, not being older than a date.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 7 — المطبخ بيقبل أو يرفض",
+      "old": "المخزون بيتفرج عنه مرة واحدة",
+      "new": "الحصص المحجوزة بترجع متاحة مرة واحدة",
+      "severity": "MINOR",
+      "reason": "Use natural stock-release explanation; no consumed stock restored.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## الخطوة 8 — التحضير",
+      "old": "بيفرّج عن التخصيص مرة واحدة",
+      "new": "بيرجع الحصص المخصّصة متاحة مرة واحدة",
+      "severity": "MINOR",
+      "reason": "Natural allocation-release explanation before preparation.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+      "section": "## نظرة عامة",
+      "old": "هي عايشة في سجلات منفصلة",
+      "new": "بتتسجّل في سجلات منفصلة",
+      "severity": "MINOR",
+      "reason": "Avoid anthropomorphic literal translation.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "# التسعير والدفع",
+      "old": "منفّذة ومختبرة بفلوس اصطناعية (Synthetic)؛ الفلوس الحقيقية متقفّلة (Gated)",
+      "new": "منفّذة ومختبرة بمبالغ تجريبية غير حقيقية (Synthetic)؛ التعاملات المالية الحقيقية مش مفعّلة حاليًا ومشروطة بالمراجعات المطلوبة (Gated)",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic amounts and gated real payments.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "# التسعير والدفع",
+      "old": "**الفلوس الحقيقية متقفّلة.**",
+      "new": "**التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة.**",
+      "severity": "MINOR",
+      "reason": "State real-money gate clearly and retain following required reviews.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "## 1. إزاي السعر بيتبني",
+      "old": "فالـ Overflow بيفشل بصوت عالي",
+      "new": "فلو حصل Overflow العملية بتفشل بخطأ واضح",
+      "severity": "MINOR",
+      "reason": "Fail loudly means explicit error, not sound.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "### إصدارات السعر والـ Snapshots",
+      "old": "صف واحد لكل حساب فيه",
+      "new": "صف واحد لكل عملية حساب للسعر، فيه",
+      "severity": "MAJOR",
+      "reason": "Calculation is distinct from user account.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "## 2. تغييرات السعر قبل التسجيل (قرار المالك D13)",
+      "old": "مفيش خصم صامت ولا إعادة إرسال صامتة",
+      "new": "مفيش خصم ولا إعادة إرسال من غير علم العميل",
+      "severity": "MINOR",
+      "reason": "Natural explanation of silent resubmission prohibition.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+      "section": "## 7. المطابقة والثوابت المالية",
+      "old": "| تقرير الكاش ≠ المتحقِّق |",
+      "new": "| مقدّم تقرير الكاش ≠ المتحقِّق منه |",
+      "severity": "MAJOR",
+      "reason": "Separation of duties compares people, not report to person.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "section": "## مقاييس النجاح (أهداف، مش نتايج)",
+      "old": "زي تحويل الـ Checkout",
+      "new": "زي نسبة إتمام الطلبات في الـ Checkout",
+      "severity": "MAJOR",
+      "reason": "Checkout conversion is a conversion rate, not transfer.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "البلاطات التلاتة للنية",
+      "new": "الاختيارات التلاتة حسب غرض الطلب",
+      "severity": "MINOR",
+      "reason": "Intent tiles are user choices, not literal tiles.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## الـ Authorization وفصل الحسابات",
+      "old": "الـ Objects الغريبة بترجع 404",
+      "new": "الـ Objects الخاصة بمستخدم أو مطبخ تاني بترجع 404",
+      "severity": "MAJOR",
+      "reason": "Foreign means ownership scope, not malformed object.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## الـ Authorization وفصل الحسابات",
+      "old": "الصلاحيات الملغاة بتوقف شغل",
+      "new": "الصلاحيات اللي اتسحبت بتبطل تشتغل",
+      "severity": "MINOR",
+      "reason": "Natural revoked-grant phrasing.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## حجز السعة (Capacity)",
+      "old": "آخر وجبة مبتتباعش زيادة عن اللازم أبدًا",
+      "new": "آخر حصة مينفعش تتباع لأكتر من عميل",
+      "severity": "MAJOR",
+      "reason": "Capacity applies to portions, not meal types.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+      "section": "# رحلات المستخدم: المصادقة وMFA",
+      "old": "نص السياسة (هو المرجع في النيّة)",
+      "new": "نص السياسة (هو المرجع للهدف المقصود)",
+      "severity": "MINOR",
+      "reason": "Intent is policy purpose, not personal intention.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+      "section": "## مكونات الهوية الأساسية",
+      "old": "SSL مطلوب للخارج",
+      "new": "SSL مطلوب للاتصالات الخارجية",
+      "severity": "MINOR",
+      "reason": "Clarify external connection requirement.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "section": "## مفيش \"أدوار\" للـ Staff، فيه صلاحيات ممنوحة بس",
+      "old": "لسلطة Spring اسمها",
+      "new": "لصلاحية Spring اسمها",
+      "severity": "MINOR",
+      "reason": "Use established authority context instead of literal power.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "# رحلات المستخدم: رحلة الأوردر الكاملة",
+      "old": "هذه الصفحة بتربط",
+      "new": "الصفحة دي بتربط",
+      "severity": "MINOR",
+      "reason": "Consistent professional Egyptian prose.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+      "old": "جهة اتصال مقنّعة",
+      "new": "بيانات تواصل مخفية جزئيًا",
+      "severity": "MINOR",
+      "reason": "Masked contact is partially hidden data, not disguised contact.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+      "old": "| 18 | العميل | المراجعة |",
+      "new": "| 18 | العميل | التقييم |",
+      "severity": "MINOR",
+      "reason": "Review here is customer rating, not editorial or operational review.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)",
+      "old": "| مراجعة واحدة |",
+      "new": "| تقييم واحد |",
+      "severity": "MINOR",
+      "reason": "Customer review terminology consistency.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+      "section": "## السيناريو C: عربون مباشر 50% (الرحلتين الأساسيتين 3 و4)",
+      "old": "الفلوس الحية مقفولة بشروط",
+      "new": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify real-money gate.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-1 التسجيل: التقديم، الإرسال، انتظار القرار",
+      "old": "علم الاستلام",
+      "new": "إعداد إتاحة الاستلام",
+      "severity": "MINOR",
+      "reason": "Flag is a boolean setting, not a literal flag.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-6 تقارير الكاش والعربون من المطبخ",
+      "old": "الفلوس الحية مقفولة بشروط",
+      "new": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify real-money gate.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "### الـ Authentication والـ Redirect والـ Deep Links",
+      "old": "والمزوّد غير المتاح بيحافظ عليها",
+      "new": "ولو المزوّد مش متاح، التطبيق بيحتفظ بالـ Session",
+      "severity": "MAJOR",
+      "reason": "Unreachable provider does not actively preserve session; app does.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "### CM-3 عرض السعر، التسجيل، واسترجاع الأوردر غير المؤكد",
+      "old": "حتى لو التطبيق مات",
+      "new": "حتى لو التطبيق اتقفل فجأة",
+      "severity": "MINOR",
+      "reason": "Professional Egyptian description of app termination.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "### CM-4 تتبّع الأوردر، تقرير العربون، الإلغاء، التقييم",
+      "old": "Deep Link دافئ وبارد",
+      "new": "Deep Link والتطبيق شغّال أو مقفول",
+      "severity": "MINOR",
+      "reason": "Warm/cold links describe application lifecycle, not temperature.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "## أندرويد مقابل iOS",
+      "old": "مُحترَم؛ بيمنع",
+      "new": "بيتطبّق؛ وبيمنع",
+      "severity": "MINOR",
+      "reason": "Honoured option means applied, not respected.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-3 اختيار الوجبة والسلة",
+      "old": "الـ Slot المستنفد مايتضافش",
+      "new": "الـ Slot اللي حصصه خلصت مايتضافش",
+      "severity": "MINOR",
+      "reason": "Natural exhausted-capacity wording.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-4 عرض السعر، التحقق من التليفون، وتسجيل الأوردر",
+      "old": "الفلوس الحقيقية مقفولة بشروط",
+      "new": "التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify real-money gate.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم",
+      "old": "تكرار تقرير التحويل Idempotent وإعلامي",
+      "new": "تكرار تقرير التحويل Idempotent، وهو للإبلاغ بس",
+      "severity": "MINOR",
+      "reason": "Informational is not media-related.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-5 تتبّع الأوردر، تقرير الدفع، الإلغاء، والتقييم",
+      "old": "المراجعة التانية بتدي 409",
+      "new": "التقييم التاني بيرجّع 409",
+      "severity": "MINOR",
+      "reason": "Review means customer rating here.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-8 الأخطاء والاسترجاع (شامل)",
+      "old": "علم البناء",
+      "new": "إعداد الـ Build",
+      "severity": "MINOR",
+      "reason": "Build flag is a configuration switch, not literal flag.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "# رحلات المستخدم: المالية والدعم",
+      "old": "كل الفلوس بيانات اصطناعية (Synthetic) والفلوس الحية مقفولة بشروط",
+      "new": "كل المبالغ تجريبية وغير حقيقية (Synthetic)، والتعاملات المالية الحقيقية مش مفعّلة حاليًا وتفعيلها مشروط بالمراجعات المطلوبة",
+      "severity": "MINOR",
+      "reason": "Clarify synthetic money and real-money gate.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "# رحلات المستخدم: المالية والدعم",
+      "old": "والطبّاخ والعميل لنصفهم هم",
+      "new": "والطبّاخ والعميل كل واحد في الجزء الخاص بيه",
+      "severity": "MINOR",
+      "reason": "Natural explanation of each actor’s part.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)",
+      "old": "تسجيل استرداد المطبخ للعميل بالكامل للكاش المتحقق منه والمحصّل عند المطبخ",
+      "new": "تسجيل ردّ المطبخ للعميل مبلغ الكاش بالكامل، بعد التحقق من تحصيل المطبخ ليه",
+      "severity": "MAJOR",
+      "reason": "Clarify kitchen-to-customer refund direction without implying kitchen receives refund.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+      "section": "## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)",
+      "old": "القيود ذات المبلغ صفر مايتحطش في دفعات",
+      "new": "القيود اللي مبلغها صفر ماينفعش تتحط في دفعات",
+      "severity": "MINOR",
+      "reason": "Fix plural agreement and readability.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## الـ Authorization على مستوى الـ Object (الملكية والعزل بين المطابخ)",
+      "old": "فالسجل الغريب ببساطة مش موجود",
+      "new": "فالسجل الخاص بحد تاني مش موجود",
+      "severity": "MAJOR",
+      "reason": "Clarify foreign-record ownership scope.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## الـ Authorization على مستوى الـ Object (الملكية والعزل بين المطابخ)",
+      "old": "المعرّف الغريب بيرجّع",
+      "new": "معرّف السجل الخاص بحد تاني بيرجّع",
+      "severity": "MAJOR",
+      "reason": "Clarify cross-owner id rather than malformed id.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+      "section": "## القيود المعروفة وفجوات التوثيق",
+      "old": "جدول أدوار خشن",
+      "new": "جدول عام للأدوار من غير تفاصيل الصلاحيات",
+      "severity": "MINOR",
+      "reason": "Coarse means broad-grained, not rough texture.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "section": "## 5. الشاشات",
+      "old": "| السطح | الملفات |",
+      "new": "| الواجهة | الملفات |",
+      "severity": "MINOR",
+      "reason": "Use application-interface terminology.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+      "section": "## 7. \"أنفّذ تغييري فين؟\"",
+      "old": "| التغيير | ابدأ من هنا | لمس كمان |",
+      "new": "| التغيير | ابدأ من هنا | حدّث كمان |",
+      "severity": "MINOR",
+      "reason": "Natural wording for files also affected.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## شرائح العملاء",
+      "old": "تلات بلاطات \"نية\"",
+      "new": "تلات اختيارات حسب غرض الطلب",
+      "severity": "MINOR",
+      "reason": "Avoid literal intent-tile terminology.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## شرائح العملاء",
+      "old": "بلاطة النية (النص بالإنجليزي)",
+      "new": "اختيار غرض الطلب (النص بالإنجليزي)",
+      "severity": "MINOR",
+      "reason": "Use consistent natural intent terminology.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## شرائح العملاء",
+      "old": "البلاطات التلاتة **تلميح عرض**",
+      "new": "الاختيارات التلاتة **بتوجّه طريقة العرض بس**",
+      "severity": "MINOR",
+      "reason": "Clarify presentation-only behaviour without implying server filtering.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "section": "## BO-3 متابعة الأوردرات والاستثناءات",
+      "old": "جهة اتصال مقنّعة",
+      "new": "بيانات تواصل مخفية جزئيًا",
+      "severity": "MINOR",
+      "reason": "Masked contact means partially hidden personal data.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+      "section": "## BO-3 متابعة الأوردرات والاستثناءات",
+      "old": "وفتح جهة اتصال العميل",
+      "new": "وفتح بيانات تواصل العميل",
+      "severity": "MINOR",
+      "reason": "Use accurate contact-data wording.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "# ملخص قواعد العمل",
+      "old": "في صيغة مقروءة للآلة",
+      "new": "في صيغة قابلة للقراءة آليًا",
+      "severity": "MINOR",
+      "reason": "Natural machine-readable terminology.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+      "section": "## الـ Authentication",
+      "old": "رقم تليفون مصري متطبَّع ومتحقَّق منه",
+      "new": "رقم تليفون مصري بصيغة موحّدة ومتحقَّق منه",
+      "severity": "MINOR",
+      "reason": "Normalized phone means standard format, not literal normalization.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## المسارات الموجودة",
+      "old": "كروت النية",
+      "new": "اختيارات غرض الطلب",
+      "severity": "MINOR",
+      "reason": "Natural intent choices terminology.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-1 اكتشاف الزائر، البحث، والفلترة",
+      "old": "كارت نية اختياريًا",
+      "new": "اختيار غرض الطلب اختياريًا",
+      "severity": "MINOR",
+      "reason": "Natural intent selection wording.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+      "section": "## CW-1 اكتشاف الزائر، البحث، والفلترة",
+      "old": "عدّ المشاهدات المجهولة، أرسل وانسَ",
+      "new": "عدّ مرات الظهور من غير تحديد هوية الزائر، وإرسال الطلب من غير انتظار نتيجته",
+      "severity": "MAJOR",
+      "reason": "Impressions differ from views; explain fire-and-forget precisely.",
+      "technical_semantic_risk": "Low: wording clarified; English requirement and protected technical text preserved."
+    }
+  ],
+  "validation": {
+    "protected_fences_inline_code_headings_links": "PASS: exact match against source Arabic for all 20 files",
+    "doc001_docs": "PASS (0 problems)",
+    "git_diff_check": "PASS",
+    "parity": "Only 20 stale sync-record failures; no structural/protected-token errors. Integrator must update-sync after combined review."
+  },
+  "severity_counts": {
+    "MINOR": 63,
+    "MAJOR": 17
+  },
+  "limitations": [
+    "AI editorial review does not guarantee perfect naturalness or semantics.",
+    "GitHub RTL rendering was not visually tested.",
+    "No application tests rerun for prose-only changes; code and deployment unchanged."
+  ],
+  "independent_feedback_repair": "Removed duplicated اختيار introduced by initial intent-choice correction, per architecture reviewer feedback.",
+  "independent_semantic_repairs": {
+    "sha": "cd9403a987ce1d7f33360195ab554401e3e2a122",
+    "severity": "MAJOR",
+    "count": 3,
+    "reason": "Disambiguate carry/contain required state/code and headers from ambiguous يشيل (could mean remove).",
+    "files": [
+      "02-user-journeys/customer-mobile-ar.md",
+      "02-user-journeys/customer-web-ar.md",
+      "02-user-journeys/complete-order-journey-ar.md"
+    ]
+  }
+}

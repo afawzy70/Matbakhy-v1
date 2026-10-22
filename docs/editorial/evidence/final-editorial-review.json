@@ -1,0 +1,166 @@
+{
+  "findings": [
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "حماية آخر أدمن والتصعيد الذاتي",
+      "corrected": "حماية آخر أدمن ومنع التصعيد الذاتي للصلاحيات",
+      "reason": "Independent review: avoid security-control polarity ambiguity.",
+      "severity": "MAJOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وإعادة ضبط الأدمن",
+      "corrected": "وإعادة ضبط MFA بواسطة الأدمن",
+      "reason": "Independent review: clarify actor and target of reset.",
+      "severity": "MAJOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 6. التسعير وعروض الأسعار اللي مبقتش مواكبة للشروط الحالية (Stale quotes)",
+      "original": "مبالغ EGP بوحدات صحيحة",
+      "corrected": "مبالغ EGP بالقروش كأرقام صحيحة",
+      "reason": "Independent review: full handbook specifies integer piastres.",
+      "severity": "MAJOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "أيوه (للاستخدام التجريبي غير الحقيقي (Synthetic)/بيئة المعاينة بس)",
+      "corrected": "أيوه (للاستخدام ببيانات تجريبية غير حقيقية (Synthetic Data) أو في بيئة المعاينة بس)",
+      "reason": "Independent review: natural synthetic/preview restriction.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+      "section": "## حالة حماية الـ Branch",
+      "original": "إلغاء الموافقة بعد تشغيل DOC-001 أخضر",
+      "corrected": "إلغاء الموافقة بعد نجاح فحص DOC-001",
+      "reason": "Use successful check instead of color shorthand.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-policy-ar.md",
+      "section": "## 4. التحقق من التوثيق (بيشتغل دايمًا)",
+      "original": "عمرك ما تقرا الفحص الأخضر على إنه شهادة دقة",
+      "corrected": "عمرك ما تعتبر نجاح الفحص شهادة على دقة المحتوى",
+      "reason": "Explain green check without color shorthand.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/documentation-policy-ar.md",
+      "section": "## 5. حوكمة البوابة نفسها",
+      "original": "فالنتيجة الخضرا ممكن تعيش بعد إلغاء لاحق للموافقة",
+      "corrected": "فنتيجة النجاح ممكن تفضل ظاهرة حتى بعد إلغاء الموافقة",
+      "reason": "Natural rendering of green result outliving approval dismissal.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/target-users-ar.md",
+      "section": "## افتراضات الجغرافيا والحجم",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "reason": "Glossary: synthetic development zones are not real service areas.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+      "section": "## الرحلات",
+      "original": "(بيانات اصطناعية (Synthetic)، للـ CI بس)",
+      "corrected": "(بيانات تجريبية غير حقيقية (Synthetic Data)، للـ CI بس)",
+      "reason": "Glossary: distinguish synthetic native seed data.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "section": "# رؤية المنتج",
+      "original": "ببيانات اصطناعية (Synthetic)",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data)",
+      "reason": "Glossary: synthetic MVP data.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+      "section": "## مراحل الإصدار",
+      "original": "المسارات الأساسية ببيانات اصطناعية؛",
+      "corrected": "المسارات الأساسية ببيانات تجريبية غير حقيقية؛",
+      "reason": "Glossary: synthetic scope before live-money gates.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-6 تقارير الكاش والعربون من المطبخ",
+      "original": "IMPLEMENTED (بيانات اصطناعية (Synthetic)؛",
+      "corrected": "IMPLEMENTED (بيانات تجريبية غير حقيقية (Synthetic Data)؛",
+      "reason": "Glossary: synthetic implementation status preserved.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+      "section": "## CO-2 موافقة الـ Staff وإنشاء المطبخ",
+      "original": "`FORBIDDEN` مراجعة النفس",
+      "corrected": "`FORBIDDEN` لما الشخص يراجع طلبه بنفسه",
+      "reason": "Clarify self-review refusal.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+      "section": "# البيئة المحلية",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+      "section": "# بيئة المعاينة",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+      "section": "## حدود الجاهزية للـ Production",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+      "section": "# التقييم النهائي",
+      "original": "بيانات تجريبية غير حقيقية (Synthetic)",
+      "corrected": "بيانات تجريبية غير حقيقية (Synthetic Data)",
+      "reason": "Glossary: canonical Synthetic Data label.",
+      "severity": "MINOR",
+      "risk": "English technical meaning preserved; protected text unchanged."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "استلام المطبخ، النزاعات، التسوية، تبليغ الاسترداد",
+      "corrected": "استلام المطبخ، النزاعات، المطابقة، تبليغ الاسترداد",
+      "severity": "MAJOR",
+      "reason": "Reconciliation of deposit reports is distinct from commission Settlement.",
+      "risk": "Preserve deposit dispute workflow; do not imply money settlement."
+    }
+  ]
+}

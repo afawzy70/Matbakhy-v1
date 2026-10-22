@@ -1,0 +1,501 @@
+{
+  "reviewed_pairs": [
+    "07-reference/architecture-decisions.md",
+    "07-reference/branch-cleanup-audit-2026-10-20.md",
+    "07-reference/documentation-map.md",
+    "07-reference/frequently-asked-questions.md",
+    "07-reference/fresh-developer-simulation.md",
+    "07-reference/implementation-status.md",
+    "07-reference/independent-reviews.md",
+    "07-reference/inventory-and-gaps.md",
+    "07-reference/requirements-traceability.md"
+  ],
+  "findings": [
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "القرارات موجودة في أربع أماكن",
+      "corrected": "القرارات موجودة في أربعة أماكن",
+      "reason": "تصحيح العدد مع أماكن.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "السجل المقروء آليًا",
+      "corrected": "السجل القابل للقراءة آليًا",
+      "reason": "صياغة واضحة لـ machine-readable.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "السجل البشري",
+      "corrected": "السجل المكتوب للقراءة البشرية",
+      "reason": "Human register يصف جمهور المستند مش نوع السجل.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "# فهرس القرارات المعمارية وقرارات المنتج",
+      "original": "مستندات موضوعية فيها تفاصيل قرارات بعينها",
+      "corrected": "مستندات متخصصة فيها تفاصيل قرارات بعينها",
+      "reason": "Topic documents مش مستندات محايدة أو موضوعية.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "القرار `ACCEPTED` لازم يشيل مرجع موافقة؛ والـ `OPEN` ميكونش ليه قيمة وليه Gate",
+      "corrected": "القرار `ACCEPTED` لازم يكون معاه مرجع موافقة؛ والقرار `OPEN` لازم يكون من غير قيمة وله Gate",
+      "reason": "إزالة التركيب الملتبس مع إبقاء الشرطين الصريحين.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "اتحل محله جزئيًا بـ D16",
+      "corrected": "D16 حلّ محل جزء منه",
+      "reason": "تصحيح تركيب الاستبدال.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "والفلوس الحقيقية متقفّلة بـ Gate",
+      "corrected": "والتعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل",
+      "reason": "توضيح live money gated مع إبقاء شرط التفعيل.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "أيوه (اصطناعي (Synthetic)/معاينة بس)",
+      "corrected": "أيوه (للاستخدام التجريبي غير الحقيقي (Synthetic)/بيئة المعاينة بس)",
+      "reason": "إزالة تداخل الأقواس والتمييز عن الاستخدام الحقيقي.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## سجل القرارات (`planning/decisions.json`)",
+      "original": "قيم اصطناعية في الكود",
+      "corrected": "قيم تجريبية غير حقيقية (Synthetic) في الكود",
+      "reason": "توضيح synthetic policy values دون وصفها ببيانات عملاء.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## الـ ADRs في `docs/engineering/01-architecture.md`",
+      "original": "موديولات الـ Domain بتتكلم عن طريق حزم",
+      "corrected": "موديولات الـ Domain بتتواصل عن طريق حزم",
+      "reason": "صياغة هندسية طبيعية للاتصال بين الموديولات.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+      "section": "## روابط الإحلال والاستبدال اللي ممكن يتحقق منها",
+      "original": "\"MFA للموظفين إلزامي عالميًا\"",
+      "corrected": "\"MFA إلزامي لكل الموظفين\"",
+      "reason": "Universally mandatory تعني كل الموظفين مش النطاق الجغرافي.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/branch-cleanup-audit-2026-10-20-ar.md",
+      "section": "## اللي اتمسح (كل الـ Commits أسلاف لـ `develop` وقتها؛ الاسترجاع بـ `git branch <name> <sha>`)",
+      "original": "الـ Branches السبعة `test/doc001-*` كانت Branches اختبار فرض مؤقتة",
+      "corrected": "الـ Branches السبعة `test/doc001-*` كانت Branches مؤقتة لاختبار تطبيق القواعد",
+      "reason": "توضيح enforcement tests.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/branch-cleanup-audit-2026-10-20-ar.md",
+      "section": "## اللي اتمسح (كل الـ Commits أسلاف لـ `develop` وقتها؛ الاسترجاع بـ `git branch <name> <sha>`)",
+      "original": "وفضلت رؤوس الـ PRs على GitHub",
+      "corrected": "وفضلت نسخ الـ Head بتاعة الـ PRs على GitHub",
+      "reason": "إزالة الترجمة الحرفية لكلمة heads.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "# خريطة التوثيق والمصادر المرجعية",
+      "original": "للنية → المستندات الموضوعية",
+      "corrected": "لمعرفة السلوك المقصود → المستندات المتخصصة",
+      "reason": "توضيح intent وtopic documents في ترتيب المصادر.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "# خريطة التوثيق والمصادر المرجعية",
+      "original": "`docs/product/04-state-machines.md` (النية)",
+      "corrected": "`docs/product/04-state-machines.md` (السلوك المقصود)",
+      "reason": "توضيح دور مرجع state machines.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "# خريطة التوثيق والمصادر المرجعية",
+      "original": "`docs/product/06-permissions.md` (النية)",
+      "corrected": "`docs/product/06-permissions.md` (الصلاحيات المقصودة)",
+      "reason": "توضيح دور مرجع الصلاحيات.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "## التكرار المعروف",
+      "original": "`docs/product/*` (النية)",
+      "corrected": "`docs/product/*` (السلوك المقصود)",
+      "reason": "توضيح توثيق intent.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+      "section": "## ",
+      "original": "مستندات تاريخية أو لحظية (ماتعتبرهاش حالية)",
+      "corrected": "مستندات تاريخية أو بتسجّل الحالة في وقت معيّن (ماتعتبرهاش حالية)",
+      "reason": "Point-in-time مش لحظي أو realtime.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## الإعداد والأدوات",
+      "original": "بيتولّدوا في ملف env بتاعك انت والمتجاهل من git بواسطة",
+      "corrected": "بتتولّد في ملف env خاص بيك وGit بيتجاهله، عن طريق",
+      "reason": "تصحيح المطابقة وصياغة git-ignored.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## المنتج والكود",
+      "original": "الفلوس الحقيقية لسه متقفّل عليها بـ Gates",
+      "corrected": "التعاملات المالية الحقيقية لسه مش مفعّلة لحد استيفاء شروط التفعيل",
+      "reason": "توضيح تعطيل التعاملات مع إبقاء الـ gates.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## الاختبارات والأدلة",
+      "original": "**الـ CI الأخضر بيثبت إيه؟** بيثبت إن الـ Jobs المذكورة في",
+      "corrected": "**نجاح فحوصات الـ CI بيثبت إيه؟** بيثبت إن الـ Jobs المذكورة في",
+      "reason": "توضيح green CI بلغة مباشرة.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## الاختبارات والأدلة",
+      "original": "ببيانات اصطناعية (Synthetic) وLogs متنضّفة",
+      "corrected": "ببيانات تجريبية غير حقيقية (Synthetic Data) وLogs بعد إزالة المعلومات الحساسة منها",
+      "reason": "توضيح synthetic وsanitized logs دون تخفيف التحذير.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## Git والـ PR والـ CI",
+      "original": "وبعدها الـ Images بـ Commit SHA",
+      "corrected": "وبعدها Docker Images متوسمة بالـ Commit SHA",
+      "reason": "التمييز بين Docker Images وصور الميديا.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## Git والـ PR والـ CI",
+      "original": "الـ Database مابترجعش لورا أوتوماتيك",
+      "corrected": "مفيش Rollback تلقائي للـ Database",
+      "reason": "إزالة التعبير المبهم مع إبقاء عدم الرجوع التلقائي.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+      "section": "## المعاينة والتشغيل",
+      "original": "لا: بيانات اصطناعية، وبانر Demo",
+      "corrected": "لا: بيانات تجريبية غير حقيقية (Synthetic Data)، وبانر Demo",
+      "reason": "تمييز بيانات المعاينة عن بيانات العملاء.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "# محاكاة المطوّر الجديد (الجاهزية للأسبوع الأول)",
+      "original": "والصف الناقص بيفشل بأمان إلى REQUIRED",
+      "corrected": "ولو صف السياسة مش موجود، النظام بيطبّق REQUIRED كاختيار آمن",
+      "reason": "fail safe يصف اختيار REQUIRED مش فشل العملية.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "# محاكاة المطوّر الجديد (الجاهزية للأسبوع الأول)",
+      "original": "CI، Images بـ SHA",
+      "corrected": "CI، Docker Images متوسمة بالـ SHA",
+      "reason": "توضيح نوع الصور.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "## عيوب التوثيق اللي اتلاقت واللي اتعمل فيها",
+      "original": "مسارات Truncated/nonexistent في صفحة الفجوات",
+      "corrected": "مسارات ناقصة أو مش موجودة في صفحة الفجوات",
+      "reason": "إزالة خلط إنجليزي غير ضروري.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+      "section": "## المتطلبات المسبقة الخفية اللي اتكشفت",
+      "original": "و`gh` متوثّق",
+      "corrected": "و`gh` مسجّل دخول بحساب مصرح له",
+      "reason": "Authenticated مش موثّق كمستند.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "# سجل المراجعات المستقلة (الدليل وDOC-001)",
+      "original": "مقدروش يشغّلوا Stack بتاع Java/Docker",
+      "corrected": "مقدروش يشغّلوا الـ Stack بتاع Java/Docker",
+      "reason": "إضافة أداة التعريف الناقصة.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "## الجولة 1 (الـ Commit `6c94a7c`)",
+      "original": "اقتباسات من غير المستندات",
+      "corrected": "الاستشهاد بملفات مش مستندات",
+      "reason": "non-doc citations تعني مراجع غير توثيقية.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "## الجولة 2 (الـ Commit `5238465`)",
+      "original": "سحب موافقة المراجعة بعد تشغيل أخضر مش بيتعاد تقييمه",
+      "corrected": "سحب موافقة المراجعة بعد نجاح الفحص مش بيتعاد تقييمه",
+      "reason": "توضيح green run.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+      "section": "## الجولة 2 (الـ Commit `5238465`)",
+      "original": "فشل لسبب ده",
+      "corrected": "فشل للسبب ده",
+      "reason": "تصحيح نحوي.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 2. تعارضات بين التوثيق والكود (مستندات المصدر لسه محتاجة تتصلّح)",
+      "original": "بلاطات النية (\"وجبة ليا/لينا\"، \"كمّل سفرتي\"، \"جهّز تجمّع\")",
+      "corrected": "بطاقات اختيار الغرض من الطلب (\"وجبة ليا/لينا\"، \"كمّل سفرتي\"، \"جهّز عزومة\")",
+      "reason": "Intent tiles ترجمة حرفية مربكة، وgathering عزومة في سياق المنتج.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 2. تعارضات بين التوثيق والكود (مستندات المصدر لسه محتاجة تتصلّح)",
+      "original": "مفيش منتج تموين (Catering)",
+      "corrected": "مفيش منتج مخصص لتجهيز أكل المناسبات (Catering)",
+      "reason": "تموين قد تفهم كتوريد سلع مدعمة.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 4. مناطق التغطية الآلية فيها ضعيفة",
+      "original": "واختبارات الـ Proxy بتتخطّى لما صور caddy/python مش موجودة",
+      "corrected": "واختبارات الـ Proxy بتتخطّى لما Docker Images الخاصة بـ caddy/python مش موجودة",
+      "reason": "تمييز Docker Images عن الميديا.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 5. اللي NOT VERIFIED في الدليل كله",
+      "original": "وتصحيح الـ IDE لـ API الموجود في Container",
+      "corrected": "وتتبّع أخطاء الـ API اللي شغّال في Container باستخدام الـ IDE",
+      "reason": "Debugging مش تصحيح الـ IDE نفسه.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+      "section": "## 6. التكرار",
+      "original": "عشان نتجنب انجراف جديد",
+      "corrected": "عشان نتجنب اختلاف النسخ عن بعض مع الوقت",
+      "reason": "إزالة الترجمة الحرفية لـ drift.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "# حالة التنفيذ",
+      "original": "ومعناها أبدًا مش \"شغّال فعليًا\": مفيش بيئة Production، والفلوس الحقيقية متقفّل عليها بـ Gate (D16)، وبيئة PREVIEW ببيانات اصطناعية (Synthetic) بس هي اللي اتنشرت",
+      "corrected": "وعمرها ما تعني \"شغّال في بيئة الإنتاج\": مفيش بيئة Production، والتعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل (D16)، وبيئة PREVIEW ببيانات تجريبية غير حقيقية (Synthetic Data) بس هي اللي اتنشرت",
+      "reason": "توضيح live وتمييز التنفيذ عن نجاح الاختبارات أو التشغيل الحقيقي.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وـ Job الانتهاء",
+      "corrected": "والـ Job الخاص بانتهاء المهلة",
+      "reason": "تصحيح تركيب التعريف وتوضيح expiry job.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وـ Outbox Dispatcher",
+      "corrected": "والـ Outbox Dispatcher",
+      "reason": "تصحيح أداة التعريف.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "وـ Feature Flags",
+      "corrected": "والـ Feature Flags",
+      "reason": "تصحيح أداة التعريف.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "قدرة نايمة:",
+      "corrected": "إمكانية موجودة تقنيًا لكنها مش مفعّلة:",
+      "reason": "توضيح dormant capability.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## قدرات الـ Backend",
+      "original": "**الفلوس الحقيقية متقفّل عليها**",
+      "corrected": "**التعاملات المالية الحقيقية مش مفعّلة لحد استيفاء شروط التفعيل**",
+      "reason": "توضيح التحذير مع الحفاظ على منع التفعيل.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## البيئات والعمليات",
+      "original": "المعاينة (بيانات اصطناعية،",
+      "corrected": "المعاينة (بيانات تجريبية غير حقيقية (Synthetic Data)،",
+      "reason": "توحيد معنى بيانات المعاينة.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "section": "## التعارضات اللي اتلاقت بين المستندات والكود",
+      "original": "NOT VERIFIED إزاي بيعمل الـ Native Builds Authentication على المعاينة",
+      "corrected": "NOT VERIFIED إزاي الـ Native Builds بتعمل Authentication على المعاينة",
+      "reason": "تصحيح ترتيب الفاعل والفعل.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 2. الـ Authorization (الأدوار والصلاحيات ونطاق الـ Object)",
+      "original": "والـ Objects الغريبة بترد 404",
+      "corrected": "والـ Objects اللي خارج نطاق صلاحية المستخدم بترجّع 404",
+      "reason": "Foreign objects تعني خارج نطاق صلاحية المستخدم مش غريبة.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 2. الـ Authorization (الأدوار والصلاحيات ونطاق الـ Object)",
+      "original": "والأدوار في الـ Claims بتتتجاهل",
+      "corrected": "والأدوار في الـ Claims بيتم تجاهلها",
+      "reason": "تصحيح صياغة مبنية للمجهول.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 6. التسعير وعروض الأسعار اللي مبقتش مواكبة للشروط الحالية (Stale quotes)",
+      "original": "BR-019 السيرفر بيحسب الجنيه كأرقام صحيحة",
+      "corrected": "BR-019 السيرفر بيحسب مبالغ EGP بوحدات صحيحة",
+      "reason": "إبقاء integer EGP كما في المصدر دون الإيحاء بتقريب لجنيه كامل.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 7. حجز السعة",
+      "original": "BR-025 آخر حصة متزامنة مابتتباعش زيادة",
+      "corrected": "BR-025 الطلبات المتزامنة على آخر حصة ماينفعش تبيع أكتر من المتاح",
+      "reason": "الحصة نفسها مش متزامنة؛ الطلبات هي المتزامنة.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 7. حجز السعة",
+      "original": "BR-029 الإفراج مرة واحدة بالظبط؛ والمستهلك يفضل مستهلك",
+      "corrected": "BR-029 تحرير المخزون المحجوز مرة واحدة بالظبط؛ والمخزون المستهلك يفضل مستهلك",
+      "reason": "تمييز release عن الإفراج وتوضيح حالة المخزون.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 12. MFA",
+      "original": "الصف الناقص بيفشل بأمان إلى REQUIRED",
+      "corrected": "لو صف السياسة مش موجود، النظام بيطبّق REQUIRED كاختيار آمن",
+      "reason": "fail safe تعني اختيار السياسة الأشد، مش فشل مجهول.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 12. MFA",
+      "original": "إعادة ضبط الأدمن بتشيل العامل، وتنهي الجلسات، ومتدقَّقة",
+      "corrected": "إعادة ضبط MFA بواسطة الأدمن بتشيل عامل التحقق، وبتنهي الجلسات، وبتتسجّل في سجل التدقيق",
+      "reason": "تمييز إجراء الأدمن عن إعادة ضبط حساب الأدمن وتوضيح audited.",
+      "severity": "MAJOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    },
+    {
+      "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+      "section": "## 5. تسجيل الأوردر",
+      "original": "والرد المجهول بيتحلّ بالبحث",
+      "corrected": "ولو نتيجة الطلب مش معروفة، بيتحقق منها بالبحث",
+      "reason": "Unknown response مش رد مجهول الهوية.",
+      "severity": "MINOR",
+      "risk": "Preserve English meaning; no executable or identifier change."
+    }
+  ]
+}

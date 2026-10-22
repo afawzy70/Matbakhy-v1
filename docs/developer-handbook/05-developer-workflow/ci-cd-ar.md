@@ -12,11 +12,11 @@
 | `.github/workflows/blueprint-integrity.yml` | Push، Pull Request | `validate_blueprint.py`، `check_scope.py`، سحب صورتين مساعدتين، وبعدها `python3 -m unittest discover -s scripts -p 'test_*.py'` | هيكل التخطيط وكل اختبار Guardrail في الـ Scripts | سلوك المنتج (العنوان بيقول كده) |
 | `.github/workflows/native-build.yml` | PR على `develop`؛ Push على `implementation/mvp` بيلمس مسارات الموبايل؛ يدوي | `android` (Prebuild، `assembleDebug`، `assembleRelease`، الـ Local Stack، تشغيل الـ Emulator، دورة تسجيل الدخول، دورة الأوردر، لقطات الشاشة)؛ `ios` (Prebuild، Builds الـ Debug والـ Release على الـ Simulator، التشغيل، الـ Native Stack، تسجيل الدخول والأوردر بـ XCUITest) | إن التطبيق بيتبني وبيشتغل وبيسجّل دخول بـ PKCE وبيسترجع أوردر اتقطع على Emulator/Simulator | الأجهزة الحقيقية، والتوقيع، والتقديم للمتاجر |
 | `.github/workflows/owner-e2e-fixtures.yml` | PR أو Push بيلمس `deploy/web-preview/**` أو الـ Migrations أو مستندات قبول المالك أو `scripts/owner_e2e_*` | بيطبّق كل الـ Flyway Migrations على PostgreSQL 16، وبيشغّل الـ Seed SQL مرتين، وبيقارن عدد الصفوف، وبيشغّل `scripts/owner_e2e_reconcile.py` | إن الـ Seed SQL سليم وIdempotent على الـ Schema | مستخدمين Keycloak، وبيئة المعاينة الحقيقية |
-| `.github/workflows/deploy-preview.yml` | Push على `develop`؛ يدوي | `build` (بيستنى Product CI أخضر على نفس الـ Commit بالظبط، وبيبني الـ API jar، وبيبني ويرفع صورتين على GHCR موسومتين بـ SHA الـ Commit، وبيطلّع الـ Digests)؛ `deploy` (البيئة `preview`: SSH، رفع `deploy/` و`infra/` و`scripts/` وملف Fixtures manifest، تشغيل `deploy.sh up` و`deploy.sh smoke`، وبعدها `deploy.sh admin-console enable`) | إن الـ Commit اللي عدّى الـ CI هو اللي شغّال على بيئة المعاينة وبيعدّي الـ Smoke للقراءة بس | الجاهزية للـ Production؛ ومفيش Rollback تلقائي للـ Database |
+| `.github/workflows/deploy-preview.yml` | Push على `develop`؛ يدوي | `build` (بيستنى نجاح فحوصات Product CI على نفس الـ Commit بالظبط، وبيبني الـ API jar، وبيبني ويرفع صورتين على GHCR موسومتين بـ SHA الـ Commit، وبيطلّع الـ Digests)؛ `deploy` (البيئة `preview`: SSH، رفع `deploy/` و`infra/` و`scripts/` وملف Fixtures manifest، تشغيل `deploy.sh up` و`deploy.sh smoke`، وبعدها `deploy.sh admin-console enable`) | إن الـ Commit اللي عدّى الـ CI هو اللي شغّال على بيئة المعاينة وبيعدّي الـ Smoke للقراءة بس | الجاهزية للـ Production؛ ومفيش Rollback تلقائي للـ Database |
 | `.github/workflows/owner-e2e-provision.yml` | Push على `develop` بيغيّر `deploy/web-preview/owner-e2e-run.request` | بيستنى Deployment الـ Commit ده، وبعدها بيشغّل بـ SSH الأمر `owner-e2e-provision.sh plan` أو `apply` | إن Fixtures الـ E2E بتاعة المالك اتجهّزت (أو هتتجهّز) على بيئة المعاينة | إن حالات القبول بتنجح |
 | `.github/workflows/doc001.yml` | `pull_request` (opened, synchronize, reopened, edited, ready_for_review) موجّه لـ `develop` أو `main` | بيشغّل `scripts/doc001_check.py pr` من الـ **Base** SHA على ملفات الـ PR؛ اسم الفحص `Documentation Consistency / DOC-001` | إن وصف الـ PR فيه إقرار Documentation Impact صالح، وإن مناطق الـ Matrix فيها تغييرات توثيق حقيقية، وإن روابط/Anchors/مسارات/معرّفات الدليل بتتحل، وإن ملفات الحوكمة عليها موافقة من حد غير صاحب الـ PR على الـ Head الحالي | إن التوثيق دقيق من ناحية المعنى؛ وهو عمره ما بينفّذ كود الـ PR. السياسة: [documentation-policy.md](documentation-policy-ar.md) |
 | `.github/workflows/handbook-parity.yml` | `pull_request` أو Push على `develop` بيلمس `docs/developer-handbook/**` أو `scripts/validate_handbook_parity.py` أو اختباراته | الـ Job اسمه `Handbook Arabic parity (structural)`: بيسطّب `markdown-it-py`، وبيشغّل `scripts/test_validate_handbook_parity.py` و`scripts/validate_handbook_parity.py` (ومعاه `--base` في الـ Pull Requests) والأمر `python3 scripts/doc001_check.py docs` | إن كل صفحة إنجليزي في الدليل ليها نسخة عربي بنفس البنية والمحتوى التقني المحمي والروابط والـ Anchors؛ وإن الإنجليزي والعربي اتغيروا مع بعض في الـ PR | إن العربي معناه نفس الإنجليزي؛ وهو مش ضمن الـ Checks المطلوبة في الـ Ruleset بتاع `develop` |
-| `.github/workflows/preview-images.yml` | يدوي، ومحتاج مُدخل Domain لبيئة المعاينة | بيبني ويرفع الصورتين لـ Domain مختار؛ وبيرفض Commit مالوش Product CI أخضر | إن الصور موجودة وبـ Digests في ملخص الـ Job | مفيش أي حاجة بتتنشر بيه |
+| `.github/workflows/preview-images.yml` | يدوي، ومحتاج مُدخل Domain لبيئة المعاينة | بيبني ويرفع الصورتين لـ Domain مختار؛ وبيرفض Commit فحوصات Product CI مانجحتش عليه | إن الصور موجودة وبـ Digests في ملخص الـ Job | مفيش أي حاجة بتتنشر بيه |
 
 كل الـ Actions الخارجية مثبّتة بـ SHA الـ Commit. و`NODE_VERSION` مع الـ SHA-256 بتاعه مثبّتين في الـ Workflows، وبيتم التحقق من Checksum أرشيف Node قبل الاستخدام.
 
@@ -34,16 +34,16 @@ flowchart LR
 ```
 
 1. `deploy-preview.yml` بيعمل Polling على GitHub API لحد ما يلاقي تشغيل `ci.yml` ناجح من نوع Push على نفس الـ SHA (لحد 60 محاولة، بينهم 30 ثانية)، وبيفشل لو الـ CI فشل أو خلص الوقت.
-2. صورتي `matbakhy-api` و`matbakhy-preview-front` بيتبنّوا مرة واحدة وبيتشار لهم بالـ Digest؛ وصورة الـ Front بتدمج Domain بيئة المعاينة جواها عن طريق Build Argument (شوف الـ Workflow؛ مش متكرر هنا).
-3. على السيرفر، `deploy.sh up` (في `deploy/web-preview`) بيتأكد إن الصور مثبّتة بالـ Digest وإن `RELEASE_COMMIT` هو SHA كامل، وبياخد Lock مشترك، وبياخد نسخة احتياطية من الـ Database ويتحقق من استرجاعها لو الـ Database موجودة، وبيسحب الصور الناقصة، وبيشغّل الـ Stack، وبيستنى صحة الـ API، وبيتأكد إن الـ Buckets موجودة، وبيضيف سطر في سجل الإصدارات (`releases.log` تحت مجلد النسخ الاحتياطية).
-4. لو `up` أو `smoke` فشل، السكريبت على السيرفر بيسترجع `.env` السابق وبيخرج بكود غير صفري؛ **والـ Database مابتترجعش تلقائيًا**.
+2. الـ Docker Images بتاعة `matbakhy-api` و`matbakhy-preview-front` بيتبنّوا مرة واحدة وبيتشار لهم بالـ Digest؛ وصورة الـ Front بتدمج Domain بيئة المعاينة جواها عن طريق Build Argument (شوف الـ Workflow؛ مش متكرر هنا).
+3. على السيرفر، `deploy.sh up` (في `deploy/web-preview`) بيتأكد إن الصور مثبّتة بالـ Digest وإن `RELEASE_COMMIT` هو SHA كامل، وبياخد Lock مشترك، وبياخد نسخة احتياطية من الـ Database ويتحقق من استرجاعها لو الـ Database موجودة، وبيسحب الصور الناقصة، وبيشغّل الـ Stack، وبيستنى فحوصات صحة الـ API تنجح، وبيتأكد إن الـ Buckets موجودة، وبيضيف سطر في سجل الإصدارات (`releases.log` تحت مجلد النسخ الاحتياطية).
+4. لو `up` أو `smoke` فشل، السكريبت على السيرفر بيسترجع `.env` السابق وبيخرج بكود غير صفري؛ **والـ Database مابيتعملهاش Rollback تلقائيًا**.
 5. التزامن: المجموعة `matbakhy-preview-deploy` مع `cancel-in-progress: false`؛ و`flock` على السيرفر في `deploy.sh` و`admin-console.sh` و`owner-e2e-provision.sh` بيرتّب التغييرات واحد ورا التاني. الـ Workflow بتاع التجهيز (provisioning) بيستخدم مجموعة خاصة بيه لأنه بيستنى الـ Deployment.
 
 ## الـ Rollback والنسخ الاحتياطية
 
 سكريبت المشغّل: `deploy/web-preview/deploy.sh` (الـ Header بتاعه فيه كل الأوامر): `backup`، `restore-db <dump>`، `status`، `rollback-plan [N]` (للقراءة بس)، `smoke`، `prune-qa`، `admin-console`، `e2e-reset` (محمي: ملف علامة، وHosts عملاء غير عامة، وتأكيد بالكتابة).
 
-- الـ Rollback للصور بس آمن لما الـ Schema ماتحركتش أو كل الـ Migrations من وقتها Expand-only. `scripts/check_migration_compat.py` بيفرض ملاحظات `-- rollback-compat: breaking|tightening|expand-only` على الـ Migrations اللي بعد الـ Baseline.
+- الرجوع لإصدار Docker Images سابق بس آمن لما مفيش تغيير في إصدار أو بنية الـ Database Schema أو كل الـ Migrations من وقتها Expand-only. `scripts/check_migration_compat.py` بيفرض ملاحظات `-- rollback-compat: breaking|tightening|expand-only` على الـ Migrations اللي بعد الـ Baseline.
 - غير كده، استرجع النسخة الاحتياطية اللي قبل الـ Deployment؛ والبيانات اللي اتكتبت بعدها بتضيع. التفاصيل وجدول القرار: [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md).
 - الـ Rollback اتجرّب محليًا بـ `scripts/rehearse-preview.sh rollback`؛ أما الـ Rollback على جهاز بيئة المعاينة الحقيقي: NOT VERIFIED.
 
@@ -56,7 +56,7 @@ flowchart LR
 - Secrets الـ Repository/بيئة `preview` فيها الـ SSH Host والمستخدم والمفتاح والمفتاح العام للـ Host (الأسماء `STAGING_SSH_HOST` و`STAGING_SSH_USER` و`STAGING_SSH_KEY` و`STAGING_SSH_HOST_PUBKEY`). القيم عمرها ما بتكون في الـ Repository ولا الـ Logs ولا الدليل ده. الـ SSH بيستخدم فحص صارم لمفتاح الـ Host مقابل المفتاح العام المخزّن.
 - Secrets التطبيق بتعيش بس في `.env` على السيرفر (صلاحية 600)، ومتولّدة بـ `deploy.sh init-secrets`؛ وملفات الـ Realm/التخزين المتولّدة بتروح لمجلد خاص متولّد. تسجيل الدخول على GHCR بيستخدم Token الـ Job وإعداد Docker مؤقت.
 - كلمات السر المحلية عشوائية لكل جهاز (`scripts/dev.sh`). كلمات سر الـ Database المؤقتة في الـ CI متعلّم عليها كده في الـ Workflow.
-- Gitleaks بيفحص التاريخ والشجرة في كل تشغيل لـ Product CI.
+- Gitleaks بيفحص التاريخ والشجرة في كل تشغيل لـ Product CI. فحص التاريخ بيغطي كل الـ refs اللي اتجابت، فأي إيجابية كاذبة اتراجعت بتتسجّل في `.gitleaksignore` ببصمتها بالظبط (الـ commit والملف والقاعدة والسطر)، مش باستثناء مسار أو قاعدة.
 
 ## اختبارات الـ Smoke
 
@@ -65,7 +65,7 @@ flowchart LR
 
 ## حدود الجاهزية للـ Production
 
-بيئة المعاينة اصطناعية (Synthetic)، ومقيّدة بـ IP، وسيرفر واحد، ومفيهاش مزودين حقيقيين ولا فلوس حقيقية. مفيش بيئة Production ولا Deployment عام ولا تقديم للمتاجر ولا دفع فعلي في الـ Repository؛ وده كله محتاج تفويض من المالك وبوابات قانونية/مزودين ([CLAUDE.md](../../../CLAUDE.md)). ماتوصفش Deployment أخضر على إنه جاهزية للـ Production. شوف [preview-environment.md](preview-environment-ar.md).
+بيئة المعاينة بتستخدم بيانات تجريبية غير حقيقية (Synthetic Data)، ومقيّدة بـ IP، وسيرفر واحد، ومفيهاش مزودين حقيقيين ولا فلوس حقيقية. مفيش بيئة Production ولا Deployment عام ولا تقديم للمتاجر ولا دفع فعلي في الـ Repository؛ وده كله محتاج تفويض من المالك وبوابات قانونية/مزودين ([CLAUDE.md](../../../CLAUDE.md)). ماتوصفش Deployment نجح على إنه جاهزية للـ Production. شوف [preview-environment.md](preview-environment-ar.md).
 
 ## القيود المعروفة وفجوات التوثيق
 

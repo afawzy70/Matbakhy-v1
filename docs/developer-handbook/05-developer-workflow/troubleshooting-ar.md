@@ -24,7 +24,7 @@
 |---|---|---|
 | `refusing` / "not marked MATBAKHY_ENV_MARKER=local" | `ensure_env` في `scripts/dev.sh` بيقبل ملفات env المحلية بس | ماتوجّهش `MATBAKHY_ENV_FILE` على `.env` بتاع بيئة منشورة أبدًا |
 | البورت مستخدم (5432، 8080، 8180، 9090، 8025، 1025) | القيم الافتراضية في `infra/.env.example`؛ والـ compose بينشر على `127.0.0.1` | وقّف العملية التانية، أو عدّل قيم البورتات في ملف env المحلي بتاعك (وخلّي رابط الـ API في تطبيقات الويب متماشي معاها) |
-| `up` بيعلّق وبعدين يبلّغ unhealthy | الـ compose بيستنى لحد 300 ثانية للصحة | `docker compose --env-file infra/.env -f infra/compose.yaml ps` و`logs --tail 100 api identity postgres` |
+| `up` بيعلّق وبعدين يبلّغ unhealthy | الـ compose بيستنى لحد 300 ثانية عشان فحوصات الصحة تنجح | `docker compose --env-file infra/.env -f infra/compose.yaml ps` و`logs --tail 100 api identity postgres` |
 | الـ Smoke: "Flyway baseline not applied" | الـ API ماشتغلش أو الـ Migrations فشلت | اقرا Logs الـ API؛ الـ Migration الفاشلة بتظهر بـ `success = false` في `flyway_schema_history` |
 | الـ Smoke: "Keycloak realm discovery failed" | استيراد الـ realm فشل؛ والـ realm المتولّد موجود في infra/.generated/identity (متجاهَل من git) | `logs identity`؛ وبعدين `scripts/dev.sh reset` ثم `up` (بيولّد الـ realm تاني) |
 | أسرار الـ Realm باينة قديمة | قيم `OIDC_*_CLIENT_SECRET` في ملف env مختلفة عن الـ realm المتولّد | `scripts/dev.sh reset` ثم `up` |
@@ -39,7 +39,7 @@
 |---|---|---|
 | `scripts/check_backend_suite.sh` بيطبع `FAIL: X did not run` | اتغيّر اسم الـ Class، أو الاسم غلط، أو اتفلتر | استخدم اسم الـ Class البسيط؛ وراجع `backend/**/target/surefire-reports` |
 | اختبار التكامل بيعلّق في البداية | سحب الحاوية، أو Docker بطيء، أو مورد Testcontainers قديم | راجع Docker والمساحة الفاضية وأعد التشغيل؛ وماتستبدلش الحاوية بـ Mock أبدًا |
-| اختبار Race بيفشل بشكل متقطع | sleep بدل Barrier | صلّح الاختبار عشان يستخدم تنسيق محدد ([01-verification.md](../../quality/01-verification.md))؛ وماتعيدش التشغيل بس لحد ما يبقى أخضر |
+| اختبار Race بيفشل بشكل متقطع | sleep بدل Barrier | صلّح الاختبار عشان يستخدم تنسيق حتمي بين العمليات المتزامنة ([01-verification.md](../../quality/01-verification.md))؛ وماتعيدش التشغيل بس لحد ما ينجح |
 | فحص العقد بيفشل بانحراف | اتغيّر `contracts/openapi.yaml` من غير ما يتولّد `packages/api-client/src/generated/schema.ts` تاني | `pnpm --filter @matbakhy/api-client run generate`، واعمل Commit، وأعد `pnpm contract:check` |
 | `scripts/dev.sh e2e` فشل في تشغيل الويب | البورتات 5173/5174 مشغولة | فضّي البورتات؛ وعند الفشل السكريبت بيطبع Log سيرفر الويب (`web.log` / `customer.log`) في الـ Terminal وبعدين بيمسح مجلده المؤقت عند الخروج، فانسخ اللي محتاجه من الـ Terminal؛ ولو عايز تحتفظ بـ Playwright Traces اضبط `E2E_OUTPUT_DIR` على مسار ثابت ومتجاهَل قبل التشغيل |
 | Playwright مش قادر يشغّل متصفح | مفيش متصفح منزّل | اضبط `E2E_CHROMIUM` على Chromium مسطّب |
@@ -55,7 +55,7 @@
 | `doc001_check.py docs` بيفشل على رابط أو `path` | المسار اللي بين Backticks لازم يكون موجود؛ استخدم `<placeholders>` أو Code Block للمسارات المستقبلية |
 | `doc001_check.py pr` بيبلّغ "area ... changed but none of its required documentation was updated" | حدّث صفحة من المكتوبة لذلك الـ area في `docs/developer-handbook/doc001-matrix.json` واذكرها في `handbook_pages` |
 | الإقرار اترفض: التبرير عام | سمّي السلوك الموثّق اللي ماتغيّرش واذكر صفحة موجودة بمسارها ([documentation-policy.md](documentation-policy-ar.md)) |
-| الـ CI بيفشل على Branch رغم إن التشغيل المحلي أخضر | الـ CI بيستخدم Clone نضيف لـ `HEAD` اللي عملتله Commit وإصدارات مثبّتة بالظبط؛ والملفات اللي ماتعملهاش Commit أو مش متتبَّعة، أو Node مختلف، أو تحديث Lockfile ناقص بيفسّروا معظم الاختلافات |
+| الـ CI بيفشل على Branch رغم إن الفحوصات المحلية نجحت | الـ CI بيستخدم Clone نضيف لـ `HEAD` اللي عملتله Commit وإصدارات مثبّتة بالظبط؛ والملفات اللي ماتعملهاش Commit أو مش متتبَّعة، أو Node مختلف، أو تحديث Lockfile ناقص بيفسّروا معظم الاختلافات |
 | الـ Push اترفض | اعمل Fetch وMerge أو Rebase للـ Branch بتاعك انت؛ وماتعملش force-push لـ Branch مشترك أبدًا |
 
 ## بيئة المعاينة

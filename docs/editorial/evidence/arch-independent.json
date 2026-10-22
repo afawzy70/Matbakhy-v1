@@ -1,0 +1,488 @@
+{
+  "reviewer": "business editorial agent, independent of architecture/code author",
+  "reviewed_sha": "44f873bba60a66162531ab4c03bf66337ab49c96",
+  "files": [
+    {
+      "arabic": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+      "english": "docs/developer-handbook/03-architecture/backend-architecture.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 7,
+          "section": "# معمارية الـ Backend"
+        },
+        {
+          "line": 25,
+          "section": "## تركيب الـ Maven"
+        },
+        {
+          "line": 52,
+          "section": "## الطبقات والوصول للبيانات"
+        },
+        {
+          "line": 54,
+          "section": "## الطبقات والوصول للبيانات"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "english": "docs/developer-handbook/03-architecture/database-architecture.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 4,
+          "section": "# معمارية قاعدة البيانات"
+        },
+        {
+          "line": 7,
+          "section": "# معمارية قاعدة البيانات"
+        },
+        {
+          "line": 28,
+          "section": "## الـ Migrations"
+        },
+        {
+          "line": 45,
+          "section": "## الـ Migrations"
+        },
+        {
+          "line": 55,
+          "section": "## الـ Migrations"
+        },
+        {
+          "line": 81,
+          "section": "## الكيانات الأساسية والعلاقات"
+        },
+        {
+          "line": 101,
+          "section": "## الـ Indexes اللي تستاهل تعرفها"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+      "english": "docs/developer-handbook/03-architecture/frontend-architecture.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 26,
+          "section": "## الحزم المشتركة"
+        },
+        {
+          "line": 37,
+          "section": "## طبقة الوصول للـ API"
+        },
+        {
+          "line": 49,
+          "section": "## ويب العميل (`apps/customer-web`)"
+        },
+        {
+          "line": 62,
+          "section": "## ويب العميل (`apps/customer-web`)"
+        },
+        {
+          "line": 102,
+          "section": "## القيود المعروفة وفجوات التوثيق"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+      "english": "docs/developer-handbook/03-architecture/identity-and-security.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 13,
+          "section": "## المبادئ (زي ما هي متنفّذة)"
+        },
+        {
+          "line": 39,
+          "section": "## الـ Claims المستخدمة من الـ Token"
+        },
+        {
+          "line": 50,
+          "section": "## مسارين للـ Authentication"
+        },
+        {
+          "line": 72,
+          "section": "## سياسة الـ MFA: التخزين والفرض"
+        },
+        {
+          "line": 74,
+          "section": "## سياسة الـ MFA: التخزين والفرض"
+        },
+        {
+          "line": 80,
+          "section": "## الـ Sessions"
+        },
+        {
+          "line": 87,
+          "section": "## تأمين المتصفح والـ Proxy"
+        },
+        {
+          "line": 107,
+          "section": "## ضوابط أمان تانية تستاهل تعرفها"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "english": "docs/developer-handbook/03-architecture/infrastructure-and-deployment.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 4,
+          "section": "# البنية التحتية والـ Deployment"
+        },
+        {
+          "line": 13,
+          "section": "## البيئات في نظرة سريعة"
+        },
+        {
+          "line": 15,
+          "section": "## البيئات في نظرة سريعة"
+        },
+        {
+          "line": 95,
+          "section": "## النسخ الاحتياطي والاسترجاع والـ Rollback"
+        },
+        {
+          "line": 107,
+          "section": "## حدود جاهزية الـ Production (إيه اللي مش موجود)"
+        },
+        {
+          "line": 116,
+          "section": "## القيود المعروفة وفجوات التوثيق"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "english": "docs/developer-handbook/03-architecture/integration-and-events.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 40,
+          "section": "### التسليم: `DeliveryWorker`"
+        },
+        {
+          "line": 46,
+          "section": "### تشغيل الـ Outbox"
+        },
+        {
+          "line": 73,
+          "section": "## الأنظمة الخارجية اللي الـ Backend بينادي عليها"
+        },
+        {
+          "line": 75,
+          "section": "## الأنظمة الخارجية اللي الـ Backend بينادي عليها"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+      "english": "docs/developer-handbook/03-architecture/mobile-architecture.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 28,
+          "section": "## الكود المشترك مقابل الكود الخاص بكل منصة"
+        },
+        {
+          "line": 42,
+          "section": "## طبقة الـ State والـ Session والشبكة"
+        },
+        {
+          "line": 54,
+          "section": "## إشعارات الـ Push"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+      "english": "docs/developer-handbook/03-architecture/system-overview.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 4,
+          "section": "# نظرة عامة على السيستم"
+        },
+        {
+          "line": 47,
+          "section": "## مين صاحب القرار في إيه"
+        },
+        {
+          "line": 70,
+          "section": "## البيئات"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+      "english": "docs/developer-handbook/04-codebase/api-contracts.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 7,
+          "section": "# عقود الـ API"
+        },
+        {
+          "line": 45,
+          "section": "## الاتفاقيات اللي كل Endpoint بيمشي عليها"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+      "english": "docs/developer-handbook/04-codebase/backend-module-guide.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 70,
+          "section": "## `shared` — `backend/shared`"
+        },
+        {
+          "line": 87,
+          "section": "## `identity` — الحسابات وبيانات التواصل والـ Grants"
+        },
+        {
+          "line": 118,
+          "section": "## `catalog` — الوجبات والميديا والاكتشاف والمفضلة والنشاط"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "english": "docs/developer-handbook/04-codebase/frontend-code-guide.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 43,
+          "section": "## ويب العميل — `apps/customer-web/`"
+        },
+        {
+          "line": 62,
+          "section": "## ويب العمليات — `apps/operations-web/`"
+        },
+        {
+          "line": 73,
+          "section": "## تنفّذ فين"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+      "english": "docs/developer-handbook/04-codebase/mobile-code-guide.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 4,
+          "section": "# دليل كود الموبايل (تطبيق العميل)"
+        },
+        {
+          "line": 31,
+          "section": "## الـ Authentication وتخزين الـ Session"
+        },
+        {
+          "line": 47,
+          "section": "## كود الطلب"
+        },
+        {
+          "line": 60,
+          "section": "## القيود المعروفة وفجوات التوثيق"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "english": "docs/developer-handbook/04-codebase/order-implementation.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 13,
+          "section": "## طبقتين Idempotency (ماتخلطش بينهم)"
+        },
+        {
+          "line": 49,
+          "section": "## خطوة بخطوة"
+        },
+        {
+          "line": 51,
+          "section": "## خطوة بخطوة"
+        },
+        {
+          "line": 58,
+          "section": "## خطوة بخطوة"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+      "english": "docs/developer-handbook/04-codebase/payment-implementation.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 4,
+          "section": "# شرح تنفيذ الدفع والكاش والـ Ledger"
+        },
+        {
+          "line": 7,
+          "section": "# شرح تنفيذ الدفع والكاش والـ Ledger"
+        },
+        {
+          "line": 67,
+          "section": "## الـ State Machine بتاعة العربون — `PaymentService`"
+        },
+        {
+          "line": 70,
+          "section": "## الـ State Machine بتاعة العربون — `PaymentService`"
+        },
+        {
+          "line": 91,
+          "section": "## الـ Gate بتاع الفلوس الحقيقية"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+      "english": "docs/developer-handbook/04-codebase/pricing-implementation.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 4,
+          "section": "# شرح تنفيذ التسعير"
+        },
+        {
+          "line": 11,
+          "section": "## المبادئ في الكود"
+        },
+        {
+          "line": 13,
+          "section": "## المبادئ في الكود"
+        },
+        {
+          "line": 23,
+          "section": "## السعر بييجي منين"
+        },
+        {
+          "line": 64,
+          "section": "## إعادة تأكيد الـ Quote القديم في جهة العميل (D13)"
+        },
+        {
+          "line": 80,
+          "section": "## القيود المعروفة وفجوات التوثيق"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/repository-map-ar.md",
+      "english": "docs/developer-handbook/04-codebase/repository-map.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 24,
+          "section": "## المستوى الأعلى"
+        }
+      ],
+      "protected_content_preserved": true
+    },
+    {
+      "arabic": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+      "english": "docs/developer-handbook/04-codebase/shared-libraries.md",
+      "complete_english_original_read": true,
+      "every_edited_arabic_paragraph_and_diff_read": true,
+      "sections": [
+        {
+          "line": 16,
+          "section": "## `packages/api-client` — `@matbakhy/api-client`"
+        },
+        {
+          "line": 32,
+          "section": "## `packages/design-tokens` — `@matbakhy/design-tokens`"
+        },
+        {
+          "line": 46,
+          "section": "## المشاركة بين الويب والموبايل: إيه المشترك وإيه مش مشترك"
+        }
+      ],
+      "protected_content_preserved": true
+    }
+  ],
+  "findings": [
+    {
+      "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+      "section": "Operating the outbox",
+      "severity": "MAJOR",
+      "old": "عمليات التسليم اللي استنفدت محاولاتها (Dead deliveries)",
+      "recommended": "عمليات التسليم المتوقفة نهائيًا (Dead deliveries)",
+      "reason": "DEAD includes permanent failures as well as retries exhausted; edited wording narrows meaning.",
+      "status": "FIXED and independently verified against English"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+      "section": "Operations web",
+      "severity": "MAJOR",
+      "old": "طابور مراجعة وتسوية مدفوعات العربون",
+      "recommended": "طابور مطابقة مدفوعات العربون",
+      "reason": "Reconciliation must not be conflated with Settlement; payment disputes are human reconciliation, distinct commission settlement.",
+      "status": "FIXED and independently verified against English"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "Two idempotency layers",
+      "severity": "MINOR",
+      "old": "إعادة التشغيل (Replay)",
+      "recommended": "إعادة تنفيذ نفس الأمر (Replay)",
+      "reason": "Replay describes repeat command, not process restart.",
+      "status": "FIXED and independently verified against English"
+    },
+    {
+      "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+      "section": "Step by step",
+      "severity": "MAJOR",
+      "old": "فحص الاسترداد",
+      "recommended": "فحص استرجاع الأوردر الموجود",
+      "reason": "Recovery check looks up existing order, not financial refund.",
+      "status": "FIXED and independently verified against English"
+    }
+  ],
+  "verdict": "PASS for all edited sections after repairs; AI semantic review with disclosed limits",
+  "limitations": [
+    "AI reviewer, not human approval.",
+    "Review checks English-to-Arabic meaning; no claim to re-execute application behaviours.",
+    "GitHub visual RTL rendering not tested."
+  ],
+  "repair_sha": "4879c329b4c50243c835d783e4f53a67f1b13ed2"
+}

@@ -37,13 +37,13 @@
 
 ### التسليم: `DeliveryWorker`
 
-بياخد صفوف `notification_delivery` بنفس الطريقة (Lease، و`SKIP LOCKED`)، وبينادي Port القناة **برّه** أي Transaction في الـ Database، وبعدين بيسجّل النتيجة بس لو لسه ماسك الـ Lease. الـ Ports هي `EmailSender` و`PushSender` في `backend/modules/notifications/src/main/java/com/matbakhy/notifications/api/NotificationChannels.java`؛ وكل إرسال بيشيل `deliveryId` ثابت لازم المزوّد الحقيقي يستخدمه كمفتاح Idempotency بتاعه. الـ Exception المرمي بيعتبر مؤقت (بيتعاد)؛ أما `Result.permanentFailure` فلأ. الصفوف اللي بتوصل لحد إعادة المحاولة بتبقى `DEAD` وبتبان للعمليات. نص خطأ المزوّد بيتحفظ بس لو طابق نمط كود بسيط (فالبيانات الشخصية اللي المزوّد بيرددها عمرها ما بتتخزن). والمستلم اللي حسابه مش `ACTIVE` بياخد فشل دائم.
+بياخد صفوف `notification_delivery` بنفس الطريقة (Lease، و`SKIP LOCKED`)، وبينادي Port القناة **برّه** أي Transaction في الـ Database، وبعدين بيسجّل النتيجة بس لو لسه ماسك الـ Lease. الـ Ports هي `EmailSender` و`PushSender` في `backend/modules/notifications/src/main/java/com/matbakhy/notifications/api/NotificationChannels.java`؛ وكل إرسال بيحمل `deliveryId` ثابت لازم المزوّد الحقيقي يستخدمه كمفتاح Idempotency بتاعه. الـ Exception المرمي بيعتبر مؤقت (بيتعاد)؛ أما `Result.permanentFailure` فلأ. الصفوف اللي بتوصل لحد إعادة المحاولة بتبقى `DEAD` وبتبان للعمليات. نص خطأ المزوّد بيتحفظ بس لو طابق نمط كود بسيط (فالبيانات الشخصية اللي المزوّد بيرددها عمرها ما بتتخزن). والمستلم اللي حسابه مش `ACTIVE` بياخد فشل دائم.
 
 ترتيب الضمانات: تسليم مرة على الأقل (at-least-once) للقناة، وصفوف إشعار مرة على الأكتر (at-most-once) لكل مستلم وحدث منطقي، ومفيش تأثير على حالة الأوردر لما التسليم يفشل.
 
 ### تشغيل الـ Outbox
 
-* الموظفين اللي معاهم `integration.ops` يقدروا يقرأوا صحة التكامل (`GET /api/v1/ops/integrations`: أعداد المعلّق والفاشل، وعمر أقدم معلّق، والتسليمات الميتة) ويعيدوا تشغيل حدث `FAILED` (`POST /api/v1/ops/outbox/{eventId}/retry` مع `expectedVersion` وسبب؛ ومسجّل في الـ Audit كـ `outbox.retry`). الأحداث `FAILED` بس هي اللي تتعاد (`NotificationService.retryOutbox`).
+* الموظفين اللي معاهم `integration.ops` يقدروا يقرأوا صحة التكامل (`GET /api/v1/ops/integrations`: أعداد المعلّق والفاشل، وعمر أقدم معلّق، وعمليات التسليم المتوقفة نهائيًا (Dead deliveries)) ويعيدوا تشغيل حدث `FAILED` (`POST /api/v1/ops/outbox/{eventId}/retry` مع `expectedVersion` وسبب؛ ومسجّل في الـ Audit كـ `outbox.retry`). الأحداث `FAILED` بس هي اللي تتعاد (`NotificationService.retryOutbox`).
 * الـ Gauges للتنبيه: `matbakhy.outbox.oldest.pending.age` و`matbakhy.outbox.failed` و`matbakhy.notifications.dead` و`matbakhy.notifications.oldest.pending.age` (`OperationalMetrics`)، مع قواعد تنبيه في `deploy/web-preview/observability/alerts.yml`.
 * الاختبارات: `backend/app/src/test/java/com/matbakhy/app/notifications/NotificationIntegrationTest.java` و`PushFlagIntegrationTest.java` و`backend/app/src/test/java/com/matbakhy/app/reliability/RestartRecoveryIntegrationTest.java`.
 
@@ -70,9 +70,9 @@
 | النظام | إزاي | ملاحظات |
 |---|---|---|
 | Keycloak | جلب JWKS وEndpoints الـ Token عن طريق `OIDC_BACKCHANNEL_ISSUER` (URL داخلي، فالـ Issuer جوه الـ Tokens يفضل العام)؛ والـ Admin REST في `KeycloakAdmin` | نداءات الـ Admin لإعادة ضبط الـ MFA وإنهاء الـ Sessions بس |
-| تخزين الـ Objects | AWS SDK v2 S3 client (`S3ObjectStorage`)؛ والـ Clients بترفع وتقرا من خلال **روابط Presigned** جذرها `OBJECT_STORAGE_CLIENT_ENDPOINT` | Bucket خاص للرفع والمستندات، وBucket عام للنسخ الموافق عليها (`matbakhy-public`)؛ وبوابة فحص الـ Malware اسمها `MalwareScanner` بتفشل بشكل مقفول |
+| تخزين الـ Objects | AWS SDK v2 S3 client (`S3ObjectStorage`)؛ والـ Clients بترفع وتقرا من خلال **روابط Presigned** جذرها `OBJECT_STORAGE_CLIENT_ENDPOINT` | Bucket خاص للرفع والمستندات، وBucket عام للنسخ الموافق عليها (`matbakhy-public`)؛ وبوابة فحص الـ Malware اسمها `MalwareScanner` بترفض إتاحة الملف لو الفحص مش متاح أو مش ناجح (fail closed) |
 | Email/SMS/push | Ports بس؛ ووهميين | شوف فوق |
-| المدفوعات | مفيش. تدفقات العربون والكاش هي State machines داخلية بتتغذى من بلاغات المستخدمين | `PaymentService`؛ والفلوس الحقيقية مقفولة بقرار المالك D16 |
+| المدفوعات | مفيش. تدفقات العربون والكاش هي State machines داخلية بتتغذى من بلاغات المستخدمين | `PaymentService`؛ والتعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بقرار المالك D16 |
 
 الـ API مبيعملش أي نداءات خارجة لخدمات الدفع أو الخرائط أو التحليلات أو الإعلانات (مفيش حاجة اتلقت في مصدر `backend/` أو `application.yaml`).
 

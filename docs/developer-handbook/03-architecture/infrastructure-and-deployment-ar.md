@@ -1,7 +1,7 @@
 # البنية التحتية والـ Deployment
 
 > **Owner role:** Infrastructure and deployment
-> **Status:** PARTIALLY IMPLEMENTED — فيه Stack محلي ومعاينة ببيانات اصطناعية (Synthetic) محدودة الوصول؛ ومفيش Deployment للـ Staging أو الـ Production، والمعاينة مش Production
+> **Status:** PARTIALLY IMPLEMENTED — فيه Stack محلي ومعاينة ببيانات تجريبية غير حقيقية (Synthetic Data) محدودة الوصول؛ ومفيش Deployment للـ Staging أو الـ Production، والمعاينة مش Production
 > **Language / اللغة:** [English](infrastructure-and-deployment.md) · العربية
 
 الرسومات: [CI/CD](diagrams-ar.md#13-cicd) و[البنية التحتية للمعاينة](diagrams-ar.md#14-بنية-المعاينة). الإجراءات اليومية مكانها [بيئة المعاينة](../05-developer-workflow/preview-environment-ar.md) و[CI/CD](../05-developer-workflow/ci-cd-ar.md)؛ والصفحة دي بتشرح الأجزاء إيه وإزاي بتتركب مع بعض.
@@ -10,9 +10,9 @@
 
 | البيئة | بتشتغل فين | الإعدادات | البيانات | الغرض |
 |---|---|---|---|---|
-| التطوير المحلي | جهاز المطوّر، Docker Compose + JDK/Node محلي | `infra/compose.yaml`, `scripts/dev.sh` | Fixtures اصطناعية من الـ Profile اسمه `dev` | الشغل اليومي |
+| التطوير المحلي | جهاز المطوّر، Docker Compose + JDK/Node محلي | `infra/compose.yaml`, `scripts/dev.sh` | Fixtures ببيانات تجريبية غير حقيقية من الـ Profile اسمه `dev` | الشغل اليومي |
 | CI | Runners مستضافة على GitHub | `.github/workflows/*.yml` | Testcontainers وStacks Compose مؤقتة | البناء، والاختبار، وفحوصات الـ Native |
-| المعاينة (Preview) | VPS واحد بيشغّل Docker Compose (المشروع `matbakhy-preview`) | `deploy/web-preview/` | اصطناعية بس، وعربون محاكى، وإشعارات وهمية، وإشعار ديمو ظاهر | معاينة ويب مبكرة محدودة الوصول للمالك والمختبرين المدعوّين |
+| المعاينة (Preview) | VPS واحد بيشغّل Docker Compose (المشروع `matbakhy-preview`) | `deploy/web-preview/` | بيانات تجريبية غير حقيقية بس، وعربون محاكى، وإشعارات وهمية، وإشعار ديمو ظاهر | معاينة ويب مبكرة محدودة الوصول للمالك والمختبرين المدعوّين |
 | Staging, Production | مفيش | الأسماء موجودة في الكود بس | n/a | PLANNED؛ والتطبيق بيرفض يشتغل هناك من غير مزوّدين حقيقيين |
 
 متوصفش المعاينة إنها Production: هي بتشتغل بـ `APP_ENV=PREVIEW` مع مزوّدين وهميين وFixtures الـ Profile بتاع التطوير ومن غير فلوس حقيقية وعلى Host واحد من غير Redundancy.
@@ -80,7 +80,7 @@
 
 أما `./deploy.sh up` نفسه: بيفحص الصور المثبّتة والأسرار، وبياخد قفل التغيير المشترك (`flock` على `.preview-mutation.lock` في مجلد الـ Backup)، وبيعمل Render للإعدادات، وبياخد **Backup للـ Database قبل الـ Deployment** لو الـ Database موجودة، وبيعمل Pull للصور الناقصة، و`compose up -d`، وبيستنى الـ Health، وبيعمل الـ Buckets، وبيضيف سطر لسجل الإصدارات (`releases.log` في مجلد الـ Backup) فيه الـ Commit وDigests الصور ونسخة الـ Schema قبل وبعد ومسار الـ Backup. وحاوية الـ API بتطبّق Flyway migrations عند البدء.
 
-الـ Workflow اسمه `owner-e2e-provision.yml` بيتفاعل مع تغييرات `deploy/web-preview/owner-e2e-run.request` على `develop`: بعد Deployment نفس الـ Commit، بيشغّل تجهيز E2E بتاع المالك على المعاينة (الخطة = قراءة بس؛ والتطبيق = Backup متحقق منه، وPartial import لـ Keycloak، وSQL seeds، وتحديث الـ Slots، وتسوية قراءة بس) تحت مجموعة التزامن الخاصة بيه؛ و`flock` على السيرفر بيسلسله مع الـ Deployments والـ Admin console.
+الـ Workflow اسمه `owner-e2e-provision.yml` بيتفاعل مع تغييرات `deploy/web-preview/owner-e2e-run.request` على `develop`: بعد Deployment نفس الـ Commit، بيشغّل تجهيز E2E بتاع المالك على المعاينة (الخطة = قراءة بس؛ والتطبيق = Backup متحقق منه، وPartial import لـ Keycloak، وSQL seeds، وتحديث الـ Slots، وفحص مطابقة البيانات للقراءة بس) تحت مجموعة التزامن الخاصة بيه؛ و`flock` على السيرفر بيسلسله مع الـ Deployments والـ Admin console.
 
 عنوان الـ Workflow بيقول "Contabo" بينما مستندات العمليات بتوصف سيرفر Hetzner؛ شوف الفجوة تحت.
 
@@ -91,8 +91,8 @@
 ## النسخ الاحتياطي والاسترجاع والـ Rollback
 
 * **الـ Backup** (`deploy.sh backup`، وكمان قبل كل Deployment): `pg_dump` بصيغة Custom مع Checksum بـ SHA-256 وManifest، ومتحقق منه بالاسترجاع في Database مؤقتة وتشغيل `infra/db/reconcile.sql`، بالإضافة لأرشيف لتخزين الصور. الناتج بيروح لـ `BACKUP_DIR` (برّه Git). وعمر الـ Backup بيتصدّر كـ Metric وعليه تنبيه (`BackupStale`).
-* **الاسترجاع** (`deploy.sh restore-db <dump>`): بيسترجع في `matbakhy_restore` وبيعمل له تسوية؛ وتحويل التطبيق ليه خطوة يدوية على المالك. البيانات اللي اتكتبت بعد الـ Backup بتضيع.
-* **الـ Rollback** (`deploy.sh rollback-plan [N]`، قراءة بس): بيطبع قيم `.env` التلاتة للإصدار اللي قبل بـ N مرحلة وحُكم. لو نسخة الـ Schema ماتحركتش، الـ Rollback للصور بس آمن (عدّل `.env`، و`./deploy.sh up`). ولو اتحركت، الـ Rollback للصور بس آمن بس لو كل Migration في النص هي expand-only؛ و`scripts/check_migration_compat.py` بيجبر كاتبي الـ Migrations بعد V28 إنهم يعلّموا بـ `-- rollback-compat: breaking|tightening|expand-only`، والـ CI بيفرض ده. غير كده استرجع الـ Backup بتاع ما قبل الـ Deployment. الـ Runbook: `docs/operations/11-staging-deployment-and-rollback.md`؛ والتدريب: `scripts/rehearse-preview.sh rollback`.
+* **الاسترجاع** (`deploy.sh restore-db <dump>`): بيسترجع في `matbakhy_restore` وبيفحص مطابقة بياناته؛ وتحويل التطبيق ليه خطوة يدوية على المالك. البيانات اللي اتكتبت بعد الـ Backup بتضيع.
+* **الـ Rollback** (`deploy.sh rollback-plan [N]`، قراءة بس): بيطبع قيم `.env` التلاتة للإصدار اللي قبل بـ N مرحلة وحُكم. لو إصدار الـ Database Schema متغيّرش، الرجوع لإصدار Docker Images سابق بس آمن (عدّل `.env`، و`./deploy.sh up`). ولو إصدارها اتغيّر، الرجوع لإصدار Docker Images سابق بس آمن بشرط إن كل Migration في النص هي expand-only؛ و`scripts/check_migration_compat.py` بيجبر كاتبي الـ Migrations بعد V28 إنهم يعلّموا بـ `-- rollback-compat: breaking|tightening|expand-only`، والـ CI بيفرض ده. غير كده استرجع الـ Backup بتاع ما قبل الـ Deployment. الـ Runbook: `docs/operations/11-staging-deployment-and-rollback.md`؛ والتدريب: `scripts/rehearse-preview.sh rollback`.
 * **إعادة ضبط الـ E2E** (`deploy.sh e2e-reset`): بيمسح Database التطبيق؛ وبيرفض إلا لو الـ Host عليه ملف علامة E2E، وHosts العملاء مش عامة، والمشغّل كتب الدومين؛ وبياخد Backup الأول.
 * الاختبارات: `backend/app/src/test/java/com/matbakhy/app/reliability/BackupRestoreIntegrationTest.java` و`scripts/test_preview_backup.py` و`scripts/test_preview_release.py`.
 
@@ -104,7 +104,7 @@
 
 * مفيش بيئة Production أو Staging ولا دومين ولا تصميم TLS ولا WAF ولا CDN ولا Database مُدارة؛ Host واحد، ومفيش Redundancy، ومفيش Autoscaling.
 * مفيش مزوّدين حقيقيين للـ SMS أو الإيميل أو الـ Push، ولا خدمة فاحص Malware، ولا خدمة تخزين Objects متحددة (قرارات المالك O07 و O08).
-* الفلوس الحقيقية مقفولة بالامتثال (قرار المالك D16)؛ ومفيش تكامل دفع.
+* التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط باستيفاء متطلبات الامتثال (قرار المالك D16)؛ ومفيش تكامل دفع.
 * وصول العملاء محصور بقايمة سماح IPs لحد ما المالك يفتح `CUSTOMER_ALLOWED_IPS` صراحةً؛ والـ CSP في وضع Report-Only؛ وHost الـ Admin console عام بالتصميم (للمعاينة بس).
 * سياسات الاحتفاظ والخصوصية والنسخ الاحتياطي خارج الجهاز هي افتراضيات مقترحة في انتظار قرار المالك O06؛ والـ Backups بتفضل على نفس الـ Host (ومتلقاش نسخة خارج الـ Host في السكريبتات: NOT VERIFIED).
 * الموبايل: معرّفات التطوير بس؛ ومفيش تقديم على المتاجر؛ ومفيش تحقق على أجهزة فعلية.
@@ -113,4 +113,4 @@
 
 * **تعارض في تسمية المزوّد.** الملفين `.github/workflows/deploy-preview.yml` و`.github/workflows/owner-e2e-provision.yml` بيقولوا "Contabo"، و`docs/operations/09-staging-hetzner-preparation.md` و`12-owner-server-setup.md` و`deploy/web-preview/README.md` بيقولوا "Hetzner". الـ Workflow هو اللي بيعمل الـ Deployment فعلًا (الـ Host من سر `STAGING_SSH_HOST`، والدومين `167-86-90-174.sslip.io` مدموج في Build صورة الـ front)؛ والمزوّد NOT VERIFIED من الـ Repository. ومسار السيرفر اللي بيستخدمه الـ CD هو `/srv/matbakhy-staging`، بينما `.env.example` بيقول `/srv/matbakhy-preview`: بقية تانية من تسمية "staging".
 * `deploy/web-preview/README.md` لسه بيقول "Nothing here has been deployed"، وده قديم دلوقتي إن الـ CD بيعمل Deployment مع كل Push على `develop`.
-* المعاينة بتشغّل Spring Profile اسمه `dev` (مسموح لإن `PREVIEW` بتتحسب بيئة اصطناعية)، فـ Migrations الـ Fixtures الخاصة بالتطوير شغّالة هناك.
+* المعاينة بتشغّل Spring Profile اسمه `dev` (مسموح لإن `PREVIEW` بتتحسب بيئة بيانات تجريبية غير حقيقية)، فـ Migrations الـ Fixtures الخاصة بالتطوير شغّالة هناك.

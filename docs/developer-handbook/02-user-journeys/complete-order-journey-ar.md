@@ -4,7 +4,7 @@
 > **Status:** PARTIALLY IMPLEMENTED — كل خطوة تحت موجودة في الكود؛ واختبارات الـ Backend بتغطي الخطوات فرادى، وأتمتة المتصفح بتغطي بس طلب العميل وإجراءات الطبّاخ (`customer-journey.e2e.ts`) وتخطيط كشف حساب مالي (`money-reflow.e2e.ts`)؛ التحقق المالي وقرارات الاسترداد وقراءة الأدمن لسجل الـ Audit مفيهاش أتمتة متصفح (قبول المالك أو الـ API بس)؛ وتشغيل قبول المالك على المعاينة الحية والأجهزة الفعلية مش متسجّل هنا إنه نجح (NOT VERIFIED).
 > **Language / اللغة:** [English](complete-order-journey.md) · العربية
 
-هذه الصفحة بتربط رحلات الأطراف المنفردة في جولة واحدة: **العميل بيطلب، والمطبخ بينفّذ، والعمليات والمالية والأدمن بيفحصوا**. كل خطوة مربوطة بالصفحة اللي بتشرحها بالتفصيل: [ويب العميل](customer-web-ar.md)، [موبايل العميل](customer-mobile-ar.md)، [عمليات الطبّاخ](cook-operations-ar.md)، [إدارة الـ Backoffice](backoffice-admin-ar.md)، [المالية والدعم](finance-and-support-ar.md)، [المصادقة وMFA](authentication-and-mfa-ar.md). الـ State Machines: [دورة حياة الأوردر](../01-business/order-lifecycle-ar.md).
+الصفحة دي بتربط رحلات الأطراف المنفردة في جولة واحدة: **العميل بيطلب، والمطبخ بينفّذ، والعمليات والمالية والأدمن بيفحصوا**. كل خطوة مربوطة بالصفحة اللي بتشرحها بالتفصيل: [ويب العميل](customer-web-ar.md)، [موبايل العميل](customer-mobile-ar.md)، [عمليات الطبّاخ](cook-operations-ar.md)، [إدارة الـ Backoffice](backoffice-admin-ar.md)، [المالية والدعم](finance-and-support-ar.md)، [المصادقة وMFA](authentication-and-mfa-ar.md). الـ State Machines: [دورة حياة الأوردر](../01-business/order-lifecycle-ar.md).
 
 ## السيناريو A: الاستلام، الدفع كاش عند الاستلام (الرحلة الأساسية 1)
 
@@ -24,12 +24,12 @@
 | 12 | الطبّاخ | التسليم (بيكتب الكود المكوّن من 6 أرقام) | `POST …/handover` | `COMPLETED`؛ الكود اتستهلك؛ الكاش `DUE` |
 | 13 | الطبّاخ | الإبلاغ عن الكاش | `POST /api/v1/cook/orders/{orderId}/cash-reports` | الكاش `REPORTED` |
 | 14 | المالية (مش اللي أبلغ) | التحقق من الكاش | `POST /api/v1/ops/finance/cash-reports/{reportId}/verification` (API بس؛ مفيش شاشة) | الكاش `VERIFIED` |
-| 15 | العمليات | فحص الأوردر | `GET /api/v1/ops/orders`, `GET /api/v1/ops/orders/{orderId}` | قراءة بس، جهة اتصال مقنّعة |
+| 15 | العمليات | فحص الأوردر | `GET /api/v1/ops/orders`, `GET /api/v1/ops/orders/{orderId}` | قراءة بس، بيانات تواصل مخفية جزئيًا |
 | 16 | المالية | قراءة كشف الحساب | `GET /api/v1/ops/finance/statements?kitchenId=…` | إجماليات، من غير عمولة |
 | 17 | الأدمن | قراءة سجل الـ Audit | `GET /api/v1/ops/audit` (API بس) | القراءة متسجّلة في الـ Audit |
-| 18 | العميل | المراجعة | `POST /api/v1/orders/{orderId}/reviews` | مراجعة واحدة |
+| 18 | العميل | التقييم | `POST /api/v1/orders/{orderId}/reviews` | تقييم واحد |
 
-كل `POST` بيغيّر أوردر بيشيل `Idempotency-Key` و`expectedVersion`. السيرفر بيرفض الأوامر خارج الترتيب (`STATE_CONFLICT`) والـ Version الغلط (`VERSION_CONFLICT`).
+كل `POST` بيغيّر أوردر بيحتوي على `Idempotency-Key` و`expectedVersion`. السيرفر بيرفض الأوامر خارج الترتيب (`STATE_CONFLICT`) والـ Version الغلط (`VERSION_CONFLICT`).
 
 ## السيناريو B: التوصيل
 
@@ -49,7 +49,7 @@
 | 8 | الطبّاخ، العميل، المالية | المبلغ المتبقي كاش، وبعدين زي السيناريو A الخطوات من 12 لـ 16 | الكاش `DUE → VERIFIED` |
 | 9 | بديل | الطبّاخ بيبلّغ إنه ماستلمش / فيه عدم تطابق | `DISPUTED`، حالة دعم PAYMENT، والـ Staff بيقرروا `REFUND_OWED` أو `CLOSED_NO_FUNDS` (شوف [المالية والدعم](finance-and-support-ar.md)) |
 
-التطبيق عمره ما بيقول "متحقق منه بنكيًا"؛ وتقرير المطبخ هو إفادة. الفلوس الحية مقفولة بشروط.
+التطبيق عمره ما بيقول "متحقق منه بنكيًا"؛ وتقرير المطبخ هو إفادة. التعاملات المالية الحقيقية مش مفعّلة حاليًا، وتفعيلها مشروط بالمراجعات المطلوبة.
 
 ## التسلسل
 

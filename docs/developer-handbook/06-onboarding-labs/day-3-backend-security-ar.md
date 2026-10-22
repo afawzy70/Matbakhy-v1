@@ -7,7 +7,7 @@
 ## الأهداف
 
 - اتنقّل في الـ Modular Monolith: `backend/app` و`backend/shared` و`backend/modules/*`.
-- تتبّع Request واحد من الـ Controller للـ Database والرجوع.
+- تتبّع Request واحد من الـ Controller للـ Database، وبعدها تتبّع رجوع النتيجة.
 - افهم الـ Authentication (OIDC عن طريق Keycloak) والـ Authorization على مستوى الـ Object والـ Idempotency والـ Snapshots غير القابلة للتعديل.
 
 ## قايمة القراءة

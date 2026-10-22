@@ -1,12 +1,12 @@
 # رحلات المستخدم: المالية والدعم
 
 > **Owner role:** Business documentation
-> **Status:** PARTIALLY IMPLEMENTED — مطابقة العربون، والاستردادات، والتسويات، وكشوف الحساب، وحالات الدعم ليها API وشاشات؛ والتحقق من تقرير الكاش له API ومفيش له شاشة؛ كل الفلوس بيانات اصطناعية (Synthetic) والفلوس الحية مقفولة بشروط.
+> **Status:** PARTIALLY IMPLEMENTED — مطابقة العربون، والاستردادات، والتسويات، وكشوف الحساب، وحالات الدعم ليها API وشاشات؛ والتحقق من تقرير الكاش له API ومفيش له شاشة؛ كل المبالغ تجريبية وغير حقيقية (Synthetic)، والتعاملات المالية الحقيقية مش مفعّلة حاليًا وتفعيلها مشروط بالمراجعات المطلوبة.
 > **Language / اللغة:** [English](finance-and-support.md) · العربية
 
 قواعد الفلوس اللي لازم تفتكرها: صفر عمولة لمطبخي ومفيش رسوم منصة على العميل في الـ MVP؛ مطبخي عمره ما بيمسك فلوس العميل؛ والعربون تحويل يدوي مباشر من العميل للمستلم المعتمد عند المطبخ، والمطبخ **بيبلّغ** عن الاستلام (عمره ما يتقال "متحقق منه بنكيًا"). الخلفية: [التسعير والدفع](../01-business/pricing-and-payments-ar.md)، `docs/product/09-deposit-payment-states.md`، [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md). صلاحيات الـ Staff: [إدارة الـ Backoffice](backoffice-admin-ar.md).
 
-عناصر مشتركة. **الطرف:** الـ Staff اللي معاهم الصلاحية المذكورة لكل رحلة؛ والطبّاخ والعميل لنصفهم هم. **وسيلة النقل:** Session على الويب + CSRF. **الـ Audit:** كل قرار Staff بيكتب `audit_event`. **الاختبارات (كلها):** `backend/app/src/test/java/com/matbakhy/app/finance/CashAndLedgerIntegrationTest.java`، `FinanceOperationsIntegrationTest.java`، `ZeroCommissionIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `PaymentReconciliationIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/support/cases/SupportIntegrationTest.java`، `apps/operations-web/src/App.test.tsx`، `apps/operations-web/e2e/money-reflow.e2e.ts`. النتايج للـ Commit الحالي: NOT VERIFIED هنا.
+عناصر مشتركة. **الطرف:** الـ Staff اللي معاهم الصلاحية المذكورة لكل رحلة؛ والطبّاخ والعميل كل واحد في الجزء الخاص بيه. **وسيلة النقل:** Session على الويب + CSRF. **الـ Audit:** كل قرار Staff بيكتب `audit_event`. **الاختبارات (كلها):** `backend/app/src/test/java/com/matbakhy/app/finance/CashAndLedgerIntegrationTest.java`، `FinanceOperationsIntegrationTest.java`، `ZeroCommissionIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java`، `PaymentReconciliationIntegrationTest.java`، `backend/app/src/test/java/com/matbakhy/app/support/cases/SupportIntegrationTest.java`، `apps/operations-web/src/App.test.tsx`، `apps/operations-web/e2e/money-reflow.e2e.ts`. النتايج للـ Commit الحالي: NOT VERIFIED هنا.
 
 ## FS-1 الدفع كاش عند الاستلام: التقرير والتحقق
 
@@ -46,12 +46,12 @@
 
 ## FS-3 الاستردادات والتسويات وكشوف الحساب (المالية)
 
-1. **الهدف.** تسجيل استرداد المطبخ للعميل بالكامل للكاش المتحقق منه والمحصّل عند المطبخ (مطبخي عمره ما بيمسك الكاش)، وتسجيل تسويات سداد العمولة (المطبخ بيدفع للمنصة؛ خاملة عند صفر عمولة)، وقراءة كشوف الحساب.
+1. **الهدف.** تسجيل ردّ المطبخ للعميل مبلغ الكاش بالكامل، بعد التحقق من تحصيل المطبخ ليه (مطبخي عمره ما بيمسك الكاش)، وتسجيل تسويات سداد العمولة (المطبخ بيدفع للمنصة؛ خاملة عند صفر عمولة)، وقراءة كشوف الحساب.
 2. **الطرف.** `finance.refund_approve`، `finance.settlement`، `finance.read`.
 3. **المتطلبات المسبقة.** الاسترداد: حالة الكاش `VERIFIED` بمبلغ متحقق منه؛ ومقدّم الطلب والموافق مختلفين.
 4. **البداية.** تبويب Finance: أدخل UUID مطبخ عشان تحمّل كشف حسابه؛ ونماذج الاسترداد والتسوية تحته (`apps/operations-web/src/ops/Finance.tsx`).
 5. **الإجراءات.** طلب استرداد كامل (معرّف الأوردر، مرجع الحالة، المبلغ، السبب)؛ وبعدين APPROVE، PAYMENT_RECORDED (مرجع الدليل)، VERIFY أو REJECT؛ ودفعات التسوية REVIEW، PAYMENT_RECORDED، RECONCILE، CANCEL.
-6. **الاستجابات.** المبلغ القابل للاسترداد بالظبط هو المقبول بس (`FULL_REFUND_REQUIRED`، `OVER_REFUND`)؛ كشوف الحساب مابتعرضش عمولة تحت سياسة صفر العمولة (`hasCommission` في `apps/operations-web/src/api.ts`)؛ وتحت صفر عمولة التسويات خاملة، والقيود ذات المبلغ صفر مايتحطش في دفعات (E2E-FIN-110).
+6. **الاستجابات.** المبلغ القابل للاسترداد بالظبط هو المقبول بس (`FULL_REFUND_REQUIRED`، `OVER_REFUND`)؛ كشوف الحساب مابتعرضش عمولة تحت سياسة صفر العمولة (`hasCommission` في `apps/operations-web/src/api.ts`)؛ وتحت صفر عمولة التسويات خاملة، والقيود اللي مبلغها صفر ماينفعش تتحط في دفعات (E2E-FIN-110).
 7. **الـ API.** 084، 085، 086، 087، 088 (`/api/v1/ops/finance/refunds`، `…/refunds/{refundId}/action`، `…/statements`، `…/settlements`، `…/settlements/{batchId}/action`)؛ وجانب الطبّاخ `GET /api/v1/cook/statements` (064).
 8. **الـ Backend.** `FinanceOpsController.java` → `FinanceOpsService.java`؛ `StatementController.java` → `StatementService.java`؛ `LedgerService.java`، `LedgerPostingJob.java`.
 9. **قاعدة البيانات.** `refund`، `settlement_batch`، `settlement_line` (V18)، `ledger_group` (الأنواع `COMMISSION` و`COMMISSION_REVERSAL`، V18)، `ledger_entry` (V13)، `cash_report`.

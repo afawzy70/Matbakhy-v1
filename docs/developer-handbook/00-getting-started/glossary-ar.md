@@ -64,7 +64,7 @@
 | Snapshot | نسخة مجمّدة من محتوى الوجبة والأسعار وإصدارات السياسات وبيانات التواصل والعنوان، متخزّنة على الأوردر | `order_item.meal_snapshot`، `customer_order` |
 | Meal revision | إصدار غير قابل للتعديل من محتوى الوجبة، شامل السعر | `meal_revision` |
 | Commerce policy | إعدادات بيزنس بإصدارات: الضريبة، العمولة، مدة صلاحية الـ Quote، نوافذ القبول، وإصدارات الشروط والإلغاء | `commerce_policy`، `CommercePolicies` |
-| Synthetic policy | سياسة اصطناعية مسموحة بس في local/CI/preview؛ السياسات الحقيقية محتاجة مرجع موافقة | `SyntheticPolicyPermission` |
+| Synthetic policy | سياسة تجريبية غير حقيقية مسموحة بس في local/CI/preview؛ السياسات الحقيقية محتاجة مرجع موافقة | `SyntheticPolicyPermission` |
 | Reservation / allocation / consumption | مراحل المخزون التلاتة: الأوردر اتسجّل، الأوردر اتقبل، التحضير بدأ | `SlotInventory.Stage` |
 | Cutoff | بداية الـ Slot ناقص مهلة الطلب المسبق (lead time)؛ بعده مفيش أوردرات جديدة ولا تعديل للسعة | `cook_slot.cutoff_at` |
 | Acceptance deadline (`acceptBy`) | الوقت اللي الأوردر المعلّق بينتهي فيه | `customer_order.accept_by` |
@@ -77,7 +77,7 @@
 | Grant (permission grant) | صف في `user_grant` بيدّي حساب صلاحية موظف واحدة باسمها، وممكن تنتهي | `GrantService` |
 | Permission | واحدة من 17 قيمة، مثلًا `finance.verify`؛ بتتحوّل لصلاحية `PERM_<code>` | `Permission` |
 | Bootstrap administrator | أول أدمن بيتعمل من إعدادات البيئة؛ معاه `staff.grant` و`audit.read` | `GrantService.bootstrapAdministratorIfNone` |
-| Object-level authorization | فحص حق المستخدم في السجل المحدّد، مش الدور بس؛ السجلات الغريبة بترجّع 404 | [الأطراف والصلاحيات](../01-business/actors-and-permissions-ar.md) |
+| Object-level authorization | فحص حق المستخدم في السجل المحدّد، مش الدور بس؛ السجلات الخاصة بمستخدم تاني بترجّع 404 | [الأطراف والصلاحيات](../01-business/actors-and-permissions-ar.md) |
 | Separation of duties | خطوتين لازم يعملهم ناس مختلفة (البلاغ مقابل التحقق، الطلب مقابل الموافقة) | `CashService`، `FinanceOpsService` |
 | MFA policy | الوضع `DISABLED` أو `OPTIONAL` أو `REQUIRED` لكل فئة `CUSTOMER` و`KITCHEN` و`STAFF` | `MfaPolicyService`، `docs/security/mfa-policy.md` |
 | Step-up | إعادة Authentication بعامل تاني بيطلبها الـ API (`STEP_UP_REQUIRED`) | `MfaEnforcementFilter`، `StaffAssurance` |

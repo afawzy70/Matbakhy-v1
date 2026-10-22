@@ -1,16 +1,16 @@
 # شرح تنفيذ التسعير
 
 > **Owner role:** Backend architecture
-> **Status:** IMPLEMENTED — التسعير على السيرفر ونسخ الوجبات غير القابلة للتعديل والتحقق من الـ Quote ورفض الـ Quote القديم وإعادة تأكيد العميل موجودين؛ القيم التجارية (الضريبة، الحدود) اصطناعية (Synthetic) لحد قرار المالك O04
+> **Status:** IMPLEMENTED — التسعير على السيرفر ونسخ الوجبات غير القابلة للتعديل والتحقق من الـ Quote ورفض الـ Quote القديم وإعادة تأكيد العميل موجودين؛ القيم التجارية (الضريبة، الحدود) تجريبية وغير حقيقية (Synthetic) لحد قرار المالك O04
 > **Language / اللغة:** [English](pricing-implementation.md) · العربية
 
 مين اللي بيحدد السعر، وهو متخزّن فين، وبيتفحص إزاي، وإيه اللي بيحصل لما يتغيّر بين "العميل شاف السعر" و"العميل داس أوردر". الصورة البيزنس: [التسعير والدفع](../01-business/pricing-and-payments-ar.md). القرارات: D10 (مفيش عمولة ولا رسوم منصة على العميل)، D13 (التعامل مع الـ Quote القديم، `docs/product/rq-004-stale-quote.md`)، D14 (تاريخ أسعار المطبخ).
 
 ## المبادئ في الكود
 
-- **السيرفر هو اللي بيملك كل مبلغ.** أجسام طلبات الـ Quote (`QuoteController.Body`، `backend/modules/orders/src/main/java/com/matbakhy/orders/web/QuoteController.java:36`) فيها أرقام الوجبات والكميات والـ Slot وطريقة الاستلام/التوصيل والعنوان وطريقة الدفع بس — مفيش أسعار ولا رسوم ولا إجماليات ولا أدوار؛ وخصائص الـ JSON غير المعروفة بتترفض (`StrictJsonConfiguration`). الاختبار: `QuoteIntegrationTest` (الحقول المزوّرة بتترفض، TC-019).
+- **السيرفر هو اللي بيحدد كل مبلغ.** أجسام طلبات الـ Quote (`QuoteController.Body`، `backend/modules/orders/src/main/java/com/matbakhy/orders/web/QuoteController.java:36`) فيها أرقام الوجبات والكميات والـ Slot وطريقة الاستلام/التوصيل والعنوان وطريقة الدفع بس — مفيش أسعار ولا رسوم ولا إجماليات ولا أدوار؛ وخصائص الـ JSON غير المعروفة بتترفض (`StrictJsonConfiguration`). الاختبار: `QuoteIntegrationTest` (الحقول المزوّرة بتترفض، TC-019).
 - **فلوس بأرقام صحيحة.** القروش في `long`؛ والحساب بيستخدم `Math.multiplyExact`/`addExact`. الضريبة بتتقرّب لأقرب قرش صحيح (half up) (`QuoteService.java:269`). في جهة العميل: `packages/api-client/src/money.ts` بيعمل Parse لـ `{amountMinor, currency}`.
-- **الأسعار بتتنسخ في الأوردرات، مبتتشاورش عليها.** الـ Quotes بتخزّن `unit_price_minor` و`meal_revision`؛ والأوردرات بتخزّن السعر المتسعّر في الـ Quote مع Snapshot الوجبة (`OrderService.java:206-213`).
+- **الأسعار بتتنسخ جوه الأوردرات، ومبتتخزّنش كمجرد مراجع لقيمها الحالية.** الـ Quotes بتخزّن `unit_price_minor` و`meal_revision`؛ والأوردرات بتخزّن السعر المتسعّر في الـ Quote مع Snapshot الوجبة (`OrderService.java:206-213`).
 
 ## السعر بييجي منين
 
@@ -20,7 +20,7 @@
 | نسخة السعر | `meal.revision` — كل تغيير في المحتوى مختلف عن المحتوى الحالي بيدخّل صف `meal_revision` جديد غير قابل للتعديل (`MealService.update` `:163`، `writeContent` `:420`)؛ التعديلات اللي مفيهاش تغيير فعلي مبتضيفش حاجة (`:173`) | الجدول V7، وTrigger للإضافة بس اسمه `meal_revision_append_only` |
 | رسوم التوصيل | `coalesce(kitchen_zone.fee_override_minor, service_zone.delivery_fee_minor)` لمنطقة مفعّلة ونشطة | `JdbcMealCatalog.deliveryFee` (`backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/JdbcMealCatalog.java:44`) |
 | الضريبة | `commerce_policy.tax_rate_bps` للسياسة الفعّالة (اصطناعية 0 لحد O04) | `CommercePolicies.active` (`backend/modules/orders/src/main/java/com/matbakhy/orders/internal/CommercePolicies.java`) |
-| العمولة | `commerce_policy.commission_rate_bps`؛ **0** عند الإطلاق؛ الـ CHECK في قاعدة البيانات `commerce_policy_launch_commission_ck` (V23) بيسمح بقيمة غير صفرية للسياسات الاصطناعية بس؛ بيتعملها Snapshot على الأوردر بس مبتتعرضش للعملاء أبدًا | `OrderService.java:194` |
+| العمولة | `commerce_policy.commission_rate_bps`؛ **0** عند الإطلاق؛ الـ CHECK في قاعدة البيانات `commerce_policy_launch_commission_ck` (V23) بيسمح بقيمة غير صفرية للسياسات التجريبية غير الحقيقية بس؛ بيتعملها Snapshot على الأوردر بس مبتتعرضش للعملاء أبدًا | `OrderService.java:194` |
 | الحدود | `max_item_quantity` (لكل سطر)، 20 سطر (`CommercePolicies.MAX_LINES_PER_ORDER`)، `quote_ttl_seconds` (سياسة التطوير 300 = 5 دقايق، `backend/app/src/main/resources/db/devdata/R__dev_commerce_policy.sql`) | `QuoteService.create` `:92` |
 | العربون | لكل مطبخ، `kitchen_payment_profile.deposit_bps` | [تنفيذ الدفع](payment-implementation-ar.md) |
 
@@ -61,7 +61,7 @@
 |---|---|---|
 | التسجيل بيرد `PRICE_CHANGED` | `Checkout.place` بيمسح المفاتيح المعلّقة وبينادي `requote` (`apps/customer-web/src/Checkout.tsx:286-289`، `:245`) | `Cart.submit` -> `requote` (`apps/customer-mobile/src/screens/Cart.tsx:341-343`) |
 | حساب الفرق | `priceChanges(previous, next)` في `packages/api-client/src/priceChanges.ts:31` | نفس الدالة |
-| النسب | تغييرات سعر الوجبة بتتنسب للمطبخ؛ ورسوم التوصيل والضريبة بتتبلّغ منفصلين؛ و`unexplained` بيطلّع إشعار عام | نفس الحاجة |
+| تحديد مصدر التغيير | تغييرات سعر الوجبة بتتنسب للمطبخ؛ ورسوم التوصيل والضريبة بتتبلّغ منفصلين؛ و`unexplained` بيطلّع إشعار عام | نفس الحاجة |
 | القبول | `PriceChangeNotice` (`Checkout.tsx:444`) بيطلب قبول صريح قبل ما يفعّل التسجيل | `apps/customer-mobile/src/screens/Cart.tsx:460-463` |
 | إعادة الإرسال | الـ Quote الجديد بياخد `clientRequestId` و`Idempotency-Key` جداد؛ ومفيش إعادة إرسال تلقائية أبدًا | نفس الحاجة |
 
@@ -77,8 +77,8 @@
 
 ## القيود المعروفة وفجوات التوثيق
 
-- معاملة الضريبة لسه متقرّرتش (O04، `planning/decisions.json`)؛ الكود بيدعم نسبة ضريبة بس السياسة الاصطناعية بتستخدم 0 ومفيش منطق فواتير. PLANNED.
-- مدة الـ Quote قيمة سياسة؛ والقاعدة `BR-020` بتقول 5 دقايق، وده بيساوي سياسة التطوير الاصطناعية (300 ثانية) بس القيمة الفعلية NOT VERIFIED لأن مفيش سياسة فعلية موافَق عليها في الـ Repository.
+- معاملة الضريبة لسه متقرّرتش (O04، `planning/decisions.json`)؛ الكود بيدعم نسبة ضريبة بس السياسة التجريبية غير الحقيقية بتستخدم 0 ومفيش منطق فواتير. PLANNED.
+- مدة الـ Quote قيمة سياسة؛ والقاعدة `BR-020` بتقول 5 دقايق، وده بيساوي سياسة التطوير التجريبية غير الحقيقية (300 ثانية) بس القيمة الفعلية NOT VERIFIED لأن مفيش سياسة فعلية موافَق عليها في الـ Repository.
 
 ## تغيير مدة الـ Quote
 
