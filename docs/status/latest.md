@@ -2,6 +2,10 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
+## 2026-10-22 — Testing Workspace (IN_PROGRESS)
+
+[Daily checkpoint](daily/2026-10-22.md) · [Draft PR #43](https://github.com/afawzy70/Matbakhy-v1/pull/43). Source 2d57143331e1b9f25e3c28294e3bb1cb8be32fe2: 200 cases / 1,005 steps represented; 0 guidance reviewed complete; product scenarios NOT_RUN. Website checks passed locally, remote CI pending. No merge or deployment. Next: case-by-case Egyptian Arabic setup/source/fixture review, starting J0/J1.
+
 ## 2026-10-14 (work window authorized 06:35:02 Kuwait; deadline 2026-10-15 00:00)
 
 - **New QA candidate J (immutable): `52e4e21cd3788e0429855ded44e52ca3041d03c5`** ([handoff](../quality/14-qa-candidate-j-push-flag-staging-prep.md)). Six local checks PASS from a clean worktree with fresh synthetic data; the secret scan covered 368 commits ([evidence](../../verification/runs/20261014-CANDIDATE-J/evidence.json)). Scope: candidate I plus the push flag (O07) and the staging preparation. Nothing deployed.
