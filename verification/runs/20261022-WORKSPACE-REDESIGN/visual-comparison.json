@@ -1,0 +1,110 @@
+{
+  "reference_sha256": "c754b6e7249a15c1aac89271d5b155f155e805d1da55d44aaf95199f4436fafa",
+  "comparison": "Exact computed visual tokens/geometry; semantic content differs intentionally. No claim of pixel-identical page.",
+  "font_control": "Cairo 400–800 identical self-hosted subsets supplied to reference import during offline comparison",
+  "comparisons": [
+    {
+      "viewport": 1440,
+      "prototype": {
+        "mainWidth": 940,
+        "background": "rgb(248, 247, 242)",
+        "font": "Cairo, Tahoma, Arial, sans-serif",
+        "headerBackground": "rgb(21, 62, 50)",
+        "headerRadius": "22px",
+        "headerPadding": "26px",
+        "titleSize": "30px",
+        "cardRadius": "16px",
+        "cardBackground": "rgb(255, 255, 255)",
+        "stepRadius": "17px",
+        "stepBackground": "rgb(244, 248, 243)",
+        "rtl": "rtl"
+      },
+      "implementation": {
+        "mainWidth": 940,
+        "background": "rgb(248, 247, 242)",
+        "font": "Cairo, Tahoma, Arial, sans-serif",
+        "headerBackground": "rgb(21, 62, 50)",
+        "headerRadius": "22px",
+        "headerPadding": "26px",
+        "titleSize": "30px",
+        "cardRadius": "16px",
+        "cardBackground": "rgb(255, 255, 255)",
+        "stepRadius": "17px",
+        "stepBackground": "rgb(244, 248, 243)",
+        "rtl": "rtl"
+      },
+      "tokens_and_geometry": "PASS",
+      "canonical_steps": 10,
+      "visible_flow_steps": 19
+    },
+    {
+      "viewport": 390,
+      "prototype": {
+        "mainWidth": 390,
+        "background": "rgb(248, 247, 242)",
+        "font": "Cairo, Tahoma, Arial, sans-serif",
+        "headerBackground": "rgb(21, 62, 50)",
+        "headerRadius": "22px",
+        "headerPadding": "26px",
+        "titleSize": "25px",
+        "cardRadius": "16px",
+        "cardBackground": "rgb(255, 255, 255)",
+        "stepRadius": "17px",
+        "stepBackground": "rgb(244, 248, 243)",
+        "rtl": "rtl"
+      },
+      "implementation": {
+        "mainWidth": 390,
+        "background": "rgb(248, 247, 242)",
+        "font": "Cairo, Tahoma, Arial, sans-serif",
+        "headerBackground": "rgb(21, 62, 50)",
+        "headerRadius": "22px",
+        "headerPadding": "26px",
+        "titleSize": "25px",
+        "cardRadius": "16px",
+        "cardBackground": "rgb(255, 255, 255)",
+        "stepRadius": "17px",
+        "stepBackground": "rgb(244, 248, 243)",
+        "rtl": "rtl"
+      },
+      "tokens_and_geometry": "PASS",
+      "canonical_steps": 10,
+      "visible_flow_steps": 19
+    },
+    {
+      "viewport": 320,
+      "prototype": {
+        "mainWidth": 320,
+        "background": "rgb(248, 247, 242)",
+        "font": "Cairo, Tahoma, Arial, sans-serif",
+        "headerBackground": "rgb(21, 62, 50)",
+        "headerRadius": "22px",
+        "headerPadding": "26px",
+        "titleSize": "25px",
+        "cardRadius": "16px",
+        "cardBackground": "rgb(255, 255, 255)",
+        "stepRadius": "17px",
+        "stepBackground": "rgb(244, 248, 243)",
+        "rtl": "rtl"
+      },
+      "implementation": {
+        "mainWidth": 320,
+        "background": "rgb(248, 247, 242)",
+        "font": "Cairo, Tahoma, Arial, sans-serif",
+        "headerBackground": "rgb(21, 62, 50)",
+        "headerRadius": "22px",
+        "headerPadding": "26px",
+        "titleSize": "25px",
+        "cardRadius": "16px",
+        "cardBackground": "rgb(255, 255, 255)",
+        "stepRadius": "17px",
+        "stepBackground": "rgb(244, 248, 243)",
+        "rtl": "rtl"
+      },
+      "tokens_and_geometry": "PASS",
+      "canonical_steps": 10,
+      "visible_flow_steps": 19
+    }
+  ],
+  "live_application_verification": "NOT_RUN"
+}

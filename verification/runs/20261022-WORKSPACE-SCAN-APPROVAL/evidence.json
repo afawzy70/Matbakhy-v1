@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "scope": "OWNER_APPROVED_SECRET_SCAN_EXCEPTIONS",
+  "source_commit": "37271995801c0fc18f4c34c24955dc56413f03a8",
+  "finished_at": "2026-10-22T09:19:13.414049+00:00",
+  "status": "BLOCKED",
+  "approvals": [
+    {
+      "type": "OWNER_EXPLICIT_APPROVAL",
+      "scope": "Four exact historical fingerprints from the documented proposal",
+      "date": "2026-10-22"
+    }
+  ],
+  "applied_exception_count": 4,
+  "additional_exception_applied": false,
+  "checks": [
+    {
+      "command": "Gitleaks 8.30.1 git . --redact --no-banner",
+      "status": "PASS",
+      "exit_code": 0,
+      "commits_scanned": 564,
+      "findings": 0
+    },
+    {
+      "command": "Gitleaks 8.30.1 dir committable-tree --redact --max-target-megabytes 5",
+      "status": "FAIL",
+      "exit_code": 1,
+      "findings": 1,
+      "classification": "Same independently classified non-credential progress namespace; directory fingerprint differs from commit fingerprint"
+    },
+    {
+      "command": "python3 scripts/test_testing_workspace.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": 8
+    },
+    {
+      "command": "python3 scripts/test_doc001_gate.py",
+      "status": "PASS",
+      "exit_code": 0,
+      "tests": 32
+    },
+    {
+      "command": "python3 scripts/doc001_check.py docs",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/validate_handbook_parity.py --base origin/develop",
+      "status": "PASS",
+      "exit_code": 0,
+      "pairs": 81
+    },
+    {
+      "command": "node --check scripts/testing-workspace/app.js",
+      "status": "PASS",
+      "exit_code": 0
+    }
+  ],
+  "unapplied_directory_fingerprint": "/repo/docs/quality/testing-workspace/reference/approved-prototype.html:generic-api-key:24",
+  "notes": [
+    "No whole-file, path or rule exclusion. Four approved historical fingerprints only.",
+    "CI lint duplicate globals repaired by removing redundant navigator/localStorage declarations from comment; runtime unchanged.",
+    "Latest source remote DOC-001/handbook/fixture SQL succeeded at observation; other jobs pending.",
+    "PR #43 stays Draft; no merge, deployment, live configuration or fixture changes.",
+    "Coverage remains 200 represented / 1005 canonical steps / 1 reviewed complete guide; no product scenario execution."
+  ]
+}

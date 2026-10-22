@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "scope": "TESTING_WORKSPACE_UI_AND_GUIDANCE_ONLY",
+  "source_commit": "8569f10818c7823fec2457514e6f6332a815f37b",
+  "environment": "Local Python/Node/Chromium; no live Matbakhy runtime requests",
+  "finished_at": "2026-10-22T08:44:24.551850+00:00",
+  "status": "BLOCKED",
+  "checks": [
+    {
+      "command": "python3 scripts/testing_workspace.py --check",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/test_testing_workspace.py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "node --test scripts/testing-workspace/core.test.mjs",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/doc001_check.py docs",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/test_doc001_gate.py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/validate_handbook_parity.py --base origin/develop",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/validate_blueprint.py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/check_scope.py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/testing-workspace/browser_check.py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/testing-workspace/reference_check.py",
+      "status": "PASS",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p test_*.py -v",
+      "status": "PASS_WITH_SKIP",
+      "exit_code": 0
+    },
+    {
+      "command": "Gitleaks 8.30.1 full-history scan, official SHA256 verified binary",
+      "status": "FAIL",
+      "exit_code": 1
+    }
+  ],
+  "scenario_results": [],
+  "coverage": {
+    "cases_represented": 200,
+    "canonical_steps": 1005,
+    "guidance_complete": 1,
+    "guidance_draft": 199,
+    "actual_product_executions": 0
+  },
+  "browser_validation": {
+    "widths": [
+      1440,
+      390,
+      320
+    ],
+    "scenario_routes": 200,
+    "primary_visible_controls": 19,
+    "primary_canonical_steps": 10,
+    "prerequisite_mapping": 8,
+    "essential_content_visible": true,
+    "visual_reference": "owner-supplied actual HTML",
+    "pixel_identical_claim": false,
+    "controlled_font": "same self-hosted Cairo files for both views"
+  },
+  "review": {
+    "type": "INDEPENDENT_AI_REVIEW",
+    "reviewers": [
+      "audit_commerce",
+      "audit_identity",
+      "guidance_discovery"
+    ],
+    "status": "PARTIAL",
+    "findings": [
+      "ORDER-101 source-grounded instruction completeness approved after repairs; no live PASS.",
+      "Credential/export and prerequisite guard findings repaired and reviewed.",
+      "Actual desktop/mobile before/reference/after screenshots reviewed; no blocking visual defect. Dense mixed-language passages remain a minor readability issue.",
+      "199 guides remain drafts and not reviewed complete."
+    ]
+  },
+  "secret_scan": {
+    "commits_scanned": 561,
+    "matches": 4,
+    "independently_classified_non_credentials": 4,
+    "exclusions_applied": false,
+    "automatic_review": "Rejected persistent exclusions without explicit owner approval",
+    "proposal": "docs/quality/testing-workspace/security-review.md"
+  },
+  "ci": {
+    "observed_head": "8569f10818c7823fec2457514e6f6332a815f37b",
+    "blueprint": "PASS after shallow-checkout fix",
+    "doc001": "PASS",
+    "handbook_parity": "PASS",
+    "fixture_sql": "PASS",
+    "design": "PASS",
+    "secret_scan": "FAIL",
+    "workspace": "IN_PROGRESS",
+    "local_stack": "IN_PROGRESS",
+    "native": "IN_PROGRESS"
+  },
+  "notes": [
+    "Full local script suite: 190 tests OK, one Docker-dependent skip.",
+    "Eight focused checks and four Node regression tests pass. Shallow checkout clone passes all eight workspace checks.",
+    "Browser PASS validator tests use synthetic local-only evidence and never represent a completed product order.",
+    "Complete guidance does not prove runtime readiness; operations fixture, Keycloak access, capacity and read-only SQL evidence can still block actual ORDER-101 execution.",
+    "No canonical catalog changes, live configuration, provisioning, deployment or merge."
+  ],
+  "artifacts": [
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/after-desktop-checkout.png",
+      "sha256": "06043eeab939cba24d3b62f8a6b3dc9d8ca0e326a84cc622af00113a9efa6b95"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/after-desktop.png",
+      "sha256": "6ec9d678204d45a32ef73ba01a397950921d0ba6b92dc951dadfa54388a9cddd"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/after-mobile-checkout.png",
+      "sha256": "9f4c1ef3451abb2867132b54f585548a4b2ae93af3ab92003e545dfb3787e5d7"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/after-mobile.png",
+      "sha256": "3cd9e02f0c655cce19799131cdc65036da8de38d8507907d6d6f02015b41adea"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/after-small-mobile.png",
+      "sha256": "e1064b72125cc60afec740e27d5a47a3c57cce77f32f31184fd39d7f4703d401"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/before-desktop.png",
+      "sha256": "210571732b059701c3135fbfe0a0365221db20142c1193dcafec52c19db64291"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/before-mobile.png",
+      "sha256": "853e0b448d488a6edb5ab266e5c67ce343984a30fe18f96d87dd10db9c33ad23"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/reference-desktop.png",
+      "sha256": "bbaf4473b2b1b5756666278312e26973edeea2645d217f1e66acc2eeab96f4ff"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/reference-mobile.png",
+      "sha256": "ebf0ecd46bd6895984708d8fd5e7061a98764c513386d3e401f3f9fc93793ee5"
+    },
+    {
+      "path": "verification/runs/20261022-WORKSPACE-REDESIGN/screenshots/reference-small-mobile.png",
+      "sha256": "c009f72b79ccf53e7954944e4221311ac1cd84af8b583a7330432c7593831c47"
+    }
+  ],
+  "approvals": []
+}

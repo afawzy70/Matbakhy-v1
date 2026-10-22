@@ -1,0 +1,33 @@
+{
+  "source_commit": "433f93b9771d87e05da859637fbe83a85ddf4c01",
+  "observed_at": "2026-10-22T09:28:26.230966+00:00",
+  "approval": "Explicit owner approval for only /repo/docs/quality/testing-workspace/reference/approved-prototype.html:generic-api-key:24",
+  "history_scan": {
+    "gitleaks": "8.30.1",
+    "commits": 566,
+    "exit_code": 0,
+    "findings": 0
+  },
+  "local_tree_scan": {
+    "exit_code": 1,
+    "findings": 1,
+    "classification": "Only same reviewed prototype namespace; local /tmp path differs from CI /repo fingerprint. No local-path exception added."
+  },
+  "ci_exact_path_scan": "PENDING remote CI; /repo creation denied locally; sudo requires password; Docker wrapper not run",
+  "checks": {
+    "workspace_tests": 8,
+    "doc001_tests": 32,
+    "doc001": "PASS",
+    "handbook_pairs": 81,
+    "diff_check": "PASS"
+  },
+  "coverage": {
+    "represented": 200,
+    "canonical_steps": 1005,
+    "guidance_complete": 1,
+    "guidance_draft": 199,
+    "live_product_execution": "NOT_RUN"
+  },
+  "pr": 43,
+  "draft": true
+}

@@ -72,3 +72,7 @@ flowchart LR
 - `deploy-preview.yml` بينشر Keycloak admin console بعد كل Deployment (`admin-console enable`)؛ والسياسة والتحصين في [14-keycloak-admin-console.md](../../operations/14-keycloak-admin-console.md). الـ Job اسمه `build` في Workflow الـ Deploy بيشتغل مع كل Push على `develop` ومع التشغيل اليدوي، لكن الـ Job اسمه `deploy` بيشتغل بس لما الـ Ref يكون `develop`.
 - `deploy/web-preview/README.md` لسه بيقول "Nothing here has been deployed"، وده قديم بالنسبة للـ Workflows.
 - إعدادات حماية الـ Branch والفحوصات المطلوبة مش موجودة في الـ Repository: NOT VERIFIED.
+
+## استثناءات الفحص المحددة والمتراجعة
+
+المالك وافق على 5 بصمات محددة مش بيانات اعتماد (4 بصمات تاريخية و1 بصمة لفحص الملفات لنفس اسم تخزين النموذج) في `.gitleaksignore`: اسم تخزين تقدّم النموذج المعتمد، وتعليق تاريخي، وعلامات اختبارات إخفاء اصطناعية. [مراجعة الأمان](../../quality/testing-workspace/security-review.md) بتوثّق النطاق وتصنيف المصدر المستقل. مفيش استثناء لملف كامل أو مسار كامل أو قاعدة كاملة؛ أي نتيجة تانية لسه بتفشل الفحص.

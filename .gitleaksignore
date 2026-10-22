@@ -38,8 +38,15 @@ e053225724c2a060ede4202ef43e20bbdc1316ff:docs/security/audits/current-stabilizat
 7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:2
 7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:11
 7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:12
-7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:12
-# Reviewed false positives (ai-skills developer-handbook redaction tests, intermediate commits): generic-api-key matched deliberately synthetic test strings that prove the validator masks credential values; no real credential. Exactly these three fingerprints (the third is the first version of this comment, which quoted the strings).
+
+# Owner-approved 2026-10-22: four exact independently reviewed non-credential findings.
+# Progress storage namespace and historical synthetic redaction fixtures; no path or rule exclusions.
+# Scope and classification: docs/quality/testing-workspace/security-review.md.
+ab514a810cb07b3d3a40648af172a3e68d611197:docs/quality/testing-workspace/reference/approved-prototype.html:generic-api-key:24
+2edfa2dae0555f48564e162af5cdff4ea11baed3:.gitleaksignore:generic-api-key:41
 433d6925243b47473a35dc8816019e9d0571b1e7:ai-skills/developer-handbook/scripts/test_bilingual_parity.py:generic-api-key:351
 5e15ddd6e293d4e79499564d3aaefd51af089ad3:ai-skills/developer-handbook/scripts/test_bilingual_parity.py:generic-api-key:284
-2edfa2dae0555f48564e162af5cdff4ea11baed3:.gitleaksignore:generic-api-key:41
+
+# Owner-approved directory-scan equivalent of the reviewed prototype namespace.
+/repo/docs/quality/testing-workspace/reference/approved-prototype.html:generic-api-key:24
+# Reviewed false positives (ai-skills developer-handbook redaction tests, intermediate commits): generic-api-key matched deliberately synthetic test strings that prove the validator masks credential values; no real credential. Exactly these three fingerprints (the third is the first version of this comment, which quoted the strings).

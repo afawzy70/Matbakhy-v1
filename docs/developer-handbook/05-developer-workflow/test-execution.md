@@ -104,3 +104,11 @@ Only synthetic actors exist: `customer-a/b`, `cook-a`, `ops-a` locally; `preview
 
 - Catalog README count (199) disagrees with the case files (200).
 - No single command runs "everything"; `scripts/check_workspace.sh` skips browser, native, design and secret checks.
+
+## Scenario Testing Workspace
+
+The [Testing Workspace](../../../scripts/testing-workspace/README.md) groups all 200 canonical owner cases into one Arabic RTL execution flow with J0–J8, search, fixture references, step checkboxes and local result recording. Generate with `python3 scripts/testing_workspace.py`; check with `python3 scripts/test_testing_workspace.py`. The [coverage matrix](../../quality/testing-workspace/coverage-matrix.md) separates representation from reviewed guidance completeness. This delivery is PARTIALLY IMPLEMENTED: draft guidance is NOT VERIFIED and product execution is NOT_RUN. Private credentials and narrative evidence stay only in tab memory; a resumed result needs its evidence reattached before sharing. It performs no provisioning or application API calls.
+
+## Approved scenario tutorial design
+
+The workspace now follows the owner-supplied [HTML reference](../../quality/testing-workspace/reference/approved-prototype.html): 940px centered layout, Cairo, green/ivory cards and visible chronological execution. E2E-ORDER-101 has 19 visible controls retaining 10 canonical steps, with 8 mapped prerequisites. The [comparison report](../../quality/testing-workspace/design-comparison.md) separates visual verification from live execution. Counts: 200 represented, 1005 canonical steps, 1 reviewed complete guide and 199 drafts. All product results remain NOT_RUN. Export revalidates PASS against the case-specific release, evidence and every required step; a stale PASS exports BLOCKED. Run `python3 scripts/testing-workspace/reference_check.py` for local visual checks.

@@ -72,3 +72,7 @@ The preview is synthetic, IP-restricted, single-server and has no real providers
 - `deploy-preview.yml` publishes the Keycloak admin console after every deploy (`admin-console enable`); the policy and hardening are in [14-keycloak-admin-console.md](../../operations/14-keycloak-admin-console.md). The deploy workflow's `build` job runs on every push to `develop` and on manual dispatch, but the `deploy` job only when the ref is `develop`.
 - `deploy/web-preview/README.md` still says "Nothing here has been deployed", which is out of date relative to the workflows.
 - Branch protection and required-check settings are not in the repository: NOT VERIFIED.
+
+## Exact reviewed scanner exclusions
+
+The owner approved 5 exact non-credential fingerprints (4 historical fingerprints and 1 directory-scan equivalent for the same prototype namespace) in `.gitleaksignore`: the approved prototype progress-storage namespace, a historical explanatory comment and synthetic redaction-test markers. [Security review](../../quality/testing-workspace/security-review.md) records the scope and independent source classification. No complete file, path or rule is excluded; all other findings still fail the scan.
