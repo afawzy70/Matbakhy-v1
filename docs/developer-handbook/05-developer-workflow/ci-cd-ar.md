@@ -56,7 +56,7 @@ flowchart LR
 - Secrets الـ Repository/بيئة `preview` فيها الـ SSH Host والمستخدم والمفتاح والمفتاح العام للـ Host (الأسماء `STAGING_SSH_HOST` و`STAGING_SSH_USER` و`STAGING_SSH_KEY` و`STAGING_SSH_HOST_PUBKEY`). القيم عمرها ما بتكون في الـ Repository ولا الـ Logs ولا الدليل ده. الـ SSH بيستخدم فحص صارم لمفتاح الـ Host مقابل المفتاح العام المخزّن.
 - Secrets التطبيق بتعيش بس في `.env` على السيرفر (صلاحية 600)، ومتولّدة بـ `deploy.sh init-secrets`؛ وملفات الـ Realm/التخزين المتولّدة بتروح لمجلد خاص متولّد. تسجيل الدخول على GHCR بيستخدم Token الـ Job وإعداد Docker مؤقت.
 - كلمات السر المحلية عشوائية لكل جهاز (`scripts/dev.sh`). كلمات سر الـ Database المؤقتة في الـ CI متعلّم عليها كده في الـ Workflow.
-- Gitleaks بيفحص التاريخ والشجرة في كل تشغيل لـ Product CI.
+- Gitleaks بيفحص التاريخ والشجرة في كل تشغيل لـ Product CI. فحص التاريخ بيغطي كل الـ refs اللي اتجابت، فأي إيجابية كاذبة اتراجعت بتتسجّل في `.gitleaksignore` ببصمتها بالظبط (الـ commit والملف والقاعدة والسطر)، مش باستثناء مسار أو قاعدة.
 
 ## اختبارات الـ Smoke
 
