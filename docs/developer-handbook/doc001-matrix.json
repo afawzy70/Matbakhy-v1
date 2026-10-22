@@ -305,6 +305,18 @@
         "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow.md"
       ],
       "owner_role": "Handbook navigation"
+    },
+    {
+      "id": "ai-skills",
+      "description": "Owner-controlled reusable AI skills library (ai-skills/)",
+      "code": [
+        "ai-skills/**",
+        ".claude/skills/**"
+      ],
+      "docs": [
+        "ai-skills/README.md"
+      ],
+      "owner_role": "Handbook navigation"
     }
   ]
 }

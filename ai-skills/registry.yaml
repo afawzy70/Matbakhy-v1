@@ -1,0 +1,22 @@
+# Owner-controlled registry of reusable AI skills. Only the owner may authorize a new entry.
+# Agents may RECOMMEND skills in a pull request description or report, never add an entry without explicit owner approval.
+schema_version: 1
+skills:
+  - name: developer-handbook
+    path: developer-handbook
+    entry: developer-handbook/SKILL.md
+    status: approved-for-creation   # not "validated" until the dependencies listed below are complete
+    approved_by: repository owner
+    approved_on: "2026-10-21"
+    scope: documentation-only; read-only infrastructure discovery; bilingual (English + Egyptian Arabic) handover handbooks
+    reusable_across_repositories: true
+    external_publication: not approved   # never publish to an external registry without owner approval
+    validation:
+      packaging_tests: ai-skills/developer-handbook/scripts/test_skill_package.py
+      validator_tests: ai-skills/developer-handbook/scripts/test_bilingual_parity.py
+      behavioral_dry_run: ai-skills/developer-handbook/scripts/test_fixture_dry_run.py
+      editorial_regression: ai-skills/developer-handbook/scripts/test_editorial_fixture.py
+      claude_code_invocation: not verified in this environment
+    dependencies:
+      - reference implementation: the handbook delivered in pull requests #38 (English/Arabic mirror) and the infrastructure handbook pull request
+    recommendations_not_created: []

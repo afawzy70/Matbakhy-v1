@@ -9,6 +9,8 @@ on:
       - "scripts/validate_handbook_parity.py"
       - "scripts/test_validate_handbook_parity.py"
       - "scripts/doc001_check.py"
+      - "ai-skills/**"
+      - ".claude/skills/**"
       - ".github/workflows/handbook-parity.yml"
   push:
     branches: [develop]
@@ -16,6 +18,8 @@ on:
       - "docs/developer-handbook/**"
       - "scripts/validate_handbook_parity.py"
       - "scripts/test_validate_handbook_parity.py"
+      - "ai-skills/**"
+      - ".claude/skills/**"
       - ".github/workflows/handbook-parity.yml"
 
 permissions:
@@ -39,6 +43,11 @@ jobs:
         run: |
           python3 -m venv "$RUNNER_TEMP/venv"
           "$RUNNER_TEMP/venv/bin/pip" install --quiet 'markdown-it-py==3.0.0'
+      - name: AI skills library tests (packaging, validator, fixture dry run)
+        run: |
+          for t in ai-skills/developer-handbook/scripts/test_*.py; do
+            echo "== $t"; "$RUNNER_TEMP/venv/bin/python" "$t"
+          done
       - name: Validator unit tests
         run: '"$RUNNER_TEMP/venv/bin/python" scripts/test_validate_handbook_parity.py'
       - name: Structural parity of every English page and its Arabic mirror

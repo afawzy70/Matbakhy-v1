@@ -1,0 +1,7 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo "fixture workflow, never executed"

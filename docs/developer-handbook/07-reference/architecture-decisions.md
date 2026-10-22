@@ -53,6 +53,10 @@ Open decisions that most often surprise a developer: O04 (tax and refund policy 
 | ADR-004 | External services behind ports; fakes only in dev/test; production start fails if a required provider is fake | `EnvironmentGuard`, `ProviderConfigurationTest` |
 | ADR-005 | Pin versions; no `latest` tags | `pom.xml`, `package.json` pinned versions |
 
+## Process decisions outside the register
+
+Owner decision 2026-10-21 (a process rule, not an entry in `planning/decisions.json`): the repository keeps an owner-controlled library of reusable AI skills in `ai-skills/`. Only the owner authorizes a new skill; the first one is `developer-handbook`, which creates, audits and validates bilingual engineering handover handbooks and includes a mandatory Egyptian Arabic editorial review. Details and the install and test instructions: [ai-skills README](../../../ai-skills/README.md).
+
 ## Supersession and replacement links that can be verified
 
 | Older | Newer | Evidence |
