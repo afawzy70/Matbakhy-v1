@@ -55,6 +55,7 @@ class TestingWorkspaceTest(unittest.TestCase):
 
     def test_no_secret_patterns_or_live_verification_claims(self):
         text = json.dumps(self.data)
+        self.assertLess((ROOT / 'scripts/testing-workspace/catalog.json').stat().st_size, 5_000_000, 'Generated catalog must remain under the secret-scanner size ceiling')
         patterns = [r'-----BEGIN [A-Z ]*PRIVATE KEY-----', r'gh[pousr]_[A-Za-z0-9]{20,}', r'github_pat_[A-Za-z0-9_]{20,}', r'AKIA[0-9A-Z]{16}', r'eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+']
         for pattern in patterns:
             self.assertIsNone(re.search(pattern, text))

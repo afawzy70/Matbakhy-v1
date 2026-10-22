@@ -111,6 +111,7 @@ def build():
             for ref in guide.get('source_refs', []):
                 if not (ROOT / ref).is_file():
                     missing.append('Missing source reference: ' + ref)
+            case['conventions'] = source.get('conventions', {})
             flow = tutorial['flow'] if tutorial else project_flow(case, guide)
             if not tutorial or not tutorial.get('reviewed'):
                 missing.append('Chronological standalone tutorial review pending')
@@ -170,7 +171,7 @@ def outputs(data):
                     'COMPLETE' if case['guidance_complete'] else 'NOT VERIFIED',
                     '; '.join(case['guidance_gaps']).replace('|', '/')]) + ' |')
     return {
-        OUT / 'catalog.json': json.dumps(data, ensure_ascii=False, indent=2) + '\n',
+        OUT / 'catalog.json': json.dumps(data, ensure_ascii=False, separators=(',', ':')) + '\n',
         ROOT / 'docs/quality/testing-workspace/coverage-matrix.md': '\n'.join(rows) + '\n',
     }
 
