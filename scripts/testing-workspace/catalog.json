@@ -20,9 +20,10 @@
     "docs/operations/13-keycloak-mfa-migration.md": "d89244dbbb247609880b1a357013f6dfe4fdd63c0c54242721b581878852902a",
     "docs/developer-handbook/05-developer-workflow/local-environment-ar.md": "c577c5d70079dcec4a273d12c92099db6d4665394ffd1ef41ee9b8e15c355b40",
     "docs/quality/owner-acceptance/core-suite.json": "df54e8177717bcd9dd5a6977bc602b489aef4393954ad5e881bf9c49c11ba537",
-    "docs/quality/owner-acceptance/fixtures.json": "743e0400dba9178d9212fded34df830aa15b5eab0144c0890581225efcbfeb46"
+    "docs/quality/owner-acceptance/fixtures.json": "743e0400dba9178d9212fded34df830aa15b5eab0144c0890581225efcbfeb46",
+    "docs/quality/testing-workspace/source-baseline.json": "bd4b1efed28c5f0425dfaf8ccefaa28d365f7dd790f5a3849fd6691eb02df4c3"
   },
-  "catalog_digest": "b806833bc796b964571a2969a726812d71e7ab5fce1dae2edcc310ee428b1f64",
+  "catalog_digest": "612ba19e023db3daf8ad441c526b86dbf83c1cd93a4860da4de0fb05103a0ccf",
   "provenance": "Source links: develop base; content: per-file SHA256 input manifest",
   "cases": [
     {

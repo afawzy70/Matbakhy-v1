@@ -48,3 +48,5 @@ python3 scripts/testing-workspace/reference_check.py
 ```
 
 The second script compares computed geometry and tokens against the archived HTML at desktop/mobile widths, using the same self-hosted Cairo font in both views. It writes screenshots and visual-comparison.json under verification/runs/20261022-WORKSPACE-REDESIGN. This is not a claim of pixel-identical content or a successful live order. See the [comparison and limitations](../../docs/quality/testing-workspace/design-comparison.md).
+
+Canonical immutability checks compare SHA256 values captured from the pinned develop baseline, so they also work in GitHub shallow checkouts. The baseline capture was verified against the actual Git objects before recording the hashes; test failure never authorizes changing a canonical case.

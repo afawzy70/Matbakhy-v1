@@ -80,9 +80,12 @@ class TestingWorkspaceTest(unittest.TestCase):
         ref = ROOT / 'docs/quality/testing-workspace/reference'
         manifest = json.loads((ref / 'provenance.json').read_text())
         self.assertEqual(hashlib.sha256((ref / 'approved-prototype.html').read_bytes()).hexdigest(), manifest['sha256'])
-        for path in (ROOT / 'docs/quality/owner-acceptance/cases').glob('*.json'):
-            original = subprocess.check_output(['git','show',self.data['source_sha']+':'+str(path.relative_to(ROOT))],cwd=ROOT)
-            self.assertEqual(path.read_bytes(), original)
+        # GitHub uses fetch-depth=1. Check pinned baseline hashes without depending on historical Git objects.
+        baseline = json.loads((ROOT / 'docs/quality/testing-workspace/source-baseline.json').read_text())
+        paths = list((ROOT / 'docs/quality/owner-acceptance/cases').glob('*.json'))
+        self.assertEqual(set(baseline['canonical_sha256']), {str(p.relative_to(ROOT)) for p in paths})
+        for path in paths:
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), baseline['canonical_sha256'][str(path.relative_to(ROOT))])
 
     def test_frontend_logic(self):
         subprocess.run(['node', '--test', 'scripts/testing-workspace/core.test.mjs'], cwd=ROOT, check=True, capture_output=True)

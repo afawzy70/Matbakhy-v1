@@ -1,5 +1,11 @@
 {
   "repository": "afawzy70/Matbakhy-v1",
   "branch": "develop",
-  "commit": "36e3d4b56d59616175c9448b0f6f8ac2bda42461"
+  "commit": "36e3d4b56d59616175c9448b0f6f8ac2bda42461",
+  "canonical_sha256": {
+    "docs/quality/owner-acceptance/cases/config-security.json": "43ad4a8a2b949529c3041a66dd01962ef8b81ebc0330bf8a92084a438efc58ac",
+    "docs/quality/owner-acceptance/cases/cook-ops.json": "ccfdafcd0414f7438afc1e2f1efe098202b7a48b728baf9eda5e677a536c7a42",
+    "docs/quality/owner-acceptance/cases/discovery-basket.json": "eec20bed0e1379c6e84cc2297cef8b04e416fdff1361e07d5d138b37997c3fee",
+    "docs/quality/owner-acceptance/cases/orders-finance.json": "e43b95d923e82a99b81d28c363415ca4301fbd9ccd41063189a0bf09b8fd061a"
+  }
 }

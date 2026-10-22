@@ -153,6 +153,8 @@ def build():
         inputs[str((SOURCE / rel).relative_to(ROOT))] = hashlib.sha256((SOURCE / rel).read_bytes()).hexdigest()
     source_sha = json.loads((ROOT / 'docs/quality/testing-workspace/source-baseline.json').read_text())['commit']
     # The base SHA identifies source-code links, never the generated/supplement content.
+    baseline_path = ROOT / 'docs/quality/testing-workspace/source-baseline.json'
+    inputs[str(baseline_path.relative_to(ROOT))] = hashlib.sha256(baseline_path.read_bytes()).hexdigest()
     catalog_digest = hashlib.sha256(json.dumps(inputs, sort_keys=True).encode()).hexdigest()
     return dict(schema=1, source_sha=source_sha, live_verified=False, inputs=inputs,
                 catalog_digest=catalog_digest, provenance='Source links: develop base; content: per-file SHA256 input manifest',
