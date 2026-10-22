@@ -6,17 +6,17 @@
       {
         "n": 1,
         "instruction": "ضيف علبتين كشري لنفس الموعد، اختار الاستلام والكاش واحسب الإجمالي ثم وافق واحجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote panel: Meals 150.00, Delivery fee 0.00, Tax 0.00, Total 150.00, text 'Pay in cash on receipt.', notice 'Synthetic policy (test environment)'. Order page: '<MB-number> · Waiting for the kitchen', '2 × Preview koshari — 150.00', timeline with one line, no handover code, no deposit panel."
+        "expected": "الطلب يتعمل مرة واحدة بعد الموافقة بإجمالي 150.00 للاستلام وعلبتين كشري. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 2,
         "instruction": "انسخ معرّف الطلب وافتح استجابات الطلب والأحداث من Console",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: GET events 200: exactly one event {sequence 1, fromState null, toState PENDING_ACCEPTANCE, actorType CUSTOMER}."
+        "expected": "تفاصيل الطلب والأحداث تخص الطلب المحفوظ وتعرض نسخة ثابتة من الأسعار والوجبات. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 3,
         "instruction": "نفّذ استعلامات القراءة بالمعرّف وسجّل السعر والعدادات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT state, quantity, released_at FROM stock_allocation WHERE order_id = :'order'; -> one row RESERVED quantity 2, released_at null. cook_slot.reserved = R_slot0 + 2 and meal_slot.reserved = R_meal0 + 2 (SELECT cs.reserved, cs.allocated, cs.consumed, cs.max_portions FROM cook_slot cs JOIN customer_order o ON o.slot_id = cs.id WHERE o.id = :'order';)."
+        "expected": "عداد الحجز يزيد حصتين والمعاملة تحفظ الطلب ولقطته سوا. سجّل الرد الفعلي كدليل."
       }
     ],
     "reviewed": false
@@ -28,22 +28,22 @@
       {
         "n": 1,
         "instruction": "جهّز عرض السعر وسجّل الحجز الحالي من غير إنشاء الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT count(*) FROM customer_order WHERE customer_id = (SELECT id FROM app_user WHERE display_name = 'Preview Customer 1') AND client_request_id = '<C>'; -> 1."
+        "expected": "عرض السعر يتعمل من غير إنشاء طلب أو حجز سعة؛ سجّل reserved كخط أساس R0. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 2,
         "instruction": "ابعت طلب الحجز بالمفتاح K ومعرّف المحاولة C واحتفظ بالرد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: by-request returns 200 with that id; the orders list contains exactly one order with this id."
+        "expected": "أول حجز ينجح ويرجع طلبًا واحدًا؛ احفظ معرّفه وردّه. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 3,
         "instruction": "كرر نفس الطلب مرتين بنفس القيم تمامًا",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer web 'My orders' lists the order once (open https://app.<PREVIEW_DOMAIN>/#/orders)."
+        "expected": "الردين يرجعوا نفس الطلب من غير إنشاء طلب أو حجز جديد. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 4,
         "instruction": "راجع القائمة والبحث بمعرّف المحاولة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: by-request returns 200 with that id; the orders list contains exactly one order with this id."
+        "expected": "القائمة والبحث بـC يرجعوا نفس الطلب الوحيد؛ الزيادة في الحجز حصتين بس. سجّل الرد الفعلي كدليل."
       }
     ],
     "reviewed": false
@@ -55,22 +55,22 @@
       {
         "n": 1,
         "instruction": "اعمل عرضين بكميتين مختلفتين واحجز الأول",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only)."
+        "expected": "حجز q1 ينجح واحفظ معرّف الطلب ونسخته. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 2,
         "instruction": "جرّب حجز التاني بنفس K ومعرّف محاولة مختلف",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: 200 (state CANCELLED): the same key is accepted for a different command, so the scope is actor + command + key."
+        "expected": "إعادة K لجسم مختلف تترفض بـ409 IDEMPOTENCY_CONFLICT من غير حجز q2. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 3,
         "instruction": "جرّب إلغاء الطلب بنفس K وسجّل الرد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: 200 (state CANCELLED): the same key is accepted for a different command, so the scope is actor + command + key."
+        "expected": "استخدام نفس K لأمر cancel مستقل مسموح لأن نطاق المفتاح يشمل الأمر؛ الإلغاء يرجع 200 حسب التوقع الأصلي. سجّل الرد الفعلي كدليل."
       },
       {
         "n": 4,
         "instruction": "راجع استعلامات القراءة للتأكد من عدم تكرار الأثر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Order 1 is CANCELLED after step 3 and its allocation RELEASED (cleanup)."
+        "expected": "الطلب الأول هو الوحيد والحجز يتفك مرة واحدة بعد إلغائه. سجّل الرد الفعلي كدليل."
       }
     ],
     "reviewed": false
@@ -82,27 +82,27 @@
       {
         "n": 1,
         "instruction": "جهّز كشري واحد للاستلام واحسب الإجمالي ووافق",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: red/notice text 'We could not confirm your order. Retry the same order; it will not be duplicated.' and a button 'Retry the same order'; the basket quantity/remove buttons are disabled (basket locked)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من Network اختار Offline واضغط الحجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3-4: after the retry the browser navigates to the order page '#/orders/<uuid>' showing 'Waiting for the kitchen'; 'My orders' lists ONE new order."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: red/notice text 'We could not confirm your order. Retry the same order; it will not be duplicated.' and a button 'Retry the same order'; the basket quantity/remove buttons are disabled (basket locked)."
       },
       {
         "n": 3,
         "instruction": "رجّع الشبكة واعمل Reload وافتح السلة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3-4: after the retry the browser navigates to the order page '#/orders/<uuid>' showing 'Waiting for the kitchen'; 'My orders' lists ONE new order."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "اضغط Retry the same order وسجّل الطلب الناتج",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3-4: after the retry the browser navigates to the order page '#/orders/<uuid>' showing 'Waiting for the kitchen'; 'My orders' lists ONE new order."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "نفّذ بديل API بنفس المفتاح ومعرّف المحاولة للتحقق بعد حفظ الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 5: by-request returns 200 with the order that the first call committed; the second POST returns 201 with the same id."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 5: by-request returns 200 with the order that the first call committed; the second POST returns 201 with the same id."
       }
     ],
     "reviewed": false
@@ -114,22 +114,22 @@
       {
         "n": 1,
         "instruction": "من Orders ثم Active افتح الطلب واضغط Accept",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook card after Accept: badge 'Accepted', 'Customer: Preview Customer 1 · +201000000101', buttons 'Start preparing' and 'Cancel'. Customer page: '<MB-number> · Accepted', 'Kitchen contact: مطبخ المعاينة · +201000000201 · Pickup location: Synthetic location 1', button 'Request cancellation (reviewed by support)' (no 'Cancel order')."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث صفحة العميل وراجع الحالة والتواصل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook card after Accept: badge 'Accepted', 'Customer: Preview Customer 1 · +201000000101', buttons 'Start preparing' and 'Cancel'. Customer page: '<MB-number> · Accepted', 'Kitchen contact: مطبخ المعاينة · +201000000201 · Pickup location: Synthetic location 1', button 'Request cancellation (reviewed by support)' (no 'Cancel order')."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "كرر القبول بنفس المفتاح ثم بمفتاح جديد ونسخة قديمة ثم الحالية حسب القيم الأصلية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Replay with the same key: 200 and the same CookOrderView. New key + old version: 409 VERSION_CONFLICT. New key + current version: 409 STATE_CONFLICT with fieldErrors [{state,'ACCEPTED'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع الحجز والتخصيص والأحداث باستعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT n.type, n.recipient_id, n.params->>'state' AS state, n.read_at FROM notification n WHERE n.order_id = :'order' ORDER BY n.created_at; -> a notification type ORDER_ACCEPTED for the customer with params.state 'ACCEPTED' within about 5-10 s (dispatch poll 5 s)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -141,22 +141,22 @@
       {
         "n": 1,
         "instruction": "اختار Kitchen busy واضغط Reject",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page: '<MB-number> · Rejected by the kitchen', no cancel button; the card disappears from the cook 'Active' list after reload."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث صفحة العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page: '<MB-number> · Rejected by the kitchen', no cancel button; the card disappears from the cook 'Active' list after reload."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب رفض بسبب BAD ثم بسبب صالح بعد انتهاء الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Invalid reason on a terminal order: 409 STATE_CONFLICT (terminal check precedes the reason check). Invalid reason on a pending order (use a fresh order): 422 VALIDATION_FAILED fieldErrors reasonCode 'ALLOWED_INGREDIENT_UNAVAILABLE|KITCHEN_BUSY|OTHER|OUTSIDE_CAPACITY'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع إن الحجز اتفك مرة واحدة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> state NOT_DUE.  SELECT n.type, n.recipient_id, n.params->>'state' AS state, n.read_at FROM notification n WHERE n.order_id = :'order' ORDER BY n.created_at; -> one ORDER_REJECTED notification for the customer (ORDER_REJECTED is a customer event only; the rejecting cook gets none)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -168,22 +168,22 @@
       {
         "n": 1,
         "instruction": "افتح الطلب واضغط إلغاء الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Cancelled', no buttons. Cook 'Active' list no longer contains O1."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث قائمة Active عند المطبخ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Cancelled', no buttons. Cook 'Active' list no longer contains O1."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "كرر الإلغاء بمفتاح جديد والنسخة الحالية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Second cancel: 409 STATE_CONFLICT fieldErrors [{state,'CANCELLED'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع فك الحجز والأحداث",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Notifications: cook (kitchen owner) and customer both receive ORDER_CANCELLED (dedup key type:order per recipient) - SELECT recipient_id, type FROM notification WHERE order_id = :'order';"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -195,12 +195,12 @@
       {
         "n": 1,
         "instruction": "في بيئة معزولة شغّل القبول والإلغاء مع بعض لكل محاولة وبنفس النسخة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Per iteration exactly one 200 and one 409 (STATE_CONFLICT or VERSION_CONFLICT) carrying the current state; never two 200."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "شغّل reconcile واستعلامات كل طلب بعد انتهاء المحاولات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Final state ACCEPTED (allocation ALLOCATED) or CANCELLED (allocation RELEASED once); order_event has exactly one transition after sequence 1; reconcile.sql all zero; no negative counters."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -212,22 +212,22 @@
       {
         "n": 1,
         "instruction": "سجّل وقت Accept by وسيب الطلب من غير تدخل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Before the deadline: 'N min left'; after: 'Deadline passed'. Customer page: '<MB-number> · Not accepted in time'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "بعد المهلة جرّب Accept من الشاشة ومن API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Accept after the deadline: 409 STATE_CONFLICT with fieldErrors [{acceptBy,'DEADLINE_PASSED'}] (job has not run yet) or [{state,'EXPIRED'}] (job ran)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "حدّث صفحة العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Before the deadline: 'N min left'; after: 'Deadline passed'. Customer page: '<MB-number> · Not accepted in time'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع الحالة والحجز باستعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Notifications ORDER_EXPIRED for both the customer and the kitchen owner."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -239,27 +239,27 @@
       {
         "n": 1,
         "instruction": "اضغط Start preparing وبعدها Ready",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: After 'Start preparing': customer state 'Preparing', no code. After 'Ready': 'Ready' and 'Handover code (give it to the cook or courier on receipt)' with 6 digits. The cook card never shows the code."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث صفحة العميل بعد كل حركة وسجّل ظهور الكود",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: After 'Start preparing': customer state 'Preparing', no code. After 'Ready': 'Ready' and 'Handover code (give it to the cook or courier on receipt)' with 6 digits. The cook card never shows the code."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "اقرأ طلب المطبخ وتأكد من الحقول اللي رجعت",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook JSON has no property 'handoverCode'. FX-CUST-B gets 404 NOT_FOUND. Owner JSON handoverCode matches ^[0-9]{6}$."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "اقرأ طلب العميل بنفس المعرّف",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook JSON has no property 'handoverCode'. FX-CUST-B gets 404 NOT_FOUND. Owner JSON handoverCode matches ^[0-9]{6}$."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "نفّذ استعلامات القراءة من غير إخراج الكود المشفّر للسجلات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT sequence, from_state, to_state, actor_type, reason_code FROM order_event WHERE order_id = :'order' ORDER BY sequence; -> ACCEPTED→PREPARING→READY actor COOK."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -271,22 +271,22 @@
       {
         "n": 1,
         "instruction": "تأكد إن التأكيد مقفول قبل إدخال ٦ أرقام ثم اكتب الكود واضغط",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Delivered' (English COMPLETED label also for pickup; ar 'تم التسليم'), handover line gone, 'Rate your order' shown."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "كرر handover بمفتاح جديد والكود الصحيح",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: First handover 200 state COMPLETED. Replay with a new key: 409 STATE_CONFLICT (terminal, fieldErrors state COMPLETED); with the SAME key: 200 original result."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "حدّث صفحة العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Delivered' (English COMPLETED label also for pickup; ar 'تم التسليم'), handover line gone, 'Rate your order' shown."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع استهلاك الكود وعدم تكرار الأثر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Within about 30 s: SELECT g.kind, g.rate_bps, g.base_minor, e.account, e.direction, e.amount_minor FROM ledger_group g JOIN ledger_entry e ON e.group_id = g.id WHERE g.order_id = :'order' ORDER BY g.posted_at, e.direction; -> one kind COMMISSION group, rate_bps 0, both entries amount_minor 0 (no commission under D10)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -298,22 +298,22 @@
       {
         "n": 1,
         "instruction": "جرّب handover لطلب التوصيل وهو READY",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 409 STATE_CONFLICT fieldErrors [{fulfillmentMode,'WRONG_FULFILLMENT_MODE'}]. 2: 409 STATE_CONFLICT WRONG_FULFILLMENT_MODE. 3: blank -> 422 VALIDATION_FAILED deliveryReference REQUIRED; valid -> 200 state OUT_FOR_DELIVERY. 4: 200 COMPLETED."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب dispatch لطلب استلام",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 409 STATE_CONFLICT fieldErrors [{fulfillmentMode,'WRONG_FULFILLMENT_MODE'}]. 2: 409 STATE_CONFLICT WRONG_FULFILLMENT_MODE. 3: blank -> 422 VALIDATION_FAILED deliveryReference REQUIRED; valid -> 200 state OUT_FOR_DELIVERY. 4: 200 COMPLETED."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب مرجع مندوب فاضي ثم COURIER-TEST-01",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 409 STATE_CONFLICT fieldErrors [{fulfillmentMode,'WRONG_FULFILLMENT_MODE'}]. 2: 409 STATE_CONFLICT WRONG_FULFILLMENT_MODE. 3: blank -> 422 VALIDATION_FAILED deliveryReference REQUIRED; valid -> 200 state OUT_FOR_DELIVERY. 4: 200 COMPLETED."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "أكد التسليم بالكود بعد OUT_FOR_DELIVERY",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook card of D1 at READY shows 'Hand to courier'; the card of P1 at READY shows 'Confirm handover' only."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -325,22 +325,22 @@
       {
         "n": 1,
         "instruction": "اكتب الكود الغلط W خمس مرات وراقب كل رد في Network",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page: state still 'Ready' and the handover code line is NOT shown any more (locked challenge)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب الكود الصحيح X بعد القفل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page: state still 'Ready' and the handover code line is NOT shown any more (locked challenge)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "حدّث صفحة العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page: state still 'Ready' and the handover code line is NOT shown any more (locked challenge)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع محاولات الكود وحالته في استعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Order state READY, no COMPLETED event. Recovery is E2E-ORDER-108."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -352,22 +352,22 @@
       {
         "n": 1,
         "instruction": "اختار Customer unreachable واضغط Delivery failed",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Delivery failed'. The cook UI shows O1 in neither 'Active' nor 'Completed' (the filter list in Orders.tsx has only those two). Ops filter 'Delivery failed' lists O1 with badge 'Delivery failed'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث صفحة العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Delivery failed'. The cook UI shows O1 in neither 'Active' nor 'Completed' (the filter list in Orders.tsx has only those two). Ops filter 'Delivery failed' lists O1 with badge 'Delivery failed'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "دور على الطلب في Active وCompleted وسجّل ظهوره الفعلي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Delivery failed'. The cook UI shows O1 in neither 'Active' nor 'Completed' (the filter list in Orders.tsx has only those two). Ops filter 'Delivery failed' lists O1 with badge 'Delivery failed'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "من Order monitoring اختار Delivery failed",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Delivery failed'. The cook UI shows O1 in neither 'Active' nor 'Completed' (the filter list in Orders.tsx has only those two). Ops filter 'Delivery failed' lists O1 with badge 'Delivery failed'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -379,22 +379,22 @@
       {
         "n": 1,
         "instruction": "اضغط طلب الإلغاء اللي بيتراجع من الدعم",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: text 'Cancellation request sent.' and a link 'Support cases for this order'; the order still says 'Accepted'. Step 3: the case appears with severity 'High'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: text 'Cancellation request sent.' and a link 'Support cases for this order'; the order still says 'Accepted'. Step 3: the case appears with severity 'High'."
       },
       {
         "n": 2,
         "instruction": "جرّب طلبات الإلغاء المباشر وطلب المراجعة بالقيم الأصلية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Direct cancel: 409 STATE_CONFLICT fieldErrors [{state,'CANCELLATION_REQUEST_REQUIRED'}]. Second request: 409 STATE_CONFLICT fieldErrors [{orderId,'OPEN_CANCELLATION_REQUEST'}]. Request on a pending order: 409 STATE_CONFLICT fieldErrors [{state,'PENDING_ACCEPTANCE'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "من Support دور على Cancellation request",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: text 'Cancellation request sent.' and a link 'Support cases for this order'; the order still says 'Accepted'. Step 3: the case appears with severity 'High'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: text 'Cancellation request sent.' and a link 'Support cases for this order'; the order still says 'Accepted'. Step 3: the case appears with severity 'High'."
       },
       {
         "n": 4,
         "instruction": "راجع الطلب وحالة الدعم في استعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT state, quantity, released_at FROM stock_allocation WHERE order_id = :'order'; -> ALLOCATED unchanged; customer_order.state ACCEPTED, version unchanged."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -406,22 +406,22 @@
       {
         "n": 1,
         "instruction": "ابعت أوامر التحضير والجاهزية والقبول للطلبات المحددة بنسخها الحالية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب نسخة قديمة ونسخة ناقصة ومفتاح ناقص",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب إلغاء العميل لطلب منتهي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "قارن النسخ وعدد الأحداث قبل وبعد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -433,27 +433,27 @@
       {
         "n": 1,
         "instruction": "بحساب المطبخ راجع القائمة وجرّب قراءة وتغيير طلب المطبخ التاني",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook on OK2: 404 NOT_FOUND for every call (no data about the order). Customer on cook endpoints: 403 FORBIDDEN. Cook cancelling a customer order: 404 NOT_FOUND. No-grant staff: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "بحساب العميل جرّب واجهات المطبخ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook on OK2: 404 NOT_FOUND for every call (no data about the order). Customer on cook endpoints: 403 FORBIDDEN. Cook cancelling a customer order: 404 NOT_FOUND. No-grant staff: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "بحساب المطبخ جرّب إلغاء طلب العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook on OK2: 404 NOT_FOUND for every call (no data about the order). Customer on cook endpoints: 403 FORBIDDEN. Cook cancelling a customer order: 404 NOT_FOUND. No-grant staff: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "بحساب الموظف المحدد راجع التبويبات وواجهات العمليات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Cook on OK2: 404 NOT_FOUND for every call (no data about the order). Customer on cook endpoints: 403 FORBIDDEN. Cook cancelling a customer order: 404 NOT_FOUND. No-grant staff: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "الغِ الطلبين بحساب صاحبهم لتنضيف التجربة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: FX-STAFF-NOGRANT sees no Finance, Order monitoring or Support tabs; the cook's list never contains OK2."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -465,52 +465,52 @@
       {
         "n": 1,
         "instruction": "سجّل دخول العميل واختار English ثم كشري وموعد اليوم الأول بكمية ٢",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: heading reads '<MB-number> · Waiting for the kitchen'; line '2 × Preview koshari — 150.00'; 'Total: 150.00'; no 'Payment' (deposit) panel because the order is cash."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من Cart اختار Pickup والكاش واحسب ووافق واحجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: card badges as stated; after Accept the badge becomes 'Accepted', customer name 'Preview Customer 1' and phone +201000000101 appear, buttons 'Start preparing' and 'Cancel'. After Ready the badge is 'Ready' and the only action is 'Confirm handover'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "سجّل رقم MB وحالة الطلب ووجوده في My orders",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: customer page shows 'Ready', a 6-digit handover code, 'Kitchen contact: مطبخ المعاينة · +201000000201 · Pickup location: Synthetic location 1'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 3: heading reads '<MB-number> · Waiting for the kitchen'; line '2 × Preview koshari — 150.00'; 'Total: 150.00'; no 'Payment' (deposit) panel because the order is cash."
       },
       {
         "n": 4,
         "instruction": "بحساب المطبخ من Orders ثم Active طابق الرقم واضغط Accept",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: customer page heading '<MB-number> · Delivered' (English label for COMPLETED, also for pickup), the code line is gone, the 'Rate your order' form is shown; the timeline has 5 lines in order: Waiting for the kitchen, Accepted, Preparing, Ready, Delivered. Notifications list contains (newest first) Delivered, Ready, Preparing, Accepted, each with the MB- link and 'Mark read'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: card badges as stated; after Accept the badge becomes 'Accepted', customer name 'Preview Customer 1' and phone +201000000101 appear, buttons 'Start preparing' and 'Cancel'. After Ready the badge is 'Ready' and the only action is 'Confirm handover'."
       },
       {
         "n": 5,
         "instruction": "اضغط Start preparing ثم Ready",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 9: completion did not mark cash paid: the card shows 'Cash due'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "حدّث العميل واقرأ الكود وبيانات التواصل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 6: customer page shows 'Ready', a 6-digit handover code, 'Kitchen contact: مطبخ المعاينة · +201000000201 · Pickup location: Synthetic location 1'."
       },
       {
         "n": 7,
         "instruction": "اكتب الكود عند المطبخ واضغط Confirm handover",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 8,
         "instruction": "حدّث العميل وراجع الحالة والتقييم والإشعارات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 8: customer page heading '<MB-number> · Delivered' (English label for COMPLETED, also for pickup), the code line is gone, the 'Rate your order' form is shown; the timeline has 5 lines in order: Waiting for the kitchen, Accepted, Preparing, Ready, Delivered. Notifications list contains (newest first) Delivered, Ready, Preparing, Accepted, each with the MB- link and 'Mark read'."
       },
       {
         "n": 9,
         "instruction": "من Completed راجع Cash due ونموذج تسجيل الكاش",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 9: completion did not mark cash paid: the card shows 'Cash due'."
       },
       {
         "n": 10,
         "instruction": "بحساب العمليات افتح نفس الرقم في Order monitoring وراجع الأحداث",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 10: operations timeline lists the first row 'Waiting for acceptance' (no 'from' state) followed by 'Waiting for acceptance → Accepted', 'Accepted → Preparing', 'Preparing → Ready', 'Ready → Completed' rows with Africa/Cairo times; customer phone/name are NOT shown for the completed order ('Contact details are not shown in this state.'); no handover code anywhere."
       }
     ],
     "reviewed": false
@@ -522,42 +522,42 @@
       {
         "n": 1,
         "instruction": "ضيف كشري ومحشي لنفس موعد اليوم التاني",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3 quote panel: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; order heading 'Waiting for the kitchen'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من Cart جهّز عنوان Test zone A بالحقول الأصلية كلها",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: after Accept the cook card shows the customer name/phone and the address line 'Address: Test street 1، 1'; the 'Hand to courier' button is disabled while the reference is empty."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "اختار الكاش واحسب الإجمالي ووافق واحجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 5: customer state 'On the way' with the handover code visible. Step 7: 'Delivered'. Timeline order: Waiting for the kitchen, Accepted, Preparing, Ready, On the way, Delivered."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "اقبل وحضّر وجهّز الطلب وجرّب مرجع مندوب فاضي ثم المرجع المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: operations timeline shows READY → OUT_FOR_DELIVERY → COMPLETED with Cairo times; no customer contact (terminal)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: after Accept the cook card shows the customer name/phone and the address line 'Address: Test street 1، 1'; the 'Hand to courier' button is disabled while the reference is empty."
       },
       {
         "n": 5,
         "instruction": "حدّث العميل واقرأ الحالة والكود",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: operations timeline shows READY → OUT_FOR_DELIVERY → COMPLETED with Cairo times; no customer contact (terminal)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 5: customer state 'On the way' with the handover code visible. Step 7: 'Delivered'. Timeline order: Waiting for the kitchen, Accepted, Preparing, Ready, On the way, Delivered."
       },
       {
         "n": 6,
         "instruction": "أكد التسليم بالكود من بطاقة المطبخ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: operations timeline shows READY → OUT_FOR_DELIVERY → COMPLETED with Cairo times; no customer contact (terminal)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 7,
         "instruction": "حدّث العميل وراجع النهاية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: operations timeline shows READY → OUT_FOR_DELIVERY → COMPLETED with Cairo times; no customer contact (terminal)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 5: customer state 'On the way' with the handover code visible. Step 7: 'Delivered'. Timeline order: Waiting for the kitchen, Accepted, Preparing, Ready, On the way, Delivered."
       },
       {
         "n": 8,
         "instruction": "افتح رقم الطلب في Order monitoring وراجع التسلسل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: operations timeline shows READY → OUT_FOR_DELIVERY → COMPLETED with Cairo times; no customer contact (terminal)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 8: operations timeline shows READY → OUT_FOR_DELIVERY → COMPLETED with Cairo times; no customer contact (terminal)."
       }
     ],
     "reviewed": false
@@ -569,17 +569,17 @@
       {
         "n": 1,
         "instruction": "احجز العرض الأول بمعرّف C ثم جهّز عرض مختلف",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب العرض التاني بنفس C ومفتاح جديد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: 200 and the body is the ORIGINAL order (q1 items, total 15000)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 409 IDEMPOTENCY_CONFLICT with fieldErrors [{field 'clientRequestId', code 'ALREADY_USED'}]."
       },
       {
         "n": 3,
         "instruction": "ابحث بالمعرّف C وتأكد من الطلب المرجوع",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: 200 and the body is the ORIGINAL order (q1 items, total 15000)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 3: 200 and the body is the ORIGINAL order (q1 items, total 15000)."
       }
     ],
     "reviewed": false
@@ -591,17 +591,17 @@
       {
         "n": 1,
         "instruction": "احجز من غير fulfillmentNote واحفظ C",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "كرر نفس العرض وC مع ملاحظة no onions ومفتاح جديد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 409 IDEMPOTENCY_CONFLICT (fieldErrors clientRequestId ALREADY_USED). Step 3: 201 with the original order id (a true replay is allowed)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 409 IDEMPOTENCY_CONFLICT (fieldErrors clientRequestId ALREADY_USED). Step 3: 201 with the original order id (a true replay is allowed)."
       },
       {
         "n": 3,
         "instruction": "كرر الطلب الأصلي من غير ملاحظة بمفتاح جديد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 409 IDEMPOTENCY_CONFLICT (fieldErrors clientRequestId ALREADY_USED). Step 3: 201 with the original order id (a true replay is allowed)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 409 IDEMPOTENCY_CONFLICT (fieldErrors clientRequestId ALREADY_USED). Step 3: 201 with the original order id (a true replay is allowed)."
       }
     ],
     "reviewed": false
@@ -613,17 +613,17 @@
       {
         "n": 1,
         "instruction": "على نسخة موقعة مؤكدة جهّز كشري ووافق على الشروط",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Pending notice (testID 'pending-order'): \"We couldn't confirm whether your order arrived. Retrying will not create a second order.\" (offline variant: \"You're offline. We couldn't confirm whether your order arrived; retry when you're back online. It will not be duplicated.\"). After 'Check and retry' the Orders tab shows ONE new order in 'Waiting for the kitchen'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "فعّل وضع الطيران واحجز واقفل التطبيق ثم رجّع الشبكة وافتحه",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Pending notice (testID 'pending-order'): \"We couldn't confirm whether your order arrived. Retrying will not create a second order.\" (offline variant: \"You're offline. We couldn't confirm whether your order arrived; retry when you're back online. It will not be duplicated.\"). After 'Check and retry' the Orders tab shows ONE new order in 'Waiting for the kitchen'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "من السلة اضغط Check and retry وسجّل الطلب المسترجع",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Pending notice (testID 'pending-order'): \"We couldn't confirm whether your order arrived. Retrying will not create a second order.\" (offline variant: \"You're offline. We couldn't confirm whether your order arrived; retry when you're back online. It will not be duplicated.\"). After 'Check and retry' the Orders tab shows ONE new order in 'Waiting for the kitchen'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -635,27 +635,27 @@
       {
         "n": 1,
         "instruction": "من Order monitoring افتح الطلب وجرّب سبب فاضي ثم قصير",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: message 'This action needs additional verification (MFA).' with link 'Verify again'. Step 3: order shows '<MB-number> · Completed'; the Delivered state appears for the customer."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب السبب الكامل والدليل من غير تحقق حديث",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: message 'This action needs additional verification (MFA).' with link 'Verify again'. Step 3: order shows '<MB-number> · Completed'; the Delivered state appears for the customer."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: message 'This action needs additional verification (MFA).' with link 'Verify again'. Step 3: order shows '<MB-number> · Completed'; the Delivered state appears for the customer. | Step 2: 403 STEP_UP_REQUIRED. Step 3: 200 OrderView state COMPLETED, handoverCode null, no customer contact. Direct API call with reason of 9 chars: 422 VALIDATION_FAILED fieldErrors reason MIN_10_CHARS. Steps 4-5: 403 FORBIDDEN."
       },
       {
         "n": 3,
         "instruction": "اضغط Verify again وأكمل العامل التاني ثم أعد الإرسال",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: message 'This action needs additional verification (MFA).' with link 'Verify again'. Step 3: order shows '<MB-number> · Completed'; the Delivered state appears for the customer."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: message 'This action needs additional verification (MFA).' with link 'Verify again'. Step 3: order shows '<MB-number> · Completed'; the Delivered state appears for the customer. | Step 2: 403 STEP_UP_REQUIRED. Step 3: 200 OrderView state COMPLETED, handoverCode null, no customer contact. Direct API call with reason of 9 chars: 422 VALIDATION_FAILED fieldErrors reason MIN_10_CHARS. Steps 4-5: 403 FORBIDDEN."
       },
       {
         "n": 4,
         "instruction": "جرّب نفس الواجهة بحساب المطبخ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 403 STEP_UP_REQUIRED. Step 3: 200 OrderView state COMPLETED, handoverCode null, no customer contact. Direct API call with reason of 9 chars: 422 VALIDATION_FAILED fieldErrors reason MIN_10_CHARS. Steps 4-5: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "كرر بحساب موظف من غير المنحة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: message 'This action needs additional verification (MFA).' with link 'Verify again'. Step 3: order shows '<MB-number> · Completed'; the Delivered state appears for the customer."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -667,27 +667,27 @@
       {
         "n": 1,
         "instruction": "من Support جرّب قفل الحالة قبل إلغاء الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Cancelled'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 409 STATE_CONFLICT fieldErrors [{resolutionCode,'ORDER_NOT_CANCELLED'}]. Step 3: 409 STATE_CONFLICT ('exception cancel only from PREPARING or READY'); blank caseId: 422 VALIDATION_FAILED. Step 4: 200 case RESOLVED."
       },
       {
         "n": 2,
         "instruction": "في Exception cancellation اكتب OPERATIONAL ورقم الحالة والملاحظة المحددة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Cancelled'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب API لطلب ACCEPTED ثم caseId فاضي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: 409 STATE_CONFLICT fieldErrors [{resolutionCode,'ORDER_NOT_CANCELLED'}]. Step 3: 409 STATE_CONFLICT ('exception cancel only from PREPARING or READY'); blank caseId: 422 VALIDATION_FAILED. Step 4: 200 case RESOLVED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 409 STATE_CONFLICT fieldErrors [{resolutionCode,'ORDER_NOT_CANCELLED'}]. Step 3: 409 STATE_CONFLICT ('exception cancel only from PREPARING or READY'); blank caseId: 422 VALIDATION_FAILED. Step 4: 200 case RESOLVED."
       },
       {
         "n": 4,
         "instruction": "اقفل حالة الدعم بعد الإلغاء",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Cancelled'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 409 STATE_CONFLICT fieldErrors [{resolutionCode,'ORDER_NOT_CANCELLED'}]. Step 3: 409 STATE_CONFLICT ('exception cancel only from PREPARING or READY'); blank caseId: 422 VALIDATION_FAILED. Step 4: 200 case RESOLVED."
       },
       {
         "n": 5,
         "instruction": "حدّث صفحة العميل وراجع الحالة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer page '<MB-number> · Cancelled'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -699,22 +699,22 @@
       {
         "n": 1,
         "instruction": "على A1 اختار Ingredient unavailable واضغط Cancel",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: A1 customer page '<MB-number> · Cancelled'. B1 card shows only 'Ready' (no 'Cancel')."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "على B1 راجع الأزرار وجرّب cancel من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: B1 cancel: 409 STATE_CONFLICT fieldErrors [{state,'PREPARING'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "حدّث A1",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: A1 customer page '<MB-number> · Cancelled'. B1 card shows only 'Ready' (no 'Cancel')."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع فك التخصيص لـ A1 باستعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT amount_minor, state FROM cash_obligation WHERE order_id = :'order'; -> NOT_DUE."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -726,22 +726,22 @@
       {
         "n": 1,
         "instruction": "سجّل reserved واعمل عرض وسجّل expiresAt ثم راجع reserved تاني",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: 409 QUOTE_EXPIRED with fieldErrors [{quoteId, QUOTE_EXPIRED}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "استنى لحد expiresAt زائد ٥ ثواني بوقت حقيقي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: UI variant: error line \"The quote expired. Calculate the total again.\" (ar: انتهت صلاحية العرض. احسب الإجمالي مرة أخرى.); no order created."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب إنشاء طلب بالعرض المنتهي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3: 409 QUOTE_EXPIRED with fieldErrors [{quoteId, QUOTE_EXPIRED}]."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 3: 409 QUOTE_EXPIRED with fieldErrors [{quoteId, QUOTE_EXPIRED}]."
       },
       {
         "n": 4,
         "instruction": "كرر من الواجهة بعد انتظار الخمس دقايق",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: UI variant: error line \"The quote expired. Calculate the total again.\" (ar: انتهت صلاحية العرض. احسب الإجمالي مرة أخرى.); no order created."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -753,42 +753,42 @@
       {
         "n": 1,
         "instruction": "جهّز عرض علبتين كشري بإجمالي 150 من غير حجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3-4: notice titled 'The price changed' with \"The kitchen updated the price of “Preview koshari” from … 75.00 to … 80.00.\" and \"The total was … 150.00 and is now … 160.00. Review the new total before confirming your order.\"; 'Place order' stays disabled until 'Accept the new total' is pressed, then 'You accepted the new total. Confirm the order to send it.'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من Meals ثم Price history غيّر السعر إلى 80 لو الأكلة من غير صورة معتمدة ما تكملش: سجّل APPROVED_PHOTO_REQUIRED كعائق تجهيز، واستخدم وجبة الاختبار المطلوبة بدل البذرة بعد مراجعة أسعارها.",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "قبل انتهاء العرض وافق واضغط الحجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع التنبيه واقبل الإجمالي الجديد ووافق على الشروط واحجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "غيّر السعر إلى 90",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "راجع الطلب المحفوظ من الشاشة وAPI",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 3 server answer: 409 PRICE_CHANGED with fieldErrors [{quoteId, MEAL_CHANGED}]. Order total.amountMinor 16000, items[0].unitPrice.amountMinor 8000 after step 4 and unchanged after step 5."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
       },
       {
         "n": 7,
         "instruction": "رجّع السعر إلى 75 بنفس المسار",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 8,
         "instruction": "حدّث صفحة الأكلة وتأكد من رجوع السعر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 6: the order page still shows '2 × Preview koshari — 160.00' and total 160.00 although the kitchen now charges 90.00."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -800,27 +800,27 @@
       {
         "n": 1,
         "instruction": "جرّب عرض سعر بحقل totalMinor مزوّر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 400 MALFORMED_REQUEST (strict JSON, QuoteController comment). 2: 422 VALIDATION_FAILED fieldErrors items.quantity RANGE_1_TO_10 (the policy max is 10 in the dev policy) for both."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب الكمية 11 ثم صفر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب خلط كشري وملوخية من مطبخين",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب العناوين والأوضاع وتكرار السطر بالقيم الأصلية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "بحساب العميل الآخر جرّب حجز عرض العميل الأول",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 5: 404 NOT_FOUND (a foreign quote is indistinguishable from a missing one)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -832,37 +832,37 @@
       {
         "n": 1,
         "instruction": "احجز ١٠ كشري في الموعد المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب عرض كشري إضافي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 409 STOCK_CHANGED fieldErrors items.quantity INSUFFICIENT_PORTIONS (koshari meal-slot 10/10). Step 4: 409 STOCK_CHANGED (kitchen slot 20/20). Step 6: 201."
       },
       {
         "n": 3,
         "instruction": "احجز ١٠ محشي في نفس الموعد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب إضافة صنف وراجع التوفر في صفحة المطبخ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'. | Step 2: 409 STOCK_CHANGED fieldErrors items.quantity INSUFFICIENT_PORTIONS (koshari meal-slot 10/10). Step 4: 409 STOCK_CHANGED (kitchen slot 20/20). Step 6: 201."
       },
       {
         "n": 5,
         "instruction": "الغِ طلب الكشري",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'. | Between steps 3 and 5: SELECT cs.reserved, cs.allocated, cs.consumed, cs.max_portions FROM cook_slot cs JOIN customer_order o ON o.slot_id = cs.id WHERE o.id = :'order'; -> reserved 20, max_portions 20; meal_slot reserved 10/10. After step 5: koshari meal_slot.reserved 0, cook_slot.reserved 10; stock_allocation of the cancelled order RELEASED once."
       },
       {
         "n": 6,
         "instruction": "جرّب عرض كشري واحد تاني",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 409 STOCK_CHANGED fieldErrors items.quantity INSUFFICIENT_PORTIONS (koshari meal-slot 10/10). Step 4: 409 STOCK_CHANGED (kitchen slot 20/20). Step 6: 201."
       },
       {
         "n": 7,
         "instruction": "الغِ طلب المحشي لتنضيف التجربة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: the slot shows sold out (\"This time is sold out. Choose another time.\" when trying to add) and 'Calculate total' fails. Step 5: order shows 'Cancelled'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -874,17 +874,17 @@
       {
         "n": 1,
         "instruction": "من ملفين منفصلين اعمل عرض لكل عميل لنفس الحصة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "شغّل الحجزين مع بعض بمفاتيح ومعرّفات مختلفة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Exactly one 201 and one 409 STOCK_CHANGED (INSUFFICIENT_PORTIONS)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "شغّل reconcile وراجع عدادات الموعد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: meal_slot reserved + allocated + consumed <= capacity (check constraint meal_slot_capacity_ck); cook_slot likewise; reconcile.sql violations 0; exactly one RESERVED allocation was added."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -896,22 +896,22 @@
       {
         "n": 1,
         "instruction": "من حساب العميل افتح Notifications واضغط Mark read للأحدث",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Inbox lines '<Cairo time> · <state label> <MB-number link> [Mark read]' for Accepted, Preparing, Ready, Delivered (newest first); the entry you marked becomes muted and loses its button."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "اقرأ الإشعارات كلها ثم غير المقروءة من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer notifications types, oldest to newest: ORDER_ACCEPTED, ORDER_PREPARING, ORDER_READY, ORDER_COMPLETED (4 items, each params.state = the new state, params.orderNumber = MB-…). No ORDER_PLACED for the customer. Cook notifications for the order: ORDER_PLACED only (1 item). unreadOnly excludes the item marked read (readAt set)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "بحساب المطبخ اقرأ الإشعارات من API لعدم وجود شاشة صندوق",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer notifications types, oldest to newest: ORDER_ACCEPTED, ORDER_PREPARING, ORDER_READY, ORDER_COMPLETED (4 items, each params.state = the new state, params.orderNumber = MB-…). No ORDER_PLACED for the customer. Cook notifications for the order: ORDER_PLACED only (1 item). unreadOnly excludes the item marked read (readAt set)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع صفوف الإشعارات باستعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT channel, status, count(*) FROM notification_delivery d JOIN notification n ON n.id = d.notification_id WHERE n.order_id = :'order' GROUP BY 1,2; -> EMAIL rows only, no PUSH rows (push flag off by default, PUSH_DELIVERY_ENABLED=false); no real e-mail is sent in PREVIEW."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -923,32 +923,32 @@
       {
         "n": 1,
         "instruction": "من حساب العميل افتح Get help with an order واملأ رقم الطلب وLate والوصف المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Case creation 201 category LATE severity HIGH. PAYMENT / CANCELLATION_REQUEST: 422 VALIDATION_FAILED fieldErrors category 'ALLOWED_CASH|FOOD_SAFETY|HANDOVER|LATE|MISSING_ITEM|OTHER|QUALITY'. short description: 422 description LENGTH_10_4000. FX-CUST-B: 404 NOT_FOUND on both."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "افتح رابط حالات الدعم من الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer sees the case reference (CS-XXXXXXXX), category 'Late', and only the message 'We are checking with the kitchen'; the internal note is not visible. Order page lists the case link."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "بحساب الدعم افتح الحالة وعيّنها لنفسك وابعت Internal note ثم Message to customer",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer sees the case reference (CS-XXXXXXXX), category 'Late', and only the message 'We are checking with the kitchen'; the internal note is not visible. Order page lists the case link."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "بحساب العميل راجع الرسائل الظاهرة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Customer sees the case reference (CS-XXXXXXXX), category 'Late', and only the message 'We are checking with the kitchen'; the internal note is not visible. Order page lists the case link."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "جرّب فئات الدعم والوصف القصير المحددة من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Case creation 201 category LATE severity HIGH. PAYMENT / CANCELLATION_REQUEST: 422 VALIDATION_FAILED fieldErrors category 'ALLOWED_CASH|FOOD_SAFETY|HANDOVER|LATE|MISSING_ITEM|OTHER|QUALITY'. short description: 422 description LENGTH_10_4000. FX-CUST-B: 404 NOT_FOUND on both."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "بحساب العميل الآخر جرّب إنشاء وقراءة حالة الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Case creation 201 category LATE severity HIGH. PAYMENT / CANCELLATION_REQUEST: 422 VALIDATION_FAILED fieldErrors category 'ALLOWED_CASH|FOOD_SAFETY|HANDOVER|LATE|MISSING_ITEM|OTHER|QUALITY'. short description: 422 description LENGTH_10_4000. FX-CUST-B: 404 NOT_FOUND on both."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -960,22 +960,22 @@
       {
         "n": 1,
         "instruction": "من Order monitoring جرّب كل الفلاتر المذكورة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: O1 detail shows the customer name and phone; T1 detail shows 'Contact details are not shown in this state.'; neither shows a handover code."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "افتح الطلبين بالضغط على رقم MB",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: O1 detail shows the customer name and phone; T1 detail shows 'Contact details are not shown in this state.'; neither shows a handover code."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "بحساب الموظف المحدد جرّب واجهة تفاصيل الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: GET /api/v1/ops/orders/<O1> 200: order.handoverCode null, customerContact present for active states; T1 customerContact null. No-grant staff: 403."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع سجل التدقيق باستعلامات القراءة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT action, actor_id, object_id FROM audit_event WHERE action = 'access.order_contact' AND object_id = '<O1>'; -> one ALLOWED row per detail view of O1 (request_id set); none for T1."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -987,22 +987,22 @@
       {
         "n": 1,
         "instruction": "بحساب العميل الآخر نفّذ واجهات القراءة والأحداث والإلغاء والدفع والتقييم المذكورة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Every call in step 1: 404 NOT_FOUND. Step 3: list excludes OA and OD. Step 4: 401 UNAUTHENTICATED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Every call in step 1: 404 NOT_FOUND. Step 3: list excludes OA and OD. Step 4: 401 UNAUTHENTICATED."
       },
       {
         "n": 2,
         "instruction": "افتح رابط الطلب مباشرة في المتصفح",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: the page shows the not-found error ('Not found.'), never order data."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: the page shows the not-found error ('Not found.'), never order data."
       },
       {
         "n": 3,
         "instruction": "راجع قائمة طلبات العميل الحالي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Every call in step 1: 404 NOT_FOUND. Step 3: list excludes OA and OD. Step 4: 401 UNAUTHENTICATED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Every call in step 1: 404 NOT_FOUND. Step 3: list excludes OA and OD. Step 4: 401 UNAUTHENTICATED."
       },
       {
         "n": 4,
         "instruction": "من غير جلسة افتح واجهة الطلبات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Every call in step 1: 404 NOT_FOUND. Step 3: list excludes OA and OD. Step 4: 401 UNAUTHENTICATED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Every call in step 1: 404 NOT_FOUND. Step 3: list excludes OA and OD. Step 4: 401 UNAUTHENTICATED."
       }
     ],
     "reviewed": false
@@ -1014,12 +1014,12 @@
       {
         "n": 1,
         "instruction": "على بيئة معزولة فقط وبحساب matbakhy_app نفّذ كل محاولة تعديل في معاملة منفصلة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "قارن أعداد الصفوف وبصماتها قبل وبعد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1031,22 +1031,22 @@
       {
         "n": 1,
         "instruction": "على كل جهاز احجز علبتين كشري للموعد المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Both platforms: quote Food 150.00 / Delivery 0.00 / Tax 0.00 / Total 150.00; order states 'Waiting for the kitchen', 'Accepted', 'Preparing', 'Ready' (with 'Handover code'), 'Delivered'; layout mirrors correctly in RTL."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من المطبخ على الويب اقبل وحضّر وجهّز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Both platforms: quote Food 150.00 / Delivery 0.00 / Tax 0.00 / Total 150.00; order states 'Waiting for the kitchen', 'Accepted', 'Preparing', 'Ready' (with 'Handover code'), 'Delivered'; layout mirrors correctly in RTL."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "على الجهاز افتح الطلب واسحب للتحديث ثم سلّم بالكود",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Both platforms: quote Food 150.00 / Delivery 0.00 / Tax 0.00 / Total 150.00; order states 'Waiting for the kitchen', 'Accepted', 'Preparing', 'Ready' (with 'Handover code'), 'Delivered'; layout mirrors correctly in RTL."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "كرر بالعربي وبالإنجليزي على الجهازين",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Both platforms: quote Food 150.00 / Delivery 0.00 / Tax 0.00 / Total 150.00; order states 'Waiting for the kitchen', 'Accepted', 'Preparing', 'Ready' (with 'Handover code'), 'Delivered'; layout mirrors correctly in RTL."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1058,12 +1058,12 @@
       {
         "n": 1,
         "instruction": "ابعت ١٠ طلبات متطابقة مع بعض بنفس K وC والجسم",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Every response is 201 with the same order id, or a retryable 409/503 that is not a second order; no response carries a different order id; no 500."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "راجع استعلامات القراءة بعد انتهاء الكل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: stock_allocation rows for that order -> 1; cook_slot.reserved increased by 2 only."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1075,42 +1075,42 @@
       {
         "n": 1,
         "instruction": "اقرأ التزام الكاش للطلب المكتمل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Before step 3: cash_obligation 28500 state DUE although the order is COMPLETED (BR-032)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من Finance اعرض المطبخ وسجّل Cash verified قبل التجربة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 7: statement lists '<MB-number> · 285.00 · Verified'; 'Cash verified' S1 = S0 + 285.00 (increase asserted, not an absolute value); banner 'No platform commission: the whole order amount is yours.' (the text '(owner decision D10)' belongs to the operating-configuration screen only)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "من Completed سجّل 285.00 ومرجع TEST-CASH-001",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: cook statement shows the same row and the same banner; no commission column."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 3: after Submit the card text reads 'Reported' and the form disappears. | Before step 3: cash_obligation 28500 state DUE although the order is COMPLETED (BR-032)."
       },
       {
         "n": 4,
         "instruction": "من API هات تقرير الطلب ومعرّفه ونسخته",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Report 201: amount 28500 EGP, discrepancy 0, state REPORTED, version 0. Verification 200: state VERIFIED, verifiedAmount 28500. 6a: same key and body -> 200 identical. 6b: 409 VERSION_CONFLICT (the version check precedes the state check, CashService.verify). 6c: 409 STATE_CONFLICT fieldErrors [{state,'VERIFIED'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "بحساب المالية تحقق من 28500 بالمفتاح الجديد والمرجع المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Report 201: amount 28500 EGP, discrepancy 0, state REPORTED, version 0. Verification 200: state VERIFIED, verifiedAmount 28500. 6a: same key and body -> 200 identical. 6b: 409 VERSION_CONFLICT (the version check precedes the state check, CashService.verify). 6c: 409 STATE_CONFLICT fieldErrors [{state,'VERIFIED'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "كرر بنفس المفتاح ثم مفتاح جديد ونسخة قديمة ثم حالية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: cook statement shows the same row and the same banner; no commission column."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 7,
         "instruction": "حدّث Finance وقارن زيادة الكاش",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: cook statement shows the same row and the same banner; no commission column."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 7: statement lists '<MB-number> · 285.00 · Verified'; 'Cash verified' S1 = S0 + 285.00 (increase asserted, not an absolute value); banner 'No platform commission: the whole order amount is yours.' (the text '(owner decision D10)' belongs to the operating-configuration screen only)."
       },
       {
         "n": 8,
         "instruction": "افتح Statement وراجع نفس الأرقام",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 8: cook statement shows the same row and the same banner; no commission column."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 8: cook statement shows the same row and the same banner; no commission column."
       }
     ],
     "reviewed": false
@@ -1122,62 +1122,62 @@
       {
         "n": 1,
         "instruction": "جهّز علبتين كشري للاستلام بعربون ٥٠٪ واحسب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1 box: 'Deposit now: 75.00 · Rest on receipt: 75.00', 'InstaPay: demo-kitchen@instapay.invalid · Demo kitchen (not a real account)', 'Send the deposit before <acceptBy time>.', 'You pay the kitchen's account directly; the platform never receives or holds the money. The kitchen confirms after checking its own account; your report alone is not proof.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "وافق واحجز واقرأ حالة الدفع",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Payment: Waiting for your deposit' + the reference field and 'I sent the deposit'. Step 3: 'Payment: You reported the transfer; waiting for the kitchen to confirm' and 'Preparation starts only after the kitchen confirms the deposit reached its account.' (no bank-verified wording anywhere)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Payment: Waiting for your deposit' + the reference field and 'I sent the deposit'. Step 3: 'Payment: You reported the transfer; waiting for the kitchen to confirm' and 'Preparation starts only after the kitchen confirms the deposit reached its account.' (no bank-verified wording anywhere)."
       },
       {
         "n": 3,
         "instruction": "اكتب TEST-REF-0001 واضغط I sent the deposit من غير تحويل حقيقي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: cook panel 'Deposit: 75.00 · rest on hand-over 75.00 · Customer reported a transfer' and the notice 'Check your own account before reporting; what you record is your statement, not a bank confirmation.' Step 5: badge 'Kitchen reported receipt'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Payment: Waiting for your deposit' + the reference field and 'I sent the deposit'. Step 3: 'Payment: You reported the transfer; waiting for the kitchen to confirm' and 'Preparation starts only after the kitchen confirms the deposit reached its account.' (no bank-verified wording anywhere)."
       },
       {
         "n": 4,
         "instruction": "بحساب المطبخ اقرأ العربون واضغط Accept",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: cook panel 'Deposit: 75.00 · rest on hand-over 75.00 · Customer reported a transfer' and the notice 'Check your own account before reporting; what you record is your statement, not a bank confirmation.' Step 5: badge 'Kitchen reported receipt'."
       },
       {
         "n": 5,
         "instruction": "اضغط The deposit arrived للقيمة 75",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: cook panel 'Deposit: 75.00 · rest on hand-over 75.00 · Customer reported a transfer' and the notice 'Check your own account before reporting; what you record is your statement, not a bank confirmation.' Step 5: badge 'Kitchen reported receipt'."
       },
       {
         "n": 6,
         "instruction": "حضّر وجهّز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 7,
         "instruction": "حدّث العميل واقرأ الكود",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 8,
         "instruction": "أكد التسليم بالكود",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 9,
         "instruction": "من Completed سجّل كاش متبقي 75 ومرجعه",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 10,
         "instruction": "بحساب مالية مختلف هات التقرير وحقّق 7500 من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: POST /api/v1/cook/orders/<id>/cash-reports 201: amount 7500, discrepancy 0, state REPORTED. Verification 200 state VERIFIED verifiedAmount 7500."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 11,
         "instruction": "افتح Finance وراجع الكشف",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
       },
       {
         "n": 12,
         "instruction": "حدّث العميل وراجع الإشعارات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 12: customer page 'Delivered', Payment panel 'The kitchen reported receiving the deposit'; inbox contains 'Deposit: the kitchen reported receiving it'. Step 11: statement row '<MB-number> · 150.00 · Verified'; 'Cash verified' rises by 75.00 compared with the value recorded before step 10 (the figure sums all verified cash of the kitchen in the month); no commission lines; banner 'No platform commission: the whole order amount is yours.'"
       }
     ],
     "reviewed": false
@@ -1189,37 +1189,37 @@
       {
         "n": 1,
         "instruction": "من لوحة العربون اضغط Not received من غير تحويل فعلي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active). | Step 1: 200 PaymentView state DISPUTED. Step 4: 422 VALIDATION_FAILED (customers cannot open PAYMENT cases). Step 5: 409 STATE_CONFLICT payment DEPOSIT_NOT_RECEIVED. Step 7: 409 STATE_CONFLICT fieldErrors [{orderId,'ORDER_ACTIVE'}] (a decision is possible only after the order ended; without MFA 403 STEP_UP_REQUIRED comes first)."
       },
       {
         "n": 2,
         "instruction": "حدّث العميل وإشعاراته",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
       },
       {
         "n": 3,
         "instruction": "افتح حالات دعم الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
       },
       {
         "n": 4,
         "instruction": "جرّب إنشاء حالة PAYMENT يدويًا من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: 200 PaymentView state DISPUTED. Step 4: 422 VALIDATION_FAILED (customers cannot open PAYMENT cases). Step 5: 409 STATE_CONFLICT payment DEPOSIT_NOT_RECEIVED. Step 7: 409 STATE_CONFLICT fieldErrors [{orderId,'ORDER_ACTIVE'}] (a decision is possible only after the order ended; without MFA 403 STEP_UP_REQUIRED comes first)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 200 PaymentView state DISPUTED. Step 4: 422 VALIDATION_FAILED (customers cannot open PAYMENT cases). Step 5: 409 STATE_CONFLICT payment DEPOSIT_NOT_RECEIVED. Step 7: 409 STATE_CONFLICT fieldErrors [{orderId,'ORDER_ACTIVE'}] (a decision is possible only after the order ended; without MFA 403 STEP_UP_REQUIRED comes first)."
       },
       {
         "n": 5,
         "instruction": "جرّب Start preparing",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 200 PaymentView state DISPUTED. Step 4: 422 VALIDATION_FAILED (customers cannot open PAYMENT cases). Step 5: 409 STATE_CONFLICT payment DEPOSIT_NOT_RECEIVED. Step 7: 409 STATE_CONFLICT fieldErrors [{orderId,'ORDER_ACTIVE'}] (a decision is possible only after the order ended; without MFA 403 STEP_UP_REQUIRED comes first)."
       },
       {
         "n": 6,
         "instruction": "بحساب المالية افتح Payments needing attention ثم Payment disputed",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: Deposit panel badge 'Payment disputed'. Step 2: 'Payment: The kitchen did not find the transfer or found a different amount' plus 'Contact support from the order page with your transfer reference.'; inbox entry 'Deposit: the kitchen did not find the transfer or found a different amount'; order still 'Accepted'. Step 3: a case with category 'Deposit review' (High). Step 6: D1 listed with the line 'The order is still active; waiting for the kitchen's report.' (no decision form while the order is active)."
       },
       {
         "n": 7,
         "instruction": "جرّب قرار REFUND_OWED والطلب لسه نشط مع تحقق MFA حديث",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: 200 PaymentView state DISPUTED. Step 4: 422 VALIDATION_FAILED (customers cannot open PAYMENT cases). Step 5: 409 STATE_CONFLICT payment DEPOSIT_NOT_RECEIVED. Step 7: 409 STATE_CONFLICT fieldErrors [{orderId,'ORDER_ACTIVE'}] (a decision is possible only after the order ended; without MFA 403 STEP_UP_REQUIRED comes first)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 200 PaymentView state DISPUTED. Step 4: 422 VALIDATION_FAILED (customers cannot open PAYMENT cases). Step 5: 409 STATE_CONFLICT payment DEPOSIT_NOT_RECEIVED. Step 7: 409 STATE_CONFLICT fieldErrors [{orderId,'ORDER_ACTIVE'}] (a decision is possible only after the order ended; without MFA 403 STEP_UP_REQUIRED comes first)."
       }
     ],
     "reviewed": false
@@ -1231,22 +1231,22 @@
       {
         "n": 1,
         "instruction": "جرّب الحقول الإضافية depositMinor وtotalMinor في العرض",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 400 MALFORMED_REQUEST (unknown field). 2: 15000 and 7000 -> 422 VALIDATION_FAILED fieldErrors [{amountMinor,'DOES_NOT_MATCH_DEPOSIT'}]; 0 -> 422 VALIDATION_FAILED (must be positive). 3: 422 depositBps RANGE_0_10000 and 422 codMaxTotalMinor NOT_NEGATIVE; the profile is unchanged. 4: 409 VERSION_CONFLICT."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب تسجيل استلام 15000 ثم 7000 ثم صفر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 400 MALFORMED_REQUEST (unknown field). 2: 15000 and 7000 -> 422 VALIDATION_FAILED fieldErrors [{amountMinor,'DOES_NOT_MATCH_DEPOSIT'}]; 0 -> 422 VALIDATION_FAILED (must be positive). 3: 422 depositBps RANGE_0_10000 and 422 codMaxTotalMinor NOT_NEGATIVE; the profile is unchanged. 4: 409 VERSION_CONFLICT."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب depositBps أعلى من المسموح وحد كاش سالب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب استلام 7500 بنسخة قديمة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 400 MALFORMED_REQUEST (unknown field). 2: 15000 and 7000 -> 422 VALIDATION_FAILED fieldErrors [{amountMinor,'DOES_NOT_MATCH_DEPOSIT'}]; 0 -> 422 VALIDATION_FAILED (must be positive). 3: 422 depositBps RANGE_0_10000 and 422 codMaxTotalMinor NOT_NEGATIVE; the profile is unchanged. 4: 409 VERSION_CONFLICT."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1258,22 +1258,22 @@
       {
         "n": 1,
         "instruction": "اضغط I sent the deposit ثم كرر البلاغ مرتين من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Repeat reports: 200 with the same payment state CUSTOMER_TRANSFER_REPORTED and the same version. 65-char reference: 422 VALIDATION_FAILED; extra field: 400 MALFORMED_REQUEST; COD order: 409 STATE_CONFLICT fieldErrors [{payment,'NO_DEPOSIT_WAITING'}]; FX-CUST-B: 404 NOT_FOUND."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب مرجع طويل وحقل مبلغ إضافي وطلب COD",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Repeat reports: 200 with the same payment state CUSTOMER_TRANSFER_REPORTED and the same version. 65-char reference: 422 VALIDATION_FAILED; extra field: 400 MALFORMED_REQUEST; COD order: 409 STATE_CONFLICT fieldErrors [{payment,'NO_DEPOSIT_WAITING'}]; FX-CUST-B: 404 NOT_FOUND."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "كرر البلاغ على D1 بالحساب المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Repeat reports: 200 with the same payment state CUSTOMER_TRANSFER_REPORTED and the same version. 65-char reference: 422 VALIDATION_FAILED; extra field: 400 MALFORMED_REQUEST; COD order: 409 STATE_CONFLICT fieldErrors [{payment,'NO_DEPOSIT_WAITING'}]; FX-CUST-B: 404 NOT_FOUND."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع إشعارات العميل من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Repeat reports: 200 with the same payment state CUSTOMER_TRANSFER_REPORTED and the same version. 65-char reference: 422 VALIDATION_FAILED; extra field: 400 MALFORMED_REQUEST; COD order: 409 STATE_CONFLICT fieldErrors [{payment,'NO_DEPOSIT_WAITING'}]; FX-CUST-B: 404 NOT_FOUND."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1285,32 +1285,32 @@
       {
         "n": 1,
         "instruction": "في Completed سجّل 140 بدل 150 ومرجع short-test",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: card text 'Under review'. Step 5: O1 listed with badge 'Cash disputed'; its total still reads 150.00 and state Completed."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: card text 'Under review'. Step 5: O1 listed with badge 'Cash disputed'; its total still reads 150.00 and state Completed."
       },
       {
         "n": 2,
         "instruction": "هات تقرير DISPUTED ونسخته",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1 report 201: discrepancy.amountMinor -1000, state REPORTED. Step 3a: 422 VALIDATION_FAILED fieldErrors reason REQUIRED_FOR_EXCEPTIONS; 3b: 422 verifiedAmountMinor MUST_EQUAL_AMOUNT_DUE_OR_DISPUTE. Step 4: 200 state DISPUTED."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب VERIFY من غير سبب ثم بالسبب المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1 report 201: discrepancy.amountMinor -1000, state REPORTED. Step 3a: 422 VALIDATION_FAILED fieldErrors reason REQUIRED_FOR_EXCEPTIONS; 3b: 422 verifiedAmountMinor MUST_EQUAL_AMOUNT_DUE_OR_DISPUTE. Step 4: 200 state DISPUTED."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "سجّل DISPUTE بالمبلغ والسبب والنسخة الصحيحة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1 report 201: discrepancy.amountMinor -1000, state REPORTED. Step 3a: 422 VALIDATION_FAILED fieldErrors reason REQUIRED_FOR_EXCEPTIONS; 3b: 422 verifiedAmountMinor MUST_EQUAL_AMOUNT_DUE_OR_DISPUTE. Step 4: 200 state DISPUTED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1 report 201: discrepancy.amountMinor -1000, state REPORTED. Step 3a: 422 VALIDATION_FAILED fieldErrors reason REQUIRED_FOR_EXCEPTIONS; 3b: 422 verifiedAmountMinor MUST_EQUAL_AMOUNT_DUE_OR_DISPUTE. Step 4: 200 state DISPUTED."
       },
       {
         "n": 5,
         "instruction": "من العمليات افتح فلتر Cash disputed",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: card text 'Under review'. Step 5: O1 listed with badge 'Cash disputed'; its total still reads 150.00 and state Completed."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: card text 'Under review'. Step 5: O1 listed with badge 'Cash disputed'; its total still reads 150.00 and state Completed."
       },
       {
         "n": 6,
         "instruction": "حدّث Completed وراجع الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: card text 'Under review'. Step 5: O1 listed with badge 'Cash disputed'; its total still reads 150.00 and state Completed."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1322,32 +1322,32 @@
       {
         "n": 1,
         "instruction": "جرّب طلب الاسترداد بحسابات المالية والدعم والعميل المذكورة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 403 FORBIDDEN each. 2: 10000 -> 422 fieldErrors fullAmountMinor FULL_REFUND_REQUIRED; 20000 -> OVER_REFUND; 15000 -> 200 state REQUESTED. 3: 403 FORBIDDEN (separation of duties, requester = approver). 4: APPROVE 200 state APPROVED; VERIFY -> 409 STATE_CONFLICT fieldErrors [{state,'APPROVED'}]; PAYMENT_RECORDED 200 state PAID. 5: same payer VERIFY -> 403; other person VERIFY -> 200 VERIFIED. 6: 409 STATE_CONFLICT fieldErrors [{fullAmountMinor,'OVER_REFUND'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب مبلغ أقل ثم أكبر ثم الكامل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only; the ops Finance statement offers 'Request full refund' and per-state buttons Approve/Reject/Record payment/Verify)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب اعتماد طالب الاسترداد لنفسه",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 403 FORBIDDEN each. 2: 10000 -> 422 fieldErrors fullAmountMinor FULL_REFUND_REQUIRED; 20000 -> OVER_REFUND; 15000 -> 200 state REQUESTED. 3: 403 FORBIDDEN (separation of duties, requester = approver). 4: APPROVE 200 state APPROVED; VERIFY -> 409 STATE_CONFLICT fieldErrors [{state,'APPROVED'}]; PAYMENT_RECORDED 200 state PAID. 5: same payer VERIFY -> 403; other person VERIFY -> 200 VERIFIED. 6: 409 STATE_CONFLICT fieldErrors [{fullAmountMinor,'OVER_REFUND'}]."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "بحساب المعتمد الآخر اعتمد ثم جرّب التحقق المبكر ثم سجّل PAYMENT_RECORDED بالدليل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only; the ops Finance statement offers 'Request full refund' and per-state buttons Approve/Reject/Record payment/Verify)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "جرّب تحقق نفس مسجّل الدفع ثم حساب المالية الآخر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only; the ops Finance statement offers 'Request full refund' and per-state buttons Approve/Reject/Record payment/Verify)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "جرّب استرداد تاني لنفس الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable (API only; the ops Finance statement offers 'Request full refund' and per-state buttons Approve/Reject/Record payment/Verify)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1359,17 +1359,17 @@
       {
         "n": 1,
         "instruction": "شغّل reconcile في جلسة قراءة معتمدة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: reconcile.sql returns every check_name with violations = 0: meal_slot_counters_match_allocations, cook_slot_counters_match_meal_slots, terminal_orders_hold_no_live_stock, order_items_match_subtotal, order_state_matches_latest_event, one_cash_obligation_per_order, ledger_groups_balanced, ledger_only_for_completed_orders, migrations_all_successful, payment_state_matches_history."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "شغّل الاستعلامات الإضافية المرفقة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Finance statement totals equal the SQL sums."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "قارن Cash verified في كشف الشهر الحالي مع مجموع SQL",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT count(*) FROM ledger_entry WHERE account NOT IN ('COOK_COMMISSION_RECEIVABLE','PLATFORM_COMMISSION_REVENUE'); -> 0 (no entry for deposits or cash). SELECT count(*) FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id JOIN customer_order o ON o.id = g.order_id WHERE o.commission_bps_snapshot = 0 AND e.amount_minor <> 0; -> 0."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1381,27 +1381,27 @@
       {
         "n": 1,
         "instruction": "اعمل عروض الاستلام والتوصيل بالكاش والعربون واحفظ JSON",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote panel shows only Meals, Delivery fee, Tax, Total. Policy screen reads 'no platform commission (owner decision D10)' and the synthetic-policy label. Cook statement: 'No platform commission: the whole order amount is yours.' and no commission column."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "احجز واحد وراجع بنود التكلفة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote panel shows only Meals, Delivery fee, Tax, Total. Policy screen reads 'no platform commission (owner decision D10)' and the synthetic-policy label. Cook statement: 'No platform commission: the whole order amount is yours.' and no commission column."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "من Operating configuration اقرأ السياسة الحالية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote panel shows only Meals, Delivery fee, Tax, Total. Policy screen reads 'no platform commission (owner decision D10)' and the synthetic-policy label. Cook statement: 'No platform commission: the whole order amount is yours.' and no commission column."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "افتح Statement",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote panel shows only Meals, Delivery fee, Tax, Total. Policy screen reads 'no platform commission (owner decision D10)' and the synthetic-policy label. Cook statement: 'No platform commission: the whole order amount is yours.' and no commission column."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "نفّذ استعلامات القراءة للمقارنة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: SELECT policy_version, commission_bps_snapshot, commission_minor, tax_minor FROM customer_order; -> policy_version >= 1 (the active synthetic policy version, not 0) and commission_bps_snapshot, commission_minor and tax_minor all 0 on every preview order. SELECT version, commission_rate_bps, tax_rate_bps, synthetic FROM commerce_policy WHERE status = 'ACTIVE'; -> commission_rate_bps 0, tax_rate_bps 0. SELECT count(*) FROM ledger_entry WHERE amount_minor <> 0; -> 0."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1413,22 +1413,22 @@
       {
         "n": 1,
         "instruction": "افتح Network ونفّذ خطوات العميل في FIN-039",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Persistent banner 'Demo environment — Test data only. Orders, deposits and payments here are simulated, and no real notification is sent.' on customer web and ops web. Recipient shows 'demo-kitchen@instapay.invalid' (non-routable '.invalid') and 'Demo kitchen (not a real account)'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "نفّذ تسجيل المطبخ ومراجعة المالية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Persistent banner 'Demo environment — Test data only. Orders, deposits and payments here are simulated, and no real notification is sent.' on customer web and ops web. Recipient shows 'demo-kitchen@instapay.invalid' (non-routable '.invalid') and 'Demo kitchen (not a real account)'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "سجّل أسماء المضيفين ولاحظ تنبيه التجربة وحساب العربون الوهمي",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Persistent banner 'Demo environment — Test data only. Orders, deposits and payments here are simulated, and no real notification is sent.' on customer web and ops web. Recipient shows 'demo-kitchen@instapay.invalid' (non-routable '.invalid') and 'Demo kitchen (not a real account)'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "راجع إعدادات المزوّدين في النشر المعتمد من غير تعديلها وسجّل ما لم يمكن التحقق منه",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Persistent banner 'Demo environment — Test data only. Orders, deposits and payments here are simulated, and no real notification is sent.' on customer web and ops web. Recipient shows 'demo-kitchen@instapay.invalid' (non-routable '.invalid') and 'Demo kitchen (not a real account)'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1440,32 +1440,32 @@
       {
         "n": 1,
         "instruction": "احجز كشري ومحشي لنفس الموعد بعنوان Test zone A وعربون",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; 'Deposit now: 142.50 · Rest on receipt: 142.50'. Cook card shows the delivery address line and the Deposit panel. Final customer state 'Delivered'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "بلّغ I sent the deposit من غير مرجع",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; 'Deposit now: 142.50 · Rest on receipt: 142.50'. Cook card shows the delivery address line and the Deposit panel. Final customer state 'Delivered'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "اقبل وسجّل 142.50 مستلم وحضّر وجهّز ثم سلّم للمندوب بالمرجع",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; 'Deposit now: 142.50 · Rest on receipt: 142.50'. Cook card shows the delivery address line and the Deposit panel. Final customer state 'Delivered'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "حدّث العميل واقرأ الكود وحالة On the way",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; 'Deposit now: 142.50 · Rest on receipt: 142.50'. Cook card shows the delivery address line and the Deposit panel. Final customer state 'Delivered'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "أكد التسليم وسجّل الكاش المتبقي 142.50",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; 'Deposit now: 142.50 · Rest on receipt: 142.50'. Cook card shows the delivery address line and the Deposit panel. Final customer state 'Delivered'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "بحساب مالية مختلف تحقّق من التقرير بمبلغ 14250",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote: Meals 255.00, Delivery fee 30.00, Tax 0.00, Total 285.00; 'Deposit now: 142.50 · Rest on receipt: 142.50'. Cook card shows the delivery address line and the Deposit panel. Final customer state 'Delivered'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1477,32 +1477,32 @@
       {
         "n": 1,
         "instruction": "جهّز جسم تقرير C1 بالقيم الأصلية وابعت بالمفتاح K",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 201 state REPORTED. 2: same key and body -> 201 with the same report id; changed body -> 409 IDEMPOTENCY_CONFLICT. 3: 409 STATE_CONFLICT fieldErrors [{cashState,'REPORTED'}]. 4: 422 VALIDATION_FAILED fieldErrors method CASH_EGP_ONLY; 422 collectedAt BETWEEN_ORDER_AND_NOW; 409 VERSION_CONFLICT. 5: 409 STATE_CONFLICT fieldErrors [{state,'PREPARING'}]. 6: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "كرر بنفس المفتاح ثم غيّر المبلغ مع نفس المفتاح",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 201 state REPORTED. 2: same key and body -> 201 with the same report id; changed body -> 409 IDEMPOTENCY_CONFLICT. 3: 409 STATE_CONFLICT fieldErrors [{cashState,'REPORTED'}]. 4: 422 VALIDATION_FAILED fieldErrors method CASH_EGP_ONLY; 422 collectedAt BETWEEN_ORDER_AND_NOW; 409 VERSION_CONFLICT. 5: 409 STATE_CONFLICT fieldErrors [{state,'PREPARING'}]. 6: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "كرر بمفتاح جديد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 1: 201 state REPORTED. 2: same key and body -> 201 with the same report id; changed body -> 409 IDEMPOTENCY_CONFLICT. 3: 409 STATE_CONFLICT fieldErrors [{cashState,'REPORTED'}]. 4: 422 VALIDATION_FAILED fieldErrors method CASH_EGP_ONLY; 422 collectedAt BETWEEN_ORDER_AND_NOW; 409 VERSION_CONFLICT. 5: 409 STATE_CONFLICT fieldErrors [{state,'PREPARING'}]. 6: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "على C2 جرّب عملة USD ووقت مستقبلي ونسخة قديمة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "جرّب التقرير على P1 قبل اكتماله",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 6,
         "instruction": "جرّب تقرير C2 بحساب العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1514,42 +1514,42 @@
       {
         "n": 1,
         "instruction": "اعمل عرض عربون من غير حجز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "من Settings ثم Payment غيّر الحساب إلى العنوان التجريبي التاني واحفظ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
       },
       {
         "n": 3,
         "instruction": "جرّب حجز العرض القديم قبل انتهائه",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.' | Step 3: 409 PRICE_CHANGED fieldErrors [{quoteId,'PAYMENT_CHANGED'}]. Step 4 deposit: 422 VALIDATION_FAILED fieldErrors [{paymentMethod,'DEPOSIT_NOT_OFFERED'}]. Step 5 without MFA: 403 STEP_UP_REQUIRED; reason shorter than 10 characters: 422 VALIDATION_FAILED on field reason. After approval 200 ProfileView recipientStatus APPROVED."
       },
       {
         "n": 4,
         "instruction": "جرّب عرض عربون جديد ثم كاش",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
       },
       {
         "n": 5,
         "instruction": "بحساب المالية مع MFA حديث اعتمد الحساب بالسبب المحدد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
       },
       {
         "n": 6,
         "instruction": "جرّب عرض العربون تاني",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
       },
       {
         "n": 7,
         "instruction": "رجّع الحساب التجريبي الأصلي واحفظ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 8,
         "instruction": "اعتمد الحساب الأصلي تاني بنفس المسار",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 'Waiting for staff approval; deposits are not offered to customers until then.' Step 3: the placement is refused (nothing is ordered); the page tries a new quote, which fails because deposits are no longer offered, so it shows \"We couldn't calculate the new total. Calculate the total again.\" and no order exists. Step 4: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' for deposit, cash quote works. Step 5: the approved row disappears from the waiting list. Step 6: deposit quote works and shows 'demo-kitchen-2@instapay.invalid'. Step 8 leaves 'Staff approved this account.'"
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1561,32 +1561,32 @@
       {
         "n": 1,
         "instruction": "من Payment حط حد الكاش 255 واحفظ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "اعمل عرض كشري ومحشي بإجمالي 255 للاستلام والكاش",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
       },
       {
         "n": 3,
         "instruction": "غيّر الحد إلى 254.99 واحفظ",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب نفس السلة بالكاش ثم العربون",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
       },
       {
         "n": 5,
         "instruction": "جرّب عرض COD من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 5: 422 VALIDATION_FAILED fieldErrors [{paymentMethod,'COD_NOT_ELIGIBLE'}]."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 5: 422 VALIDATION_FAILED fieldErrors [{paymentMethod,'COD_NOT_ELIGIBLE'}]."
       },
       {
         "n": 6,
         "instruction": "امسح الحد واحفظ لاستعادة الإعداد",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: quote accepted (total exactly at the cap is eligible). Step 4: message 'Cash on receipt is not available for this total at this kitchen. Choose the deposit.' for cash; the deposit quote works with 'Deposit now: 127.50 · Rest on receipt: 127.50'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1598,12 +1598,12 @@
       {
         "n": 1,
         "instruction": "ضيف ملوخية من المطبخ التاني واختار الاستلام والعربون واحسب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' and no quote. Step 2: total 120.25 (odd piastres kept: 12025), text 'Pay in cash on receipt.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' and no quote. Step 2: total 120.25 (odd piastres kept: 12025), text 'Pay in cash on receipt.'"
       },
       {
         "n": 2,
         "instruction": "حوّل للكاش واحسب وراجع 120.25",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' and no quote. Step 2: total 120.25 (odd piastres kept: 12025), text 'Pay in cash on receipt.'"
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: 'This kitchen does not take deposits at the moment. Choose cash on receipt.' and no quote. Step 2: total 120.25 (odd piastres kept: 12025), text 'Pay in cash on receipt.' | Step 1 API: 422 VALIDATION_FAILED fieldErrors [{paymentMethod,'DEPOSIT_NOT_OFFERED'}]. Step 2: 201, total.amountMinor 12025, payment.method COD."
       }
     ],
     "reviewed": false
@@ -1615,27 +1615,27 @@
       {
         "n": 1,
         "instruction": "اقبل D1 قبل بلاغ التحويل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'."
       },
       {
         "n": 2,
         "instruction": "جرّب Start preparing",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "بحساب العميل بلّغ I sent the deposit",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب التحضير تاني",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "سجّل استلام 75 عند المطبخ ثم ابدأ التحضير",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 1: the order becomes 'Accepted' (acceptance is allowed without a deposit). Steps 2 and 4: the card stays 'Accepted' and an error line appears (ops web error text for STATE_CONFLICT). Step 5: badge 'Preparing'. | Steps 2 and 4: 409 STATE_CONFLICT with fieldErrors [{payment,'DEPOSIT_NOT_RECEIVED'}]. Step 5: 200 PREPARING."
       }
     ],
     "reviewed": false
@@ -1647,37 +1647,37 @@
       {
         "n": 1,
         "instruction": "اقبل D1 وسجّل استلام 75 ثم الغِ بسبب Ingredient unavailable",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث العميل وافتح الإشعارات وحالة الدعم",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
       },
       {
         "n": 3,
         "instruction": "من Finance افتح Needs reconciliation وراجع الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب outcome غير صالح ثم سبب قصير",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 4: invalid outcome 'RECEIVED' -> 400 MALFORMED_REQUEST (no outcome marks money as received); short reason -> 422 VALIDATION_FAILED on field reason (bean-validation size rule, 10..500). Without a recent MFA proof the call returns 403 STEP_UP_REQUIRED (on origin/develop the realm has no OTP flow, so MFA-gated steps cannot complete there). Step 5: 200 PaymentView state REFUND_OWED. Step 6: 200 state REFUNDED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: invalid outcome 'RECEIVED' -> 400 MALFORMED_REQUEST (no outcome marks money as received); short reason -> 422 VALIDATION_FAILED on field reason (bean-validation size rule, 10..500). Without a recent MFA proof the call returns 403 STEP_UP_REQUIRED (on origin/develop the realm has no OTP flow, so MFA-gated steps cannot complete there). Step 5: 200 PaymentView state REFUND_OWED. Step 6: 200 state REFUNDED."
       },
       {
         "n": 5,
         "instruction": "اختار Kitchen owes a refund بالسبب المحدد وأكمل Verify again عند الطلب",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: invalid outcome 'RECEIVED' -> 400 MALFORMED_REQUEST (no outcome marks money as received); short reason -> 422 VALIDATION_FAILED on field reason (bean-validation size rule, 10..500). Without a recent MFA proof the call returns 403 STEP_UP_REQUIRED (on origin/develop the realm has no OTP flow, so MFA-gated steps cannot complete there). Step 5: 200 PaymentView state REFUND_OWED. Step 6: 200 state REFUNDED."
       },
       {
         "n": 6,
         "instruction": "من لوحة المطبخ اكتب REFUND-TEST-1 واضغط Refund sent",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 4: invalid outcome 'RECEIVED' -> 400 MALFORMED_REQUEST (no outcome marks money as received); short reason -> 422 VALIDATION_FAILED on field reason (bean-validation size rule, 10..500). Without a recent MFA proof the call returns 403 STEP_UP_REQUIRED (on origin/develop the realm has no OTP flow, so MFA-gated steps cannot complete there). Step 5: 200 PaymentView state REFUND_OWED. Step 6: 200 state REFUNDED."
       },
       {
         "n": 7,
         "instruction": "حدّث العميل وإشعاراته",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: customer order 'Cancelled'; Payment panel 'Needs reconciliation' with 'The order ended after a reported transfer; support will follow up the refund or confirmation.'; a case 'Deposit review' (High). Step 5-6: customer Payment panel 'The kitchen owes you a refund' + 'The kitchen is responsible for returning your deposit. Contact support if it is late.'; inbox 'Deposit: the kitchen owes you a refund'. Step 7 (after the cook's report): 'The kitchen reported sending the refund' and inbox 'Deposit: the kitchen reported sending the refund'. The ops queue shows no decision that marks money received (only the two outcomes)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1689,17 +1689,17 @@
       {
         "n": 1,
         "instruction": "من لوحة العربون سجّل استلام 75",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Panel badge 'Kitchen reported receipt'; 'Start preparing' now works."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب Start preparing",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Panel badge 'Kitchen reported receipt'; 'Start preparing' now works."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "راجع حالة الدعم وسجّل حالتها الفعلية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Panel badge 'Kitchen reported receipt'; 'Start preparing' now works."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1711,12 +1711,12 @@
       {
         "n": 1,
         "instruction": "اكتب 50 واضغط A different amount arrived",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Panel badge 'Payment disputed'."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب AMOUNT_MISMATCH من غير مبلغ ثم نوع RECEIVED غير الصالح",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 1 200 state DISPUTED. Missing amount: 422 VALIDATION_FAILED fieldErrors [{amountMinor,'REQUIRED_FOR_MISMATCH'}]. Unknown kind: 400 MALFORMED_REQUEST (there is no way to record 'received' through the problem endpoint)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1728,12 +1728,12 @@
       {
         "n": 1,
         "instruction": "من Finance افتح Settlements واقرأ Unsettled entries",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: 'Unsettled entries' is empty (zero-amount groups are not listed)."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "جرّب إنشاء تسوية للقيد G ثم UUID عشوائي ثم قائمة فاضية",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Zero-amount entry: 422 VALIDATION_FAILED fieldErrors [{entryIds,'ZERO_AMOUNT'}]. Random UUID: 422 entryIds UNKNOWN_ENTRY. Empty list: 422 entryIds SIZE_1_500."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1745,22 +1745,22 @@
       {
         "n": 1,
         "instruction": "من Statement اعرض الشهر الحالي وراجع الملخص والجدول",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Summary rows 'Completed orders', 'Order value', 'Cash not reported', 'Cash reported', 'Cash verified'; notice 'The cash you collect is yours. Includes refunds and settlements.'; table columns #, Date, Total, 'Report cash collected' (cash state text) and no commission column. Future range: zero completed orders."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "اختار From بعد النهارده واعرض",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Summary rows 'Completed orders', 'Order value', 'Cash not reported', 'Cash reported', 'Cash verified'; notice 'The cash you collect is yours. Includes refunds and settlements.'; table columns #, Date, Total, 'Report cash collected' (cash state text) and no commission column. Future range: zero completed orders."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "جرّب فترة أكبر من 366 يوم من API",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Range over 366 days: 422 VALIDATION_FAILED fieldErrors [{to,'RANGE_MAX_366_DAYS'}]. Customer: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "جرّب واجهة الكشف بحساب العميل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Range over 366 days: 422 VALIDATION_FAILED fieldErrors [{to,'RANGE_MAX_366_DAYS'}]. Customer: 403 FORBIDDEN."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1772,27 +1772,27 @@
       {
         "n": 1,
         "instruction": "من غير جلسة جرّب واجهة المدفوعات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Guest: 401 UNAUTHENTICATED. Customer, cook, no-grant/support/ops-only staff: 403 FORBIDDEN on every finance/payment call (the statements probe returns 403 instead of 404). Finance staff: 200 on the GETs. The payment decision additionally returns 403 STEP_UP_REQUIRED without a recent MFA proof."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "بحساب العميل نفّذ الأربع قراءات المذكورة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Guest: 401 UNAUTHENTICATED. Customer, cook, no-grant/support/ops-only staff: 403 FORBIDDEN on every finance/payment call (the statements probe returns 403 instead of 404). Finance staff: 200 on the GETs. The payment decision additionally returns 403 STEP_UP_REQUIRED without a recent MFA proof."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "بحساب المطبخ كررها وجرّب قرار الدفع",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Guest: 401 UNAUTHENTICATED. Customer, cook, no-grant/support/ops-only staff: 403 FORBIDDEN on every finance/payment call (the statements probe returns 403 instead of 404). Finance staff: 200 on the GETs. The payment decision additionally returns 403 STEP_UP_REQUIRED without a recent MFA proof."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "بحساب الموظف غير المخوّل راجع التبويبات وجرّب القراءات والكتابات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Guest: 401 UNAUTHENTICATED. Customer, cook, no-grant/support/ops-only staff: 403 FORBIDDEN on every finance/payment call (the statements probe returns 403 instead of 404). Finance staff: 200 on the GETs. The payment decision additionally returns 403 STEP_UP_REQUIRED without a recent MFA proof."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "بحساب المالية راجع ظهور Finance والقراءات",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: No-grant, support and ops-only staff do not see the 'Finance' tab; finance staff do."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1804,22 +1804,22 @@
       {
         "n": 1,
         "instruction": "على كل جهاز جهّز عرض عربون لعلبتين كشري",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote shows 'Deposit now: 75.00', 'Rest on receipt: 75.00', the InstaPay demo recipient and the note that the platform never receives or holds the money. Status texts: 'Waiting for your deposit' -> 'You reported the transfer; waiting for the kitchen to confirm' -> 'The kitchen reported receiving the deposit'. No wording says 'verified by the bank' or 'paid'. Arabic (RTL) variant uses the ar strings."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "وافق واحجز وبلّغ بالمرجع TEST-REF-0003 وكرر لو الزر لسه ظاهر",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote shows 'Deposit now: 75.00', 'Rest on receipt: 75.00', the InstaPay demo recipient and the note that the platform never receives or holds the money. Status texts: 'Waiting for your deposit' -> 'You reported the transfer; waiting for the kitchen to confirm' -> 'The kitchen reported receiving the deposit'. No wording says 'verified by the bank' or 'paid'. Arabic (RTL) variant uses the ar strings."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "من المطبخ على الويب سجّل استلام 75",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote shows 'Deposit now: 75.00', 'Rest on receipt: 75.00', the InstaPay demo recipient and the note that the platform never receives or holds the money. Status texts: 'Waiting for your deposit' -> 'You reported the transfer; waiting for the kitchen to confirm' -> 'The kitchen reported receiving the deposit'. No wording says 'verified by the bank' or 'paid'. Arabic (RTL) variant uses the ar strings."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "اسحب لتحديث الطلب على الجهاز",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Quote shows 'Deposit now: 75.00', 'Rest on receipt: 75.00', the InstaPay demo recipient and the note that the platform never receives or holds the money. Status texts: 'Waiting for your deposit' -> 'You reported the transfer; waiting for the kitchen to confirm' -> 'The kitchen reported receiving the deposit'. No wording says 'verified by the bank' or 'paid'. Arabic (RTL) variant uses the ar strings."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
@@ -1831,17 +1831,17 @@
       {
         "n": 1,
         "instruction": "بحساب المطبخ متعدد الأدوار سجّل تقرير المبلغ الصحيح",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 403 FORBIDDEN (message 'separation of duties'). Step 3: 200 VERIFIED."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "بنفس الشخص كموظف جرّب VERIFY للتقرير",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Step 2: 403 FORBIDDEN (message 'separation of duties'). Step 3: 200 VERIFIED."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 403 FORBIDDEN (message 'separation of duties'). Step 3: 200 VERIFIED."
       },
       {
         "n": 3,
         "instruction": "بحساب شخص مختلف تحقّق من التقرير",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: Not applicable."
+        "expected": "المتوقع المرتبط بالخطوة صراحة في الكتالوج (لسه NOT_RUN): Step 2: 403 FORBIDDEN (message 'separation of duties'). Step 3: 200 VERIFIED."
       }
     ],
     "reviewed": false
@@ -1853,27 +1853,27 @@
       {
         "n": 1,
         "instruction": "ارفض E1 بسبب Kitchen busy",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: E1: Payment 'Deposit time ran out', order 'Rejected by the kitchen', no 'Deposit review' case. E2: Payment 'Closed without funds'; no refund input appears on the cook card."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 2,
         "instruction": "حدّث E1 وراجع حالة الدفع والدعم",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: E1: Payment 'Deposit time ran out', order 'Rejected by the kitchen', no 'Deposit review' case. E2: Payment 'Closed without funds'; no refund input appears on the cook card."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 3,
         "instruction": "الغِ E2 المقبول وصاحب العربون المتنازع عليه",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: E1: Payment 'Deposit time ran out', order 'Rejected by the kitchen', no 'Deposit review' case. E2: Payment 'Closed without funds'; no refund input appears on the cook card."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 4,
         "instruction": "من Finance اختار Closed without funds بالسبب المحدد وسجّل",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: E1: Payment 'Deposit time ran out', order 'Rejected by the kitchen', no 'Deposit review' case. E2: Payment 'Closed without funds'; no refund input appears on the cook card."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       },
       {
         "n": 5,
         "instruction": "حدّث E2 وراجع النتيجة",
-        "expected": "المتوقع حسب الكتالوج، ولسه محتاج تنفيذ بدليل: E1: Payment 'Deposit time ran out', order 'Rejected by the kitchen', no 'Deposit review' case. E2: Payment 'Closed without funds'; no refund input appears on the cook card."
+        "expected": "ربط النتيجة بالخطوة دي NOT VERIFIED. راجع قائمة النتائج الكاملة للسيناريو الظاهرة هنا وقارنها بالرد الفعلي؛ ما تعتبرش توقع خاص بخطوة تانية نتيجة للخطوة الحالية."
       }
     ],
     "reviewed": false
