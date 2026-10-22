@@ -94,6 +94,10 @@ B_EN = "# B\n\n" + META.format(m="b", lang="English · [العربية](b-ar.md)
 B_AR = "# ب\n\n" + META.format(m="ب", lang="[English](b.md) · العربية") + "\nنص.\n"
 
 
+# synthetic values split so secret scanners do not mistake the test fixtures for credentials
+QUOTED = "Quoted" + "Secret" + "1234567"
+LEAK = "Synthetic" + "Leak" + "42"
+
 class Fixture:
     def __init__(self) -> None:
         self._t = tempfile.TemporaryDirectory()
@@ -281,11 +285,11 @@ class ParityTests(unittest.TestCase):
 
     def test_english_only_and_quoted_credentials_are_masked_in_every_diagnostic(self) -> None:
         self.f.edit("a.md", "`code_id`", "`code_id` and DB_PASSWORD=Sup3rSecretValue99")
-        self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة افتتاحية و API_TOKEN='QuotedSecret1234567'")
+        self.f.edit("a-ar.md", "فقرة افتتاحية", "فقرة افتتاحية و API_TOKEN='" + QUOTED + "'")
         problems = self.f.check()
         flat = json.dumps(problems, ensure_ascii=False)
         self.assertNotIn("Sup3rSecretValue99", flat)
-        self.assertNotIn("QuotedSecret1234567", flat)
+        self.assertNotIn(QUOTED, flat)
         self.assertProblem(problems, "secrets")
 
     def test_update_sync_never_writes_through_an_external_symlink(self) -> None:
@@ -348,10 +352,10 @@ class ParityTests(unittest.TestCase):
     def test_unused_exception_reasons_are_masked_in_printed_output(self) -> None:
         import subprocess as sp
         exc = self.f.root / v.EXCEPTIONS
-        exc.write_text(json.dumps({"files": {"a.md": {"checks": {"tables": {"reason": "DB_PASSWORD=SyntheticLeak42", "reviewed": "owner"}}}}}))
+        exc.write_text(json.dumps({"files": {"a.md": {"checks": {"tables": {"reason": "DB_PASSWORD=" + LEAK, "reviewed": "owner"}}}}}))
         r = sp.run([sys.executable, str(Path(v.__file__)), "--root", str(self.f.root), "--docs-dir", v.HB], capture_output=True, text=True)
         self.assertIn("unused exception", r.stdout)
-        self.assertNotIn("SyntheticLeak42", r.stdout + r.stderr)
+        self.assertNotIn(LEAK, r.stdout + r.stderr)
 
     def test_escaped_and_unclosed_quotes_are_fully_masked(self) -> None:
         for text in ['"password": "Synthetic\\"LeakedSecret42"', 'API_KEY="Synthetic\\"LeakedSecret42 more', "PASSWORD='it\\'s LeakedSecret42'"]:
