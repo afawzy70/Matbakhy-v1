@@ -1,5 +1,7 @@
 # Hetzner staging: preparation (prepared, not deployed)
 
+> **HISTORICAL (OUTDATED / INCORRECT as current instructions).** Written on 2026-10-14 for a *proposed* Hetzner 2 vCPU / 4 GB server that was not the host that was finally used. The running Preview is on a Contabo VPS (8 vCPU, about 23 GiB RAM, deployed to `/srv/matbakhy-staging`). Use the current, evidence-labelled pages instead: [Contabo server inventory](../developer-handbook/08-infrastructure/contabo-server-inventory.md), [server rebuild guide](../developer-handbook/08-infrastructure/server-rebuild-guide.md) and the [drift report](../developer-handbook/07-reference/infrastructure-documentation-coverage.md). Kept unchanged below for history.
+
 Implementation-agent record of 2026-10-14, self-review. **No staging environment exists.** Infrastructure access and deployment are not ready; nothing was bought, configured, deployed or tested on a server. Every statement below about the server is a plan or a recommendation until the owner has set the server up and the checks in section 7 have run.
 
 ## 1. Owner direction (2026-10-14)
