@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/tmp/matbakhy-security-tools/bin/semgrep",
+    "scan",
+    "--config",
+    "p/security-audit",
+    "--config",
+    "p/owasp-top-ten",
+    "--metrics=off",
+    "--disable-version-check",
+    "--json",
+    "--output",
+    "/home/aiagent/workspaces/agents/security/docs/security/audits/current-stabilization/evidence/semgrep.json",
+    "--exclude",
+    "docs",
+    "--exclude",
+    "verification",
+    "--exclude",
+    "planning",
+    "--exclude",
+    "pnpm-lock.yaml",
+    "."
+  ],
+  "exit_code": 0,
+  "timestamp": "2026-10-18T09:42:45.985381+00:00"
+}

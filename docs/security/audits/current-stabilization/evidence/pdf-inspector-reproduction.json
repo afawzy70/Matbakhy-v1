@@ -1,0 +1,11 @@
+{
+  "jdk": "21.0.12+101.0.LTS",
+  "jdk_sha256": "ce79869e1307ed8ee1e2baa86a412b1eb5b75d10a01006d788a6f968bcfaee94",
+  "source_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "compile_exit": 0,
+  "compile_stderr": "",
+  "run_exit": 0,
+  "stdout": "JavaScript:REJECTED:ACTIVE_CONTENT\nJ#61vaScript:ACCEPTED\n",
+  "stderr": "",
+  "inspector_sha256": "053d16d23d7541c0cf167ddd6c047bd035e04cf29dd1f7448fbd475830fc81ff"
+}

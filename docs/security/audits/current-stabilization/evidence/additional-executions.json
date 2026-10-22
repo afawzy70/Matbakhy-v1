@@ -1,0 +1,40 @@
+{
+  "timestamp": "2026-10-18T10:00:33.633217+00:00",
+  "executions": [
+    {
+      "name": "trivy-web-infra",
+      "result": "COMPLETED",
+      "exit_code": 0,
+      "command": "trivy fs --scanners vuln,misconfig --skip-dirs backend,docs,verification,.git --skip-db-update --timeout 5m . (cache/output options in audit_scans and reports)"
+    },
+    {
+      "name": "trivy-java-offline",
+      "result": "COMPLETED_WITH_LIMITATIONS",
+      "exit_code": 0,
+      "command": "trivy fs --scanners vuln --offline-scan --skip-db-update --timeout 3m backend (cache/output options in reports)"
+    },
+    {
+      "name": "pnpm-audit",
+      "result": "COMPLETED_FOUR_ADVISORIES",
+      "exit_code": "NOT_CAPTURED separately; raw JSON retained",
+      "command": "pnpm audit --json"
+    },
+    {
+      "name": "gitleaks-history",
+      "result": "COMPLETED_NO_DETECTIONS",
+      "exit_code": "NOT_CAPTURED separately; scanner completion log retained",
+      "command": "gitleaks git --redact=100 --report-format json --log-opts=b7ec0e9052a612f7a8aab38f00519107b1dce213 ."
+    },
+    {
+      "name": "validate_blueprint",
+      "exit_code": 0,
+      "result": "PASS_STRUCTURE_ONLY; product unverified"
+    },
+    {
+      "name": "git-diff-check",
+      "exit_code": 0,
+      "result": "PASS tracked-diff whitespace; untracked audit files validated separately"
+    }
+  ],
+  "log_normalization": "Trailing display whitespace removed from stderr logs; JSON scanner results unchanged."
+}

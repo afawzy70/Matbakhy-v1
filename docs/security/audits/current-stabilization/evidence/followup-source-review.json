@@ -1,0 +1,30 @@
+{
+  "observed_at": "2026-10-18T10:00:33.628834+00:00",
+  "baseline": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "candidate_followup_sha": "1a7d6a9da2af2acfa4accfdcc8133ece276817ca",
+  "comparisons": [
+    {
+      "path": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaInspector.java",
+      "baseline_sha256": "053d16d23d7541c0cf167ddd6c047bd035e04cf29dd1f7448fbd475830fc81ff",
+      "followup_sha256": "053d16d23d7541c0cf167ddd6c047bd035e04cf29dd1f7448fbd475830fc81ff",
+      "unchanged": true,
+      "verification": "SOURCE_COMPARISON_ONLY; unchanged compiled PDF inspector retains local reproduction"
+    },
+    {
+      "path": "scripts/rehearsal/load.py",
+      "baseline_sha256": "e3fb58db6b1d12d22bfc1214966c7528d89d9b1403140cd7341e5fff6c4e1150",
+      "followup_sha256": "e3fb58db6b1d12d22bfc1214966c7528d89d9b1403140cd7341e5fff6c4e1150",
+      "unchanged": true,
+      "verification": "SOURCE_COMPARISON_ONLY; unchanged compiled PDF inspector retains local reproduction"
+    },
+    {
+      "path": "deploy/web-preview/Caddyfile",
+      "baseline_sha256": "e5f14c7f1e457dc7388abcb1d3dc622700cea512d2762f7e5349458ed11777a6",
+      "followup_sha256": "e5f14c7f1e457dc7388abcb1d3dc622700cea512d2762f7e5349458ed11777a6",
+      "unchanged": true,
+      "verification": "SOURCE_COMPARISON_ONLY; unchanged compiled PDF inspector retains local reproduction"
+    }
+  ],
+  "SEC-002": "Sealing patch reviewed at 2be5a95; afterCommit cleanup catch reviewed at 1a7d6a9. Runtime replay NOT TESTED.",
+  "new_change_review_note": "1a7d6a9 logs a raw RuntimeException during post-commit cleanup. Synthetic log-redaction test required; sensitive data disclosure NOT VERIFIED."
+}

@@ -1,0 +1,93 @@
+[
+  {
+    "name": "oidc-invalid-redirect",
+    "url": "https://id.167-86-90-174.sslip.io/realms/matbakhy/protocol/openid-connect/auth?client_id=matbakhy-web&response_type=code&scope=openid&state=security-audit-inert-state&redirect_uri=https%3A%2F%2Fsecurity-audit.invalid%2Fcallback&code_challenge_method=S256&code_challenge=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "timestamp": "2026-10-18T09:53:51.967446+00:00",
+    "status": 400,
+    "body_sha256": "84cd799c34a6e4f560b373203a84023c5cbba10a3ab141844662e32d126d1f7f",
+    "body_bytes": 5267,
+    "cookies": [
+      {
+        "name": "KC_STATE_CHECKER",
+        "secure": false,
+        "httponly": false,
+        "samesite": "SameSite=Strict"
+      }
+    ]
+  },
+  {
+    "name": "oidc-no-pkce",
+    "url": "https://id.167-86-90-174.sslip.io/realms/matbakhy/protocol/openid-connect/auth?client_id=matbakhy-web&response_type=code&scope=openid&state=security-audit-inert-state&redirect_uri=https%3A%2F%2Fapi.167-86-90-174.sslip.io%2Flogin%2Foauth2%2Fcode%2Fkeycloak",
+    "timestamp": "2026-10-18T09:53:53.510448+00:00",
+    "status": 302,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "body_bytes": 0,
+    "cookies": [],
+    "redirect": {
+      "origin": "https://api.167-86-90-174.sslip.io",
+      "path": "/login/oauth2/code/keycloak",
+      "client_id": null,
+      "redirect_uri": null,
+      "has_state": true,
+      "has_nonce": false,
+      "code_challenge_method": null,
+      "has_code_challenge": false
+    }
+  },
+  {
+    "name": "login-initiation",
+    "url": "https://api.167-86-90-174.sslip.io/oauth2/authorization/keycloak?returnTo=https%3A%2F%2Fsecurity-audit.invalid%2F",
+    "timestamp": "2026-10-18T09:53:55.697669+00:00",
+    "status": 302,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "body_bytes": 0,
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "redirect": {
+      "origin": "https://id.167-86-90-174.sslip.io",
+      "path": "/realms/matbakhy/protocol/openid-connect/auth",
+      "client_id": [
+        "matbakhy-web"
+      ],
+      "redirect_uri": [
+        "https://api.167-86-90-174.sslip.io/login/oauth2/code/keycloak"
+      ],
+      "has_state": true,
+      "has_nonce": true,
+      "code_challenge_method": [
+        "S256"
+      ],
+      "has_code_challenge": true
+    }
+  },
+  {
+    "name": "private-bucket",
+    "url": "https://media.167-86-90-174.sslip.io/matbakhy-private",
+    "timestamp": "2026-10-18T09:53:56.480709+00:00",
+    "status": 403,
+    "body_sha256": "978dea99b32637774939ab060fb3aebe66954538c13f9c91b5da1a5614623c92",
+    "body_bytes": 238,
+    "cookies": []
+  },
+  {
+    "name": "private-guessed-object",
+    "url": "https://media.167-86-90-174.sslip.io/matbakhy-private/documents/00000000-0000-0000-0000-000000000000",
+    "timestamp": "2026-10-18T09:53:57.202081+00:00",
+    "status": 403,
+    "body_sha256": "615d17e99440d170c1ebedee1e5ec3a914c20e84d1587c5c286a8de08eb7fb51",
+    "body_bytes": 342,
+    "cookies": []
+  }
+]

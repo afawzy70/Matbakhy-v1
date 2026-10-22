@@ -1,0 +1,812 @@
+[
+  {
+    "timestamp": "2026-10-18T09:40:38.355222+00:00",
+    "method": "GET",
+    "url": "https://app.167-86-90-174.sslip.io/",
+    "request_headers": {},
+    "status": 200,
+    "body_bytes": 405,
+    "body_sha256": "d8dce68b22ab19313c4d40ba7cee0bf5cb8bfb472f3490feb7bde7741753849e",
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Accept-Encoding",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:39.226766+00:00",
+    "method": "GET",
+    "url": "https://ops.167-86-90-174.sslip.io/",
+    "request_headers": {},
+    "status": 200,
+    "body_bytes": 424,
+    "body_sha256": "14b1bf411143875c5a59d00c68294172faa5a20f93a08bdee4d2416b8a9a609f",
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Accept-Encoding",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:40.072919+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:40.766050+00:00",
+    "method": "GET",
+    "url": "https://id.167-86-90-174.sslip.io/",
+    "request_headers": {},
+    "status": 302,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:41.656563+00:00",
+    "method": "GET",
+    "url": "https://media.167-86-90-174.sslip.io/",
+    "request_headers": {},
+    "status": 403,
+    "body_bytes": 181,
+    "body_sha256": "7d7401980bf27799eb5740d64d06f019bb43e84e9b74a8d739b1151cb4aab4b0",
+    "headers": {
+      "Content-Type": "application/xml",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:42.349724+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/configuration/public",
+    "request_headers": {},
+    "status": 200,
+    "body_bytes": 151,
+    "body_sha256": "6d5e5f3f6af7c247c2e3ce681aeabf8d94265890568c9a1af0f5d403832b1291",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      }
+    ],
+    "json_keys": [
+      "environment",
+      "orderLimits",
+      "orderingAvailable"
+    ]
+  },
+  {
+    "timestamp": "2026-10-18T09:40:43.077054+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/zones",
+    "request_headers": {},
+    "status": 200,
+    "body_bytes": 429,
+    "body_sha256": "bd6fad788021d688b384815650e79d7dd34d01bd9de97ef7ec6f02e8f9b9016a",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Accept-Language",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      }
+    ],
+    "json_keys": [
+      "hasMore",
+      "items",
+      "nextCursor"
+    ]
+  },
+  {
+    "timestamp": "2026-10-18T09:40:43.654177+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/meals?limit=1",
+    "request_headers": {},
+    "status": 200,
+    "body_bytes": 46,
+    "body_sha256": "9b655c19404a0df69c945da8075378c600781e47cab4dbef2608621dba598bc8",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Accept-Language",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      }
+    ],
+    "json_keys": [
+      "hasMore",
+      "items",
+      "nextCursor"
+    ]
+  },
+  {
+    "timestamp": "2026-10-18T09:40:44.234742+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/me",
+    "request_headers": {},
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "5c360dbe7e200eae7e573817b9a4080e911ee605189952c5073300ca3938759b",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:44.800173+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/orders",
+    "request_headers": {},
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "0cae28dc93deea02b6d7967158093169be9c72fc8c7e4871a07a0d8547dc1c6a",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:45.333057+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/orders/00000000-0000-0000-0000-000000000000",
+    "request_headers": {},
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "0308013de7f524722f188f32eeca4998e15b24614e6fa7193e718dda431ebeed",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:45.880030+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/cook/orders",
+    "request_headers": {},
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "64046c8dc070b09f0d48e4f0ed0f81006c6ccb9f10256763ae8d4290ed9527c5",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:46.439212+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/ops/orders",
+    "request_headers": {},
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "5a1d6bd436e0b6afc245605989eeb47ea83a6947ed93c1c5748a0edbfd0d7831",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:46.989618+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/ops/staff",
+    "request_headers": {},
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "b3de88d4982fec2abe3a8d1353d8e33e6867cc313341df915ba07ca2889be92d",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      },
+      {
+        "name": "MATBAKHY_SESSION",
+        "secure": true,
+        "httponly": true,
+        "samesite": "SameSite=Lax"
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:47.524984+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/actuator/health",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:48.042532+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/actuator/env",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:48.565439+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/actuator/prometheus",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:49.097705+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/v3/api-docs",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:49.637912+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/swagger-ui/index.html",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:50.159721+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/meals?limit=-1",
+    "request_headers": {},
+    "status": 422,
+    "body_bytes": 191,
+    "body_sha256": "3b7dd495c4595d0a93b20c105026295d868c7e811e064c3beed9a46bc412342b",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "VALIDATION_FAILED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:50.833380+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/meals?limit=101",
+    "request_headers": {},
+    "status": 422,
+    "body_bytes": 191,
+    "body_sha256": "48365117c4e1ed48482f14192c099820419f7a8007be8e959f0f3ab6776ebfa5",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "VALIDATION_FAILED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:51.365122+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/meals?cursor=%27%22%3Csecurity-audit%3E",
+    "request_headers": {},
+    "status": 422,
+    "body_bytes": 188,
+    "body_sha256": "3ee6ca9c1b93b3a748e46104a68190ef2d93f0c02a3052a76fac86e8b69d8d46",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [
+      {
+        "name": "XSRF-TOKEN",
+        "secure": true,
+        "httponly": false,
+        "samesite": null
+      }
+    ],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "VALIDATION_FAILED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:51.904236+00:00",
+    "method": "GET",
+    "url": "https://id.167-86-90-174.sslip.io/admin/",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:52.457047+00:00",
+    "method": "GET",
+    "url": "https://id.167-86-90-174.sslip.io/realms/master/.well-known/openid-configuration",
+    "request_headers": {},
+    "status": 404,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:52.974722+00:00",
+    "method": "GET",
+    "url": "https://id.167-86-90-174.sslip.io/realms/matbakhy/.well-known/openid-configuration",
+    "request_headers": {},
+    "status": 200,
+    "body_bytes": 6859,
+    "body_sha256": "b1ce10ae049fbad58b309efd36743d2be940805633ae041ab67169b1a59c2fb5",
+    "headers": {
+      "Cache-Control": "no-cache, must-revalidate, no-transform, no-store",
+      "Content-Type": "application/json",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "SAMEORIGIN"
+    },
+    "cookies": [],
+    "json_keys": [
+      "acr_values_supported",
+      "authorization_encryption_alg_values_supported",
+      "authorization_encryption_enc_values_supported",
+      "authorization_endpoint",
+      "authorization_response_iss_parameter_supported",
+      "authorization_signing_alg_values_supported",
+      "backchannel_authentication_endpoint",
+      "backchannel_authentication_request_signing_alg_values_supported",
+      "backchannel_logout_session_supported",
+      "backchannel_logout_supported",
+      "backchannel_token_delivery_modes_supported",
+      "check_session_iframe",
+      "claim_types_supported",
+      "claims_parameter_supported",
+      "claims_supported",
+      "code_challenge_methods_supported",
+      "device_authorization_endpoint",
+      "dpop_signing_alg_values_supported",
+      "end_session_endpoint",
+      "frontchannel_logout_session_supported",
+      "frontchannel_logout_supported",
+      "grant_types_supported",
+      "id_token_encryption_alg_values_supported",
+      "id_token_encryption_enc_values_supported",
+      "id_token_signing_alg_values_supported",
+      "introspection_endpoint",
+      "introspection_endpoint_auth_methods_supported",
+      "introspection_endpoint_auth_signing_alg_values_supported",
+      "issuer",
+      "jwks_uri",
+      "mtls_endpoint_aliases",
+      "prompt_values_supported",
+      "pushed_authorization_request_endpoint",
+      "registration_endpoint",
+      "request_object_encryption_alg_values_supported",
+      "request_object_encryption_enc_values_supported",
+      "request_object_signing_alg_values_supported",
+      "request_parameter_supported",
+      "request_uri_parameter_supported",
+      "require_pushed_authorization_requests",
+      "require_request_uri_registration",
+      "response_modes_supported",
+      "response_types_supported",
+      "revocation_endpoint",
+      "revocation_endpoint_auth_methods_supported",
+      "revocation_endpoint_auth_signing_alg_values_supported",
+      "scopes_supported",
+      "subject_types_supported",
+      "tls_client_certificate_bound_access_tokens",
+      "token_endpoint",
+      "token_endpoint_auth_methods_supported",
+      "token_endpoint_auth_signing_alg_values_supported",
+      "userinfo_encryption_alg_values_supported",
+      "userinfo_encryption_enc_values_supported",
+      "userinfo_endpoint",
+      "userinfo_signing_alg_values_supported"
+    ],
+    "oidc_metadata": {
+      "issuer": "https://id.167-86-90-174.sslip.io/realms/matbakhy",
+      "code_challenge_methods_supported": [
+        "plain",
+        "S256"
+      ],
+      "token_endpoint_auth_methods_supported": [
+        "private_key_jwt",
+        "client_secret_basic",
+        "client_secret_post",
+        "tls_client_auth",
+        "client_secret_jwt"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-10-18T09:40:53.576155+00:00",
+    "method": "GET",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/orders",
+    "request_headers": {
+      "Authorization": "Bearer security-audit-invalid-token"
+    },
+    "status": 401,
+    "body_bytes": 149,
+    "body_sha256": "2368e51b015c540c985bf654953b3c81e89374427c6be04ff31a41afab0fbe5e",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Content-Type": "application/json;charset=ISO-8859-1",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": [],
+    "json_keys": [
+      "code",
+      "fieldErrors",
+      "messageKey",
+      "requestId",
+      "retryable"
+    ],
+    "error_code": "UNAUTHENTICATED"
+  },
+  {
+    "timestamp": "2026-10-18T09:40:54.166783+00:00",
+    "method": "OPTIONS",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/orders",
+    "request_headers": {
+      "Origin": "https://security-audit.invalid",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "content-type,x-xsrf-token"
+    },
+    "status": 403,
+    "body_bytes": 20,
+    "body_sha256": "492899553d985cc0122cc53bb3502fea1f837b37763efd5920fda903c3553ad8",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:54.727002+00:00",
+    "method": "OPTIONS",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/orders",
+    "request_headers": {
+      "Origin": "https://app.167-86-90-174.sslip.io",
+      "Access-Control-Request-Method": "POST",
+      "Access-Control-Request-Headers": "content-type,x-xsrf-token"
+    },
+    "status": 200,
+    "body_bytes": 0,
+    "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "headers": {
+      "Access-Control-Allow-Credentials": "true",
+      "Access-Control-Allow-Origin": "https://app.167-86-90-174.sslip.io",
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY"
+    },
+    "cookies": []
+  },
+  {
+    "timestamp": "2026-10-18T09:40:55.261021+00:00",
+    "method": "POST",
+    "url": "https://api.167-86-90-174.sslip.io/api/v1/orders",
+    "request_headers": {
+      "Content-Type": "application/json",
+      "Origin": "https://security-audit.invalid"
+    },
+    "status": 403,
+    "body_bytes": 20,
+    "body_sha256": "492899553d985cc0122cc53bb3502fea1f837b37763efd5920fda903c3553ad8",
+    "headers": {
+      "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Strict-Transport-Security": "max-age=31536000",
+      "Vary": "Access-Control-Request-Headers",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Content-Type": "text/plain; charset=utf-8"
+    },
+    "cookies": []
+  }
+]

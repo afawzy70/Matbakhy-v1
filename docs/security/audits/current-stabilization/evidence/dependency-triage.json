@@ -1,0 +1,567 @@
+{
+  "source_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "warnings": [
+    {
+      "id": "DEP-JAVA-01",
+      "severity": "Critical",
+      "affected_component": "org.apache.tomcat.embed:tomcat-embed-core",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-65182 \u2014 tomcat: Apache Tomcat: Security constraint bypass due to improper access control",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Reviewed authentication uses Spring filter chains, not container FORM/DIGEST; no equivalent servlet-constraint configuration found. Do not describe the scanner Critical label as a confirmed auth bypass.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "11.0.24"
+        }
+      ],
+      "business_impact": "Improper Access Control, Incorrect Authorization vulnerability in Apache Tomcat leads to security constraint bypass if a constraint for a longer path is specified before a more restrictive constraint for a shorter sub-path.\n\n\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.24, from 10.1.0-M1 through 10.1.57, from 9.0.0.M1 through 9.0.120, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109.\n\n\n\nUsers are recommended to upgrade to version 11.0.25, 10.1.58, 9.0.121, which fixes the issue.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 11.0.25, 10.1.58, 9.0.121. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-65182",
+      "installed_version": "11.0.24",
+      "fixed_version": "11.0.25, 10.1.58, 9.0.121",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-65182"
+    },
+    {
+      "id": "DEP-JAVA-02",
+      "severity": "Critical",
+      "affected_component": "org.apache.tomcat.embed:tomcat-embed-core",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-65905 \u2014 tomcat: Apache Tomcat: Authentication bypass via limited replay attack in DIGEST authenticator",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Reviewed authentication uses Spring filter chains, not container FORM/DIGEST; no equivalent servlet-constraint configuration found. Do not describe the scanner Critical label as a confirmed auth bypass.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "11.0.24"
+        }
+      ],
+      "business_impact": "Authentication Bypass by Capture-replay vulnerability in Apache Tomcat's DIGEST authenticator. If, before windowSize requests have been made, a client makes a DIGEST \nauthenticated request with a nonceCount on the upper boundary of the \nreplay window then that request is replayable once only while the \nassociated nonceCount remains within the replay window.\n\n\n\n\u00a0\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.24, from 10.1.0-M1 through 10.1.57, from 9.0.0.M1 through 9.0.120.\n\n\n\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected:\u00a0from 8.5.0 through 8.5.100, from 7.0.30 through 7.0.109. Other unsupported versions may also be affected.\n\n\n\nUsers are recommended to upgrade to version 11.0.25, 10.1.58 or 9.0.121, which fix the issue.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 11.0.25, 10.1.58, 9.0.121. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-65905",
+      "installed_version": "11.0.24",
+      "fixed_version": "11.0.25, 10.1.58, 9.0.121",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-65905"
+    },
+    {
+      "id": "DEP-JAVA-03",
+      "severity": "Critical",
+      "affected_component": "org.apache.tomcat.embed:tomcat-embed-core",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-68525 \u2014 tomcat: Apache Tomcat: Unauthorized resource access via FORM authentication bypass",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Reviewed authentication uses Spring filter chains, not container FORM/DIGEST; no equivalent servlet-constraint configuration found. Do not describe the scanner Critical label as a confirmed auth bypass.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "11.0.24"
+        }
+      ],
+      "business_impact": "Incorrect Authorization vulnerability in Apache Tomcat's FORM authentication process allows the bypassing of a security constraint that limits user has access to a resource POST but not GET.\n\n\n\n\n\n\n\nThis issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.24, from 10.1.0-M1 through 10.1.57, from 9.0.0.M1 through 9.0.120.\n\n\n\n\n\n\n\nThe following versions were EOL at the time the CVE was created but are \nknown to be affected: from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109. Other unsupported versions may also be affected.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nUsers are recommended to upgrade to version 11.0.25, 10.1.58 or 9.0.121, which fixes the issue.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 11.0.25, 10.1.58, 9.0.121. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-68525",
+      "installed_version": "11.0.24",
+      "fixed_version": "11.0.25, 10.1.58, 9.0.121",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-68525"
+    },
+    {
+      "id": "DEP-JAVA-04",
+      "severity": "High",
+      "affected_component": "tools.jackson.core:jackson-core",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-89407 \u2014 com.fasterxml.jackson/jackson-core: tools.jackson.core/jackson-core: Jackson-core: Denial of Service via regular expression backtracking",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Address DTO has BigDecimal fields, but StrictJsonConfiguration disables scalar/String coercion; that mitigation needs runtime regression.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "NumberInput.looksLikeValidNumber() in FasterXML jackson-core pre-validates \"stringified numbers\" with two regular expressions: PATTERN_FLOAT ([+-]?[0-9]*[\\.]?[0-9]+([eE][+-]?[0-9]+)?), present since 2.17.0, and PATTERN_FLOAT_TRAILING_DOT, added in 2.17.2. PATTERN_FLOAT places adjacent quantifiers over the same character class -- an optional [0-9]* run, an optional dot, then a required [0-9]+ run -- so input that ultimately fails to match forces Java's backtracking engine to retry every possible split point of the digit run.\u00a0\n\n\n\nMatching cost therefore grows with the square of the input length.\u00a0\n\n\n\nAn attacker who can supply JSON that an application deserializes into a numeric target type reaches this method through jackson-databind's default String-to-number coercion (StdDeserializer and NumberDeserializers for BigDecimal, BigInteger, Double and Float).\u00a0\n\n\n\nBecause StreamReadConstraints.maxStringLength defaults to 20,000,000 characters, no constraint bounds the input before it reaches the regex.\u00a0\n\n\n\nTesting by the reporter confirmed O(n^2) growth across five consecutive input-size doublings, with a single 160,000-character string consuming roughly 74 seconds in one call; a small number of concurrent requests of ordinary body size can therefore exhaust a server's request-handling thread pool.\u00a0\n\n\n\nThe affected method does not exist before 2.17.0, so 2.16.x and earlier releases are not affected.\u00a0\n\n\n\nThe fix replaces both regular expressions with a hand-rolled single-pass scan.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.1.7, 3.2.2. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-89407",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.1.7, 3.2.2",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-89407"
+    },
+    {
+      "id": "DEP-JAVA-05",
+      "severity": "High",
+      "affected_component": "tools.jackson.core:jackson-core",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-89425 \u2014 com.fasterxml.jackson.core/jackson-core: Jackson-core: Denial of Service via unbounded StringBuilder growth during malformed token processing",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Source search found no DataInput parser creation, XML Duration/calendar request binding, JsonTypeInfo or JsonIdentityInfo preconditions in application code.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "UTF8DataInputJsonParser._reportInvalidToken() in FasterXML jackson-core builds the offending-token text for its error message by appending Java identifier characters to a StringBuilder in a loop that has no upper bound. Unlike the three sibling parser implementations, including UTF8StreamJsonParser, it never consults ErrorReportConfiguration.getMaxErrorTokenLength() (default 256). A malformed token supplied to a parser created through JsonFactory.createParser(DataInput) is therefore accumulated in full. No StreamReadConstraints setting mitigates this: maxDocumentLength cannot be applied to DataInput sources at all, and maxStringLength does not cover this path because the accumulation bypasses ReadConstrainedTextBuffer. The reporter measured a 20,000,109-character exception message from a 20-million-character malformed token on the DataInput path, against 367 characters for identical input on the InputStream path. Scaling the payload drives the StringBuilder, which also incurs byte-to-char expansion and internal array doubling, to many times the raw payload size and can trigger OutOfMemoryError for the whole JVM. UTF8DataInputJsonParser was introduced in 2.8.0 together with createParser(DataInput); releases before 2.8.0 do not contain the affected class.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.1.7, 3.2.3. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-89425",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.1.7, 3.2.3",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-89425"
+    },
+    {
+      "id": "DEP-JAVA-06",
+      "severity": "High",
+      "affected_component": "tools.jackson.core:jackson-databind",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-68497 \u2014 com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: jackson-databind: CPU Denial of Service via unbounded numeric parsing",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Source search found no DataInput parser creation, XML Duration/calendar request binding, JsonTypeInfo or JsonIdentityInfo preconditions in application code.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "jackson-databind binds a JSON string to a javax.xml.datatype.Duration or javax.xml.datatype.XMLGregorianCalendar field by passing the raw string verbatim to DatatypeFactory.newDuration(value) or newXMLGregorianCalendar(value) in CoreXMLDeserializers.Std._deserialize. These deserializers are registered by default with no opt-in, so a plain ObjectMapper or JsonMapper with no polymorphic typing and no special configuration reaches this path. The XML Schema lexical grammar permits numeric components of arbitrary length, which the JDK materializes through the native BigInteger(String) and BigDecimal(String) constructors, both quadratic in digit count. Because the digits sit inside a JSON string token rather than a JSON number token, jackson-core's StreamReadConstraints.maxNumberLength guard never applies; jackson's own NumberDeserializers call validateIntegerLength or validateFPLength before parsing a stringified number, but the XML datatype deserializer omits that pre-check. An unauthenticated attacker can therefore submit a single request of a few megabytes, such as a Duration value consisting of the letter P followed by several million digits and the letter Y, and force tens of seconds to several minutes of single-threaded CPU work; a handful of concurrent requests can saturate a server's worker threads. This affects com.fasterxml.jackson.core:jackson-databind from 2.0.0 before 2.18.10, from 2.19.0 before 2.21.6, and from 2.22.0 before 2.22.2, and tools.jackson.core:jackson-databind from 3.0.0 before 3.1.6 and from 3.2.0 before 3.2.2. Users should upgrade to 2.18.10, 2.21.6, 2.22.2, 3.1.6, or 3.2.2.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.2.2, 3.1.6. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-68497",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.2.2, 3.1.6",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-68497"
+    },
+    {
+      "id": "DEP-JAVA-07",
+      "severity": "High",
+      "affected_component": "tools.jackson.core:jackson-databind",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-91776 \u2014 jackson-databind: com.fasterxml.jackson/jackson-core: jackson-databind: Denial of Service via unbounded cache growth in TypeDeserializerBase",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Source search found no DataInput parser creation, XML Duration/calendar request binding, JsonTypeInfo or JsonIdentityInfo preconditions in application code.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "TypeDeserializerBase._findDeserializer() in FasterXML jackson-databind caches the resolved deserializer under the raw, attacker-supplied type ID. When name-based polymorphism is configured with a fallback, for example @JsonTypeInfo(use = Id.NAME, defaultImpl = ...), every distinct unrecognized type ID resolves to the same fallback deserializer but is retained as its own key in the _deserializers map. That map has no configurable bound and lives for the lifetime of the type deserializer, so an attacker who can repeatedly supply fresh unknown type IDs causes monotonic memory retention across requests. The reporter observed 10,000 retained entries from 10,000 distinct unknown IDs, against a single entry for a control that repeated one unknown ID the same number of times, isolating attacker-controlled key cardinality from request volume. Exploitation requires an application that enables name-based polymorphism with a defaultImpl or equivalent fallback, accepts attacker-influenced type IDs, and reuses a long-lived ObjectMapper across requests. The fix stops caching fallback resolutions for unrecognized IDs and bounds both the number of cached entries and the length of a cacheable type ID.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.1.7, 3.2.3. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-91776",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.1.7, 3.2.3",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-91776"
+    },
+    {
+      "id": "DEP-JAVA-08",
+      "severity": "High",
+      "affected_component": "tools.jackson.core:jackson-databind",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-91777 \u2014 com.fasterxml.jackson.core/jackson-databind: tools.jackson.core:jackson-databind: Jackson-databind: Denial of Service via quadratic forward-reference completion",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Source search found no DataInput parser creation, XML Duration/calendar request binding, JsonTypeInfo or JsonIdentityInfo preconditions in application code.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "Forward-reference completion for @JsonIdentityInfo object IDs in FasterXML jackson-databind performs a linear scan of the pending-reference accumulator for every resolved ID. The affected paths are CollectionDeserializer.CollectionReferringAccumulator.resolveForwardReference() and the equivalent implementation in MapDeserializer. When a document first creates N unresolved object-ID references in an identity-enabled collection or map and then defines those same IDs in reverse order, completion performs on the order of N * (N + 1) / 2 identity comparisons, so a shallow document whose size grows linearly causes quadratic CPU work during deserialization. The reporter instrumented equals() calls on the ID class and measured exactly 2,003,000 comparisons at N = 2,000, against zero comparisons in the pending-reference lookup path for an equally sized control in which every reference was already resolved. The input requires no deep nesting and no syntactically unusual JSON. Exploitation requires an application that deserializes attacker-influenced JSON into an identity-enabled collection or map. The fix replaces the repeated linear lookup with a keyed pending-reference structure.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.1.7, 3.2.3. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-91777",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.1.7, 3.2.3",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-91777"
+    },
+    {
+      "id": "DEP-JAVA-09",
+      "severity": "Medium",
+      "affected_component": "tools.jackson.core:jackson-databind",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-19032 \u2014 com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: Jackson-databind: Uncontrolled URI scheme resolution in Path deserialization",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Source search found no DataInput parser creation, XML Duration/calendar request binding, JsonTypeInfo or JsonIdentityInfo preconditions in application code.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "jackson-databind's deserializer for java.nio.file.Path resolves an attacker-supplied URI without restricting the URI scheme. In JDKFromStringDeserializer.NioPathHelper.deserialize, a string bound from untrusted JSON is passed to new URI(value) and then to Path.of(uri). When that throws FileSystemNotFoundException, the code enumerates ServiceLoader<FileSystemProvider> and calls provider.getPath(uri) on the first provider whose scheme matches the attacker-chosen scheme. Untrusted JSON can therefore select and drive an arbitrary registered FileSystemProvider during readValue under a default JsonMapper, and forces provider class loading at the same time. With only the JDK built-in providers (file, jar/zipfs) present, the resolved path is inert and no mount or network I/O occurs; further impact requires a side-effecting third-party FileSystemProvider on the classpath. This affects com.fasterxml.jackson.core:jackson-databind from 2.8.0 before 2.18.10, from 2.19.0 before 2.21.6, and from 2.22.0 before 2.22.2, and tools.jackson.core:jackson-databind from 3.0.0 before 3.1.6 and from 3.2.0 before 3.2.2. Users should upgrade to 2.18.10, 2.21.6, 2.22.2, 3.1.6, or 3.2.2. Binding java.nio.file.Path from untrusted JSON should be avoided regardless of version.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.1.6, 3.2.2. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-19032",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.1.6, 3.2.2",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-19032"
+    },
+    {
+      "id": "DEP-JAVA-10",
+      "severity": "Medium",
+      "affected_component": "tools.jackson.core:jackson-databind",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "CVE-2026-83557 \u2014 com.fasterxml.jackson.core/jackson-databind: tools.jackson.core/jackson-databind: jackson-databind: Path traversal via incomplete type validation",
+      "description": "NOT VERIFIED against a resolved runtime JAR/image; POM version match only. Source search found no DataInput parser creation, XML Duration/calendar request binding, JsonTypeInfo or JsonIdentityInfo preconditions in application code.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/trivy-java-offline.json",
+          "target": [
+            "app/pom.xml",
+            "modules/availability/pom.xml",
+            "modules/catalog/pom.xml",
+            "modules/cooks/pom.xml",
+            "modules/finance/pom.xml",
+            "modules/identity/pom.xml",
+            "modules/notifications/pom.xml",
+            "modules/operations/pom.xml",
+            "modules/orders/pom.xml",
+            "modules/support/pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml",
+            "pom.xml"
+          ],
+          "installed_version": "3.1.5"
+        }
+      ],
+      "business_impact": "DefaultBaseTypeLimitingValidator is the PolymorphicTypeValidator applied automatically whenever @JsonTypeInfo is used without an explicitly configured custom validator. It denies polymorphic resolution only for a fixed set of \"unsafe base types\", and its isSafeSubType method returns true unconditionally for every base type outside that set. java.lang.Comparable was absent from the list despite being implemented by a very large fraction of JDK and application classes, comparable in breadth to java.io.Serializable, which is on the list for that reason. An application declaring an @JsonTypeInfo-annotated property or class with Comparable as its base type, and no custom PolymorphicTypeValidator, will accept a type identifier for essentially any class implementing Comparable. This yields an attacker-controlled object instantiation primitive; a demonstrated case constructs a java.io.File for an arbitrary attacker-chosen path, which becomes path-traversal-adjacent if the application subsequently calls path-sensitive methods on the value. No class implementing Comparable has been identified that yields code execution through deserialization alone. Global Default Typing via activateDefaultTyping is not affected, because that method structurally requires an explicit PolymorphicTypeValidator argument. This affects com.fasterxml.jackson.core:jackson-databind from 2.11.0 before 2.18.10, from 2.19.0 before 2.21.6, and from 2.22.0 before 2.22.2, and tools.jackson.core:jackson-databind from 3.0.0 before 3.1.6 and from 3.2.0 before 3.2.2. Users should upgrade to 2.18.10, 2.21.6, 2.22.2, 3.1.6, or 3.2.2.",
+      "recommended_remediation": "Update the compatible Spring Boot BOM/dependency set; advisory fixed versions: 3.1.6, 3.2.2. Verify actual runtime artifacts and rerun security regressions.",
+      "suggested_regression_security_test": "Resolve a real runtime dependency tree/SBOM, verify patched versions, and exercise the applicable feature with bounded local negative tests. Do not send DoS payloads to preview.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "CVE-2026-83557",
+      "installed_version": "3.1.5",
+      "fixed_version": "3.1.6, 3.2.2",
+      "reference": "https://avd.aquasec.com/nvd/cve-2026-83557"
+    },
+    {
+      "id": "DEP-JS-01",
+      "severity": "Medium",
+      "affected_component": "uuid",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "GHSA-w5hq-g745-h8pq \u2014 uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+      "description": "Confirmed dependency version match in Expo/Jest toolchain. Attacker-controlled input reaching the vulnerable operation in Matbakhy is NOT VERIFIED; dependency classification alone does not prove runtime exposure.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/pnpm-audit.json",
+          "findings": [
+            {
+              "version": "7.0.3",
+              "paths": [
+                "apps__customer-mobile>expo>@expo/config-plugins>xcode>uuid"
+              ]
+            }
+          ]
+        }
+      ],
+      "business_impact": "Potential toolchain integrity/availability risk under advisory preconditions. No production exploit demonstrated.",
+      "recommended_remediation": "Upgrade compatible parent tooling/transitive dependency; fixed range reported by audit: >=11.1.1. Do not force an incompatible major override without tests.",
+      "suggested_regression_security_test": "Rerun pnpm audit and verify resolved paths; build Android and iOS and run relevant tooling regressions.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "GHSA-w5hq-g745-h8pq",
+      "reference": "https://github.com/advisories/GHSA-w5hq-g745-h8pq"
+    },
+    {
+      "id": "DEP-JS-02",
+      "severity": "High",
+      "affected_component": "node-forge",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "GHSA-86w9-cpqp-85rv \u2014 node-forge RSA PKCS#1 v1.5 signature verification accepts extra nested DigestAlgorithm elements",
+      "description": "Confirmed dependency version match in Expo/Jest toolchain. Attacker-controlled input reaching the vulnerable operation in Matbakhy is NOT VERIFIED; dependency classification alone does not prove runtime exposure.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/pnpm-audit.json",
+          "findings": [
+            {
+              "version": "1.4.0",
+              "paths": [
+                "apps__customer-mobile>expo>@expo/cli>node-forge"
+              ]
+            }
+          ]
+        }
+      ],
+      "business_impact": "Potential toolchain integrity/availability risk under advisory preconditions. No production exploit demonstrated.",
+      "recommended_remediation": "Upgrade compatible parent tooling/transitive dependency; fixed range reported by audit: <0.0.0. Do not force an incompatible major override without tests.",
+      "suggested_regression_security_test": "Rerun pnpm audit and verify resolved paths; build Android and iOS and run relevant tooling regressions.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "GHSA-86w9-cpqp-85rv",
+      "reference": "https://github.com/advisories/GHSA-86w9-cpqp-85rv"
+    },
+    {
+      "id": "DEP-JS-03",
+      "severity": "High",
+      "affected_component": "braces",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "GHSA-vfj7-8cjw-p6xm \u2014 braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+      "description": "Confirmed dependency version match in Expo/Jest toolchain. Attacker-controlled input reaching the vulnerable operation in Matbakhy is NOT VERIFIED; dependency classification alone does not prove runtime exposure.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/pnpm-audit.json",
+          "findings": [
+            {
+              "version": "3.0.3",
+              "paths": [
+                "apps__customer-mobile>@react-native/jest-preset>babel-jest>@jest/transform>micromatch>braces"
+              ]
+            }
+          ]
+        }
+      ],
+      "business_impact": "Potential toolchain integrity/availability risk under advisory preconditions. No production exploit demonstrated.",
+      "recommended_remediation": "Upgrade compatible parent tooling/transitive dependency; fixed range reported by audit: <0.0.0. Do not force an incompatible major override without tests.",
+      "suggested_regression_security_test": "Rerun pnpm audit and verify resolved paths; build Android and iOS and run relevant tooling regressions.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "GHSA-vfj7-8cjw-p6xm",
+      "reference": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm"
+    },
+    {
+      "id": "DEP-JS-04",
+      "severity": "Medium",
+      "affected_component": "sprintf-js",
+      "affected_commit_sha": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+      "title": "GHSA-hp3w-g68c-fv3c \u2014 sprintf-js vulnerable to denial of service through unbounded precision specifiers",
+      "description": "Confirmed dependency version match in Expo/Jest toolchain. Attacker-controlled input reaching the vulnerable operation in Matbakhy is NOT VERIFIED; dependency classification alone does not prove runtime exposure.",
+      "reproduction_evidence": [
+        {
+          "path": "evidence/pnpm-audit.json",
+          "findings": [
+            {
+              "version": "1.0.3",
+              "paths": [
+                "apps__customer-mobile>@react-native/jest-preset>babel-jest>babel-plugin-istanbul>@istanbuljs/load-nyc-config>js-yaml>argparse>sprintf-js"
+              ]
+            }
+          ]
+        }
+      ],
+      "business_impact": "Potential toolchain integrity/availability risk under advisory preconditions. No production exploit demonstrated.",
+      "recommended_remediation": "Upgrade compatible parent tooling/transitive dependency; fixed range reported by audit: <0.0.0. Do not force an incompatible major override without tests.",
+      "suggested_regression_security_test": "Rerun pnpm audit and verify resolved paths; build Android and iOS and run relevant tooling regressions.",
+      "verification_status": "SCANNER_VERSION_MATCH_APPLICABILITY_NOT_VERIFIED",
+      "confirmed": false,
+      "advisory_id": "GHSA-hp3w-g68c-fv3c",
+      "reference": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c"
+    }
+  ]
+}
