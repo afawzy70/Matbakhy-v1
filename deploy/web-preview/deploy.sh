@@ -10,6 +10,7 @@
 #   ./deploy.sh prune-qa [--apply]   list (or, with --apply, delete) QA artifacts older than QA_ARTIFACT_RETENTION_DAYS
 #   ./deploy.sh status         running images, database schema version, last releases (read-only)
 #   ./deploy.sh rollback-plan [N]   what rolling back to the release N entries before the last one needs (prints only; changes nothing)
+#   ./deploy.sh admin-console CMD   public Keycloak admin console (Preview only): enable | verify | status | disable | rollback (admin-console.sh)
 #   ./deploy.sh e2e-reset      E2E window only: verified backup, then recreate the empty application database (guarded)
 # Nothing here builds images, creates cloud resources or changes DNS.
 set -eu
@@ -35,6 +36,7 @@ init_secrets() {
       -e "s|^KEYCLOAK_ADMIN_PASSWORD=.*|KEYCLOAK_ADMIN_PASSWORD=$(hex)|" \
       -e "s|^OIDC_WEB_CLIENT_SECRET=.*|OIDC_WEB_CLIENT_SECRET=$(hex)|" \
       -e "s|^OIDC_ADMIN_CLIENT_SECRET=.*|OIDC_ADMIN_CLIENT_SECRET=$(hex)|" \
+      -e "s|^KEYCLOAK_OPS_CLIENT_SECRET=.*|KEYCLOAK_OPS_CLIENT_SECRET=$(hex)|" \
       -e "s|^PREVIEW_USER_PASSWORD=.*|PREVIEW_USER_PASSWORD=$(openssl rand -hex 10)|" \
       -e "s|^PHONE_CODE_PEPPER=.*|PHONE_CODE_PEPPER=$(hex)|" \
       -e "s|^HANDOVER_HASH_KEY=.*|HANDOVER_HASH_KEY=$(hex)|" \
@@ -68,6 +70,14 @@ render() {
     OIDC_ADMIN_CLIENT_SECRET="$(openssl rand -hex 32)"
     printf 'OIDC_ADMIN_CLIENT_SECRET=%s\n' "$OIDC_ADMIN_CLIENT_SECRET" >> "$ENV_FILE"
   fi
+  # Admin console: the master-realm operations client secret is added once to an older .env (same mode 600 file).
+  if ! grep -q '^KEYCLOAK_OPS_CLIENT_SECRET=' "$ENV_FILE"; then
+    KEYCLOAK_OPS_CLIENT_SECRET="$(openssl rand -hex 32)"
+    printf 'KEYCLOAK_OPS_CLIENT_SECRET=%s\n' "$KEYCLOAK_OPS_CLIENT_SECRET" >> "$ENV_FILE"
+  fi
+  # Switch directory of the public admin console (mounted read-only into the proxy); empty means the console is closed.
+  mkdir -p "$GENERATED_DIR/flags"
+  chmod 755 "$GENERATED_DIR/flags"
   sed -e "s|\${OIDC_WEB_CLIENT_SECRET}|$OIDC_WEB_CLIENT_SECRET|" -e "s|\${OIDC_ADMIN_CLIENT_SECRET}|$OIDC_ADMIN_CLIENT_SECRET|" -e "s|\${PREVIEW_DOMAIN}|$PREVIEW_DOMAIN|g" \
       -e "s|\${PREVIEW_USER_PASSWORD}|$PREVIEW_USER_PASSWORD|g" identity/matbakhy-realm.preview.json > "$GENERATED_DIR/identity/matbakhy-realm.json"
   sed -e "s|\${STORAGE_ACCESS_KEY}|$STORAGE_ACCESS_KEY|" -e "s|\${STORAGE_SECRET_KEY}|$STORAGE_SECRET_KEY|" \
@@ -106,6 +116,11 @@ record_release() {
 
 up() {
   check
+  # One writer at a time on this server (the admin console and the owner E2E provisioning take the same lock).
+  lock="${BACKUP_DIR:-/srv/matbakhy-backups}/.preview-mutation.lock"
+  command -v flock >/dev/null 2>&1 || die "flock is required for the shared change lock"
+  mkdir -p "$(dirname "$lock")" && { exec 9>"$lock"; } 2>/dev/null || die "cannot create the shared lock $lock"
+  flock -n 9 || die "another preview change holds $lock"
   render
   LAST_BACKUP_DIR=""
   schema_before=0
@@ -248,5 +263,6 @@ case "${1:-}" in
   status) status ;;
   rollback-plan) shift; rollback_plan "${1:-}" ;;
   e2e-reset) e2e_reset ;;
-  *) sed -n '2,15p' "$0"; exit 2 ;;
+  admin-console) shift; load; sh ./admin-console.sh "$@" ;;
+  *) sed -n '2,16p' "$0"; exit 2 ;;
 esac

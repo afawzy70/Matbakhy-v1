@@ -102,7 +102,7 @@ jobs:
           set -euo pipefail
           ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 "$USER@$HOST" \
             'test -f /srv/matbakhy-staging/deploy/web-preview/.env && test -w /srv/matbakhy-staging'
-          tar -cf - deploy infra scripts | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
+          tar -cf - deploy infra scripts docs/quality/owner-acceptance/fixtures.json | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
             -i ~/.ssh/id_ed25519 "$USER@$HOST" 'tar -xf - -C /srv/matbakhy-staging'
       - name: Deploy digest-pinned images, wait for health, HTTPS smoke
         shell: bash
@@ -147,3 +147,11 @@ jobs:
           printf '%s\n' "$GHCR_TOKEN" | ssh -o BatchMode=yes -o StrictHostKeyChecking=yes \
             -i ~/.ssh/id_ed25519 "$USER@$HOST" \
             "bash /tmp/matbakhy-cd-${SHA}.sh '$SHA' '$API_IMAGE' '$FRONT_IMAGE'; rc=\$?; rm -f /tmp/matbakhy-cd-${SHA}.sh; exit \$rc"
+      - name: Publish and verify the Keycloak admin console (Preview only; it closes itself again if verification fails)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Owner approval 2026-10-19: https://kc-admin.<preview domain>. Hardens the master realm (required one-time password, no password
+          # grant, brute-force protection), opens the proxy switch and checks it live with a synthetic read-only administrator.
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes -i ~/.ssh/id_ed25519 "$USER@$HOST" \
+            'cd /srv/matbakhy-staging/deploy/web-preview && ./deploy.sh admin-console enable'

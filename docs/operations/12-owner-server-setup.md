@@ -1,5 +1,7 @@
 # Hetzner staging: what the owner does on the server (exact steps)
 
+> **HISTORICAL (OUTDATED / INCORRECT as current instructions).** These owner steps target the Hetzner proposal (a `matbakhy` operating user, `/srv/matbakhy-preview`, a Hetzner cloud firewall). The observed Contabo host has the accounts `ubuntu`, `devops` and `aiagent` and deploys to `/srv/matbakhy-staging`. Use the [server rebuild guide](../developer-handbook/08-infrastructure/server-rebuild-guide.md) and the [Contabo server inventory](../developer-handbook/08-infrastructure/contabo-server-inventory.md). Kept unchanged below for history.
+
 Status: **instructions only. No server access is assumed; the agent has not touched any server, DNS record or account.** Nothing below has been run on the Hetzner host. The commands were checked as far as they could be on a local machine (see [11](11-staging-deployment-and-rollback.md), "What was rehearsed"). Adjust them to the operating system you choose; they assume Ubuntu 24.04 LTS.
 
 Decisions already made (owner, 2026-10-14): the server is a Hetzner VPS with 2 vCPU and 4 GB RAM; the first Internet-accessible staging runs the **PREVIEW** profile (synthetic data, simulated deposits and payments, no real notification, a visible demo notice); push stays off (`PUSH_DELIVERY_ENABLED=false`); the proposed staging retention defaults stay (logs 30 days, debug logs 7 days, QA artifacts 90 days; not production policies).
@@ -77,7 +79,7 @@ cd apps/operations-web && STAGING_APP_URL=https://app.<domain> STAGING_OPS_URL=h
   STAGING_USER_PASSWORD=<PREVIEW_USER_PASSWORD from the server .env> pnpm exec playwright test -c playwright.staging.config.ts
 ```
 
-Test accounts (realm `matbakhy`, the same password): `preview-customer-1`, `preview-customer-2`, `preview-cook-1`, `preview-ops-1` (the bootstrap staff administrator) and `preview-ops-2` (a staff-style account without grants, for the E2E suite and for testing the grant workflow). A realm already imported before this change does not get `preview-ops-2` by itself; create it in Keycloak with the same password. Keycloak is administered through `docker compose exec identity /opt/keycloak/bin/kcadm.sh` or an SSH tunnel; its console and the master realm are not published.
+Test accounts (realm `matbakhy`, the same password): `preview-customer-1`, `preview-customer-2`, `preview-cook-1`, `preview-ops-1` (the bootstrap staff administrator) and `preview-ops-2` (a staff-style account without grants, for the E2E suite and for testing the grant workflow). A realm already imported before this change does not get `preview-ops-2` by itself; create it in Keycloak with the same password. Keycloak is administered through `docker compose exec identity /opt/keycloak/bin/kcadm.sh` or an SSH tunnel; its console is published only on the Preview's `kc-admin` host behind a required one-time password (docs/operations/14-keycloak-admin-console.md); the master realm is not on the customer host.
 
 ## 8. Letting people in
 

@@ -24,6 +24,7 @@ BACKUP_DIR="${BACKUP_DIR:-/srv/matbakhy-backups}"
 KCDIR="$BACKUP_DIR/keycloak"
 STATE="$KCDIR/mfa-migration-state.env"
 MIGRATION=identity/mfa-migration.kcadm.sh
+. ./identity/mfa-state.sh
 REALM=matbakhy
 
 run_migration() { # $1 = status | apply | rollback
@@ -47,14 +48,43 @@ backup() {
     > "$KCDIR/realm-before-$stamp.json" 2>/dev/null
   [ -s "$KCDIR/realm-before-$stamp.json" ] || die "empty realm export"
   prev="$(run_migration status 2>/dev/null | sed -n 's/^browserFlow=//p')"
-  printf 'STAMP=%s\nPREVIOUS_BROWSER_FLOW=%s\nDB_DUMP=keycloak-db-%s.dump\nREALM_EXPORT=realm-before-%s.json\n' "$stamp" "$prev" "$stamp" "$stamp" > "$STATE"
+  [ -n "$prev" ] || die "cannot read the currently bound browser flow"
+  # The rollback baseline is the flow bound BEFORE the first apply. A repeated apply (when the matbakhy flow is already bound) keeps it.
+  if [ "$prev" = "matbakhy browser" ] && [ -f "$STATE" ]; then
+    old="$(state_flow "$STATE" 2>/dev/null || true)"
+    [ -z "$old" ] || prev="$old"
+  fi
+  state_write "$STATE" "$stamp" "$prev" || die "cannot write the migration state (unexpected flow name or stamp)"
   echo "backup written under $KCDIR (state: $STATE)"
 }
 
 verify() {
   # Shell + python3 (stdlib) from this host through the public proxy, like a browser; no secret is printed.
+  # A synthetic user with a random password and TOTP secret is created for the run and always removed (fixture-delete only ever
+  # removes names starting "verify-mfa-"); with it the check obtains real tokens and calls the real API. Without it the assurance part
+  # is reported NOT_RUN and the exit code is 3, never PASS.
+  fxdir="$(mktemp -d)"
+  chmod 700 "$fxdir"
+  fx_cleanup() {
+    cleanup_rc=0
+    run_migration fixture-delete >/dev/null 2>&1 || { cleanup_rc=1; echo "WARNING: synthetic users named verify-mfa-* may remain; run ./migrate-mfa.sh fixture-clean" >&2; }
+    rm -rf "$fxdir"
+    return "$cleanup_rc"
+  }
+  trap fx_cleanup EXIT
+  trap 'exit 130' INT TERM
+  fixture=""
+  if python3 identity/verify-mfa-flow.py fixture-body "$fxdir" | run_migration fixture-create >/dev/null; then
+    fixture="$fxdir/fixture.json"
+  else
+    echo "WARNING: the synthetic verification user could not be created; assurance checks will be NOT_RUN" >&2
+  fi
+  rc=0
   PREVIEW_DOMAIN="$PREVIEW_DOMAIN" PREVIEW_USER_PASSWORD="${PREVIEW_USER_PASSWORD:-}" OIDC_ADMIN_CLIENT_SECRET="${OIDC_ADMIN_CLIENT_SECRET:-}" \
-    python3 identity/verify-mfa-flow.py
+    OIDC_WEB_CLIENT_SECRET="${OIDC_WEB_CLIENT_SECRET:-}" VERIFY_FIXTURE_FILE="$fixture" python3 identity/verify-mfa-flow.py || rc=$?
+  trap - EXIT INT TERM
+  fx_cleanup || { [ "$rc" -ne 0 ] || rc=1; }
+  return "$rc"
 }
 
 case "${1:-}" in
@@ -65,13 +95,24 @@ case "${1:-}" in
     backup
     run_migration apply
     echo "== verification"
-    verify
+    rc=0
+    verify || rc=$?
+    [ "$rc" -eq 0 ] || [ "$rc" -eq 3 ] || die "verification FAILED (exit $rc): consider ./migrate-mfa.sh rollback"
+    if [ "$rc" -eq 3 ]; then
+      echo "WARNING: applied, but authentication assurance is NOT proven (verification incomplete). Do not treat this as PASS." >&2
+      exit 3
+    fi
     ;;
   verify) verify ;;
+  fixture-clean) run_migration fixture-delete ;;
   rollback)
-    [ -f "$STATE" ] && . "$STATE" || true
-    PREVIOUS_FLOW="${PREVIOUS_FLOW:-${PREVIOUS_BROWSER_FLOW:-browser}}" run_migration rollback
+    # The state file is parsed as data (never sourced); an explicit PREVIOUS_FLOW from the operator wins, an unreadable file is refused.
+    if [ -z "${PREVIOUS_FLOW:-}" ]; then
+      [ -f "$STATE" ] || die "no state file $STATE: pass PREVIOUS_FLOW='<flow name>' explicitly (the built-in flow is 'browser')"
+      PREVIOUS_FLOW="$(state_flow "$STATE")" || die "state file $STATE is not valid; pass PREVIOUS_FLOW explicitly"
+    fi
+    PREVIOUS_FLOW="$PREVIOUS_FLOW" run_migration rollback
     echo "Rolled back the browser flow. A full restore of the identity store, if ever needed, uses the dump named in $STATE (pg_restore into an empty keycloak database while identity is stopped)."
     ;;
-  *) die "usage: ./migrate-mfa.sh backup | status | apply | verify | rollback" ;;
+  *) die "usage: ./migrate-mfa.sh backup | status | apply | verify | rollback | fixture-clean" ;;
 esac

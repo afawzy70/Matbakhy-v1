@@ -1,0 +1,52 @@
+name: Handbook Arabic parity
+# Documentation only. Fails when the Egyptian Arabic mirror of the Developer Handbook is missing, orphaned, structurally
+# different from the English source, or not updated together with it. It checks STRUCTURE; it cannot prove that the Arabic
+# means the same as the English (that needs the reviewed pair record and the human/independent review).
+on:
+  pull_request:
+    paths:
+      - "docs/developer-handbook/**"
+      - "scripts/validate_handbook_parity.py"
+      - "scripts/test_validate_handbook_parity.py"
+      - "scripts/doc001_check.py"
+      - ".github/workflows/handbook-parity.yml"
+  push:
+    branches: [develop]
+    paths:
+      - "docs/developer-handbook/**"
+      - "scripts/validate_handbook_parity.py"
+      - "scripts/test_validate_handbook_parity.py"
+      - ".github/workflows/handbook-parity.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: handbook-parity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parity:
+    name: Handbook Arabic parity (structural)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install the Markdown parser (pinned)
+        run: |
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install --quiet 'markdown-it-py==3.0.0'
+      - name: Validator unit tests
+        run: '"$RUNNER_TEMP/venv/bin/python" scripts/test_validate_handbook_parity.py'
+      - name: Structural parity of every English page and its Arabic mirror
+        run: '"$RUNNER_TEMP/venv/bin/python" scripts/validate_handbook_parity.py'
+      - name: English and Arabic must change together in this pull request
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: '"$RUNNER_TEMP/venv/bin/python" scripts/validate_handbook_parity.py --base "$BASE_SHA"'
+      - name: Handbook links, anchors, metadata and navigation (DOC-001 documentation validation)
+        run: python3 scripts/doc001_check.py docs

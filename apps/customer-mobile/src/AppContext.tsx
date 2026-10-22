@@ -1,7 +1,7 @@
 import type { Locale } from "@matbakhy/design-tokens";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { refresh as systemRefresh, signIn as systemSignIn, signOut as systemSignOut, SignInCancelled } from "./auth";
-import { clearShopping } from "./basket";
+import { bindShopping, currentShopping } from "./basket";
 import type { AppConfig } from "./config";
 import { strings, type Strings } from "./i18n";
 import { createMobileApi, type MobileApi, type Schemas } from "./mobileApi";
@@ -31,6 +31,12 @@ export interface AppContextValue {
   stepUpRequired: boolean;
   /** Verifies again with a second factor (same account, fresh login); clears the request when it succeeds. */
   startStepUp: () => Promise<void>;
+  /** Changes when the signed-in person changes: everything below it is remounted, so no screen state of the previous account survives. */
+  accountEpoch: number;
+  /** The stored basket belongs to the restored person only once this is true; screens that read it wait for it. */
+  shoppingReady: boolean;
+  /** Changes after a successful step-up for the same person: server reads that were refused are loaded again (writes are never replayed). */
+  dataEpoch: number;
   endSession: () => Promise<void>;
   switchAccount: () => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -82,6 +88,9 @@ export function AppProvider({
   const [auth, setAuth] = useState<AuthPhase>({ kind: "loading" });
   const [busy, setBusy] = useState(false);
   const [stepUpRequired, setStepUpRequired] = useState(false);
+  const [accountEpoch, setAccountEpoch] = useState(0);
+  const [shoppingReady, setShoppingReady] = useState(false);
+  const [dataEpoch, setDataEpoch] = useState(0);
   const t = strings[locale];
   // A new client per language: requests carry the current Accept-Language; a 401 ends the session everywhere.
   const api = useMemo(() => {
@@ -93,7 +102,8 @@ export function AppProvider({
           locale,
           onStepUpRequired: () => setStepUpRequired(true),
           onSignedOut: () => {
-            void clearShopping();
+            void currentShopping().clear().catch(() => undefined);
+            void bindShopping(null);
             setAuth({ kind: "signedOut", message: strings[locale].sessionEnded });
           },
         },
@@ -102,13 +112,19 @@ export function AppProvider({
   }, [config, session, fetchImpl, locale, refresh]);
 
   const reloadProfile = useCallback(async () => {
+    // An answer that arrives after the signed-in person changed belongs to the previous person and is dropped.
+    const subject = session.subject;
     try {
+      await bindShopping(subject);
       const cached = session.cache<Profile>("me");
       if (cached) {
         setAuth({ kind: "signedIn", profile: cached });
         return;
       }
       const r = await api.GET("/api/v1/me");
+      if (session.subject !== subject) {
+        return;
+      }
       if (r.data) {
         session.cache("me", r.data);
         setAuth({ kind: "signedIn", profile: r.data });
@@ -130,17 +146,25 @@ export function AppProvider({
     let active = true;
     session
       .restore()
-      .then((restored) => {
+      .then(async (restored) => {
+        // The stored basket is read for the restored person only after their storage is bound (a guest's when nobody is signed in).
+        await bindShopping(restored?.subject ?? null).catch(() => undefined);
         if (!active) {
           return;
         }
+        setShoppingReady(true);
         if (restored) {
           void reloadRef.current();
         } else {
           setAuth({ kind: "signedOut" });
         }
       })
-      .catch(() => active && setAuth({ kind: "signedOut" }));
+      .catch(() => {
+        if (active) {
+          setShoppingReady(true);
+          setAuth({ kind: "signedOut" });
+        }
+      });
     return () => {
       active = false;
     };
@@ -161,8 +185,26 @@ export function AppProvider({
   const startStepUp = useCallback(async () => {
     setBusy(true);
     try {
+      const before = (await session.restore())?.subject ?? null;
       await signIn(config, session, { stepUp: true });
-      setStepUpRequired(false);
+      const after = (await session.restore())?.subject ?? null;
+      if (before !== after) {
+        // The person signed in as somebody else in the browser: this is an account switch, so nothing of the previous account may remain (TC-048).
+        // Order matters: hide the old profile, drop the persisted basket and pending placement, then remount every screen (navigation and
+        // screen state) before the new person's profile is read; the session already cleared its private caches when the subject changed.
+        // Hide and unmount first; then the storage switches to the new person's own keys, so nothing of the previous account can be
+        // read whatever happens to its cleanup, and a late answer for it can only reach its own keys.
+        const previous = currentShopping();
+        setAuth({ kind: "loading" });
+        setStepUpRequired(false);
+        await bindShopping(after);
+        setAccountEpoch((n) => n + 1);
+        await previous.clear().catch(() => undefined);
+        await reloadProfile();
+      } else {
+        setStepUpRequired(false);
+        setDataEpoch((n) => n + 1);
+      }
     } catch (e) {
       // Cancelling keeps the account signed in with the notice still showing; a real failure says so.
       if (!(e instanceof SignInCancelled)) {
@@ -171,15 +213,17 @@ export function AppProvider({
     } finally {
       setBusy(false);
     }
-  }, [config, session, signIn]);
+  }, [config, session, signIn, reloadProfile]);
 
   const endSession = useCallback(async () => {
     setBusy(true);
     try {
       const stored = await session.restore();
-      await clearShopping();
+      // A storage failure must never keep the person signed in; their keys stay unreadable for anybody else.
+      await currentShopping().clear().catch(() => undefined);
       await signOut(config, session, stored?.refreshToken ?? null);
     } finally {
+      await bindShopping(null);
       setStepUpRequired(false);
       setAuth({ kind: "signedOut" });
       setBusy(false);
@@ -224,6 +268,9 @@ export function AppProvider({
     startSignIn,
     stepUpRequired,
     startStepUp,
+    accountEpoch,
+    shoppingReady,
+    dataEpoch,
     endSession,
     switchAccount,
     reloadProfile,

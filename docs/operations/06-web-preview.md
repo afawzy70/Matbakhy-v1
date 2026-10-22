@@ -1,5 +1,7 @@
 # Web preview on one VPS (prepared, not deployed)
 
+> **PARTLY OUTDATED.** Written before the Contabo deployment; Hetzner and `/srv/matbakhy-preview` statements are historical. Current live addresses and behaviour: [live Preview access](../developer-handbook/05-developer-workflow/live-preview-access.md); infrastructure: [Contabo server inventory](../developer-handbook/08-infrastructure/contabo-server-inventory.md).
+
 **Owner direction (2026-10-12):** try the web application first. Apple Developer, Google Play and TestFlight setup are deferred.
 
 This is an **early web preview** for the owner's own test journeys. It is not the controlled staging environment of MB-040, and it is not a release. Nothing has been purchased, deployed, published or put into DNS.
@@ -10,7 +12,7 @@ This is an **early web preview** for the owner's own test journeys. It is not th
 |---|---|---|
 | Proxy and web apps | Our `matbakhy-preview-front` image: Caddy plus the customer web and operations web builds | Ports 80/443. Hosts `app.`, `ops.`, `api.`, `id.` and `media.<domain>`, each restricted to `ALLOWED_CLIENT_IPS` |
 | API | Our `matbakhy-api` image, `APP_ENV=PREVIEW` | Internal; only `/api/*` and the OIDC login paths go through the proxy, actuator does not |
-| Identity | Keycloak 26.8.0 in production mode (`start`) on PostgreSQL, preview realm imported | Internal; the proxy blocks `/admin` |
+| Identity | Keycloak 26.8.0 in production mode (`start`) on PostgreSQL, preview realm imported | Internal; the customer host blocks `/admin`; the admin console is published only on `kc-admin.<domain>` (docs/operations/14-keycloak-admin-console.md) |
 | Database | PostgreSQL 16.15 (two databases: `matbakhy`, `keycloak`) | Internal only, persistent volume |
 | Image storage | SeaweedFS (S3-compatible) | Internal; `media.<domain>` for signed uploads and public meal photos |
 
@@ -187,7 +189,7 @@ The access method must work for: browser sign-in and the OIDC redirects between 
    - `preview-cook-1` (owns "مطبخ المعاينة"; pickup, and delivery to Test zone A);
    - `preview-ops-1` (first staff administrator through `STAFF_BOOTSTRAP_SUBJECT`);
    - `preview-ops-2` (staff-style account without grants).
-7. **Keycloak administration:** `docker compose exec identity /opt/keycloak/bin/kcadm.sh …`. The console is not published.
+7. **Keycloak administration:** `docker compose exec identity /opt/keycloak/bin/kcadm.sh …`. The console is published on `https://kc-admin.<domain>` for the Preview only (password + one-time password required; see docs/operations/14-keycloak-admin-console.md); `./deploy.sh admin-console disable` closes it.
 
 ## Migrations, rollback and recovery
 

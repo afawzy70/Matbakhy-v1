@@ -1,5 +1,7 @@
 # Staging: deployment workflow, smoke tests, rollback and the remote E2E window
 
+> **PARTLY OUTDATED.** The deployment workflow and rollback rules below are still relevant, but the sizing and Hetzner statements are historical. Current pipeline description: [deployment pipeline](../developer-handbook/08-infrastructure/deployment-pipeline.md); recovery: [backup, restore and disaster recovery](../developer-handbook/08-infrastructure/backup-restore-disaster-recovery.md).
+
 Status: **prepared, not deployed.** Written 2026-10-14 for the Hetzner 2 vCPU / 4 GB server (PREVIEW profile, owner-approved). No server access is assumed and no remote test has been run. Everything marked "rehearsed" ran only on the agent's machine ([rehearsal results](#6-what-was-rehearsed-on-the-agents-machine-and-what-was-not)); it is not evidence about the Hetzner host. What the owner does on the server: [12](12-owner-server-setup.md).
 
 ## 1. Principles

@@ -205,9 +205,40 @@ rollback() {
   fi
 }
 
+# Synthetic verification user (migrate-mfa.sh verify): created from a JSON body on standard input (it carries a random password and a
+# random TOTP secret generated for this run), and always removed afterwards. Only usernames starting with "verify-mfa-" are ever deleted.
+FIXTURE_PREFIX="verify-mfa-"
+
+fixture_create() {
+  body="$(cat)" # read before login: the sign-in call must not consume the request body
+  [ -n "$body" ] || die "fixture-create needs the user representation on standard input"
+  login
+  printf '%s' "$body" | kc_body create users -r "$REALM" -i >/dev/null || die "cannot create the synthetic verification user"
+  echo "fixture user: created"
+}
+
+fixture_delete() {
+  login
+  rows="$(kc get users -r "$REALM" -q "search=$FIXTURE_PREFIX" --fields id,username --format csv --noquotes)" || die "cannot list users for the fixture cleanup"
+  failed=0
+  # Read from a here-document (no subshell, so a failure is remembered) and keep the delete calls off the loop's standard input.
+  while IFS=, read -r id name; do
+    [ -n "$id" ] || continue
+    case "$name" in
+      "$FIXTURE_PREFIX"*)
+        if kc delete "users/$id" -r "$REALM" </dev/null >/dev/null; then echo "fixture user $name: removed"; else echo "fixture user $name: NOT removed" >&2; failed=1; fi ;;
+    esac
+  done <<ROWS
+$rows
+ROWS
+  [ "$failed" -eq 0 ] || die "fixture cleanup incomplete: users named $FIXTURE_PREFIX* remain"
+}
+
 case "${1:-}" in
   status) status ;;
   apply) apply ;;
   rollback) rollback ;;
-  *) die "usage: $0 status | apply | rollback" ;;
+  fixture-create) fixture_create ;;
+  fixture-delete) fixture_delete ;;
+  *) die "usage: $0 status | apply | rollback | fixture-create | fixture-delete" ;;
 esac

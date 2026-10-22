@@ -7,11 +7,12 @@
   "file": "backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java",
   "line": 96,
   "title": "Cash reporting and verification demand the full total after a deposit",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "CONFIRMED by reading CashService/OrderService; fixed in this branch",
   "evidence": "OrderService.placeOnce inserts cash_obligation.amount_minor as q.totalMinor() - q.depositMinor(). CashService.java:96-106 instead calculates discrepancy against customer_order.total_minor; lines 127-150 use that total again for verification. apps/operations-web/src/cook/Orders.tsx:182 initializes the report amount from order.total.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "CR-002",
@@ -21,8 +22,8 @@
   "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
   "line": 49,
   "title": "Staff grants become usable without MFA",
-  "status": "OPEN_DEPLOYMENT_VERIFICATION",
-  "triage": "Realm flow as code + StaffMfaIdpTest (real Keycloak) + optional require-staff-mfa; live preview/staging realm NOT changed or verified (no Docker/SSH for the agent). See docs/security/staff-mfa-enforcement.md",
+  "status": "CLOSED_IN_CODE_OPEN_FOR_LIVE_REALM",
+  "triage": "Superseded by D18 (configurable MFA). Config-as-code, real-Keycloak CI tests and the migration for the existing preview realm are done; the live Contabo realm has NOT been migrated or verified (needs Docker on the host).",
   "evidence": "AccountMapper.java:49-50 unconditionally adds active permission authorities; assurance claims are merely copied at lines 56-62. SecurityConfiguration's API chains require ACCOUNT_ACTIVE without a staff MFA guard. StaffCaseController.java:31 requires only PERM_support.case. CashController.java:70 requires only PERM_finance.verify. StaffAssurance is invoked only by selected endpoint annotations.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -35,11 +36,12 @@
   "file": "backend/app/src/main/java/com/matbakhy/app/providers/S3ObjectStorage.java",
   "line": 49,
   "title": "Reusable upload URL can replace an approved private document",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "CONFIRMED by code reading; approved documents now sealed to documents/<id> and upload key deleted after commit",
   "evidence": "S3ObjectStorage.java:48-50 signs PUT without checksum or overwrite protection. MediaService.java:121 issues the upload URL; lines 132-133 skip verification for approved media; lines 273-274 generate approved document read URLs using row.privateKey().",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA-001",
@@ -49,11 +51,12 @@
   "file": "backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java",
   "line": 96,
   "title": "Cash reporting and verification charge the full total after a deposit",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "duplicate of CR-001",
   "evidence": "CashService.java:77-78 selects o.total_minor; :96-106 computes discrepancy and obligation state; :127-150 again uses o.total_minor for verification. OrderService.java:203-208 correctly creates cash_obligation with total minus deposit. apps/operations-web/src/cook/Orders.tsx:182 initializes the form from order.total. docs/product/09-deposit-payment-states.md states cash due at handover is the remainder. Static rg found no deposit/DEPOSIT/remainder references in backend/app/src/test/java/com/matbakhy/app/finance.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA-002",
@@ -63,11 +66,12 @@
   "file": "backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java",
   "line": 142,
   "title": "Permanent request recovery accepts a changed payload when its quote is unchanged",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "V29 request_fingerprint on customer_order; OrderService compares it on recovery; legacy rows (null) keep quote-only check. Tests: a_reused_request_reference_with_a_changed_field_conflicts_even_after_the_cache_is_gone, orders_placed_before_the_fingerprint_migration_keep_quote_only_recovery",
   "evidence": "OrderService.java:139-146 selects only id and quote_id and returns before policy or note checks. JdbcIdempotentCommands.java:54-59 creates a new request hash when no cache record remains. OrderPlacementIntegrationTest.java:268-271 tests retention with an identical body; :284-299 tests changed quote IDs, not changed fields on the same quote. docs/product/03-business-rules.md:68 specifies payload conflict.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA-003",
@@ -77,11 +81,12 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java",
   "line": 244,
   "title": "Deposit expiry coverage does not exercise transfer/receipt races",
-  "status": "TEST_ADDED_PENDING_CI",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "a_transfer_report_racing_expiry_is_reconciled_or_refused_never_lost (6 rounds, invariant based)",
   "evidence": "DepositPaymentIntegrationTest.java:205-223 races two transfer reports; :245-256 reports before advancing the clock and expiring. OrderLifecycleIntegrationTest.java:428 names the acceptance/cancellation/expiry race. docs/delivery/07-owner-decisions-implementation-sequence.md:20 requires expiry and capacity claims to be race-safe.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA-004",
@@ -91,11 +96,12 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/payments/DepositPaymentIntegrationTest.java",
   "line": 231,
   "title": "Receipt authorization test uses a non-cook instead of a foreign kitchen owner",
-  "status": "TEST_ADDED_PENDING_CI",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "another_approved_kitchen_cannot_receipt_report_a_problem_or_refund_a_foreign_deposit",
   "evidence": "DepositPaymentIntegrationTest.java:231 calls receipt with UUID.randomUUID().toString(). PaymentService.java:81-83 rejects actors lacking a kitchen before :267-270 checks order ownership. PaymentReconciliationIntegrationTest.java:176-179 correctly creates a second approved kitchen for the problem endpoint, demonstrating the stronger fixture pattern.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA-005",
@@ -119,11 +125,12 @@
   "file": "backend/app/src/test/java/com/matbakhy/app/orders/PriceChangeIntegrationTest.java",
   "line": 209,
   "title": "Price-race tests replace the production price-update command with handwritten SQL",
-  "status": "TEST_ADDED_PENDING_CI",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "the_real_cook_price_edit_refuses_a_stale_quote_and_never_touches_a_committed_order (production PATCH path). True interleaving of the production update with placement is still covered only by the SQL stand-in lock-order tests: residual Medium risk, recorded.",
   "evidence": "PriceChangeIntegrationTest.java:118-120 and :150 call the helper; :204-215 explicitly describe and implement a SQL imitation of MealService.update. The existing real browser price-change journey supplies useful sequential integration, but not this concurrent production-command boundary.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA-007",
@@ -134,7 +141,7 @@
   "line": 52,
   "title": "Route and mocked component checks do not validate real response payload contracts",
   "status": "OPEN",
-  "triage": "test-coverage/not yet triaged",
+  "triage": "Low: route and mocked-component checks do not validate live payload contracts; accepted for this phase, follow-up in the QA backlog.",
   "evidence": "ContractRoutesTest.java:34-52 compares registry and served routes. packages/api-client/test/registry.test.ts:23-55 checks metadata and schema compilation. apps/customer-web/src/App.test.tsx:15-18 and apps/operations-web/src/App.test.tsx:13-28 explicitly use fake APIs. apps/operations-web/e2e-staging/smoke.staging.ts:108-131 and :158-168 issue payment API calls directly.",
   "found_at_commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
   "fix_commit": null
@@ -147,11 +154,12 @@
   "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
   "line": 210,
   "title": "Upload cleanup failure cannot be recovered by re-completion",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "V30 media_cleanup (durable, idempotent, bounded retries=6 with exponential back-off, FAILED state + metrics matbakhy.media.cleanup.*, referenced-object guard). Tests: MediaCleanupIntegrationTest, referenced guard + replay in MediaIntegrationTest",
   "evidence": "round-2 review",
   "found_at_commit": "890bc87",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "QA2-001",
@@ -209,10 +217,11 @@
   "severity": "Medium",
   "component": "Media/PDF",
   "title": "PDF active-content validation bypass via escaped names",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "Structural PDFBox 3.0.8 inspection (object streams + decoded names); MediaInspectorPdfTest 5/5 pass locally incl. escaped-name and compressed-object cases; test fixtures now valid PDFs",
   "found_at_commit": "b7ec0e9",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "SEC-002",
@@ -220,10 +229,11 @@
   "severity": "High",
   "component": "Media",
   "title": "Approved private document mutable through outstanding upload ticket (= CR-003)",
-  "status": "FIXED_PENDING_RETEST",
-  "triage": "Sealed key + replay-after-approval runtime test replaying_the_upload_ticket_after_approval_does_not_change_the_approved_document; independent runtime retest pending",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
+  "triage": "Sealed key + replay-after-approval runtime test replaying_the_upload_ticket_after_approval_does_not_change_the_approved_document; independent runtime retest pending Runtime replay test replaying_the_upload_ticket_after_approval_does_not_change_the_approved_document passes in CI.",
   "found_at_commit": "b7ec0e9",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "SEC-003",
@@ -231,10 +241,11 @@
   "severity": "Low",
   "component": "scripts/rehearsal/load.py",
   "title": "Rehearsal helper disables TLS verification",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "Verification on by default; scoped *.localhost opt-in; scripts/test_rehearsal_tls.py",
   "found_at_commit": "b7ec0e9",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "SEC-004",
@@ -242,7 +253,7 @@
   "severity": "Low",
   "component": "deploy/web-preview/Caddyfile",
   "title": "No CSP on web HTML",
-  "status": "MITIGATED_REPORT_ONLY",
+  "status": "MITIGATED_REPORT_ONLY_FOLLOWUP_DOCUMENTED",
   "triage": "Report-Only CSP on app./ops.; enforcement needs browser validation (docs/security/csp-rollout.md)",
   "found_at_commit": "b7ec0e9",
   "fix_commit": null
@@ -253,10 +264,11 @@
   "severity": "High (scanner label Critical)",
   "component": "backend deps",
   "title": "tomcat-embed-core 11.0.24 advisories",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "Overridden to 11.0.26 (fixed in 11.0.25); resolved with dependency:tree",
   "found_at_commit": "b7ec0e9",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "DEP-JACKSON",
@@ -264,10 +276,11 @@
   "severity": "High (scanner label)",
   "component": "backend deps",
   "title": "jackson 3.1.5 advisories",
-  "status": "FIXED_PENDING_RETEST",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
   "triage": "Overridden to 3.1.7 (fixes all listed); jackson-2 annotations unchanged",
   "found_at_commit": "b7ec0e9",
-  "fix_commit": null
+  "fix_commit": null,
+  "verified_at": "ff64f323b6266583b1c98599a6aa8803f5722190"
  },
  {
   "id": "DEP-NODE",
@@ -279,5 +292,135 @@
   "triage": "Expo/Jest build-time tooling, not shipped in runtime bundles; reachability not established; update planned with Expo SDK bump (not done: risk to native build)",
   "found_at_commit": "b7ec0e9",
   "fix_commit": null
+ },
+ {
+  "id": "D18-REVIEWS",
+  "source": "D18 / later reviews",
+  "severity": "High",
+  "component": "MFA policy",
+  "title": "Independent review rounds 1-4 of the D18 configurable MFA (CR7-*, SECR7-*, CR8-*, SECR8-*, CR9-*, CR10, SECR10, QA7-9): profile writes, reset epoch, application sessions, DISABLED step-up, audit ordering, dev secrets",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
+  "triage": "All High/Critical findings fixed; final pass on 240cf0c had 0 findings from three independent agents; CI green on ff64f32. See mfa-round1..3, mfa-final.",
+  "found_at_commit": "see round reports",
+  "fix_commit": null
+ },
+ {
+  "id": "D18-RESIDUAL-1",
+  "source": "D18 / later reviews",
+  "severity": "Medium",
+  "component": "Keycloak live realm",
+  "title": "Existing Contabo preview realm lacks the D18 flow, levels and admin client until migrate-mfa.sh is run",
+  "status": "OPEN_OPERATOR_ACTION",
+  "triage": "Runbook docs/operations/13-keycloak-mfa-migration.md; rehearsed locally only; live result NOT RUN",
+  "found_at_commit": "see round reports",
+  "fix_commit": null
+ },
+ {
+  "id": "D18-RESIDUAL-2",
+  "source": "D18 / later reviews",
+  "severity": "Medium",
+  "component": "Mobile MFA",
+  "title": "Mobile step-up banner implemented and jest/simulator-CI covered; no physical device run; no in-app Security screen",
+  "status": "OPEN_DEVICE_VERIFICATION",
+  "triage": "docs/mobile/ios-beta-device-test-plan.md section C; keep CUSTOMER/KITCHEN OPTIONAL",
+  "found_at_commit": "see round reports",
+  "fix_commit": null
+ },
+ {
+  "id": "D18-RESIDUAL-3",
+  "source": "D18 / later reviews",
+  "severity": "Low",
+  "component": "DISABLED policy",
+  "title": "A user can still add an authenticator directly in Keycloak account console under DISABLED; it has no effect in the application",
+  "status": "ACCEPTED_DOCUMENTED",
+  "triage": "docs/security/mfa-policy.md",
+  "found_at_commit": "see round reports",
+  "fix_commit": null
+ },
+ {
+  "id": "D18-RESIDUAL-4",
+  "source": "D18 / later reviews",
+  "severity": "Low",
+  "component": "Tokens",
+  "title": "Access tokens issued before a reset or switch-off stay valid up to 5 minutes for non-MFA functions; they no longer count as MFA proof for the policy or high-risk actions",
+  "status": "ACCEPTED_DOCUMENTED",
+  "triage": "verified by after_a_reset_a_still_valid_pre_reset_token_cannot_perform_a_sensitive_operation and StaffAssuranceTest",
+  "found_at_commit": "see round reports",
+  "fix_commit": null
+ },
+ {
+  "id": "CR12-1",
+  "source": "Independent Codex review after ff64f32 (rounds 1-6)",
+  "severity": "High",
+  "component": "Customer mobile",
+  "file": null,
+  "line": null,
+  "title": "Account switch during step-up left the previous account's screens, basket or pending order reachable",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
+  "triage": "Remount on account change, per-person storage keys with a handle bound at the start of each operation, guest basket keys removed first, navigation waits for the restored person's storage; regression tests in App.test.tsx and ordering.test.ts (71 mobile tests). Codex final round on a746e6d: 0 findings. Rounds 2-5 found deeper variants (failed cleanup, restart, late answers, guest migration) all fixed.",
+  "evidence": "see final-quality-gate.md section 7",
+  "found_at_commit": "0fc6fca",
+  "fix_commit": "5c7d912, 89ec820, 10cfe77, a746e6d",
+  "verified_at": "a746e6d"
+ },
+ {
+  "id": "CR12-2",
+  "source": "Independent Codex review after ff64f32 (rounds 1-6)",
+  "severity": "Medium",
+  "component": "Customer mobile",
+  "file": null,
+  "line": null,
+  "title": "Step-up did not recover the refused request; order placement must not be replayed by itself",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
+  "triage": "Refused reads reload after a same-person step-up (dataEpoch). A refused placement keeps its idempotency keys, is flagged awaitingExplicitRetry and is re-sent only by the customer's Retry (not on focus or restart). Tests in App.test.tsx, ordering.test.ts.",
+  "evidence": "see final-quality-gate.md section 7",
+  "found_at_commit": "0fc6fca",
+  "fix_commit": "5c7d912, 89ec820",
+  "verified_at": "a746e6d"
+ },
+ {
+  "id": "CR12-3",
+  "source": "Independent Codex review after ff64f32 (rounds 1-6)",
+  "severity": "Medium",
+  "component": "Migration tooling",
+  "file": null,
+  "line": null,
+  "title": "Rollback state was shell-sourced from an untrusted flow name",
+  "status": "VERIFIED_CI_AND_INDEPENDENT_REVIEW",
+  "triage": "State parsed as validated data (base64 flow name, fixed keys), never sourced; tests with hostile names and tampered files (scripts/test_keycloak_mfa_migration.py). Codex round 2/3: hostile substitutions stay literal.",
+  "evidence": "see final-quality-gate.md section 7",
+  "found_at_commit": "0fc6fca",
+  "fix_commit": "5c7d912",
+  "verified_at": "a746e6d"
+ },
+ {
+  "id": "CR12-4",
+  "source": "Independent Codex review after ff64f32 (rounds 1-6)",
+  "severity": "Medium",
+  "component": "Migration tooling",
+  "file": null,
+  "line": null,
+  "title": "Verification could report PASS from configuration alone",
+  "status": "VERIFIED_LOCAL_REHEARSAL_AND_REVIEW",
+  "triage": "verify creates a synthetic verify-mfa-* user, obtains real Keycloak tokens, checks acr/amr and API accept/reject; RESULT PASS/FAIL(1)/INCOMPLETE(3). Rehearsed on Keycloak 26.8.0 (PASS; INCOMPLETE without fixture; FAIL with the amr mapper removed). The real API acceptance runs only on the live server; the rehearsal used a stand-in for the API's MFA contract. Live verify: NOT_RUN.",
+  "evidence": "see final-quality-gate.md section 7",
+  "found_at_commit": "0fc6fca",
+  "fix_commit": "5c7d912",
+  "verified_at": "a746e6d"
+ },
+ {
+  "id": "CR12-5",
+  "source": "Independent Codex review after ff64f32 (rounds 1-6)",
+  "severity": "Medium",
+  "component": "Migration tooling",
+  "file": null,
+  "line": null,
+  "title": "Fixture cleanup could report success while leaving users; apply turned INCOMPLETE verification into exit 0",
+  "status": "VERIFIED_LOCAL_TEST_AND_REVIEW",
+  "triage": "fixture_delete fails loudly and goes on after one failure; apply exits 3 on INCOMPLETE; behaviour tests with a stub kcadm. Codex round 3 (89ec820): correct by inspection.",
+  "evidence": "see final-quality-gate.md section 7",
+  "found_at_commit": "0fc6fca",
+  "fix_commit": "89ec820",
+  "verified_at": "a746e6d"
  }
 ]
