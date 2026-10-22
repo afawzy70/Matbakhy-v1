@@ -1,4 +1,4 @@
-/* global document, window, navigator, localStorage, location, history */
+/* global document, window, location, history */
 import {matches, persisted, report, statuses, executionIssues} from './core.mjs';
 
 const main = document.querySelector('main');

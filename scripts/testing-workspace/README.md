@@ -51,4 +51,4 @@ The second script compares computed geometry and tokens against the archived HTM
 
 Canonical immutability checks compare SHA256 values captured from the pinned develop baseline, so they also work in GitHub shallow checkouts. The baseline capture was verified against the actual Git objects before recording the hashes; test failure never authorizes changing a canonical case.
 
-The generated catalog is compact JSON to remain below the secret scanner size ceiling; authored guidance stays readable in source JSON. The [security finding review](../../docs/quality/testing-workspace/security-review.md) records four classified non-credential matches and an unapplied proposal requiring explicit owner approval. No scanner exclusions were added.
+The generated catalog is compact JSON to remain below the secret scanner size ceiling; authored guidance stays readable in source JSON. The [security finding review](../../docs/quality/testing-workspace/security-review.md) records the four owner-approved exact exclusions, passing history scan, and remaining tree-scan occurrence of the same prototype progress namespace. No additional exclusion was added.
