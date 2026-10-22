@@ -100,6 +100,10 @@ python3 scripts/owner_e2e_fixtures.py check    # manifest, SQL seed and case fil
 - بلّغ عن العيب بقالب GitHub issue اسمه `.github/ISSUE_TEMPLATE/defect.md` (معرّفات الـ Story/القاعدة/السيناريو، والـ Source Commit، والخطورة، ومعرّفات الـ Fixtures الاصطناعية، والخطوات، والمتوقع، والملاحظ، والـ Logs بعد التنضيف، والثوابت المتأثرة).
 - إصلاح عيب: اعمل Reproduce باختبار آلي بيفشل الأول لو ممكن، وبعدين صلّح، وأعد تشغيل الـ Suite المتأثرة والمجاورة ليها، وبعدين اذكر الاختبار في الـ PR. تغطية الـ Regression جزء من الإصلاح، مش اختيارية.
 
+## اختبار إعداد الـ Beta على الـ iPhone
+
+`python3 -m unittest scripts.test_ios_beta_config` بيفحص هوية الـ Beta والـ Endpoints وتسجيل الـ Redirect URI، وإن مفيش أي مواد توقيع متتبّعة في Git (`*.p12` و`*.p8` و`*.mobileprovision` متجاهلة في `.gitignore`)، وكمان بيتأكد عن طريق تحليل `.github/workflows/ios-beta.yml` إن الـ Build والـ Submit بيشتغلوا بس من خلال `workflow_dispatch` يدوي ومحكوم بموافقة المالك (مع حالات سلبية). ده اختبار إعدادات: مش دليل إن Build أو رفع أو تشغيل على جهاز حصل (NOT VERIFIED).
+
 ## القيود المعروفة وفجوات التوثيق
 
 - عدد الحالات في README الكتالوج (199) مش متفق مع ملفات الحالات (200).

@@ -229,3 +229,5 @@ The access method must work for: browser sign-in and the OIDC redirects between 
   - O05 visual approval.
 
   Deployment files do not close MB-040.
+
+The iPhone beta preparation adds `deploy/web-preview/register-mobile-client.sh` and the preview realm client definition for the beta redirect URI; neither has been applied to the Contabo server by this change (see `docs/mobile/ios-testflight-beta.md`).

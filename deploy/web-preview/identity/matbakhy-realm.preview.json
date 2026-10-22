@@ -68,6 +68,42 @@
       "directAccessGrantsEnabled": false,
       "implicitFlowEnabled": false,
       "description": "Service account used only by the API for the audited MFA reset and to end sessions (never public)"
+    },
+    {
+      "clientId": "matbakhy-mobile",
+      "name": "Matbakhy customer app, iOS beta (public client, PKCE)",
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "matbakhy-beta://auth/callback"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "acr.loa.map": "{\"mfa\": \"2\"}"
+      },
+      "protocolMappers": [
+        {
+          "name": "api-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.custom.audience": "matbakhy-api",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "amr",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-amr-mapper",
+          "config": {
+            "access.token.claim": "true",
+            "id.token.claim": "true"
+          }
+        }
+      ]
     }
   ],
   "users": [

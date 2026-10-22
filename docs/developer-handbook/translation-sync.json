@@ -154,8 +154,8 @@
    "en": "d47aeba669fdb12c8bd4bda9bb73472882f92d24356b25029516e2ac18d820a0"
   },
   "05-developer-workflow/ci-cd.md": {
-   "ar": "5b20bfa654150b5fe26ae26953f6dee40e29637a8906ad92b11802b0cb8ffcea",
-   "en": "1268359b88838b6be61daff11603cfa0daa04a83f6f1b1216c2ff16274181ee4"
+   "ar": "ff77274f58ce41bb117aacf31b3e960bfb254a09f64f07b98bfaeacc0f26ed78",
+   "en": "757c6f662a8ff9c15423e5ab39af92dd5cb4e31ac603792389e065b6069e4c4d"
   },
   "05-developer-workflow/documentation-maintenance.md": {
    "ar": "9202b865427fb75a088bc6ffdf27078e9abd4cfb08686567c240fe90b7d7d279",
@@ -190,8 +190,8 @@
    "en": "a6fea03dc752bd934b38bcb8ed8a05d62da938030436677134bb7eddbe78beec"
   },
   "05-developer-workflow/test-execution.md": {
-   "ar": "9c80aacf84ce909285870b8999b10f480283d0230b1f6e89ab87af3eec284201",
-   "en": "b75a53a009dbe4d01a1eab340d95052ae16793fc04fc9b664d1ea580ed135023"
+   "ar": "5b357e846624c9e15dbb5d5c10cdf83b34c86278c2b2583af360c7d9d0347f85",
+   "en": "cfaf0542cbdd268f4a048caa984a888ce99abf6539c8a195d873893c27584914"
   },
   "05-developer-workflow/troubleshooting.md": {
    "ar": "3b42395fbba501e985f8808d7d3e885e5ef5a5c1a8097a9a5abfc5432af52ee0",

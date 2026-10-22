@@ -100,6 +100,10 @@ Only synthetic actors exist: `customer-a/b`, `cook-a`, `ops-a` locally; `preview
 - Report a defect with the GitHub issue template `.github/ISSUE_TEMPLATE/defect.md` (story/rule/scenario IDs, source commit, severity, synthetic fixture IDs, steps, expected, observed, sanitized logs, affected invariants).
 - Fixing a defect: reproduce with a failing automated test first where feasible, repair, rerun the affected suite and the neighbouring ones, then cite the test in the PR. Regression coverage is part of the fix, not optional.
 
+## iPhone beta configuration test
+
+`python3 -m unittest scripts.test_ios_beta_config` checks the beta identity, endpoints, redirect-URI registration, that no signing material is tracked (`*.p12`, `*.p8`, `*.mobileprovision` are ignored by `.gitignore`) and, by parsing `.github/workflows/ios-beta.yml`, that build and submit run only through manual, owner-gated `workflow_dispatch` (negative cases included). It is a configuration test: it is not evidence that a build, upload or device run happened (NOT VERIFIED).
+
 ## Known limitations and documentation gaps
 
 - Catalog README count (199) disagrees with the case files (200).

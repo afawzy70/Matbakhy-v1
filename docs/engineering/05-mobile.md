@@ -56,3 +56,5 @@ Record separate states for build created, installed/tested, submitted, in review
   - Unit tests cover redirect rejection, secure-store handling, account switch and logout, configuration and the crash boundary.
   - The native workflow builds release-variant apps (JS bundle embedded, not store builds), launches them on an Android emulator and an iOS simulator, and records the result in the job log.
   - A full native sign-in round trip against the identity provider is not yet automated.
+
+- **iPhone beta preparation (NOT VERIFIED, nothing built or uploaded):** `APP_VARIANT=preview` in `apps/customer-mobile/app.config.cjs` selects the separate beta identity (`com.matbakhy.customer.beta`, scheme `matbakhy-beta`); `eas.json` holds the `testflight` profile. The development identity and the native CI are unchanged when the variable is unset. See `docs/mobile/ios-testflight-beta.md`.
