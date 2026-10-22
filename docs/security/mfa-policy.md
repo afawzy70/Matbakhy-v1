@@ -46,3 +46,6 @@ The Keycloak admin API is reachable on the internal network only (the proxy neve
 
 ## Tests
 `MfaPolicyResolveTest` (precedence matrix), `MfaPolicyIntegrationTest` (defaults, permissions and step-up for policy changes, REQUIRED enforcement, preference vs REQUIRED, enable/disable and recent authentication, DISABLED, role-based categories, reset guards), `MfaIdpTest` (real Keycloak: normal login, step-up, wrong code, enrolment, SSO session), `MfaResetIntegrationTest` (real Keycloak + API over bearer tokens: enforcement and the audited reset), web tests for the Security sections and the administrator controls. `StaffAssuranceTest` is unchanged: high-risk staff actions keep requiring recent MFA whatever the policy.
+
+## Preview mobile client
+The preview realm file `deploy/web-preview/identity/matbakhy-realm.preview.json` registers the public PKCE client `matbakhy-mobile` with the single redirect URI `matbakhy-beta://auth/callback`, the `matbakhy-api` audience mapper and no direct-access grants (iPhone beta preparation; not applied to any server by this change; NOT VERIFIED on a device).

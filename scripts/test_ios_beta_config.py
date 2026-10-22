@@ -98,11 +98,63 @@ class IosBetaConfigTest(unittest.TestCase):
         self.assertIn('--id "$BUILD_ID"', submit)
         self.assertNotIn("--latest", submit, "the reviewer must approve one named build, not whatever is newest")
         self.assertIn("vars.ASC_APP_ID", submit)
+        self.assertNotIn("--asc-app-id", submit, "eas submit has no such flag; ascAppId is written into the submit profile")
+        self.assertIn("ascAppId=process.env.ASC_APP_ID", submit)
         for line in text.splitlines():
             if "inputs.confirm" in line and not line.lstrip().startswith(("#", "description:")):
                 self.assertRegex(line, r"^\s+CONFIRM: \$\{\{ inputs\.confirm \}\}$", "the confirmation text must reach the shell through env, not interpolation")
         used = set(re.findall(r"secrets\.([A-Z0-9_]+)", text))
         self.assertEqual(used, {"EXPO_TOKEN"})
+
+    # Parsed (effective) workflow checks, with negative cases proving the checker can fail.
+    @staticmethod
+    def workflow_problems(wf):
+        problems = []
+        on = wf.get(True, wf.get("on", {}))
+        if set(on) != {"pull_request", "workflow_dispatch"}:
+            problems.append(f"triggers must be exactly pull_request and workflow_dispatch, got {sorted(on)}")
+        if wf.get("permissions") != {"contents": "read"}:
+            problems.append("top-level permissions must be exactly contents: read")
+        jobs = wf.get("jobs", {})
+        if set(jobs) != {"config-check", "build", "submit"}:
+            problems.append(f"unexpected jobs {sorted(jobs)}")
+            return problems
+        want = {"build": ("ios-beta", "inputs.action == 'build'"), "submit": ("ios-beta-submit", "inputs.action == 'submit'")}
+        for name, (env, cond) in want.items():
+            job = jobs[name]
+            if job.get("environment") != env:
+                problems.append(f"{name}: environment must be {env}")
+            condition = str(job.get("if", ""))
+            if "github.event_name == 'workflow_dispatch'" not in condition or cond not in condition:
+                problems.append(f"{name}: must run only on workflow_dispatch with action {name}")
+        if "secrets." in json.dumps(jobs["config-check"]):
+            problems.append("config-check must not use secrets")
+        for name, job in jobs.items():
+            for step in job.get("steps", []):
+                uses = step.get("uses")
+                if uses and not re.search(r"@[0-9a-f]{40}$", uses.split(" ")[0]):
+                    problems.append(f"{name}: action {uses} is not pinned to a commit SHA")
+        return problems
+
+    def test_the_parsed_workflow_is_exactly_manual_for_build_and_submit(self):
+        import yaml
+        self.assertEqual(self.workflow_problems(yaml.safe_load(WORKFLOW.read_text())), [])
+
+    def test_the_workflow_checker_fails_on_loosened_workflows(self):
+        import copy
+        import yaml
+        base = yaml.safe_load(WORKFLOW.read_text())
+        def mutate(fn):
+            wf = copy.deepcopy(base)
+            fn(wf)
+            return self.workflow_problems(wf)
+        self.assertTrue(mutate(lambda w: w[True].update({"push": {"branches": ["develop"]}})))
+        self.assertTrue(mutate(lambda w: w["jobs"]["build"].pop("if")))
+        self.assertTrue(mutate(lambda w: w["jobs"]["submit"].update({"if": "inputs.action == 'submit'"})))
+        self.assertTrue(mutate(lambda w: w["jobs"]["build"].pop("environment")))
+        self.assertTrue(mutate(lambda w: w.update({"permissions": {"contents": "write"}})))
+        self.assertTrue(mutate(lambda w: w["jobs"]["config-check"]["steps"].append({"run": "echo ${{ secrets.EXPO_TOKEN }}"})))
+        self.assertTrue(mutate(lambda w: w["jobs"]["build"]["steps"].append({"uses": "actions/checkout@v4"})))
 
     def test_no_signing_material_is_tracked(self):
         tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.splitlines()

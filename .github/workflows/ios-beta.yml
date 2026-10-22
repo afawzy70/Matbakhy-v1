@@ -1,5 +1,6 @@
 name: iOS beta (EAS Build and TestFlight; manual, owner-gated)
 # Release engineering for the physical-iPhone beta (docs/mobile/ios-testflight-beta.md). Nothing here runs on push or on a schedule.
+# The only automatic trigger is the secret-free, read-only config-check on pull requests; build and submit are workflow_dispatch only.
 #  * config-check   runs on pull requests that touch the mobile app: resolves the preview Expo config, no secrets, no Apple, no EAS.
 #  * build          manual; needs the "ios-beta" environment (owner approval) and the EXPO_TOKEN secret; starts an EAS cloud build
 #                   of the "testflight" profile. Signing credentials live in EAS (created interactively once by the owner), never in Git.
@@ -118,4 +119,7 @@ jobs:
           ASC_APP_ID: ${{ vars.ASC_APP_ID }}
         run: |
           [ -n "$EXPO_TOKEN" ] || { echo "::error::EXPO_TOKEN is not configured in the ios-beta-submit environment"; exit 1; }
-          pnpm dlx "$EAS_CLI" submit --platform ios --profile testflight --id "$BUILD_ID" --asc-app-id "$ASC_APP_ID" --non-interactive
+          # eas submit takes the App Store Connect app id from the submit profile, not a flag; the id belongs in the submit profile. Write the validated, non-secret id into the
+          # runner's copy of eas.json only (never committed).
+          node -e 'const fs=require("fs");const c=JSON.parse(fs.readFileSync("eas.json","utf8"));c.submit.testflight.ios.ascAppId=process.env.ASC_APP_ID;fs.writeFileSync("eas.json",JSON.stringify(c,null,2));'
+          pnpm dlx "$EAS_CLI" submit --platform ios --profile testflight --id "$BUILD_ID" --non-interactive
