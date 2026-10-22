@@ -169,6 +169,10 @@
    "ar": "11c73c0f9c1e2898515df2299dc5a4c8ea2e5554f8bc1d71e1708a9e4713d1f8",
    "en": "84f16f432a3ffafd6034c8645a87969ad9f17bd09ec5fe9b7978d8bb05ac96b9"
   },
+  "05-developer-workflow/live-preview-access.md": {
+   "ar": "24643ca30ef46246e1986ce8f7aaa2e68ea3dee3f046f012387249753f305837",
+   "en": "a5f13c00b86d7539eba6c1e2f69711d07d7b11bac3ef8b656bce45f7ce781594"
+  },
   "05-developer-workflow/local-environment.md": {
    "ar": "c577c5d70079dcec4a273d12c92099db6d4665394ffd1ef41ee9b8e15c355b40",
    "en": "71f42315f6575259007f25c5ec649d8426b919abc0982e842206e4826330db99"
@@ -186,8 +190,8 @@
    "en": "a6fea03dc752bd934b38bcb8ed8a05d62da938030436677134bb7eddbe78beec"
   },
   "05-developer-workflow/test-execution.md": {
-   "ar": "fe59deaef8ea5ce949f3d3393878a3104908d5e7bc915e1a9319fabe6b931a35",
-   "en": "8c09bf8f8b8839c6d60a3a5658e52e04ab02b73793377ecac50621e42633833b"
+   "ar": "9c80aacf84ce909285870b8999b10f480283d0230b1f6e89ab87af3eec284201",
+   "en": "b75a53a009dbe4d01a1eab340d95052ae16793fc04fc9b664d1ea580ed135023"
   },
   "05-developer-workflow/troubleshooting.md": {
    "ar": "3b42395fbba501e985f8808d7d3e885e5ef5a5c1a8097a9a5abfc5432af52ee0",
@@ -217,6 +221,26 @@
    "ar": "ee88fed241db83fcb19cc6fc68801cd5ac3b4d1bc7b1a61935aba3f2f686e3e8",
    "en": "1671bf9d80ce53ce3ddb51cd5c834c4708a439def68ba3c6c12cba1aecea40a2"
   },
+  "06-onboarding-labs/infra-day-1-topology-accounts.md": {
+   "ar": "b9b90f7d71a6e484562ed17e9887ab4c467ceb4a05c946beb520b8555db5bc4b",
+   "en": "612a02e5b6b6d2fe86b794e07bf871721167872eac537f2e7774313433d2e09e"
+  },
+  "06-onboarding-labs/infra-day-2-docker-services.md": {
+   "ar": "0cfa03b6478d08c1ebac37889aa12b414a0db94c73dda7cb3b2630920876cf8b",
+   "en": "4e942b7e32f39d370db48cee83d8cf842b69cdb339659e932786afb9f0bf0db0"
+  },
+  "06-onboarding-labs/infra-day-3-dns-https-keycloak.md": {
+   "ar": "de06041311387f745f9c17a42d89a6aed34f6434d70eb046116cc64508fc369b",
+   "en": "f68a27e82dcc80e149f2d65d8e82a56203535522bd98ad764a34dc83faddd7e4"
+  },
+  "06-onboarding-labs/infra-day-4-cicd-operations.md": {
+   "ar": "1b49aa43aa5a32998f7912beec75f6156039815e0d29a6acdd8b4f74b3753079",
+   "en": "42a0670a56f015200619fa2ab96fb8068aba8002fcbaaea9ac5c7647f0c3d447"
+  },
+  "06-onboarding-labs/infra-day-5-rebuild-recovery.md": {
+   "ar": "89c3ee4234387ab67f42c92c8128c7b9c0da423b8779fec60f390d8a5d06b359",
+   "en": "e56c13a1ec87fc5e33d6beb71017f604a3a4239e9276e51431d8d1a2d8a24cfd"
+  },
   "07-reference/architecture-decisions.md": {
    "ar": "404f431b5e9225cc80893fff5bc4b40ce1ed7efdd27b3bb8eab91854c8a6af27",
    "en": "78926d95239a470b22b9185a1626d42d5b54f47a33632e1feadfb97680724ce7"
@@ -245,6 +269,14 @@
    "ar": "809738bd0ff2ae966feda4a7f67f775fac459286e6801453f82c43977422e5e8",
    "en": "fc1eb7fa8573ec13892da2ac5dc1462a89207df7b0522ef3da3f3fa3764d53ce"
   },
+  "07-reference/infrastructure-documentation-coverage.md": {
+   "ar": "1388bacca71c943227902c70b5717b307cdec0104e6fce8b515848ac58b90e8d",
+   "en": "b7fabd551d04f034e6f9738acadb85cd53fa311bc04209e5385e935b9fa62499"
+  },
+  "07-reference/infrastructure-handover-report.md": {
+   "ar": "ac8e133ddeab38b0e7b3fd31a11d8caa76c46df864ae9cbf1cf6711149c4c0ec",
+   "en": "3db110312af4afa6eb23cba6679502c80bbfc01b5852a8d93791d86d0382d984"
+  },
   "07-reference/inventory-and-gaps.md": {
    "ar": "17fe0aa4271ffaea7035d53009dd37eec61f59ced26cc18025545d564cae926f",
    "en": "406329e3474bb204d57a82599424f179c3cb21fa5d35ae1a6e97d4d8cd3ac95d"
@@ -253,9 +285,45 @@
    "ar": "5960f0413c4b925293947114c39ef88660520b56361def01bddca085aec91964",
    "en": "16119ea9f884fec4964ff898d8400a859b554b5b99873954a384a97bc23d6422"
   },
+  "08-infrastructure/admin-readonly-verification.md": {
+   "ar": "7d6748181153ec7da0e8a46146507991ca7d01935fbfb8071b6b8bc1e6744baf",
+   "en": "ede76d54f24b57810a6324c77209d31645a8c27fde0ae6c006cf52336137548e"
+  },
+  "08-infrastructure/backup-restore-disaster-recovery.md": {
+   "ar": "4d00bbc295ad4d339aa840190fbd2218446f13255fcbd11b61ed76a4191bada3",
+   "en": "ea5d02df1541dd6094d4599a806ba926337df4fa0da841cc8e8490294bc12058"
+  },
+  "08-infrastructure/complete-recovery-sequence.md": {
+   "ar": "22e5def730eaf229843aef60260055877416b68002855ce459802932b59f7604",
+   "en": "99c28d89746c425a0445c46741215cc216eb2965be197b925162d51e56c2c092"
+  },
+  "08-infrastructure/contabo-server-inventory.md": {
+   "ar": "fff855a6917ea21e6f8c9fdfa35042d89c68a4c8eb3202e428a6a67a7a76c759",
+   "en": "76435bcf3994c08684b4ca7bdda22de18d524831e6d86c69589547fe9d34c4f3"
+  },
+  "08-infrastructure/deployment-pipeline.md": {
+   "ar": "cb064e989b4961bd742259b8bc47279fa864459947f7c769523739ba994c091c",
+   "en": "57c72e4679c9fce3d75f26b4091db3b241b8c872032204936ae8e31dd4412f2b"
+  },
+  "08-infrastructure/dns-https-sslip-io.md": {
+   "ar": "14b38aa16b590913ed929d03a3bee0a7faf05608ddb62215882d150d85ecc175",
+   "en": "508b3d1bd7c907b966b049b5f047aee03a39d828cefed14f810ee674f388fdb6"
+  },
+  "08-infrastructure/infrastructure-troubleshooting.md": {
+   "ar": "cfae4a6a9f5255ef362daecc3339ccd794388994e5376669d3c6ec4182932820",
+   "en": "668742269336abbd45abe088d0212edf7b421704e0b5414a1ab18c71892a85e9"
+  },
+  "08-infrastructure/runtime-architecture.md": {
+   "ar": "59a234a6fb9c8ddd71780245e0719a894ea29acdd5acb4dcd4147e50dc831f5a",
+   "en": "e02ebb961e32bd9f490977cd5667294dab190e52ecabc326bee38eda9410c5ba"
+  },
+  "08-infrastructure/server-rebuild-guide.md": {
+   "ar": "5e45518b6851f5d89be1e95dc33111e5181f866b0e3afc69a1c98c9e6819515c",
+   "en": "8a5fc60599165104b8b0ae92edef5ab9f6d71d5e2e4c04121aa883ad93f68ab0"
+  },
   "README.md": {
-   "ar": "ef3d487ec440d41350ad957b8a763d722338678566e0d9488a57413b5b1ffc29",
-   "en": "d43bfa36d38d59b7a2ca827010daef328caee24941d4e8299eace60f9b3d0f46"
+   "ar": "04c88467567608054b65621c636a0b1bba918ce513d723f5bb818b333baa1436",
+   "en": "faaa74bc88209d9eb5f5f565e43ecf2d881ee87a0c5d887c76c3e92417b65d5f"
   }
  },
  "schema_version": 1
