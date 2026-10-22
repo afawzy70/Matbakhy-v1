@@ -2,6 +2,10 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
+## 2026-10-22 — Owner-approved scan exceptions follow-up
+
+[PR #43](https://github.com/afawzy70/Matbakhy-v1/pull/43) stays Draft. Tested source 37271995801c0fc18f4c34c24955dc56413f03a8: four owner-approved historical exceptions applied; full-history scan passes (564 commits, zero findings). The same prototype marker remains in directory scan under a different fingerprint; no fifth exception applied. [Security review](../quality/testing-workspace/security-review.md) · [daily report](daily/2026-10-22.md). Coverage remains 200/1005, one guide reviewed complete; no live product execution, merge or deployment.
+
 ## 2026-10-22 — Approved Testing Workspace prototype (Draft)
 
 [PR #43](https://github.com/afawzy70/Matbakhy-v1/pull/43) now follows the actual attached tutorial. [Daily checkpoint](daily/2026-10-22.md) · [comparison/screenshots](../quality/testing-workspace/design-comparison.md). Tested source 8569f10818c7823fec2457514e6f6332a815f37b: 200 cases / 1005 canonical steps unchanged; 1 source-reviewed complete guide (ORDER-101), 199 drafts, no live product runs. Local browser/coverage/documentation checks pass. Secret scan remains BLOCKED on four independently classified non-credential matches; automatic review requires explicit owner authorization for the documented exact exception proposal. No scanner changes, merge or deployment.
