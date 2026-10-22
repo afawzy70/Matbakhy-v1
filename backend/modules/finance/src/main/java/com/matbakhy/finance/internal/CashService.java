@@ -74,7 +74,7 @@ public class CashService {
                 .orElseThrow(() -> new ApiException(ErrorCode.FORBIDDEN, "not a cook"));
         UUID reportId = idempotency.execute(cookId, "cash.report", key, Map.of("orderId", orderId.toString(), "input", in), UUID.class, () -> {
             Map<String, Object> o = jdbc.queryForList("""
-                    SELECT o.state, o.version, o.total_minor, o.created_at, c.state AS cash_state FROM customer_order o
+                    SELECT o.state, o.version, c.amount_minor AS due_minor, o.created_at, c.state AS cash_state FROM customer_order o
                     JOIN cash_obligation c ON c.order_id = o.id WHERE o.id = ? AND o.kitchen_id = ? FOR UPDATE OF c""", orderId, kitchen)
                     .stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "order not found"));
             if (in.expectedVersion() != (Long) o.get("version")) {
@@ -93,7 +93,8 @@ public class CashService {
             if (in.collectedAt() == null || in.collectedAt().isAfter(now) || in.collectedAt().isBefore(((Timestamp) o.get("created_at")).toInstant())) {
                 throw invalid("collectedAt", "BETWEEN_ORDER_AND_NOW");
             }
-            long due = (Long) o.get("total_minor");
+            // The immutable obligation (total minus any acknowledged-at-placement deposit), not the order total.
+            long due = (Long) o.get("due_minor");
             long discrepancy = Math.subtractExact(in.amountMinor(), due);
             UUID id = UUID.randomUUID();
             String reference = in.externalReference() == null || in.externalReference().isBlank() ? null : in.externalReference().strip();
@@ -124,8 +125,8 @@ public class CashService {
     public CashReportView verify(UUID staffId, String key, VerificationInput in, String requestId) {
         UUID reportId = idempotency.execute(staffId, "cash.verify", key, in, UUID.class, () -> {
             Map<String, Object> r = jdbc.queryForList("""
-                    SELECT r.order_id, r.reporter_id, r.state, r.version, r.discrepancy_minor, o.total_minor FROM cash_report r
-                    JOIN customer_order o ON o.id = r.order_id WHERE r.id = ? FOR UPDATE OF r""", in.reportId()).stream().findFirst()
+                    SELECT r.order_id, r.reporter_id, r.state, r.version, r.discrepancy_minor, c.amount_minor AS due_minor FROM cash_report r
+                    JOIN cash_obligation c ON c.order_id = r.order_id WHERE r.id = ? FOR UPDATE OF r""", in.reportId()).stream().findFirst()
                     .orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "cash report not found"));
             if (staffId.equals(r.get("reporter_id"))) {
                 throw new ApiException(ErrorCode.FORBIDDEN, "separation of duties");
@@ -136,7 +137,7 @@ public class CashService {
             if (!"REPORTED".equals(r.get("state"))) {
                 throw new ApiException(ErrorCode.STATE_CONFLICT, "report already decided", List.of(new FieldError("state", (String) r.get("state"))));
             }
-            long due = (Long) r.get("total_minor");
+            long due = (Long) r.get("due_minor");
             String reason = in.reason() == null ? null : in.reason().strip();
             if (in.verifiedAmountMinor() == null || in.verifiedAmountMinor() < 0) {
                 throw invalid("verifiedAmountMinor", "REQUIRED");

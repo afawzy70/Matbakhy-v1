@@ -52,6 +52,39 @@ final class SignInRoundTripTests: XCTestCase {
         dismissKeyboard()
         guard let secret = field(secure: true, timeout: 10) else { return XCTFail("password field missing") }
         type(password + "\n", into: secret)
+        // customer-a signs in as "Customer SyntheticA", customer-b as "Customer SyntheticB".
+        dismissSavePassword(until: label(containing: "Synthetic" + username.suffix(1).uppercased()))
+    }
+
+    /// BLK-005 (bounded attempt 4, owner-authorised 2026-10-13 evening). Runs 43-47: polling the app, the sign-in sheet and
+    /// springboard for the "Save Password?" prompt either missed it, tapped it after XCTest had dismissed it (run 46), or
+    /// timed out querying other processes (run 47). Now XCTest handles the prompt itself: an interruption monitor taps
+    /// "Not Now", only the app's own hierarchy is polled, and while the prompt is visible one tap at the very top of the
+    /// screen (no control there) lets XCTest run the monitor. Sign-in stays real; nothing is bypassed.
+    private func dismissSavePassword(until done: XCUIElement? = nil) {
+        let monitor = addUIInterruptionMonitor(withDescription: "Save Password") { alert in
+            let notNow = alert.buttons["Not Now"]
+            if notNow.exists {
+                notNow.tap()
+                print("MB031-SAVE-PASSWORD-DISMISSED")
+                return true
+            }
+            return false
+        }
+        defer { removeUIInterruptionMonitor(monitor) }
+        let prompt = app.alerts["Save Password?"]
+        var deadline = Date().addingTimeInterval(90)
+        var settled = false
+        while Date() < deadline {
+            if prompt.exists {
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
+            }
+            if !settled, let done, done.exists {
+                settled = true
+                deadline = Date().addingTimeInterval(3)
+            }
+            Thread.sleep(forTimeInterval: 1)
+        }
     }
 
     /// With the software keyboard up, its form-assistant bar can cover the password field (native run 18): tap the page

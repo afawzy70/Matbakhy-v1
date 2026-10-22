@@ -1,0 +1,177 @@
+{
+  "agent": "Codex independent QA engineer",
+  "commit": "164a831fe3f38236801103582cf0c5b76a6c470d",
+  "summary": "HEAD matched before and after verification. Local Java unit tests: 11 passed. JavaScript tests: 210 passed, 0 failed. Expanded typecheck, lint, builds and contract checks passed. Python discovery: 73 executed, 72 passed, 1 failed; one additional Docker class skipped. Docker/Testcontainers tests NOT_RUN locally. Owner-supplied CI evidence: https://github.com/afawzy70/Matbakhy-v1/actions/runs/39122215555 reports 304 backend tests, 0 failures; not independently fetched. All requested new tests contain meaningful assertions. Traceability, limitations and flakiness review saved in docs/quality/stabilization/qa-test-plan.md; execution report, findings and exact command ledger saved alongside it. No application source changed.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Matched requested SHA before and after execution."
+    },
+    {
+      "command": "python3 scripts/validate_blueprint.py",
+      "exit_code": 0,
+      "note": "PASS: 1 validation, 0 failures; blueprint structure only."
+    },
+    {
+      "command": "python3 scripts/check_scope.py",
+      "exit_code": 0,
+      "note": "PASS: 1 validation, 0 failures."
+    },
+    {
+      "command": "python3 scripts/check_migration_compat.py",
+      "exit_code": 0,
+      "note": "PASS: 1 validation, 0 failures."
+    },
+    {
+      "command": "python3 -m unittest discover -s scripts -p 'test_*.py'",
+      "exit_code": 1,
+      "note": "73 executed: 72 passed, 1 failed (test_scope.ScopeGuards.test_current_repository_passes). Additional class-level skip: test_proxy_access.ProxyAccessTest, 'Docker is not available'. Negative migration-fixture FAIL output is expected. ResourceWarning at test_rehearsal_tls.py:17."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false typecheck",
+      "exit_code": 1,
+      "note": "BLOCKED before checks: nested pnpm ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false lint",
+      "exit_code": 0,
+      "note": "PASS: 1 lint check, 0 failures."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false test",
+      "exit_code": 1,
+      "note": "BLOCKED before tests: nested pnpm engine enforcement."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false build",
+      "exit_code": 1,
+      "note": "BLOCKED before builds: nested pnpm engine enforcement."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false contract:check",
+      "exit_code": 1,
+      "note": "BLOCKED before checks: nested pnpm engine enforcement."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false typecheck",
+      "exit_code": 1,
+      "note": "Same nested engine blocker."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false lint",
+      "exit_code": 0,
+      "note": "PASS."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false test",
+      "exit_code": 1,
+      "note": "Same nested engine blocker."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false build",
+      "exit_code": 1,
+      "note": "Same nested engine blocker."
+    },
+    {
+      "command": "npm_config_engine_strict=false pnpm --config.engine-strict=false contract:check",
+      "exit_code": 1,
+      "note": "Same nested engine blocker."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false -r --if-present run typecheck",
+      "exit_code": 0,
+      "note": "PASS: 5 projects, 0 failures."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false -r --if-present run test",
+      "exit_code": 0,
+      "note": "PASS: 5 projects. Separate JSON reports confirmed 210 unique tests passed, 0 failed or pending."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false --reporter=append-only -r --if-present run test",
+      "exit_code": 0,
+      "note": "Repeated PASS; output still only printed package completion."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false -r --if-present run build",
+      "exit_code": 0,
+      "note": "PASS: 2 web builds, 0 failures. Native builds NOT_RUN."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run lint:contract",
+      "exit_code": 0,
+      "note": "PASS: 0 errors, 4 ambiguous-path warnings."
+    },
+    {
+      "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run check:drift",
+      "exit_code": 0,
+      "note": "PASS: generated client matches contract; 4 ambiguous-path warnings."
+    },
+    {
+      "command": "JAVA_HOME=/home/aiagent/tools/jdk-21.0.12.1+1 PATH=/home/aiagent/tools/jdk-21.0.12.1+1/bin:$PATH ./mvnw -o -B -pl app -am test -Dtest='StaffAssuranceTest,AccountMapperStaffMfaTest,MediaInspectorPdfTest' -Dsurefire.failIfNoSpecifiedTests=false",
+      "exit_code": 0,
+      "note": "cwd=backend. PASS: 11 tests, 0 failures/errors/skips: StaffAssuranceTest 3, AccountMapperStaffMfaTest 3, MediaInspectorPdfTest 5. No sandbox block."
+    },
+    {
+      "command": "(cd packages/api-client && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-api.json)",
+      "exit_code": 0,
+      "note": "34 passed, 0 failed/pending."
+    },
+    {
+      "command": "(cd packages/design-tokens && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-tokens.json)",
+      "exit_code": 0,
+      "note": "47 passed, 0 failed/pending."
+    },
+    {
+      "command": "(cd apps/customer-web && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-customer.json)",
+      "exit_code": 0,
+      "note": "48 passed, 0 failed/pending."
+    },
+    {
+      "command": "(cd apps/operations-web && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa3-ops.json)",
+      "exit_code": 0,
+      "note": "26 passed, 0 failed/pending."
+    },
+    {
+      "command": "(cd apps/customer-mobile && ../../node_modules/.bin/jest --ci --json --outputFile=/tmp/qa3-mobile.json)",
+      "exit_code": 127,
+      "note": "Reporting attempt: executable not found. Corrected below."
+    },
+    {
+      "command": "(cd apps/customer-mobile && ./node_modules/.bin/jest --ci --json --outputFile=/tmp/qa3-mobile.json)",
+      "exit_code": 0,
+      "note": "55 tests and 4 suites passed; 0 failures/skips. React overlapping act() warnings."
+    }
+  ],
+  "findings": [
+    {
+      "id": "QA3-001",
+      "severity": "Low",
+      "component": "Python test isolation",
+      "file": "scripts/test_scope.py",
+      "line": 18,
+      "title": "Scope fixture copies environment-only directories",
+      "scenario": "Run unittest discovery in this worktree containing ignored .aws and .codex directories.",
+      "expected": "Baseline fixture excludes environment-only directories and passes inventory validation.",
+      "actual": "test_current_repository_passes fails with unlisted top-level entries .aws and .codex; standalone check_scope.py passes.",
+      "evidence": "Discovery exit 1: Ran 73 tests; failures=1, skipped=1. scripts/test_scope.py:11,18,33 copies the tree without Git metadata, causing filesystem inventory fallback.",
+      "suggested_fix": "Create fixtures from tracked/non-ignored repository files, excluding environment directories.",
+      "repro_test": "python3 -m unittest discover -s scripts -p 'test_*.py'"
+    },
+    {
+      "id": "QA3-002",
+      "severity": "Medium",
+      "component": "Media cleanup test isolation",
+      "file": "backend/app/src/test/java/com/matbakhy/app/media/MediaCleanupIntegrationTest.java",
+      "line": 84,
+      "title": "Retry assertions compete with enabled cleanup scheduler",
+      "scenario": "A scheduler tick processes the enqueued orphan before the test-controlled failing cleanup does.",
+      "expected": "Only the test-controlled storage and clock process the cleanup row.",
+      "actual": "The integration context leaves the default-enabled cleanup scheduler active. Its real-storage cleanup can mark the row DONE before assertions expecting PENDING and attempts=1. Static timing dependency; no local integration failure claimed.",
+      "evidence": "MediaCleanupIntegrationTest.java:84-95 constructs a separate failing cleanup. support/IntegrationTest.java:17-20 omits cleanup-job disabling; PlatformConfiguration.java:17 enables scheduling; MediaCleanupJob.java:9,18-20 defaults enabled and runs every 30 seconds.",
+      "suggested_fix": "Disable matbakhy.media.cleanup-job.enabled in this test context and isolate due rows used by exact runDue count assertions.",
+      "repro_test": "Docker required: after enqueue, invoke the application MediaCleanup bean before the test-controlled runDue; observe DONE instead of PENDING. NOT_RUN locally."
+    }
+  ]
+}

@@ -8,6 +8,7 @@ function quote(lines: [string, number, number][], fee: number, tax = 0) {
   return {
     quoteId: "q", expiresAt: "2026-10-13T10:00:00Z", kitchenId: "k", items, subtotal: egp(subtotal), deliveryFee: egp(fee), tax: egp(tax),
     total: egp(subtotal + fee + tax), cancellationPolicyVersion: "c", termsVersion: "t", acceptanceDeadlinePreview: "2026-10-13T10:00:00Z", warnings: [],
+    payment: { method: "COD" as const, depositBps: 0, deposit: egp(0), remainder: egp(subtotal + fee + tax), recipient: null },
   };
 }
 

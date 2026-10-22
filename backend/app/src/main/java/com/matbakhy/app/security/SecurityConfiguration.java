@@ -57,6 +57,8 @@ class SecurityConfiguration {
 
     static final String REGISTRATION_ID = "keycloak";
     static final String DELETION_REQUEST = "/api/v1/me/deletion-requests";
+    /** MB-054: anonymous browsing activity (no data returned; deduplicated, capped and stored without identity). */
+    static final String ACTIVITY = "/api/v1/activity";
     static final String[] PUBLIC_GET = {"/api/v1/configuration/public", "/api/v1/zones", "/api/v1/meals", "/api/v1/meals/*",
             "/api/v1/kitchens/*", "/api/v1/kitchens/*/slots", "/api/v1/kitchens/*/reviews", "/api/v1/policies/*"};
 
@@ -140,7 +142,8 @@ class SecurityConfiguration {
 
     @Bean
     @Order(1)
-    SecurityFilterChain bearerChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors) throws Exception {
+    SecurityFilterChain bearerChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors,
+                                    com.matbakhy.app.mfa.MfaPolicyService mfa, IdentityProperties properties) throws Exception {
         http.securityMatcher(request -> {
                     String header = request.getHeader("Authorization");
                     return header != null && header.regionMatches(true, 0, "Bearer ", 0, 7);
@@ -150,6 +153,7 @@ class SecurityConfiguration {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, ACTIVITY).permitAll()
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
@@ -158,26 +162,49 @@ class SecurityConfiguration {
                                 token.getIssuer().toString(), token.getSubject(), token.getClaims())))
                         .authenticationEntryPoint(errors)
                         .accessDeniedHandler(errors))
-                .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors));
+                .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors))
+                .addFilterBefore(new MfaEnforcementFilter(mfa, properties), AuthorizationFilter.class);
         return http.build();
+    }
+
+    /**
+     * The readable XSRF-TOKEN cookie (the web apps copy it into X-XSRF-TOKEN). On a deployment with sibling hosts it is set for the
+     * parent domain (WEB_COOKIE_DOMAIN), otherwise only the API host could read it and every browser mutation would be refused.
+     */
+    static org.springframework.security.web.csrf.CookieCsrfTokenRepository csrfTokenRepository(IdentityProperties properties) {
+        org.springframework.security.web.csrf.CookieCsrfTokenRepository repository =
+                org.springframework.security.web.csrf.CookieCsrfTokenRepository.withHttpOnlyFalse();
+        String domain = properties.webCookieDomain();
+        if (domain != null && !domain.isBlank()) {
+            repository.setCookieCustomizer(cookie -> cookie.domain(domain.strip()));
+        }
+        return repository;
     }
 
     @Bean
     @Order(2)
     SecurityFilterChain webChain(HttpSecurity http, AccountMapper mapper, ApiSecurityErrors errors,
-                                 IdentityProperties properties, ClientRegistrationRepository registrations) throws Exception {
+                                 IdentityProperties properties, ClientRegistrationRepository registrations,
+                                 com.matbakhy.app.mfa.MfaPolicyService mfa) throws Exception {
         http.cors(cors -> { })
-                .csrf(csrf -> csrf.spa())
+                // MB-054: the activity endpoint acts for nobody and ignores identity, so a signed-out phone (no cookie, no CSRF token)
+                // can send it; every other browser request keeps CSRF protection.
+                .csrf(csrf -> {
+                    csrf.spa();
+                    csrf.csrfTokenRepository(csrfTokenRepository(properties));
+                    csrf.ignoringRequestMatchers(ACTIVITY);
+                })
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/error").permitAll()
                         .requestMatchers(SecurityConfiguration::managementScrape).permitAll()
                         .requestMatchers("/oauth2/authorization/**", "/login/oauth2/code/**").permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_GET).permitAll()
+                        .requestMatchers(HttpMethod.POST, ACTIVITY).permitAll()
                         .requestMatchers(HttpMethod.POST, DELETION_REQUEST).hasAnyAuthority(AccountMapper.ACTIVE, AccountMapper.DELETION_REQUESTED)
                         .requestMatchers("/api/**").hasAuthority(AccountMapper.ACTIVE)
                         .anyRequest().denyAll())
                 .oauth2Login(login -> login
-                        .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(stepUpResolver(registrations, properties)))
+                        .authorizationEndpoint(endpoint -> endpoint.authorizationRequestResolver(stepUpResolver(registrations, properties, mfa)))
                         .successHandler(WebReturnTo.successHandler(properties.postLoginRedirect())))
                 .logout(logout -> logout
                         .logoutUrl("/api/v1/auth/logout")
@@ -186,6 +213,7 @@ class SecurityConfiguration {
                         .deleteCookies("MATBAKHY_SESSION"))
                 .exceptionHandling(e -> e.authenticationEntryPoint(errors).accessDeniedHandler(errors))
                 .addFilterBefore(new WebAccountFilter(mapper), AuthorizationFilter.class)
+                .addFilterAfter(new MfaEnforcementFilter(mfa, properties), WebAccountFilter.class)
                 .addFilterBefore(WebReturnTo.capture(properties.allowedOrigins()),
                         org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.class);
         return http.build();
@@ -210,7 +238,7 @@ class SecurityConfiguration {
      * only lets staff obtain such a token from the web app.
      */
     private static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver stepUpResolver(
-            ClientRegistrationRepository registrations, IdentityProperties properties) {
+            ClientRegistrationRepository registrations, IdentityProperties properties, com.matbakhy.app.mfa.MfaPolicyService mfa) {
         var defaults = new org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver(registrations,
                 "/oauth2/authorization");
         return new org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver() {
@@ -228,6 +256,20 @@ class SecurityConfiguration {
             private org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest stepUp(jakarta.servlet.http.HttpServletRequest request,
                     org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest resolved) {
                 if (resolved == null || !"true".equals(request.getParameter("stepUp"))) {
+                    return resolved;
+                }
+                // DISABLED for this account's categories: no second factor is requested (enrolment/use unavailable, D18).
+                // An anonymous request has no account yet and is left as asked; nothing is required of it afterwards.
+                org.springframework.security.core.Authentication current = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+                java.util.Optional<com.matbakhy.app.mfa.MfaPolicyService.Decision> decision = java.util.Optional.empty();
+                if (current instanceof AccountAuthentication account) {
+                    decision = java.util.Optional.of(mfa.decide(account.getPrincipal().id()));
+                } else if (current instanceof OAuth2AuthenticationToken token && token.getPrincipal() instanceof OidcUser user) {
+                    decision = mfa.decideForSubject(user.getIssuer().toString(), user.getSubject());
+                }
+                // Staff keep the step-up their high-risk actions always need (a separate required control), whatever the policy mode.
+                if (decision.isPresent() && !decision.get().available()
+                        && !decision.get().categories().contains(com.matbakhy.app.mfa.MfaPolicyService.Category.STAFF)) {
                     return resolved;
                 }
                 return org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.from(resolved)

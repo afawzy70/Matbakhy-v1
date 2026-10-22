@@ -36,11 +36,12 @@ SELECT check_name, violations FROM (
     LEFT JOIN LATERAL (SELECT to_state FROM order_event e WHERE e.order_id = o.id ORDER BY sequence DESC LIMIT 1) e ON true
     WHERE e.to_state IS DISTINCT FROM o.state
     UNION ALL
-    -- Cash: exactly one cash obligation per order, for the order total.
+    -- Cash: exactly one cash obligation per order, for what is still due in cash: the order total, or the remainder after a deposit (D16).
     SELECT 6, 'one_cash_obligation_per_order', count(*)
     FROM customer_order o
+    LEFT JOIN order_payment p ON p.order_id = o.id
     LEFT JOIN LATERAL (SELECT count(*) AS n, min(amount_minor) AS amount FROM cash_obligation c WHERE c.order_id = o.id) c ON true
-    WHERE c.n <> 1 OR c.amount <> o.total_minor
+    WHERE c.n <> 1 OR c.amount <> coalesce(p.remainder_minor, o.total_minor)
     UNION ALL
     -- Ledger: every group has entries and its debits equal its credits.
     SELECT 7, 'ledger_groups_balanced', count(*)
@@ -60,5 +61,13 @@ SELECT check_name, violations FROM (
     -- Schema: every applied migration succeeded.
     SELECT 9, 'migrations_all_successful', count(*)
     FROM flyway_schema_history WHERE NOT success
+    UNION ALL
+    -- Payments: the deposit and the remainder add up to the total, and the payment state is one the append-only history recorded
+    -- (the order of events within the same instant is not relied on).
+    SELECT 10, 'payment_state_matches_history', count(*)
+    FROM order_payment p
+    WHERE p.deposit_minor + p.remainder_minor <> p.total_minor
+       OR (EXISTS (SELECT 1 FROM payment_event e WHERE e.order_id = p.order_id)
+           AND NOT EXISTS (SELECT 1 FROM payment_event e WHERE e.order_id = p.order_id AND e.to_state = p.state))
 ) checks
 ORDER BY ord;

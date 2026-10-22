@@ -1,0 +1,57 @@
+{
+  "agent": "Codex independent release-engineering and security reviewer",
+  "commit": "8ddc7b521cbfcdc800eebe70726f4283287553cf",
+  "summary": "Two release defects found. All seven configuration guards pass. HEAD matches the requested SHA. No credential values were printed or files changed. Confirmation handling, pinned checkout actions, separate beta identifiers and exact S256 redirect registration look sound. GitHub environment protection settings and live EAS/Apple behavior were not verified; environment names alone do not prove owner approval is enforced.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Confirmed the requested SHA at the start and end of review."
+    },
+    {
+      "command": "git diff fef0010..HEAD",
+      "exit_code": 0,
+      "note": "Reviewed all nine changed files and relevant inherited configuration."
+    },
+    {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest scripts.test_ios_beta_config -v",
+      "exit_code": 0,
+      "note": "Seven tests passed; these do not exercise EAS submission or inspect GitHub environment protection rules."
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "note": "Clean working tree."
+    }
+  ],
+  "findings": [
+    {
+      "id": "RB1-1",
+      "severity": "Medium",
+      "component": "EAS submission configuration",
+      "file": "apps/customer-mobile/eas.json",
+      "line": 23,
+      "title": "Non-interactive submission lacks the required App Store Connect app ID",
+      "scenario": "The owner completes the documented activation checklist, provisions signing and an EAS-held API key, then approves the submit workflow.",
+      "expected": "The documented setup supplies all configuration required for non-interactive upload.",
+      "actual": "The submission profile contains an empty ios object. The workflow uses --non-interactive, but neither configuration nor the activation checklist supplies ascAppId.",
+      "evidence": "eas.json:23 is \"ios\": {}. .github/workflows/ios-beta.yml:109 invokes non-interactive submission. [Expo's submission documentation](https://docs.expo.dev/submit/ios/) explicitly requires ascAppId in the submission profile for non-interactive mode.",
+      "suggested_fix": "Add the owner-created beta app record's ascAppId to the submission profile during activation and document this prerequisite. It is an identifier, not signing material.",
+      "repro_test": "Add a guard requiring a configured beta ascAppId before enabling submission. After owner setup, exercise the submission path with the intended beta app record."
+    },
+    {
+      "id": "RB1-2",
+      "severity": "Medium",
+      "component": "Release artifact selection",
+      "file": ".github/workflows/ios-beta.yml",
+      "line": 109,
+      "title": "Submit approval is not bound to a particular beta build",
+      "scenario": "After the owner reviews a beta build, another iOS build finishes in the same EAS project before the submit job executes, including while environment approval is pending.",
+      "expected": "The approved build and source commit are the artifact uploaded.",
+      "actual": "--latest selects the newest eligible project iOS build at execution time. --profile testflight selects submission configuration; it does not bind selection to the reviewed build, source SHA or build profile.",
+      "evidence": "The workflow accepts only action and confirmation inputs and invokes submit --latest at line 109. [EAS archive selection source](https://github.com/expo/eas-cli/blob/main/packages/eas-cli/src/submit/ArchiveSource.ts) resolves latest using project ID and platform without a build-profile or commit constraint.",
+      "suggested_fix": "Require an explicit EAS build ID, validate its project, platform, beta identity, build profile and source SHA before upload, and include that artifact identity in the owner approval.",
+      "repro_test": "Prepare two synthetic build metadata records with different source SHAs; verify that approval of the older build submits that exact ID even when the newer build finishes before execution."
+    }
+  ]
+}

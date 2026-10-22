@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.payments.DepositPaymentIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.06 s -- in com.matbakhy.app.payments.DepositPaymentIntegrationTest

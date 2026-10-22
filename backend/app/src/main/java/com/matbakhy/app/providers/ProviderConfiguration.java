@@ -74,6 +74,9 @@ class ProviderConfiguration {
                 || notifications.tokenEncryptionKey().startsWith(NotificationProperties.DEV_PREFIX))) {
             throw new IllegalStateException("PUSH_TOKEN_HASH_KEY and PUSH_TOKEN_ENCRYPTION_KEY must be set for " + env);
         }
+        if (!notifications.pushEnabled()) {
+            return LoggingNotificationChannels.pushDisabled();
+        }
         requireLocal(platform, "push");
         return LoggingNotificationChannels.push();
     }

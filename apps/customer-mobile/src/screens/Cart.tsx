@@ -3,12 +3,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useCallback, useRef, useState } from "react";
 import { View } from "react-native";
 import { useApp } from "../AppContext";
-import { estimateMinor, lineLimit, loadBasket, loadPending, saveBasket, savePending, type Basket, type BasketLine, type PendingPlacement } from "../basket";
+import { currentShopping, estimateMinor, lineLimit, loadBasket, loadPending, saveBasket, type Basket, type BasketLine, type PendingPlacement } from "../basket";
 import { errorText } from "../i18n";
 import { errorCode, formatMoney, formatTime, newKey, type Schemas } from "../mobileApi";
 import { place, recover, type PlacementOutcome } from "../placement";
 import { Body, Button, Card, Choice, ErrorLine, Field, Notice, Screen, StatusView, Title } from "../ui";
 import { useServer } from "../useServer";
+import { PaymentTerms } from "./Payment";
 import type { RootProps } from "./navigation";
 
 type Quote = Schemas["QuoteResponse"];
@@ -43,10 +44,10 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
   // One recovery check at a time: a second press (or the check on focus) while one is running waits for it instead of
   // sending another lookup and possibly a second re-send (MB-033 retry review; the server's idempotency stays the backstop).
   const inFlight = useRef<Promise<void> | null>(null);
-  const recheck = useCallback(() => {
+  const recheck = useCallback((explicit = false) => {
     if (!inFlight.current) {
       setChecking(true);
-      inFlight.current = recover(api)
+      inFlight.current = recover(api, explicit)
         .then(settleOutcome)
         .finally(() => {
           inFlight.current = null;
@@ -134,7 +135,7 @@ export function CartScreen({ navigation }: RootProps<"Cart">) {
       {pending ? (
         <View accessibilityRole="alert" testID="pending-order" style={{ gap: 8 }}>
           <Notice locale={locale}>{outcome?.kind === "uncertain" && outcome.offline ? t.pendingOffline : t.pendingUncertain}</Notice>
-          <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck()} />
+          <Button testID="retry-order" label={t.retryOrder} disabled={checking || auth.kind !== "signedIn"} onPress={() => void recheck(true)} />
         </View>
       ) : null}
       {/* A refused stale price is explained by the order form's price-change notice instead (D13). */}
@@ -261,6 +262,7 @@ function OrderForm({
   const overLimit = basket.lines.some((l) => l.quantity > lineLimit(maxQuantityPerLine));
   const [mode, setMode] = useState<"DELIVERY" | "PICKUP">(basket.modes.includes("DELIVERY") ? "DELIVERY" : "PICKUP");
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [payMethod, setPayMethod] = useState<"COD" | "DEPOSIT">("COD");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -278,6 +280,7 @@ function OrderForm({
       slotId: basket.slotId,
       fulfillmentMode: mode,
       ...(mode === "DELIVERY" && selectedAddress ? { addressId: selectedAddress } : {}),
+      paymentMethod: payMethod,
     };
   }
 
@@ -308,7 +311,10 @@ function OrderForm({
     try {
       const r = await api.POST("/api/v1/quotes", { body: quoteRequest() });
       setQuote(r.data ?? null);
-      setError(r.data ? null : errorCode(r.error));
+      // MB-053: the server names the payment method it refused in the field errors.
+      const fields = JSON.stringify((r.error as { fieldErrors?: unknown } | undefined)?.fieldErrors ?? []);
+      const payment = ["COD_NOT_ELIGIBLE", "DEPOSIT_NOT_OFFERED"].find((c) => fields.includes(c));
+      setError(r.data ? null : (payment ?? errorCode(r.error)));
     } catch {
       setError("NETWORK");
     } finally {
@@ -325,11 +331,12 @@ function OrderForm({
       terms: q.termsVersion ?? "",
       cancellation: q.cancellationPolicyVersion,
     };
-    await savePending(p);
+    const shop = currentShopping(); // one handle from the first write to the answer
+    await shop.savePending(p);
     onPending(p);
     setBusy(true);
     try {
-      const o = await place(api, p);
+      const o = await place(api, p, shop);
       onOutcome(o);
       if (o.kind === "rejected" && o.code === "PRICE_CHANGED") {
         // Nothing was ordered: re-quote and let the customer review and accept the new prices (never resubmit silently).
@@ -348,7 +355,8 @@ function OrderForm({
   }
   return (
     <Card testID="order-form">
-      <View style={{ flexDirection: "row", gap: 8 }}>
+      {/* Wraps at large text sizes: at the largest iOS size the second choice ran past the screen edge (native run 39). */}
+      <View style={{ flexDirection: "row", gap: 8, flexWrap: "wrap" }}>
         {(["DELIVERY", "PICKUP"] as const)
           .filter((m) => basket.modes.includes(m))
           .map((m) => (
@@ -389,6 +397,25 @@ function OrderForm({
           )}
         </StatusView>
       ) : null}
+      <View style={{ gap: 8 }}>
+        <Body locale={locale} strong>
+          {t.pay.choose}
+        </Body>
+        {(["COD", "DEPOSIT"] as const).map((m) => (
+          <Choice
+            key={m}
+            testID={`pay-${m}`}
+            label={m === "COD" ? t.pay.cod : t.pay.deposit}
+            selected={payMethod === m}
+            onPress={() => {
+              setPayMethod(m);
+              setQuote(null);
+              setChange(null);
+              setError(null);
+            }}
+          />
+        ))}
+      </View>
       <Button
         testID="get-quote"
         label={t.getQuote}
@@ -410,9 +437,7 @@ function OrderForm({
           <Body locale={locale} strong>
             {t.total}: {formatMoney(quote.total.amountMinor, locale)}
           </Body>
-          <Body locale={locale} muted>
-            {t.cashOnDelivery}
-          </Body>
+          <PaymentTerms terms={quote.payment} deadline={quote.acceptanceDeadlinePreview} />
           {quote.warnings.includes("SYNTHETIC_POLICY") ? <Notice locale={locale}>{t.syntheticPolicy}</Notice> : null}
           <Choice testID="accept-terms" label={t.terms} selected={accepted} onPress={() => setAccepted(!accepted)} />
           <Button

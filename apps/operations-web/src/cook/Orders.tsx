@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatMoney, formatTime, newIdempotencyKey, type Schemas } from "../api";
+import { OrderPayment } from "./Payments";
 import { egpToMinor, ErrorLine, minutesLeft, Status, useMutation, useServer, type Ctx } from "./shared";
 
 type Order = Schemas["CookOrderView"];
@@ -131,6 +132,7 @@ function OrderCard({ ctx, order, refresh }: { ctx: Ctx; order: Order; refresh: (
         </p>
       ) : null}
       {order.state === "COMPLETED" ? <p className="muted">{t.cash[order.cashState] ?? order.cashState}</p> : null}
+      <OrderPayment ctx={ctx} order={order} refresh={refresh} />
 
       <div className="actions">
         {order.allowedActions.map((action) => (
@@ -177,7 +179,7 @@ function OrderCard({ ctx, order, refresh }: { ctx: Ctx; order: Order; refresh: (
 
 function CashReport({ ctx, order, refresh }: { ctx: Ctx; order: Order; refresh: () => unknown }) {
   const { t } = ctx;
-  const [amount, setAmount] = useState((order.total.amountMinor / 100).toFixed(2));
+  const [amount, setAmount] = useState((((order.payment?.remainder.amountMinor ?? order.total.amountMinor)) / 100).toFixed(2));
   const [reference, setReference] = useState("");
   const { run, error, busy } = useMutation(ctx, refresh);
   const minor = egpToMinor(amount);

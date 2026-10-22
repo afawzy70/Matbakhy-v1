@@ -23,6 +23,12 @@ final class LoggingNotificationChannels {
         };
     }
 
+    /** Push delivery is switched off (O07 flag): nothing is sent, and a stray delivery fails permanently instead of retrying. */
+    static PushSender pushDisabled() {
+        return (UUID deliveryId, String platform, String token, String template, Map<String, String> params) ->
+                Result.permanentFailure("PUSH_DISABLED");
+    }
+
     static PushSender push() {
         return (UUID deliveryId, String platform, String token, String template, Map<String, String> params) -> {
             LOG.info("fake push delivery {} template {} platform {}", deliveryId, template, platform);

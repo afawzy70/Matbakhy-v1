@@ -1,0 +1,235 @@
+[
+  {
+    "command": "python3 scripts/validate_blueprint.py",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/00.log"
+  },
+  {
+    "command": "python3 scripts/check_scope.py",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/01.log"
+  },
+  {
+    "command": "python3 scripts/check_migration_compat.py",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/02.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_dev_bootstrap -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/03.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_e2e_fixtures -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/04.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_guardrails -v",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/05.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_migration_compat -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/06.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_preview_backup -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/07.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_preview_release -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/08.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_proxy_access -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/09.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_record_evidence -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/10.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_scope -v",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/11.log"
+  },
+  {
+    "command": "python3 -m unittest scripts.test_staging_profile -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/12.log"
+  },
+  {
+    "command": "bash scripts/check_secrets.sh",
+    "exit_code": 2,
+    "log": "docs/quality/stabilization/phase2-evidence/13.log"
+  },
+  {
+    "command": "pnpm typecheck",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/14.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "pnpm lint",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/15.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "pnpm test",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/16.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "pnpm build",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/17.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "pnpm contract:check",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/18.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm typecheck",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/pnpm-typecheck.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm lint",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/pnpm-lint.log"
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm test",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/pnpm-test.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm build",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/pnpm-build.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "npm_config_engine_strict=false pnpm contract:check",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/pnpm-contract-check.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "PATH=\"/tmp/qa2-bin:$PATH\" pnpm test",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/test-final.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "PATH=\"/tmp/qa2-bin:$PATH\" pnpm build",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/build-final.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "PATH=\"/tmp/qa2-bin:$PATH\" pnpm contract:check",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/contract-check-final.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run typecheck",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/effective-0.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run test",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/effective-1.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run build",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/effective-2.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run lint:contract",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/effective-3.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --filter @matbakhy/api-client run check:drift",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/effective-4.log"
+  },
+  {
+    "command": "(cd packages/api-client && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa2-results/api-client-tests.json)",
+    "exit_code": 0
+  },
+  {
+    "command": "(cd packages/design-tokens && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa2-results/design-tokens-tests.json)",
+    "exit_code": 0
+  },
+  {
+    "command": "(cd apps/customer-web && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa2-results/customer-web-tests.json)",
+    "exit_code": 0
+  },
+  {
+    "command": "(cd apps/operations-web && ./node_modules/.bin/vitest run --reporter=json --outputFile=/tmp/qa2-results/operations-web-tests.json)",
+    "exit_code": 0
+  },
+  {
+    "command": "python3 -m unittest discover -s scripts -p test_guardrails.py -v",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/guardrails-rerun.log"
+  },
+  {
+    "command": "python3 -m unittest discover -s scripts -p test_scope.py -v",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/scope-rerun.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false typecheck",
+    "exit_code": 1,
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "PATH=\"/tmp/qa2-bin:$PATH\" pnpm typecheck",
+    "exit_code": 1,
+    "log": "docs/quality/stabilization/phase2-evidence/typecheck-final.log",
+    "note": "BLOCKED: ERR_PNPM_UNSUPPORTED_ENGINE; expected >=24.21.0 <25, got v22.23.3; no product defect."
+  },
+  {
+    "command": "pnpm --config.engine-strict=false -r --if-present run typecheck",
+    "exit_code": 0,
+    "note": "Additional verification run: five projects passed."
+  },
+  {
+    "command": "(cd packages/api-client && PATH=\"/tmp/qa2-bin:$PATH\" node scripts/check-drift.mjs)",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/drift-direct.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --reporter=append-only -r --if-present run test",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/test-counts.log"
+  },
+  {
+    "command": "pnpm --config.engine-strict=false --stream -r --if-present run test",
+    "exit_code": 0,
+    "log": "docs/quality/stabilization/phase2-evidence/test-stream.log"
+  },
+  {
+    "command": "(cd apps/customer-mobile && ./node_modules/.bin/jest --ci --json --outputFile=/tmp/qa2-results/customer-mobile-tests.json)",
+    "exit_code": 0
+  }
+]

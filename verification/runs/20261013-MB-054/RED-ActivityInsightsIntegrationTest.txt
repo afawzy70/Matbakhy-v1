@@ -1,0 +1,11 @@
+[ERROR] Tests run: 4, Failures: 3, Errors: 0, Skipped: 0, Time elapsed: 22.98 s <<< FAILURE! -- in com.matbakhy.app.insights.ActivityInsightsIntegrationTest
+[ERROR] com.matbakhy.app.insights.ActivityInsightsIntegrationTest.only_a_cook_sees_insights_and_only_for_the_own_kitchen -- Time elapsed: 1.058 s <<< FAILURE!
+expected: 403
+[ERROR] com.matbakhy.app.insights.ActivityInsightsIntegrationTest.the_cook_report_keeps_gross_refunds_and_known_net_apart_from_server_records_and_claims_no_profit -- Time elapsed: 0.900 s <<< FAILURE!
+expected: 200
+[ERROR] com.matbakhy.app.insights.ActivityInsightsIntegrationTest.activity_is_deduplicated_per_visitor_and_day_bots_are_ignored_and_no_visitor_identity_is_stored -- Time elapsed: 0.074 s <<< FAILURE!
+expected: 202
+expected: 202
+expected: 403
+expected: 200
+[ERROR] Tests run: 4, Failures: 3, Errors: 0, Skipped: 0

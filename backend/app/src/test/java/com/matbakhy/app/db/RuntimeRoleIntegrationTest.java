@@ -20,7 +20,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 /**
  * MB-039 / AUD-01 (local): the API's least-privilege runtime role, granted by the Flyway afterMigrate callback run as the
  * migration owner. Connected as that role, data access works, but audit and other append-only history cannot be updated,
- * deleted or truncated, and the protecting triggers cannot be disabled or dropped; no DDL is possible.
+ * deleted or truncated, and the protecting triggers cannot be disabled or dropped; no DDL is possible. Support messages
+ * and payment events allow only the account-erasure change their triggers permit (V27).
  */
 @IntegrationTest
 class RuntimeRoleIntegrationTest {
@@ -62,6 +63,12 @@ class RuntimeRoleIntegrationTest {
                     "UPDATE meal_revision SET price_minor = 1",
                     "DELETE FROM customer_order",
                     "UPDATE flyway_schema_history SET success = false",
+                    "DELETE FROM case_message",
+                    "TRUNCATE case_message",
+                    "ALTER TABLE case_message DISABLE TRIGGER case_message_append_only",
+                    "DELETE FROM payment_event",
+                    "TRUNCATE payment_event",
+                    "ALTER TABLE payment_event DISABLE TRIGGER payment_event_append_only",
                     "CREATE TABLE runtime_probe (id int)")) {
                 assertThatThrownBy(() -> s.execute(forbidden)).as(forbidden).isInstanceOf(SQLException.class)
                         .satisfies(e -> assertThat(((SQLException) e).getSQLState()).as(forbidden).isEqualTo("42501"));
@@ -77,6 +84,13 @@ class RuntimeRoleIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT has_table_privilege(?::text, 'public.audit_event', 'UPDATE')", Boolean.class, ROLE)).isFalse();
         assertThat(jdbc.queryForObject("SELECT has_table_privilege(?::text, 'public.customer_order', 'UPDATE')", Boolean.class, ROLE))
                 .as("orders still move through their states").isTrue();
+        // Account erasure (V27) runs as this role: it may update these two, and their triggers allow only the erasure.
+        for (String table : List.of("case_message", "payment_event")) {
+            assertThat(jdbc.queryForObject("SELECT has_table_privilege(?::text, ?::text, 'UPDATE')", Boolean.class, ROLE, "public." + table))
+                    .as("erasure can run on %s", table).isTrue();
+            assertThat(jdbc.queryForObject("SELECT has_table_privilege(?::text, ?::text, 'DELETE')", Boolean.class, ROLE, "public." + table))
+                    .as("no deletion from %s", table).isFalse();
+        }
         assertThat(jdbc.queryForObject("""
                 SELECT count(*) FROM (SELECT c.oid FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
                                       WHERE n.nspname = 'public' AND c.relkind = 'S' OFFSET 0) seq

@@ -1,0 +1,87 @@
+{
+  "agent": "code-reviewer",
+  "commit": "72ebca3384604a6e5873cf344c2d8a84ebb15bd0",
+  "summary": "SHA verified. Two findings remain, including an approval/cleanup race that blocks release. Static sanity review covered rounds 1–4; no additional release-blocking findings identified. Upsert preserves the greatest deadline, retains FAILED state and preserves pending attempts; terminal conflicts reset attempts, including FAILED. REQUIRES_NEW survives outer rollback without directly acquiring the locked media_asset row. Normal committed approvals are protected by the reference guard. Rollback callback removal and render permissions are consistent with their intended fixes. Runtime verification remains blocked. Read-only filesystem prevented saving review artifacts.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Matches the required SHA; rechecked at completion."
+    },
+    {
+      "command": "git diff d3e22ca..HEAD; git diff 6e1d881..HEAD",
+      "exit_code": 0,
+      "note": "Reviewed final changes and cumulative stabilization source changes."
+    },
+    {
+      "command": "python3 scripts/validate_blueprint.py",
+      "exit_code": 2,
+      "note": "Four broken relative links in round3/qa-execution-report-r3.md."
+    },
+    {
+      "command": "sh -n deploy/web-preview/deploy.sh",
+      "exit_code": 0,
+      "note": "Shell syntax passes."
+    },
+    {
+      "command": "git diff --check d3e22ca..HEAD",
+      "exit_code": 2,
+      "note": "Five trailing-whitespace errors in round3/qa-test-plan-r3.md."
+    },
+    {
+      "command": "python3 -B -m unittest discover -s scripts -p 'test_*.py'",
+      "exit_code": 1,
+      "note": "73 tests: 56 errors, one skipped. Errors report unavailable writable temporary directories; this is not product-test verification."
+    },
+    {
+      "command": "python3 -B scripts/test_rehearsal_tls.py",
+      "exit_code": 0,
+      "note": "Three tests pass."
+    },
+    {
+      "command": "Python parsing of Maven POMs and three Keycloak realms, with flow/configuration reference checks",
+      "exit_code": 0,
+      "note": "Static checks pass; actual realm import not exercised."
+    },
+    {
+      "command": "java -version",
+      "exit_code": 127,
+      "note": "Java unavailable; backend tests not run."
+    },
+    {
+      "command": "docker info --format '{{.ServerVersion}}'",
+      "exit_code": 1,
+      "note": "Docker socket permission denied; PostgreSQL/storage integration tests not run."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CR5-001",
+      "severity": "High",
+      "component": "Media approval and durable cleanup",
+      "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaCleanup.java",
+      "line": 97,
+      "title": "Reference guard can delete an object whose approval is still uncommitted",
+      "scenario": "Complete a document or photo. After the independent cleanup enqueue commits and the object is written, delay the outer transaction before commit for more than five minutes. Run cleanup on another instance, then allow approval to commit.",
+      "expected": "Cleanup waits for the in-flight approval to resolve and preserves the object if approval commits.",
+      "actual": "The plain EXISTS query reads the previously committed asset, which references uploads/<id> rather than documents/<id> or media/<id>.jpg. It does not wait for the locked asset row. Cleanup deletes the object and marks DONE; the outer transaction can then commit APPROVED with a missing object.",
+      "evidence": "MediaService.java:199 and :209 independently enqueue cleanup five minutes ahead while complete holds the asset lock. Object writes occur at :202 and :210 before outer commit. MediaCleanup.java:97–99 checks only visible key references without locking; :106 deletes immediately. No transaction-wide deadline guarantees approval resolves within five minutes. This is a source-derived interleaving, not an executed integration reproduction.",
+      "suggested_fix": "Coordinate cleanup with the asset identified by the deterministic key. Acquire its lock nonblockingly before checking committed state, and defer cleanup when approval owns the lock. Define consistent lock ordering with cleanup-row upserts to avoid introducing a deadlock.",
+      "repro_test": "Use the proxied services and PostgreSQL. Pause approval after object write but before commit, advance the cleanup clock past five minutes, and invoke runDue concurrently. Verify cleanup defers; after commit the object remains, and after rollback it is eventually removed. Cover both sealed documents and public variants."
+    },
+    {
+      "id": "CR5-002",
+      "severity": "Medium",
+      "component": "Media completion connection use",
+      "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaCleanup.java",
+      "line": 63,
+      "title": "Nested independent enqueue can exhaust the connection pool",
+      "scenario": "With the default pool size, synchronize ten completions for different assets so each holds its outer transaction connection before entering enqueueUnlessApproved.",
+      "expected": "Completion concurrency remains bounded without every request waiting for another connection held by the same request group.",
+      "actual": "Each REQUIRES_NEW call suspends an outer transaction that retains its connection and requests a second connection. With the pool occupied by the outer transactions, inner acquisition times out and otherwise valid completions fail.",
+      "evidence": "MediaService.complete starts its transaction and locks the asset at :126–128, then invokes enqueueUnlessApproved at :199 or :209. That method uses REQUIRES_NEW. application.yaml:12–13 sets a five-second connection acquisition timeout but supplies no pool sizing or completion admission control for nested transactions. Runtime reproduction was blocked by unavailable Java/Docker.",
+      "suggested_fix": "Bound concurrent completions while reserving connection capacity for independent enqueue transactions, or redesign durable intent creation to avoid nested connection acquisition. Size capacity explicitly for the chosen concurrency model.",
+      "repro_test": "Configure a two-connection pool, pause two distinct completions immediately before independent enqueue, then release both together. Assert successful bounded progress after the fix rather than connection acquisition timeouts."
+    }
+  ]
+}

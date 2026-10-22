@@ -13,6 +13,7 @@ import com.matbakhy.app.security.TestLogins;
 import com.matbakhy.app.support.IntegrationTest;
 import com.matbakhy.app.support.TestCommerce;
 import com.matbakhy.app.support.TestKitchens;
+import com.matbakhy.finance.internal.LedgerService;
 import com.matbakhy.identity.internal.AccountErasureService;
 import java.time.Clock;
 import java.util.Map;
@@ -48,6 +49,7 @@ class AccountErasureIntegrationTest {
     @Autowired JsonMapper json;
     @Autowired Clock clock;
     @Autowired AccountErasureService erasure;
+    @Autowired LedgerService ledger;
 
     TestCommerce fx;
     String customerSubject;
@@ -57,6 +59,7 @@ class AccountErasureIntegrationTest {
     UUID meal;
     UUID slot;
     UUID address;
+    UUID kitchen;
 
     @BeforeEach
     void setUp() {
@@ -67,7 +70,7 @@ class AccountErasureIntegrationTest {
         fx.verifyPhone(customer);
         cookSubject = UUID.randomUUID().toString();
         cook = logins.login(cookSubject, "Cook").getPrincipal().id();
-        UUID kitchen = TestKitchens.approvedKitchen(jdbc, cook, logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id());
+        kitchen = TestKitchens.approvedKitchen(jdbc, cook, logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id());
         UUID zone = fx.zone(3000);
         fx.deliversTo(kitchen, zone);
         meal = fx.meal(kitchen, 12000, "فتة", "Fatta");
@@ -163,6 +166,93 @@ class AccountErasureIntegrationTest {
         AccountAuthentication again = as(customerSubject);
         assertThat(again.getPrincipal().id()).isNotEqualTo(customer);
         assertThat(json.readTree(ok(call(get("/api/v1/orders"), again), 200).toString()).get("items").size()).as("no access to erased history").isZero();
+    }
+
+    /**
+     * Found 2026-10-13: a customer's own support reply and the transfer reference typed for a deposit (D16) live in
+     * append-only tables. Erasure must still remove them (and only them): before the fix the reply made the whole erasure
+     * fail on the append-only trigger, and the reference was never erased.
+     */
+    @Test
+    void erasure_removes_the_customers_support_replies_and_transfer_references_but_no_one_elses_history() throws Exception {
+        AccountAuthentication me = as(customerSubject);
+        jdbc.update("""
+                INSERT INTO kitchen_payment_profile (kitchen_id, deposit_bps, cod_max_total_minor, recipient_method, recipient_identifier, recipient_name,
+                                                     recipient_status, approved_by, approved_at)
+                VALUES (?, 5000, 100000, 'INSTAPAY', 'kitchen.erasure@instapay', 'Synthetic Kitchen', 'APPROVED', ?, now())""", kitchen, cook);
+        JsonNode quote = ok(call(post("/api/v1/quotes").content("{\"items\":[{\"mealId\":\"" + meal + "\",\"quantity\":1}],\"slotId\":\"" + slot
+                + "\",\"fulfillmentMode\":\"DELIVERY\",\"addressId\":\"" + address + "\",\"paymentMethod\":\"DEPOSIT\"}"), me), 201);
+        UUID order = UUID.fromString(ok(call(post("/api/v1/orders").header("Idempotency-Key", "era-" + UUID.randomUUID()).content("""
+                {"quoteId":"%s","clientRequestId":"%s","acceptedPolicyVersions":{"terms":"%s","cancellation":"%s"}}"""
+                .formatted(quote.get("quoteId").asString(), UUID.randomUUID(), TestCommerce.TERMS, TestCommerce.CANCELLATION)), me), 201).get("id").asString());
+        ok(call(post("/api/v1/orders/" + order + "/payment/transfer-report").content("{\"reference\":\"ERASE-ME-REF-77\"}"), me), 200);
+        long pv = jdbc.queryForObject("SELECT version FROM order_payment WHERE order_id = ?", Long.class, order);
+        ok(call(post("/api/v1/cook/orders/" + order + "/payment/receipt").content("{\"expectedVersion\":" + pv + ",\"amountMinor\":"
+                + jdbc.queryForObject("SELECT deposit_minor FROM order_payment WHERE order_id = ?", Long.class, order)
+                + ",\"reference\":\"KITCHEN-REF-1\"}"), as(cookSubject)), 200);
+        cancel(order, me);
+        UUID caseId = UUID.fromString(ok(call(post("/api/v1/support/cases").content("{\"orderId\":\"" + order
+                + "\",\"category\":\"QUALITY\",\"description\":\"Synthetic complaint text\"}"), me), 201).get("id").asString());
+        ok(call(post("/api/v1/support/cases/" + caseId + "/messages").header("Idempotency-Key", "era-" + UUID.randomUUID())
+                .content("{\"body\":\"My phone is 01000000000, call me\"}"), me), 201);
+
+        ok(call(post("/api/v1/me/deletion-requests").content("{\"confirm\":true,\"policyVersion\":\"retention-policy-draft\"}"), me), 200);
+        jdbc.update("UPDATE deletion_request SET requested_at = now() - interval '15 days' WHERE user_id = ?", customer);
+        assertThat(erasure.eraseDue().erased()).as("a customer with a support reply and a deposit can be erased").isEqualTo(1);
+
+        assertThat(jdbc.queryForList("SELECT body FROM case_message WHERE case_id = ? AND author_role = 'CUSTOMER'", String.class, caseId))
+                .isNotEmpty().containsOnly("[erased on account deletion]");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM payment_event WHERE order_id = ? AND actor_type = 'CUSTOMER' AND reference IS NOT NULL",
+                Integer.class, order)).as("the customer's transfer reference is erased").isZero();
+        assertThat(jdbc.queryForObject("SELECT reference FROM payment_event WHERE order_id = ? AND actor_type = 'COOK' AND reference IS NOT NULL",
+                String.class, order)).as("the kitchen's own history stays").isEqualTo("KITCHEN-REF-1");
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM payment_event WHERE order_id = ?", Integer.class, order))
+                .as("no payment event is removed").isGreaterThanOrEqualTo(3);
+        // The append-only protection still holds for everything except the erasure itself.
+        assertThatThrownBy(() -> jdbc.update("UPDATE case_message SET body = 'rewritten' WHERE case_id = ?", caseId)).hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM case_message WHERE case_id = ?", caseId)).hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("UPDATE payment_event SET amount_minor = 1 WHERE order_id = ?", order)).hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("UPDATE payment_event SET reference = NULL WHERE order_id = ? AND actor_type = 'COOK'", order))
+                .as("only a customer's reference may be erased").hasMessageContaining("append-only");
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM payment_event WHERE order_id = ?", order)).hasMessageContaining("append-only");
+    }
+
+    private void cookAction(UUID order, String action, String extra) throws Exception {
+        long v = jdbc.queryForObject("SELECT version FROM customer_order WHERE id = ?", Long.class, order);
+        ok(call(post("/api/v1/cook/orders/" + order + "/" + action).header("Idempotency-Key", "era-" + UUID.randomUUID())
+                .content("{\"expectedVersion\":" + v + extra + "}"), as(cookSubject)), 200);
+    }
+
+    /** TC-055 "balanced finance remains": a completed order's ledger (synthetic 10% commission fixture) is untouched by erasure. */
+    @Test
+    void erasure_keeps_the_ledger_of_a_completed_order_balanced_and_unchanged() throws Exception {
+        AccountAuthentication me = as(customerSubject);
+        UUID order = placeOrder(me);
+        cookAction(order, "accept", "");
+        cookAction(order, "prepare", "");
+        cookAction(order, "ready", "");
+        cookAction(order, "dispatch", ",\"deliveryReference\":\"Synthetic rider\"");
+        cookAction(order, "handover", ",\"code\":\"" + ok(call(get("/api/v1/orders/" + order), me), 200).get("handoverCode").asString() + "\"");
+        UUID completed = jdbc.queryForObject("SELECT id FROM order_event WHERE order_id = ? AND to_state = 'COMPLETED'", UUID.class, order);
+        ledger.postCommission(completed, order);
+        String ledgerSql = """
+                SELECT string_agg(e.account || ':' || e.direction || ':' || e.amount_minor, ',' ORDER BY e.account, e.direction)
+                FROM ledger_entry e JOIN ledger_group g ON g.id = e.group_id WHERE g.order_id = ?""";
+        String before = jdbc.queryForObject(ledgerSql, String.class, order);
+        assertThat(before).as("a commission group was posted").isNotNull();
+
+        ok(call(post("/api/v1/me/deletion-requests").content("{\"confirm\":true,\"policyVersion\":\"retention-policy-draft\"}"), me), 200);
+        jdbc.update("UPDATE deletion_request SET requested_at = now() - interval '15 days' WHERE user_id = ?", customer);
+        assertThat(erasure.eraseDue().erased()).isEqualTo(1);
+
+        assertThat(jdbc.queryForObject(ledgerSql, String.class, order)).as("ledger entries unchanged").isEqualTo(before);
+        assertThat(jdbc.queryForObject("""
+                SELECT count(*) FROM ledger_group g WHERE g.order_id = ? AND
+                  (SELECT coalesce(sum(CASE WHEN e.direction = 'DEBIT' THEN e.amount_minor ELSE -e.amount_minor END), 0)
+                   FROM ledger_entry e WHERE e.group_id = g.id) <> 0""", Integer.class, order)).as("every group still balances").isZero();
+        assertThat(jdbc.queryForObject("SELECT state || '|' || total_minor FROM customer_order WHERE id = ?", String.class, order))
+                .startsWith("COMPLETED|");
+        assertThat(jdbc.queryForObject("SELECT contact_snapshot::text FROM customer_order WHERE id = ?", String.class, order)).isEqualTo("{\"erased\": true}");
     }
 
     @Test

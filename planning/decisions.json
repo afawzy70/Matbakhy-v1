@@ -94,12 +94,12 @@
     {
       "id": "D10",
       "topic": "Revenue",
-      "status": "PROPOSED_DEFAULT",
-      "value": "Configurable commission on item subtotal",
+      "status": "ACCEPTED",
+      "value": "MVP launch: 0% Matbakhy commission, no customer platform/service fee, no paid ads or billing. The configurable commission stays as inactive technical capability only (not enabled or charged); third-party delivery or transfer costs are disclosed as such, never as platform fees. Later opt-in per-kitchen growth tools need evidence and explicit owner approval.",
       "owner": "Ahmed Fawzy",
       "required_before": "P04",
-      "approval_reference": null,
-      "build_with_default": true
+      "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
+      "build_with_default": false
     },
     {
       "id": "O01",
@@ -136,7 +136,7 @@
     },
     {
       "id": "O04",
-      "topic": "Commission, tax, invoices, refunds and settlement policy",
+      "topic": "Refund/cancellation rules, taxes, invoices and settlement policy (commission decided by D10: 0% at MVP)",
       "status": "OPEN",
       "value": null,
       "owner": "Ahmed Fawzy",
@@ -259,6 +259,36 @@
       "owner": "Ahmed Fawzy",
       "required_before": "P00",
       "approval_reference": "Owner session prompt received 2026-10-13 09:47 Asia/Kuwait",
+      "build_with_default": false
+    },
+    {
+      "id": "D16",
+      "topic": "MVP payment methods",
+      "status": "ACCEPTED",
+      "value": "Eligible cash on delivery/pickup plus manual deposits paid directly by the customer to the approved kitchen recipient (InstaPay, eligible regulated mobile wallets, permitted bank transfer). No platform custody, wallet, escrow or gateway. The customer's 'transferred' report is not evidence; the kitchen's acknowledgement after checking its own account is recorded as kitchen-reported, never as bank verification. Deposit-required orders cannot start preparation before the acknowledgement and a separate kitchen acceptance. Disputes, refunds, expiry and price snapshots are auditable. Live money is blocked until legal/consumer, food-business and recipient-account/provider gates clear.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P09",
+      "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
+      "build_with_default": false
+    },
+    {
+      "id": "D17",
+      "topic": "Free core and growth instrumentation",
+      "status": "ACCEPTED",
+      "value": "Record privacy-safe, deduplicated organic activity and kitchen performance (impressions, views, add-to-cart, quotes, orders, fulfilment, cancellations, repeat orders, capacity, GMV) with clear definitions; free cook reporting distinguishes gross sales, refunds and known net amounts and never claims profit. No sponsored ranking, paid campaigns, billing or commercial thresholds in the MVP. Growth pilots, AI Concierge and automated payment verification are later stages needing explicit owner go.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P08",
+      "approval_reference": "Owner commits on main 2026-10-13 (5dd1a0d, 07e0628, d18726c, 6606d2e, d6d2561; docs/delivery/07-owner-decisions-implementation-sequence.md), merged into implementation/mvp at 39856f6",
+      "build_with_default": false
+    },
+    {
+      "id": "D18",
+      "topic": "Configurable multi-factor authentication",
+      "status": "ACCEPTED",
+      "value": "MFA is performed by Keycloak (OIDC step-up), never by a custom OTP in Spring Boot. Platform administrators set a policy per account category (CUSTOMER, KITCHEN, STAFF/ADMIN) to DISABLED, OPTIONAL or REQUIRED. OPTIONAL lets each user enable or disable MFA for their own account (disabling needs recent MFA and ends sessions); REQUIRED cannot be turned off by the user and is enforced server-side before protected functions; DISABLED removes enrolment and use for the category without deleting enrolled factors. Administrators can run an audited reset (removes OTP credentials at the provider, ends sessions) and can never read OTP secrets. The PREVIEW default is OPTIONAL for every category; REQUIRED is an explicit later administrator action. Supersedes the 2026-10-18 decision to make staff MFA universal.",
+      "owner": "Ahmed Fawzy",
+      "required_before": "P08",
+      "approval_reference": "Owner decision in the stabilization session, 2026-10-18 (configurable MFA policy); docs/security/mfa-policy.md",
       "build_with_default": false
     }
   ]

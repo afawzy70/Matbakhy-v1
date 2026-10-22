@@ -5,6 +5,7 @@ import { Account, SupportCaseDetail } from "./Account";
 import { loadPending, saveCart, savePending } from "./cart";
 import { Browse } from "./Browse";
 import { Checkout } from "./Checkout";
+import { builtForDemo, EnvironmentNotice } from "./EnvironmentNotice";
 import { strings } from "./i18n";
 import { Kitchen } from "./Kitchen";
 import { Meal } from "./Meal";
@@ -29,6 +30,7 @@ export function App({
   const [me, setMe] = useState<Schemas["CustomerProfile"] | null>(null);
   const [meVersion, setMeVersion] = useState(0);
   const [maxQuantityPerLine, setMaxQuantityPerLine] = useState<number | null>(null);
+  const [demoByApi, setDemoByApi] = useState(false);
   const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
   const api = useMemo(() => createApi(fetchImpl), [fetchImpl]);
   const [signOutState, setSignOutState] = useState<"idle" | "confirm" | "busy" | "failed">("idle");
@@ -94,6 +96,7 @@ export function App({
           // A failed re-read keeps the last published limit rather than loosening the controls.
           if (r.data) {
             setMaxQuantityPerLine(r.data.orderLimits?.maxQuantityPerLine ?? null);
+            setDemoByApi(r.data.environment?.demo === true);
           }
         }
       })
@@ -150,6 +153,7 @@ export function App({
   const caseMatch = /^\/support\/([0-9a-f-]{36})$/.exec(route);
   return (
     <div className="app">
+      <EnvironmentNotice show={demoByApi || builtForDemo()} title={t.demoNoticeTitle} text={t.demoNotice} />
       <header className="topbar">
         <h1>{title(locale)}</h1>
         <div className="topbar-actions">

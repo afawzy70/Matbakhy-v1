@@ -1,0 +1,13 @@
+{
+  "agent": "QA10",
+  "commit": "240cf0c08fef1fa92bb65f2886a938cf9401d04a",
+  "summary": "HEAD verified. Validators, 220 JS tests, five typechecks, lint and 25 offline backend tests PASS. Python discovery BLOCKED by documented host .aws/.codex fixture caveat. Container tests NOT_RUN locally. No new demonstrated defects. Evidence: docs/quality/stabilization/mfa-final/qa-execution-report.md; exact commands and exit codes: commands.json. No hash manifests written.",
+  "commands": [
+    {
+      "command": "python3 -m unittest discover -s scripts -p 'test_*.py' -v",
+      "exit_code": 1,
+      "note": "73 tests reported; one host-fixture failure and one Docker class skipped."
+    }
+  ],
+  "findings": []
+}

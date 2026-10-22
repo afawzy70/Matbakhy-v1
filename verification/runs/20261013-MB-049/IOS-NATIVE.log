@@ -1,0 +1,17 @@
+## iOS simulator (job 115223935190)
+09:49:23 PASS: sign-in round trip (system browser, PKCE, restore, sign-out, account switch)
+09:54:10 MB032-ORDER-NUMBER MB-100001; side effects 1|1|1|1|1|1|1
+09:55:19 MB033-QUANTITY-STOPPED-AT 10
+09:56:23 MB033-OVER-LIMIT-BLOCKED; delivery MB-100002 DELIVERY|3000|63000|true|...|PENDING_ACCEPTANCE
+09:57:13 MB033-DEEP-LINK-OK MB-100002
+09:58:08 MB033-G-READY / MB033-SAME-SESSION-LIMIT-OK            <- same-session lowered limit
+09:59:09 MB049-STILL-SIGNED-IN                                    <- relaunch ~10 min after sign-in: token refresh works (MB-031 fix)
+09:59:09 MB049-H-READY
+09:59:09 MB049-NOTICE The kitchen updated the price of “Native Dish One” from EGP 120.00 to EGP 130.00.
+09:59:09 MB049-TOTALS The total was EGP 120.00 and is now EGP 130.00. Review the new total before confirming your order.
+09:59:09 MB049-ORDER-NUMBER MB-100003
+09:59:09 repriced order MB-100003 (total|unit|quantity): 13000|13000|1; kitchen-one orders before phase H: 1, after: 2
+10:02:05 phase I (dynamic text) FAIL: "[en] Checkout: place order not reachable at large text"
+  - harness: Place order exists only after a quote; the phase did not calculate the total first;
+  - product defect: at accessibility XXXL the Pickup choice frame was {253, w 182.3} in a 390-pt window (overflow).
+  Phase J (notification refusal) NOT_RUN (after the failure).

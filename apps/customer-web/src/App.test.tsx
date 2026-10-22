@@ -31,6 +31,21 @@ function server(routes: Record<string, Handler>) {
 }
 
 const egp = (amountMinor: number) => ({ amountMinor, currency: "EGP" });
+const cod = (total: number) => ({ method: "COD", depositBps: 0, deposit: egp(0), remainder: egp(total), recipient: null });
+const security = (over: Record<string, unknown> = {}) => ({
+  categories: ["CUSTOMER"],
+  policy: { CUSTOMER: "OPTIONAL" },
+  effectiveMode: "OPTIONAL",
+  enabled: false,
+  required: false,
+  available: true,
+  verifiedInSession: false,
+  stepUpPath: "/oauth2/authorization/keycloak?stepUp=true",
+  accountManagementUrl: "https://id.example.test/realms/matbakhy/account/#/security/signingin",
+  canManagePolicy: false,
+  canResetMfa: false,
+  ...over,
+});
 const me = { id: "u1", displayName: "Mona", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: ["BROWSE", "ORDER"] };
 const order = { id: "11111111-1111-4111-8111-111111111111", publicNumber: "MB-2001" };
 
@@ -77,7 +92,7 @@ describe("customer web", () => {
       "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
       "POST /api/v1/quotes": () => ({
         status: 201,
-        body: { quoteId: "q1", expiresAt: "2026-10-11T10:05:00Z", kitchenId: "k1", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0), total: egp(24000), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-11T10:15:00Z", warnings: ["SYNTHETIC_POLICY"] },
+        body: { quoteId: "q1", expiresAt: "2026-10-11T10:05:00Z", kitchenId: "k1", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0), total: egp(24000), payment: cod(24000), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-11T10:15:00Z", warnings: ["SYNTHETIC_POLICY"] },
       }),
       "POST /api/v1/orders": () => (++attempts === 1 ? "NETWORK_ERROR" : { status: 201, body: order }),
     });
@@ -221,6 +236,7 @@ describe("customer web", () => {
     const empty = { status: 200, body: { items: [], nextCursor: null, hasMore: false } };
     const { fetchImpl, calls } = server({
       "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/security": () => ({ status: 200, body: security() }),
       "GET /api/v1/me/favorites": () => ({
         status: 200,
         body: { items: [{ mealId: "m9", title: "Molokhia", kitchenName: "Mona", priceMinor: null, available: false }], nextCursor: null, hasMore: false },
@@ -816,7 +832,7 @@ describe("QA repair FG-001: the basket can be edited and shows an estimate (CW05
         quotes.push(body);
         return {
           status: 201,
-          body: { quoteId: `q${quotes.length}`, expiresAt: "2026-10-13T09:05:00Z", kitchenId: "kA", items: [], subtotal: egp(12025), deliveryFee: egp(0), tax: egp(1684), total: egp(13709), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T09:15:00Z", warnings: [] },
+          body: { quoteId: `q${quotes.length}`, expiresAt: "2026-10-13T09:05:00Z", kitchenId: "kA", items: [], subtotal: egp(12025), deliveryFee: egp(0), tax: egp(1684), total: egp(13709), payment: cod(13709), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T09:15:00Z", warnings: [] },
         };
       },
     });
@@ -1062,6 +1078,7 @@ describe("QA repair MBQA-004: support case conversation", () => {
       { id: "m1", authorRole: "CUSTOMER", visibility: "PUBLIC", body: "Any update?", createdAt: "2026-10-12T10:30:00Z" },
     ];
     const { fetchImpl, calls } = routes(() => ({ status: 200, body: supportCase(messages) }), {
+      "GET /api/v1/me/security": () => ({ status: 200, body: security() }),
       "GET /api/v1/me/favorites": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
       "GET /api/v1/notifications": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
       "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
@@ -1172,7 +1189,7 @@ describe("D13: changed prices need informed reconfirmation", () => {
     const subtotal = items.reduce((s, i) => s + i.lineTotal.amountMinor, 0);
     return {
       quoteId: `q${version}`, expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items, subtotal: egp(subtotal), deliveryFee: egp(fee), tax: egp(0),
-      total: egp(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
+      total: egp(subtotal + fee), payment: cod(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
     };
   };
   function setup(modes: string[] = ["PICKUP"]) {
@@ -1287,5 +1304,239 @@ describe("D13: changed prices need informed reconfirmation", () => {
     fireEvent.click(screen.getByRole("button", { name: "زيادة الكمية: Dish m2" }));
     await waitFor(() => expect(screen.queryByTestId("price-change")).toBeNull());
     expect(screen.queryByRole("button", { name: "تأكيد الطلب" })).toBeNull();
+  });
+});
+
+/**
+ * MB-053 (D16, TC-163): the customer chooses cash on receipt or a deposit paid straight to the kitchen's approved account,
+ * sees the deposit, remainder, recipient and deadline from the server quote, and can only say the deposit was sent.
+ */
+describe("MB-053: direct deposit checkout and honest payment status", () => {
+  const recipient = { method: "INSTAPAY", identifier: "kitchen@instapay", name: "Kitchen K1" };
+  function setup(codEligible = true) {
+    window.localStorage.setItem("matbakhy.cart", JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "s1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"],
+      lines: [{ mealId: "m1", title: "Dish m1", quantity: 2, unitPriceMinor: 12000, maxQuantity: 5 }] }));
+    window.location.hash = "#/checkout";
+    return server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/addresses": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "GET /api/v1/zones": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+      "POST /api/v1/quotes": (_req, body) => {
+        const method = (body as { paymentMethod: string }).paymentMethod;
+        if (method === "COD" && !codEligible) {
+          return { status: 422, body: { code: "VALIDATION_FAILED", fieldErrors: [{ field: "paymentMethod", code: "COD_NOT_ELIGIBLE" }] } };
+        }
+        const payment = method === "DEPOSIT" ? { method, depositBps: 5000, deposit: egp(12000), remainder: egp(12000), recipient } : cod(24000);
+        return { status: 201, body: { quoteId: "q1", expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0),
+          total: egp(24000), payment, cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [] } };
+      },
+    });
+  }
+  const en = (minor: number) => new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+
+  it("quotes a deposit with the amount, remainder, kitchen recipient and the direct-payment note", async () => {
+    const { fetchImpl, calls } = setup();
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("radio", { name: "Deposit sent straight to the kitchen" }));
+    fireEvent.click(screen.getByRole("button", { name: "Calculate total" }));
+    const terms = await screen.findByTestId("deposit-terms");
+    expect(terms.textContent).toContain(`Deposit now: ${en(12000)}`);
+    expect(terms.textContent).toContain(`Rest on receipt: ${en(12000)}`);
+    expect(terms.textContent).toContain("InstaPay: kitchen@instapay · Kitchen K1");
+    expect(terms.textContent).toContain("the platform never receives or holds the money");
+    expect(calls.find((c) => c.path === "/api/v1/quotes")?.body).toMatchObject({ paymentMethod: "DEPOSIT" });
+  });
+
+  it("explains when cash on receipt is not eligible, and a different method needs a fresh quote", async () => {
+    const { fetchImpl } = setup(false);
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Calculate total" }));
+    expect(await screen.findByText("Cash on receipt is not available for this total at this kitchen. Choose the deposit.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("radio", { name: "Deposit sent straight to the kitchen" }));
+    expect(screen.queryByText(/Cash on receipt is not available/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Calculate total" }));
+    expect(await screen.findByTestId("deposit-terms")).toBeTruthy();
+  });
+
+  it("lets the customer say the deposit was sent, then shows that the kitchen still has to confirm", async () => {
+    window.location.hash = `#/orders/${order.id}`;
+    let state = "WAITING_FOR_DEPOSIT";
+    const view = () => ({
+      ...order, version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP", items: [], subtotal: egp(24000), deliveryFee: egp(0), tax: egp(0), total: egp(24000),
+      slot: { id: "s1", startsAt: "2026-10-13T10:00:00Z" }, acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], supportCaseIds: [], cashState: "NOT_DUE",
+      fulfillmentNote: null, dispatchReference: null, contact: null, handoverCode: null,
+      payment: { method: "DEPOSIT", state, deposit: egp(12000), remainder: egp(12000), recipient, depositExpiresAt: "2026-10-13T09:00:00Z", version: state === "WAITING_FOR_DEPOSIT" ? 0 : 1 },
+    });
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      [`GET /api/v1/orders/${order.id}`]: () => ({ status: 200, body: view() }),
+      [`POST /api/v1/orders/${order.id}/payment/transfer-report`]: () => {
+        state = "CUSTOMER_TRANSFER_REPORTED";
+        return { status: 200, body: view().payment };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const status = await screen.findByTestId("payment-status");
+    expect(status.textContent).toContain("Waiting for your deposit");
+    fireEvent.change(within(status).getByRole("textbox", { name: "Transfer reference (optional)" }), { target: { value: " IP-123 " } });
+    fireEvent.click(within(status).getByRole("button", { name: "I sent the deposit" }));
+    await waitFor(() => expect(screen.getByTestId("payment-status").textContent).toContain("You reported the transfer; waiting for the kitchen to confirm"));
+    expect(screen.getByTestId("payment-status").textContent).toContain("Preparation starts only after the kitchen confirms");
+    expect(screen.queryByRole("button", { name: "I sent the deposit" })).toBeNull();
+    expect(calls.find((c) => c.path.endsWith("/payment/transfer-report"))?.body).toEqual({ reference: "IP-123" });
+    expect(screen.getByTestId("payment-status").textContent).not.toMatch(/bank (verified|confirmed)/i);
+  });
+});
+
+/** MB-054 (D17, TC-164): browsing activity is sent in one batch with a per-tab visitor id; failures never affect the page. */
+describe("MB-054: organic activity", () => {
+  it("sends one batch for a meal view and an add to cart, with the visitor id kept only for this tab", async () => {
+    window.sessionStorage.clear();
+    window.location.hash = "#/meal/55555555-5555-4555-8555-555555555555";
+    const meal = {
+      id: "55555555-5555-4555-8555-555555555555",
+      title: "Koshari",
+      kitchen: { id: "k5", name: "Kitchen five" },
+      portionText: "1 box",
+      price: egp(9000),
+      description: "",
+      ingredients: "",
+      allergenCodes: [],
+      allergenStatement: null,
+      photo: null,
+      nextSlots: [{ id: "s5", startsAt: "2026-10-14T12:00:00Z", availablePortions: 5, fulfillmentModes: ["PICKUP"] }],
+      availability: "AVAILABLE",
+    };
+    const { fetchImpl, calls } = server({
+      [`GET /api/v1/meals/${meal.id}`]: () => ({ status: 200, body: meal }),
+      "GET /api/v1/kitchens/k5/reviews": () => ({ status: 200, body: { items: [], summary: { count: 0, averageTenths: null }, nextCursor: null, hasMore: false } }),
+      "POST /api/v1/activity": () => ({ status: 503, body: { code: "SERVICE_UNAVAILABLE" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("radio"));
+    fireEvent.click(screen.getByRole("button", { name: /^أضف إلى السلة|^Add to cart/ }));
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/activity")).toBe(true), { timeout: 3000 });
+    const sent = calls.filter((c) => c.path === "/api/v1/activity");
+    expect(sent).toHaveLength(1);
+    const body = sent[0]?.body as { visitorId: string; events: { kind: string; subjectId: string }[] };
+    expect(body.events).toEqual([
+      { kind: "MEAL_VIEW", subjectId: meal.id },
+      { kind: "ADD_TO_CART", subjectId: meal.id },
+    ]);
+    expect(body.visitorId).toBe(window.sessionStorage.getItem("matbakhy.visitor"));
+    expect(window.localStorage.getItem("matbakhy.visitor")).toBeNull();
+    expect(JSON.parse(window.localStorage.getItem("matbakhy.cart") ?? "{}").lines).toHaveLength(1);
+  });
+});
+
+/** Owner decision 2026-10-14: a demo/test environment is labelled on every screen. */
+describe("demo environment notice", () => {
+  const config = (name: string, demo: boolean) => ({
+    status: 200,
+    body: { orderingAvailable: true, orderLimits: { maxQuantityPerLine: 10, maxLinesPerOrder: 20, policyVersion: 1 }, environment: { name, demo } },
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("shows a persistent note in Arabic and in English when the API reports a demo environment", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => config("PREVIEW", true) });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+    expect(screen.getByRole("note").textContent).toContain("الطلبات والعربون والمدفوعات هنا محاكاة");
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const note = await screen.findByRole("note", { name: "Demo environment" });
+    expect(note.textContent).toContain("Orders, deposits and payments here are simulated");
+  });
+
+  it("shows nothing in production", async () => {
+    const { fetchImpl, calls } = server({ "GET /api/v1/configuration/public": () => config("PRODUCTION", false) });
+    render(<App fetchImpl={fetchImpl} />);
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/configuration/public")).toBe(true));
+    expect(screen.queryByRole("note")).toBeNull();
+  });
+
+  it("is still there when this build was made for a demo environment and the API cannot be reached", async () => {
+    vi.stubEnv("VITE_DEMO_NOTICE", "true");
+    const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => "NETWORK_ERROR" });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+  });
+});
+
+describe("account security (D18)", () => {
+  const accountRoutes = (sec: () => { status: number; body?: unknown }, extra: Record<string, Handler> = {}) => {
+    const empty = { status: 200, body: { items: [], nextCursor: null, hasMore: false } };
+    return server({
+      "GET /api/v1/me": () => ({ status: 200, body: me }),
+      "GET /api/v1/me/security": sec,
+      "GET /api/v1/me/favorites": () => empty,
+      "GET /api/v1/notifications": () => empty,
+      "GET /api/v1/support/cases": () => empty,
+      "GET /api/v1/orders": () => empty,
+      "GET /api/v1/me/addresses": () => empty,
+      ...extra,
+    });
+  };
+
+  it("under an optional policy offers the step-up link to turn MFA on until the session has passed a second factor", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() => ({ status: 200, body: security() }));
+    render(<App fetchImpl={fetchImpl} />);
+    const heading = await screen.findByRole("heading", { name: "الأمان والتحقق بخطوتين" });
+    const section = heading.closest("section") as HTMLElement;
+    await within(section).findByText("اختياري");
+    const link = within(section).getByRole("link", { name: "تفعيل التحقق بخطوتين" });
+    expect(link.getAttribute("href")).toMatch(/\/oauth2\/authorization\/keycloak\?stepUp=true&returnTo=/);
+    expect(within(section).queryByRole("button", { name: "تفعيل التحقق بخطوتين" })).toBeNull();
+    expect(within(section).getByRole("link", { name: "إدارة تطبيق المصادقة (إضافة أو حذف)" }).getAttribute("href")).toContain("/account/#/security/signingin");
+  });
+
+  it("turns MFA on from a verified session and off again, sending only the user's own preference", async () => {
+    window.location.hash = "#/account";
+    let enabled = false;
+    const { fetchImpl, calls } = accountRoutes(() => ({ status: 200, body: security({ enabled, required: enabled, verifiedInSession: true }) }), {
+      "PUT /api/v1/me/security/mfa": (_req, body) => {
+        enabled = (body as { enabled: boolean }).enabled;
+        return { status: 200, body: security({ enabled, required: enabled, verifiedInSession: true }) };
+      },
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "تفعيل التحقق بخطوتين" }));
+    fireEvent.click(await screen.findByRole("button", { name: "إيقاف التحقق بخطوتين" }));
+    await waitFor(() => expect(screen.queryByRole("button", { name: "إيقاف التحقق بخطوتين" })).toBeNull());
+    const puts = calls.filter((c) => c.method === "PUT" && c.path === "/api/v1/me/security/mfa");
+    expect(puts.map((c) => c.body)).toEqual([{ enabled: true }, { enabled: false }]);
+  });
+
+  it("shows a required policy as not switchable and points to the step-up when the session has not verified", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() =>
+      ({ status: 200, body: security({ policy: { CUSTOMER: "REQUIRED" }, effectiveMode: "REQUIRED", required: true, verifiedInSession: false }) }));
+    render(<App fetchImpl={fetchImpl} />);
+    await screen.findByText("التحقق بخطوتين إلزامي لحسابك ولا يمكن إيقافه.");
+    expect(screen.queryByRole("button", { name: "إيقاف التحقق بخطوتين" })).toBeNull();
+    expect(screen.getByRole("link", { name: "أكمل التحقق بخطوتين" }).getAttribute("href")).toContain("stepUp=true");
+  });
+
+  it("offers no enrolment when the administrator disabled MFA for the category", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() => ({ status: 200, body: security({ policy: { CUSTOMER: "DISABLED" }, effectiveMode: "DISABLED", available: false }) }));
+    render(<App fetchImpl={fetchImpl} />);
+    await screen.findByText("التحقق بخطوتين غير متاح لحسابك حاليًا.");
+    expect(screen.queryByRole("button", { name: "تفعيل التحقق بخطوتين" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "تفعيل التحقق بخطوتين" })).toBeNull();
+  });
+
+  it("asks for fresh verification when turning MFA off is refused for lack of a recent second factor", async () => {
+    window.location.hash = "#/account";
+    const { fetchImpl } = accountRoutes(() => ({ status: 200, body: security({ enabled: true, required: true, verifiedInSession: true }) }), {
+      "PUT /api/v1/me/security/mfa": () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "إيقاف التحقق بخطوتين" }));
+    const link = await screen.findByRole("link", { name: "تحقق الآن" });
+    expect(link.getAttribute("href")).toContain("stepUp=true");
   });
 });

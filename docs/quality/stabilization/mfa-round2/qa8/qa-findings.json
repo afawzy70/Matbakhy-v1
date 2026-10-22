@@ -1,0 +1,30 @@
+[
+  {
+    "id": "QA8-001",
+    "severity": "Medium",
+    "component": "D18 requirement 5 automated coverage",
+    "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java",
+    "line": 191,
+    "title": "DISABLED test preserves a preference but never checks provider factors or high-risk controls",
+    "scenario": "Switch an enrolled account to DISABLED; accidentally delete its provider credential or relax staff high-risk assurance.",
+    "expected": "New tests detect credential deletion and weakening of unrelated high-risk controls under DISABLED.",
+    "actual": "The test inserts only user_mfa_preference, checks API availability and restores OPTIONAL. The resolver and UI tests likewise use local fixtures. The new step-up-resolver test checks redirect parameters only. These regressions have no meaningful new automated test.",
+    "evidence": "Source 9ff290f732872c637b64132a3deeb52970148336. Static assertion review: MfaPolicyIntegrationTest.java:191-206,281-288; MfaPolicyResolveTest.java:48-53; apps/customer-web/src/App.test.tsx:1523. Provider tests never switch policy to DISABLED. Container tests NOT_RUN; coverage gap, not a demonstrated production defect.",
+    "suggested_fix": "Add a real-provider test retaining a credential through DISABLED and back to OPTIONAL, plus a high-risk command denial with password-only assurance under DISABLED. Track direct provider enrolment/use as an unresolved requirement limitation.",
+    "repro_test": "A disposable mutation that deletes provider factors on DISABLED or bypasses recent-MFA checks only in DISABLED must fail the new scenarios."
+  },
+  {
+    "id": "QA8-002",
+    "severity": "Medium",
+    "component": "D18 requirement 8 automated coverage",
+    "file": "backend/app/src/test/java/com/matbakhy/app/mfa/MfaPolicyIntegrationTest.java",
+    "line": 292,
+    "title": "Preference-disable tests still cannot detect omitted provider logout",
+    "scenario": "A configured provider logout becomes a no-op when a user disables OPTIONAL MFA.",
+    "expected": "An old provider refresh token is rejected after preference disable, and existing application cookies lose authentication.",
+    "actual": "The new disable test inserts a synthetic spring_session row and checks its deletion with provider administration unconfigured. The real refresh-token rejection added to MfaResetIntegrationTest covers administrative reset only. Omitting provider logout on preference disable leaves these assertions unchanged.",
+    "evidence": "Source 9ff290f732872c637b64132a3deeb52970148336. MfaPolicyIntegrationTest.java:292-298 and :246-247 (unconfigured provider context); MfaResetIntegrationTest.java:117-136 covers reset; MfaController.java:139-146 contains the configured-provider logout branch. Static coverage finding; no runtime logout failure claimed.",
+    "suggested_fix": "Retain a real provider refresh token and application browser cookie, disable MFA with fresh assurance using configured provider administration, then assert refresh rejection and cookie denial. Exercise provider failure behavior separately.",
+    "repro_test": "A disposable no-op mutation of MfaController.endSessions provider logout should fail a real-provider preference-disable integration test."
+  }
+]

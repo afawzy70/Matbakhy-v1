@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-050",
+  "phase": "P07",
+  "source_commit": "07d7236d7d484f183f678bb44c75fce3a37c1433",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-13T10:41:28.008657+00:00",
+  "finished_at": "2026-10-13T10:47:33.948892+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (ZeroCommissionIntegrationTest and regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-050/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "OPS-WEB-TESTS",
+      "name": "Cook statement and ops finance/configuration component tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/operations-web test"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-050/OPS-WEB-TESTS.log"
+    },
+    {
+      "id": "CUSTOMER-APPS-NO-FEE",
+      "name": "Customer web and mobile sources contain no commission or service-fee wording",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "! grep -rniE 'commission|service fee|عمولة|رسوم الخدمة' apps/customer-web/src apps/customer-mobile/src --include=*.ts --include=*.tsx"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-050/CUSTOMER-APPS-NO-FEE.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-157",
+      "status": "PASS",
+      "observed": "ZeroCommissionIntegrationTest on PostgreSQL: a launch order (2 x 12000 + delivery 3000) quotes 27000 with no platform fee, stores commission snapshot 0|0, completes through the real cook commands and posts a ledger group whose entries sum to 0; the cook statement shows commissionPosted and commissionOutstanding 0. A policy change with commissionRateBps 1000 is refused 422 (value.commissionRateBps RANGE_0_0) while 0 is accepted; a direct insert of a live (non-synthetic) policy with commission 1000 is refused by the database check. The development policy is 0%. Cook statement and ops finance show 'لا توجد عمولة للمنصة' and no commission rows or column when nothing is owed; the configuration view says 'no platform commission'. Customer web and mobile have no commission or service-fee wording. Native apps were not re-run for this story: they never displayed commission (source check above)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261013-MB-050/BACKEND-VERIFY.log",
+    "verification/runs/20261013-MB-050/OPS-WEB-TESTS.log",
+    "verification/runs/20261013-MB-050/CUSTOMER-APPS-NO-FEE.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "D10 zero commission at 07d7236. Self-review, not independent review. The dormant commission arithmetic stays covered only by synthetic test fixtures."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

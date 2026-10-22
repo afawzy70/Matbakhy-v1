@@ -29,7 +29,8 @@ groups:
         labels: {severity: warning}
         annotations: {summary: "Oldest pending outbox event older than 5 minutes"}
       - alert: OutboxFailed
-        expr: matbakhy_outbox_failed_events > 0
+        # Over 15 minutes, so an outage that makes the gauge NaN (DatabaseUnavailable) does not send a false "resolved".
+        expr: max_over_time(matbakhy_outbox_failed_events[15m]) > 0
         labels: {severity: ops}
         annotations: {summary: "Outbox events exhausted their retries", runbook: "docs/operations/08-troubleshooting-runbook.md#3-inspect-and-retry-dead-letters"}
       - alert: NotificationsDeadLettered
@@ -52,7 +53,7 @@ groups:
         expr: (time() - matbakhy_backup_last_success_timestamp_seconds) > 86400 or absent(matbakhy_backup_last_success_timestamp_seconds)
         for: 5m
         labels: {severity: incident}
-        annotations: {summary: "No successful database backup in 24 hours"}
+        annotations: {summary: "No verified database backup in 24 hours"}
       - alert: DiskPressure
         expr: node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} < 0.15
         for: 5m

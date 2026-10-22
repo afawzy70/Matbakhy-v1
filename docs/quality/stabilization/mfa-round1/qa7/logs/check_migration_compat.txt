@@ -1,0 +1,1 @@
+PASS: every checked migration is expand-only or says why not

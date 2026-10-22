@@ -1,0 +1,122 @@
+ok: docker CLI
+ok: docker daemon
+ok: docker compose v2
+ok: JDK 21
+ok: Node.js 24.21.0
+ok: pnpm (corepack)
+ok: curl
+ok: openssl
+-- building API jar
+Picked up JAVA_TOOL_OPTIONS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts -Djavax.net.ssl.trustStoreType=JKS -Dhttps.proxyHost=127.0.0.1 -Dhttps.proxyPort=40955 -Dhttp.nonProxyHosts=localhost|127.0.0.1|::1|127.*|0.*|::|169.254.*|api.anthropic.com|api-staging.anthropic.com|api-pr-preview.anthropic.com|mcp-proxy.anthropic.com|mcp-proxy-staging.anthropic.com|registry.npmjs.org|jsr.io|npm.jsr.io|pypi.org|files.pythonhosted.org|index.crates.io|proxy.golang.org|host.docker.internal|10.*|172.16.*|172.17.*|172.18.*|172.19.*|172.20.*|172.21.*|172.22.*|172.23.*|172.24.*|172.25.*|172.26.*|172.27.*|172.28.*|172.29.*|172.30.*|172.31.*|192.168.*|100.64.0.0/10|*.svc.cluster.local|*.svc.cluster.local -Djdk.http.auth.tunneling.disabledSchemes= -Djdk.http.auth.proxying.disabledSchemes=
+-- starting stack (project matbakhy-e2e-19079)
+ Image matbakhy-e2e-19079-api Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 522B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 501B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context:
+#4 transferring context: 86B done
+#4 DONE 0.0s
+
+#5 [1/4] FROM docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
+#5 resolve docker.io/library/eclipse-temurin:21.0.12.1_1-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555 0.1s done
+#5 DONE 0.1s
+
+#6 [internal] load build context
+#6 transferring context: 48.87MB 0.4s done
+#6 DONE 0.4s
+
+#7 [2/4] RUN addgroup -S matbakhy && adduser -S -G matbakhy matbakhy
+#7 CACHED
+
+#8 [3/4] WORKDIR /app
+#8 CACHED
+
+#9 [4/4] COPY app/target/matbakhy-app-0.1.0-SNAPSHOT.jar /app/matbakhy-api.jar
+#9 DONE 0.2s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 2.3s done
+#10 exporting manifest sha256:59a8e1398864214ca2557023aec9f7361a086d37cbc34aa97fd2ea4cacdb6b9a done
+#10 exporting config sha256:787d8471adcdafe38da7694ae01e0e2b70b677d4d09158ddb704bf25ccfab961 done
+#10 exporting attestation manifest sha256:d8f41a5b1611aaeae7afb1959e7037a13e364884b90c58222aee5131a209a285 done
+#10 exporting manifest list sha256:53453c74d57d8b715b14af0fb3145de2d37a9b94cbf18b7dce5c2cd825ae5282 done
+#10 naming to docker.io/library/matbakhy-e2e-19079-api:latest done
+#10 unpacking to docker.io/library/matbakhy-e2e-19079-api:latest
+#10 unpacking to docker.io/library/matbakhy-e2e-19079-api:latest 0.7s done
+#10 DONE 3.0s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s
+ Image matbakhy-e2e-19079-api Built 
+ Network matbakhy-e2e-19079_default Creating 
+ Volume matbakhy-e2e-19079_postgres-data Creating 
+ Network matbakhy-e2e-19079_default Creating 
+ Volume matbakhy-e2e-19079_postgres-data Creating 
+ Volume matbakhy-e2e-19079_postgres-data Created 
+ Volume matbakhy-e2e-19079_postgres-data Created 
+ Network matbakhy-e2e-19079_default Created 
+ Network matbakhy-e2e-19079_default Created 
+ Container matbakhy-e2e-19079-postgres-1 Creating 
+ Container matbakhy-e2e-19079-object-storage-1 Creating 
+ Container matbakhy-e2e-19079-identity-1 Creating 
+ Container matbakhy-e2e-19079-mail-1 Creating 
+ Container matbakhy-e2e-19079-mail-1 Created 
+ Container matbakhy-e2e-19079-identity-1 Created 
+ Container matbakhy-e2e-19079-object-storage-1 Created 
+ Container matbakhy-e2e-19079-postgres-1 Created 
+ Container matbakhy-e2e-19079-api-1 Creating 
+ Container matbakhy-e2e-19079-api-1 Created 
+ Container matbakhy-e2e-19079-mail-1 Starting 
+ Container matbakhy-e2e-19079-identity-1 Starting 
+ Container matbakhy-e2e-19079-postgres-1 Starting 
+ Container matbakhy-e2e-19079-object-storage-1 Starting 
+ Container matbakhy-e2e-19079-mail-1 Started 
+ Container matbakhy-e2e-19079-identity-1 Started 
+ Container matbakhy-e2e-19079-postgres-1 Started 
+ Container matbakhy-e2e-19079-object-storage-1 Started 
+ Container matbakhy-e2e-19079-postgres-1 Waiting 
+ Container matbakhy-e2e-19079-identity-1 Waiting 
+ Container matbakhy-e2e-19079-postgres-1 Healthy 
+ Container matbakhy-e2e-19079-identity-1 Healthy 
+ Container matbakhy-e2e-19079-api-1 Starting 
+ Container matbakhy-e2e-19079-api-1 Started 
+ Container matbakhy-e2e-19079-identity-1 Waiting 
+ Container matbakhy-e2e-19079-object-storage-1 Waiting 
+ Container matbakhy-e2e-19079-mail-1 Waiting 
+ Container matbakhy-e2e-19079-api-1 Waiting 
+ Container matbakhy-e2e-19079-postgres-1 Waiting 
+ Container matbakhy-e2e-19079-mail-1 Healthy 
+ Container matbakhy-e2e-19079-postgres-1 Healthy 
+ Container matbakhy-e2e-19079-identity-1 Healthy 
+ Container matbakhy-e2e-19079-object-storage-1 Healthy 
+ Container matbakhy-e2e-19079-api-1 Healthy 
+NAME                                  IMAGE                                                                                              COMMAND                  SERVICE          CREATED          STATUS                    PORTS
+matbakhy-e2e-19079-api-1              matbakhy-e2e-19079-api                                                                             "java -XX:MaxRAMPerc…"   api              50 seconds ago   Up 13 seconds (healthy)   127.0.0.1:18080->8080/tcp
+matbakhy-e2e-19079-identity-1         keycloak/keycloak:26.8.0@sha256:27b3230fbabb8c9ff3c66c864cf09dcd8a41aca82e5100679d109ef0eeb05741   "/opt/keycloak/bin/k…"   identity         50 seconds ago   Up 49 seconds (healthy)   8443/tcp, 9000/tcp, 127.0.0.1:18180->8080/tcp
+matbakhy-e2e-19079-mail-1             axllent/mailpit:v1.31.5@sha256:94f6b70c1436defae6799d9ac7ff0eeff9540465b842026d5cdb018f1c0234ea    "/mailpit"               mail             50 seconds ago   Up 49 seconds (healthy)   1110/tcp, 127.0.0.1:11025->1025/tcp, 127.0.0.1:18025->8025/tcp
+matbakhy-e2e-19079-object-storage-1   adobe/s3mock:5.2.3@sha256:ab01a6946750f451ca215a47e91030695b260e4003b8a5a6201d25029b8fca92         "/cnb/process/web"       object-storage   50 seconds ago   Up 49 seconds             127.0.0.1:19090->9090/tcp
+matbakhy-e2e-19079-postgres-1         postgres:16.15-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea      "docker-entrypoint.s…"   postgres         50 seconds ago   Up 49 seconds (healthy)   127.0.0.1:15432->5432/tcp
+-- starting operations web on http://localhost:5174
+-- starting customer web on http://localhost:5173
+-- running browser workflows
+
+Running 6 tests using 1 worker
+
+  ✓  1 e2e/cook-workspace.e2e.ts:67:1 › cook fulfils pickup and delivery orders through the real API (25.7s)
+  ✓  2 e2e/customer-journey.e2e.ts:87:1 › customer orders delivery and pickup in the customer web and follows the cook's actions (54.4s)
+  ✓  3 e2e/customer-journey.e2e.ts:564:1 › customer screens keep the approved layout across widths and both directions (23.3s)
+  ✓  4 e2e/keyboard.e2e.ts:48:1 › keyboard-only customer and cook journeys with visible focus and focus restoration (6.1s)
+  ✓  5 e2e/money-reflow.e2e.ts:113:1 › MBQA-006: money amounts stay intact on the cook statement and the finance view (12 variations) (7.2s)
+  ✓  6 e2e/operations-layout.e2e.ts:87:1 › operations sections keep layout and accessibility across widths and both directions (50.8s)
+
+  6 passed (2.8m)

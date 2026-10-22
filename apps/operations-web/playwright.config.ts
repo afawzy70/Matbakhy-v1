@@ -11,6 +11,8 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: process.env.E2E_OPS_URL ?? "http://localhost:5174",
+    // Only for a rehearsal against a local https stack with an internal certificate authority.
+    ignoreHTTPSErrors: process.env.E2E_IGNORE_HTTPS_ERRORS === "1",
     launchOptions: process.env.E2E_CHROMIUM ? { executablePath: process.env.E2E_CHROMIUM } : {},
     trace: "retain-on-failure",
     screenshot: "only-on-failure",

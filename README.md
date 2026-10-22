@@ -2,7 +2,10 @@
 
 An Egypt-focused marketplace for discovering and ordering homemade meals from approved home cooks.
 
-**Current state: implementation in progress on branch `implementation/mvp`.** Minimal backend, web and Expo shells exist; no product feature, deployed environment, payment integration or native mobile build is claimed. See [latest status](docs/status/latest.md) and [toolchain](docs/engineering/toolchain.md).
+> ## New developer? Start with the [Developer Handbook](docs/developer-handbook/README.md)
+> Business, applications, architecture, codebase, workflow and a five-day onboarding ([Arabic guide](docs/developer-handbook/README-ar.md)). Every change must keep it current: [DOC-001 policy](docs/developer-handbook/05-developer-workflow/documentation-policy.md).
+
+**Current state:** the backend, customer web, operations web and Expo mobile app are implemented and a Preview deploys from `develop`; see [implementation status](docs/developer-handbook/07-reference/implementation-status.md) for what is implemented, partial or planned, and [latest status](docs/status/latest.md) (historical reports) and the [toolchain](docs/engineering/toolchain.md). The Preview is not production; no live payment integration is enabled.
 
 ## Start here
 
@@ -12,7 +15,7 @@ An Egypt-focused marketplace for discovering and ordering homemade meals from ap
 4. Give Claude Code the complete [start prompt](docs/delivery/03-claude-start-prompt.md). Later use the [resume/recovery prompts](docs/delivery/04-resume-and-recovery.md).
 5. Run `python3 scripts/validate_blueprint.py` to validate this planning pack. This does **not** verify the product.
 
-Pack contents: 46 implementation stories, 64 business rules, 110 planned verification scenarios, 97 planned API operations, and 11 delivery phases. See the [planning-pack validation report](docs/quality/03-blueprint-validation.md).
+Planning-pack contents at 2026-10-11 (historical; the backlog has since grown): 46 implementation stories, 64 business rules, 110 planned verification scenarios, 97 planned API operations, and 11 delivery phases. See the [planning-pack validation report](docs/quality/03-blueprint-validation.md).
 
 ## Planned product surfaces
 
@@ -28,7 +31,7 @@ Cook workspace and platform backoffice are role-restricted areas of one operatio
 
 ## Working architecture
 
-Java 21 + Spring Boot modular monolith, PostgreSQL, React/TypeScript customer and operations web apps, React Native/Expo customer mobile app, OpenAPI contracts, container-based local development. These are proposed implementation defaults except the previously requested Spring Boot backend and Android/iOS targets. Exact supported dependency versions must be selected and pinned in Phase P01.
+Java 21 + Spring Boot modular monolith, PostgreSQL, React/TypeScript customer and operations web apps, React Native/Expo customer mobile app, OpenAPI contracts, container-based local development. These began as proposed defaults and are what the repository now implements; the pinned versions are in [toolchain](docs/engineering/toolchain.md) and the current picture is in the [Developer Handbook](docs/developer-handbook/README.md).
 
 The proposed initial commercial path is one cook and fulfillment slot per order, cash at delivery/pickup, cook-arranged delivery or pickup, and manual audited reconciliation. Provider-based online payments, courier integration, and social-feed functionality are specified as conditional extensions, not silently assumed to be approved.
 
@@ -50,4 +53,4 @@ The proposed initial commercial path is one cook and fulfillment slot per order,
 
 Routine implementation, tests, repair, documentation and local verification should continue within the execution instructions. Real-money integrations, public release, store submission and unresolved launch policies require the relevant recorded decision. Missing launch information must not prevent unrelated engineering work.
 
-Repository baseline inspected: `82968ee4fe10192a23e5912bfb6ecc05e33eb757` on 2026-10-11; only the initial README existed.
+Planning baseline (historical) inspected: `82968ee4fe10192a23e5912bfb6ecc05e33eb757` on 2026-10-11; only the initial README existed.

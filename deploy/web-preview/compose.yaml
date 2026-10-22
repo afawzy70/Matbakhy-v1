@@ -26,9 +26,15 @@ services:
       PREVIEW_DOMAIN: ${PREVIEW_DOMAIN:?set PREVIEW_DOMAIN}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL}
       ALLOWED_CLIENT_IPS: ${ALLOWED_CLIENT_IPS:?set ALLOWED_CLIENT_IPS}
+      # Two access classes (Caddyfile). Both default to ALLOWED_CLIENT_IPS; making the customer hosts public is the owner's
+      # explicit step: CUSTOMER_ALLOWED_IPS="0.0.0.0/0 ::/0". Kitchen and staff access never follows it.
+      CUSTOMER_ALLOWED_IPS: ${CUSTOMER_ALLOWED_IPS:-${ALLOWED_CLIENT_IPS}}
+      STAFF_ALLOWED_IPS: ${STAFF_ALLOWED_IPS:-${ALLOWED_CLIENT_IPS}}
     volumes:
       - caddy-data:/data
       - caddy-config:/config
+      # Switch of the public Keycloak admin console (kc-admin.*): present only while admin-console.sh has hardened and verified it.
+      - ${GENERATED_DIR:-/srv/matbakhy-preview/generated}/flags:/srv/flags:ro
     networks: [edge, internal]
     depends_on:
       api:
@@ -73,6 +79,9 @@ services:
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
       KC_HOSTNAME: https://id.${PREVIEW_DOMAIN}
+      # Admin console and Admin REST API on their own host (owner approval 2026-10-19, Preview only). The master realm's own URLs follow
+      # via its frontendUrl attribute, set by admin-console.sh; the matbakhy realm and its customers stay on id.
+      KC_HOSTNAME_ADMIN: https://kc-admin.${PREVIEW_DOMAIN}
       KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
       KC_HTTP_ENABLED: "true"
       KC_PROXY_HEADERS: xforwarded
@@ -88,7 +97,8 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      # Healthy only when the matbakhy realm answers: management readiness is UP well before --import-realm has finished.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && printf 'GET /realms/matbakhy/.well-known/openid-configuration HTTP/1.1\\r\\nHost: localhost\\r\\nX-Forwarded-Proto: https\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"issuer\"' <&3"]
       interval: 10s
       timeout: 5s
       retries: 60
@@ -136,12 +146,19 @@ services:
       OIDC_ISSUER: https://id.${PREVIEW_DOMAIN}/realms/matbakhy
       OIDC_BACKCHANNEL_ISSUER: http://identity:8080/realms/matbakhy
       OIDC_WEB_CLIENT_SECRET: ${OIDC_WEB_CLIENT_SECRET:?set OIDC_WEB_CLIENT_SECRET}
+      OIDC_ADMIN_CLIENT_SECRET: ${OIDC_ADMIN_CLIENT_SECRET:-}
       WEB_ALLOWED_ORIGINS: https://app.${PREVIEW_DOMAIN},https://ops.${PREVIEW_DOMAIN}
+      # The web apps (app., ops.) read the XSRF-TOKEN cookie that the API (api.) sets: it must be set for the parent domain, or every
+      # browser mutation is refused with 403 (found by the remote browser E2E).
+      WEB_COOKIE_DOMAIN: ${PREVIEW_DOMAIN}
       WEB_POST_LOGIN_REDIRECT: https://app.${PREVIEW_DOMAIN}/
       STAFF_BOOTSTRAP_SUBJECT: ${STAFF_BOOTSTRAP_SUBJECT:-}
       PHONE_CODE_PEPPER: ${PHONE_CODE_PEPPER:?set PHONE_CODE_PEPPER}
       HANDOVER_HASH_KEY: ${HANDOVER_HASH_KEY:?set HANDOVER_HASH_KEY}
+      ACTIVITY_HASH_KEY: ${ACTIVITY_HASH_KEY:?set ACTIVITY_HASH_KEY}
       HANDOVER_ENCRYPTION_KEY: ${HANDOVER_ENCRYPTION_KEY:?set HANDOVER_ENCRYPTION_KEY}
+      # O07: external push delivery stays off until approved, credentialed and tested on devices (in-app notifications are unaffected).
+      PUSH_DELIVERY_ENABLED: ${PUSH_DELIVERY_ENABLED:-false}
       PUSH_TOKEN_HASH_KEY: ${PUSH_TOKEN_HASH_KEY:?set PUSH_TOKEN_HASH_KEY}
       PUSH_TOKEN_ENCRYPTION_KEY: ${PUSH_TOKEN_ENCRYPTION_KEY:?set PUSH_TOKEN_ENCRYPTION_KEY}
       OBJECT_STORAGE_ENDPOINT: http://storage:8333
@@ -167,13 +184,14 @@ services:
     cpus: 1.5
 
   # --- MB-039 observability (OPS-01/OPS-02). Internal network only; Grafana is published on the host loopback and
-  # reached through an SSH tunnel. Retention values are rehearsal values pending O06. ---
+  # reached through an SSH tunnel. Retention values are the proposed staging defaults, not approved policies (O06). ---
   loki:
     image: grafana/loki:3.5.3@sha256:3165cecce301ce5b9b6e3530284b080934a05cd5cafac3d3d82edcb887b45ecd
     restart: unless-stopped
     command: ["-config.file=/etc/loki/loki.yaml", "-config.expand-env=true"]
     environment:
-      LOG_RETENTION: ${LOG_RETENTION:-168h}
+      LOG_RETENTION: ${LOG_RETENTION:-720h}
+      DEBUG_LOG_RETENTION: ${DEBUG_LOG_RETENTION:-168h}
     volumes:
       - ./observability/loki.yaml:/etc/loki/loki.yaml:ro
       - loki-data:/loki

@@ -42,7 +42,7 @@ public class QuoteService implements QuoteDirectory {
     public record ItemRequest(UUID mealId, int quantity) {
     }
 
-    public record QuoteRequest(List<ItemRequest> items, UUID slotId, Mode fulfillmentMode, UUID addressId) {
+    public record QuoteRequest(List<ItemRequest> items, UUID slotId, Mode fulfillmentMode, UUID addressId, PaymentService.Method paymentMethod) {
     }
 
     public record Money(long amountMinor, String currency) {
@@ -53,7 +53,7 @@ public class QuoteService implements QuoteDirectory {
 
     public record QuoteResponse(UUID quoteId, Instant expiresAt, UUID kitchenId, List<QuoteLine> items, Money subtotal, Money deliveryFee,
                                 Money tax, Money total, String cancellationPolicyVersion, String termsVersion, Instant acceptanceDeadlinePreview,
-                                List<String> warnings) {
+                                List<String> warnings, PaymentService.Terms payment) {
     }
 
     static final int MAX_ITEMS = CommercePolicies.MAX_LINES_PER_ORDER;
@@ -65,10 +65,11 @@ public class QuoteService implements QuoteDirectory {
     private final SlotDirectory slots;
     private final AddressDirectory addresses;
     private final CheckoutContactPolicy contact;
+    private final PaymentService payments;
     private final Clock clock;
 
     QuoteService(JdbcTemplate jdbc, CommercePolicies policies, MealCatalog meals, SellerDirectory sellers, SlotDirectory slots,
-                 AddressDirectory addresses, CheckoutContactPolicy contact, Clock clock) {
+                 AddressDirectory addresses, CheckoutContactPolicy contact, PaymentService payments, Clock clock) {
         this.jdbc = jdbc;
         this.policies = policies;
         this.meals = meals;
@@ -76,6 +77,7 @@ public class QuoteService implements QuoteDirectory {
         this.slots = slots;
         this.addresses = addresses;
         this.contact = contact;
+        this.payments = payments;
         this.clock = clock;
     }
 
@@ -107,17 +109,22 @@ public class QuoteService implements QuoteDirectory {
         }
         Instant now = clock.instant();
         Terms t = terms(customerId, in.items(), in.slotId(), in.fulfillmentMode(), in.addressId(), policy, now);
+        PaymentService.Method method = in.paymentMethod() == null ? PaymentService.Method.COD : in.paymentMethod();
+        PaymentService.Terms pay = payments.terms(payments.profile(t.seller().kitchenId(), false), method, t.total());
 
         UUID id = UUID.randomUUID();
         Instant expires = now.plus(Duration.ofSeconds(policy.quoteTtlSeconds()));
         boolean delivery = in.fulfillmentMode() == Mode.DELIVERY;
         jdbc.update("""
                 INSERT INTO quote (id, customer_id, kitchen_id, slot_id, fulfillment_mode, address_id, address_version, zone_id, policy_version,
-                                   subtotal_minor, delivery_fee_minor, tax_minor, total_minor, accept_by_preview, expires_at, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                   subtotal_minor, delivery_fee_minor, tax_minor, total_minor, accept_by_preview, expires_at, created_at,
+                                   payment_method, deposit_bps, deposit_minor, recipient_method, recipient_identifier, recipient_name)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 id, customerId, t.seller().kitchenId(), in.slotId(), in.fulfillmentMode().name(), delivery ? t.address().id() : null,
                 delivery ? t.address().version() : null, delivery ? t.address().zoneId() : null, policy.version(), t.subtotal(), t.deliveryFee(),
-                t.tax(), t.total(), Timestamp.from(t.acceptBy()), Timestamp.from(expires), Timestamp.from(now));
+                t.tax(), t.total(), Timestamp.from(t.acceptBy()), Timestamp.from(expires), Timestamp.from(now), pay.method(), pay.depositBps(),
+                pay.deposit().amountMinor(), pay.recipient() == null ? null : pay.recipient().method(),
+                pay.recipient() == null ? null : pay.recipient().identifier(), pay.recipient() == null ? null : pay.recipient().name());
         List<QuoteLine> lines = new ArrayList<>();
         for (Priced p : t.lines()) {
             jdbc.update("""
@@ -131,7 +138,7 @@ public class QuoteService implements QuoteDirectory {
             warnings.add("SYNTHETIC_POLICY");
         }
         return new QuoteResponse(id, expires, t.seller().kitchenId(), lines, egp(t.subtotal()), egp(t.deliveryFee()), egp(t.tax()), egp(t.total()),
-                policy.cancellationPolicyVersion(), policy.termsVersion(), t.acceptBy(), warnings);
+                policy.cancellationPolicyVersion(), policy.termsVersion(), t.acceptBy(), warnings, pay);
     }
 
     @Override
@@ -174,10 +181,25 @@ public class QuoteService implements QuoteDirectory {
         if (t.deliveryFee() != (Long) q.get("delivery_fee_minor") || t.total() != (Long) q.get("total_minor")) {
             throw changed(ErrorCode.PRICE_CHANGED, "TOTAL_CHANGED");
         }
+        // MB-051: the kitchen's payment terms are part of the quote; a change since quoting needs a new quote (D13 protocol).
+        PaymentService.Terms pay;
+        try {
+            pay = payments.terms(payments.profile(t.seller().kitchenId(), true), PaymentService.Method.valueOf((String) q.get("payment_method")), t.total());
+        } catch (ApiException e) {
+            throw changed(ErrorCode.PRICE_CHANGED, "PAYMENT_CHANGED");
+        }
+        if (pay.depositBps() != (Integer) q.get("deposit_bps") || pay.deposit().amountMinor() != (Long) q.get("deposit_minor")
+                || !java.util.Objects.equals(pay.recipient() == null ? null : pay.recipient().identifier(), q.get("recipient_identifier"))
+                || !java.util.Objects.equals(pay.recipient() == null ? null : pay.recipient().method(), q.get("recipient_method"))
+                || !java.util.Objects.equals(pay.recipient() == null ? null : pay.recipient().name(), q.get("recipient_name"))) {
+            throw changed(ErrorCode.PRICE_CHANGED, "PAYMENT_CHANGED");
+        }
         return new ValidQuote(quoteId, customerId, t.seller().kitchenId(), (UUID) q.get("slot_id"), mode.name(), addressId,
                 (Long) q.get("address_version"), (UUID) q.get("zone_id"), policy.version(), t.subtotal(), t.deliveryFee(), t.tax(), t.total(),
                 ((Timestamp) q.get("accept_by_preview")).toInstant(), expires, items, t.acceptBy(), policy.commissionRateBps(),
-                policy.cancellationPolicyVersion(), policy.termsVersion());
+                policy.cancellationPolicyVersion(), policy.termsVersion(), pay.method(), pay.deposit().amountMinor(),
+                pay.recipient() == null ? null : pay.recipient().method(), pay.recipient() == null ? null : pay.recipient().identifier(),
+                pay.recipient() == null ? null : pay.recipient().name());
     }
 
     /** Recomputes the authoritative terms from current data; used for creation and revalidation. */

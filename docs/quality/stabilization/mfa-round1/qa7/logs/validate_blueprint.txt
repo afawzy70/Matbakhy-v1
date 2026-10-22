@@ -1,0 +1,1 @@
+PASS: blueprint structure only; product remains unverified

@@ -1,0 +1,44 @@
+[
+ {
+  "id": "SECR4-001",
+  "severity": "High",
+  "component": "Staff MFA enforcement",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
+  "line": 55,
+  "title": "Default-off MFA enforcement still permits password-only staff grant holders",
+  "scenario": "An active account has an application staff grant but lacks the Keycloak matbakhy-staff role. With the default configuration, password-only authentication skips the realm's role-conditioned OTP and receives staff authorities.",
+  "expected": "Every staff grant holder must assert MFA before using staff authority.",
+  "actual": "The default-off gate issues database-backed permissions without checking MFA. This is the still-open SECR-001 decision, not a newly introduced bypass.",
+  "evidence": "AccountMapper.java:33 defaults false and :55-58 conditionally adds permissions. application.yaml:71 binds IDENTITY_REQUIRE_STAFF_MFA with default false; deploy/web-preview/compose.yaml:150 also defaults false. With the flag true, both bearer and web paths use this mapper and cannot obtain these authorities without StaffAssurance.assertsMfa succeeding.",
+  "suggested_fix": "Reconcile staff grant holders with the provider MFA policy and enable enforcement in the target environment.",
+  "repro_test": "Using synthetic accounts, grant support.case to an account without the realm role. Verify password-only access succeeds with the default and is denied with IDENTITY_REQUIRE_STAFF_MFA=true. Static-only; not executed."
+ },
+ {
+  "id": "SECR4-002",
+  "severity": "Medium",
+  "component": "Public media rollback cleanup",
+  "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
+  "line": 203,
+  "title": "Public-image rollback callback can still delete a concurrent retry's approved object",
+  "scenario": "Completion A writes media/<id>.jpg and rolls back. After its database lock releases but before its rollback callback deletes the object, completion B writes the same key and commits approval. A's delayed callback then deletes B's approved image.",
+  "expected": "Rollback cleanup must not delete an object referenced by a committed approval.",
+  "actual": "The document branch no longer registers rollback deletion, but the public branch retains unconditional deletion of its shared deterministic key.",
+  "evidence": "MediaService.java:198-203 writes the deterministic public key and registers deletion. The callback executes after rollback at :305-312, outside the reference-aware cleanup worker. SECR-003 therefore remains open for public variants.",
+  "suggested_fix": "Use attempt-specific keys with durable reference-aware cleanup, or otherwise remove unconditional rollback deletion of the shared public key.",
+  "repro_test": "Pause A's rollback callback after database rollback, complete and commit B for the same synthetic media asset, resume A, and assert B's public object remains readable. Static-only; concurrency reproduction not executed."
+ },
+ {
+  "id": "SECR4-003",
+  "severity": "Medium",
+  "component": "Deployment secret rendering",
+  "file": "deploy/web-preview/deploy.sh",
+  "line": 61,
+  "title": "Credential files are written before their parent directory becomes private",
+  "scenario": "On a fresh render with a traversable deployment parent and a normal 022 umask, mkdir creates traversable generated directories. An unrelated local account opens or copies the rendered credential files before chmod 700 runs. A rendering failure before chmod can leave the exposure persistent.",
+  "expected": "The output directory must be private before any credential-bearing file is created or truncated.",
+  "actual": "The script writes both files at lines 62-65 and restricts GENERATED_DIR only at line 68. Successful completion protects subsequent pathname access but cannot revoke a file descriptor already opened during rendering.",
+  "evidence": "deploy.sh:59-70 has mkdir, credential rendering, then chmod 700 in that order. render establishes no restrictive umask; umask 077 at :30 belongs only to init_secrets. This leaves SECR-004 partially unresolved.",
+  "suggested_fix": "Create and restrict GENERATED_DIR before writing secrets, and establish restrictive creation permissions before rendering. Apply container-readable file permissions only beneath the already-private parent.",
+  "repro_test": "Render synthetic credentials under a traversable temporary parent with umask 022, pause before chmod, and attempt reads as an unrelated UID. Also simulate rendering failure before chmod. Reads must fail throughout. Static-only; not executed."
+ }
+]

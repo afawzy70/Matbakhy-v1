@@ -1,0 +1,44 @@
+[
+ {
+  "id": "CR3-001",
+  "severity": "Medium",
+  "component": "Order placement idempotency",
+  "file": "backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderService.java",
+  "line": 139,
+  "title": "Unescaped field delimiters allow different placement requests to share a fingerprint",
+  "scenario": "Place an order with cancellation version 'cancel-v1' and fulfillment note 'leave\\nat door'. Retry the same quoteId/clientRequestId with a new Idempotency-Key, cancellation version 'cancel-v1\\nleave', and note 'at door'. Both policy strings satisfy the controller's length and nonblank constraints.",
+  "expected": "The changed cancellation version and fulfillment note produce IDEMPOTENCY_CONFLICT.",
+  "actual": "Both requests produce the same canonical string and SHA-256. The existing-order branch returns the original order before validating the changed policy version.",
+  "evidence": "An executable Python reproduction of the exact concatenation confirmed equal fingerprints. Lines 158-160 accept the matching fingerprint; policy validation occurs later at line 166. A new Idempotency-Key avoids the temporary idempotency record's distinct JSON hash.",
+  "suggested_fix": "Hash an unambiguous versioned encoding, such as a JSON array or length-prefixed fields, after applying the intended normalization.",
+  "repro_test": "Place the first request, then submit the second with a different Idempotency-Key and assert IDEMPOTENCY_CONFLICT. Also assert the two fingerprints differ. Fingerprint collision reproduced; endpoint integration test not run."
+ },
+ {
+  "id": "CR3-002",
+  "severity": "Medium",
+  "component": "Durable media cleanup",
+  "file": "backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java",
+  "line": 212,
+  "title": "Cleanup can finish before the upload ticket loses write access",
+  "scenario": "Complete a document shortly after obtaining its ten-minute upload ticket. The cleanup job deletes uploads/<id> and marks the cleanup DONE. Before the ticket expires, reuse the original signed PUT URL to upload the same-sized bytes again.",
+  "expected": "The obsolete upload object is eventually removed after no valid ticket can recreate it.",
+  "actual": "The object is recreated after successful cleanup and retained indefinitely by this cleanup mechanism. DONE rows are never selected again, enqueue ignores the existing row, and the approved asset now stores only documents/<id>.",
+  "evidence": "createTicket issues a ten-minute reusable signed PUT. Line 212 enqueues immediate cleanup without ticket expiry. MediaCleanup.runDue selects only PENDING rows and marks successful deletion DONE at line 76. The approved-object reference guard cannot detect a later PUT to the abandoned upload key.",
+  "suggested_fix": "Schedule final deletion after ticket_expires_at plus an appropriate margin. If immediate deletion is desired, retain a pending final sweep until the upload capability expires.",
+  "repro_test": "Complete a synthetic document, run cleanup, reuse its still-valid upload URL, advance beyond ticket expiry, and run cleanup again. Assert the upload object is absent while the sealed approved document remains readable. Not executed."
+ },
+ {
+  "id": "CR3-003",
+  "severity": "High",
+  "component": "Staff MFA configuration",
+  "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
+  "line": 33,
+  "title": "Documented MFA rollout variable does not enable the API enforcement",
+  "scenario": "Follow docs/security/staff-mfa-enforcement.md and set IDENTITY_REQUIRE_STAFF_MFA=true for the backend. A server-side grant holder without the Keycloak matbakhy-staff role signs in using a password-only token.",
+  "expected": "The documented toggle enables enforcement and prevents that token from receiving staff permissions.",
+  "actual": "The injected property remains false: IDENTITY_REQUIRE_STAFF_MFA is not mapped to matbakhy.identity.require-staff-mfa. AccountMapper therefore continues granting staff authorities without checking the token's MFA assertion.",
+  "evidence": "The constructor reads only ${matbakhy.identity.require-staff-mfa:false}. application.yaml maps other identity environment aliases explicitly but contains no mapping for IDENTITY_REQUIRE_STAFF_MFA. Repository search finds that alias only in documentation. Lines 55-58 grant permissions when the flag is false.",
+  "suggested_fix": "Add an explicit application.yaml mapping from IDENTITY_REQUIRE_STAFF_MFA to matbakhy.identity.require-staff-mfa, propagate it through the deployment configuration, and verify the documented rollout path.",
+  "repro_test": "Start a configuration test with only IDENTITY_REQUIRE_STAFF_MFA=true and assert that a grant holder's password-only token receives no staff authorities. Current unit tests pass the constructor boolean directly and do not cover environment binding. Not executed."
+ }
+]

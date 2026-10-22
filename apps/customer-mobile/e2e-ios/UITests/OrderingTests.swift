@@ -17,6 +17,9 @@ import XCTest
 ///          then in Arabic, shows its content and reaches its main action; screenshots are kept for visual review.
 ///   testJ  MB-033 notification permission: not asked on launch; Allow shows the system prompt; Don't Allow leaves the
 ///          app usable with a Settings path and the in-app notifications.
+///   testK  MB-053: the script gives the kitchen a 50% deposit to an approved synthetic recipient and caps cash at 1 EGP;
+///          cash is refused with an explanation, the deposit quote shows amount, recipient and the direct-payment note,
+///          and after "I sent the deposit" the order says the kitchen still has to confirm.
 ///   testH  D13: after a quote the script raises Native Dish One to 130.00 (the test waits on the public meal); placing shows
 ///          the kitchen's change and the old and new totals; the new quote is placed only after explicit acceptance.
 final class OrderingTests: XCTestCase {
@@ -47,6 +50,30 @@ final class OrderingTests: XCTestCase {
         attachment.name = name
         attachment.lifetime = .keepAlways
         add(attachment)
+    }
+
+    /// MB-033 report only (never fails the test): labelled elements that run past the left or right screen edge, printed
+    /// to the job log so the large-text pass can be reviewed where the screenshot artifacts cannot be downloaded.
+    private func edgeReport(_ name: String) {
+        guard let root = try? app.snapshot() else { return print("EDGE-REPORT \(name): no snapshot") }
+        let width = root.frame.width
+        var past: [String] = []
+        var stack: [XCUIElementSnapshot] = [root]
+        while let node = stack.popLast() {
+            stack.append(contentsOf: node.children)
+            let label = node.label.isEmpty ? node.identifier : node.label
+            let f = node.frame
+            if !label.isEmpty, f.width > 0, f.minX < -0.5 || f.maxX > width + 0.5 {
+                past.append("'\(label.prefix(40))' [\(Int(f.minX)),\(Int(f.maxX))]")
+            }
+        }
+        print("EDGE-REPORT \(name): width \(Int(width)), \(past.count) labelled element(s) past the edge"
+            + (past.isEmpty ? "" : "; " + past.prefix(10).joined(separator: "; ")))
+    }
+
+    private func dtShot(_ name: String) {
+        shot(name)
+        edgeReport(name)
     }
 
     /// Scrolls until the element is hittable, then taps it.
@@ -100,6 +127,38 @@ final class OrderingTests: XCTestCase {
         secret.tap()
         Thread.sleep(forTimeInterval: 1.5)
         secret.typeText(password + "\n")
+        dismissSavePassword(until: element("mode-PICKUP"))
+    }
+
+    /// BLK-005 (bounded attempt 4, owner-authorised 2026-10-13 evening). Runs 43-47: polling the app, the sign-in sheet and
+    /// springboard for the "Save Password?" prompt either missed it, tapped it after XCTest had dismissed it (run 46), or
+    /// timed out querying other processes (run 47). Now XCTest handles the prompt itself: an interruption monitor taps
+    /// "Not Now", only the app's own hierarchy is polled, and while the prompt is visible one tap at the very top of the
+    /// screen (no control there) lets XCTest run the monitor. Sign-in stays real; nothing is bypassed.
+    private func dismissSavePassword(until done: XCUIElement? = nil) {
+        let monitor = addUIInterruptionMonitor(withDescription: "Save Password") { alert in
+            let notNow = alert.buttons["Not Now"]
+            if notNow.exists {
+                notNow.tap()
+                print("MB031-SAVE-PASSWORD-DISMISSED")
+                return true
+            }
+            return false
+        }
+        defer { removeUIInterruptionMonitor(monitor) }
+        let prompt = app.alerts["Save Password?"]
+        var deadline = Date().addingTimeInterval(90)
+        var settled = false
+        while Date() < deadline {
+            if prompt.exists {
+                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01)).tap()
+            }
+            if !settled, let done, done.exists {
+                settled = true
+                deadline = Date().addingTimeInterval(3)
+            }
+            Thread.sleep(forTimeInterval: 1)
+        }
     }
 
     func testA_ReplacementPromptAndSubmitThenKill() {
@@ -367,37 +426,45 @@ final class OrderingTests: XCTestCase {
         element("tab-discover").tap()
         let meal = element("meal-00000000-0000-4000-8000-00000000a0b1")
         expect(meal, "[\(lang)] Discover: meal not listed at large text", timeout: 90)
-        shot("dt-\(lang)-discover")
+        dtShot("dt-\(lang)-discover")
         meal.tap()
         expect(element("slot-0"), "[\(lang)] Meal: no slot")
         element("slot-0").tap()
         reach("add-to-cart", "[\(lang)] Meal: add to cart not reachable at large text")
-        shot("dt-\(lang)-meal")
+        dtShot("dt-\(lang)-meal")
         tapScrolled("add-to-cart")
         tapScrolled("go-to-cart")
         expect(element("cart-lines"), "[\(lang)] Cart: basket lines missing")
-        shot("dt-\(lang)-cart")
-        reach("get-quote", "[\(lang)] Checkout: calculate total not reachable at large text")
+        dtShot("dt-\(lang)-cart")
+        // Nothing may extend past the screen edge (native run 39: the Pickup choice did at the largest size).
+        let width = app.windows.firstMatch.frame.width
+        for id in ["mode-DELIVERY", "mode-PICKUP", "get-quote"] where element(id).exists {
+            let frame = element(id).frame
+            XCTAssertTrue(frame.minX >= 0 && frame.maxX <= width + 0.5, "[\(lang)] \(id) runs past the screen edge: \(frame) in width \(width)")
+        }
+        // Place order appears only with a quote: calculate the total first.
+        tapScrolled("get-quote")
+        expect(element("quote"), "[\(lang)] Checkout: no quote at large text")
         reach("place-order", "[\(lang)] Checkout: place order not reachable at large text")
-        shot("dt-\(lang)-checkout")
+        dtShot("dt-\(lang)-checkout")
         app.navigationBars.buttons.firstMatch.tap()
         app.navigationBars.buttons.firstMatch.tap()
         element("tab-orders").tap()
         let order = element("order-\(number)")
         expect(order, "[\(lang)] Orders: \(number) not listed")
-        shot("dt-\(lang)-orders")
+        dtShot("dt-\(lang)-orders")
         order.tap()
         expect(element("order-items"), "[\(lang)] Order: items missing")
-        shot("dt-\(lang)-order")
+        dtShot("dt-\(lang)-order")
         app.navigationBars.buttons.firstMatch.tap()
         element("tab-account").tap()
         tapLabel(notifications)
         expect(element("notifications"), "[\(lang)] Notifications screen missing")
-        shot("dt-\(lang)-notifications")
+        dtShot("dt-\(lang)-notifications")
         app.navigationBars.buttons.firstMatch.tap()
         tapLabel(support)
         expect(element("support"), "[\(lang)] Support screen missing")
-        shot("dt-\(lang)-support")
+        dtShot("dt-\(lang)-support")
         app.navigationBars.buttons.firstMatch.tap()
         print("MB033-DYNAMIC-TEXT-OK \(lang)")
     }
@@ -417,6 +484,8 @@ final class OrderingTests: XCTestCase {
     func testJ_NotificationRefusalIsSafe() {
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         app.launch()
+        // Run 50: tapped before the first frame appeared; wait like the other phases do.
+        expect(element("tab-account"), "app not ready: no Account tab")
         element("tab-account").tap()
         let undetermined = element("phone-alerts-undetermined")
         expect(undetermined, "permission not shown as not yet asked (the app must not ask on launch)")
@@ -435,5 +504,43 @@ final class OrderingTests: XCTestCase {
         tapLabel("Notifications")
         expect(element("notifications"), "in-app notifications unavailable after the refusal")
         shot("notifications-after-refusal")
+    }
+
+    func testK_DepositCheckoutAndTransferReport() {
+        app.launch()
+        element("tab-discover").tap()
+        let meal = element("meal-00000000-0000-4000-8000-00000000a0b1")
+        expect(meal, "meal not listed", timeout: 90)
+        meal.tap()
+        expect(element("slot-0"), "no slot")
+        element("slot-0").tap()
+        tapScrolled("add-to-cart")
+        tapScrolled("go-to-cart")
+        tapScrolled("mode-PICKUP")
+        tapScrolled("get-quote")
+        expect(text("Cash on receipt is not available for this total"), "COD_NOT_ELIGIBLE not explained")
+        tapScrolled("pay-DEPOSIT")
+        tapScrolled("get-quote")
+        expect(element("deposit-terms"), "no deposit terms in the quote")
+        expect(text("Deposit now: "), "deposit amount not shown")
+        expect(text("synthetic-kitchen@instapay"), "approved recipient not shown")
+        expect(text("the platform never receives or holds the money"), "direct-payment note not shown")
+        print("MB053-TERMS \(text("Deposit now: ").label)")
+        shot("deposit-terms")
+        tapScrolled("accept-terms")
+        tapScrolled("place-order")
+        let number = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "MB-")).firstMatch
+        expect(number, "deposit order not confirmed")
+        print("MB053-ORDER-NUMBER \(number.label)")
+        expect(text("Payment: Waiting for your deposit"), "payment state not shown on the order")
+        tapScrolled("transfer-reference")
+        // Return ends editing (single-line field), so the keyboard does not cover the button.
+        element("transfer-reference").typeText("IP123\n")
+        tapScrolled("report-transfer")
+        expect(text("Payment: You reported the transfer; waiting for the kitchen to confirm"), "reported transfer not shown honestly")
+        expect(text("Preparation starts only after the kitchen confirms"), "no explanation that the kitchen must confirm", timeout: 10)
+        XCTAssertFalse(element("report-transfer").exists, "the report can be sent again")
+        print("MB053-REPORTED")
+        shot("deposit-reported")
     }
 }

@@ -31,4 +31,21 @@ class CommerceConfigurationTest {
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> new CommerceConfiguration().handoverKeyGuard(preview, dev))
                 .hasMessageContaining("HANDOVER_HASH_KEY");
     }
+
+    @Test
+    void deployed_environments_refuse_the_development_activity_key() {
+        com.matbakhy.catalog.internal.activity.ActivityProperties dev = new com.matbakhy.catalog.internal.activity.ActivityProperties(
+                "local-dev-only-activity-hash-key-not-a-secret", 300);
+        for (DeploymentEnvironment env : new DeploymentEnvironment[] {DeploymentEnvironment.PREVIEW, DeploymentEnvironment.STAGING,
+                DeploymentEnvironment.PRODUCTION}) {
+            org.assertj.core.api.Assertions.assertThatThrownBy(() -> new CommerceConfiguration().activityKeyGuard(
+                    new MatbakhyProperties(env, new Market("EGP", "Africa/Cairo")), dev)).hasMessageContaining("ACTIVITY_HASH_KEY");
+        }
+        assertThat(new CommerceConfiguration().activityKeyGuard(new MatbakhyProperties(DeploymentEnvironment.CI, new Market("EGP", "Africa/Cairo")), dev))
+                .isNotNull();
+        com.matbakhy.catalog.internal.activity.ActivityProperties real = new com.matbakhy.catalog.internal.activity.ActivityProperties(
+                "0123456789abcdef0123456789abcdef0123456789abcdef", 300);
+        assertThat(new CommerceConfiguration().activityKeyGuard(new MatbakhyProperties(DeploymentEnvironment.PRODUCTION,
+                new Market("EGP", "Africa/Cairo")), real)).isNotNull();
+    }
 }

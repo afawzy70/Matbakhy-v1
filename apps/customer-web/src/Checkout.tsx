@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { errorCode, formatMoney, formatTime, loginUrl, newIdempotencyKey, type Schemas } from "./api";
 import { estimateMinor, lineLimit, loadCart, loadPending, saveCart, savePending, type CartLine, type PendingPlacement } from "./cart";
 import { errorText } from "./i18n";
+import { PaymentTerms } from "./Payment";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "./shared";
 
 type Me = Schemas["CustomerProfile"];
@@ -195,6 +196,7 @@ function OrderForm({
   const { t, locale } = ctx;
   const [mode, setMode] = useState<"DELIVERY" | "PICKUP">(cart.modes.includes("DELIVERY") ? "DELIVERY" : "PICKUP");
   const [addressId, setAddressId] = useState<string | null>(null);
+  const [payMethod, setPayMethod] = useState<"COD" | "DEPOSIT">("COD");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [accepted, setAccepted] = useState(false);
   const [pending, setPending] = useState<PendingPlacement | null>(loadPending);
@@ -235,6 +237,7 @@ function OrderForm({
       slotId: cart.slotId,
       fulfillmentMode: mode,
       ...(mode === "DELIVERY" && addressId ? { addressId } : {}),
+      paymentMethod: payMethod,
     };
   }
 
@@ -349,6 +352,25 @@ function OrderForm({
           )}
         </Status>
       ) : null}
+      <fieldset className="mode-switch">
+        <legend>{t.pay.choose}</legend>
+        {(["COD", "DEPOSIT"] as const).map((m) => (
+          <label key={m} className="option-card">
+            <input
+              type="radio"
+              name="payment-method"
+              checked={payMethod === m}
+              onChange={() => {
+                setPayMethod(m);
+                setQuote(null);
+                setChange(null);
+                setError(null);
+              }}
+            />{" "}
+            {m === "COD" ? t.pay.cod : t.pay.deposit}
+          </label>
+        ))}
+      </fieldset>
       <button
         type="button"
         className="cta"
@@ -358,7 +380,8 @@ function OrderForm({
             const r = await ctx.api.POST("/api/v1/quotes", { body: quoteRequest() });
             setQuote(r.data ?? null);
             setChange(null);
-            setError(null);
+            const fields = JSON.stringify((r.error as { fieldErrors?: unknown } | undefined)?.fieldErrors ?? []);
+            setError(fields.includes("COD_NOT_ELIGIBLE") ? t.pay.codNotEligible : fields.includes("DEPOSIT_NOT_OFFERED") ? t.pay.depositNotOffered : null);
             return r;
           })
         }
@@ -381,7 +404,7 @@ function OrderForm({
               <strong>{formatMoney(quote.total.amountMinor, locale)}</strong>
             </dd>
           </dl>
-          <p className="muted">{t.cashOnDelivery}</p>
+          <PaymentTerms ctx={ctx} terms={quote.payment} deadline={quote.acceptanceDeadlinePreview} />
           {quote.warnings.includes("SYNTHETIC_POLICY") ? <p className="notice">{t.syntheticPolicy}</p> : null}
           <label className="check">
             <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} /> {t.terms}

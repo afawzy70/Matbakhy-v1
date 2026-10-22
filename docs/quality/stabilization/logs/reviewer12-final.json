@@ -1,0 +1,52 @@
+{
+  "agent": "Codex code and security reviewer",
+  "commit": "fef001052ee52fdbbcb616460ecb45f10287acc5",
+  "summary": "Found two actionable defects. HEAD matches the required SHA. Static migration checks passed; mobile/native, backend integration and live Keycloak checks were not run. No additional evidence-backed finding in response cloning, cancellation, token logging or the new reset-proof test. Review was read-only.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "note": "Matched fef001052ee52fdbbcb616460ecb45f10287acc5."
+    },
+    {
+      "command": "python3 -B -m unittest scripts/test_keycloak_mfa_migration.py",
+      "exit_code": 0,
+      "note": "Six static checks passed; these do not establish runtime Keycloak correctness."
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "note": "Clean working tree."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CR11-1",
+      "severity": "High",
+      "component": "Mobile step-up account isolation",
+      "file": "apps/customer-mobile/src/AppContext.tsx",
+      "line": 164,
+      "title": "Step-up accepts another subject without clearing shopping or displayed private state",
+      "scenario": "Customer A presses Verify now and authenticates as customer B in the fresh browser login.",
+      "expected": "Same-subject verification preserves the basket; a different subject clears shopping, pending placement and displayed private state before B uses the app.",
+      "actual": "signIn replaces the session with B's tokens, but startStepUp only hides the banner. Session.signedIn clears its internal cache on subject change, while SecureStore shopping state and auth.profile remain A's. Mounted screens also remain active.",
+      "evidence": "auth.ts permits a fresh username/password login and passes the resulting tokens to Session.signedIn. AppContext.tsx:164-165 neither compares subjects nor calls clearShopping/reloadProfile. basket.ts stores basket and pending placement separately from Session's private cache.",
+      "suggested_fix": "Compare subjects across verification. On a change, clear shopping and pending placement, reset mounted private screens, and load the new profile before displaying the signed-in account. Preserve shopping only for the same subject.",
+      "repro_test": "Sign in as A, populate basket/pending placement and profile, trigger STEP_UP_REQUIRED, then complete verification as B. Assert shopping is cleared and no A profile or screen data remains. Retain the same-subject preservation test."
+    },
+    {
+      "id": "CR11-2",
+      "severity": "Medium",
+      "component": "Keycloak migration rollback",
+      "file": "deploy/web-preview/migrate-mfa.sh",
+      "line": 50,
+      "title": "Repeated apply overwrites the rollback baseline and writes an invalid shell assignment",
+      "scenario": "Run apply successfully, then repeat apply as documented, or run backup afterward, and subsequently request rollback.",
+      "expected": "Rollback restores the original pre-migration flow after any supported repeat operation.",
+      "actual": "Every backup overwrites the single state file with the currently bound flow. After migration this writes PREVIOUS_BROWSER_FLOW=matbakhy browser without quoting. Sourcing it executes browser as a command and fails to restore the recorded value; the failure is ignored. Even if quoted, the saved target would be the migration flow that rollback then attempts to delete.",
+      "evidence": "backup reads the current binding at line 49 and unconditionally replaces STATE at line 50. apply always calls backup at line 65. rollback sources STATE with errors ignored at line 72. identity/mfa-migration.kcadm.sh:190-194 binds the saved target and then deletes TOP. The shell assignment with the space reproduces 'browser: not found'.",
+      "suggested_fix": "Preserve an immutable original migration baseline across repeats, serialize aliases safely without sourcing unescaped data, and reject rollback targets equal to the flow being deleted.",
+      "repro_test": "Exercise apply twice followed by rollback, and apply followed by backup and rollback. Assert the original binding is restored. Include an original flow alias containing spaces and verify exact round-trip serialization."
+    }
+  ]
+}

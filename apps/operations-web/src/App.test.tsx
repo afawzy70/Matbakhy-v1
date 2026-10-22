@@ -1,6 +1,6 @@
 import { brand } from "@matbakhy/design-tokens";
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { App, title } from "./App";
 
 afterEach(() => {
@@ -351,6 +351,146 @@ describe("operations-web cook workspace", () => {
     expect(screen.getByRole("cell", { name: "MB-1001" })).toBeTruthy();
   });
 
+  it("MB-050 (D10): with no commission the cook statement says so and shows no commission rows or column", async () => {
+    const zero = egp(0);
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/statements": () => ({
+        status: 200,
+        body: {
+          from: "2026-10-01", to: "2026-10-13", includes: ["COMPLETED_ORDERS", "CASH_POSITION", "COMMISSION"], kitchenId: "k1",
+          direction: "COOK_PAYS_PLATFORM", refunds: [], settlements: [], unsettledEntries: [],
+          summary: { completedOrders: 1, ordersTotal: egp(27000), cashReported: zero, cashVerified: zero, cashOutstanding: egp(27000),
+            commissionPosted: zero, commissionPending: 0, commissionReversed: zero, commissionSettled: zero, commissionOutstanding: zero },
+          items: [{ orderId: "o1", publicNumber: "MB-1002", completedAt: "2026-10-13T09:00:00Z", orderTotal: egp(27000), cashState: "DUE", commission: zero, commissionState: "POSTED" }],
+          nextCursor: null, hasMore: false,
+        },
+      }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الكشف" }));
+    expect(await screen.findByText("لا توجد عمولة للمنصة: كل مبلغ الطلب لك.")).toBeTruthy();
+    expect(screen.queryByText(/عمولة/, { selector: "dt" })).toBeNull();
+    expect(screen.queryByRole("columnheader", { name: "العمولة" })).toBeNull();
+    expect(screen.queryByText(/المستحق للمنصة هو العمولة فقط/)).toBeNull();
+    expect(screen.getByRole("cell", { name: "MB-1002" })).toBeTruthy();
+  });
+
+  it("MB-054 (D17): the cook's free report keeps interest, orders, portions and money apart and never claims profit", async () => {
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/insights": () => ({
+        status: 200,
+        body: {
+          kitchenId: "k1", from: "2026-09-14", to: "2026-10-13", timezone: "Africa/Cairo",
+          activity: { mealImpressions: 40, mealViews: 12, kitchenViews: 5, addToCart: 3 },
+          orders: { quotes: 4, placed: 3, completed: 2, cancelled: 1, rejected: 0, expired: 0, deliveryFailed: 0, repeatCustomers: 1 },
+          capacity: { portionsOffered: 20, portionsTaken: 2 },
+          money: { grossSales: egp(20000), refunds: egp(2500), netKnown: egp(17500) },
+          definitions: ["NET_IS_NOT_PROFIT"],
+        },
+      }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأداء" }));
+    const report = await screen.findByTestId("insights");
+    const value = (label: string) => within(report).getByText(label).nextElementSibling?.textContent;
+    expect(value("مشاهدات صفحات الأطباق")).toBe("12");
+    expect(value("عملاء لهم طلبان مكتملان أو أكثر")).toBe("1");
+    expect(value("الكميات المعروضة")).toBe("20");
+    expect(value("إجمالي المبيعات (الطلبات المكتملة)")).toBe(new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" }).format(200));
+    expect(value("الصافي المعروف بعد الاستردادات")).toBe(new Intl.NumberFormat("ar-EG", { style: "currency", currency: "EGP" }).format(175));
+    expect(within(report).getByText("هذا ليس ربحًا؛ لا تُحتسب أي تكاليف.")).toBeTruthy();
+    // No figure is labelled as profit or margin; the only mention of profit is the disclaimer. Nothing is sponsored.
+    expect([...report.querySelectorAll("dt")].map((d) => d.textContent).join("|")).not.toMatch(/ربح|هامش/);
+    expect(report.textContent).not.toMatch(/إعلان|ممول|ترويج/);
+    expect(calls.some((c) => c.path.startsWith("/api/v1/cook/insights"))).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    expect(await within(await screen.findByTestId("insights")).findByText("This is not profit; no costs are included.")).toBeTruthy();
+  });
+
+  it("MB-052 (D16): the cook sees the deposit and reports receipt or a problem; it is never called a bank confirmation", async () => {
+    const pay = (state: string, version = 1) => ({
+      method: "DEPOSIT", state, deposit: egp(13500), remainder: egp(13500), version, depositExpiresAt: "2026-10-11T10:25:00Z",
+      recipient: { method: "INSTAPAY", identifier: "kitchen@instapay", name: "Synthetic Kitchen" },
+    });
+    const current = { ...order("ACCEPTED", ["PREPARE", "CANCEL"], 2), payment: pay("CUSTOMER_TRANSFER_REPORTED") };
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 200, body: dashboard() }),
+      "GET /api/v1/cook/orders": (req) => ({
+        status: 200,
+        body: { items: new URL(req.url).searchParams.get("state") === "ACCEPTED" ? [current] : [], nextCursor: null, hasMore: false },
+      }),
+      "POST /api/v1/cook/orders/o1/payment/receipt": () => ({ status: 200, body: pay("KITCHEN_RECEIPT_REPORTED", 2) }),
+      "POST /api/v1/cook/orders/o1/payment/problem": () => ({ status: 200, body: pay("DISPUTED", 2) }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الطلبات" }));
+    const card = await screen.findByRole("article", { name: "MB-1001" });
+    expect(within(card).getByText("العميل أبلغ بالتحويل")).toBeTruthy();
+    expect(within(card).getByText("kitchen@instapay")).toBeTruthy();
+    expect(within(card).getByText(/ليس تأكيدًا من البنك/)).toBeTruthy();
+    fireEvent.click(within(card).getByRole("button", { name: /وصلني العربون/ }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment/receipt"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment/receipt"))?.body).toEqual({ expectedVersion: 1, amountMinor: 13500 });
+    fireEvent.click(within(card).getByRole("button", { name: "لم يصلني" }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment/problem"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment/problem"))?.body).toEqual({ expectedVersion: 1, kind: "NOT_RECEIVED" });
+    expect(card.textContent).not.toMatch(/verified|مؤكد من البنك/i);
+  });
+
+  it("MB-052 (D16): finance staff approve an account and decide an ended order's deposit, with no way to mark money received", async () => {
+    const { fetchImpl, calls } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+      "GET /api/v1/ops/finance/statements": () => ({ status: 404, body: { code: "NOT_FOUND" } }),
+      "GET /api/v1/ops/payment-recipients": () => ({
+        status: 200,
+        body: { items: [{ kitchenId: "k9", kitchenName: "مطبخ تجريبي", recipient: { method: "INSTAPAY", identifier: "k9@instapay", name: "Synthetic" }, version: 3 }] },
+      }),
+      "GET /api/v1/ops/payments": () => ({
+        status: 200,
+        body: { items: [{ orderId: "o7", publicNumber: "MB-1007", kitchenId: "k9", orderState: "REJECTED", state: "DISPUTED", deposit: egp(13500), lastReason: "NOT_RECEIVED", updatedAt: SERVER_NOW, version: 4 }] },
+      }),
+      "POST /api/v1/ops/kitchens/k9/payment-recipient/approval": () => ({ status: 200, body: {} }),
+      "POST /api/v1/ops/orders/o7/payment/decision": () => ({ status: 200, body: {} }),
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByText("k9@instapay")).toBeTruthy();
+    const reasons = await screen.findAllByLabelText("السبب");
+    fireEvent.change(reasons[0] as HTMLElement, { target: { value: "name matches the approved cook" } });
+    fireEvent.click(screen.getByRole("button", { name: "موافقة على الحساب" }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment-recipient/approval"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment-recipient/approval"))?.body).toEqual({ expectedVersion: 3, reason: "name matches the approved cook" });
+
+    expect(await screen.findByText(/MB-1007/)).toBeTruthy();
+    const outcome = screen.getByLabelText("القرار") as HTMLSelectElement;
+    expect([...outcome.options].map((o) => o.value)).toEqual(["REFUND_OWED", "CLOSED_NO_FUNDS"]);
+    fireEvent.change(screen.getAllByLabelText("السبب")[1] as HTMLElement, { target: { value: "kitchen rejected after the transfer" } });
+    fireEvent.click(screen.getByRole("button", { name: "تسجيل القرار" }));
+    await waitFor(() => expect(calls.some((c) => c.path.endsWith("/payment/decision"))).toBe(true));
+    expect(calls.find((c) => c.path.endsWith("/payment/decision"))?.body).toEqual({ expectedVersion: 4, outcome: "REFUND_OWED", reason: "kitchen rejected after the transfer" });
+  });
+
+  it("MB-052: finance staff without the verify permission see no payment panels and no error cards", async () => {
+    const forbidden = () => ({ status: 403, body: { code: "FORBIDDEN" } });
+    const { fetchImpl } = server({
+      "GET /api/v1/me": me,
+      "GET /api/v1/cook/dashboard": forbidden,
+      "GET /api/v1/ops/finance/statements": () => ({ status: 404, body: { code: "NOT_FOUND" } }),
+      "GET /api/v1/ops/payment-recipients": forbidden,
+      "GET /api/v1/ops/payments": forbidden,
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("button", { name: "عرض" })).toBeTruthy();
+    await waitFor(() => expect(screen.queryByText("جارٍ التحميل…")).toBeNull());
+    expect(screen.queryByText("غير مسموح.")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "حسابات تنتظر الموافقة" })).toBeNull();
+  });
+
   it("gives a reviewer the application queue and asks for MFA step-up when a decision needs it", async () => {
     const review = {
       id: "a1",
@@ -591,3 +731,140 @@ describe("operations-web cook workspace", () => {
   });
 });
 
+/** Owner decision 2026-10-14: a demo/test environment is labelled on every screen, also in the operations web. */
+describe("demo environment notice", () => {
+  const config = (name: string, demo: boolean) => ({
+    status: 200,
+    body: { orderingAvailable: true, orderLimits: null, environment: { name, demo } },
+  });
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("shows a persistent note in Arabic and in English when the API reports a demo environment", async () => {
+    const { fetchImpl } = server({ "GET /api/v1/configuration/public": () => config("PREVIEW", true) });
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "English" }));
+    const note = await screen.findByRole("note", { name: "Demo environment" });
+    expect(note.textContent).toContain("no real notification is sent");
+  });
+
+  it("shows nothing in production", async () => {
+    const { fetchImpl, calls } = server({ "GET /api/v1/configuration/public": () => config("PRODUCTION", false) });
+    render(<App fetchImpl={fetchImpl} />);
+    await waitFor(() => expect(calls.some((c) => c.path === "/api/v1/configuration/public")).toBe(true));
+    expect(screen.queryByRole("note")).toBeNull();
+  });
+
+  it("is still there when this build was made for a demo environment and the API cannot be reached", async () => {
+    vi.stubEnv("VITE_DEMO_NOTICE", "true");
+    const { fetchImpl } = server({});
+    render(<App fetchImpl={fetchImpl} />);
+    expect(await screen.findByRole("note", { name: "بيئة تجريبية" })).toBeTruthy();
+  });
+});
+
+describe("two-step verification policy (D18)", () => {
+  const meBody = { id: "u1", displayName: "Salma", locale: "ar", emailVerified: true, phoneVerified: true, version: 0, capabilities: [] };
+  const security = (over: Record<string, unknown> = {}) => ({
+    categories: ["CUSTOMER", "STAFF"],
+    policy: { CUSTOMER: "OPTIONAL", STAFF: "OPTIONAL" },
+    effectiveMode: "OPTIONAL",
+    enabled: false,
+    required: false,
+    available: true,
+    verifiedInSession: false,
+    stepUpPath: "/oauth2/authorization/keycloak?stepUp=true",
+    accountManagementUrl: "https://id.example.test/realms/matbakhy/account/#/security/signingin",
+    canManagePolicy: true,
+    canResetMfa: true,
+    ...over,
+  });
+  const policies = () => ({
+    items: ["CUSTOMER", "KITCHEN", "STAFF"].map((category) => ({ category, mode: "OPTIONAL", reason: null, updatedBy: null, updatedAt: SERVER_NOW, version: 4 })),
+  });
+  const adminRoutes = (extra: Record<string, Handler> = {}) => ({
+    "GET /api/v1/me": () => ({ status: 200, body: meBody }),
+    "GET /api/v1/cook/dashboard": () => ({ status: 403, body: { code: "FORBIDDEN" } }),
+    "GET /api/v1/ops/staff": () => ({ status: 200, body: { items: [], nextCursor: null, hasMore: false } }),
+    "GET /api/v1/ops/security/mfa-policy": () => ({ status: 200, body: policies() }),
+    "GET /api/v1/me/security": () => ({ status: 200, body: security() }),
+    ...extra,
+  });
+
+  it("shows the administrator the policy per category and saves a change with the version and a reason", async () => {
+    const { fetchImpl, calls } = server(
+      adminRoutes({
+        "PUT /api/v1/ops/security/mfa-policy/STAFF": (_req, body) => ({ status: 200, body: { category: "STAFF", ...(body as object), updatedAt: SERVER_NOW, version: 5 } }),
+      }),
+    );
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    const group = (await screen.findByRole("group", { name: "فريق الإدارة" })) as HTMLElement;
+    const apply = within(group).getByRole("button", { name: "تطبيق" }) as HTMLButtonElement;
+    expect(apply.disabled).toBe(true);
+    fireEvent.change(within(group).getByLabelText("الوضع"), { target: { value: "REQUIRED" } });
+    expect(await within(group).findByText(/يُلزم كل مستخدم في الفئة/)).toBeTruthy();
+    fireEvent.change(within(group).getByLabelText("السبب"), { target: { value: "owner decision" } });
+    fireEvent.click(apply);
+    await within(group).findByText("تم حفظ السياسة.");
+    const put = calls.find((c) => c.method === "PUT" && c.path === "/api/v1/ops/security/mfa-policy/STAFF");
+    expect(put?.body).toEqual({ mode: "REQUIRED", expectedVersion: 4, reason: "owner decision" });
+  });
+
+  it("points to the step-up link when changing the policy needs a fresh second factor", async () => {
+    const { fetchImpl } = server(adminRoutes({ "PUT /api/v1/ops/security/mfa-policy/CUSTOMER": () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } }) }));
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    const group = (await screen.findByRole("group", { name: "العملاء" })) as HTMLElement;
+    fireEvent.change(within(group).getByLabelText("الوضع"), { target: { value: "DISABLED" } });
+    fireEvent.change(within(group).getByLabelText("السبب"), { target: { value: "owner decision" } });
+    fireEvent.click(within(group).getByRole("button", { name: "تطبيق" }));
+    const link = await within(group).findByRole("link", { name: "إعادة التحقق" });
+    expect(link.getAttribute("href")).toContain("stepUp=true");
+  });
+
+  it("sends the audited reset with the account and a reason of at least ten characters, and shows only the count", async () => {
+    const id = "11111111-1111-4111-8111-111111111111";
+    const { fetchImpl, calls } = server(
+      adminRoutes({ [`POST /api/v1/ops/accounts/${id}/mfa-reset`]: () => ({ status: 200, body: { accountId: id, removedFactors: 1, sessionsEnded: true } }) }),
+    );
+    render(<App fetchImpl={fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    const section = (await screen.findByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).closest("section") as HTMLElement;
+    const reset = within(section).getByRole("button", { name: "إعادة الضبط" }) as HTMLButtonElement;
+    fireEvent.change(within(section).getByLabelText("معرّف الحساب"), { target: { value: id } });
+    fireEvent.change(within(section).getByLabelText("السبب (10 أحرف على الأقل)"), { target: { value: "short" } });
+    expect(reset.disabled).toBe(true);
+    fireEvent.change(within(section).getByLabelText("السبب (10 أحرف على الأقل)"), { target: { value: "lost phone verified by support" } });
+    fireEvent.click(reset);
+    await within(section).findByText("تم حذف 1 من وسائل التحقق وإنهاء الجلسات.");
+    expect(calls.find((c) => c.method === "POST")?.body).toEqual({ reason: "lost phone verified by support" });
+  });
+
+  it("shows each security administration panel only to the account that holds its own permission", async () => {
+    const onlyReset = server(adminRoutes({ "GET /api/v1/me/security": () => ({ status: 200, body: security({ canManagePolicy: false, canResetMfa: true }) }) }));
+    render(<App fetchImpl={onlyReset.fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    expect(await screen.findByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "سياسة التحقق بخطوتين لكل فئة" })).toBeNull();
+    cleanup();
+    const onlyPolicy = server(adminRoutes({ "GET /api/v1/me/security": () => ({ status: 200, body: security({ canManagePolicy: true, canResetMfa: false }) }) }));
+    render(<App fetchImpl={onlyPolicy.fetchImpl} />);
+    fireEvent.click(await screen.findByRole("button", { name: "الأمان" }));
+    expect(await screen.findByRole("heading", { name: "سياسة التحقق بخطوتين لكل فئة" })).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "إعادة ضبط التحقق بخطوتين لمستخدم" })).toBeNull();
+  });
+
+  it("explains a required policy that this session has not satisfied instead of showing an empty workspace", async () => {
+    const stepUp = () => ({ status: 403, body: { code: "STEP_UP_REQUIRED" } });
+    const { fetchImpl } = server({
+      "GET /api/v1/me": () => ({ status: 200, body: meBody }),
+      "GET /api/v1/cook/dashboard": stepUp,
+      "GET /api/v1/ops/staff": stepUp,
+    });
+    render(<App fetchImpl={fetchImpl} />);
+    const link = await screen.findByRole("link", { name: "أكمل التحقق بخطوتين" });
+    expect(link.getAttribute("href")).toContain("stepUp=true");
+    expect(screen.getByText("يتطلب حسابك التحقق بخطوتين قبل استخدام هذه الشاشات.")).toBeTruthy();
+  });
+});

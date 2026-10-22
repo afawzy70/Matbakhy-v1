@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { formatMoney, newIdempotencyKey, type Schemas } from "../api";
+import { formatMoney, hasCommission, newIdempotencyKey, type Schemas } from "../api";
 import { ErrorLine, Status, useMutation, useServer, type Ctx } from "../cook/shared";
+import { PaymentsOps } from "./Payments";
 
 type Statement = Schemas["StatementPage"];
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -27,6 +28,7 @@ export function Finance({ ctx }: { ctx: Ctx }) {
         <button type="submit">{t.show}</button>
       </form>
       {kitchenId ? <KitchenFinance key={kitchenId} ctx={ctx} kitchenId={kitchenId} /> : null}
+      <PaymentsOps ctx={ctx} />
     </div>
   );
 }
@@ -46,18 +48,23 @@ function KitchenFinance({ ctx, kitchenId }: { ctx: Ctx; kitchenId: string }) {
             <h2 id="fin-summary">
               {t.statement} {s.from} – {s.to}
             </h2>
-            <p className="notice">{t.statementNote}</p>
+            <p className="notice">{hasCommission(s) ? t.statementNote : t.statementNoteNoCommission}</p>
+            {hasCommission(s) ? null : <p className="notice">{t.noCommission}</p>}
             <dl className="summary">
               <dt>{t.cashVerified}</dt>
               <dd>{formatMoney(s.summary.cashVerified.amountMinor, locale)}</dd>
-              <dt>{t.commissionPosted}</dt>
-              <dd>{formatMoney(s.summary.commissionPosted.amountMinor, locale)}</dd>
-              <dt>{t.commissionReversed}</dt>
-              <dd>{formatMoney(s.summary.commissionReversed.amountMinor, locale)}</dd>
-              <dt>{t.commissionSettled}</dt>
-              <dd>{formatMoney(s.summary.commissionSettled.amountMinor, locale)}</dd>
-              <dt>{t.commissionOutstanding}</dt>
-              <dd>{formatMoney(s.summary.commissionOutstanding.amountMinor, locale)}</dd>
+              {hasCommission(s) ? (
+                <>
+                  <dt>{t.commissionPosted}</dt>
+                  <dd>{formatMoney(s.summary.commissionPosted.amountMinor, locale)}</dd>
+                  <dt>{t.commissionReversed}</dt>
+                  <dd>{formatMoney(s.summary.commissionReversed.amountMinor, locale)}</dd>
+                  <dt>{t.commissionSettled}</dt>
+                  <dd>{formatMoney(s.summary.commissionSettled.amountMinor, locale)}</dd>
+                  <dt>{t.commissionOutstanding}</dt>
+                  <dd>{formatMoney(s.summary.commissionOutstanding.amountMinor, locale)}</dd>
+                </>
+              ) : null}
             </dl>
             <ul className="rows">
               {s.items.map((l) => (

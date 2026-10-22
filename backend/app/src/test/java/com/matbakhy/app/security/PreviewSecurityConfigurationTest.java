@@ -26,7 +26,7 @@ class PreviewSecurityConfigurationTest {
     void the_web_client_secret_is_required() {
         IdentityProperties identity = new IdentityProperties("https://id.example.test/realms/matbakhy", null, "matbakhy-api",
                 "matbakhy-web", "", java.util.List.of("https://app.example.test"), "https://app.example.test/",
-                java.util.List.of("mfa"), java.time.Duration.ofMinutes(10), null);
+                java.util.List.of("mfa"), java.time.Duration.ofMinutes(10), null, null);
         assertThatThrownBy(() -> new SecurityConfiguration().clientRegistrations(identity, PREVIEW)).hasMessageContaining("OIDC_WEB_CLIENT_SECRET");
     }
 }

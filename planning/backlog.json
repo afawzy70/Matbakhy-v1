@@ -1172,7 +1172,7 @@
         "verification/runs/20261012-MB-031/evidence.json"
       ],
       "review_status": "PASS",
-      "completion_note": "Native shell and authentication: release variants launch and the system-browser PKCE sign-in round trip passes on an Android emulator and an iOS simulator (native run 19) at fd689aa; fixed a defect where sign-in after sign-out or account switch silently reused the previous person's browser login. Emulator/simulator only; device and store builds are MB-034/MB-035. TC-048 order-link clause verified server-side; native re-check in MB-033."
+      "completion_note": "Native shell and authentication: release variants launch and the system-browser PKCE sign-in round trip passes on an Android emulator and an iOS simulator (native run 19) at fd689aa; fixed a defect where sign-in after sign-out or account switch silently reused the previous person's browser login. Emulator/simulator only; device and store builds are MB-034/MB-035. TC-048 order-link clause verified server-side; native re-check in MB-033. 2026-10-13: defect found in native runs 36/37 (iOS) — the app never used its refresh token, so the first request after the 5-minute access-token lifetime got 401, ended the session and cleared the basket. Fixed in c4b1598 (refresh before requests, one shared refresh, refused refresh ends the session); unit and app tests red first (verification/runs/20261013-MB-031-REFRESH). Native confirmation: iOS ordering phase H (about 10 minutes after sign-in) in the candidate E native run."
     },
     {
       "id": "MB-032",
@@ -1247,7 +1247,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004)."
+      "completion_note": "2026-10-12 progress (not DONE): order deep links (warm/cold), sign-in prompt on a linked order, foreground refetch, one recovery check at a time, session-read retry; native delivery checkout and quantity-limit regression on Android and iOS (verification/runs/20261012-MB-033-FOLLOWUP). Not started: device token registration/push routing (no provider, O07), dynamic text and screen-reader checks (BLK-003), physical-device verification (BLK-004). 2026-10-13: native dynamic-text phases (Android font scale 2.0, iOS accessibility XXXL; English and Arabic; discover, meal, cart, checkout, orders, order, notifications, support; screenshots as CI artifacts) and provider-independent notification permission (asked only on request; refusal safe; development builds only while O07 is open) added; native refusal phases on both platforms. Visual review of the screenshots by a person is still needed. Push delivery (O07), screen readers (BLK-003) and physical devices (BLK-004) remain open; not DONE. 2026-10-13 evening: TC-050 observed on both platforms (iOS run 40 phase J at 9c0db34, verification/runs/20261013-MB-033-NATIVE/NATIVE-dfec36a.log; Android runs 43/46/47, verification/runs/20261013-NATIVE-43/) recorded as evidence run verification/runs/20261013-TC-050 at 60b833d: TC-050 PASS. Android every phase PASS in runs 43, 46, 47. iOS reruns after run 40 blocked by the simulator Save Password prompt in the sign-in harness (BLK-005). Still open: push routing (O07), screen readers (BLK-003), physical devices (BLK-004), visual review of large-text screenshots; not DONE. Native run 48 at f05e3d6: iOS every phase A-K PASS (BLK-005 resolved), Android every phase PASS."
     },
     {
       "id": "MB-034",
@@ -1470,7 +1470,7 @@
       ],
       "evidence": [],
       "review_status": "NOT_RUN",
-      "completion_note": null
+      "completion_note": " 2026-10-13 local (self-review): runtime DB role (owner migrates, API least privilege; 12 forbidden statements refused); audit-write failure fault-injected (denial still 403; critical change rolls back); Prometheus only on the management port; gauges bounded during a DB outage (defect found, fixed); local Loki/Alloy/Prometheus/Alertmanager/Grafana stack rehearsed (search by request ID, retention across redeploy/restart, collector outage, alerts to a local test sink) and runbook rehearsal against a deliberately failed outbox event (staff retry API NOT_RUN). Evidence: verification/runs/20261013-MB-039-LOCAL. Deployed checks AUD-01/LOG-01/OPS-01..03 NOT_RUN (MB-040); retention O06; real alert routing O07. 2026-10-13 evening: TC-056 PASS at the local test level (verification/runs/20261013-TC-056 at 1aa501a): logs and metrics hold no tokens, OTPs, contact, address, document content, deposit recipient, transfer reference or activity visitor id; deployed LOG-01 still NOT_RUN. TC-055 PASS under the fixture policy (verification/runs/20261013-TC-055 at 0a94978); defect found and fixed: erasure failed for customers with a support reply and left deposit transfer references (V27, 241a166). Preview backups now count only after a restore check (BR-057, deploy.sh). TC-057 (staging restore, RPO/RTO) and deployed checks remain."
     },
     {
       "id": "MB-040",
@@ -1714,7 +1714,7 @@
       "id": "MB-048",
       "phase": "P07",
       "title": "Show kitchen meal price history (D14)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P1",
       "depends_on": [
         "MB-014",
@@ -1738,15 +1738,18 @@
       "scenario_ids": [
         "TC-153"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": "Approved increment: Owner decision D13/D14 (session prompt 2026-10-13 09:47 Asia/Kuwait)"
+      "evidence": [
+        "verification/runs/20261013-MB-048/evidence.json",
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D14 kitchen price history at bc305c6 (self-review): API-099 owner-scoped, derived from immutable meal revisions (no entry for edits without a price change; read-only; meal_revision UPDATE/DELETE refused for the runtime role, RuntimeRoleIntegrationTest); cook UI with Active price and previous prices in Africa/Cairo time; browser journey on the real stack changes a price through it. TC-153 PASS."
     },
     {
       "id": "MB-049",
       "phase": "P07",
       "title": "Informed reconfirmation of changed prices before placement (D13, RQ-004)",
-      "status": "IN_PROGRESS",
+      "status": "DONE",
       "priority": "P0",
       "depends_on": [
         "MB-017",
@@ -1774,9 +1777,183 @@
         "TC-155",
         "TC-156"
       ],
-      "evidence": [],
-      "review_status": "NOT_RUN",
-      "completion_note": "Owner decision: Owner decision D13/D14 (session prompt 2026-10-13 09:47 Asia/Kuwait)"
+      "evidence": [
+        "verification/runs/20261013-MB-049/evidence.json",
+        "verification/runs/20261013-CANDIDATE-E/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D13 at bc305c6 = QA candidate E (self-review): TC-155/156 PASS (backend verify, real PostgreSQL); TC-154 PASS on web (component tests red first; real-stack browser journey in BROWSER-E2E), Android emulator and iOS simulator (native run 39 phase H: notice with old/new prices and totals, no order at the stale price, placed only after explicit acceptance, stored 13000|13000|1). The run 39 workflow failed later, in the MB-033 dynamic-text phase (not D13). Independent retest pending."
+    },
+    {
+      "id": "MB-050",
+      "phase": "P07",
+      "title": "Zero platform commission and fees at launch (D10)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-020",
+        "MB-025",
+        "MB-026",
+        "MB-027"
+      ],
+      "implementation_steps": [
+        "Server and database refuse a non-zero commission rate for live policies; the development policy is 0%",
+        "Ledger, statements and finance views carry zero commission without hiding non-zero amounts",
+        "Customer, cook and ops screens show no platform commission or service fee; regression tests updated"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/customer-web",
+        "apps/operations-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "No commission or platform/service fee is calculated, stored as non-zero, posted to the ledger or shown in customer web, Android, iOS, cook or ops screens at launch; a non-zero commission configuration is refused by the server; the dormant capability stays testable only in synthetic test fixtures"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-157"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-050/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D10 at 07d7236 (self-review): server refuses non-zero commission; V23 database check for live policies; development policy 0%; launch order carries 0 commission from quote to ledger and statement; cook statement, ops finance and configuration say there is no platform commission; customer apps never show commission or a service fee. TC-157 PASS. Dormant commission arithmetic covered only by synthetic fixtures."
+    },
+    {
+      "id": "MB-051",
+      "phase": "P07",
+      "title": "Deposit-required checkout and separated payment state (D16)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-017",
+        "MB-018",
+        "MB-019",
+        "MB-020",
+        "MB-050"
+      ],
+      "implementation_steps": [
+        "Quote and immutable order snapshot: deposit due, remainder, method, approved kitchen recipient identifier, expiry, terms",
+        "Payment state machine separate from order and fulfilment states: WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, EXPIRED/RECONCILE_PENDING",
+        "No preparation before kitchen-reported receipt and separate acceptance; race-safe expiry and capacity"
+      ],
+      "artifacts": [
+        "backend",
+        "contracts"
+      ],
+      "acceptance": [
+        "Eligible COD and deposit-required orders have correct integer EGP amounts, recipient and remainder in an immutable snapshot; a customer's transfer report never counts as payment; preparation is impossible before kitchen-reported receipt and acceptance; nothing is labelled bank verified; expiry after a reported transfer reconciles instead of silently closing; development/test fixtures only, live money blocked"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-158",
+        "TC-159",
+        "TC-160"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-051/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "Server part of D16 at 61d8dd5 (self-review): kitchen payment profile, COD/deposit quote terms with stale-terms refusal, immutable order_payment snapshot and append-only payment_event, API-100 customer transfer report (idempotent, not payment), API-101 kitchen receipt report (exact amount, not bank verification), preparation gate, reconciliation on close. TC-158/159/160 PASS. Limits recorded in docs/product/09-deposit-payment-states.md. Synthetic data only; live money blocked."
+    },
+    {
+      "id": "MB-052",
+      "phase": "P07",
+      "title": "Kitchen receipt acknowledgement, mismatches, disputes and refunds (D16)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-051",
+        "MB-022",
+        "MB-024",
+        "MB-025"
+      ],
+      "implementation_steps": [
+        "Cook acknowledges receipt or reports not received/mismatch with identity, time, amount, optional reference and reason (audited)",
+        "Ops dispute and reconciliation queue; refund obligations with clear owner; no fabricated confirmation"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Kitchen-reported receipt, not-received and mismatched-amount paths are audited and object-scoped; disputes pause processing and reach ops; a kitchen that cannot fulfil after reported receipt records a refund obligation; staff cannot mark funds received without the kitchen's report; cross-kitchen payment data is not visible"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-161",
+        "TC-162"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-052/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D16 kitchen acknowledgement at 49a55f1 (self-review): staff-approved recipients (finance.verify with recent MFA, audited; a changed recipient needs re-approval), kitchen not-received and wrong-amount reports to DISPUTED, finance queue, refund obligation (REFUND_OWED, audited, ended orders only) and kitchen refund report (REFUNDED), no staff path to mark money received; cook and finance screens (API-103..109). TC-161/162 PASS. Follow-ups: automatic support case and customer notification for DISPUTED/REFUND_OWED. Synthetic data only; live money blocked."
+    },
+    {
+      "id": "MB-053",
+      "phase": "P07",
+      "title": "Deposit checkout and payment status on web, Android and iOS (D16)",
+      "status": "DONE",
+      "priority": "P0",
+      "depends_on": [
+        "MB-051",
+        "MB-027",
+        "MB-032"
+      ],
+      "implementation_steps": [
+        "Shared contract: recipient, amount, expiry and terms; 'I transferred' with optional reference; status and next steps",
+        "Arabic RTL and English LTR parity; native verification"
+      ],
+      "artifacts": [
+        "apps/customer-web",
+        "apps/customer-mobile"
+      ],
+      "acceptance": [
+        "Customers see the approved recipient, amount, expiry and refund/cancellation terms before placing, can report a transfer once (idempotent), and always see an honest payment status (reported by you, reported by the kitchen, disputed) on web, Android and iOS; no 'bank verified' or 'protected' claims"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-163"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-053/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D16 customer deposit checkout and honest status on web (6d5d2d0), Android and iOS (6611e69, native phase 49a55f1). TC-163 PASS (evidence at 6b7741f): component tests on web and native, deposit integration tests, native run 48 at f05e3d6 with the full deposit journey on the Android emulator and the iOS simulator (iOS after BLK-005 was resolved with an XCTest interruption monitor; sign-in real). Self-review; synthetic data; live money blocked (D16)."
+    },
+    {
+      "id": "MB-054",
+      "phase": "P08",
+      "title": "Privacy-safe organic activity and kitchen performance metrics (D17)",
+      "status": "DONE",
+      "priority": "P1",
+      "depends_on": [
+        "MB-016",
+        "MB-022",
+        "MB-050"
+      ],
+      "implementation_steps": [
+        "Deduplicated, consent/privacy-compliant events: impressions, views, add-to-cart, quotes, orders, fulfilment, cancellations, repeat orders, capacity, GMV",
+        "Free cook report: gross sales, refunds, known net amounts, definitions and windows; no profit claims"
+      ],
+      "artifacts": [
+        "backend",
+        "apps/operations-web"
+      ],
+      "acceptance": [
+        "Activity counts are deduplicated and robust to refresh/bot inflation, scoped per kitchen, contain no personal targeting data, distinguish gross sales from net amounts and never claim profit; no sponsored ranking, campaign or billing exists"
+      ],
+      "rule_ids": [],
+      "scenario_ids": [
+        "TC-164"
+      ],
+      "evidence": [
+        "verification/runs/20261013-MB-054/evidence.json"
+      ],
+      "review_status": "PASS",
+      "completion_note": "D17 Stage 2 at a89151f (self-review): API-110 organic activity counted once per visitor, kind, subject and Cairo day with only a per-day keyed hash stored; API-111 cook insights (activity, orders, portions, gross, paid refunds, known net; NET_IS_NOT_PROFIT); customer web events; cook Insights tab. TC-164 PASS (BACKEND-VERIFY, CONTRACT-CHECK, WORKSPACE-TESTS, BROWSER-E2E at a89151f). Real-stack browser check at 51c1c96 (test-only change): an anonymous visitor's impression, view and add-to-cart are stored. Limits in docs/product/10-organic-activity-and-cook-insights.md (native apps not instrumented, rotating bots need edge limits, retention under O06). No ranking, campaign, billing or profit figure."
     }
   ]
 }

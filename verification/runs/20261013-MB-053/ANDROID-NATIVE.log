@@ -1,0 +1,8 @@
+# Excerpt from GitHub Actions job 115380826888 (native run 48, 38421819591, source f05e3d6), job "Android debug APK (Gradle)".
+# The same phase passed in runs 43, 46 and 47.
+2026-10-13T16:01:16.1350160Z == MB-053 deposit: cash refused above the kitchen's limit; deposit terms shown; the customer reports the transfer
+2026-10-13T16:02:01.5483705Z screenshot 32-deposit-terms: 52865d71ba22e7c6
+2026-10-13T16:02:12.8101562Z deposit order MB-100004 (method|state|half|recipient): DEPOSIT|WAITING_FOR_DEPOSIT|true|synthetic-kitchen@instapay
+2026-10-13T16:02:33.0515319Z screenshot 33-deposit-reported: f46cda0cdaa7b11c
+2026-10-13T16:02:33.2834645Z ok: cash refused above the limit; deposit, recipient and direct-payment note shown; order MB-100004 waits for the deposit; the customer's report is shown as theirs, not as payment
+2026-10-13T16:02:33.5994719Z PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest font size in English and Arabic; notification refusal safe; deposit checkout and transfer report shown honestly

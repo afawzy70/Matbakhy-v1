@@ -18,7 +18,7 @@ The machine-readable source is [rules.json](../../planning/rules.json). Observab
 ## Access
 
 - **BR-006** — Every kitchen/order/case/list/count/export checks object scope; UUID secrecy is not authorization. Implementation: `MB-011`; verification: `TC-006`.
-- **BR-007** — Staff privileges are assigned server-side; MFA required; revoked grants cannot perform sensitive commands. Implementation: `MB-011`; verification: `TC-007`.
+- **BR-007** — Staff privileges are assigned server-side; MFA follows the administrator's policy per account category (D18: DISABLED, OPTIONAL or REQUIRED, performed by Keycloak and enforced server-side); revoked grants cannot perform sensitive commands. Implementation: `MB-011`; verification: `TC-007`.
 - **BR-043** — Staff cannot self-escalate or remove last recoverable administrator; high-risk changes require step-up. Implementation: `MB-026`; verification: `TC-043`.
 
 ## Cook

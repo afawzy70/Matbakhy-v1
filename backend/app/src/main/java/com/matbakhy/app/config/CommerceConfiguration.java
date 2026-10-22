@@ -24,4 +24,14 @@ class CommerceConfiguration {
         }
         return new Object();
     }
+
+    /** MB-054: deployed environments must not hash visitor ids with the development key. */
+    @Bean
+    Object activityKeyGuard(MatbakhyProperties platform, com.matbakhy.catalog.internal.activity.ActivityProperties activity) {
+        if (!platform.environment().developmentSecrets()
+                && activity.hashKey().startsWith(com.matbakhy.catalog.internal.activity.ActivityProperties.DEV_PREFIX)) {
+            throw new IllegalStateException("ACTIVITY_HASH_KEY must be set for " + platform.environment());
+        }
+        return new Object();
+    }
 }

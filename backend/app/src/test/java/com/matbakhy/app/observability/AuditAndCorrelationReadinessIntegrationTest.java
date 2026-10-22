@@ -3,7 +3,9 @@ package com.matbakhy.app.observability;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.matbakhy.app.security.AccountAuthentication;
 import com.matbakhy.app.security.TestLogins;
@@ -23,7 +25,9 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -146,5 +150,88 @@ class AuditAndCorrelationReadinessIntegrationTest {
             assertThat(environment).isNotBlank();
             assertThat(version).isNotBlank();
         });
+    }
+
+    /**
+     * MB-039 runbook step 5 (docs/operations/08-troubleshooting-runbook.md), the step the local rehearsal of 2026-10-13
+     * left NOT_RUN: a staff retry of a dead-lettered outbox event through the real HTTP stack. A staff member without
+     * integration.ops is refused and the denial is audited; the authorized retry resets the event once, is audited with
+     * the operator's reason, and the response, audit row and log line share one request ID; a replay with the same
+     * Idempotency-Key changes nothing and a second retry of the now pending event is refused.
+     */
+    @Test
+    void a_staff_outbox_retry_is_authorized_audited_deduplicated_and_correlated(CapturedOutput output) throws Exception {
+        UUID event = UUID.randomUUID();
+        jdbc.update("""
+                INSERT INTO outbox_event (id, aggregate_type, aggregate_id, event_type, payload, status, attempts, last_error, available_at, created_at,
+                                          request_id)
+                VALUES (?, 'ORDER', ?, 'ORDER_PLACED', '{}'::jsonb, 'FAILED', 5, 'UncategorizedSQLException', now(), now(), 'trace-original-0001')""",
+                event, UUID.randomUUID());
+        long version = jdbc.queryForObject("SELECT version FROM outbox_event WHERE id = ?", Long.class, event);
+        String url = "/api/v1/ops/outbox/" + event + "/retry";
+        String body = "{\"reason\":\"rehearsal: cause removed\",\"expectedVersion\":" + version + "}";
+
+        AccountAuthentication support = staff("support.case");
+        MockHttpServletResponse denied = retry(url, body, "rehearsal-deny-0001", "retry-" + UUID.randomUUID(), support);
+        assertThat(denied.getStatus()).isEqualTo(403);
+        assertThat(denied.getHeader("X-Request-Id")).isEqualTo("rehearsal-deny-0001");
+        assertThat(jdbc.queryForList("SELECT outcome, request_id FROM audit_event WHERE actor_id = ?", support.getPrincipal().id()))
+                .singleElement().satisfies(r -> {
+                    assertThat(r.get("outcome")).isEqualTo("DENIED");
+                    assertThat(r.get("request_id")).isEqualTo("rehearsal-deny-0001");
+                });
+        assertThat(jdbc.queryForObject("SELECT status FROM outbox_event WHERE id = ?", String.class, event)).isEqualTo("FAILED");
+
+        AccountAuthentication ops = staff("integration.ops");
+        String key = "retry-" + UUID.randomUUID();
+        MockHttpServletResponse allowed = retry(url, body, "rehearsal-retry-0001", key, ops);
+        assertThat(allowed.getStatus()).as(allowed.getContentAsString()).isEqualTo(200);
+        assertThat(allowed.getHeader("X-Request-Id")).isEqualTo("rehearsal-retry-0001");
+        JsonNode reset = json.readTree(allowed.getContentAsString());
+        assertThat(reset.path("status").asString()).isEqualTo("PENDING");
+        assertThat(reset.path("attempts").asInt()).isZero();
+
+        MockHttpServletResponse replay = retry(url, body, "rehearsal-replay-0001", key, ops);
+        assertThat(replay.getStatus()).isEqualTo(200);
+        assertThat(json.readTree(replay.getContentAsString()).path("version").asLong()).as("idempotent replay").isEqualTo(reset.path("version").asLong());
+        MockHttpServletResponse again = retry(url, "{\"reason\":\"rehearsal: again\",\"expectedVersion\":" + reset.path("version").asLong() + "}",
+                "rehearsal-again-0001", "retry-" + UUID.randomUUID(), ops);
+        assertThat(again.getStatus()).as("only FAILED events are retried").isEqualTo(409);
+
+        assertThat(jdbc.queryForList("SELECT outcome, permission, reason, request_id FROM audit_event WHERE action = 'outbox.retry' AND object_id = ?",
+                event.toString())).singleElement().satisfies(r -> {
+                    assertThat(r.get("outcome")).isEqualTo("ALLOWED");
+                    assertThat(r.get("permission")).isEqualTo("integration.ops");
+                    assertThat(r.get("reason")).isEqualTo("rehearsal: cause removed");
+                    assertThat(r.get("request_id")).isEqualTo("rehearsal-retry-0001");
+                });
+        assertThat(jdbc.queryForObject("SELECT request_id FROM outbox_event WHERE id = ?", String.class, event))
+                .as("the event keeps the request ID of the change that produced it").isEqualTo("trace-original-0001");
+
+        List<JsonNode> retried = new ArrayList<>();
+        for (String line : output.getAll().split("\\R")) {
+            if (line.startsWith("{") && line.contains(event.toString())) {
+                JsonNode l = json.readTree(line);
+                if (l.path("message").asString().startsWith("outbox event " + event + " reset for retry")) {
+                    retried.add(l);
+                }
+            }
+        }
+        assertThat(retried).as("one operator log line, under the retry's request ID").singleElement()
+                .satisfies(l -> assertThat(l.path("requestId").asString()).isEqualTo("rehearsal-retry-0001"));
+        assertThat(output.getAll()).doesNotContain("rehearsal: cause removed");
+    }
+
+    private AccountAuthentication staff(String permission) {
+        String subject = UUID.randomUUID().toString();
+        jdbc.update("INSERT INTO user_grant (id, user_id, permission, grant_reason) VALUES (?, ?, ?, 'test grant')", UUID.randomUUID(),
+                logins.login(subject, "Staff").getPrincipal().id(), permission);
+        // Permissions are read at login.
+        return logins.login(subject, "Staff");
+    }
+
+    private MockHttpServletResponse retry(String url, String body, String requestId, String key, AccountAuthentication who) throws Exception {
+        return mvc.perform(post(url).header("X-Request-Id", requestId).header("Idempotency-Key", key).contentType(MediaType.APPLICATION_JSON)
+                .content(body).with(authentication(who)).with(csrf())).andReturn().getResponse();
     }
 }

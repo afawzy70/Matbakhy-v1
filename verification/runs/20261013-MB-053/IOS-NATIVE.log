@@ -1,0 +1,10 @@
+# Excerpt from GitHub Actions job 115380827650 (native run 48, 38421819591, source f05e3d6), job "iOS simulator build (Xcode, unsigned)".
+# BLK-005 attempt (owner-authorised): the sign-in harness lets XCTest handle "Save Password?" via an interruption monitor; sign-in is real.
+2026-10-13T16:01:13.2174070Z == phase K (MB-053): cash refused above the kitchen's limit; deposit terms; the customer reports the transfer
+2026-10-13T16:02:07.2696980Z Test Case '-[SignInUITests.OrderingTests testK_DepositCheckoutAndTransferReport]' started.
+2026-10-13T16:02:07.3020110Z MB053-TERMS Deposit now: EGP 65.00
+2026-10-13T16:02:07.3021960Z MB053-ORDER-NUMBER MB-100004
+2026-10-13T16:02:07.3023120Z MB053-REPORTED
+2026-10-13T16:02:07.3023850Z Test Case '-[SignInUITests.OrderingTests testK_DepositCheckoutAndTransferReport]' passed (36.881 seconds).
+2026-10-13T16:02:07.6610590Z deposit order MB-100004 (method|state|half|recipient): DEPOSIT|CUSTOMER_TRANSFER_REPORTED|true|synthetic-kitchen@instapay
+2026-10-13T16:02:07.6971560Z PASS: iOS basket replacement asks first (keep/replace); terminated during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest accessibility text size in English and Arabic; notification refusal safe; deposit checkout and transfer report shown honestly

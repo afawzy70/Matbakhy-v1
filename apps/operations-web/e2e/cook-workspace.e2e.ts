@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext, type BrowserContext, type Page } from "@playwright/test";
 import { strings } from "../src/i18n";
-import { axe, cairoDate, env, png, sql } from "./fixtures";
+import { account, axe, cairoDate, env, fixture, idpLogin, png } from "./fixtures";
 
 /**
  * TC-122 against the real local stack: a cook signs in through the identity provider, waits for approval, creates and
@@ -11,17 +11,7 @@ import { axe, cairoDate, env, png, sql } from "./fixtures";
  */
 const t = strings.ar;
 const API = env("E2E_API_URL");
-const PASSWORD = env("E2E_USER_PASSWORD");
-const COOK_SUBJECT = "00000000-0000-4000-8000-0000000000c1";
-const CUSTOMER_SUBJECT = "00000000-0000-4000-8000-0000000000a1";
 const ZONE = "00000000-0000-4000-8000-00000000a001";
-const OPS_SUBJECT = "00000000-0000-4000-8000-0000000000d2";
-
-async function idpLogin(page: Page, user: string) {
-  await page.locator("#username").fill(user);
-  await page.locator("#password").fill(PASSWORD);
-  await page.locator("#kc-login").click();
-}
 
 async function xsrf(context: BrowserContext): Promise<string> {
   const cookie = (await context.cookies(API)).find((c) => c.name === "XSRF-TOKEN");
@@ -68,19 +58,7 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await expect(cook.getByText(t.noApplication)).toBeVisible();
 
   // ---- synthetic approval (staff MFA step not available locally) ----
-  sql(`
-    INSERT INTO app_user (id, issuer, subject, display_name) VALUES ('00000000-0000-4000-8000-0000000000e1', 'e2e-setup', 'e2e-reviewer', 'E2E reviewer');
-    INSERT INTO cook_application (id, user_id, state, public_name, bio, contact_phone, private_location, pickup_enabled, zone_ids, current_revision)
-      SELECT '00000000-0000-4000-8000-0000000000f1', id, 'APPROVED', 'مطبخ تجريبي', 'أكل بيتي تجريبي', '+201001234567', 'Synthetic location', true, '{${ZONE}}', 1
-      FROM app_user WHERE subject = '${COOK_SUBJECT}';
-    INSERT INTO cook_application_revision (application_id, revision, public_name, bio, contact_phone, private_location, pickup_enabled, zone_ids,
-                                           submitted_at, decision, decision_reason, reviewer_id, decided_at)
-      VALUES ('00000000-0000-4000-8000-0000000000f1', 1, 'مطبخ تجريبي', 'أكل بيتي تجريبي', '+201001234567', 'Synthetic location', true, '{${ZONE}}',
-              now(), 'APPROVED', 'e2e synthetic approval', '00000000-0000-4000-8000-0000000000e1', now());
-    INSERT INTO kitchen (id, owner_id, application_id, approved_revision, public_slug, display_name, description, pickup_enabled, contact_phone, private_location)
-      SELECT '00000000-0000-4000-8000-0000000000d1', id, '00000000-0000-4000-8000-0000000000f1', 1, 'e2e-kitchen', 'مطبخ تجريبي', 'أكل بيتي تجريبي', true,
-             '+201001234567', 'Synthetic location' FROM app_user WHERE subject = '${COOK_SUBJECT}';
-    INSERT INTO kitchen_zone (kitchen_id, zone_id) VALUES ('00000000-0000-4000-8000-0000000000d1', '${ZONE}');`);
+  fixture("cook_approved_with_kitchen", { cook_subject: account("cook-a").subject });
   await cook.reload();
   await expect(cook.getByRole("heading", { name: "مطبخ تجريبي" })).toBeVisible();
 
@@ -117,7 +95,7 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await customer.goto(`${API}/oauth2/authorization/keycloak?returnTo=${encodeURIComponent(new URL("/", cook.url()).toString())}`);
   await idpLogin(customer, "customer-a");
   await expect(customer.getByText(t.noKitchen)).toBeVisible();
-  sql(`UPDATE app_user SET phone_e164 = '+201001112223', phone_verified_at = now(), email_verified = true WHERE subject = '${CUSTOMER_SUBJECT}'`);
+  fixture("customer_phone_verified", { subject: account("customer-a").subject, phone: "+201001112223" });
   const req = customer.request;
   expect((await customerCall(customerContext, req, "GET", "/api/v1/cook/dashboard")).status, "a customer has no kitchen data").toBe(403);
   const address = await customerCall(customerContext, req, "POST", "/api/v1/me/addresses", {
@@ -131,9 +109,9 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
     building: "7",
   });
   expect(address.status, JSON.stringify(address.body)).toBe(201);
-  const mealId = sql(`SELECT id FROM meal WHERE kitchen_id = '00000000-0000-4000-8000-0000000000d1'`);
-  const slotId = sql(`SELECT id FROM cook_slot WHERE kitchen_id = '00000000-0000-4000-8000-0000000000d1'`);
-  const policy = JSON.parse(sql(`SELECT json_build_object('terms', terms_version, 'cancellation', cancellation_policy_version) FROM commerce_policy WHERE status = 'ACTIVE'`)) as {
+  const mealId = fixture("kitchen_meal_id");
+  const slotId = fixture("kitchen_slot_id");
+  const policy = JSON.parse(fixture("active_policy_versions")) as {
     terms: string;
     cancellation: string;
   };
@@ -222,7 +200,10 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await cook.getByRole("button", { name: t.tabs.statement }).click();
   await expect(cook.getByRole("cell", { name: pickup.number })).toBeVisible();
   await expect(cook.getByRole("cell", { name: delivery.number })).toBeVisible();
-  await expect(cook.getByText(t.statementNote)).toBeVisible();
+  // MB-050 (D10): the launch policy has no platform commission, so the statement says so instead of the commission note.
+  await expect(cook.getByText(t.statementNoteNoCommission)).toBeVisible();
+  await expect(cook.getByText(t.noCommission)).toBeVisible();
+  await expect(cook.getByText(t.statementNote)).toHaveCount(0);
   await axe(cook, "cook statement");
 
   // ---- pause stops new sales; resume restores them ----
@@ -243,9 +224,7 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await ops.getByRole("link", { name: t.signIn }).click();
   await idpLogin(ops, "ops-a");
   await expect(ops.getByText(t.noKitchen)).toBeVisible();
-  sql(`INSERT INTO user_grant (id, user_id, permission, grant_reason)
-       SELECT gen_random_uuid(), id, p, 'e2e synthetic grant' FROM app_user, unnest(ARRAY['content.moderate', 'cook.review', 'support.case', 'order.ops', 'order.exception_cancel']) AS p
-       WHERE subject = '${OPS_SUBJECT}'`);
+  fixture("staff_review_grants", { subject: account("ops-a").subject });
   await ops.reload();
   await expect(ops.getByRole("button", { name: t.ops.reviews })).toBeVisible();
   await expect(ops.getByRole("button", { name: t.tabs.orders, exact: true })).toHaveCount(0);
@@ -277,7 +256,7 @@ test("cook fulfils pickup and delivery orders through the real API", async ({ br
   await kitchenPanel.getByLabel(t.reason).fill("e2e suspension attempt");
   await kitchenPanel.getByRole("button", { name: label(t.ops.kitchenAction.SUSPEND), exact: true }).click();
   await expect(kitchenPanel.getByRole("link", { name: t.ops.stepUpLink })).toHaveAttribute("href", /stepUp=true/);
-  expect(sql(`SELECT operating_state FROM kitchen WHERE id = '00000000-0000-4000-8000-0000000000d1'`)).toBe("ACTIVE");
+  expect(fixture("kitchen_operating_state")).toBe("ACTIVE");
   // A cook never sees staff sections or private application data of others.
   expect((await cook.request.get(`${API}/api/v1/ops/catalogue`)).status()).toBe(403);
 

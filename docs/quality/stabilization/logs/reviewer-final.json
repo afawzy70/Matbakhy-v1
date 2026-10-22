@@ -1,0 +1,151 @@
+{
+  "agent": "code-reviewer",
+  "commit": "b7ec0e9052a612f7a8aab38f00519107b1dce213",
+  "summary": "Found three High-severity defects involving deposit accounting, staff MFA enforcement, and approved document integrity. Read-only static review covered the requested areas with deeper inspection of security and transactional paths; it was not exhaustive line-by-line verification. No files changed. Build, integration, and native tests were not run.",
+  "commands": [
+    {
+      "command": "cat .agents/codex/code-reviewer.md",
+      "exit_code": 0
+    ,
+      "note": "Read reviewer role first."
+    },
+    {
+      "command": "cat CLAUDE.md docs/delivery/02-execution-protocol.md; rg --files docs/product; git rev-parse HEAD; git status --short",
+      "exit_code": 0
+    ,
+      "note": "Confirmed requested HEAD and clean workspace."
+    },
+    {
+      "command": "cat docs/product/{01-context-and-decisions,03-business-rules,04-state-machines,06-permissions,09-deposit-payment-states}.md; rg --files backend/src/main apps packages contracts deploy infra .github/workflows | head -180",
+      "exit_code": 0,
+      "note": "Output truncated. rg reported backend/src/main missing; pipeline exit code was 0."
+    },
+    {
+      "command": "rg --files backend | head -100; cat .github/workflows/{deploy-preview,preview-images}.yml; cat packages/api-client/src/index.ts",
+      "exit_code": 0
+    ,
+      "note": "Inspected repository layout, deployment workflows, and shared client."
+    },
+    {
+      "command": "rg --files backend | rg '(OrderService|PaymentService|QuoteService|Security|Idempot|Migration|/V[0-9]|FinanceOpsService|CashService)' ",
+      "exit_code": 0
+    ,
+      "note": "Located transaction, security, and migration sources."
+    },
+    {
+      "command": "cat backend/modules/orders/src/main/java/com/matbakhy/orders/internal/{OrderService,PaymentService}.java",
+      "exit_code": 0,
+      "note": "Output truncated."
+    },
+    {
+      "command": "cat backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java; cat backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java; cat backend/app/src/main/java/com/matbakhy/app/idempotency/JdbcIdempotentCommands.java",
+      "exit_code": 0
+    ,
+      "note": "Inspected session/CSRF chains, cash accounting, and idempotency."
+    },
+    {
+      "command": "cat backend/modules/finance/src/main/java/com/matbakhy/finance/internal/{LedgerService,FinanceOpsService}.java",
+      "exit_code": 0
+    ,
+      "note": "Inspected ledger, refunds, and settlements."
+    },
+    {
+      "command": "cat backend/modules/orders/src/main/java/com/matbakhy/orders/internal/QuoteService.java",
+      "exit_code": 0
+    ,
+      "note": "Inspected server pricing and quote revalidation."
+    },
+    {
+      "command": "cat backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/JdbcMealCatalog.java backend/modules/availability/src/main/java/com/matbakhy/availability/internal/JdbcSlotInventory.java; rg -n 'PreAuthorize|permissions.require|requirePermission|assurance' backend/modules/*/src/main/java/*/*/*/web; cat backend/app/src/main/resources/db/migration/V{24,25,27,28}*.sql",
+      "exit_code": 0
+    ,
+      "note": "Inspected pricing locks, stock transitions, controller permission checks, and deposit migrations."
+    },
+    {
+      "command": "cat backend/modules/orders/src/main/java/com/matbakhy/orders/internal/OrderLifecycleService.java; cat apps/customer-mobile/src/{auth,tokenStore,placement}.ts; cat apps/customer-web/src/api.ts apps/operations-web/src/api.ts; cat deploy/web-preview/Caddyfile",
+      "exit_code": 0,
+      "note": "Output truncated."
+    },
+    {
+      "command": "cat backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java; cat deploy/web-preview/storage/s3.json.template; cat backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java; cat backend/modules/support/src/main/java/com/matbakhy/support/internal/CaseService.java",
+      "exit_code": 1,
+      "note": "Final cat failed because CaseService.java does not exist; preceding files were read."
+    },
+    {
+      "command": "rg --files backend | rg '(Storage|Support.*Service|StaffAssurance)'; cat backend/modules/identity/src/main/java/com/matbakhy/identity/internal/StaffAssurance.java; cat .github/workflows/ci.yml; cat infra/compose.yaml",
+      "exit_code": 0,
+      "note": "StaffAssurance path was incorrect; subsequent reads succeeded, giving compound command exit code 0."
+    },
+    {
+      "command": "cat backend/app/src/main/java/com/matbakhy/app/providers/S3ObjectStorage.java backend/app/src/main/java/com/matbakhy/app/security/StaffAssurance.java; cat backend/modules/support/src/main/java/com/matbakhy/support/internal/SupportService.java",
+      "exit_code": 0
+    ,
+      "note": "Inspected storage signing, MFA validation, and support scope."
+    },
+    {
+      "command": "cat backend/app/src/main/java/com/matbakhy/app/security/WebAccountFilter.java; cat backend/modules/identity/src/main/java/com/matbakhy/identity/internal/JdbcGrantDirectory.java; rg -n 'mfa|Mfa|acr' backend/modules/identity/src/main/java backend/app/src/main/java/com/matbakhy/app/security; nl -ba backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java | sed -n '78,172p'; nl -ba backend/app/src/main/java/com/matbakhy/app/providers/S3ObjectStorage.java | sed -n '45,64p'",
+      "exit_code": 0,
+      "note": "JdbcGrantDirectory.java was missing; remaining reads succeeded. Captured finding line references."
+    },
+    {
+      "command": "cat backend/modules/identity/src/main/java/com/matbakhy/identity/internal/GrantService.java; rg -n 'otp|authenticationFlow|browserFlow|acr|conditional|requirement' deploy/web-preview/identity/matbakhy-realm.preview.json infra/identity/matbakhy-realm.json; nl -ba backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java | sed -n '44,70p'; nl -ba backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java | sed -n '120,142p;285,302p'; cat apps/operations-web/src/cook/Orders.tsx | rg -n 'cash|total|remainder' ",
+      "exit_code": 0
+    ,
+      "note": "Confirmed grant mapping and cook cash form behavior."
+    },
+    {
+      "command": "cat docs/product/03-business-rules.md docs/product/04-state-machines.md; cat .github/workflows/native-build.yml; rg -n 'DROP |ALTER .*NOT NULL|TRUNCATE|DELETE FROM' backend/app/src/main/resources/db/migration; rg -n 'dangerouslySetInnerHTML|localStorage|AsyncStorage|console\\.(log|error)|http://' apps/*/src packages/*/src; cat backend/modules/finance/src/main/java/com/matbakhy/finance/web/CashController.java; cat backend/modules/support/src/main/java/com/matbakhy/support/web/StaffCaseController.java",
+      "exit_code": 0,
+      "note": "Output truncated. Inspected product rules, native workflow, migration operations, client exposure patterns, and staff routes."
+    },
+    {
+      "command": "nl -ba apps/operations-web/src/cook/Orders.tsx | sed -n '178,207p'; nl -ba backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/media/MediaService.java | sed -n '205,222p;268,281p'; rg -n 'mfa|otp|browserFlow|authenticationFlows' deploy/web-preview/identity/matbakhy-realm.preview.json infra/identity/matbakhy-realm.json; rg -n 'cashDue|remainder|deposit|CashReport' contracts/openapi.yaml | head -40; git rev-parse HEAD; git status --short",
+      "exit_code": 0,
+      "note": "Confirmed final HEAD, clean workspace, contract fields, and evidence references."
+    }
+  ],
+  "findings": [
+    {
+      "id": "CR-001",
+      "severity": "High",
+      "component": "Deposit and cash accounting",
+      "file": "backend/modules/finance/src/main/java/com/matbakhy/finance/internal/CashService.java",
+      "line": 96,
+      "title": "Cash reporting and verification demand the full total after a deposit",
+      "scenario": "A completed EGP 200 order has an acknowledged EGP 100 deposit and EGP 100 cash remainder. The cook reports the correctly collected EGP 100 cash.",
+      "expected": "The cash report has zero discrepancy and finance can verify EGP 100 against the immutable cash obligation.",
+      "actual": "The report records a negative EGP 100 discrepancy and marks the obligation DISPUTED. Verification rejects EGP 100 because it also requires the full EGP 200 total. The cook form defaults to that full total.",
+      "evidence": "OrderService.placeOnce inserts cash_obligation.amount_minor as q.totalMinor() - q.depositMinor(). CashService.java:96-106 instead calculates discrepancy against customer_order.total_minor; lines 127-150 use that total again for verification. apps/operations-web/src/cook/Orders.tsx:182 initializes the report amount from order.total.",
+      "suggested_fix": "Use cash_obligation.amount_minor for reporting and verification, and payment.remainder for the cook form default. Handle zero-remainder orders explicitly.",
+      "repro_test": "Add an integration scenario placing a 50% deposit order, acknowledging receipt, completing it, reporting the remainder, and verifying that remainder. Assert zero discrepancy and VERIFIED cash state. Not executed."
+    },
+    {
+      "id": "CR-002",
+      "severity": "High",
+      "component": "Staff authentication",
+      "file": "backend/app/src/main/java/com/matbakhy/app/security/AccountMapper.java",
+      "line": 49,
+      "title": "Staff grants become usable without MFA",
+      "scenario": "An active account with finance.verify or support.case authenticates using a password-only session or bearer token with no MFA claims, then accesses its staff endpoints.",
+      "expected": "BR-007 and the permission specification require MFA for staff sessions, with recent step-up additionally required for high-risk actions.",
+      "actual": "AccountMapper grants every active database permission without checking assurance. Most staff controllers check only those permissions, so password-only authentication can read support conversations and verify cash reports.",
+      "evidence": "AccountMapper.java:49-50 unconditionally adds active permission authorities; assurance claims are merely copied at lines 56-62. SecurityConfiguration's API chains require ACCOUNT_ACTIVE without a staff MFA guard. StaffCaseController.java:31 requires only PERM_support.case. CashController.java:70 requires only PERM_finance.verify. StaffAssurance is invoked only by selected endpoint annotations.",
+      "suggested_fix": "Require a validated MFA assertion before granting or exercising any staff authority. Keep recent authentication age checks as an additional requirement for sensitive actions.",
+      "repro_test": "Authenticate an account holding support.case and finance.verify with claims lacking MFA. Assert denial for staff case reads and cash verification; assert access with valid MFA and appropriate grants. Cover both web and bearer chains. Not executed."
+    },
+    {
+      "id": "CR-003",
+      "severity": "High",
+      "component": "Private document upload integrity",
+      "file": "backend/app/src/main/java/com/matbakhy/app/providers/S3ObjectStorage.java",
+      "line": 49,
+      "title": "Reusable upload URL can replace an approved private document",
+      "scenario": "A cook uploads a clean document and completes scanning, then reuses the still-valid ten-minute PUT URL to replace it with different bytes of the same length and content type.",
+      "expected": "Approved document reads return exactly the bytes that passed checksum, content inspection, and malware scanning.",
+      "actual": "The PUT signature binds the key, type, and length but no content checksum or create-only condition. Approval retains the upload key, and private reads sign that same mutable key. Completion returns immediately for an APPROVED row, so replacement bytes are served without inspection.",
+      "evidence": "S3ObjectStorage.java:48-50 signs PUT without checksum or overwrite protection. MediaService.java:121 issues the upload URL; lines 132-133 skip verification for approved media; lines 273-274 generate approved document read URLs using row.privateKey().",
+      "suggested_fix": "Bind uploads to the declared checksum and ensure approved reads reference immutable verified bytes, using a separate protected object or a verified immutable object version. Prevent upload tickets from overwriting approved content.",
+      "repro_test": "Against the configured S3-compatible storage, upload and approve a clean synthetic document, overwrite it through the original ticket before expiry, then read it as a reviewer. Assert overwrite rejection or retrieval of the original verified bytes. Not executed."
+    }
+  ]
+}

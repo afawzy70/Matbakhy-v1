@@ -1,0 +1,6 @@
+orders before=1 after=1
+  matbakhy-private	size:0	logical:0	chunk:0
+  matbakhy-public	size:0	logical:0	chunk:0
+ok: sign-in redirects to the identity provider and back to the API over HTTPS
+PASS: web preview smoke test for mb.localhost
+api killed and healthy again after 21 s

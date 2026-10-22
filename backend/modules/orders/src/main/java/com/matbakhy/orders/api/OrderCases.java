@@ -11,4 +11,10 @@ public interface OrderCases {
 
     /** Orders with a case that is not RESOLVED or CLOSED. */
     Set<UUID> ordersWithOpenCases();
+
+    /**
+     * Opens the order's PAYMENT case for staff reconciliation (MB-052), or returns the one already open. Called in the
+     * payment transition's transaction; retries and concurrent calls never create a second open case.
+     */
+    UUID openPaymentCase(UUID orderId, String paymentState);
 }

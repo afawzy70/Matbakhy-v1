@@ -278,6 +278,20 @@ class CashAndLedgerIntegrationTest {
         assertThat(verify(verifier, reportId, "VERIFY", 27000, null, 1).getStatus()).as("decided once").isEqualTo(409);
     }
 
+    /** Stabilization CR-001/QA-001: with a deposit, cash due is the obligation (total minus deposit), never the order total. */
+    @Test
+    void cash_reporting_and_verification_use_the_obligation_after_a_deposit() throws Exception {
+        UUID order = completedOrder();
+        // OrderService.placeOnce stores total - deposit in cash_obligation; model a 13500 deposit on the 27000 total.
+        jdbc.update("UPDATE cash_obligation SET amount_minor = 13500 WHERE order_id = ?", order);
+        JsonNode report = ok(report(order, 13500), 201);
+        assertThat(report.get("discrepancy").get("amountMinor").asLong()).as("remainder collected exactly").isZero();
+        assertThat(cashState(order)).isEqualTo("REPORTED");
+        UUID reportId = UUID.fromString(report.get("id").asString());
+        JsonNode verified = ok(verify(staff("finance.verify"), reportId, "VERIFY", 13500, null, 0), 200);
+        assertThat(verified.get("state").asString()).isEqualTo("VERIFIED");
+    }
+
     @Test
     void short_or_zero_reports_are_exceptions_and_need_a_reasoned_decision() throws Exception {
         UUID order = completedOrder();

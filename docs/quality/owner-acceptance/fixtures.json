@@ -1,0 +1,152 @@
+{
+ "schema": 1,
+ "note": "No credentials here. Passwords are generated per run by scripts/owner_e2e_fixtures.py into a private file outside the repository.",
+ "actors": [
+  {
+   "key": "FX-GUEST",
+   "username": null,
+   "exists": true,
+   "note": "No session."
+  },
+  {
+   "key": "FX-CUST-A",
+   "username": "preview-customer-1",
+   "exists": true,
+   "note": "Seeded customer, phone verified."
+  },
+  {
+   "key": "FX-CUST-B",
+   "username": "preview-customer-2",
+   "exists": true,
+   "note": "Seeded customer, phone verified."
+  },
+  {
+   "key": "FX-CUST-NEW",
+   "username": "owner-e2e-cust-new-{n}",
+   "exists": false,
+   "note": "Self sign-up is disabled (registrationAllowed=false, no SMTP, phone OTP never exposed), so these are pre-created Keycloak users with NO app row and an UNVERIFIED phone; the app row is created at first sign-in. Four instances: cases consume them.",
+   "instances": 4,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000d{n}"
+  },
+  {
+   "key": "FX-COOK-A",
+   "username": "preview-cook-1",
+   "exists": true,
+   "note": "Seeded kitchen 'مطبخ المعاينة', pickup + Test zone A delivery, 50% deposit profile, 2 meals."
+  },
+  {
+   "key": "FX-STAFF-ADMIN",
+   "username": "preview-ops-1",
+   "exists": true,
+   "note": "First staff administrator (STAFF_BOOTSTRAP_SUBJECT): receives staff.grant and audit.read only."
+  },
+  {
+   "key": "FX-STAFF-NOGRANT",
+   "username": "preview-ops-2",
+   "exists": true,
+   "note": "Staff-style account without grants."
+  },
+  {
+   "key": "FX-COOK-B",
+   "username": "owner-e2e-cook-b",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000b1",
+   "app": "00000000-0000-4000-8000-0000000b00a2",
+   "note": "Makes the seeded second kitchen 'مطبخ تجريبي تاني' (1 meal) loginable by re-pointing its existing app_user at the new Keycloak user."
+  },
+  {
+   "key": "FX-COOK-PENDING",
+   "username": "owner-e2e-cook-pending",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000b2",
+   "app": "00000000-0000-4000-8000-0000000b01b2",
+   "note": "Cook application SUBMITTED, awaiting ops review (consumed by approval cases; it is single-use: a consumed fixture is not reset by re-seeding; use a fresh isolated stack)."
+  },
+  {
+   "key": "FX-STAFF-SUPPORT",
+   "username": "owner-e2e-support",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000c1",
+   "app": "00000000-0000-4000-8000-0000000b01c1",
+   "grants": [
+    "support.case"
+   ],
+   "note": "Support agent."
+  },
+  {
+   "key": "FX-STAFF-OPS",
+   "username": "owner-e2e-ops",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000c2",
+   "app": "00000000-0000-4000-8000-0000000b01c2",
+   "grants": [
+    "cook.review",
+    "content.moderate",
+    "order.ops",
+    "order.exception_cancel",
+    "order.handover_override"
+   ],
+   "note": "Operations: cook approval, moderation, order exceptions."
+  },
+  {
+   "key": "FX-STAFF-FINANCE",
+   "username": "owner-e2e-finance",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000c3",
+   "app": "00000000-0000-4000-8000-0000000b01c3",
+   "grants": [
+    "finance.read",
+    "finance.verify",
+    "finance.refund_approve",
+    "finance.settlement",
+    "config.read"
+   ],
+   "note": "Finance: cash/deposit verification, refunds, settlement."
+  },
+  {
+   "key": "FX-STAFF-ADMIN-B",
+   "username": "owner-e2e-admin-b",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000c4",
+   "app": "00000000-0000-4000-8000-0000000b01c4",
+   "grants": [
+    "staff.grant",
+    "audit.read",
+    "config.read",
+    "config.write",
+    "security.mfa_policy",
+    "security.mfa_reset"
+   ],
+   "note": "Second administrator holding the MFA policy/reset permissions (the bootstrap admin cannot self-grant them)."
+  },
+  {
+   "key": "FX-MULTIROLE",
+   "username": "owner-e2e-multirole",
+   "exists": false,
+   "kc": "7d3f0a52-1c0e-4b8e-9a3e-0000000000c5",
+   "app": "00000000-0000-4000-8000-0000000b01c5",
+   "grants": [
+    "support.case"
+   ],
+   "note": "Customer + approved cook (own kitchen) + support staff in one identity."
+  },
+  {
+   "key": "FX-ISOLATED",
+   "username": null,
+   "exists": false,
+   "note": "Disposable Docker Compose stack (never the shared preview). Provisioned by the operator; see fixtures.md."
+  },
+  {
+   "key": "FX-DEVICE-IOS",
+   "username": null,
+   "exists": false,
+   "note": "Signed physical iPhone build (PR #11, owner credentials needed)."
+  },
+  {
+   "key": "FX-DEVICE-ANDROID",
+   "username": null,
+   "exists": false,
+   "note": "Physical Android build (no build pipeline for installable APK distribution yet)."
+  }
+ ]
+}

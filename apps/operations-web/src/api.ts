@@ -46,6 +46,11 @@ export function loginUrl(returnTo: string): string {
   return `${API_BASE}/oauth2/authorization/keycloak?returnTo=${encodeURIComponent(returnTo)}`;
 }
 
+/** Starts a Keycloak step-up (second factor; enrolment when none exists) and returns to {@code returnTo}. */
+export function stepUpUrl(returnTo: string): string {
+  return `${API_BASE}/oauth2/authorization/keycloak?stepUp=true&returnTo=${encodeURIComponent(returnTo)}`;
+}
+
 export function newIdempotencyKey(): string {
   return `ops-${crypto.randomUUID()}`;
 }
@@ -66,4 +71,17 @@ export function formatTime(iso: string, locale: string): string {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(iso));
+}
+
+/**
+ * Owner decision D10 (2026-10-13): no platform commission at launch. Commission rows are shown only when a statement
+ * actually carries a commission (the dormant capability); otherwise the screen says there is none.
+ */
+export function hasCommission(statement: {
+  summary: { commissionPosted: { amountMinor: number }; commissionReversed: { amountMinor: number }; commissionSettled: { amountMinor: number }; commissionOutstanding: { amountMinor: number } };
+  items: { commission?: { amountMinor: number } | null }[];
+}): boolean {
+  const s = statement.summary;
+  return [s.commissionPosted, s.commissionReversed, s.commissionSettled, s.commissionOutstanding].some((m) => m.amountMinor !== 0)
+    || statement.items.some((l) => (l.commission?.amountMinor ?? 0) !== 0);
 }

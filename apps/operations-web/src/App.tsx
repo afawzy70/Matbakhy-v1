@@ -1,12 +1,14 @@
 import { brand, direction, type Locale } from "@matbakhy/design-tokens";
 import { useEffect, useMemo, useState } from "react";
-import { API_BASE, createApi, loginUrl, type Api } from "./api";
+import { API_BASE, createApi, errorCode, loginUrl, stepUpUrl, type Api } from "./api";
 import { Dashboard } from "./cook/Dashboard";
+import { builtForDemo, EnvironmentNotice } from "./EnvironmentNotice";
 import { Meals } from "./cook/Meals";
 import { Onboarding } from "./cook/Onboarding";
 import { Orders } from "./cook/Orders";
 import { SettingsPanel } from "./cook/Settings";
 import { Slots } from "./cook/Slots";
+import { Insights } from "./cook/Insights";
 import { Statement } from "./cook/Statement";
 import { Cases } from "./ops/Cases";
 import { Catalogue } from "./ops/Catalogue";
@@ -14,12 +16,13 @@ import { Configuration } from "./ops/Configuration";
 import { Finance } from "./ops/Finance";
 import { OpsOrders } from "./ops/OpsOrders";
 import { Reviews } from "./ops/Reviews";
+import { SecurityTab } from "./ops/Security";
 import { Staff } from "./ops/Staff";
 import type { Ctx } from "./cook/shared";
 import { strings } from "./i18n";
 
-const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "settings"] as const;
-type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance" | "configuration" | "staff";
+const COOK_TABS = ["dashboard", "orders", "meals", "slots", "statement", "insights", "settings"] as const;
+type Tab = (typeof COOK_TABS)[number] | "reviews" | "catalogue" | "cases" | "opsOrders" | "finance" | "configuration" | "staff" | "security";
 
 export function title(locale: Locale): string {
   return `${brand.name[locale]} — ${strings[locale].section}`;
@@ -30,10 +33,11 @@ type Session =
   | { kind: "checking" }
   | { kind: "signedOut" }
   | { kind: "error" }
-  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean };
+  | { kind: "stepUp" }
+  | { kind: "in"; kitchen: boolean; serverOffsetMs: number; reviews: boolean; catalogue: boolean; cases: boolean; opsOrders: boolean; finance: boolean; configuration: boolean; staff: boolean; mfaPolicy: boolean; mfaReset: boolean };
 
 function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
-  return [
+  const sections: Tab[] = [
     ...(s.kitchen ? COOK_TABS : []),
     ...(s.reviews ? (["reviews"] as const) : []),
     ...(s.catalogue ? (["catalogue"] as const) : []),
@@ -42,7 +46,10 @@ function allowedTabs(s: Extract<Session, { kind: "in" }>): Tab[] {
     ...(s.finance ? (["finance"] as const) : []),
     ...(s.configuration ? (["configuration"] as const) : []),
     ...(s.staff ? (["staff"] as const) : []),
+    ...(s.mfaPolicy || s.mfaReset ? (["security"] as const) : []),
   ];
+  // Account security (D18) is shown beside the other sections; an applicant with none keeps the onboarding screen.
+  return sections.length > 0 && !sections.includes("security") ? [...sections, "security"] : sections;
 }
 
 /** Signed in? Approved kitchen? The server decides; 403 on the dashboard means no approved kitchen. */
@@ -52,7 +59,7 @@ async function checkSession(api: Api): Promise<Session> {
     if (me.response.status === 401) {
       return { kind: "signedOut" };
     }
-    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff] = await Promise.all([
+    const [d, reviews, catalogue, cases, opsOrders, finance, configuration, staff, security] = await Promise.all([
       api.GET("/api/v1/cook/dashboard"),
       api.GET("/api/v1/ops/cooks", { params: { query: { limit: 1 } } }),
       api.GET("/api/v1/ops/catalogue", { params: { query: { limit: 1 } } }),
@@ -62,7 +69,13 @@ async function checkSession(api: Api): Promise<Session> {
       api.GET("/api/v1/ops/finance/statements", { params: { query: { kitchenId: "00000000-0000-0000-0000-000000000000" } } }),
       api.GET("/api/v1/ops/configuration"),
       api.GET("/api/v1/ops/staff"),
+      // Which security administration this account may do (from its own grants); every account may use its own settings.
+      api.GET("/api/v1/me/security"),
     ]);
+    // The administrator's policy requires a second factor this session has not passed: nothing else will load, so say so.
+    if ([d, reviews, catalogue, cases, opsOrders, configuration, staff].some((r) => errorCode(r.error) === "STEP_UP_REQUIRED")) {
+      return { kind: "stepUp" };
+    }
     if (!d.data && d.response.status !== 403) {
       return { kind: "error" };
     }
@@ -77,6 +90,8 @@ async function checkSession(api: Api): Promise<Session> {
       finance: finance.response.status === 404,
       configuration: configuration.response.ok,
       staff: staff.response.ok,
+      mfaPolicy: security.data?.canManagePolicy === true,
+      mfaReset: security.data?.canResetMfa === true,
     };
   } catch {
     return { kind: "error" };
@@ -90,6 +105,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
   const t = strings[locale];
   const api = useMemo(() => createApi(fetchImpl), [fetchImpl]);
   const [probe, setProbe] = useState(0);
+  const [demoByApi, setDemoByApi] = useState(false);
 
   useEffect(() => {
     document.documentElement.lang = locale;
@@ -108,6 +124,22 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
       active = false;
     };
   }, [api, probe]);
+
+  // Demo/test environments are labelled on every screen (owner decision 2026-10-14); a failed read keeps the build-time flag only.
+  useEffect(() => {
+    let active = true;
+    api
+      .GET("/api/v1/configuration/public")
+      .then((r) => {
+        if (active && r.data) {
+          setDemoByApi(r.data.environment?.demo === true);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [api]);
 
   // The first allowed section is shown until the user picks another one.
   const current: Tab | null =
@@ -136,6 +168,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
 
   return (
     <div className="app">
+      <EnvironmentNotice show={demoByApi || builtForDemo()} title={t.demoNoticeTitle} text={t.demoNotice} />
       <header className="topbar">
         <h1>{title(locale)}</h1>
         <div className="topbar-actions">
@@ -163,6 +196,14 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
               {t.retry}
             </button>
           </div>
+        ) : null}
+        {session.kind === "stepUp" ? (
+          <section className="card" role="alert">
+            <p>{t.sec.requiredScreen}</p>
+            <a className="button" href={stepUpUrl(window.location.href)}>
+              {t.sec.verifyNow}
+            </a>
+          </section>
         ) : null}
         {session.kind === "signedOut" ? (
           <section className="card">
@@ -193,7 +234,9 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
                               ? t.ops.configuration
                               : name === "staff"
                                 ? t.ops.staff
-                                : t.tabs[name]}
+                                : name === "security"
+                                  ? t.sec.tab
+                                  : t.tabs[name]}
                 </button>
               ))}
             </nav>
@@ -204,6 +247,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "meals" ? <Meals ctx={ctx} /> : null}
             {current === "slots" ? <Slots ctx={ctx} /> : null}
             {current === "statement" ? <Statement ctx={ctx} /> : null}
+            {current === "insights" ? <Insights ctx={ctx} /> : null}
             {current === "settings" ? <SettingsPanel ctx={ctx} /> : null}
             {current === "reviews" ? <Reviews ctx={ctx} /> : null}
             {current === "catalogue" ? <Catalogue ctx={ctx} /> : null}
@@ -212,6 +256,7 @@ export function App({ fetchImpl }: { fetchImpl?: typeof fetch } = {}) {
             {current === "finance" ? <Finance ctx={ctx} /> : null}
             {current === "configuration" ? <Configuration ctx={ctx} /> : null}
             {current === "staff" ? <Staff ctx={ctx} /> : null}
+            {current === "security" ? <SecurityTab ctx={ctx} policyAdmin={session.mfaPolicy} resetAllowed={session.mfaReset} /> : null}
           </>
         ) : null}
       </main>

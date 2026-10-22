@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Alert, View } from "react-native";
 import { useApp } from "../AppContext";
-import { decideAdd, lineLimit, loadBasket, loadPending, saveBasket, type Basket } from "../basket";
+import { currentShopping, decideAdd, lineLimit, type Basket } from "../basket";
 import { formatMoney, formatTime } from "../mobileApi";
 import { Body, Button, Card, Choice, Notice, Screen, StatusView, Title } from "../ui";
 import { useServer } from "../useServer";
+import { track, useTrack } from "../activity";
 import type { RootProps } from "./navigation";
 
 /** Bounded by the chosen slot's remaining portions and the server's per-line limit (both server values). */
@@ -21,6 +22,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
   const limit = lineLimit(maxQuantityPerLine);
   const { mealId } = route.params;
   const [meal, reload] = useServer(() => api.GET("/api/v1/meals/{mealId}", { params: { path: { mealId } } }), `${mealId}|${locale}`);
+  useTrack(api, "MEAL_VIEW", meal.status === "ok" ? [mealId] : []);
   const [slotId, setSlotId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
@@ -28,10 +30,13 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
   const [favorite, setFavorite] = useState<boolean | null>(null);
 
   async function add(target: Omit<Basket, "lines">, line: Basket["lines"][number]) {
-    const outcome = decideAdd(await loadBasket(), await loadPending(), target, line);
+    // One storage handle for the whole operation: if the signed-in person changes meanwhile, it still only touches the keys it started with.
+    const shop = currentShopping();
+    const outcome = decideAdd(await shop.loadBasket(), await shop.loadPending(), target, line);
     if (outcome.kind === "added") {
-      await saveBasket(outcome.basket);
+      await shop.saveBasket(outcome.basket);
       setMessage(t.added);
+      track(api, "ADD_TO_CART", line.mealId);
       return;
     }
     if (outcome.kind === "placementPending") {
@@ -48,7 +53,10 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
           text: t.replaceBasket,
           style: "destructive",
           onPress: () => {
-            void saveBasket(outcome.replacement).then(() => setMessage(t.added));
+            void shop.saveBasket(outcome.replacement).then(() => {
+              setMessage(t.added);
+              track(api, "ADD_TO_CART", line.mealId);
+            });
           },
         },
       ],
@@ -107,7 +115,7 @@ export function MealScreen({ route, navigation }: RootProps<"Meal">) {
                   }}
                 />
               ))}
-              <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }} accessibilityLabel={t.quantity}>
+              <View style={{ flexDirection: "row", gap: 8, alignItems: "center", flexWrap: "wrap" }} accessibilityLabel={t.quantity}>
                 <Button label="−" accessibilityLabel={t.decrease} variant="secondary" disabled={quantity <= 1} onPress={() => setQuantity(quantity - 1)} />
                 <Body locale={locale} strong>
                   {quantity}

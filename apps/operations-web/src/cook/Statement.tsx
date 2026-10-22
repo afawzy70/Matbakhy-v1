@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { formatMoney, formatTime, type Schemas } from "../api";
+import { formatMoney, formatTime, hasCommission, type Schemas } from "../api";
 import { Status, useServer, type Ctx } from "./shared";
 
 export function Statement({ ctx }: { ctx: Ctx }) {
@@ -30,12 +30,15 @@ export function Statement({ ctx }: { ctx: Ctx }) {
         <button type="submit">{t.show}</button>
       </form>
       <Status ctx={ctx} state={state} onRetry={reload}>
-        {(s) => (
+        {(s) => {
+          const commission = hasCommission(s);
+          return (
           <section aria-labelledby="statement-heading" className="card">
             <h2 id="statement-heading">
               {t.statement} {s.from} – {s.to}
             </h2>
-            <p className="notice">{t.statementNote}</p>
+            <p className="notice">{commission ? t.statementNote : t.statementNoteNoCommission}</p>
+            {commission ? null : <p className="notice">{t.noCommission}</p>}
             <dl className="summary">
               <dt>{t.completedOrders}</dt>
               <dd>{s.summary.completedOrders}</dd>
@@ -47,18 +50,22 @@ export function Statement({ ctx }: { ctx: Ctx }) {
               <dd>{formatMoney(s.summary.cashReported.amountMinor, locale)}</dd>
               <dt>{t.cashVerified}</dt>
               <dd>{formatMoney(s.summary.cashVerified.amountMinor, locale)}</dd>
-              <dt>{t.commissionPosted}</dt>
-              <dd>{formatMoney(s.summary.commissionPosted.amountMinor, locale)}</dd>
-              <dt>{t.commissionPending}</dt>
-              <dd>{s.summary.commissionPending}</dd>
-              <dt>{t.commissionReversed}</dt>
-              <dd>{formatMoney(s.summary.commissionReversed.amountMinor, locale)}</dd>
-              <dt>{t.commissionSettled}</dt>
-              <dd>{formatMoney(s.summary.commissionSettled.amountMinor, locale)}</dd>
-              <dt>{t.commissionOutstanding}</dt>
-              <dd>
-                <strong>{formatMoney(s.summary.commissionOutstanding.amountMinor, locale)}</strong>
-              </dd>
+              {commission ? (
+                <>
+                  <dt>{t.commissionPosted}</dt>
+                  <dd>{formatMoney(s.summary.commissionPosted.amountMinor, locale)}</dd>
+                  <dt>{t.commissionPending}</dt>
+                  <dd>{s.summary.commissionPending}</dd>
+                  <dt>{t.commissionReversed}</dt>
+                  <dd>{formatMoney(s.summary.commissionReversed.amountMinor, locale)}</dd>
+                  <dt>{t.commissionSettled}</dt>
+                  <dd>{formatMoney(s.summary.commissionSettled.amountMinor, locale)}</dd>
+                  <dt>{t.commissionOutstanding}</dt>
+                  <dd>
+                    <strong>{formatMoney(s.summary.commissionOutstanding.amountMinor, locale)}</strong>
+                  </dd>
+                </>
+              ) : null}
             </dl>
             <div className="table-wrap" tabIndex={0} role="region" aria-label={t.statement}>
               <table>
@@ -68,7 +75,7 @@ export function Statement({ ctx }: { ctx: Ctx }) {
                     <th scope="col">{t.date}</th>
                     <th scope="col">{t.total}</th>
                     <th scope="col">{t.cashReport}</th>
-                    <th scope="col">{t.commission}</th>
+                    {commission ? <th scope="col">{t.commission}</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -78,14 +85,15 @@ export function Statement({ ctx }: { ctx: Ctx }) {
                       <td>{formatTime(l.completedAt, locale)}</td>
                       <td>{formatMoney(l.orderTotal.amountMinor, locale)}</td>
                       <td>{t.cash[l.cashState] ?? l.cashState}</td>
-                      <td>{l.commission ? formatMoney(l.commission.amountMinor, locale) : t.commissionPending}</td>
+                      {commission ? <td>{l.commission ? formatMoney(l.commission.amountMinor, locale) : t.commissionPending}</td> : null}
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           </section>
-        )}
+          );
+        }}
       </Status>
     </div>
   );

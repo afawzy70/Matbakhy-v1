@@ -71,16 +71,18 @@ public class MediaService implements MediaLibrary {
     private final List<PrivateMediaAccess> access;
     private final AccessPolicy accessPolicy;
     private final AuditLog audit;
+    private final MediaCleanup cleanup;
     private final Clock clock;
 
     MediaService(JdbcTemplate jdbc, ObjectStorage storage, MalwareScanner scanner, List<PrivateMediaAccess> access,
-                 AccessPolicy accessPolicy, AuditLog audit, Clock clock) {
+                 AccessPolicy accessPolicy, AuditLog audit, MediaCleanup cleanup, Clock clock) {
         this.jdbc = jdbc;
         this.storage = storage;
         this.scanner = scanner;
         this.access = access;
         this.accessPolicy = accessPolicy;
         this.audit = audit;
+        this.cleanup = cleanup;
         this.clock = clock;
     }
 
@@ -194,14 +196,25 @@ public class MediaService implements MediaLibrary {
                 return reject(lockOwned(ownerId, mediaId), r.reason);
             }
             publicKey = "media/" + mediaId + ".jpg";
-            String written = publicKey;
+            // If this transaction rolls back the object stays behind; a durable job removes it later unless a committed
+            // approval references it (a concurrent retry may have approved the same key).
+            onRollbackEnqueue(Bucket.PUBLIC, publicKey, "UNAPPROVED_PUBLIC_VARIANT");
             jdbc.update("UPDATE media_asset SET state = 'APPROVED', public_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
                     publicKey, Timestamp.from(clock.instant()), mediaId);
             storage.write(Bucket.PUBLIC, publicKey, variant, MediaInspector.JPEG);
-            onRollback(() -> storage.delete(Bucket.PUBLIC, written));
         } else {
-            jdbc.update("UPDATE media_asset SET state = 'APPROVED', updated_at = ?, version = version + 1 WHERE id = ?",
-                    Timestamp.from(clock.instant()), mediaId);
+            // The upload ticket stays valid for its TTL, so approved bytes move to a key no ticket can write (CR-003).
+            String sealed = "documents/" + mediaId;
+            String uploadKey = row.privateKey();
+            // Idempotent, deterministic key: a retry after a rollback rewrites the same verified bytes. It is deliberately not
+            // deleted on rollback, because a concurrent retry may already have approved the same key (SECR-003).
+            onRollbackEnqueue(Bucket.PRIVATE, sealed, "UNAPPROVED_SEALED_DOCUMENT");
+            storage.write(Bucket.PRIVATE, sealed, content, sniffed);
+            jdbc.update("UPDATE media_asset SET state = 'APPROVED', private_key = ?, updated_at = ?, version = version + 1 WHERE id = ?",
+                    sealed, Timestamp.from(clock.instant()), mediaId);
+            // The upload ticket may still be valid: clean the upload key only after it has expired, or a replayed PUT would
+            // recreate it after the cleanup (CR3-002).
+            cleanup.enqueue(Bucket.PRIVATE, uploadKey, "SEALED_UPLOAD", row.ticketExpiresAt().plus(Duration.ofMinutes(1)));
         }
         return view(lockOwned(ownerId, mediaId));
     }
@@ -234,6 +247,10 @@ public class MediaService implements MediaLibrary {
                 UPDATE media_asset SET state = 'DELETED', public_key = NULL, rejection_reason = NULL, updated_at = ?, version = version + 1
                 WHERE id = ?""", Timestamp.from(clock.instant()), mediaId);
         storage.delete(Bucket.PRIVATE, row.privateKey());
+        if (row.purpose() == Purpose.COOK_DOCUMENT) {
+            // A sealed copy may exist under its deterministic key even if approval never committed.
+            cleanup.enqueue(Bucket.PRIVATE, "documents/" + mediaId, "DELETED_DOCUMENT");
+        }
         if (row.publicKey() != null) {
             storage.delete(Bucket.PUBLIC, row.publicKey());
         }
@@ -256,8 +273,12 @@ public class MediaService implements MediaLibrary {
         jdbc.update("""
                 UPDATE media_asset SET state = 'REJECTED', rejection_reason = ?, public_key = NULL, updated_at = ?, version = version + 1
                 WHERE id = ?""", reason, Timestamp.from(clock.instant()), row.id());
-        // Rejected bytes are not retained.
-        storage.delete(Bucket.PRIVATE, row.privateKey());
+        // Rejected bytes are not retained: deleted now, or by the durable cleanup job if storage is unavailable.
+        try {
+            storage.delete(Bucket.PRIVATE, row.privateKey());
+        } catch (RuntimeException e) {
+            cleanup.enqueue(Bucket.PRIVATE, row.privateKey(), "REJECTED_UPLOAD");
+        }
         if (reason.equals("MALWARE") || reason.equals("ACTIVE_CONTENT") || reason.equals("TYPE_MISMATCH")) {
             audit.record(new Entry(row.ownerId(), "media.rejected", null, "media", row.id().toString(), Outcome.DENIED, reason, null,
                     Map.of("purpose", row.purpose().name())));
@@ -283,13 +304,21 @@ public class MediaService implements MediaLibrary {
                 mediaId, ownerId).stream().findFirst().orElseThrow(() -> new ApiException(ErrorCode.NOT_FOUND, "media not found"));
     }
 
-    private static void onRollback(Runnable action) {
+    /**
+     * Only on rollback (the rare path, so the second connection is not held on every completion): record the written
+     * object for the guarded durable cleanup. Nothing is deleted here, so a concurrent retry that committed is unharmed.
+     */
+    private void onRollbackEnqueue(Bucket bucket, String key, String reason) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCompletion(int status) {
                     if (status == STATUS_ROLLED_BACK) {
-                        action.run();
+                        try {
+                            cleanup.enqueueUnlessApproved(bucket, key, reason, Duration.ofMinutes(5));
+                        } catch (RuntimeException e) {
+                            org.slf4j.LoggerFactory.getLogger(MediaService.class).warn("could not record unapproved object for cleanup ({})", e.getClass().getSimpleName());
+                        }
                     }
                 }
             });

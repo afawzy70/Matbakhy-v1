@@ -18,6 +18,8 @@ const PERMISSIONS: Member["grants"][number]["permission"][] = [
   "config.read",
   "config.write",
   "integration.ops",
+  "security.mfa_policy",
+  "security.mfa_reset",
   "audit.read",
   "staff.grant",
 ];

@@ -1,0 +1,13 @@
+
+> @matbakhy/customer-web@0.1.0 test /home/aiagent/workspaces/agents/codex-qa/apps/customer-web
+> vitest run
+
+
+ RUN  v5.0.3 /home/aiagent/workspaces/agents/codex-qa/apps/customer-web
+
+
+ Test Files  1 passed (1)
+      Tests  53 passed (53)
+   Start at  14:59:53
+   Duration  26.09s (tests 87%, environment 7%, transform 4%, import 2%)
+

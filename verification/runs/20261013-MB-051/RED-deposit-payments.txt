@@ -1,0 +1,38 @@
+-------------------------------------------------------------------------------
+Test set: com.matbakhy.app.payments.DepositPaymentIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 21.65 s <<< FAILURE! -- in com.matbakhy.app.payments.DepositPaymentIntegrationTest
+com.matbakhy.app.payments.DepositPaymentIntegrationTest.a_cash_order_has_no_payment_step -- Time elapsed: 1.116 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[{"code":"MALFORMED_REQUEST","messageKey":"error.malformed_request","fieldErrors":[],"requestId":"2d34f45e-45ed-4b80-a2f7-5ed63f4fa2df","retryable":false}] 
+expected: 201
+ but was: 400
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.ok(DepositPaymentIntegrationTest.java:119)
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.a_cash_order_has_no_payment_step(DepositPaymentIntegrationTest.java:261)
+
+com.matbakhy.app.payments.DepositPaymentIntegrationTest.deposit_terms_are_quoted_and_snapshotted_and_cod_follows_the_kitchen_limit -- Time elapsed: 0.058 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[{"code":"MALFORMED_REQUEST","messageKey":"error.malformed_request","fieldErrors":[],"requestId":"ecbe854c-975a-4c3c-b8b0-3663edae530b","retryable":false}] 
+expected: 201
+ but was: 400
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.ok(DepositPaymentIntegrationTest.java:119)
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.deposit_terms_are_quoted_and_snapshotted_and_cod_follows_the_kitchen_limit(DepositPaymentIntegrationTest.java:164)
+
+com.matbakhy.app.payments.DepositPaymentIntegrationTest.a_transfer_report_is_not_payment_and_preparation_waits_for_the_kitchen_report -- Time elapsed: 0.048 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[{"code":"MALFORMED_REQUEST","messageKey":"error.malformed_request","fieldErrors":[],"requestId":"00fe809a-986e-483b-b4d5-06ba820b53f5","retryable":false}] 
+expected: 201
+ but was: 400
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.ok(DepositPaymentIntegrationTest.java:119)
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.depositOrder(DepositPaymentIntegrationTest.java:154)
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.a_transfer_report_is_not_payment_and_preparation_waits_for_the_kitchen_report(DepositPaymentIntegrationTest.java:205)
+
+com.matbakhy.app.payments.DepositPaymentIntegrationTest.expiry_after_a_reported_transfer_goes_to_reconciliation_and_without_one_the_deposit_expires -- Time elapsed: 0.042 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: 
+[{"code":"MALFORMED_REQUEST","messageKey":"error.malformed_request","fieldErrors":[],"requestId":"440b55ee-919d-4345-aa75-3185255fa20c","retryable":false}] 
+expected: 201
+ but was: 400
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.ok(DepositPaymentIntegrationTest.java:119)
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.depositOrder(DepositPaymentIntegrationTest.java:154)
+	at com.matbakhy.app.payments.DepositPaymentIntegrationTest.expiry_after_a_reported_transfer_goes_to_reconciliation_and_without_one_the_deposit_expires(DepositPaymentIntegrationTest.java:245)
+

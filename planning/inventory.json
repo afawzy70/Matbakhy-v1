@@ -69,6 +69,12 @@
       "purpose": "Evidence templates and committed redacted verification runs"
     },
     {
+      "path": ".agents",
+      "state": "PRESENT",
+      "owner_story": "MB-002",
+      "purpose": "Independent Codex QA and code-review role definitions for the stabilization phase"
+    },
+    {
       "path": "backend",
       "state": "PRESENT",
       "owner_story": "MB-005",

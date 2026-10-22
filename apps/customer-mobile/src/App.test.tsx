@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-
 import { Alert, Linking } from "react-native";
 import { App } from "./App";
 import type { AppConfig } from "./config";
+import { bindShopping } from "./basket";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { strings } from "./i18n";
 import { Session } from "./session";
@@ -20,13 +21,19 @@ jest.mock("expo-crypto", () => ({ randomUUID: () => jest.requireActual<{ randomU
 jest.mock("./auth", () => ({ signIn: jest.fn(), signOut: jest.fn(), SignInCancelled: class extends Error {} }));
 jest.mock("react-native-safe-area-context", () => jest.requireActual("react-native-safe-area-context/jest/mock").default);
 
-beforeEach(() => mockStore.clear());
+beforeEach(async () => {
+  mockStore.clear();
+  await bindShopping(null);
+});
 
 const t = strings.en;
+/** True when any stored basket / pending placement key exists, whoever owns it (keys are per person). */
+const stores = (base: string) => [...mockStore.keys()].some((k) => k === base || k.startsWith(`${base}.`));
 const config: AppConfig = { environment: "development", apiBaseUrl: "http://api", issuer: "http://id", clientId: "matbakhy-mobile", redirectUri: "matbakhy-dev://auth/callback" };
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
 const money = (amountMinor: number) => ({ amountMinor, currency: "EGP" });
+const cod = (total: number) => ({ method: "COD", depositBps: 0, deposit: money(0), remainder: money(total), recipient: null });
 const slot = (id: string) => ({ id, startsAt: "2026-10-13T10:00:00Z", endsAt: "2026-10-13T11:00:00Z", timezone: "Africa/Cairo", cutoffAt: "2026-10-13T08:00:00Z", availablePortions: 5, fulfillmentModes: ["DELIVERY", "PICKUP"] });
 const meal = (id: string, kitchenId: string) => ({
   id,
@@ -70,7 +77,7 @@ async function openAccount() {
 describe("customer app shell (MB-031, kept in MB-032)", () => {
   it("signs in through the injected PKCE flow from the Account tab, shows the profile and switches language", async () => {
     const session = new Session();
-    const signIn = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 }));
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 }));
     const fetchImpl = api({ ...discover, "GET /api/v1/me": () => json(200, profile) });
     await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={fetchImpl} />);
     await openAccount();
@@ -119,6 +126,161 @@ describe("customer app shell (MB-031, kept in MB-032)", () => {
     );
     expect(screen.getByText(strings.en.crashTitle)).toBeTruthy();
     expect(screen.queryByText(/secret stack detail/)).toBeNull();
+  });
+});
+
+/** Refuses with STEP_UP_REQUIRED until the injected sign-in has run, like the server after a verified second factor. */
+const refusedUntil = (signIn: jest.Mock) => () => (signIn.mock.calls.length > 0 ? json(200, { items: [meal("m1", "k1"), meal("m2", "k2")], nextCursor: null, hasMore: false }) : json(403, { code: "STEP_UP_REQUIRED" }));
+
+describe("two-step verification step-up (D18)", () => {
+  async function signedInSession() {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    return session;
+  }
+
+  it("offers a step-up sign-in when the server asks for a second factor, instead of a broken screen", async () => {
+    const session = await signedInSession();
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r2", expiresIn: 300 }));
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": refusedUntil(signIn) })} />);
+    expect(await screen.findByText(t.stepUp.message)).toBeTruthy();
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    expect(signIn).toHaveBeenCalledWith(config, session, { stepUp: true });
+    expect(session.accessToken).toBe(fakeJwt("customer-a"));
+    expect(mockStore.get("matbakhy.basket.v1.customer-a")).toBeTruthy();
+  });
+
+  it("treats a step-up that signs in as another person as an account switch: basket cleared, profile re-read", async () => {
+    const session = await signedInSession();
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    let profileCalls = 0;
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => { profileCalls += 1; return json(200, profile); }, "GET /api/v1/meals": refusedUntil(signIn) })} />);
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
+    expect(session.accessToken).toBe(fakeJwt("customer-b"));
+    expect(profileCalls).toBeGreaterThanOrEqual(2);
+  });
+
+  it("an account switch during step-up leaves nothing of account A on any screen: orders, navigation, basket and pending order are gone", async () => {
+    const session = await signedInSession();
+    let who = "A";
+    const orderOf = (n: string) => ({ id: `o-${n}`, publicNumber: n, state: "PLACED", total: money(5000) });
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => {
+      who = "B";
+      return s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 });
+    });
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify({ clientRequestId: "c", idempotencyKey: "k", quoteId: "q", terms: "t", cancellation: "c" }));
+    const routes = {
+      ...discover,
+      "GET /api/v1/me": () => json(200, { ...profile, displayName: who === "A" ? "Account A" : "Account B" }),
+      "GET /api/v1/orders": () => json(200, { items: [orderOf(`${who}-1`)], nextCursor: null, hasMore: false }),
+      "GET /api/v1/meals": () => refusedUntil(signIn)(),
+    };
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api(routes)} />);
+    await fireEvent.press(await screen.findByTestId("tab-orders"));
+    expect(await screen.findByTestId("order-A-1")).toBeTruthy();
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    // Navigation was reset to the first tab and A's order list was unmounted; B's data is never mixed with A's.
+    await waitFor(() => expect(screen.queryByTestId("order-A-1")).toBeNull());
+    expect(screen.queryByTestId("orders")).toBeNull();
+    await fireEvent.press(await screen.findByTestId("tab-orders"));
+    expect(await screen.findByTestId("order-B-1")).toBeTruthy();
+    expect(screen.queryByTestId("order-A-1")).toBeNull();
+    expect(mockStore.get("matbakhy.basket.v1")).toBeUndefined();
+    expect(mockStore.get("matbakhy.pendingPlacement.v1")).toBeUndefined();
+    expect(session.cachedKeys.filter((k) => k !== "me")).toEqual([]);
+    expect(session.cache<{ displayName: string }>("me")?.displayName).toBe("Account B");
+  });
+
+  it("if the previous account's storage cannot be cleared during an account switch, the new person still starts empty and can never read it", async () => {
+    const session = await signedInSession();
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] }));
+    mockStore.set("matbakhy.pendingPlacement.v1", JSON.stringify({ clientRequestId: "c", idempotencyKey: "k", quoteId: "q", terms: "t", cancellation: "c" }));
+    const store = jest.requireMock("expo-secure-store") as { deleteItemAsync: jest.Mock };
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => refusedUntil(signIn)() })} />);
+    await fireEvent.press(await screen.findByTestId("tab-orders"));
+    const working = store.deleteItemAsync.getMockImplementation();
+    store.deleteItemAsync.mockImplementation(async () => {
+      throw new Error("keychain unavailable");
+    });
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(screen.queryByText(t.stepUp.message)).toBeNull());
+    store.deleteItemAsync.mockImplementation(working);
+    // Account A's data is still in storage (cleanup failed) under A's own keys; B reads empty and writing as B changes nothing of A's.
+    expect(mockStore.get("matbakhy.basket.v1.customer-a")).toBeTruthy();
+    expect(mockStore.get("matbakhy.pendingPlacement.v1.customer-a")).toBeTruthy();
+    const basket = jest.requireActual<typeof import("./basket")>("./basket");
+    expect(basket.currentShopping().owner).toBe("customer-b");
+    expect(await basket.loadBasket()).toBeNull();
+    expect(await basket.loadPending()).toBeNull();
+    await basket.saveBasket({ kitchenId: "k9", slotId: "s", slotStartsAt: "2026-10-13T10:00:00Z", modes: [], lines: [] });
+    expect(await basket.loadPending()).toBeNull();
+    expect(session.accessToken).toBe(fakeJwt("customer-b"));
+  });
+
+  it("an answer for the previous person's profile that arrives after the switch is dropped", async () => {
+    const session = await signedInSession();
+    let release: (r: Response) => void = () => undefined;
+    const slowA = new Promise<Response>((resolve) => (release = resolve));
+    let calls = 0;
+    const signIn: jest.Mock = jest.fn(async (_c: AppConfig, s: Session) => s.signedIn({ accessToken: fakeJwt("customer-b"), idToken: fakeJwt("customer-b"), refreshToken: "r3", expiresIn: 300 }));
+    const fetchImpl = jest.fn(async (input: Request | string) => {
+      const req = typeof input === "string" ? new Request(input) : input;
+      const path = new URL(req.url).pathname;
+      if (path === "/api/v1/me") {
+        calls += 1;
+        return calls === 1 ? slowA : json(200, { ...profile, displayName: "Account B" });
+      }
+      if (path === "/api/v1/meals") return refusedUntil(signIn)();
+      if (path === "/api/v1/configuration/public") return json(200, {});
+      throw new Error(`unrouted ${path}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    await waitFor(() => expect(calls).toBeGreaterThanOrEqual(2));
+    await act(async () => release(json(200, { ...profile, displayName: "Account A" })));
+    await waitFor(() => expect(session.cache<{ displayName: string }>("me")?.displayName).toBe("Account B"));
+  });
+
+  it("after a step-up for the same person the refused reads load again without a manual action", async () => {
+    const session = await signedInSession();
+    let verified = false;
+    const signIn = jest.fn(async (_c: AppConfig, s: Session) => {
+      verified = true;
+      return s.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r2", expiresIn: 300 });
+    });
+    const meals = () => (verified ? discover["GET /api/v1/meals"]() : json(403, { code: "STEP_UP_REQUIRED" }));
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": meals })} />);
+    expect(screen.queryByTestId("meal-m1")).toBeNull();
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    expect(await screen.findByTestId("meal-m1")).toBeTruthy();
+    expect(screen.queryByTestId("step-up-banner")).toBeNull();
+  });
+
+  it("keeps showing the request when the user cancels the verification, and never signs them out", async () => {
+    const session = await signedInSession();
+    const { SignInCancelled } = jest.requireMock("./auth") as { SignInCancelled: new () => Error };
+    const signIn = jest.fn(async () => {
+      throw new SignInCancelled();
+    });
+    await render(<App config={config} session={session} signIn={signIn} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => json(403, { code: "STEP_UP_REQUIRED" }) })} />);
+    await fireEvent.press(await screen.findByTestId("step-up-verify"));
+    expect(await screen.findByText(t.stepUp.message)).toBeTruthy();
+    expect(session.accessToken).not.toBeNull();
+  });
+
+  it("does not show the request for other 403 answers", async () => {
+    const session = await signedInSession();
+    await render(<App config={config} session={session} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={api({ ...discover, "GET /api/v1/me": () => json(200, profile), "GET /api/v1/meals": () => json(403, { code: "FORBIDDEN" }) })} />);
+    await screen.findByTestId("tab-discover");
+    expect(screen.queryByTestId("step-up-banner")).toBeNull();
   });
 });
 
@@ -205,8 +367,8 @@ describe("native discovery and ordering (MB-032)", () => {
     expect(screen.getByText(`${t.total}: ${new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(270)}`)).toBeTruthy();
     const posts = (offlineFetch as jest.Mock).mock.calls.filter((c) => (c[0] as Request).method === "POST");
     expect(posts).toHaveLength(0);
-    expect(mockStore.has("matbakhy.pendingPlacement.v1")).toBe(false);
-    expect(mockStore.has("matbakhy.basket.v1")).toBe(false);
+    expect(stores("matbakhy.pendingPlacement.v1")).toBe(false);
+    expect(stores("matbakhy.basket.v1")).toBe(false);
   });
 });
 
@@ -415,7 +577,7 @@ describe("native basket editing (CW05, MB-032; parity with QA finding FG-001)", 
     expect(await estimate()).toMatch(/180\.00/);
     await fireEvent.press(screen.getByTestId("remove-m3"));
     expect(await screen.findByText(t.cartEmpty)).toBeTruthy();
-    await waitFor(() => expect(mockStore.has("matbakhy.basket.v1")).toBe(false));
+    await waitFor(() => expect(stores("matbakhy.basket.v1")).toBe(false));
   });
 
   it("keeps quantity between 1 and the line's limit, and locks the basket while an order is unconfirmed", async () => {
@@ -542,7 +704,7 @@ describe("D13 on native: changed prices need informed reconfirmation", () => {
     const subtotal = items.reduce((s, i) => s + i.lineTotal.amountMinor, 0);
     return {
       quoteId: `q${version}`, expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items, subtotal: money(subtotal), deliveryFee: money(fee), tax: money(0),
-      total: money(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
+      total: money(subtotal + fee), payment: cod(subtotal + fee), cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [],
     };
   };
   const placed = {
@@ -627,7 +789,7 @@ describe("D13 on native: changed prices need informed reconfirmation", () => {
     await fireEvent.press(screen.getByTestId("place-order"));
     expect(await screen.findByText("We couldn't calculate the new total. Calculate the total again.")).toBeTruthy();
     expect(screen.queryByTestId("place-order")).toBeNull();
-    expect(mockStore.has("matbakhy.basket.v1")).toBe(true);
+    expect(stores("matbakhy.basket.v1")).toBe(true);
     expect(posts).toHaveLength(2);
   });
 
@@ -686,7 +848,7 @@ describe("MB-033 notification permission (provider-independent; push delivery is
     await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
     await openAccount();
     await fireEvent.press(await screen.findByTestId("allow-alerts"));
-    expect(await screen.findByText(t.alertsDenied)).toBeTruthy();
+    expect(await screen.findByText(t.alertsDenied(brand.name.en))).toBeTruthy();
     expect(screen.queryByTestId("allow-alerts")).toBeNull();
     await fireEvent.press(screen.getByTestId("open-alert-settings"));
     expect(permissions.openSettings).toHaveBeenCalledTimes(1);
@@ -698,7 +860,7 @@ describe("MB-033 notification permission (provider-independent; push delivery is
     const permissions = fake("denied", "denied");
     await render(<App config={promptConfig} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={routes()} permissions={permissions} />);
     await openAccount();
-    expect(await screen.findByText(t.alertsDenied)).toBeTruthy();
+    expect(await screen.findByText(t.alertsDenied(brand.name.en))).toBeTruthy();
     expect(screen.queryByTestId("allow-alerts")).toBeNull();
     expect(permissions.request).not.toHaveBeenCalled();
   });
@@ -723,7 +885,10 @@ describe("MB-033 notification permission (provider-independent; push delivery is
     expect(stateOf({ status: "granted", granted: true, canAskAgain: true })).toBe("granted");
     expect(stateOf({ status: "undetermined", granted: false, canAskAgain: true })).toBe("undetermined");
     expect(stateOf({ status: "undetermined", granted: false, canAskAgain: false })).toBe("denied");
-    expect(stateOf({ status: "denied", granted: false, canAskAgain: true })).toBe("denied");
+    // Android 13+ before the first request: "denied" but askable.
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: true })).toBe("undetermined");
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: true }, true)).toBe("denied");
+    expect(stateOf({ status: "denied", granted: false, canAskAgain: false })).toBe("denied");
   });
 });
 
@@ -754,5 +919,119 @@ describe("an expired access token is refreshed instead of signing the customer o
     expect(await screen.findByRole("button", { name: t.signIn })).toBeTruthy();
     await waitFor(() => expect(mockStore.size).toBe(0));
     expect(session.accessToken).toBeNull();
+  });
+});
+
+/** MB-053 (D16, TC-163) on native: the same deposit choice, terms and honest status as the web. */
+describe("MB-053 on native: direct deposit checkout and payment status", () => {
+  const recipient = { method: "INSTAPAY", identifier: "kitchen@instapay", name: "Kitchen K1" };
+  const en = (minor: number) => new Intl.NumberFormat("en-EG", { style: "currency", currency: "EGP" }).format(minor / 100);
+  async function signedIn() {
+    const session = new Session();
+    await session.signedIn({ accessToken: fakeJwt("customer-a"), idToken: fakeJwt("customer-a"), refreshToken: "r", expiresIn: 300 });
+    return session;
+  }
+
+  it("quotes a deposit with the recipient and the direct-payment note, and explains when cash is not eligible", async () => {
+    mockStore.set("matbakhy.basket.v1", JSON.stringify({ kitchenId: "k1", kitchenName: "Kitchen k1", slotId: "slot-k1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["PICKUP"],
+      lines: [{ mealId: "m1", title: "Dish m1", quantity: 2, unitPriceMinor: 12000, maxQuantity: 5 }] }));
+    const quoteBodies: { paymentMethod?: string }[] = [];
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const key = `${input.method} ${new URL(input.url).pathname}`;
+      if (key === "GET /api/v1/me") return json(200, profile);
+      if (key === "GET /api/v1/meals") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "GET /api/v1/me/addresses") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "POST /api/v1/quotes") {
+        const body = (await input.json()) as { paymentMethod?: string };
+        quoteBodies.push(body);
+        if (body.paymentMethod === "COD") return json(422, { code: "VALIDATION_FAILED", fieldErrors: [{ field: "paymentMethod", code: "COD_NOT_ELIGIBLE" }] });
+        return json(201, { quoteId: "q1", expiresAt: "2026-10-13T10:05:00Z", kitchenId: "k1", items: [], subtotal: money(24000), deliveryFee: money(0), tax: money(0), total: money(24000),
+          payment: { method: "DEPOSIT", depositBps: 5000, deposit: money(12000), remainder: money(12000), recipient },
+          cancellationPolicyVersion: "c1", termsVersion: "t1", acceptanceDeadlinePreview: "2026-10-13T10:15:00Z", warnings: [] });
+      }
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("open-cart"));
+    await fireEvent.press(await screen.findByTestId("get-quote"));
+    expect(await screen.findByText(t.errors.COD_NOT_ELIGIBLE ?? "missing")).toBeTruthy();
+    await fireEvent.press(screen.getByTestId("pay-DEPOSIT"));
+    expect(screen.queryByText(t.errors.COD_NOT_ELIGIBLE ?? "missing")).toBeNull();
+    await fireEvent.press(screen.getByTestId("get-quote"));
+    await screen.findByTestId("deposit-terms");
+    expect(screen.getByText(`Deposit now: ${en(12000)}`)).toBeTruthy();
+    expect(screen.getByText(`Rest on receipt: ${en(12000)}`)).toBeTruthy();
+    expect(screen.getByText(/kitchen@instapay/)).toBeTruthy();
+    expect(screen.getByText(t.pay.directNote)).toBeTruthy();
+    expect(quoteBodies.map((b) => b.paymentMethod)).toEqual(["COD", "DEPOSIT"]);
+  });
+
+  it("lets the customer say the deposit was sent, then shows that the kitchen still has to confirm", async () => {
+    let state = "WAITING_FOR_DEPOSIT";
+    let reported: unknown = null;
+    const view = () => ({
+      id: "o9", publicNumber: "MB-000902", version: 1, state: "PENDING_ACCEPTANCE", fulfillmentMode: "PICKUP", items: [], subtotal: money(24000), deliveryFee: money(0), tax: money(0),
+      total: money(24000), slot: slot("slot-k1"), acceptBy: "2026-10-13T09:00:00Z", events: [], allowedActions: [], cashState: "NOT_DUE", supportCaseIds: [], handoverCode: null, contact: null,
+      payment: { method: "DEPOSIT", state, deposit: money(12000), remainder: money(12000), recipient, depositExpiresAt: "2026-10-13T09:00:00Z", version: 0 },
+    });
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue("matbakhy-dev://orders/o9");
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const key = `${input.method} ${new URL(input.url).pathname}`;
+      if (key === "GET /api/v1/me") return json(200, profile);
+      if (key === "GET /api/v1/meals") return json(200, { items: [], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "GET /api/v1/orders/o9") return json(200, view());
+      if (key === "POST /api/v1/orders/o9/payment/transfer-report") {
+        reported = await input.json();
+        state = "CUSTOMER_TRANSFER_REPORTED";
+        return json(200, view().payment);
+      }
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    try {
+      await render(<App config={config} session={await signedIn()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+      expect(await screen.findByText(`${t.pay.title}: ${t.pay.states.WAITING_FOR_DEPOSIT}`)).toBeTruthy();
+      await fireEvent.changeText(screen.getByTestId("transfer-reference"), " IP-123 ");
+      await fireEvent.press(screen.getByTestId("report-transfer"));
+      expect(await screen.findByText(`${t.pay.title}: ${t.pay.states.CUSTOMER_TRANSFER_REPORTED}`)).toBeTruthy();
+      expect(screen.getByText(t.pay.explain.CUSTOMER_TRANSFER_REPORTED ?? "missing")).toBeTruthy();
+      expect(screen.queryByTestId("report-transfer")).toBeNull();
+      expect(reported).toEqual({ reference: "IP-123" });
+    } finally {
+      jest.restoreAllMocks();
+    }
+  });
+});
+
+/** MB-054 (D17, TC-164) on native: browsing activity goes in one batch with a per-process visitor id, without signing in. */
+describe("MB-054 on native: organic activity", () => {
+  afterEach(() => jest.restoreAllMocks());
+
+  it("sends the impressions, the meal view and the add to cart, and never blocks the screen on a failure", async () => {
+    // Start on Discover regardless of a link another test opened.
+    jest.spyOn(Linking, "getInitialURL").mockResolvedValue(null);
+    const sent: { visitorId: string; events: { kind: string; subjectId: string }[] }[] = [];
+    const fetchImpl = jest.fn(async (input: Request) => {
+      const key = `${input.method} ${new URL(input.url).pathname}`;
+      if (key === "GET /api/v1/meals") return json(200, { items: [meal("m1", "k1"), meal("m2", "k2")], nextCursor: null, hasMore: false });
+      if (key === "GET /api/v1/meals/m1") return json(200, meal("m1", "k1"));
+      if (key === "GET /api/v1/configuration/public") return json(200, { orderingAvailable: true, orderLimits: null });
+      if (key === "POST /api/v1/activity") {
+        sent.push((await input.json()) as (typeof sent)[number]);
+        return json(503, { code: "SERVICE_UNAVAILABLE" });
+      }
+      throw new Error(`unrouted ${key}`);
+    }) as unknown as typeof fetch;
+    await render(<App config={config} session={new Session()} signIn={jest.fn()} signOut={jest.fn()} fetchImpl={fetchImpl} />);
+    await fireEvent.press(await screen.findByTestId("meal-m1"));
+    await fireEvent.press(await screen.findByTestId("slot-0", {}, { timeout: 5000 }));
+    await fireEvent.press(screen.getByTestId("add-to-cart"));
+    expect(await screen.findByText(t.added)).toBeTruthy();
+    await waitFor(() => expect(sent.flatMap((b) => b.events.map((e) => `${e.kind}:${e.subjectId}`))).toEqual(
+      expect.arrayContaining(["MEAL_IMPRESSION:m1", "MEAL_IMPRESSION:m2", "MEAL_VIEW:m1", "ADD_TO_CART:m1"])), { timeout: 4000 });
+    expect(new Set(sent.map((b) => b.visitorId)).size).toBe(1);
+    expect(sent[0]?.visitorId).toMatch(/^app-[0-9a-f-]{36}$/);
+    expect([...mockStore.keys()].some((k) => k.includes("visitor"))).toBe(false);
   });
 });

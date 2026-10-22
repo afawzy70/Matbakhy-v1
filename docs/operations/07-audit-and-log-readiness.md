@@ -20,7 +20,7 @@ Audit writes go through `AuditLog.record` (`JdbcAuditLog`). It joins the caller'
 | Configuration | policy, zones, feature flags | `config.change` | staff / config key | reason required; approval reference for a real policy | ConfigurationIntegrationTest |
 | Finance | refunds; settlements; cash verification; own report refused | `refund.*`, `settlement.*`, `cash.verify` | staff / refund, batch, report | reason or evidence depending on action | FinanceOperationsIntegrationTest, CashAndLedgerIntegrationTest |
 | Audit | audit trail read | `audit.read` | staff / looked-up object or actor | ALLOWED, filter in details | StaffAccessIntegrationTest |
-| Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest |
+| Notifications | dead-letter retry | `outbox.retry` | staff / outbox event | reason required | NotificationIntegrationTest; AuditAndCorrelationReadinessIntegrationTest (HTTP: authorized, denied by a staff member without `integration.ops`, replay, second retry 409; response, audit and log share the request ID; 2026-10-14) |
 | Orders (protected data) | staff view disclosing customer contact | `access.order_contact` | staff / order | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support (protected data) | staff view of a case | `access.support_case` | staff / case | ALLOWED, fixed reason, request ID | SupportIntegrationTest |
 | Support | staff message, case update | `case.message`, `case.update` | staff / case | reason for some transitions | SupportIntegrationTest |
@@ -78,8 +78,20 @@ Evidence: `verification/runs/20261013-MB-039-LOCAL/OBSERVABILITY-REHEARSAL.md` (
 - **Metrics (OPS-02, local):** the API publishes health and Prometheus metrics only on a separate management port (8081) that the proxy never forwards; the API port refuses them (ManagementPortIntegrationTest). Prometheus scrapes the API, the host (disk, memory, backup age via node-exporter's textfile) and the pipeline itself.
 - **Alerts:** the proposed thresholds from [01-environments.md](01-environments.md) are rules in `observability/alerts.yml` with `promtool` unit tests. All are **provisional**. Alertmanager sends every alert to a local test sink; there is no real recipient (O07). Exercised end to end: failing outbox, stale backup (fires, then resolves after `deploy.sh` backup), API down, database down, disk pressure (real, on the rehearsal host).
 - **Defect found in the rehearsal and fixed:** during a database outage each gauge waited for a connection, the scrape timed out and only ApiDown fired. Gauges now read with a 1.5 s budget and a 10 s back-off (red first: 57 s → under 4 s), and DatabaseUnavailable fires.
-- **Open tuning:** data alerts such as OutboxFailed show "resolved" while their data is missing during an outage; proposal in the evidence file.
+- **Tuning applied:** OutboxFailed now uses the maximum over 15 minutes. A short outage that makes the gauge NaN no longer sends a false "resolved" (promtool test, red against the old rule). Other data alerts with a `for:` clause keep their pending state rules; real-traffic tuning stays provisional.
 - **Runbook:** [08-troubleshooting-runbook.md](08-troubleshooting-runbook.md) now uses these tools. Not yet rehearsed against a deliberately failed synthetic event on the preview (OPS-03).
+
+## TC-139 coverage review (2026-10-14, self-review)
+
+TC-139 stays **NOT_RUN**: its "then" needs a restored staging database, and no staging or preview is authorized. Local evidence for each part:
+
+| TC-139 part | Local evidence | Still missing |
+|---|---|---|
+| Retention and deletion workflows | Account erasure after the grace period, including support replies and deposit references on append-only history (AccountErasureIntegrationTest, TC-055) | Retention periods and the activity/log deletion jobs wait on O06 |
+| Redacted structured logs, metrics and alerts | LogRedactionIntegrationTest (TC-056); ECS JSON with request ID (this file, sections 3–4); 12 alert rules, 8 of them with promtool unit tests (`observability/alerts.test.yml`) | Real alert routing (O07); deployed LOG-01/OPS-02 |
+| Migration checks | MigrationIntegrationTest; RuntimeRoleIntegrationTest (V27/V28 on the runtime role) | — |
+| Backup/restore automation | BackupRestoreIntegrationTest (schema 28; orders, allocations and ledger reconcile); `deploy.sh backup` counts a backup only after restore and reconciliation (`scripts/test_preview_backup.py`) | TC-057 on staging with measured RPO/RTO |
+| Provider outage dashboards | OperationalMetricsOutageIntegrationTest; NotificationIntegrationTest (TC-037 dead letter); staff outbox retry over HTTP with audit and correlation (AuditAndCorrelationReadinessIntegrationTest, 2026-10-14) | Deployed OPS-01..03 |
 
 ## Preview checks
 

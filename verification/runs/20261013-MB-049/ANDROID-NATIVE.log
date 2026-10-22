@@ -1,0 +1,12 @@
+## Android emulator (job 115223934905)
+09:51:17 PASS: sign-in round trip
+09:53:27 side effects 1|1|1|1|1|1|1; 09:53:52 cap 10; 09:54:19 lowered limit; 09:54:43 delivery MB-100002 DELIVERY|3000|63000
+09:54:53 deep link warm and cold
+09:55:32 ok: same process (8560): limit 10 -> 5 while running; reopening the cart flagged the line
+09:56:12 repriced order MB-100003 (total|unit|quantity): 13000|13000|1
+09:56:12 ok: refused at the stale price with no order; notice with old and new prices; placed only after acceptance at 130.00
+09:56:18-36 screenshots dt-en-discover, dt-en-meal, dt-en-cart (font scale 2.0)
+09:57:20 FAIL: [en] Checkout: place order not reachable at large text (same harness cause: no quote calculated)
+  Notification refusal phase NOT_RUN (after the failure).
+Fix for the next run: the cart's mode row and the meal quantity row wrap; the harnesses calculate the total first;
+the iOS phase asserts that the mode choices and the quote button stay inside the screen width.

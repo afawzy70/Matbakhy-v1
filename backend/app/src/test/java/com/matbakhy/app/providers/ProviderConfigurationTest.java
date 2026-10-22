@@ -37,14 +37,30 @@ class ProviderConfigurationTest {
     void notification_channels_only_in_local_and_ci_and_dev_token_keys_refused_elsewhere() {
         ProviderConfiguration config = new ProviderConfiguration();
         NotificationProperties dev = new NotificationProperties("local-dev-only-push-token-hash-key-not-secret",
-                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60), true);
         NotificationProperties real = new NotificationProperties("a-real-hash-key-value-0123456789abcdef",
-                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60), true);
         assertThat(config.emailSender(env(DeploymentEnvironment.CI))).isNotNull();
         assertThat(config.pushSender(env(DeploymentEnvironment.LOCAL), dev)).isNotNull();
         assertThatThrownBy(() -> config.pushSender(env(DeploymentEnvironment.PRODUCTION), dev)).hasMessageContaining("PUSH_TOKEN_HASH_KEY");
         assertThatThrownBy(() -> config.pushSender(env(DeploymentEnvironment.STAGING), real)).hasMessageContaining("No push notification provider");
         assertThatThrownBy(() -> config.emailSender(env(DeploymentEnvironment.PRODUCTION))).hasMessageContaining("No email notification provider");
+    }
+
+    /** O07: with the push flag off, any environment starts without a push provider, nothing is sent, and real token keys are still required. */
+    @Test
+    void with_push_delivery_off_no_provider_is_needed_and_nothing_is_sent() {
+        ProviderConfiguration config = new ProviderConfiguration();
+        NotificationProperties off = new NotificationProperties("a-real-hash-key-value-0123456789abcdef",
+                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60), false);
+        NotificationProperties offDevKeys = new NotificationProperties("local-dev-only-push-token-hash-key-not-secret",
+                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60), false);
+        for (DeploymentEnvironment e : DeploymentEnvironment.values()) {
+            com.matbakhy.notifications.api.NotificationChannels.PushSender sender = config.pushSender(env(e), e.developmentSecrets() ? offDevKeys : off);
+            assertThat(sender.send(java.util.UUID.randomUUID(), "ANDROID", "synthetic-token", "notification.order_accepted", java.util.Map.of()))
+                    .isEqualTo(com.matbakhy.notifications.api.NotificationChannels.Result.permanentFailure("PUSH_DISABLED"));
+        }
+        assertThatThrownBy(() -> config.pushSender(env(DeploymentEnvironment.PRODUCTION), offDevKeys)).hasMessageContaining("PUSH_TOKEN_HASH_KEY");
     }
 
     /** PREVIEW keeps synthetic providers (nothing is ever sent) but demands real secrets and real S3-compatible storage. */
@@ -59,9 +75,9 @@ class ProviderConfigurationTest {
         assertThat(config.malwareScanner(preview)).isInstanceOf(FakeMalwareScanner.class);
         assertThat(config.emailSender(preview)).isNotNull();
         NotificationProperties dev = new NotificationProperties("local-dev-only-push-token-hash-key-not-secret",
-                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+                "local-dev-only-push-token-encryption-key-not-secret", 5, Duration.ofSeconds(30), Duration.ofSeconds(60), true);
         NotificationProperties real = new NotificationProperties("a-real-hash-key-value-0123456789abcdef",
-                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60));
+                "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=", 5, Duration.ofSeconds(30), Duration.ofSeconds(60), true);
         assertThat(config.pushSender(preview, real)).isNotNull();
         assertThatThrownBy(() -> config.pushSender(preview, dev)).hasMessageContaining("PUSH_TOKEN_HASH_KEY");
         StorageProperties emulator = new StorageProperties(java.net.URI.create("http://storage:9000"), null, "eu-central-1", "local-emulator-only",

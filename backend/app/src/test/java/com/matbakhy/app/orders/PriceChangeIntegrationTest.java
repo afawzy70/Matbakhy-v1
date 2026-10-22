@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import com.matbakhy.app.security.TestLogins;
@@ -50,6 +51,7 @@ class PriceChangeIntegrationTest {
 
     TestCommerce fx;
     String subject;
+    String cookSubject;
     UUID customer;
     UUID kitchen;
     UUID zone;
@@ -66,7 +68,8 @@ class PriceChangeIntegrationTest {
         customer = logins.login(subject, "Customer").getPrincipal().id();
         fx.verifyPhone(customer);
         UUID reviewer = logins.login(UUID.randomUUID().toString(), "Reviewer").getPrincipal().id();
-        kitchen = TestKitchens.approvedKitchen(jdbc, logins.login(UUID.randomUUID().toString(), "Cook").getPrincipal().id(), reviewer);
+        cookSubject = UUID.randomUUID().toString();
+        kitchen = TestKitchens.approvedKitchen(jdbc, logins.login(cookSubject, "Cook").getPrincipal().id(), reviewer);
         zone = fx.zone(3000);
         fx.deliversTo(kitchen, zone);
         mealA = fx.meal(kitchen, 12000, "كشري", "Koshari");
@@ -96,6 +99,39 @@ class PriceChangeIntegrationTest {
         MockHttpServletResponse placed = place(UUID.fromString(latest.get("quoteId").asString()), UUID.randomUUID(), key());
         assertThat(placed.getStatus()).as(placed.getContentAsString()).isEqualTo(201);
         assertThat(body(placed).get("total").get("amountMinor").asLong()).isEqualTo(30000);
+    }
+
+    /** QA-006: the same guarantees through the production cook edit (PATCH), not the SQL stand-in used by the lock-order tests. */
+    @Test
+    void the_real_cook_price_edit_refuses_a_stale_quote_and_never_touches_a_committed_order() throws Exception {
+        // A published meal needs an approved photo to be edited through the real cook endpoint.
+        UUID photo = com.matbakhy.app.support.TestUploads.approvedMealPhoto(mvc, json, logins.login(cookSubject, "Cook"));
+        jdbc.update("INSERT INTO meal_media (meal_id, media_id, position) VALUES (?, ?, 0)", mealA, photo);
+        UUID stale = quote(item(mealA, 2), false);
+        patchPrice(mealA, 13000);
+        MockHttpServletResponse refused = place(stale, UUID.randomUUID(), key());
+        assertThat(refused.getStatus()).isEqualTo(409);
+        assertThat(body(refused).get("code").asString()).isEqualTo("PRICE_CHANGED");
+        assertNothingCommitted();
+
+        JsonNode fresh = quoteBody(item(mealA, 2), false);
+        assertThat(fresh.get("total").get("amountMinor").asLong()).isEqualTo(2 * 13000);
+        MockHttpServletResponse placed = place(UUID.fromString(fresh.get("quoteId").asString()), UUID.randomUUID(), key());
+        assertThat(placed.getStatus()).as(placed.getContentAsString()).isEqualTo(201);
+        UUID order = UUID.fromString(body(placed).get("id").asString());
+
+        patchPrice(mealA, 9000);
+        assertThat(jdbc.queryForObject("SELECT total_minor FROM customer_order WHERE id = ?", Long.class, order))
+                .as("immutable order snapshot after a later price edit").isEqualTo(26000L);
+        assertThat(jdbc.queryForObject("SELECT unit_price_minor FROM order_item WHERE order_id = ?", Long.class, order)).isEqualTo(13000L);
+    }
+
+    private void patchPrice(UUID meal, long price) throws Exception {
+        long version = jdbc.queryForObject("SELECT version FROM meal WHERE id = ?", Long.class, meal);
+        MockHttpServletResponse r = mvc.perform(patch("/api/v1/cook/meals/" + meal)
+                .content("{\"priceMinor\":" + price + ",\"expectedVersion\":" + version + "}")
+                .with(authentication(logins.login(cookSubject, "Cook"))).with(csrf()).contentType(MediaType.APPLICATION_JSON)).andReturn().getResponse();
+        assertThat(r.getStatus()).as(r.getContentAsString()).isEqualTo(200);
     }
 
     @Test

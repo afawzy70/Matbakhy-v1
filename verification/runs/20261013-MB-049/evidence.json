@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-049",
+  "phase": "P07",
+  "source_commit": "bc305c642442f1bdeaf0f1c92f30bc9976dcddc5",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-13T10:06:27.743111+00:00",
+  "finished_at": "2026-10-13T10:07:34.681917+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-PRICE-CHANGE",
+      "name": "D13 integration tests on PostgreSQL (increase/decrease, fee-only, both race orders, lost response)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp -pl app -am test -Dtest=PriceChangeIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-049/BACKEND-PRICE-CHANGE.log"
+    },
+    {
+      "id": "WEB-COMPONENT",
+      "name": "Customer web D13 component tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/customer-web test"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-049/WEB-COMPONENT.log"
+    },
+    {
+      "id": "NATIVE-COMPONENT",
+      "name": "Customer mobile D13 component tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "pnpm --filter @matbakhy/customer-mobile test"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261013-MB-049/NATIVE-COMPONENT.log"
+    },
+    {
+      "id": "ANDROID-NATIVE-D13",
+      "name": "Android emulator (API 35): quote at EGP 120.00, kitchen price raised to 130.00, placement refused with no order, notice with old and new prices and totals, Place disabled until acceptance, order stored 13000|13000|1",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38375863664 (job: Android debug APK (Gradle)) at bc305c6; the workflow failed later in the MB-033 dynamic-text phase",
+      "log_path": "verification/runs/20261013-MB-049/ANDROID-NATIVE.log"
+    },
+    {
+      "id": "IOS-NATIVE-D13",
+      "name": "iOS simulator: same flow (phase H) after a relaunch about 10 minutes after sign-in; notice and totals printed; one new order at 13000|13000|1",
+      "kind": "manual",
+      "required": true,
+      "status": "PASS",
+      "reviewer": "Claude Code implementation agent (inspected GitHub Actions job log)",
+      "reference": "https://github.com/afawzy70/Matbakhy-v1/actions/runs/38375863664 (job: iOS simulator build) at bc305c6; the workflow failed later in the MB-033 dynamic-text phase",
+      "log_path": "verification/runs/20261013-MB-049/IOS-NATIVE.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-154",
+      "status": "PASS",
+      "observed": "Kitchen increase and decrease on two lines, fee-only change attributed to the fee, refresh failure and second change asking for review again, edit/leave after the notice (customer web component tests, red first); the real-stack browser journey (candidate E BROWSER-E2E): the cook changes the price in the price-history UI, the customer's placement is refused, the Arabic notice appears, no order, no overflow at 320/390 px, axe clean, then the order at the new price after acceptance; native component tests (Arabic and English); Android emulator and iOS simulator native run 39: refused at the stale price with no order, notice 'The kitchen updated the price of “Native Dish One” from EGP 120.00 to EGP 130.00.', totals 120.00 -> 130.00, Place disabled until 'Accept the new total' and terms, order stored 13000|13000|1."
+    },
+    {
+      "id": "TC-155",
+      "status": "PASS",
+      "observed": "PriceChangeIntegrationTest in BACKEND-PRICE-CHANGE: update-first race refused 409 PRICE_CHANGED with no side effects; placement-first race keeps 12000 and the meal is 15000 afterwards."
+    },
+    {
+      "id": "TC-156",
+      "status": "PASS",
+      "observed": "PriceChangeIntegrationTest: lost response recovered as the same single order at total 35000 after price and fee changes; commission and cash obligation unchanged."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261013-MB-049/BACKEND-PRICE-CHANGE.log",
+    "verification/runs/20261013-MB-049/WEB-COMPONENT.log",
+    "verification/runs/20261013-MB-049/NATIVE-COMPONENT.log",
+    "verification/runs/20261013-MB-049/ANDROID-NATIVE.log",
+    "verification/runs/20261013-MB-049/IOS-NATIVE.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "D13 informed reconfirmation at candidate E (bc305c6). Self-review, not independent review."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

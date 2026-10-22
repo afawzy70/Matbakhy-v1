@@ -1,0 +1,4 @@
+
+> @matbakhy/design-tokens@0.1.0 typecheck /home/aiagent/workspaces/agents/codex-qa/packages/design-tokens
+> tsc -p tsconfig.json
+

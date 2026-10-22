@@ -1,0 +1,102 @@
+test_doctor_names_each_missing_prerequisite_and_starts_nothing (test_dev_bootstrap.DevBootstrapGuards.test_doctor_names_each_missing_prerequisite_and_starts_nothing) ... ok
+test_env_file_without_local_marker_is_refused (test_dev_bootstrap.DevBootstrapGuards.test_env_file_without_local_marker_is_refused) ... ok
+test_smoke_fails_clearly_when_stack_is_not_running (test_dev_bootstrap.DevBootstrapGuards.test_smoke_fails_clearly_when_stack_is_not_running) ... ok
+test_unknown_command_prints_usage (test_dev_bootstrap.DevBootstrapGuards.test_unknown_command_prints_usage) ... ok
+test_up_runs_doctor_first (test_dev_bootstrap.DevBootstrapGuards.test_up_runs_doctor_first) ... ok
+test_every_fixture_declares_its_parameters_and_uses_each_as_a_psql_variable (test_e2e_fixtures.FixtureFilesTest.test_every_fixture_declares_its_parameters_and_uses_each_as_a_psql_variable) ... ok
+test_fixtures_are_plain_select_insert_and_update_statements (test_e2e_fixtures.FixtureFilesTest.test_fixtures_are_plain_select_insert_and_update_statements) ... ok
+test_the_specs_send_names_and_parameters_and_never_sql (test_e2e_fixtures.FixtureFilesTest.test_the_specs_send_names_and_parameters_and_never_sql) ... ok
+test_a_valid_request_reaches_psql_as_variables_and_the_checked_in_sql (test_e2e_fixtures.FixtureScriptTest.test_a_valid_request_reaches_psql_as_variables_and_the_checked_in_sql) ... ok
+test_hostile_values_are_passed_as_data_and_never_executed_or_expanded (test_e2e_fixtures.FixtureScriptTest.test_hostile_values_are_passed_as_data_and_never_executed_or_expanded) ... ok
+test_it_refuses_bad_names_unknown_fixtures_and_wrong_parameters (test_e2e_fixtures.FixtureScriptTest.test_it_refuses_bad_names_unknown_fixtures_and_wrong_parameters) ... ok
+test_it_refuses_unless_the_host_has_enabled_it (test_e2e_fixtures.FixtureScriptTest.test_it_refuses_unless_the_host_has_enabled_it) ... ok
+test_broken_document_link_is_rejected (test_guardrails.BlueprintGuards.test_broken_document_link_is_rejected) ... ok
+test_command_only_report_cannot_be_product_evidence (test_guardrails.BlueprintGuards.test_command_only_report_cannot_be_product_evidence) ... ok
+test_dependency_cycle_is_rejected (test_guardrails.BlueprintGuards.test_dependency_cycle_is_rejected) ... ok
+test_done_without_evidence_cannot_pass (test_guardrails.BlueprintGuards.test_done_without_evidence_cannot_pass) ... ok
+test_duplicate_endpoint_is_rejected (test_guardrails.BlueprintGuards.test_duplicate_endpoint_is_rejected) ... ok
+test_initial_phase_cannot_be_promoted (test_guardrails.BlueprintGuards.test_initial_phase_cannot_be_promoted) ... ok
+test_rule_losing_coverage_is_rejected (test_guardrails.BlueprintGuards.test_rule_losing_coverage_is_rejected) ... ok
+test_scenario_pass_without_evidence_is_rejected (test_guardrails.BlueprintGuards.test_scenario_pass_without_evidence_is_rejected) ... ok
+test_valid_initial_blueprint (test_guardrails.BlueprintGuards.test_valid_initial_blueprint) ... ok
+test_empty_or_blocked_required_set_cannot_pass (test_guardrails.RunnerGuards.test_empty_or_blocked_required_set_cannot_pass) ... ok
+test_failing_command_cannot_pass (test_guardrails.RunnerGuards.test_failing_command_cannot_pass) ... ok
+test_missing_executable_is_blocked (test_guardrails.RunnerGuards.test_missing_executable_is_blocked) ... ok
+test_real_zero_exit_records_log (test_guardrails.RunnerGuards.test_real_zero_exit_records_log) ... ok
+test_timeout_is_failure (test_guardrails.RunnerGuards.test_timeout_is_failure) ... ok
+test_unconfigured_is_blocked (test_guardrails.RunnerGuards.test_unconfigured_is_blocked) ... ok
+test_a_trigger_that_mentions_truncate_is_not_a_truncate (test_migration_compat.MigrationCompatTest.test_a_trigger_that_mentions_truncate_is_not_a_truncate) ... ok
+test_additive_changes_are_expand_only (test_migration_compat.MigrationCompatTest.test_additive_changes_are_expand_only) ... ok
+test_breaking_statements_need_an_annotation_with_a_reason (test_migration_compat.MigrationCompatTest.test_breaking_statements_need_an_annotation_with_a_reason) ... ok
+test_constraints_on_a_table_the_migration_creates_do_not_count (test_migration_compat.MigrationCompatTest.test_constraints_on_a_table_the_migration_creates_do_not_count) ... ok
+test_expand_only_cannot_be_claimed_for_a_risky_migration (test_migration_compat.MigrationCompatTest.test_expand_only_cannot_be_claimed_for_a_risky_migration) ... ok
+test_main_checks_only_after_the_baseline_and_fails_on_a_violation (test_migration_compat.MigrationCompatTest.test_main_checks_only_after_the_baseline_and_fails_on_a_violation) ... FAIL V29__test.sql: breaking: drops an object the previous API may read or write, but there is no '-- rollback-compat: breaking <reason of at least 10 characters>'
+ok
+test_the_real_migrations_after_the_baseline_pass (test_migration_compat.MigrationCompatTest.test_the_real_migrations_after_the_baseline_pass) ... ok
+test_tightening_on_an_existing_table_needs_an_annotation (test_migration_compat.MigrationCompatTest.test_tightening_on_an_existing_table_needs_an_annotation) ... ok
+test_a_failed_restore_leaves_no_metric_and_fails_the_command (test_preview_backup.PreviewBackupTest.test_a_failed_restore_leaves_no_metric_and_fails_the_command) ... ok
+test_metric_is_written_only_after_the_backup_was_restored_and_reconciled (test_preview_backup.PreviewBackupTest.test_metric_is_written_only_after_the_backup_was_restored_and_reconciled) ... ok
+test_e2e_reset_is_guarded (test_preview_release.PreviewReleaseTest.test_e2e_reset_is_guarded) ... ok
+test_e2e_reset_takes_a_verified_backup_before_it_drops_the_database (test_preview_release.PreviewReleaseTest.test_e2e_reset_takes_a_verified_backup_before_it_drops_the_database) ... ok
+test_rollback_plan_points_to_the_backup_when_the_schema_moved (test_preview_release.PreviewReleaseTest.test_rollback_plan_points_to_the_backup_when_the_schema_moved) ... ok
+test_rollback_plan_refuses_without_history (test_preview_release.PreviewReleaseTest.test_rollback_plan_refuses_without_history) ... ok
+test_rollback_plan_says_image_only_when_the_schema_has_not_moved (test_preview_release.PreviewReleaseTest.test_rollback_plan_says_image_only_when_the_schema_has_not_moved) ... ok
+test_up_backs_up_first_pulls_only_missing_images_and_records_the_release (test_preview_release.PreviewReleaseTest.test_up_backs_up_first_pulls_only_missing_images_and_records_the_release) ... ok
+test_up_refuses_a_value_that_is_still_a_placeholder (test_preview_release.PreviewReleaseTest.test_up_refuses_a_value_that_is_still_a_placeholder) ... ok
+test_up_refuses_an_image_that_is_not_pinned_by_digest (test_preview_release.PreviewReleaseTest.test_up_refuses_an_image_that_is_not_pinned_by_digest) ... ok
+setUpClass (test_proxy_access.ProxyAccessTest) ... skipped 'Docker is not available'
+test_a_modified_tracked_run_file_on_the_first_line_is_allowed (test_record_evidence.DirtyOutsideRunsTest.test_a_modified_tracked_run_file_on_the_first_line_is_allowed) ... ok
+test_changes_outside_the_run_directory_are_reported (test_record_evidence.DirtyOutsideRunsTest.test_changes_outside_the_run_directory_are_reported) ... ok
+test_default_run_with_no_duration_does_not_disable_verification (test_rehearsal_tls.RehearsalTlsTest.test_default_run_with_no_duration_does_not_disable_verification) ... ok
+test_insecure_opt_in_is_refused_for_a_public_domain (test_rehearsal_tls.RehearsalTlsTest.test_insecure_opt_in_is_refused_for_a_public_domain) ... ok
+test_source_has_no_unconditional_verification_override (test_rehearsal_tls.RehearsalTlsTest.test_source_has_no_unconditional_verification_override) ... /home/aiagent/workspaces/agents/codex-qa/scripts/test_rehearsal_tls.py:17: ResourceWarning: unclosed file <_io.TextIOWrapper name='/home/aiagent/workspaces/agents/codex-qa/scripts/rehearsal/load.py' mode='r' encoding='UTF-8'>
+  text = open(HELPER).read()
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_current_repository_passes (test_scope.ScopeGuards.test_current_repository_passes) ... FAIL
+test_decision_missing_from_register_is_rejected (test_scope.ScopeGuards.test_decision_missing_from_register_is_rejected) ... ok
+test_fabricated_acceptance_is_rejected (test_scope.ScopeGuards.test_fabricated_acceptance_is_rejected) ... ok
+test_later_phase_dependency_is_rejected (test_scope.ScopeGuards.test_later_phase_dependency_is_rejected) ... ok
+test_lost_client_target_is_rejected (test_scope.ScopeGuards.test_lost_client_target_is_rejected) ... ok
+test_merged_native_verification_is_rejected (test_scope.ScopeGuards.test_merged_native_verification_is_rejected) ... ok
+test_open_decision_with_value_is_rejected (test_scope.ScopeGuards.test_open_decision_with_value_is_rejected) ... ok
+test_planned_path_that_exists_is_rejected (test_scope.ScopeGuards.test_planned_path_that_exists_is_rejected) ... ok
+test_present_path_that_is_missing_is_rejected (test_scope.ScopeGuards.test_present_path_that_is_missing_is_rejected) ... ok
+test_removed_deferred_extension_is_rejected (test_scope.ScopeGuards.test_removed_deferred_extension_is_rejected) ... ok
+test_stale_matrix_is_rejected (test_scope.ScopeGuards.test_stale_matrix_is_rejected) ... ok
+test_unlisted_top_level_path_is_rejected (test_scope.ScopeGuards.test_unlisted_top_level_path_is_rejected) ... ok
+test_apply_removes_only_files_older_than_the_retention (test_staging_profile.QaArtifactPruneTest.test_apply_removes_only_files_older_than_the_retention) ... ok
+test_dry_run_lists_old_files_and_deletes_nothing (test_staging_profile.QaArtifactPruneTest.test_dry_run_lists_old_files_and_deletes_nothing) ... ok
+test_it_refuses_an_unset_or_dangerous_directory_and_a_bad_period (test_staging_profile.QaArtifactPruneTest.test_it_refuses_an_unset_or_dangerous_directory_and_a_bad_period) ... ok
+test_four_gb_profile_keeps_memory_ceilings_below_three_and_a_half_gib (test_staging_profile.StagingProfileTest.test_four_gb_profile_keeps_memory_ceilings_below_three_and_a_half_gib) ... ok
+test_grafana_is_an_optional_tool_in_the_four_gb_profile_and_present_when_asked (test_staging_profile.StagingProfileTest.test_grafana_is_an_optional_tool_in_the_four_gb_profile_and_present_when_asked) ... ok
+test_push_delivery_is_off_by_default_in_the_deployment (test_staging_profile.StagingProfileTest.test_push_delivery_is_off_by_default_in_the_deployment) ... ok
+test_retention_defaults_are_the_proposed_staging_values (test_staging_profile.StagingProfileTest.test_retention_defaults_are_the_proposed_staging_values) ... ok
+test_the_api_sets_the_csrf_cookie_for_the_parent_domain_so_the_sibling_web_apps_can_read_it (test_staging_profile.StagingProfileTest.test_the_api_sets_the_csrf_cookie_for_the_parent_domain_so_the_sibling_web_apps_can_read_it) ... ok
+test_the_default_profile_still_includes_everything_unchanged (test_staging_profile.StagingProfileTest.test_the_default_profile_still_includes_everything_unchanged) ... ok
+test_the_identity_container_is_healthy_only_once_the_realm_exists (test_staging_profile.StagingProfileTest.test_the_identity_container_is_healthy_only_once_the_realm_exists) ... ok
+test_the_jvm_heap_fits_inside_each_memory_ceiling_of_the_four_gb_profile (test_staging_profile.StagingProfileTest.test_the_jvm_heap_fits_inside_each_memory_ceiling_of_the_four_gb_profile) ... ok
+
+======================================================================
+FAIL: test_current_repository_passes (test_scope.ScopeGuards.test_current_repository_passes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/aiagent/workspaces/agents/codex-qa/scripts/test_scope.py", line 33, in test_current_repository_passes
+    self.assertEqual(check(self.root), [])
+AssertionError: Lists differ: ['inventory: unlisted top-level entry .aws[43 chars]dex'] != []
+
+First list contains 2 additional elements.
+First extra element 0:
+'inventory: unlisted top-level entry .aws'
+
++ []
+- ['inventory: unlisted top-level entry .aws',
+-  'inventory: unlisted top-level entry .codex']
+
+----------------------------------------------------------------------
+Ran 73 tests in 33.868s
+
+FAILED (failures=1, skipped=1)
+PASS: every checked migration is expand-only or says why not
+PASS: every checked migration is expand-only or says why not
+PASS: every checked migration is expand-only or says why not

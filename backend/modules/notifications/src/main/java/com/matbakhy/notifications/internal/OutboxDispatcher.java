@@ -36,8 +36,9 @@ public class OutboxDispatcher {
     private static final Logger LOG = LoggerFactory.getLogger(OutboxDispatcher.class);
 
     static final Set<String> CUSTOMER_EVENTS = Set.of("ORDER_ACCEPTED", "ORDER_PREPARING", "ORDER_READY", "ORDER_OUT_FOR_DELIVERY",
-            "ORDER_COMPLETED", "ORDER_REJECTED", "ORDER_EXPIRED", "ORDER_DELIVERY_FAILED", "ORDER_CANCELLED");
-    static final Set<String> COOK_EVENTS = Set.of("ORDER_PLACED", "ORDER_CANCELLED", "ORDER_EXPIRED");
+            "ORDER_COMPLETED", "ORDER_REJECTED", "ORDER_EXPIRED", "ORDER_DELIVERY_FAILED", "ORDER_CANCELLED",
+            "PAYMENT_KITCHEN_RECEIPT_REPORTED", "PAYMENT_DISPUTED", "PAYMENT_REFUND_OWED", "PAYMENT_REFUNDED");
+    static final Set<String> COOK_EVENTS = Set.of("ORDER_PLACED", "ORDER_CANCELLED", "ORDER_EXPIRED", "PAYMENT_CUSTOMER_TRANSFER_REPORTED");
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate tx;
@@ -120,8 +121,10 @@ public class OutboxDispatcher {
             jdbc.update("""
                     INSERT INTO notification_delivery (id, notification_id, channel, target, next_attempt_at)
                     VALUES (?, ?, 'EMAIL', 'account', ?) ON CONFLICT DO NOTHING""", UUID.randomUUID(), notification, Timestamp.from(now));
-            for (String installation : jdbc.queryForList("SELECT installation_id FROM device_registration WHERE user_id = ? AND revoked_at IS NULL",
-                    String.class, recipient)) {
+            // O07: while push delivery is switched off, registered devices are kept but no PUSH delivery is created.
+            List<String> installations = props.pushEnabled() ? jdbc.queryForList(
+                    "SELECT installation_id FROM device_registration WHERE user_id = ? AND revoked_at IS NULL", String.class, recipient) : List.of();
+            for (String installation : installations) {
                 jdbc.update("""
                         INSERT INTO notification_delivery (id, notification_id, channel, target, next_attempt_at)
                         VALUES (?, ?, 'PUSH', ?, ?) ON CONFLICT DO NOTHING""", UUID.randomUUID(), notification, installation, Timestamp.from(now));

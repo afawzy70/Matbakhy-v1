@@ -893,6 +893,159 @@
       "response_type": "MealPriceHistory",
       "contract": "Own meal's active price and previous actual price changes from immutable revisions (D14); another kitchen's meal is 404",
       "implemented": true
+    },
+    {
+      "id": "API-100",
+      "method": "POST",
+      "path": "/api/v1/orders/{orderId}/payment/transfer-report",
+      "permission": "ORDER_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Customer reports a sent deposit (D16); idempotent; a report is not payment",
+      "implemented": true
+    },
+    {
+      "id": "API-101",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/receipt",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports the deposit arrived in its own account (D16); exact amount and current version; not a bank confirmation",
+      "implemented": true
+    },
+    {
+      "id": "API-102",
+      "method": "GET",
+      "path": "/api/v1/cook/payment-profile",
+      "permission": "COOK",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Own kitchen's deposit share, COD cap and recipient with approval status (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-103",
+      "method": "PUT",
+      "path": "/api/v1/cook/payment-profile",
+      "permission": "COOK",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Set own payment terms; a new or changed recipient needs staff approval again (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-104",
+      "method": "POST",
+      "path": "/api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "KitchenPaymentProfile",
+      "contract": "Approve a kitchen's recipient; recent MFA, reason, audited; never own kitchen (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-105",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/problem",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports deposit not received or a different amount; payment DISPUTED (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-106",
+      "method": "GET",
+      "path": "/api/v1/ops/payments",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PaymentQueue",
+      "contract": "Payments needing attention: DISPUTED, RECONCILE_PENDING, REFUND_OWED (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-107",
+      "method": "POST",
+      "path": "/api/v1/ops/orders/{orderId}/payment/decision",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PaymentView",
+      "contract": "Decide an ended order's open payment (REFUND_OWED or CLOSED_NO_FUNDS); reason; audited; never 'received' (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-108",
+      "method": "POST",
+      "path": "/api/v1/cook/orders/{orderId}/payment/refund",
+      "permission": "COOK_OWNER",
+      "response_type": "PaymentView",
+      "contract": "Kitchen reports the refund it sent with the transfer reference (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-109",
+      "method": "GET",
+      "path": "/api/v1/ops/payment-recipients",
+      "permission": "FINANCE_VERIFY",
+      "response_type": "PendingRecipients",
+      "contract": "Kitchen payment recipients waiting for staff approval (D16)",
+      "implemented": true
+    },
+    {
+      "id": "API-110",
+      "method": "POST",
+      "path": "/api/v1/activity",
+      "permission": "PUBLIC",
+      "response_type": "NoContent",
+      "contract": "Organic browsing activity, counted once per visitor, kind, subject and Cairo day; stored without identity; 202 either way (D17, MB-054)",
+      "implemented": true
+    },
+    {
+      "id": "API-111",
+      "method": "GET",
+      "path": "/api/v1/cook/insights",
+      "permission": "COOK",
+      "response_type": "CookInsights",
+      "contract": "The cook's own free report: activity, orders, capacity, gross sales, refunds and known net; no profit claim (D17, MB-054)",
+      "implemented": true
+    },
+    {
+      "id": "API-112",
+      "method": "GET",
+      "path": "/api/v1/me/security",
+      "permission": "AUTHENTICATED",
+      "response_type": "SecuritySettings",
+      "contract": "MFA state of the signed-in account (D18): applicable categories/policies, effective mode, own preference, MFA asserted in this session, step-up path, account-management link",
+      "implemented": true
+    },
+    {
+      "id": "API-113",
+      "method": "PUT",
+      "path": "/api/v1/me/security/mfa",
+      "permission": "SELF",
+      "response_type": "SecuritySettings",
+      "contract": "enabled: on needs a session that passed MFA; off needs recent MFA, is refused under REQUIRED and unavailable under DISABLED",
+      "implemented": true
+    },
+    {
+      "id": "API-114",
+      "method": "GET",
+      "path": "/api/v1/ops/security/mfa-policy",
+      "permission": "SECURITY_MFA_POLICY",
+      "response_type": "MfaPolicyList",
+      "contract": "MFA policy per account category (D18)",
+      "implemented": true
+    },
+    {
+      "id": "API-115",
+      "method": "PUT",
+      "path": "/api/v1/ops/security/mfa-policy/{category}",
+      "permission": "SECURITY_MFA_POLICY",
+      "response_type": "MfaPolicy",
+      "contract": "mode, expectedVersion, reason; recent MFA; audited",
+      "implemented": true
+    },
+    {
+      "id": "API-116",
+      "method": "POST",
+      "path": "/api/v1/ops/accounts/{accountId}/mfa-reset",
+      "permission": "SECURITY_MFA_RESET",
+      "response_type": "MfaResetResult",
+      "contract": "reason; recent MFA; removes OTP credentials at the provider and ends sessions; no secrets; no self-reset; audited",
+      "implemented": true
     }
   ]
 }

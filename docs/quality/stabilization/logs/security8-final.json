@@ -1,0 +1,71 @@
+{
+  "agent": "Independent Senior Application Security Reviewer",
+  "commit": "c139bdf3c03705f042388ad5d8bd0c1ccf945a1d",
+  "summary": "Static-only, read-only review of 1df6b0d..HEAD; HEAD matches the requested SHA. Three findings. No network, runtime tests, or live Keycloak verification performed. Server-side precedence prevents preferences overriding REQUIRED; mutation endpoints retain browser CSRF protection; reset checks permission, recent MFA and self-reset. No application response or logging path exposing OTP secrets was identified. /me/security returns own-account policy/preference and session assurance, not actual factor inventory. Service-account manage-users scope is broad. Realm configurations match, but ACR/AMR issuance, unrelated-client step-up, account-console removal safeguards and live rollout semantics remain unverified; existing tests do not establish those cases. No confirmed client-parameter ACR forgery or persistent policy-change race bypass is claimed.",
+  "commands": [
+    {
+      "command": "git rev-parse HEAD; git status --short",
+      "exit_code": 0,
+      "note": "Requested SHA confirmed; working tree clean."
+    },
+    {
+      "command": "git diff --stat 1df6b0d..HEAD; targeted local source, configuration, contract and test inspection",
+      "exit_code": 0,
+      "note": "Static inspection only; no secret values printed."
+    },
+    {
+      "command": "python3 -B: verify SHA, compare three realm flow configurations, assert reset operation ordering",
+      "exit_code": 0,
+      "note": "Local, preview and test browser flows/authenticator configurations match; removal precedes logout and success audit."
+    },
+    {
+      "command": "bash -n scripts/dev.sh; sh -n deploy/web-preview/deploy.sh",
+      "exit_code": 0,
+      "note": "Shell syntax checks passed; scripts were not executed."
+    }
+  ],
+  "findings": [
+    {
+      "id": "SECR7-001",
+      "severity": "High",
+      "component": "MFA recovery and application sessions",
+      "file": "backend/app/src/main/java/com/matbakhy/app/mfa/MfaAdminController.java",
+      "line": 101,
+      "title": "MFA reset leaves existing application web sessions authorized",
+      "scenario": "An attacker holds a previously stepped-up Spring web session. An administrator resets the victim's MFA, removing OTP credentials and ending Keycloak sessions. The attacker continues calling protected APIs with the existing application cookie under REQUIRED.",
+      "expected": "Recovery invalidates application sessions and their old assurance, forcing fresh authentication and enrolment.",
+      "actual": "Reset only calls Keycloak logout. Spring sessions are neither deleted nor checked against a revocation generation. WebAccountFilter reuses stored OIDC claims, and REQUIRED accepts their old MFA assertion without checking token expiry or reset time. Activity can keep the application session alive beyond the documented access-token lifetime.",
+      "evidence": "MfaAdminController.java:97-107 removes credentials, logs out at Keycloak and returns sessionsEnded=true. WebAccountFilter.java:31-35 maps user.getClaims() from the stored login on each request. MfaEnforcementFilter.java:42-44 checks only policy and assertsMfa. No application-session invalidation or back-channel logout integration was found.",
+      "suggested_fix": "Invalidate all affected Spring sessions on reset and disabling, or enforce a server-side authentication generation on every request. Integrate provider logout/revocation events where applicable and report session termination accurately.",
+      "repro_test": "Runtime test proposed, not executed: establish an MFA web session, reset that account from another administrator, then reuse its cookie against /api/v1/me/addresses under REQUIRED. Require rejection immediately and after the original ID token expires."
+    },
+    {
+      "id": "SECR7-002",
+      "severity": "Medium",
+      "component": "DISABLED policy and Keycloak flows",
+      "file": "backend/app/src/main/java/com/matbakhy/app/mfa/MfaController.java",
+      "line": 95,
+      "title": "DISABLED blocks preference enablement but not MFA enrolment or use",
+      "scenario": "All categories applicable to a user are DISABLED. The user directly visits /oauth2/authorization/keycloak?stepUp=true instead of using the hidden UI controls.",
+      "expected": "D18 DISABLED makes enrolment and MFA use unavailable while preserving existing factors and independent required controls.",
+      "actual": "Only preference enablement checks availability. The authorization resolver unconditionally requests MFA for stepUp=true, and the shared Keycloak flow runs OTP or enrolment without consulting category policy. Security settings also return the step-up and account-console URLs while disabled.",
+      "evidence": "MfaController.java:71-75 always returns both URLs; :94-97 restricts only preference enablement. SecurityConfiguration.java stepUpResolver checks only the stepUp parameter. infra/identity/matbakhy-realm.json:269-283 makes level-2 OTP REQUIRED with no application-policy condition; the enrolment test documents the no-factor path.",
+      "suggested_fix": "Enforce availability in supported provider enrolment/use flows as well as application entry points, while retaining separate mandatory assurance for privileged operations. Do not rely on hiding UI controls.",
+      "repro_test": "Runtime test proposed, not executed: set all applicable policies DISABLED, invoke the direct step-up URL with a synthetic account lacking OTP, and attempt enrolment. Repeat with an enrolled account and direct account-console access."
+    },
+    {
+      "id": "SECR7-003",
+      "severity": "Medium",
+      "component": "Administrative recovery audit",
+      "file": "backend/app/src/main/java/com/matbakhy/app/mfa/MfaAdminController.java",
+      "line": 97,
+      "title": "Partial reset failures can remove factors without a durable reset audit",
+      "scenario": "Credential deletion succeeds, then another deletion or Keycloak logout fails. Alternatively, the final audit write fails after provider changes have completed.",
+      "expected": "Every destructive recovery attempt durably records actor, target, reason, completed changes and session-termination outcome, including partial failures.",
+      "actual": "The only success audit occurs after all remote operations. There is no attempt record or failure handler. A dependency exception can therefore leave OTP removed with no reset audit, and potentially leave provider sessions active.",
+      "evidence": "MfaAdminController.java:97-101 performs irreversible remote operations before audit.record at :105-106. KeycloakAdmin.deleteCredential/logout throw on unsuccessful responses. The shared denial audit handles AccessDeniedException, not these dependency failures.",
+      "suggested_fix": "Persist a reset attempt before destructive calls, then record completion or partial failure with removed-factor count and logout outcome. Use a durable retry/reconciliation mechanism for incomplete session termination.",
+      "repro_test": "Fault-injection test proposed, not executed: allow credential deletion, fail logout, and verify a durable partial-failure audit with actor, target and reason. Also simulate failure of the final audit write."
+    }
+  ]
+}

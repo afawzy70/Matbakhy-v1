@@ -953,6 +953,391 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/TransitionCommand"
+  /api/v1/orders/{orderId}/payment/transfer-report:
+    post:
+      operationId: postOrdersPaymentTransferReport
+      tags:
+        - orders
+      summary: "API-100: the customer reports a sent deposit (D16); idempotent; not payment"
+      description: Moves WAITING_FOR_DEPOSIT to CUSTOMER_TRANSFER_REPORTED once; repeated or concurrent reports change nothing more. Another customer's order is 404; a COD order is 409.
+      x-matbakhy-id: API-100
+      x-permission: ORDER_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentTransferReport"
+  /api/v1/cook/orders/{orderId}/payment/receipt:
+    post:
+      operationId: postCookOrdersPaymentReceipt
+      tags:
+        - cook
+      summary: "API-101: the kitchen reports the deposit arrived in its own account (D16); not a bank confirmation"
+      description: Requires the current payment version and the exact deposit amount. Preparation of a deposit order is refused until this report exists. Another kitchen's order is 404.
+      x-matbakhy-id: API-101
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentReceiptReport"
+  /api/v1/cook/payment-profile:
+    get:
+      operationId: getCookPaymentProfile
+      tags:
+        - cook
+      summary: "API-102: own kitchen's payment terms (D16)"
+      description: Deposit share, COD cap, recipient and its approval status.
+      x-matbakhy-id: API-102
+      x-permission: COOK
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPaymentProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+    put:
+      operationId: putCookPaymentProfile
+      tags:
+        - cook
+      summary: "API-103: set own payment terms (D16); a new or changed recipient needs staff approval again"
+      description: Optimistic version. The recipient is offered to customers only after staff approval.
+      x-matbakhy-id: API-103
+      x-permission: COOK
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPaymentProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KitchenPaymentProfileUpdate"
+  /api/v1/ops/kitchens/{kitchenId}/payment-recipient/approval:
+    post:
+      operationId: postOpsKitchensPaymentRecipientApproval
+      tags:
+        - ops
+      summary: "API-104: approve a kitchen's payment recipient (finance.verify, recent MFA, reason; audited)"
+      description: Staff check the recipient against the approved cook; never for their own kitchen.
+      x-matbakhy-id: API-104
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: kitchenId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KitchenPaymentProfile"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReasonedVersion"
+  /api/v1/cook/orders/{orderId}/payment/problem:
+    post:
+      operationId: postCookOrdersPaymentProblem
+      tags:
+        - cook
+      summary: "API-105: kitchen reports deposit not received or a different amount (D16)"
+      description: Moves the payment to DISPUTED; preparation stays blocked; ops see it in their queue.
+      x-matbakhy-id: API-105
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentProblemReport"
+  /api/v1/ops/payments:
+    get:
+      operationId: getOpsPayments
+      tags:
+        - ops
+      summary: "API-106: payments needing attention (D16)"
+      description: DISPUTED, RECONCILE_PENDING or REFUND_OWED, newest first, at most 100.
+      x-matbakhy-id: API-106
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: state
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [DISPUTED, RECONCILE_PENDING, REFUND_OWED]
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentQueue"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/orders/{orderId}/payment/decision:
+    post:
+      operationId: postOpsOrdersPaymentDecision
+      tags:
+        - ops
+      summary: "API-107: decide an ended order's open payment (REFUND_OWED or CLOSED_NO_FUNDS; reason; audited)"
+      description: Only after the order has ended. No decision marks money as received.
+      x-matbakhy-id: API-107
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentDecision"
+  /api/v1/cook/orders/{orderId}/payment/refund:
+    post:
+      operationId: postCookOrdersPaymentRefund
+      tags:
+        - cook
+      summary: "API-108: kitchen reports the refund it sent, with the transfer reference (D16)"
+      description: The kitchen's statement, not a bank confirmation.
+      x-matbakhy-id: API-108
+      x-permission: COOK_OWNER
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema: *a1
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentView"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRefundReport"
+  /api/v1/ops/payment-recipients:
+    get:
+      operationId: getOpsPaymentRecipients
+      tags:
+        - ops
+      summary: "API-109: kitchen payment recipients waiting for approval (D16)"
+      description: At most 100. Approve with API-104 after checking the recipient against the approved cook.
+      x-matbakhy-id: API-109
+      x-permission: FINANCE_VERIFY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PendingRecipients"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/activity:
+    post:
+      operationId: postActivity
+      tags:
+        - discovery
+      summary: "API-110: organic browsing activity (D17, MB-054); visitors allowed; 202 either way"
+      description: >-
+        Up to 50 events per request. Each counts once per visitor, kind, subject and Cairo day; the visitor id is a random
+        per-session value stored only as a per-day keyed hash. Declared crawlers, unknown subjects and events beyond the
+        per-visitor daily cap are dropped without saying so. Returns no data. Never used for ranking, targeting or billing.
+      x-matbakhy-id: API-110
+      x-permission: PUBLIC
+      x-implemented: true
+      security: []
+      responses:
+        "202":
+          description: Accepted (whether or not each event counted)
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityBatch"
+  /api/v1/cook/insights:
+    get:
+      operationId: getCookInsights
+      tags:
+        - cook
+      summary: "API-111: the cook's own free activity and sales report (D17, MB-054); no profit claim"
+      description: >-
+        Own kitchen only (the kitchen comes from the caller). Cairo dates, default the last 30 days, at most 366 days.
+        Activity is distinct visitors per day; orders, capacity and money come from server records. Gross sales, paid or
+        verified refunds and the known net are separate; the net is not profit.
+      x-matbakhy-id: API-111
+      x-permission: COOK
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CookInsights"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
   /api/v1/orders/{orderId}/cancellation-requests:
     post:
       operationId: postOrdersCancellationRequests
@@ -3199,6 +3584,161 @@ paths:
           $ref: "#/components/responses/Error"
         5XX:
           $ref: "#/components/responses/Error"
+  /api/v1/me/security:
+    get:
+      operationId: getMeSecurity
+      tags:
+        - account
+      summary: "API-112: MFA state of the signed-in account: applicable categories and policies, effective mode, own preference, whether this session passed MFA, step-up path and the provider's account-management link"
+      description: "MFA state of the signed-in account: applicable categories and policies, effective mode, own preference, whether this session passed MFA, step-up path and the provider's account-management link"
+      x-matbakhy-id: API-112
+      x-permission: AUTHENTICATED
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecuritySettings"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/me/security/mfa:
+    put:
+      operationId: putMeSecurityMfa
+      tags:
+        - account
+      summary: "API-113: enabled: turn MFA on (needs a session that passed MFA) or off (needs recent MFA; refused when policy is REQUIRED; unavailable when DISABLED)"
+      description: "enabled: turn MFA on (needs a session that passed MFA) or off (needs recent MFA; refused when policy is REQUIRED; unavailable when DISABLED)"
+      x-matbakhy-id: API-113
+      x-permission: SELF
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SecuritySettings"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaPreferenceRequest"
+  /api/v1/ops/security/mfa-policy:
+    get:
+      operationId: getOpsSecurityMfaPolicy
+      tags:
+        - operations
+      summary: "API-114: MFA policy per account category (CUSTOMER, KITCHEN, STAFF)"
+      description: MFA policy per account category (CUSTOMER, KITCHEN, STAFF)
+      x-matbakhy-id: API-114
+      x-permission: SECURITY_MFA_POLICY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaPolicyList"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+  /api/v1/ops/security/mfa-policy/{category}:
+    put:
+      operationId: putOpsSecurityMfaPolicyByCategory
+      tags:
+        - operations
+      summary: "API-115: mode DISABLED, OPTIONAL or REQUIRED, expectedVersion, reason; needs recent MFA; audited"
+      description: mode DISABLED, OPTIONAL or REQUIRED, expectedVersion, reason; needs recent MFA; audited
+      x-matbakhy-id: API-115
+      x-permission: SECURITY_MFA_POLICY
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+            enum:
+              - CUSTOMER
+              - KITCHEN
+              - STAFF
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaPolicy"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaPolicyUpdateRequest"
+  /api/v1/ops/accounts/{accountId}/mfa-reset:
+    post:
+      operationId: postOpsAccountsMfaReset
+      tags:
+        - operations
+      summary: "API-116: reason (at least 10 characters); needs recent MFA; removes the account's OTP credentials at the identity provider and ends its sessions; never returns a secret; no self-reset; audited"
+      description: reason (at least 10 characters); needs recent MFA; removes the account's OTP credentials at the identity provider and ends its sessions; never returns a secret; no self-reset; audited
+      x-matbakhy-id: API-116
+      x-permission: SECURITY_MFA_RESET
+      x-implemented: true
+      security:
+        - sessionCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MfaResetResult"
+        4XX:
+          $ref: "#/components/responses/Error"
+        5XX:
+          $ref: "#/components/responses/Error"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MfaResetRequest"
   /api/v1/ops/staff/{userId}/grants:
     post:
       operationId: postOpsStaffGrants
@@ -3868,8 +4408,8 @@ components:
           format: date-time
     CaseCategory:
       type: string
-      enum: [LATE, MISSING_ITEM, QUALITY, FOOD_SAFETY, CASH, HANDOVER, OTHER, CANCELLATION_REQUEST]
-      description: CANCELLATION_REQUEST cases are created only through API-028. FOOD_SAFETY cases are CRITICAL and escalated at creation.
+      enum: [LATE, MISSING_ITEM, QUALITY, FOOD_SAFETY, CASH, HANDOVER, OTHER, CANCELLATION_REQUEST, PAYMENT]
+      description: CANCELLATION_REQUEST cases are created only through API-028. PAYMENT cases are opened by the system (HIGH, one open per order) when a deposit is disputed, awaits reconciliation or a refund is owed; customers cannot open them. FOOD_SAFETY cases are CRITICAL and escalated at creation.
     CaseState:
       type: string
       enum: [OPEN, IN_PROGRESS, WAITING_ON_CUSTOMER, RESOLVED, CLOSED]
@@ -4505,6 +5045,11 @@ components:
           oneOf:
             - $ref: "#/components/schemas/CustomerFulfillmentContact"
             - type: "null"
+        payment:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentView"
+            - type: "null"
+          description: Payment terms and state (D16), kept apart from the order state; null for orders placed before payment records existed.
     CustomerFulfillmentContact:
       type: object
       additionalProperties: false
@@ -4818,6 +5363,75 @@ components:
       enum:
         - DELIVERY
         - PICKUP
+    SecuritySettings:
+      type: object
+      additionalProperties: false
+      required: [categories, policy, effectiveMode, enabled, required, available, verifiedInSession, stepUpPath, accountManagementUrl, canManagePolicy, canResetMfa]
+      properties:
+        categories:
+          type: array
+          items: {type: string, enum: [CUSTOMER, KITCHEN, STAFF]}
+        policy:
+          type: object
+          description: Policy mode for each category that applies to this account
+          additionalProperties: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        effectiveMode: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        enabled: {type: boolean, description: The user's own preference (kept while the policy makes it irrelevant)}
+        required: {type: boolean, description: MFA must be asserted on the session for protected functions}
+        available: {type: boolean, description: False only when every applicable category is DISABLED}
+        verifiedInSession: {type: boolean, description: The current token/session carries the identity provider's MFA assertion}
+        stepUpPath: {type: string, description: Web path that starts a Keycloak step-up (acr mfa)}
+        accountManagementUrl: {type: string, description: Keycloak account console page for enrolling or removing the authenticator}
+        canManagePolicy: {type: boolean, description: The account holds security.mfa_policy}
+        canResetMfa: {type: boolean, description: The account holds security.mfa_reset}
+    MfaPreferenceRequest:
+      type: object
+      additionalProperties: false
+      required: [enabled]
+      properties:
+        enabled: {type: boolean}
+    MfaPolicy:
+      type: object
+      additionalProperties: false
+      required: [category, mode, updatedAt, version]
+      properties:
+        category: {type: string, enum: [CUSTOMER, KITCHEN, STAFF]}
+        mode: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        reason: {type: [string, "null"]}
+        updatedBy: {type: [string, "null"], format: uuid}
+        updatedAt: {type: string, format: date-time}
+        version: {type: integer, format: int64}
+    MfaPolicyList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MfaPolicy"
+    MfaPolicyUpdateRequest:
+      type: object
+      additionalProperties: false
+      required: [mode, expectedVersion, reason]
+      properties:
+        mode: {type: string, enum: [DISABLED, OPTIONAL, REQUIRED]}
+        expectedVersion: {type: integer, format: int64}
+        reason: {type: string, minLength: 3, maxLength: 500}
+    MfaResetRequest:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason: {type: string, minLength: 10, maxLength: 500}
+    MfaResetResult:
+      type: object
+      additionalProperties: false
+      required: [accountId, removedFactors, sessionsEnded]
+      properties:
+        accountId: {type: string, format: uuid}
+        removedFactors: {type: integer}
+        sessionsEnded: {type: boolean}
     Grant:
       type: object
       additionalProperties: false
@@ -4849,6 +5463,8 @@ components:
             - config.read
             - config.write
             - integration.ops
+            - security.mfa_policy
+            - security.mfa_reset
         grantedAt: *a6
         expiresAt:
           type:
@@ -5186,7 +5802,8 @@ components:
         type:
           type: string
           enum: [ORDER_PLACED, ORDER_ACCEPTED, ORDER_PREPARING, ORDER_READY, ORDER_OUT_FOR_DELIVERY, ORDER_COMPLETED,
-                 ORDER_REJECTED, ORDER_EXPIRED, ORDER_DELIVERY_FAILED, ORDER_CANCELLED]
+                 ORDER_REJECTED, ORDER_EXPIRED, ORDER_DELIVERY_FAILED, ORDER_CANCELLED, PAYMENT_CUSTOMER_TRANSFER_REPORTED,
+                 PAYMENT_KITCHEN_RECEIPT_REPORTED, PAYMENT_DISPUTED, PAYMENT_REFUND_OWED, PAYMENT_REFUNDED]
         orderId:
           type: [string, "null"]
           format: uuid
@@ -5481,6 +6098,11 @@ components:
           oneOf:
             - $ref: "#/components/schemas/KitchenFulfillmentContact"
             - type: "null"
+        payment:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentView"
+            - type: "null"
+          description: Payment terms and state (D16), kept apart from the order state; null for orders placed before payment records existed.
       description: Monetary amounts are immutable snapshots from placement.
     OutboxStatus:
       type: object
@@ -5708,6 +6330,338 @@ components:
           format: uri
         alt:
           type: string
+    PaymentMethod:
+      type: string
+      enum: [COD, DEPOSIT]
+      description: COD where the kitchen allows it for the total; DEPOSIT paid by the customer directly to the kitchen's approved recipient (D16). Matbakhy never holds the money.
+    PaymentRecipient:
+      type: object
+      additionalProperties: false
+      required: [method, identifier, name]
+      properties:
+        method:
+          type: string
+          enum: [INSTAPAY, MOBILE_WALLET, BANK_TRANSFER]
+        identifier:
+          type: string
+          description: The kitchen's approved, intentionally public payment identifier
+        name:
+          type: string
+    QuotePaymentTerms:
+      type: object
+      additionalProperties: false
+      required: [method, depositBps, deposit, remainder, recipient]
+      properties:
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+        depositBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        deposit:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        remainder:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+    PaymentState:
+      type: string
+      enum: [NOT_REQUIRED, WAITING_FOR_DEPOSIT, CUSTOMER_TRANSFER_REPORTED, KITCHEN_RECEIPT_REPORTED, DISPUTED, RECONCILE_PENDING, EXPIRED, REFUND_OWED, REFUNDED, CLOSED_NO_FUNDS]
+      description: CUSTOMER_TRANSFER_REPORTED is the customer's statement, not payment. KITCHEN_RECEIPT_REPORTED is the kitchen's statement after checking its own account, not a bank confirmation.
+    PaymentView:
+      type: object
+      additionalProperties: false
+      required: [method, state, deposit, remainder, recipient, depositExpiresAt, version]
+      properties:
+        method:
+          $ref: "#/components/schemas/PaymentMethod"
+        state:
+          $ref: "#/components/schemas/PaymentState"
+        deposit:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        remainder:
+          $ref: "#/components/schemas/NonNegativeMoney"
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+        depositExpiresAt:
+          type:
+            - string
+            - "null"
+          format: date-time
+        version:
+          type: integer
+          minimum: 0
+    PaymentTransferReport:
+      type: object
+      additionalProperties: false
+      properties:
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+          description: Optional transfer reference from the customer's app; never a card or account secret
+    PaymentReceiptReport:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, amountMinor]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        amountMinor:
+          type: integer
+          minimum: 1
+          description: Must equal the deposit; a different amount or "not received" is reported through the mismatch path (MB-052)
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+    KitchenPaymentProfile:
+      type: object
+      additionalProperties: false
+      required: [depositBps, codMaxTotalMinor, recipient, recipientStatus, version]
+      properties:
+        depositBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        codMaxTotalMinor:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+        recipientStatus:
+          type: string
+          enum: [NONE, APPROVED]
+        version:
+          type: integer
+          minimum: 0
+    KitchenPaymentProfileUpdate:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, depositBps]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        depositBps:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        codMaxTotalMinor:
+          type:
+            - integer
+            - "null"
+          minimum: 0
+        recipient:
+          oneOf:
+            - $ref: "#/components/schemas/PaymentRecipient"
+            - type: "null"
+    ReasonedVersion:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, reason]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reason:
+          type: string
+          minLength: 10
+          maxLength: 500
+    PaymentProblemReport:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, kind]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        kind:
+          type: string
+          enum: [NOT_RECEIVED, AMOUNT_MISMATCH]
+        amountMinor:
+          type: integer
+          minimum: 0
+          description: Required for AMOUNT_MISMATCH (the amount the kitchen saw)
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+    PaymentQueue:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [orderId, publicNumber, kitchenId, orderState, state, deposit, lastReason, updatedAt, version]
+            properties:
+              orderId: *a1
+              publicNumber:
+                type: string
+              kitchenId: *a1
+              orderState:
+                $ref: "#/components/schemas/OrderState"
+              state:
+                $ref: "#/components/schemas/PaymentState"
+              deposit:
+                $ref: "#/components/schemas/NonNegativeMoney"
+              lastReason:
+                type:
+                  - string
+                  - "null"
+              updatedAt:
+                type: string
+                format: date-time
+              version:
+                type: integer
+                minimum: 0
+    PaymentDecision:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, outcome, reason]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        outcome:
+          type: string
+          enum: [REFUND_OWED, CLOSED_NO_FUNDS]
+        reason:
+          type: string
+          minLength: 10
+          maxLength: 500
+    PaymentRefundReport:
+      type: object
+      additionalProperties: false
+      required: [expectedVersion, reference]
+      properties:
+        expectedVersion:
+          type: integer
+          minimum: 0
+        reference:
+          type: string
+          minLength: 1
+          maxLength: 64
+    ActivityEvent:
+      type: object
+      additionalProperties: false
+      required: [kind, subjectId]
+      properties:
+        kind:
+          type: string
+          enum: [MEAL_IMPRESSION, MEAL_VIEW, KITCHEN_VIEW, ADD_TO_CART]
+        subjectId:
+          type: string
+          format: uuid
+          description: The meal (impression, view, add to cart) or the kitchen (kitchen view)
+    ActivityBatch:
+      type: object
+      additionalProperties: false
+      required: [visitorId, events]
+      properties:
+        visitorId:
+          type: string
+          pattern: "^[A-Za-z0-9-]{8,64}$"
+          description: Random per browser session; never an account, device or advertising id
+        events:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            $ref: "#/components/schemas/ActivityEvent"
+    CookInsights:
+      type: object
+      additionalProperties: false
+      required: [kitchenId, from, to, timezone, activity, orders, capacity, money, definitions]
+      properties:
+        kitchenId:
+          type: string
+          format: uuid
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        timezone:
+          type: string
+        activity:
+          type: object
+          additionalProperties: false
+          required: [mealImpressions, mealViews, kitchenViews, addToCart]
+          properties:
+            mealImpressions: {type: integer, minimum: 0}
+            mealViews: {type: integer, minimum: 0}
+            kitchenViews: {type: integer, minimum: 0}
+            addToCart: {type: integer, minimum: 0}
+        orders:
+          type: object
+          additionalProperties: false
+          required: [quotes, placed, completed, cancelled, rejected, expired, deliveryFailed, repeatCustomers]
+          properties:
+            quotes: {type: integer, minimum: 0}
+            placed: {type: integer, minimum: 0}
+            completed: {type: integer, minimum: 0}
+            cancelled: {type: integer, minimum: 0}
+            rejected: {type: integer, minimum: 0}
+            expired: {type: integer, minimum: 0}
+            deliveryFailed: {type: integer, minimum: 0}
+            repeatCustomers: {type: integer, minimum: 0}
+        capacity:
+          type: object
+          additionalProperties: false
+          required: [portionsOffered, portionsTaken]
+          properties:
+            portionsOffered: {type: integer, minimum: 0}
+            portionsTaken: {type: integer, minimum: 0}
+        money:
+          type: object
+          additionalProperties: false
+          required: [grossSales, refunds, netKnown]
+          properties:
+            grossSales:
+              $ref: "#/components/schemas/NonNegativeMoney"
+            refunds:
+              $ref: "#/components/schemas/NonNegativeMoney"
+            netKnown:
+              $ref: "#/components/schemas/Money"
+        definitions:
+          type: array
+          items:
+            type: string
+    PendingRecipients:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [kitchenId, kitchenName, recipient, version]
+            properties:
+              kitchenId: *a1
+              kitchenName:
+                type: string
+              recipient:
+                $ref: "#/components/schemas/PaymentRecipient"
+              version:
+                type: integer
+                minimum: 0
     PlaceOrderRequest:
       type: object
       additionalProperties: false
@@ -6412,7 +7366,7 @@ components:
       type: object
       additionalProperties: false
       description: Response for API-001.
-      required: [orderingAvailable, orderLimits]
+      required: [orderingAvailable, orderLimits, environment]
       properties:
         orderingAvailable:
           type: boolean
@@ -6421,6 +7375,20 @@ components:
           oneOf:
             - $ref: "#/components/schemas/OrderLimits"
             - type: "null"
+        environment:
+          $ref: "#/components/schemas/RuntimeEnvironment"
+    RuntimeEnvironment:
+      type: object
+      additionalProperties: false
+      required: [name, demo]
+      description: The deployment the API runs in. Clients show a persistent notice when demo is true.
+      properties:
+        name:
+          type: string
+          enum: [LOCAL, CI, PREVIEW, STAGING, PRODUCTION]
+        demo:
+          type: boolean
+          description: True in every environment except PRODUCTION. Data is synthetic or test data, deposits and payments are simulated, and nothing real is sent.
     OrderLimits:
       type: object
       additionalProperties: false
@@ -6557,7 +7525,9 @@ components:
           type: string
           format: uuid
           description: Required when fulfillmentMode is DELIVERY
-      description: No client price, tax, fee or commission fields are accepted.
+        paymentMethod:
+          $ref: "#/components/schemas/PaymentMethod"
+      description: No client price, tax, fee or commission fields are accepted. paymentMethod defaults to COD (D16).
     QuoteResponse:
       type: object
       additionalProperties: false
@@ -6573,6 +7543,7 @@ components:
         - cancellationPolicyVersion
         - acceptanceDeadlinePreview
         - warnings
+        - payment
       properties:
         quoteId: *a1
         expiresAt:
@@ -6604,6 +7575,8 @@ components:
           type: array
           items:
             type: string
+        payment:
+          $ref: "#/components/schemas/QuotePaymentTerms"
     RatingSummary:
       type: object
       additionalProperties: false

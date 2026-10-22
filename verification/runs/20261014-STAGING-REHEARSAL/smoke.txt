@@ -1,0 +1,10 @@
+ok: customer web served over HTTPS with security headers and the demo notice
+ok: operations web served over HTTPS with the demo notice
+ok: API reachable; public configuration reports the PREVIEW demo environment
+ok: discovery served
+ok: profile, staff and kitchen APIs refuse a request without a session
+ok: actuator and metrics not published
+ok: identity issuer https://id.mb.localhost/realms/matbakhy
+ok: Keycloak admin console and master realm not published
+ok: sign-in redirects to the identity provider and back to the API over HTTPS
+PASS: web preview smoke test for mb.localhost

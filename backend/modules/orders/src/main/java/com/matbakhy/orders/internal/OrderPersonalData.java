@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 /**
  * Account erasure for orders and reviews (MB-039). Erasure waits until the customer has no active order. Terminal
  * orders keep amounts, items, events and stock history; only the contact and address snapshots and the free-text note
- * are replaced (the database trigger allows nothing else). Review text is removed; the rating stays.
+ * are replaced (the database trigger allows nothing else). Review text is removed; the rating stays. A customer's
+ * deposit transfer references are cleared (V27 allows exactly that on the append-only payment history).
  */
 @Component
 class OrderPersonalData implements PersonalDataEraser {
@@ -42,6 +43,11 @@ class OrderPersonalData implements PersonalDataEraser {
                        fulfillment_note = NULL, personal_data_erased_at = now()
                 WHERE customer_id = ? AND personal_data_erased_at IS NULL""", accountId);
         int reviews = jdbc.update("UPDATE review SET text = NULL WHERE customer_id = ? AND text IS NOT NULL", accountId);
-        return Map.of("orderSnapshots", orders, "reviewTexts", reviews);
+        // D16: the transfer reference the customer typed; the kitchen's and staff's payment history is not theirs to erase.
+        int references = jdbc.update("""
+                UPDATE payment_event SET reference = NULL
+                WHERE actor_type = 'CUSTOMER' AND reference IS NOT NULL
+                  AND order_id IN (SELECT id FROM customer_order WHERE customer_id = ?)""", accountId);
+        return Map.of("orderSnapshots", orders, "reviewTexts", reviews, "paymentReferences", references);
     }
 }

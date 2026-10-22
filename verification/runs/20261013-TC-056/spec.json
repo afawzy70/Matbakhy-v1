@@ -1,0 +1,35 @@
+{
+  "run_id": "20261013-TC-056",
+  "story_id": "MB-039",
+  "phase": "P08",
+  "checks": [
+    {
+      "id": "LOG-REDACTION",
+      "name": "LogRedactionIntegrationTest on PostgreSQL and the S3 emulator, ECS JSON log format",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp -pl app -am test -Dtest=LogRedactionIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-056",
+      "observed": "With distinctive synthetic values and the deployed ECS JSON log format: an OTP flow (wrong then right code), an address with recipient and phone, a push device token, a bearer token, a delivery order with wrong and right handover codes, failing email/push providers that echo the token, and an unexpected failure quoting personal data leave none of the name, email, phone (local, E.164, digits), street, recipient, push token, bearer token, OTP or handover code in the captured logs; provider-echoed text is stored and logged as PROVIDER_ERROR; one request ID traces the order to its later provider failure. A second test: a private document's content marker and file name (signed upload), a kitchen deposit recipient account and owner name, a customer transfer reference and an anonymous activity visitor id appear neither in the logs nor in any metric name or tag in the registry. Mutation-checked: printing the visitor id fails the test."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "TC-056 at the local test level. Self-review, not independent review. The deployed log pipeline check (LOG-01) remains NOT_RUN until an authorized preview exists (MB-040). MB-039 stays IN_PROGRESS (TC-055 retention under O06; TC-057 restore on staging)."
+    ]
+  },
+  "open_defects": []
+}

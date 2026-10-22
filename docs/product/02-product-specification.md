@@ -25,7 +25,7 @@ Proposed launch is a controlled pilot in owner-selected Egyptian service zones. 
 | Discovery | Browse by service zone, meal/cook name, category, price and available date/slot; sort; pagination | Recommendations, full social feed, video, complex personalization |
 | Trust | Cook profile, operational approval label, ingredient/allergen declarations, reviews of completed orders | Claims of certified food safety, automatic verification |
 | Catalogue | Meal title/description, photos, portion details, price, ingredients/allergens, prep/availability | Complex option bundles, subscriptions, nutrition computation |
-| Basket/checkout | One cook/slot; server quote; address/serviceability; delivery/pickup; cash; order confirmation | Multi-cook basket, coupons, loyalty, wallets, tips |
+| Basket/checkout | One cook/slot; server quote; address/serviceability; delivery/pickup; eligible COD **or manual deposit directly to approved kitchen payment recipient via InstaPay/mobile wallet/bank transfer**; kitchen-reported receipt, then separate kitchen acceptance | Multi-cook basket, coupons, loyalty, **Matbakhy-owned wallets**, automated gateways and platform-held funds |
 | Order lifecycle | Pending acceptance, accepted, preparing, ready, delivery/pickup, completed; cancellations and failure reasons | Live GPS, courier dispatch optimizer |
 | Cook work | Application, verification status, catalogue, capacity, order action queue, statement | Cook native app, advanced business intelligence |
 | Backoffice | Approvals, moderation, queues, order timeline, exceptions, support, policies, audit, finance | Hidden impersonation, arbitrary SQL/report builder |
@@ -76,3 +76,7 @@ Every required backlog story DONE with real evidence; all release-critical scena
 ## Pilot measures (targets, not existing results)
 
 Track checkout conversion, successful order submissions excluding validation failures, acceptance latency, rejection/expiry rate, fulfillment completion, stock conflicts, support cases per order, cash variance and repeat purchase. Define cohort/time window and exclude synthetic/staff accounts. Proposed operating targets: 99% successful valid order submissions, no overselling or duplicate orders, no unexplained ledger imbalance; other business KPI targets are owner decisions after pilot baseline.
+
+## MVP payment update (owner approved 2026-10-13)
+
+For the initial controlled MVP, existing Egyptian payment methods are supported as **manual direct-to-kitchen deposit**, with COD for eligible smaller orders. No built-in Matbakhy wallet or platform custody. A customer's claim of transfer does not satisfy payment; the kitchen confirms funds arrived by checking its own payment account, and the system records **kitchen-reported confirmation**, not bank verification. Deposit-required orders may not start preparation before confirmation AND kitchen acceptance. Build customer-web, iOS, Android and cook/backoffice workflows consistently. Document and test exceptions, refunds and payment mismatches. Any real-money launch is gated by written legal/consumer, food-business and recipient-account/provider compliance review, so this product direction does not authorize accepting live transfers. See [MVP payment design](../strategy/mvp-direct-deposit-payment.md).

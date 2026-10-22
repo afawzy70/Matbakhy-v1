@@ -1,0 +1,4 @@
+
+> @matbakhy/api-client@0.1.0 typecheck /home/aiagent/workspaces/agents/codex-qa/packages/api-client
+> tsc -p tsconfig.json
+

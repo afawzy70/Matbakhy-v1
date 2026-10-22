@@ -1,4 +1,4 @@
-import { decideAdd, loadBasket, loadPending, saveBasket, savePending, type Basket, type PendingPlacement } from "./basket";
+import { bindShopping, decideAdd, loadBasket, loadPending, saveBasket, savePending, type Basket, type PendingPlacement } from "./basket";
 import { createMobileApi } from "./mobileApi";
 import { place, recover } from "./placement";
 import { Session } from "./session";
@@ -12,7 +12,10 @@ jest.mock("expo-secure-store", () => ({
 }));
 jest.mock("expo-crypto", () => ({ randomUUID: () => jest.requireActual<{ randomUUID: () => string }>("crypto").randomUUID() }));
 
-beforeEach(() => mockStore.clear());
+beforeEach(async () => {
+  mockStore.clear();
+  await bindShopping(null);
+});
 
 const target = { kitchenId: "k1", slotId: "s1", slotStartsAt: "2026-10-13T10:00:00Z", modes: ["DELIVERY"] };
 const line = (mealId: string, quantity = 1) => ({ mealId, title: mealId, quantity });
@@ -83,6 +86,120 @@ describe("placement that cannot duplicate an order (BR-023, TC-049)", () => {
     await savePending(pending);
     const refused = server(() => json(409, { code: "QUOTE_EXPIRED" }));
     expect(await place(apiFor(refused.fetchImpl), pending)).toEqual({ kind: "rejected", code: "QUOTE_EXPIRED" });
+    expect(await loadPending()).toBeNull();
+  });
+
+  it("keeps the stored keys when the server asks for a second factor and sends the same keys on the explicit retry", async () => {
+    await saveBasket({ ...target, lines: [line("m1")] });
+    await savePending(pending);
+    const stepUp = server(() => json(403, { code: "STEP_UP_REQUIRED" }));
+    expect(await place(apiFor(stepUp.fetchImpl), pending)).toEqual({ kind: "stepUp" });
+    expect(await loadPending()).toEqual({ ...pending, awaitingExplicitRetry: true });
+    expect(await loadBasket()).not.toBeNull();
+    // Nothing is replayed by itself: the retry is the customer's explicit action and reuses the very same keys.
+    const ok = server(() => json(201, { id: "order-1" }));
+    expect(await place(apiFor(ok.fetchImpl), pending)).toEqual({ kind: "placed", orderId: "order-1" });
+    expect(ok.calls[0]?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
+    expect(JSON.parse(ok.calls[0]?.body ?? "{}")).toMatchObject({ clientRequestId: pending.clientRequestId });
+  });
+
+  it("a refused placement is never re-sent by a focus or restart check, only by the explicit retry, with the same keys", async () => {
+    await savePending({ ...pending, awaitingExplicitRetry: true });
+    const quiet = server(() => {
+      throw new Error("no request may be sent without the explicit retry");
+    });
+    expect(await recover(apiFor(quiet.fetchImpl))).toEqual({ kind: "stepUp" });
+    expect(quiet.calls).toHaveLength(0);
+    const answers = server((req) => (req.method === "GET" ? json(404, { code: "NOT_FOUND" }) : json(201, { id: "order-7" })));
+    expect(await recover(apiFor(answers.fetchImpl), true)).toEqual({ kind: "placed", orderId: "order-7" });
+    const post = answers.calls.find((c) => c.method === "POST");
+    expect(post?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
+    expect(JSON.parse(post?.body ?? "{}")).toMatchObject({ clientRequestId: pending.clientRequestId });
+    expect(await loadPending()).toBeNull();
+  });
+
+  it("a late answer after an account switch only ever touches the previous person's own keys", async () => {
+    await bindShopping("subject-a");
+    await savePending(pending);
+    const otherPending: PendingPlacement = { ...pending, clientRequestId: "other-request", idempotencyKey: "other-key" };
+    // Account A's request is still in flight when B signs in; B starts a pending order of their own before A's answer arrives.
+    const late = server(async () => {
+      await bindShopping("subject-b");
+      await savePending(otherPending);
+      return json(403, { code: "STEP_UP_REQUIRED" });
+    });
+    expect(await place(apiFor(late.fetchImpl), pending)).toEqual({ kind: "stepUp" });
+    expect(await loadPending()).toEqual(otherPending);
+    await bindShopping("subject-a");
+    expect(await loadPending()).toEqual({ ...pending, awaitingExplicitRetry: true });
+    const placed = server(async () => {
+      await bindShopping("subject-b");
+      return json(201, { id: "order-a" });
+    });
+    expect(await place(apiFor(placed.fetchImpl), pending)).toEqual({ kind: "placed", orderId: "order-a" });
+    expect(await loadPending()).toEqual(otherPending);
+    await bindShopping("subject-a");
+    expect(await loadPending()).toBeNull();
+  });
+
+  it("a late 404 recovery answer re-sends under the previous person's keys and handle, never the next person's", async () => {
+    await bindShopping("subject-a");
+    await savePending(pending);
+    const otherPending: PendingPlacement = { ...pending, clientRequestId: "other-request", idempotencyKey: "other-key" };
+    const lookups = server(async (c) => {
+      if (c.method === "GET") {
+        await bindShopping("subject-b");
+        await savePending(otherPending);
+        return json(404, { code: "NOT_FOUND" });
+      }
+      return json(409, { code: "QUOTE_EXPIRED" });
+    });
+    expect(await recover(apiFor(lookups.fetchImpl))).toEqual({ kind: "rejected", code: "QUOTE_EXPIRED" });
+    expect(lookups.calls.find((c) => c.method === "POST")?.headers.get("Idempotency-Key")).toBe(pending.idempotencyKey);
+    expect(await loadPending()).toEqual(otherPending);
+  });
+
+  it("storage keys are per person: a failed cleanup, a restart or a new sign-in never exposes another person's basket or pending order", async () => {
+    await bindShopping("subject-a");
+    await saveBasket({ ...target, lines: [line("m1")] });
+    await savePending(pending);
+    for (const next of ["subject-b", null]) {
+      await bindShopping(next);
+      expect(await loadBasket()).toBeNull();
+      expect(await loadPending()).toBeNull();
+    }
+    await bindShopping("subject-b");
+    await saveBasket({ ...target, lines: [line("m2")] });
+    expect(await loadPending()).toBeNull();
+    await bindShopping("subject-a");
+    expect(await loadPending()).toEqual(pending);
+  });
+
+  it("a basket built as a guest follows the person who signs in, unless that person already has one", async () => {
+    await saveBasket({ ...target, lines: [line("m1")] });
+    await bindShopping("subject-a");
+    expect((await loadBasket())?.lines[0]?.mealId).toBe("m1");
+    await bindShopping(null);
+    expect(await loadBasket()).toBeNull();
+    await saveBasket({ ...target, lines: [line("m3")] });
+    await bindShopping("subject-a");
+    expect((await loadBasket())?.lines[0]?.mealId).toBe("m1");
+  });
+
+  it("a guest basket is never left behind for the next person: it moves to the first person only when they have none, and is dropped otherwise", async () => {
+    await bindShopping("subject-a");
+    await saveBasket({ ...target, lines: [line("own")] });
+    await bindShopping(null);
+    await saveBasket({ ...target, lines: [line("guest")] });
+    await savePending(pending);
+    await bindShopping("subject-a"); // A already has a basket: A's wins, the guest keys are removed
+    expect((await loadBasket())?.lines[0]?.mealId).toBe("own");
+    expect(await loadPending()).toBeNull();
+    await bindShopping(null);
+    expect(await loadBasket()).toBeNull();
+    expect(await loadPending()).toBeNull();
+    await bindShopping("subject-b"); // nothing of the earlier guest basket can reach B
+    expect(await loadBasket()).toBeNull();
     expect(await loadPending()).toBeNull();
   });
 

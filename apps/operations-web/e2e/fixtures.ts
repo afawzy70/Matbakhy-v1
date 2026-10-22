@@ -11,11 +11,43 @@ export function env(name: string): string {
   return v;
 }
 
-/** Runs SQL against the throwaway stack's database (test setup only; synthetic data). */
-export function sql(statement: string): string {
-  const prefix = JSON.parse(env("E2E_PSQL")) as string[];
-  const [cmd, ...args] = prefix;
-  return execFileSync(cmd as string, [...args, "-At", "-v", "ON_ERROR_STOP=1", "-c", statement], { encoding: "utf8" }).trim();
+/**
+ * Test setup and read-only checks through the staging-only fixture channel. The runner has no database access and never
+ * sends SQL: it sends the NAME of a checked-in fixture (deploy/web-preview/e2e-fixtures/<name>.sql) and its parameters on
+ * the standard input of E2E_FIXTURE_CMD, a JSON array. Locally that is the server-side script itself
+ * (deploy/web-preview/e2e-fixture.sh); on a staging host it is an SSH command restricted to that script.
+ */
+export function fixture(name: string, params: Record<string, string> = {}): string {
+  const [cmd, ...args] = JSON.parse(env("E2E_FIXTURE_CMD")) as string[];
+  const lines = Object.entries(params).map(([key, value]) => {
+    if (/[\r\n]/.test(value)) {
+      throw new Error(`fixture parameter ${key} contains a line break`);
+    }
+    return `${key}=${value}`;
+  });
+  return execFileSync(cmd as string, args, { encoding: "utf8", input: `${[name, ...lines].join("\n")}\n` }).trim();
+}
+
+/** The synthetic identities of the suite: the login name at the identity provider and the subject the API stores for it. */
+export type AccountName = "cook-a" | "customer-a" | "customer-b" | "ops-a";
+const LOCAL_ACCOUNTS: Record<AccountName, { username: string; subject: string }> = {
+  "cook-a": { username: "cook-a", subject: "00000000-0000-4000-8000-0000000000c1" },
+  "customer-a": { username: "customer-a", subject: "00000000-0000-4000-8000-0000000000a1" },
+  "customer-b": { username: "customer-b", subject: "00000000-0000-4000-8000-0000000000b1" },
+  "ops-a": { username: "ops-a", subject: "00000000-0000-4000-8000-0000000000d2" },
+};
+
+/** E2E_USERS (JSON, optional) maps these names to the accounts of another realm, e.g. the preview realm's users. */
+export function account(name: AccountName): { username: string; subject: string } {
+  const override = process.env.E2E_USERS ? (JSON.parse(process.env.E2E_USERS) as Partial<Record<AccountName, { username: string; subject: string }>>) : {};
+  return override[name] ?? LOCAL_ACCOUNTS[name];
+}
+
+/** Fills the identity provider's login form (the page is already there). */
+export async function idpLogin(page: Page, name: AccountName) {
+  await page.locator("#username").fill(account(name).username);
+  await page.locator("#password").fill(env("E2E_USER_PASSWORD"));
+  await page.locator("#kc-login").click();
 }
 
 /** A synthetic solid-colour PNG (no metadata) large enough for the meal-photo policy. */

@@ -68,6 +68,14 @@ matbakhy:
     step-up-max-age: ${OIDC_STEP_UP_MAX_AGE:10m}
     # Provider subject that receives staff.grant + audit.read on first login while no administrator exists.
     bootstrap-admin-subject: ${STAFF_BOOTSTRAP_SUBJECT:}
+    # Parent domain of a deployment with sibling hosts (app., ops., api.); the readable XSRF-TOKEN cookie is set for it. Blank locally.
+    web-cookie-domain: ${WEB_COOKIE_DOMAIN:}
+  mfa:
+    # D18: the factor lives in Keycloak. The admin client (service account) is used only for the audited MFA reset and to
+    # end sessions when a user turns MFA off; blank secret = those two operations are unavailable (policy/preference still work).
+    admin-client-id: ${OIDC_ADMIN_CLIENT_ID:matbakhy-admin}
+    admin-client-secret: ${OIDC_ADMIN_CLIENT_SECRET:}
+    account-console-url: ${OIDC_ACCOUNT_CONSOLE_URL:}
   phone-verification:
     # The default pepper is accepted only in LOCAL/CI; deployed environments must provide PHONE_CODE_PEPPER.
     code-pepper: ${PHONE_CODE_PEPPER:local-dev-only-pepper-not-a-secret-000000}
@@ -83,6 +91,10 @@ matbakhy:
     max-attempts: 5
     expiry-after-slot-end: 2h
     max-attempts-per-actor-per-hour: 30
+  activity:
+    # MB-054: the default key is accepted only in LOCAL/CI; deployed environments must set ACTIVITY_HASH_KEY.
+    hash-key: ${ACTIVITY_HASH_KEY:local-dev-only-activity-hash-key-not-a-secret}
+    max-events-per-visitor-day: 300
   finance:
     posting-job:
       enabled: ${LEDGER_POSTING_JOB_ENABLED:true}
@@ -101,6 +113,9 @@ matbakhy:
     initial-backoff: 30s
     lease: 60s
     jobs-enabled: ${NOTIFICATION_JOBS_ENABLED:true}
+    # O07 feature flag: external push delivery is OFF unless explicitly enabled. Enable only with provider credentials,
+    # device testing and the owner's approval; deployed environments refuse the flag until a real adapter exists.
+    push-enabled: ${PUSH_DELIVERY_ENABLED:false}
     poll-interval: 5s
   orders:
     expiry-job:

@@ -1,0 +1,18 @@
+# Native run 40 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38381271465), source dfec36a.
+## iOS simulator (job 115242006076): success — every phase
+10:30:08 PASS: iOS system-browser PKCE round trip (Save Password dismissal in place)
+10:32-10:37 phases A-G passed (MB033-QUANTITY-STOPPED-AT 10; MB033-OVER-LIMIT-BLOCKED; delivery MB-100002; MB033-DEEP-LINK-OK; MB033-SAME-SESSION-LIMIT-OK)
+10:38:17 MB049-STILL-SIGNED-IN; MB049-NOTICE ... from EGP 120.00 to EGP 130.00.; MB049-ORDER-NUMBER MB-100003
+10:40:49 MB033-DYNAMIC-TEXT-OK en
+10:40:49 MB033-DYNAMIC-TEXT-OK ar     (accessibility XXXL; discover, meal, cart, checkout with quote, orders, order,
+                                       notifications, support; mode choices and quote button inside the screen width)
+10:41:53 MB033-ALERTS-DENIED-SAFE     (not asked on launch; Allow -> system prompt -> Don't Allow; refusal explained,
+                                       Settings path, in-app notifications still listed)
+10:41:53 PASS: iOS ... every customer area usable at the largest accessibility text size in English and Arabic; notification refusal safe
+## Android emulator (job 115242005711): failure (harness)
+10:36:54 ok: D13 refused at the stale price; repriced order MB-100003 13000|13000|1
+10:37:00-10:38:04 screenshots 14-21 dt-en-discover ... dt-en-support
+10:38:04 ok: [en] discover, meal, cart, checkout actions, orders, order, notifications and support at font scale 2.0
+10:39:46 FAIL: [ar] Discover: meal not listed at large text — only "طبق تجريبي اثنان" fitted on screen; the script
+         waited without scrolling (harness). Fixed: scroll to the expected meal. Arabic Android and the Android
+         notification-refusal phase are NOT_RUN in this run.

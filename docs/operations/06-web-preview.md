@@ -1,5 +1,7 @@
 # Web preview on one VPS (prepared, not deployed)
 
+> **PARTLY OUTDATED.** Written before the Contabo deployment; Hetzner and `/srv/matbakhy-preview` statements are historical. Current live addresses and behaviour: [live Preview access](../developer-handbook/05-developer-workflow/live-preview-access.md); infrastructure: [Contabo server inventory](../developer-handbook/08-infrastructure/contabo-server-inventory.md).
+
 **Owner direction (2026-10-12):** try the web application first. Apple Developer, Google Play and TestFlight setup are deferred.
 
 This is an **early web preview** for the owner's own test journeys. It is not the controlled staging environment of MB-040, and it is not a release. Nothing has been purchased, deployed, published or put into DNS.
@@ -10,7 +12,7 @@ This is an **early web preview** for the owner's own test journeys. It is not th
 |---|---|---|
 | Proxy and web apps | Our `matbakhy-preview-front` image: Caddy plus the customer web and operations web builds | Ports 80/443. Hosts `app.`, `ops.`, `api.`, `id.` and `media.<domain>`, each restricted to `ALLOWED_CLIENT_IPS` |
 | API | Our `matbakhy-api` image, `APP_ENV=PREVIEW` | Internal; only `/api/*` and the OIDC login paths go through the proxy, actuator does not |
-| Identity | Keycloak 26.8.0 in production mode (`start`) on PostgreSQL, preview realm imported | Internal; the proxy blocks `/admin` |
+| Identity | Keycloak 26.8.0 in production mode (`start`) on PostgreSQL, preview realm imported | Internal; the customer host blocks `/admin`; the admin console is published only on `kc-admin.<domain>` (docs/operations/14-keycloak-admin-console.md) |
 | Database | PostgreSQL 16.15 (two databases: `matbakhy`, `keycloak`) | Internal only, persistent volume |
 | Image storage | SeaweedFS (S3-compatible) | Internal; `media.<domain>` for signed uploads and public meal photos |
 
@@ -33,17 +35,20 @@ This is intended, and it is unchanged.
 | File | Purpose |
 |---|---|
 | `compose.yaml` | Services, internal network, health checks, resource limits, bounded logs |
-| `Caddyfile` | HTTPS, IP allow-list, security headers |
+| `Caddyfile` | HTTPS, two access classes (customer, staff; deny by default), security headers. Tested by running the real Caddy (`scripts/test_proxy_access.py`) |
+| `compose.4gb.yaml` | Memory ceilings and JVM heap shares for a 2 vCPU / 4 GB host; Grafana optional |
 | `front.Dockerfile` | Proxy plus both web builds |
 | `.env.example` | Placeholders only |
-| `deploy.sh` | Commands: `init-secrets`, `render`, `up`, `seed`, `smoke`, `backup`, `restore-db` |
+| `deploy.sh` | Commands: `init-secrets`, `render`, `up`, `seed`, `smoke`, `backup`, `restore-db`, `status`, `rollback-plan`, `prune-qa`, `e2e-reset` |
+| `e2e-fixture.sh`, `e2e-fixtures/` | Staging-only test setup channel for the browser E2E suite: named, allow-listed SQL fixtures behind a marker file ([11](11-staging-deployment-and-rollback.md)) |
+| `prune-qa-artifacts.sh` | Lists (or with `--apply` deletes) QA artifacts older than the retention |
 | `identity/matbakhy-realm.preview.json` | Realm template |
 | `storage/s3.json.template` | Storage identities and access |
 | `postgres/10-keycloak.sh` | Creates the Keycloak database on first start |
 | `observability/` | Log collection (Alloy → Loki), metrics and alert rules (Prometheus, `promtool` tests), Alertmanager to a local test sink, Grafana data sources (MB-039) |
 | `postgres/20-runtime-role.sh` | Creates the API's least-privilege runtime role `matbakhy_app` on first start (MB-039) |
 | `seed-preview.sql` | Synthetic catalogue and accounts |
-| `smoke.sh` | Read-only HTTPS smoke test |
+| `smoke.sh` | Read-only HTTPS smoke test (customer web, operations web, API, authentication, boundary of privileged operations) |
 
 ## Verified locally (self-review, 2026-10-12)
 
@@ -96,7 +101,7 @@ The provisional target is **4 vCPU, 8 GB RAM, at least 80 GB disk**. Builds and 
 | Proxy | 256 MiB | — | 10 MB × 3 |
 | Observability (Loki 384, Alloy 256, Prometheus 512, Alertmanager 128, Grafana 256, node-exporter 64, sink 64) | about 1.6 GiB | about 2 | 10 MB × 3 each |
 
-- 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside.
+- 2 vCPU / 4 GB would probably start, but has no headroom for Keycloak and JVM peaks or a backup running alongside. The owner selected a 2 vCPU / 4 GB Hetzner server on 2026-10-14; the lowered ceilings, retention defaults and push flag for it are in [09-staging-hetzner-preparation.md](09-staging-hetzner-preparation.md) (`compose.4gb.yaml`). Peak use is unmeasured.
 
 ### Bounded load and smoke plan (prepared, NOT_RUN)
 
@@ -128,6 +133,8 @@ Neither price is a prepaid promotional price. The script's own backups are free,
 **Recommendation:** Hetzner CX33 if it is available in an EU location, otherwise the fallback. Both have EU regions close enough to Egypt for a preview. Expected total: about €10–12 per month with IPv4 and provider backups, or about US$58 per month on the fallback, plus the domain. Unverified.
 
 ## Tester access (recommendation; owner decision needed)
+
+> **Update 2026-10-14:** the owner approved the first Internet-accessible staging on the PREVIEW profile. The proxy now has two classes: customer hosts (`CUSTOMER_ALLOWED_IPS`, public only by the owner's explicit setting) and the kitchen/staff side (`STAFF_ALLOWED_IPS`). See [09](09-staging-hetzner-preparation.md) and [12](12-owner-server-setup.md). The comparison below still applies to the staff side and to a restricted preview.
 
 The preview must stay **deny-by-default**: nothing reachable for a client that has not been let in. The current package does this with an IP allow-list (`ALLOWED_CLIENT_IPS` in Caddy). That works for fixed office or home lines but not for testers on mobile data or moving between Wi-Fi networks, whose public address changes; Egyptian mobile carriers also use carrier-grade NAT, so one allowed address can be shared with strangers.
 
@@ -165,7 +172,7 @@ The access method must work for: browser sign-in and the OIDC redirects between 
    - synthetic data only;
    - no real SMS, e-mail, push or malware scanning;
    - a synthetic commerce policy (O04 open);
-   - staff actions that need MFA are not available, because no OTP is configured in the preview realm.
+   - MFA policy (D18) defaults to OPTIONAL for every category; step-up and enrolment work only after the Keycloak step-up flow and the admin service account are applied to the running preview realm (`--import-realm` skips an existing realm; see docs/security/mfa-policy.md, Migration and rollout).
 
 ## Procedure (after the inputs exist)
 
@@ -180,15 +187,16 @@ The access method must work for: browser sign-in and the OIDC redirects between 
 6. **Test accounts** (realm `matbakhy`, password `PREVIEW_USER_PASSWORD` from `.env`):
    - `preview-customer-1` and `preview-customer-2` (phones pre-verified);
    - `preview-cook-1` (owns "مطبخ المعاينة"; pickup, and delivery to Test zone A);
-   - `preview-ops-1` (first staff administrator through `STAFF_BOOTSTRAP_SUBJECT`).
-7. **Keycloak administration:** `docker compose exec identity /opt/keycloak/bin/kcadm.sh …`. The console is not published.
+   - `preview-ops-1` (first staff administrator through `STAFF_BOOTSTRAP_SUBJECT`);
+   - `preview-ops-2` (staff-style account without grants).
+7. **Keycloak administration:** `docker compose exec identity /opt/keycloak/bin/kcadm.sh …`. The console is published on `https://kc-admin.<domain>` for the Preview only (password + one-time password required; see docs/operations/14-keycloak-admin-console.md); `./deploy.sh admin-console disable` closes it.
 
 ## Migrations, rollback and recovery
 
 - **Migrations:** Flyway runs forward-only at API start. `up` always takes a database backup first.
 - **Database roles (MB-039):**
   - Flyway connects as the owner `matbakhy` (`SPRING_FLYWAY_USER`/`SPRING_FLYWAY_PASSWORD`). The API itself connects as `matbakhy_app` (`APP_DB_PASSWORD`, generated by `init-secrets`).
-  - After every migrate, the callback `db/migration/afterMigrate.sql` grants `matbakhy_app` table and sequence access, and nothing else: no DDL, no trigger changes, no UPDATE/DELETE on append-only tables (audit, ledger, order events and items, meal revisions, configuration changes, case messages), no DELETE on orders.
+  - After every migrate, the callback `db/migration/afterMigrate.sql` grants `matbakhy_app` table and sequence access, and nothing else: no DDL, no trigger changes, no UPDATE/DELETE on append-only tables (audit, ledger, order events and items, meal revisions, configuration changes), no DELETE on orders. Case messages and payment events (V27) allow UPDATE only for the account-erasure change their triggers permit, and never DELETE.
   - The role is created only when the PostgreSQL volume is first initialised. **An existing preview volume** created before this change has no `matbakhy_app`. Create it once as the owner (`CREATE ROLE matbakhy_app LOGIN PASSWORD '…'`, the value from `.env`), then restart the API.
   - After `restore-db` into `matbakhy_restore`, the next API start against that database re-applies the grants.
   - Local rehearsal (2026-10-13, self-review): `verification/runs/20261013-MB-039-LOCAL/PREVIEW-RUNTIME-ROLE-REHEARSAL.txt`. On the deployed preview this is NOT_RUN.

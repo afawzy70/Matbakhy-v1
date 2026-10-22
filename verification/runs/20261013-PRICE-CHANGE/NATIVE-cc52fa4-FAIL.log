@@ -1,0 +1,16 @@
+# Native run 38 (https://github.com/afawzy70/Matbakhy-v1/actions/runs/38371139616), source cc52fa4: FAIL on both
+# platforms in the MB-031 sign-in round trip, before any ordering phase. Causes found and fixed in the next commit.
+Android job 115208138187:
+09:09:23 ok: signed in as customer-a; session restored after restart
+09:10:26 FAIL: not found: text="Sign out"
+  visible: ... "Order alerts on this phone", "Alerts are off for Matbakhy on this phone. ...", "Open Settings" ...
+  Cause 1 (harness-visible layout): the new alerts card on Account pushed "Sign out" below the fold.
+  Cause 2 (product defect): before anything was asked, Android 13+ reports the permission as "denied" with
+  canAskAgain, and the app showed "Alerts are off" instead of offering to ask. Fixed: a never-answered, askable
+  permission is "undetermined"; only a refusal the customer has just given, or one the system will not ask again,
+  counts as denied. The card now sits below the account actions.
+iOS job 115208138254:
+09:16:29 failed - customer-a not signed in; the hierarchy shows the system "Save Password?" alert over the app,
+  and Keycloak logged CODE_TO_TOKEN_ERROR error="expired_code" for matbakhy-mobile at 09:15:02.
+  Cause (harness): the alert held the redirect until the authorization code expired. Earlier runs never showed it.
+  Fixed: both iOS login helpers dismiss "Save Password?" ("Not Now") when it appears.

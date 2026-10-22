@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "scope": "PRODUCT_VERIFICATION",
+  "story_id": "MB-039",
+  "phase": "P08",
+  "source_commit": "be33bc2de0d30366f50767dfe1ee35af2737d434",
+  "environment": {
+    "host": "cloud development container (not a supported-platform claim)",
+    "os": "Linux-6.18.44-fc-v114-x86_64-with-glibc2.39",
+    "python": "3.13.16",
+    "java": "openjdk version \"21.0.12.1\" 2026-08-18",
+    "maven": "Apache Maven 3.9.11 (3e54c93a704957b63ee3494413a2b544fd3d825b)",
+    "node": "v24.21.0",
+    "pnpm": "10.34.6",
+    "docker": "Docker version 29.8.2, build 7fc2dff"
+  },
+  "started_at": "2026-10-14T03:55:47.521364+00:00",
+  "finished_at": "2026-10-14T04:16:03.949649+00:00",
+  "status": "PASS",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-I/BACKEND-VERIFY.log"
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-I/WORKSPACE-CLEAN-CHECKOUT.log"
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-I/LOCAL-STACK.log"
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-I/BROWSER-E2E.log"
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-I/SECRET-SCAN.log"
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "kind": "command",
+      "required": true,
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "log_path": "verification/runs/20261014-CANDIDATE-I/GUARDRAIL-TESTS.log"
+    }
+  ],
+  "scenario_results": [
+    {
+      "id": "TC-162",
+      "status": "PASS",
+      "observed": "PaymentReconciliationIntegrationTest (BACKEND-VERIFY): a dispute, an unreconciled payment and a refund obligation keep exactly one open PAYMENT/HIGH support case for the order (V28), visible to the order's customer and support staff, not to another customer; no reference, account or amount in the case."
+    },
+    {
+      "id": "TC-056",
+      "status": "PASS",
+      "observed": "LogRedactionIntegrationTest (BACKEND-VERIFY): no tokens, OTPs, contact, address, document content, deposit recipient, transfer reference or activity visitor id in ECS logs or metric names and tags; the new outbox-retry log line carries IDs only (the operator's reason stays in the audit row)."
+    }
+  ],
+  "artifacts": [
+    "verification/runs/20261014-CANDIDATE-I/BACKEND-VERIFY.log",
+    "verification/runs/20261014-CANDIDATE-I/WORKSPACE-CLEAN-CHECKOUT.log",
+    "verification/runs/20261014-CANDIDATE-I/LOCAL-STACK.log",
+    "verification/runs/20261014-CANDIDATE-I/BROWSER-E2E.log",
+    "verification/runs/20261014-CANDIDATE-I/SECRET-SCAN.log",
+    "verification/runs/20261014-CANDIDATE-I/GUARDRAIL-TESTS.log"
+  ],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Local regression checks for QA candidate I. Since candidate H (1850f7b): MB-052 automatic PAYMENT support case (V28, 863edf0); MB-039 staff outbox retry over HTTP with audit and log correlation and an operator log line (22b5f73); docs (TC-139 coverage, V27 preview note); report-only EDGE-REPORT lines in the native large-text harness (d9b0873, test code only).",
+      "Self-review, not independent review. MBQA-003/004/005/006 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST."
+    ]
+  },
+  "approvals": [],
+  "open_defects": []
+}

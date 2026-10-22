@@ -24,7 +24,8 @@ export function Configuration({ ctx }: { ctx: Ctx }) {
                 {c.commercePolicy.synthetic ? ` · ${t.ops.syntheticPolicy}` : ""}
               </p>
               <p className="muted">
-                tax {c.commercePolicy.taxRateBps / 100}% · commission {c.commercePolicy.commissionRateBps / 100}% · {c.commercePolicy.termsVersion} ·{" "}
+                tax {c.commercePolicy.taxRateBps / 100}% ·{" "}
+                {c.commercePolicy.commissionRateBps === 0 ? t.ops.noCommission : `commission ${c.commercePolicy.commissionRateBps / 100}%`} · {c.commercePolicy.termsVersion} ·{" "}
                 {c.commercePolicy.cancellationPolicyVersion}
               </p>
             </section>

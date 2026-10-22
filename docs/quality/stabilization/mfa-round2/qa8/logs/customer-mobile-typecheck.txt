@@ -1,0 +1,4 @@
+
+> @matbakhy/customer-mobile@0.1.0 typecheck /home/aiagent/workspaces/agents/codex-qa/apps/customer-mobile
+> tsc -p tsconfig.json
+

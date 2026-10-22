@@ -28,3 +28,13 @@
 # matched generic-api-key ("api" followed by a host:port path). No credential; the line was reworded in the next
 # commit so the working tree no longer matches. Reviewed by the implementation agent; this one historical finding only.
 a8b206e608464952064b127d0bed5993b8c70799:docs/operations/08-troubleshooting-runbook.md:generic-api-key:46
+# Reviewed false positives: file-hash manifest (sha256 of test-result JSON) in QA phase-2 evidence, removed from tree
+1a7d6a9da2af2acfa4accfdcc8133ece276817ca:docs/quality/stabilization/phase2-evidence/sha256.json:generic-api-key:21
+1a7d6a9da2af2acfa4accfdcc8133ece276817ca:docs/quality/stabilization/phase2-evidence/sha256.json:generic-api-key:27
+# Reviewed false positives (agent/security-audit e053225): generic-api-key matched JSON keys that are evidence file names ('...publication-secret-check.json/.stderr') paired with 64-hex SHA-256 digests of redacted evidence files; no credential. Exactly these two fingerprints; no path/rule-wide exclusion.
+e053225724c2a060ede4202ef43e20bbdc1316ff:docs/security/audits/current-stabilization/evidence/sha256-manifest.json:generic-api-key:28
+e053225724c2a060ede4202ef43e20bbdc1316ff:docs/security/audits/current-stabilization/evidence/sha256-manifest.json:generic-api-key:29
+# Reviewed false positives (QA round-2 evidence manifest, file removed from the tree): generic-api-key matched JSON keys that are log file names paired with 64-hex SHA-256 digests of those logs; no credential. Exactly these three fingerprints.
+7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:2
+7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:11
+7e61db71e8a089e52d3bae9ffacdf7022907b2cd:docs/quality/stabilization/mfa-round2/qa8/log-sha256.json:generic-api-key:12

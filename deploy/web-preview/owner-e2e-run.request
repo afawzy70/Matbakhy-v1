@@ -1,0 +1,2 @@
+apply
+# request 5 (apply; partial import prints its result with -o). First word = mode.

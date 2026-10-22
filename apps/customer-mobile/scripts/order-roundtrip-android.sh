@@ -342,39 +342,61 @@ echo "== MB-033 dynamic text: largest system font size, English then Arabic, eve
 # the screenshots (CI artifact) are for visual review of wrapping and RTL. Overflow is not measured automatically:
 # uiautomator reports bounds clipped to the window.
 MEAL='resource-id="meal-00000000-0000-4000-8000-00000000a0b1"'
+# MB-033 report only (never fails the run): labelled elements that run past the left or right screen edge, written to
+# the job log so the large-text pass can be reviewed where the screenshot artifacts cannot be downloaded.
+edges() {
+  dump
+  python3 - "$UI" "$1" "$(adb shell wm size | tr -d '\r' | sed -n 's/.*: \([0-9]*\)x.*/\1/p' | tail -1)" <<'P'
+import re, sys
+xml, name, width = open(sys.argv[1], encoding="utf-8", errors="replace").read(), sys.argv[2], int(sys.argv[3] or 0)
+past = []
+for node in re.findall(r"<node [^>]*>", xml):
+    label = next((x.group(1) for x in (re.search(r' text="([^"]*)"', node), re.search(r'content-desc="([^"]*)"', node)) if x and x.group(1)), "")
+    m = re.search(r'bounds="\[(-?\d+),(-?\d+)\]\[(-?\d+),(-?\d+)\]"', node)
+    if label and m and width:
+        x1, _, x2, _ = map(int, m.groups())
+        if x1 < 0 or x2 > width:
+            past.append(f"{label[:40]!r} [{x1},{x2}]")
+print(f"EDGE-REPORT {name}: width {width}, {len(past)} labelled element(s) past the edge" + ("; " + "; ".join(past[:10]) if past else ""))
+P
+}
+dt_shot() { shot "$1"; edges "$1"; }
 dynamic_text_pass() {
   local lang="$1" notif="$2" support="$3"
   tap 'resource-id="tab-discover"'
-  wait_for "$MEAL" 90 >/dev/null || fail "[$lang] Discover: meal not listed at large text"
-  shot "dt-$lang-discover"
-  tap "$MEAL"
-  tap 'resource-id="slot-0"'
+  # At the largest size only one meal card may fit; scroll to the expected one (native run 40, Arabic).
+  wait_scrolled "$MEAL" 90 || fail "[$lang] Discover: meal not listed at large text"
+  dt_shot "dt-$lang-discover"
+  tap_scrolled "$MEAL"
+  tap_scrolled 'resource-id="slot-0"'
   wait_scrolled 'resource-id="add-to-cart"' 30 || fail "[$lang] Meal: add to cart not reachable at large text"
-  shot "dt-$lang-meal"
+  dt_shot "dt-$lang-meal"
   tap_scrolled 'resource-id="add-to-cart"'
   tap_scrolled 'resource-id="go-to-cart"'
   wait_for 'resource-id="cart-lines"' 30 >/dev/null || fail "[$lang] Cart: basket lines missing"
-  shot "dt-$lang-cart"
-  wait_scrolled 'resource-id="get-quote"' 30 || fail "[$lang] Checkout: calculate total not reachable at large text"
+  dt_shot "dt-$lang-cart"
+  # Place order appears only with a quote: calculate the total first (native run 39).
+  tap_scrolled 'resource-id="get-quote"'
+  wait_scrolled 'resource-id="quote"' 60 || fail "[$lang] Checkout: no quote at large text"
   wait_scrolled 'resource-id="place-order"' 30 || fail "[$lang] Checkout: place order not reachable at large text"
-  shot "dt-$lang-checkout"
+  dt_shot "dt-$lang-checkout"
   adb shell input keyevent 4
   adb shell input keyevent 4
   tap 'resource-id="tab-orders"'
   wait_for "resource-id=\"order-$PNUMBER\"" 30 >/dev/null || fail "[$lang] Orders: $PNUMBER not listed"
-  shot "dt-$lang-orders"
+  dt_shot "dt-$lang-orders"
   tap "resource-id=\"order-$PNUMBER\""
   wait_for 'resource-id="order-items"' 30 >/dev/null || fail "[$lang] Order: items missing"
-  shot "dt-$lang-order"
+  dt_shot "dt-$lang-order"
   adb shell input keyevent 4
   tap 'resource-id="tab-account"'
   tap_scrolled "text=\"$notif\""
   wait_for 'resource-id="notifications"' 30 >/dev/null || fail "[$lang] Notifications screen missing"
-  shot "dt-$lang-notifications"
+  dt_shot "dt-$lang-notifications"
   adb shell input keyevent 4
   tap_scrolled "text=\"$support\""
   wait_for 'resource-id="support"' 30 >/dev/null || fail "[$lang] Support screen missing"
-  shot "dt-$lang-support"
+  dt_shot "dt-$lang-support"
   adb shell input keyevent 4
   echo "ok: [$lang] discover, meal, cart, checkout actions, orders, order, notifications and support at font scale $SCALE"
 }
@@ -412,5 +434,47 @@ shot notifications-after-refusal
 adb shell input keyevent 4
 echo "ok: not asked on launch; Allow opened the system dialog; Don't allow left the app usable with the Settings path and in-app notifications"
 
+echo "== MB-053 deposit: cash refused above the kitchen's limit; deposit terms shown; the customer reports the transfer"
+KITCHEN=00000000-0000-4000-8000-00000000a0d1
+psql_q -v kitchen=$KITCHEN < "$HERE/e2e-native/deposit-profile.sql" >/dev/null
+trap 'kill $PROXY 2>/dev/null || true; psql_q -c "DELETE FROM kitchen_payment_profile WHERE kitchen_id = '"'$KITCHEN'"'" >/dev/null || true' EXIT
+launch
+tap 'resource-id="tab-discover"'
+tap_scrolled "$MEAL"
+tap_scrolled 'resource-id="slot-0"'
+tap_scrolled 'resource-id="add-to-cart"'
+tap_scrolled 'resource-id="go-to-cart"'
+tap_scrolled 'resource-id="mode-PICKUP"'
+tap_scrolled 'resource-id="get-quote"'
+wait_scrolled 'text="Cash on receipt is not available for this total at this kitchen. Choose the deposit\."' 60 || fail "COD_NOT_ELIGIBLE not explained"
+tap_scrolled 'resource-id="pay-DEPOSIT"'
+tap_scrolled 'resource-id="get-quote"'
+wait_scrolled 'resource-id="deposit-terms"' 60 || fail "no deposit terms in the quote"
+wait_scrolled 'text="Deposit now: EGP[^"]*"' 20 || fail "deposit amount not shown"
+wait_scrolled 'text="[^"]*synthetic-kitchen@instapay[^"]*Synthetic Kitchen"' 20 || fail "approved recipient not shown"
+wait_scrolled 'text="[^"]*the platform never receives or holds the money[^"]*"' 20 || fail "direct-payment note not shown"
+shot deposit-terms
+tap_scrolled 'resource-id="accept-terms"'
+tap_scrolled 'resource-id="place-order"'
+wait_for 'text="MB-[^"]*"' 60 >/dev/null || fail "deposit order not confirmed"
+QNUMBER=$(grep -o 'text="MB-[^"]*"' "$UI" | head -1 | sed 's/text="\(.*\)"/\1/')
+QROW=$(psql_q -c "SELECT p.method || '|' || p.state || '|' || (p.deposit_minor * 2 - o.total_minor BETWEEN 0 AND 1) || '|' || p.recipient_identifier FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE o.public_number = '$QNUMBER'")
+echo "deposit order $QNUMBER (method|state|half|recipient): $QROW"
+[ "$QROW" = "DEPOSIT|WAITING_FOR_DEPOSIT|true|synthetic-kitchen@instapay" ] || fail "deposit order not stored with the quoted terms: $QROW"
+wait_scrolled 'text="Payment: Waiting for your deposit"' 30 || fail "payment state not shown on the order"
+tap_scrolled 'resource-id="transfer-reference"'
+sleep 1
+adb shell input text "IP123"
+# Close the keyboard only if it is open, so Back never leaves the order screen.
+if adb shell dumpsys input_method | grep -q "mInputShown=true"; then adb shell input keyevent 4; sleep 1; fi
+tap_scrolled 'resource-id="report-transfer"'
+wait_scrolled_up 'text="Payment: You reported the transfer; waiting for the kitchen to confirm"' 30 || fail "reported transfer not shown honestly"
+wait_scrolled 'text="Preparation starts only after the kitchen confirms[^"]*"' 20 || fail "no explanation that the kitchen must confirm"
+absent 'resource-id="report-transfer"'
+shot deposit-reported
+[ "$(psql_q -c "SELECT p.state FROM order_payment p JOIN customer_order o ON o.id = p.order_id WHERE o.public_number = '$QNUMBER'")" = "CUSTOMER_TRANSFER_REPORTED" ] || fail "transfer report not stored"
+psql_q -c "DELETE FROM kitchen_payment_profile WHERE kitchen_id = '$KITCHEN'" >/dev/null
+echo "ok: cash refused above the limit; deposit, recipient and direct-payment note shown; order $QNUMBER waits for the deposit; the customer's report is shown as theirs, not as payment"
+
 if adb logcat -d | grep -E "FATAL EXCEPTION"; then fail "fatal exception"; fi
-echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest font size in English and Arabic; notification refusal safe"
+echo "PASS: Android basket replacement asks first (keep/replace); killed during submit, reopened offline with the order unconfirmed, recovered online as exactly one order with the server's total; quantity limited to min(policy, availability), a lowered limit blocks the quote until corrected; delivery order with zone fee and matching total; order deep link warm and cold; limit lowered in the same session; kitchen price change reconfirmed; every customer area usable at the largest font size in English and Arabic; notification refusal safe; deposit checkout and transfer report shown honestly"

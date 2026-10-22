@@ -69,7 +69,7 @@ public class OrderService {
     public record OrderView(UUID id, String publicNumber, long version, String state, String fulfillmentMode, List<OrderLine> items,
                             Money subtotal, Money deliveryFee, Money tax, Money total, SlotView slot, Instant acceptBy,
                             List<OrderEvent> events, List<String> allowedActions, String cashState, List<UUID> supportCaseIds,
-                            String handoverCode, KitchenContact contact) {
+                            String handoverCode, KitchenContact contact, PaymentService.PaymentView payment) {
     }
 
     /** Kitchen contact for the order owner after acceptance; the pickup location only for pickup orders. */
@@ -83,7 +83,7 @@ public class OrderService {
     public record CookOrderView(UUID id, String publicNumber, long version, String state, String fulfillmentMode, List<OrderLine> items,
                                 Money subtotal, Money deliveryFee, Money tax, Money total, SlotView slot, Instant acceptBy,
                                 List<OrderEvent> events, List<String> allowedActions, String cashState, String fulfillmentNote,
-                                String dispatchReference, CustomerContact contact) {
+                                String dispatchReference, CustomerContact contact, PaymentService.PaymentView payment) {
     }
 
     public record CookOrderPage(List<CookOrderView> items, String nextCursor, boolean hasMore) {
@@ -106,11 +106,12 @@ public class OrderService {
     private final KitchenDirectory kitchens;
     private final OrderCases cases;
     private final HandoverCodes codes;
+    private final PaymentService payments;
     private final Clock clock;
 
     OrderService(JdbcTemplate jdbc, QuoteDirectory quotes, SlotInventory inventory, MealCatalog meals, AddressDirectory addresses,
                  CheckoutContactPolicy contact, IdempotentCommands idempotency, JsonMapper json, KitchenDirectory kitchens,
-                 HandoverCodes codes, OrderCases cases, Clock clock) {
+                 HandoverCodes codes, OrderCases cases, PaymentService payments, Clock clock) {
         this.jdbc = jdbc;
         this.quotes = quotes;
         this.inventory = inventory;
@@ -122,6 +123,7 @@ public class OrderService {
         this.kitchens = kitchens;
         this.codes = codes;
         this.cases = cases;
+        this.payments = payments;
         this.clock = clock;
     }
 
@@ -131,16 +133,39 @@ public class OrderService {
         return view(customerId, orderId, english);
     }
 
+    /**
+     * Canonical, versioned digest of the placement request: the same logical request always yields the same value and
+     * different requests never share one (every field is length-prefixed, so no value can imitate a delimiter).
+     */
+    static String fingerprint(PlaceRequest in) {
+        String note = in.fulfillmentNote() == null || in.fulfillmentNote().isBlank() ? "" : in.fulfillmentNote().strip();
+        StringBuilder canonical = new StringBuilder("v1");
+        for (String field : new String[] {String.valueOf(in.quoteId()), String.valueOf(in.clientRequestId()), String.valueOf(in.termsVersion()),
+                String.valueOf(in.cancellationPolicyVersion()), note}) {
+            canonical.append('|').append(field.length()).append(':').append(field);
+        }
+        try {
+            return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(canonical.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        } catch (java.security.NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     private UUID placeOnce(UUID customerId, PlaceRequest in) {
         // Serialize attempts carrying the same permanent request reference.
         jdbc.query("SELECT pg_advisory_xact_lock(hashtextextended(?, 0))", rs -> null, "order-request:" + customerId + ":" + in.clientRequestId());
-        Map<String, Object> existing = jdbc.queryForList("SELECT id, quote_id FROM customer_order WHERE customer_id = ? AND client_request_id = ?",
+        String fingerprint = fingerprint(in);
+        Map<String, Object> existing = jdbc.queryForList("SELECT id, quote_id, request_fingerprint FROM customer_order WHERE customer_id = ? AND client_request_id = ?",
                 customerId, in.clientRequestId()).stream().findFirst().orElse(null);
         if (existing != null) {
-            if (in.quoteId().equals(existing.get("quote_id"))) {
+            // Orders placed before V29 have no stored fingerprint and keep the quote-only check.
+            Object stored = existing.get("request_fingerprint");
+            boolean same = in.quoteId().equals(existing.get("quote_id")) && (stored == null || fingerprint.equals(stored));
+            if (same) {
                 return (UUID) existing.get("id");
             }
-            throw new ApiException(ErrorCode.IDEMPOTENCY_CONFLICT, "clientRequestId already used for another quote",
+            throw new ApiException(ErrorCode.IDEMPOTENCY_CONFLICT, "clientRequestId already used for a different request",
                     List.of(new FieldError("clientRequestId", "ALREADY_USED")));
         }
         ValidQuote q = quotes.requireValid(customerId, in.quoteId());
@@ -169,12 +194,12 @@ public class OrderService {
         long commission = Math.floorDiv(Math.addExact(Math.multiplyExact(q.subtotalMinor(), (long) q.commissionRateBps()), 5_000L), 10_000L);
         String note = in.fulfillmentNote() == null || in.fulfillmentNote().isBlank() ? null : in.fulfillmentNote().strip();
         jdbc.update("""
-                INSERT INTO customer_order (id, public_number, customer_id, client_request_id, quote_id, kitchen_id, slot_id, state, fulfillment_mode,
+                INSERT INTO customer_order (id, public_number, customer_id, client_request_id, request_fingerprint, quote_id, kitchen_id, slot_id, state, fulfillment_mode,
                                             address_snapshot, contact_snapshot, fulfillment_note, subtotal_minor, delivery_fee_minor, tax_minor,
                                             total_minor, policy_version, commission_bps_snapshot, commission_minor, cancellation_policy_version,
                                             terms_version, accept_by, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING_ACCEPTANCE', ?, ?::jsonb, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                orderId, "MB-" + number, customerId, in.clientRequestId(), in.quoteId(), q.kitchenId(), q.slotId(), q.fulfillmentMode(),
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PENDING_ACCEPTANCE', ?, ?::jsonb, ?::jsonb, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                orderId, "MB-" + number, customerId, in.clientRequestId(), fingerprint, in.quoteId(), q.kitchenId(), q.slotId(), q.fulfillmentMode(),
                 addressSnapshot, json.writeValueAsString(who), note, q.subtotalMinor(), q.deliveryFeeMinor(), q.taxMinor(), q.totalMinor(),
                 q.policyVersion(), q.commissionRateBps(), commission, q.cancellationPolicyVersion(), q.termsVersion(), Timestamp.from(q.acceptBy()),
                 Timestamp.from(now), Timestamp.from(now));
@@ -198,8 +223,12 @@ public class OrderService {
                 VALUES (?, 'order', ?, 'ORDER_PLACED', ?::jsonb, ?, ?, ?)""",
                 UUID.randomUUID(), orderId, json.writeValueAsString(Map.of("orderId", orderId.toString(), "kitchenId", q.kitchenId().toString())),
                 Timestamp.from(now), Timestamp.from(now), org.slf4j.MDC.get(com.matbakhy.shared.web.RequestContext.REQUEST_ID_MDC_KEY));
+        // MB-051: the payment terms are snapshotted with the order; cash due at hand-over is what the deposit does not cover.
+        payments.createFor(orderId, customerId, q.paymentMethod(), q.totalMinor(), q.depositMinor(),
+                q.recipientIdentifier() == null ? null : new PaymentService.Recipient(q.recipientMethod(), q.recipientIdentifier(), q.recipientName()),
+                q.acceptBy(), now);
         jdbc.update("INSERT INTO cash_obligation (id, order_id, amount_minor, state, created_at) VALUES (?, ?, ?, 'DUE', ?)",
-                UUID.randomUUID(), orderId, q.totalMinor(), Timestamp.from(now));
+                UUID.randomUUID(), orderId, q.totalMinor() - q.depositMinor(), Timestamp.from(now));
         log.info("order {} recorded in its placement transaction", orderId);
         return orderId;
     }
@@ -318,7 +347,8 @@ public class OrderService {
         return new OrderView(orderId, (String) o.get("public_number"), (Long) o.get("version"), state, mode, lines,
                 egp((Long) o.get("subtotal_minor")), egp((Long) o.get("delivery_fee_minor")), egp((Long) o.get("tax_minor")),
                 egp((Long) o.get("total_minor")), slot, ((Timestamp) o.get("accept_by")).toInstant(), eventsAfter(orderId, 0, 1000), actions,
-                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), cases.caseIds(orderId), handoverCode(orderId, state), kitchenContact);
+                o.get("cash_state") == null ? "NOT_DUE" : (String) o.get("cash_state"), cases.caseIds(orderId), handoverCode(orderId, state), kitchenContact,
+                payments.view(orderId).orElse(null));
     }
 
     static final Set<String> CONTACT_STATES = Set.of("ACCEPTED", "PREPARING", "READY", "OUT_FOR_DELIVERY");
@@ -341,7 +371,7 @@ public class OrderService {
         }
         OrderView v = view(customer, orderId, false);
         return new OrderView(v.id(), v.publicNumber(), v.version(), v.state(), v.fulfillmentMode(), v.items(), v.subtotal(), v.deliveryFee(), v.tax(),
-                v.total(), v.slot(), v.acceptBy(), v.events(), List.of(), v.cashState(), v.supportCaseIds(), null, null);
+                v.total(), v.slot(), v.acceptBy(), v.events(), List.of(), v.cashState(), v.supportCaseIds(), null, null, v.payment());
     }
 
     // ---- cook reads ----
@@ -407,7 +437,7 @@ public class OrderService {
         boolean showNote = CONTACT_STATES.contains(v.state()) || "PENDING_ACCEPTANCE".equals(v.state());
         return new CookOrderView(v.id(), v.publicNumber(), v.version(), v.state(), v.fulfillmentMode(), v.items(), v.subtotal(), v.deliveryFee(),
                 v.tax(), v.total(), v.slot(), v.acceptBy(), v.events(), cookActions(v.state(), v.fulfillmentMode()), v.cashState(),
-                showNote ? (String) o.get("fulfillment_note") : null, (String) o.get("dispatch_reference"), contact);
+                showNote ? (String) o.get("fulfillment_note") : null, (String) o.get("dispatch_reference"), contact, v.payment());
     }
 
     private static List<String> cookActions(String state, String mode) {

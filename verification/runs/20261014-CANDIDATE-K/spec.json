@@ -1,0 +1,90 @@
+{
+  "run_id": "20261014-CANDIDATE-K",
+  "story_id": "MB-039",
+  "phase": "P08",
+  "checks": [
+    {
+      "id": "BACKEND-VERIFY",
+      "name": "Backend verify (regression)",
+      "command": [
+        "bash",
+        "-c",
+        "cd backend && ./mvnw -B -ntp verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "WORKSPACE-CLEAN-CHECKOUT",
+      "name": "Clean-clone workspace incl. contract lint/drift and registry parity",
+      "command": [
+        "scripts/check_workspace.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 2400
+    },
+    {
+      "id": "LOCAL-STACK",
+      "name": "Local stack verify",
+      "command": [
+        "scripts/dev.sh",
+        "verify"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "BROWSER-E2E",
+      "name": "Browser workflows on the real stack (regression)",
+      "command": [
+        "scripts/dev.sh",
+        "e2e"
+      ],
+      "required": true,
+      "timeout_seconds": 1800
+    },
+    {
+      "id": "SECRET-SCAN",
+      "name": "Gitleaks history and committable tree",
+      "command": [
+        "scripts/check_secrets.sh"
+      ],
+      "required": true,
+      "timeout_seconds": 600
+    },
+    {
+      "id": "GUARDRAIL-TESTS",
+      "name": "Planning guardrail and bootstrap tests",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "scripts",
+        "-p",
+        "test_*.py"
+      ],
+      "required": true,
+      "timeout_seconds": 300
+    }
+  ],
+  "manual_checks": [],
+  "scenarios": [
+    {
+      "id": "TC-056",
+      "observed": "LogRedactionIntegrationTest (BACKEND-VERIFY) with the push delivery flag on: no tokens, OTPs, contact, address, document content, deposit recipient, transfer reference or activity visitor id in ECS logs or metric names and tags. PushFlagIntegrationTest and ProviderConfigurationTest (same run) cover the flag off: no PUSH delivery is created, the in-app notification exists, and no provider is needed."
+    }
+  ],
+  "artifacts": [],
+  "review": {
+    "status": "PASS",
+    "reviewer": "Claude Code implementation agent",
+    "type": "SELF_REVIEW",
+    "findings": [
+      "Local regression checks for QA candidate K. Since candidate J (52e4e21): demo-environment notice in both web apps and in the public configuration (RuntimeEnvironment), proxy access classes and admin-path blocking, remote-mode browser E2E through a restricted fixture channel (no direct database access from the runner), JVM heap settings, CSRF cookie domain for subdomain deployments, deposit orders accepted by the reconcile check, deployment/rollback/migration-compatibility tooling and docs, and a clean local staging rehearsal (verification/runs/20261014-STAGING-REHEARSAL, source ea159c1). Nothing was deployed or provisioned.",
+      "Self-review, not independent review. MBQA-003/004/005/006 and OBS-001 stay FIXED_PENDING_INDEPENDENT_RETEST."
+    ]
+  },
+  "open_defects": []
+}

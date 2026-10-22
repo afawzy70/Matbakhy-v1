@@ -1,3 +1,4 @@
+import { track, useTrack } from "./activity";
 import { useRef, useState } from "react";
 import { formatMoney, formatTime } from "./api";
 import { lineLimit, loadCart, loadPending, saveCart, type Cart } from "./cart";
@@ -12,6 +13,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
   const { t, locale } = ctx;
   const limit = lineLimit(ctx.maxQuantityPerLine);
   const [meal, reload] = useServer(ctx, () => ctx.api.GET("/api/v1/meals/{mealId}", { params: { path: { mealId: id } } }), `${id}|${locale}`);
+  useTrack(ctx.api, "MEAL_VIEW", meal.status === "ok" ? [id] : []);
   const [slotId, setSlotId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
@@ -125,6 +127,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                 saveCart({ ...next, lines });
                 setReplacement(null);
                 setMessage(t.added);
+                track(ctx.api, "ADD_TO_CART", m.id);
               }}
             >
               {t.addToCart} · <bdi>{formatMoney(m.price.amountMinor * quantity, locale)}</bdi>
@@ -155,6 +158,7 @@ export function Meal({ ctx, id, signedIn }: { ctx: Ctx; id: string; signedIn: bo
                       saveCart(replacement);
                       closePrompt();
                       setMessage(t.added);
+                track(ctx.api, "ADD_TO_CART", m.id);
                     }}
                   >
                     {t.replaceBasket}
