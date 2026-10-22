@@ -35,3 +35,7 @@ CI uses the Docker mount path, so the unresolved directory-scan fingerprint is:
 ```
 
 This additional fingerprint is not covered by the four-line approval and has not been applied. Full Secret scan success is not claimed. The change also removes two redundant browser-global declarations identified by CI lint; this is a comment-only correction with no runtime change.
+
+## Additional directory fingerprint approved
+
+The owner subsequently explicitly approved the exact `/repo` directory fingerprint shown above. It is now applied alongside the four historical fingerprints, for five exact entries total. The earlier tree failure is historical evidence, not the current approval state. No path-wide exclusion or scanner rule change was made. Follow-up evidence records fresh history and committable-tree scans; the Docker wrapper itself remains untested locally.

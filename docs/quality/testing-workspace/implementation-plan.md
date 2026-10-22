@@ -32,3 +32,7 @@ Documentation impact before implementation: update this plan, workspace README, 
 The owner explicitly approved the four exact fingerprints documented in security-review.md. Documentation impact assessed before applying: update .gitleaksignore, security-review.md, CI/CD handbook English/Arabic and status/evidence in the same PR. The scanner, all rules, all other findings, canonical cases and runtime code remain unchanged. Re-run the verified Gitleaks binary over full history and the committable tree, DOC-001 and handbook parity. Keep PR #43 Draft; approval is limited to these exceptions, not merge or deployment.
 
 Post-approval CI review also found two redundant browser-global declarations in the testing workspace header comment under the pinned globals package. Remove only those declarations; no runtime behavior or visual change. Validate syntax, focused checks and the new remote workspace run.
+
+## Directory fingerprint approval follow-up
+
+Owner explicitly approved the exact `/repo` directory-scan fingerprint for the already reviewed prototype progress namespace. Documentation impact: security review, workspace README, CI/CD handbook English/Arabic, translation sync, and verification/status evidence. Add only that fingerprint; preserve prototype bytes, scanner rules, canonical cases, Draft PR and deployment boundaries.

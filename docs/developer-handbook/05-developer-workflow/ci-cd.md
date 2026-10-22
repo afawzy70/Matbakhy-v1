@@ -75,4 +75,4 @@ The preview is synthetic, IP-restricted, single-server and has no real providers
 
 ## Exact reviewed scanner exclusions
 
-The owner approved 4 exact non-credential fingerprints in `.gitleaksignore`: the approved prototype progress-storage namespace, a historical explanatory comment and synthetic redaction-test markers. [Security review](../../quality/testing-workspace/security-review.md) records the scope and independent source classification. No complete file, path or rule is excluded; all other findings still fail the scan.
+The owner approved 5 exact non-credential fingerprints (4 historical fingerprints and 1 directory-scan equivalent for the same prototype namespace) in `.gitleaksignore`: the approved prototype progress-storage namespace, a historical explanatory comment and synthetic redaction-test markers. [Security review](../../quality/testing-workspace/security-review.md) records the scope and independent source classification. No complete file, path or rule is excluded; all other findings still fail the scan.
