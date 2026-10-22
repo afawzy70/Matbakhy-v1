@@ -104,3 +104,7 @@ python3 scripts/owner_e2e_fixtures.py check    # manifest, SQL seed and case fil
 
 - عدد الحالات في README الكتالوج (199) مش متفق مع ملفات الحالات (200).
 - مفيش أمر واحد بيشغّل "كل حاجة"؛ و`scripts/check_workspace.sh` بيتخطى فحوصات المتصفح والـ Native والتصميم والأسرار.
+
+## مساحة اختبار السيناريوهات
+
+[Testing Workspace](../../../scripts/testing-workspace/README.md) بتجمع كل الـ 200 حالة الأساسية في مسار تنفيذ عربي RTL فيه J0–J8 وبحث ومراجع fixtures وعلامات إتمام وتسجيل نتايج محلي. ولّد البيانات بـ `python3 scripts/testing_workspace.py`؛ وافحصها بـ `python3 scripts/test_testing_workspace.py`. [مصفوفة التغطية](../../quality/testing-workspace/coverage-matrix.md) بتفصل وجود الحالة عن اكتمال دليلها المتراجع. التسليم ده PARTIALLY IMPLEMENTED: الدليل المبدئي NOT VERIFIED وتنفيذ المنتج NOT_RUN. كلمات السر والأدلة النصية بتفضل في ذاكرة التبويب بس؛ النتيجة المستكملة محتاجة تربط دليلها تاني قبل المشاركة. الموقع مابيجهزش حسابات ولا بينفذ طلبات API للتطبيق.

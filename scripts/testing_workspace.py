@@ -4,12 +4,11 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
-import subprocess
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'docs/quality/owner-acceptance'
 GUIDANCE = ROOT / 'docs/quality/testing-workspace/guidance'
-OUT = ROOT / 'tools/testing-workspace'
+OUT = ROOT / 'scripts/testing-workspace'
 
 
 def build():
@@ -26,6 +25,8 @@ def build():
             inputs[str(supplement_path.relative_to(ROOT))] = hashlib.sha256(supplement_path.read_bytes()).hexdigest()
         for original in source['cases']:
             case = dict(original)
+            case['catalog_design_status'] = original.get('status', 'NOT_RUN')
+            case['status'] = 'NOT_RUN'  # This workspace delivery has executed no product cases.
             guide = supplement.get(case['id'], {})
             missing = []
             for key in ('steps', 'expected', 'prerequisites', 'actors'):
@@ -43,6 +44,9 @@ def build():
             # A human-readable review decision is mandatory, never inferred from fields.
             if guide.get('reviewed') is not True or not guide.get('source_refs'):
                 missing.append('Case-specific source/configuration/fixture review is pending')
+            for ref in guide.get('source_refs', []):
+                if not (ROOT / ref).is_file():
+                    missing.append('Missing source reference: ' + ref)
             missing.extend(guide.get('blockers', []))
             case.update(domain=source['domain'], source=str(path.relative_to(ROOT)),
                         guidance=guide, conventions=source.get('conventions', {}),
@@ -65,8 +69,14 @@ def build():
         'local': 'docs/developer-handbook/05-developer-workflow/local-environment-ar.md',
     }.items():
         documents[name] = {'path': rel, 'text': (ROOT / rel).read_text()}
-    source_sha = subprocess.check_output(['git', 'rev-parse', 'origin/develop'], cwd=ROOT, text=True).strip()
+        inputs[rel] = hashlib.sha256((ROOT / rel).read_bytes()).hexdigest()
+    for rel in ['core-suite.json', 'fixtures.json']:
+        inputs[str((SOURCE / rel).relative_to(ROOT))] = hashlib.sha256((SOURCE / rel).read_bytes()).hexdigest()
+    source_sha = json.loads((ROOT / 'docs/quality/testing-workspace/source-baseline.json').read_text())['commit']
+    # The base SHA identifies source-code links, never the generated/supplement content.
+    catalog_digest = hashlib.sha256(json.dumps(inputs, sort_keys=True).encode()).hexdigest()
     return dict(schema=1, source_sha=source_sha, live_verified=False, inputs=inputs,
+                catalog_digest=catalog_digest, provenance='Source links: develop base; content: per-file SHA256 input manifest',
                 cases=cases, actors=actors, journeys=journeys, documents=documents)
 
 

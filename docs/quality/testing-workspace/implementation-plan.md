@@ -4,7 +4,7 @@ Status: IN_PROGRESS / NOT_RUN for product acceptance. Owner direction: 2026-10-2
 
 ## Documentation impact assessed before implementation
 
-Add an isolated, buildless testing website under tools/testing-workspace. It reads generated data from the canonical owner-acceptance catalog; it does not replace that catalog or the Developer Handbook. Update handbook test-execution English/Arabic pages, owner guide, coverage matrix and this checkpoint. Backend, API, permissions, payment rules and deployment configuration do not change. No diagram or contract change is required: the website makes no application API requests and has no server component.
+Add an isolated, buildless testing website under scripts/testing-workspace. It reads generated data from the canonical owner-acceptance catalog; it does not replace that catalog or the Developer Handbook. Update handbook test-execution English/Arabic pages, owner guide, coverage matrix and this checkpoint. Backend, API, permissions, payment rules and deployment configuration do not change. No diagram or contract change is required: the website makes no application API requests and has no server component.
 
 ## Delivery batches
 

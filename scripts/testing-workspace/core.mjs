@@ -15,7 +15,11 @@ export function persisted(records) {
 }
 export function sanitize(text, secrets = []) {
   let value = String(text || '');
-  for (const secret of secrets) if (secret) value = value.split(secret).join('[REDACTED]');
+  const privateValues = [...new Set(secrets.filter(Boolean))].sort((a,b)=>b.length-a.length);
+  if (privateValues.length) {
+    const alternatives = privateValues.map(s=>s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    value = value.replace(new RegExp(alternatives.join('|'), 'g'), '[REDACTED]');
+  }
   return value.replace(/Bearer\s+[^\s"']+/gi, 'Bearer [REDACTED]')
     .replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '[REDACTED TOKEN]')
     .replace(/((?:password|passwd|secret|token|otp|authorization|cookie)\s*[:=]\s*)[^\n,;]+/gi, '$1[REDACTED]');
@@ -23,12 +27,14 @@ export function sanitize(text, secrets = []) {
 export function report(data, records, notes, secrets, metadata) {
   return {
     schema: 1, exported_at: new Date().toISOString(), catalog_source_sha: data.source_sha,
+    catalog_digest: data.catalog_digest, source_inputs: data.inputs,
     live_verification_by_workspace: false,
     environment: sanitize(metadata.environment, secrets), release: sanitize(metadata.release, secrets),
     results: data.cases.map(c => ({
       id: c.id, status: records[c.id]?.status || 'NOT_RUN',
       updated: records[c.id]?.updated || null, checked_steps: records[c.id]?.checks || [],
       guidance_complete: c.guidance_complete,
+      evidence_state: notes[c.id]?.evidence?.trim() && metadata.release.trim() ? 'TESTER_SUPPLIED' : 'MISSING_EVIDENCE_OR_RELEASE',
       evidence: sanitize(notes[c.id]?.evidence, secrets),
       defect: sanitize(notes[c.id]?.defect, secrets),
       reason: sanitize(notes[c.id]?.reason, secrets),
