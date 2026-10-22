@@ -4,13 +4,13 @@
 > **Status:** PARTIALLY IMPLEMENTED — تسجيل الدخول بـ OIDC، والـ Step-up بـ TOTP المبني على سياسة، والتفضيل، وإعادة الضبط، وإنهاء الـ Sessions كلها متنفّذة؛ لكن تطبيق الـ Migration بتاع الـ Realm على الـ Realm الحي والتحقق على أجهزة الموبايل محتاجين موافقة المالك وحالتهم NOT VERIFIED.
 > **Language / اللغة:** [English](authentication-and-mfa.md) · العربية
 
-الـ Keycloak (الـ Realm اسمه `matbakhy`) هو اللي بيعمل الـ Authentication للناس، والـ Spring Boot هو اللي بيعمل الـ Authorization. الـ Backend مفيهوش أي Password ولا كود OTP. التصميم: [الهوية والأمان](../03-architecture/identity-and-security-ar.md). نص السياسة (هو المرجع في النيّة): `docs/security/mfa-policy.md`. لوحة إدارة Keycloak: `docs/operations/14-keycloak-admin-console.md`.
+الـ Keycloak (الـ Realm اسمه `matbakhy`) هو اللي بيعمل الـ Authentication للناس، والـ Spring Boot هو اللي بيعمل الـ Authorization. الـ Backend مفيهوش أي Password ولا كود OTP. التصميم: [الهوية والأمان](../03-architecture/identity-and-security-ar.md). نص السياسة (هو المرجع للهدف المقصود): `docs/security/mfa-policy.md`. لوحة إدارة Keycloak: `docs/operations/14-keycloak-admin-console.md`.
 
 ## مكونات الهوية الأساسية
 
 | العنصر | المكان | الحقائق (من الكود والإعدادات) |
 |---|---|---|
-| قوالب الـ Realm | `infra/identity/matbakhy-realm.json` (محلي)، `deploy/web-preview/identity/matbakhy-realm.preview.json` (معاينة) | الـ Realm `matbakhy`؛ التسجيل الذاتي مقفول؛ التحقق من الإيميل مفعّل؛ الحماية من التخمين (Brute-force) مفعّلة؛ مدة صلاحية الـ Access Token هي 300 s؛ SSL مطلوب للخارج |
+| قوالب الـ Realm | `infra/identity/matbakhy-realm.json` (محلي)، `deploy/web-preview/identity/matbakhy-realm.preview.json` (معاينة) | الـ Realm `matbakhy`؛ التسجيل الذاتي مقفول؛ التحقق من الإيميل مفعّل؛ الحماية من التخمين (Brute-force) مفعّلة؛ مدة صلاحية الـ Access Token هي 300 s؛ SSL مطلوب للاتصالات الخارجية |
 | عميل الويب | `matbakhy-web`، سري (Confidential)، Authorization Code بس، Direct Grants مقفولة، PKCE `S256`، `acr.loa.map {"mfa":"2"}`، الـ Mappers هي `api-audience` و`amr` | الـ Redirect URI هو الـ Callback بتاع الـ **API** `/login/oauth2/code/keycloak` (محلي `http://localhost:${API_PORT}/…`، معاينة `https://api.${PREVIEW_DOMAIN}/…`)؛ التحويل بعد تسجيل الخروج بيروح لمواقع الويب |
 | عميل الموبايل | `matbakhy-mobile`، عام (Public)، PKCE `S256`، نفس خريطة الـ ACR ونفس الـ Mappers | الـ Redirect هو `matbakhy-dev://auth/callback` (تطوير). موجود في القالب المحلي بس؛ قالب المعاينة مفيهوش (NOT VERIFIED على الـ Realm الحي) |
 | عميل الأدمن | `matbakhy-admin`، حساب خدمة (Service Account)، مفيش Flow تفاعلي | الـ Backend بس هو اللي بيستخدمه لإعادة ضبط الـ MFA وإنهاء Sessions المزوّد (`backend/app/src/main/java/com/matbakhy/app/mfa/KeycloakAdmin.java`)؛ السرّ بيتولّد لكل بيئة ومابيتعملوش Commit أبدًا |

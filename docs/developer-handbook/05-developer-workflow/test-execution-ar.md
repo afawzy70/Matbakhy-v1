@@ -16,7 +16,7 @@
 | المعمارية | `ModuleBoundaryTest` في `backend/app/src/test/java/com/matbakhy/app/architecture` | جزء من `verify` | حدود الموديولات (الموديولات التانية بتستخدم Package اسمه `api` بس؛ ومفيش دورات) | السلوك وقت التشغيل |
 | عقد الـ API | `pnpm contract:check` | Node، pnpm | إن `contracts/openapi.yaml` سليم في الـ Lint (Redocly) وإن الـ Client المتولّد مفيهوش انحراف | إن السيرفر بينفّذه فعلًا (`ContractRoutesTest` في `backend/app/src/test/java/com/matbakhy/app/web` بيغطي المسارات) |
 | وحدة للويب / الـ Packages | `pnpm test` (Vitest، وJest للموبايل) | Node، pnpm | سلوك المكونات والمنطق | التكامل الحقيقي مع الـ API |
-| الأنواع والـ Lint | `pnpm typecheck`، `pnpm lint` | Node، pnpm | الصحة الساكنة | السلوك |
+| الأنواع والـ Lint | `pnpm typecheck`، `pnpm lint` | Node، pnpm | سلامة الأنواع والكود بالفحص الساكن | السلوك |
 | E2E في المتصفح (API حقيقي) | `scripts/dev.sh e2e` | Docker، JDK، Node، Chromium | مسارات العميل والطبّاخ والعمليات على Stack مؤقت | تطبيقات الـ Native، والمزوّدين الحقيقيين |
 | Smoke المتصفح على الـ Staging | `pnpm --filter @matbakhy/operations-web e2e:staging` | بيئة معاينة منشورة وIP بتاعك في القايمة المسموحة | أوردر بعربون محاكى على بيئة المعاينة | الجاهزية للـ Production |
 | Native | `.github/workflows/native-build.yml`، `apps/customer-mobile/scripts/*.sh` | Android SDK / macOS | الـ Compile والتشغيل وتسجيل الدخول واسترجاع الأوردر على Emulator/Simulator | السلوك على جهاز فعلي، والجاهزية للـ Store |
@@ -65,7 +65,7 @@ scripts/check_backend_suite.sh ClassA ClassB
 - الاختبارات اللي بتحمّل السياق كامل بتستخدم `@IntegrationTest`؛ والمساعدات في `backend/app/src/test/java/com/matbakhy/app/support/` (`TestKitchens` و`TestCommerce` و`TestUploads` و`MutableClock` و`OidcBrowser` و`MfaBrowser`). الشغل في الخلفية متعطّل في الـ Annotation ده عشان الاختبارات تتحكم في الوقت بـ `MutableClock`.
 - حزم الاختبارات بتعكس الـ Domains: `orders` و`payments` و`catalog` و`availability` و`cooks` و`identity` و`mfa` و`finance` و`support` و`notifications` و`privacy` و`security` و`reliability` و`observability` و`media` و`insights` و`providers` و`db` و`config` و`web`.
 - حالات الـ Race (آخر حصة، والسعة، والإرسال المكرر) لازم تستخدم تزامن حقيقي على PostgreSQL، مش sleep ([01-verification.md](../../quality/01-verification.md)).
-- ماتضعّفش Assertion، ولا تعمل Mock للـ Database، ولا تمسح اختبار بيفشل عشان تجيب أخضر. دي قاعدة في المشروع ([CLAUDE.md](../../../CLAUDE.md)).
+- ماتضعّفش Assertion، ولا تعمل Mock للـ Database، ولا تمسح اختبار بيفشل عشان الفحوصات تنجح. دي قاعدة في المشروع ([CLAUDE.md](../../../CLAUDE.md)).
 
 ## اختبارات E2E في المتصفح (Playwright)
 
@@ -79,7 +79,7 @@ scripts/check_backend_suite.sh ClassA ClassB
 
 ## كتالوج قبول المالك (200 حالة)
 
-الملفات `docs/quality/owner-acceptance/cases/*.json` فيها 200 تعريف حالة (معدودة: config-security 54، وcook-ops 39، وdiscovery-basket 45، وorders-finance 62). الـ README بتاع الكتالوج بيقول 199، و 53 لـ config-security؛ والمصدر هو الـ JSON، فصدّق 200. كل حالة حالتها NOT_RUN أو BLOCKED؛ وPASS مكانه في سجل التشغيل بس.
+الملفات `docs/quality/owner-acceptance/cases/*.json` فيها 200 تعريف حالة (معدودة: config-security 54، وcook-ops 39، وdiscovery-basket 45، وorders-finance 62). الـ README بتاع الكتالوج بيقول 199، و 53 لـ config-security؛ والمصدر هو الـ JSON، فاعتمد العدد 200. كل حالة حالتها NOT_RUN أو BLOCKED؛ وPASS مكانه في سجل التشغيل بس.
 
 ```bash
 python3 scripts/owner_e2e_catalog.py check     # sources valid and generated files not stale
@@ -91,13 +91,13 @@ python3 scripts/owner_e2e_fixtures.py check    # manifest, SQL seed and case fil
 
 ## الـ Fixtures الاصطناعية (Synthetic)
 
-مفيش غير أطراف وهمية: `customer-a/b` و`cook-a` و`ops-a` محليًا؛ و`preview-customer-1/2` و`preview-cook-1` و`preview-ops-1/2` وحسابات `owner-e2e-*` على بيئة المعاينة. كلمات السر مش موجودة في الـ Repository أبدًا؛ والملفات المتولّدة بتروح لمجلد خاص برّه الـ Checkout. ماتستخدمش أرقام تليفونات ولا عناوين ولا أسامي حقيقية في أي مكان، بما فيها لقطات الشاشة.
+مفيش غير حسابات تجريبية غير حقيقية: `customer-a/b` و`cook-a` و`ops-a` محليًا؛ و`preview-customer-1/2` و`preview-cook-1` و`preview-ops-1/2` وحسابات `owner-e2e-*` على بيئة المعاينة. كلمات السر مش موجودة في الـ Repository أبدًا؛ والملفات المتولّدة بتروح لمجلد خاص برّه الـ Checkout. ماتستخدمش أرقام تليفونات ولا عناوين ولا أسامي حقيقية في أي مكان، بما فيها لقطات الشاشة.
 
 ## الأدلة والتعامل مع العيوب
 
 - دليل كل Story: `verification/runs/<date>-<story>/evidence.json` بيكتبه `scripts/record_evidence.py` على مصدر نضيف معمول له Commit؛ و`scripts/mark_story.py` بيرفض DONE من غير دليل ناجح ومراجعة PASS. فحوصات الـ Schema: `python3 scripts/validate_blueprint.py`.
-- مفردات النتايج: PASS لحاجة اتنفّذت ومعاها مخرجات بس؛ غير كده NOT_RUN أو BLOCKED أو FAIL. الـ CI الأخضر مش معناه "كل السيناريوهات نجحت" ([owner-e2e-execution-guide.md](../../quality/owner-e2e-execution-guide.md)).
-- بلّغ عن العيب بقالب GitHub issue اسمه `.github/ISSUE_TEMPLATE/defect.md` (معرّفات الـ Story/القاعدة/السيناريو، والـ Source Commit، والخطورة، ومعرّفات الـ Fixtures الاصطناعية، والخطوات، والمتوقع، والملاحظ، والـ Logs بعد التنضيف، والثوابت المتأثرة).
+- مفردات النتايج: PASS لحاجة اتنفّذت ومعاها مخرجات بس؛ غير كده NOT_RUN أو BLOCKED أو FAIL. نجاح فحوصات الـ CI مش معناه "كل السيناريوهات نجحت" ([owner-e2e-execution-guide.md](../../quality/owner-e2e-execution-guide.md)).
+- بلّغ عن العيب بقالب GitHub issue اسمه `.github/ISSUE_TEMPLATE/defect.md` (معرّفات الـ Story/القاعدة/السيناريو، والـ Source Commit، والخطورة، ومعرّفات الـ Fixtures ذات البيانات التجريبية غير الحقيقية، والخطوات، والمتوقع، والملاحظ، والـ Logs بعد التنضيف، والثوابت المتأثرة).
 - إصلاح عيب: اعمل Reproduce باختبار آلي بيفشل الأول لو ممكن، وبعدين صلّح، وأعد تشغيل الـ Suite المتأثرة والمجاورة ليها، وبعدين اذكر الاختبار في الـ PR. تغطية الـ Regression جزء من الإصلاح، مش اختيارية.
 
 ## القيود المعروفة وفجوات التوثيق

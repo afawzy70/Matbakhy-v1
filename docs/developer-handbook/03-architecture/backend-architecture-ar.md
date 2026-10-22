@@ -4,7 +4,7 @@
 > **Status:** IMPLEMENTED — Modular Monolith زي ما هو موصوف؛ وأي Provider adapters مخطّط لها متوضّحة في النص
 > **Language / اللغة:** [English](backend-architecture.md) · العربية
 
-الـ Backend موجود في `backend/`: Java 21 وSpring Boot 4.1.1 (`backend/pom.xml`) وMaven wrapper اسمه `backend/mvnw`. هو وحدة Deployment واحدة (`backend/app`) متجمّعة من تسع موديولات Domain بالإضافة لـ Shared kernel صغير. الرسم: [مكوّنات الـ Backend](diagrams-ar.md#3-مكونات-الـ-backend). ودليل قراءة موديول بموديول موجود في [دليل موديولات الـ Backend](../04-codebase/backend-module-guide-ar.md).
+الـ Backend موجود في `backend/`: Java 21 وSpring Boot 4.1.1 (`backend/pom.xml`) وMaven wrapper اسمه `backend/mvnw`. هو وحدة Deployment واحدة (`backend/app`) متجمّعة من تسعة موديولات Domain بالإضافة لـ Shared kernel صغير. الرسم: [مكوّنات الـ Backend](diagrams-ar.md#3-مكونات-الـ-backend). ودليل قراءة موديول بموديول موجود في [دليل موديولات الـ Backend](../04-codebase/backend-module-guide-ar.md).
 
 ## تركيب الـ Maven
 
@@ -22,7 +22,7 @@
 | `matbakhy-operations` | `backend/modules/operations` | الـ Audit log port وتنفيذه، والـ Redaction، وAPI قراءة الـ Audit |
 | `matbakhy-app` | `backend/app` | طبقة التجميع (Composition) وتطبيق Spring Boot الوحيد (`MatbakhyApplication`): الأمان، والـ MFA، ومعالجة الاستثناءات، وProvider adapters، وStore الـ Idempotency، والـ Metrics، والإعدادات، والـ Resources والـ Migrations، وكل اختبارات التكامل |
 
-ملف `backend/pom.xml` الأب بيسرد الموديولات بترتيب الاعتماد وبيدير الإصدارات (AWS SDK BOM، وPDFBox، وصور الـ Test-container المثبّتة بالـ Digest). وكمان بيثبّت Tomcat 11.0.26 وJackson 3.1.7 فوق الـ Boot BOM كـ Overrides لتحذيرات الاعتماديات (Dependency advisory).
+ملف `backend/pom.xml` الأب بيسرد الموديولات بترتيب الاعتماد وبيدير الإصدارات (AWS SDK BOM، وPDFBox، وصور الـ Test-container المثبّتة بالـ Digest). وكمان بيثبّت Tomcat 11.0.26 وJackson 3.1.7 متجاوزًا إصدارات الـ Boot BOM لمعالجة التنبيهات الأمنية الخاصة بالاعتماديات (Dependency advisories).
 
 ## اصطلاح الـ Packages جوه الموديول
 
@@ -49,9 +49,9 @@ internal/  services, JDBC adapters implementing api interfaces, jobs, properties
 
 ## الطبقات والوصول للبيانات
 
-* **الـ Controller (web).** رفيع: بيربط الـ Request record ويعمل له Validation، وبيقرا المتصل من `@AuthenticationPrincipal CurrentAccount`، وبيستدعي Service، وبيرجّع View record. الـ Controllers كلاسات Package-private بحقن عن طريق الـ Constructor. مثال: `OrderController.place` بيقرا الـ Headers `Idempotency-Key` و`Accept-Language` وبيرجّع `201` مع `Location`.
+* **الـ Controller (web).** مسؤوليته محدودة: بيربط الـ Request record ويعمل له Validation، وبيقرا المتصل من `@AuthenticationPrincipal CurrentAccount`، وبيستدعي Service، وبيرجّع View record. الـ Controllers كلاسات Package-private بحقن عن طريق الـ Constructor. مثال: `OrderController.place` بيقرا الـ Headers `Idempotency-Key` و`Accept-Language` وبيرجّع `201` مع `Location`.
 * **الـ Service (internal).** فيه قواعد العمل وحدود الـ Transaction (`@Transactional` بتاعة Spring؛ 81 استخدام في الكود الرئيسي). الـ Services بترجّع Java records عادية؛ ومفيش طبقة DTO mapping منفصلة.
-* **الـ Persistence.** **JDBC عادي عن طريق Spring `JdbcTemplate` بـ SQL مكتوب بإيد**؛ مفيش JPA/Hibernate (`@Entity` مش موجودة في الكود خالص) ومفيش Spring Data repositories. الـ "Repositories" يا إما SQL جوه Service يا إما كلاسات `Jdbc*` بتنفّذ Interface من الـ `api` (مثلًا `JdbcSlotInventory` و`JdbcMealCatalog` و`JdbcAccountDirectory` و`JdbcOrderDirectory` و`JdbcAuditLog`). الصفوف بتتحوّل بـ Lambdas أو `queryForMap`. النتيجة: مفيش مفاجآت Lazy-loading وكل Query باينة في المراجعة، بس تغيير اسم عمود محتاج grep في الـ Services.
+* **الـ Persistence.** **JDBC عادي عن طريق Spring `JdbcTemplate` بـ SQL مكتوب يدويًا**؛ مفيش JPA/Hibernate (`@Entity` مش موجودة في الكود خالص) ومفيش Spring Data repositories. الـ "Repositories" يا إما SQL جوه Service يا إما كلاسات `Jdbc*` بتنفّذ Interface من الـ `api` (مثلًا `JdbcSlotInventory` و`JdbcMealCatalog` و`JdbcAccountDirectory` و`JdbcOrderDirectory` و`JdbcAuditLog`). الصفوف بتتحوّل بـ Lambdas أو `queryForMap`. النتيجة: مفيش مفاجآت Lazy-loading وكل Query باينة في المراجعة، بس تغيير اسم عمود محتاج grep في الـ Services.
 * **الـ Schema.** مملوك لـ Flyway SQL migrations في `backend/app/src/main/resources/db/migration` (شوف [معمارية قاعدة البيانات](database-architecture-ar.md)). التطبيق عمره ما بيعمل جداول.
 
 ## الـ Transactions والتزامن (Concurrency)

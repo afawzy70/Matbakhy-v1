@@ -4,18 +4,18 @@
 > **Status:** PARTIALLY IMPLEMENTED — الـ Local Stack المبني على Docker وخوادم Vite للتطوير موجودين (IMPLEMENTED) والـ CI بيجرّبهم على Linux؛ وإجراءات Windows/macOS وتشغيل الـ API برّه Docker هي NOT VERIFIED.
 > **Language / اللغة:** [English](local-environment.md) · العربية
 
-سطّب الأدوات الأول ([prerequisites.md](prerequisites-ar.md)). كل حاجة هنا بتستخدم بيانات اصطناعية (Synthetic) وSecrets محلية بس.
+سطّب الأدوات الأول ([prerequisites.md](prerequisites-ar.md)). كل حاجة هنا بتستخدم بيانات تجريبية غير حقيقية (Synthetic Data) وSecrets محلية بس.
 
 ## اللي بيوفّره `scripts/dev.sh`
 
-`scripts/dev.sh` (bash) بيلف حوالين `infra/compose.yaml`. الخدمات، من ملف الـ Compose:
+`scripts/dev.sh` (bash) بيسهّل تشغيل وإدارة الخدمات المتعرّفة في `infra/compose.yaml`. الخدمات، من ملف الـ Compose:
 
 | الخدمة | الصورة (مثبّتة بالـ Digest) | بورت الجهاز (الافتراضي، على 127.0.0.1 بس) | الغرض |
 |---|---|---|---|
 | `postgres` | `postgres:16.15-alpine` | 5432 | قاعدة بيانات التطبيق، وFlyway Migrations بتشتغل مع تشغيل الـ API |
 | `identity` | `keycloak/keycloak:26.8.0` في وضع `start-dev` | 8180 | مزود OIDC محلي، والـ Realm بيتعمل له Import من `infra/identity/matbakhy-realm.json` |
 | `object-storage` | `adobe/s3mock:5.2.3` | 9090 | محاكي S3 فيه Buckets اسمها `matbakhy-private` و`matbakhy-public` |
-| `mail` | `axllent/mailpit:v1.31.5` | 8025 (الواجهة)، 1025 (SMTP) | مصرف بريد؛ مفيش حاجة بتخرج من الجهاز |
+| `mail` | `axllent/mailpit:v1.31.5` | 8025 (الواجهة)، 1025 (SMTP) | خدمة بتستقبل رسائل البريد التجريبية محليًا؛ مفيش حاجة بتخرج من الجهاز |
 | `api` | متبني من `backend/Dockerfile` | 8080 | الـ API بتاع Spring Boot، `APP_ENV=LOCAL`، البروفايل `dev` |
 
 الأوامر (كلها من جذر الـ Repository):
@@ -24,7 +24,7 @@
 |---|---|
 | `scripts/dev.sh doctor` | بيتحقق من المتطلبات المسبقة؛ مابيشغّلش حاجة |
 | `scripts/dev.sh up` | `doctor`، وبينشئ ملف الـ env لو ناقص، وبيبني الـ API jar (`./mvnw -DskipTests package`)، وبيرندر الـ Realm، و`docker compose up --build --detach --wait` |
-| `scripts/dev.sh smoke` | الصحة، وFlyway baseline، ومناطق التطوير، وOIDC discovery، وS3 buckets، والتقاط البريد، وإنفاذ PKCE، واستجابة 401 للمستخدم المجهول، وتسجيل دخول OIDC من الويب بمستخدم وهمي، ودورة رفع خاص موقّع |
+| `scripts/dev.sh smoke` | الصحة، وFlyway baseline، ومناطق التطوير، وOIDC discovery، وS3 buckets، والتقاط البريد، وإنفاذ PKCE، واستجابة 401 للمستخدم المجهول، وتسجيل دخول OIDC من الويب بمستخدم تجريبي، واختبار دورة رفع ملف خاص باستخدام رابط موقّع |
 | `scripts/dev.sh down` | بيوقف الـ Containers وبيحتفظ بـ Volume البيانات |
 | `scripts/dev.sh reset` | بيوقف ويمسح Volume الـ Stack ده (وبيرفض ملفات env مش معلّمة إنها محلية) |
 | `scripts/dev.sh verify` | `doctor` + `up` + `smoke` في مشروع Compose مؤقت على بورتات بديلة (15432، 18180، 18080 ...)، وبيتشال عند الخروج |
@@ -43,7 +43,7 @@ scripts/dev.sh smoke      # prints PASS only if every check passed
 
 الـ Realm المحلي (`infra/identity/matbakhy-realm.json`) بيعرّف `customer-a` و`customer-b` و`cook-a` و`ops-a`، بالإضافة لحساب الخدمة `service-account-matbakhy-admin`. كل المستخدمين ليهم نفس كلمة السر، `DEV_USER_PASSWORD` في ملف الـ env المحلي بتاعك. اقراها من ملفك لما تحتاجها؛ وماتلصقهاش في أي مكان. الـ SMS مش متاح محليًا، وتسجيل الـ MFA التفاعلي المحلي NOT VERIFIED (الـ Realm بيعرّف تدفق OTP في `infra/identity/matbakhy-realm.json`)؛ واختبارات المتصفح بتحاكي التحقق من التليفون بـ SQL (شوف `apps/operations-web/e2e/fixtures.ts`).
 
-بيانات التطوير بتيجي من سكريبتات Flyway المتكررة في `backend/app/src/main/resources/db/devdata` (مناطق خدمة اسمها `test-zone-*`، وسياسة تجارة اصطناعية). `EnvironmentGuard` (`backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`) بيرفض البروفايل `dev` أو مواقع devdata لما `APP_ENV` يكون STAGING أو PRODUCTION؛ وLOCAL وCI وPREVIEW بيتحسبوا بيئات اصطناعية.
+بيانات التطوير بتيجي من سكريبتات Flyway المتكررة في `backend/app/src/main/resources/db/devdata` (مناطق خدمة اسمها `test-zone-*`، وسياسة تجارية ببيانات تجريبية غير حقيقية). `EnvironmentGuard` (`backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`) بيرفض البروفايل `dev` أو مواقع devdata لما `APP_ENV` يكون STAGING أو PRODUCTION؛ وLOCAL وCI وPREVIEW بيتحسبوا بيئات ببيانات تجريبية غير حقيقية.
 
 ## الـ Frontends
 
@@ -65,11 +65,11 @@ pnpm --filter @matbakhy/customer-mobile start     # Expo dev server
 (cd apps/customer-mobile && pnpm bundle:native)    # Android + iOS JS bundles, no native toolchain needed
 ```
 
-التشغيل على Emulator أو Simulator محتاج الـ Native Toolchains وDevelopment Build؛ ومجلدات `android/` و`ios/` بتتولّد بـ `expo prebuild` ومش بتتعمل لها Commit. Expo Go أو حزمة JS أو معاينة ويب عمرها ما بتتحسب تحقق Native (قاعدة المشروع، شوف [toolchain.md](../../engineering/toolchain.md)). التدفقات الـ Native المتسكربتة موجودة في `apps/customer-mobile/scripts/` وبتشتغل في الـ CI ([ci-cd.md](ci-cd-ar.md)). على الـ Emulator التطبيق بيوصل لـ Stack الجهاز عن طريق الاسم البديل للـ Loopback بتاع الـ Emulator؛ والقيم بالظبط اللي الـ CI بيستخدمها موجودة في `apps/customer-mobile/scripts/auth-roundtrip-android.sh`. جلسة Emulator تفاعلية محلية بإيدك: NOT VERIFIED.
+التشغيل على Emulator أو Simulator محتاج الـ Native Toolchains وDevelopment Build؛ ومجلدات `android/` و`ios/` بتتولّد بـ `expo prebuild` ومش بتتعمل لها Commit. Expo Go أو حزمة JS أو معاينة ويب عمرها ما بتتحسب تحقق Native (قاعدة المشروع، شوف [toolchain.md](../../engineering/toolchain.md)). خطوات الـ Native المؤتمتة بالسكريبتات موجودة في `apps/customer-mobile/scripts/` وبتشتغل في الـ CI ([ci-cd.md](ci-cd-ar.md)). على الـ Emulator التطبيق بيوصل لـ Stack الجهاز عن طريق الاسم البديل للـ Loopback بتاع الـ Emulator؛ والقيم بالظبط اللي الـ CI بيستخدمها موجودة في `apps/customer-mobile/scripts/auth-roundtrip-android.sh`. جلسة Emulator تفاعلية محلية بإيدك: NOT VERIFIED.
 
 ## تشغيل الـ API برّه Docker
 
-`./mvnw spring-boot:run` من `backend/app` محتمل (الـ Spring Boot plugin متظبط في `backend/app/pom.xml`) لكنه NOT VERIFIED هنا. المتطلبات المقروءة من `application.yaml`: `APP_ENV` ملوش قيمة افتراضية ولازم يتظبط (`LOCAL` للتطوير)؛ و`DATABASE_URL` و`DATABASE_USERNAME` و`DATABASE_PASSWORD` افتراضيهم `localhost:5432/matbakhy`؛ و`OIDC_ISSUER` افتراضيه `http://localhost:8180/realms/matbakhy`؛ و`OIDC_WEB_CLIENT_SECRET` والـ Realm لازم يطابقوا اللي `scripts/dev.sh` رندره. أبسط طريقة مدعومة للتكرار على الـ Backend هي `scripts/dev.sh up` وتعيد تشغيله بعد التغييرات (بيعيد بناء الـ jar والصورة).
+`./mvnw spring-boot:run` من `backend/app` محتمل (الـ Spring Boot plugin متظبط في `backend/app/pom.xml`) لكنه NOT VERIFIED هنا. المتطلبات المقروءة من `application.yaml`: `APP_ENV` ملوش قيمة افتراضية ولازم يتظبط (`LOCAL` للتطوير)؛ و`DATABASE_URL` و`DATABASE_USERNAME` و`DATABASE_PASSWORD` افتراضيهم `localhost:5432/matbakhy`؛ و`OIDC_ISSUER` افتراضيه `http://localhost:8180/realms/matbakhy`؛ و`OIDC_WEB_CLIENT_SECRET` والـ Realm لازم يطابقوا اللي `scripts/dev.sh` رندره. أبسط طريقة مدعومة لتطوير الـ Backend وتجربة التعديلات هي `scripts/dev.sh up` وتعيد تشغيله بعد التغييرات (بيعيد بناء الـ jar والصورة).
 
 ## الوصول للـ Database وKeycloak (محليًا)
 

@@ -1,12 +1,12 @@
 # بيئة المعاينة
 
 > **Owner role:** Infrastructure and deployment
-> **Status:** PARTIALLY IMPLEMENTED — بيئة معاينة ببيانات اصطناعية (Synthetic) على VPS واحد بتتنشر من `develop` بواسطة `.github/workflows/deploy-preview.yml`؛ هي مش Staging ومش Production. حالة السيرفر ماتفحصتش وقت كتابة الصفحة (NOT VERIFIED).
+> **Status:** PARTIALLY IMPLEMENTED — بيئة معاينة ببيانات تجريبية غير حقيقية (Synthetic Data) على VPS واحد بتتنشر من `develop` بواسطة `.github/workflows/deploy-preview.yml`؛ هي مش Staging ومش Production. حالة السيرفر ماتفحصتش وقت كتابة الصفحة (NOT VERIFIED).
 > **Language / اللغة:** [English](preview-environment.md) · العربية
 
 ## هي إيه
 
-بيئة الوصول ليها مقيّد، ومعلّمة إنها Demo، وبياناتها اصطناعية، وبتشتغل بـ Docker Compose من `deploy/web-preview` (`compose.yaml`، وملف `compose.4gb.yaml` الاختياري لتعديل الأحجام، وCaddy كـ Reverse Proxy في `deploy/web-preview/Caddyfile`، وقالب Keycloak realm تحت `deploy/web-preview/identity`، وتخزين متوافق مع S3 تحت `deploy/web-preview/storage`، وإعدادات Grafana/Loki/Prometheus تحت `deploy/web-preview/observability`). الـ API بيشتغل بـ `APP_ENV=PREVIEW`، والكود بيعتبره بيئة اصطناعية (مسموح فيها الـ Fixtures ومزوّدي الخدمة اللي مابيبعتوش فعلًا؛ شوف `DeploymentEnvironment` في `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java`). الإعدادات العامة بترجّع `{"environment":{"name":"PREVIEW","demo":true}}`، وده اللي بيتحقق منه `deploy/web-preview/smoke.sh`.
+بيئة الوصول ليها مقيّد، ومعلّمة إنها Demo، وبياناتها تجريبية غير حقيقية، وبتشتغل بـ Docker Compose من `deploy/web-preview` (`compose.yaml`، وملف `compose.4gb.yaml` الاختياري لتعديل الأحجام، وCaddy كـ Reverse Proxy في `deploy/web-preview/Caddyfile`، وقالب Keycloak realm تحت `deploy/web-preview/identity`، وتخزين متوافق مع S3 تحت `deploy/web-preview/storage`، وإعدادات Grafana/Loki/Prometheus تحت `deploy/web-preview/observability`). الـ API بيشتغل بـ `APP_ENV=PREVIEW`، والكود بيعتبره بيئة ببيانات تجريبية غير حقيقية (مسموح فيها الـ Fixtures ومزوّدي الخدمة اللي مابيبعتوش فعلًا؛ شوف `DeploymentEnvironment` في `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java`). الإعدادات العامة بترجّع `{"environment":{"name":"PREVIEW","demo":true}}`، وده اللي بيتحقق منه `deploy/web-preview/smoke.sh`.
 
 الخلفية: [06-web-preview.md](../../operations/06-web-preview.md)، [09-staging-hetzner-preparation.md](../../operations/09-staging-hetzner-preparation.md)، [11-staging-deployment-and-rollback.md](../../operations/11-staging-deployment-and-rollback.md)، [12-owner-server-setup.md](../../operations/12-owner-server-setup.md).
 
@@ -41,7 +41,7 @@
 3. سجّل دخول عن طريق Keycloak؛ ميزات الموظفين محتاجة حساب عنده الصلاحيات الصح ([actors-and-permissions.md](../01-business/actors-and-permissions-ar.md)).
 4. شغّل الـ Smoke للقراءة بس من جهازك: `sh deploy/web-preview/smoke.sh <PREVIEW_DOMAIN>` (استخدم `SMOKE_OPS=skip` لو انت مش في فئة الموظفين).
 5. الـ Smoke عن طريق المتصفح: `pnpm --filter @matbakhy/operations-web e2e:staging` مع متغيرات `STAGING_*` ([test-execution.md](test-execution-ar.md)). بيعمل أوردر Demo واحد في كل تشغيل.
-6. معرفة الإصدار المنشور: اطلب من المسؤول عن التشغيل إنه يشغّل `./deploy.sh status` (الصور الشغّالة، وإصدار الـ Schema، وآخر الإصدارات). قارن الـ Commit مع `git log`. ممكن بيئة المعاينة تكون أقدم من `develop` لو في Deployment واقف في الطابور.
+6. معرفة الإصدار المنشور: اطلب من المسؤول عن التشغيل إنه يشغّل `./deploy.sh status` (الـ Docker Images الشغّالة، وإصدار الـ Schema، وآخر الإصدارات). قارن الـ Commit مع `git log`. ممكن بيئة المعاينة تكون أقدم من `develop` لو في Deployment مستني دوره في التنفيذ.
 
 ## هي مش إيه
 

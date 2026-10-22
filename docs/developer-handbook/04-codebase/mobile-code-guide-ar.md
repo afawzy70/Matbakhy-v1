@@ -1,7 +1,7 @@
 # دليل كود الموبايل (تطبيق العميل)
 
 > **Owner role:** Frontend and mobile
-> **Status:** PARTIALLY IMPLEMENTED — مسارات اكتشاف العميل والطلب والعربون موجودة؛ إرسال الـ Push وقبول الجهاز الفعلي وقارئ الشاشة مش موجودين
+> **Status:** PARTIALLY IMPLEMENTED — مسارات اكتشاف العميل والطلب والعربون موجودة؛ إرسال الـ Push واختبارات القبول على أجهزة فعلية وبقارئ الشاشة مش موجودين
 > **Language / اللغة:** [English](mobile-code-guide.md) · العربية
 
 تطبيق العميل لـ Android/iOS هو `apps/customer-mobile/`: React Native 0.86 + Expo 57 مع React Navigation
@@ -28,7 +28,7 @@
 | دورة حياة الـ Session | `src/session.ts` | تجديد Access-token قبل انتهائه؛ رفض التجديد بينهي الـ Session |
 | الـ API Client | `src/mobileApi.ts` | بيضيف `Authorization: Bearer`؛ الرد 401 بيشغّل التجديد/تسجيل الخروج، والرد 403 `STEP_UP_REQUIRED` بيشغّل بانر الـ Step-up |
 | السلة والتسجيل المعلّق | `src/basket.ts` | مخزن آمن لكل حساب؛ بيتمسح عند تسجيل الخروج وتبديل الحساب |
-| تبديل الحساب | `src/AppContext.tsx` (`accountEpoch`) | بيعيد Mount لكل اللي تحته لما الشخص يتغيّر عشان مفيش حالة شاشة تفضل عايشة (TC-048) |
+| تبديل الحساب | `src/AppContext.tsx` (`accountEpoch`) | بيعيد Mount لكل اللي تحته لما الشخص يتغيّر عشان مفيش حالة شاشة تفضل محفوظة من الحساب السابق (TC-048) |
 
 الـ Backend بيتحقق من دول كسلسلة Bearer JWT من غير حالة (Stateless) (`SecurityConfiguration.bearerChain`، من غير كوكيز، وCSRF
 معطّل للسلسلة دي بالتصميم).
@@ -44,7 +44,7 @@
 | `src/screens/Discover.tsx`, `Meal.tsx`, `Favorites.tsx` | التصفح |
 | `src/screens/Notifications.tsx`, `Support.tsx`, `Account.tsx` | الصندوق وحالات الدعم والبروفايل/الأمان |
 | `src/activity.ts`, `src/notificationPermission.ts` | النشاط المجهول؛ وصلاحية الإشعارات الاختيارية (إرسال الـ Push نفسه مش شغّال) |
-| `src/useServer.ts`, `src/ui.tsx`, `src/i18n.ts`, `src/ErrorBoundary.tsx` | Hook تحميل البيانات والواجهة المشتركة والنصوص وحاجز الانهيار (Crash Boundary) |
+| `src/useServer.ts`, `src/ui.tsx`, `src/i18n.ts`, `src/ErrorBoundary.tsx` | Hook تحميل البيانات والواجهة المشتركة والنصوص ومكوّن احتواء أخطاء العرض (Crash Boundary) |
 
 ## الاختبارات والتحقق على الجهاز (Native)
 
@@ -57,5 +57,5 @@
 ## القيود المعروفة وفجوات التوثيق
 
 - إرسال الـ Push: PLANNED. التطبيق يقدر يطلب صلاحية الإشعارات في نسخ التطوير بس (`src/config.ts` `notificationPrompt`)؛ ومفيش أدابتور FCM/APNs على الـ Backend.
-- قبول الجهاز الفعلي وقارئ الشاشة (BLK-003 و BLK-004 في `docs/status/latest.md`) لسه ماتعملوش؛ و MB-034 و MB-035 (مرشحات الإصدار) حالتهم TODO في `planning/backlog.json`.
+- اختبارات القبول على أجهزة فعلية وبقارئ الشاشة (BLK-003 و BLK-004 في `docs/status/latest.md`) لسه ماتعملوش؛ و MB-034 و MB-035 (مرشحات الإصدار) حالتهم TODO في `planning/backlog.json`.
 - Realm الـ Keycloak بتاع المعاينة `deploy/web-preview/identity/matbakhy-realm.preview.json` بيعرّف Clients اسمهم `matbakhy-web` و `matbakhy-admin` لكن مفيش Client اسمه `matbakhy-mobile`، في حين إن الـ Realm المحلي `infra/identity/matbakhy-realm.json` فيه؛ إزاي نسخ الموبايل بتعمل Authentication ضد المعاينة NOT VERIFIED هنا.

@@ -1,7 +1,7 @@
 # نظرة عامة على السيستم
 
 > **Owner role:** Backend architecture
-> **Status:** PARTIALLY IMPLEMENTED — منصة الطلبات الأساسية شغّالة على بيئة معاينة ببيانات اصطناعية (Synthetic)؛ مفيش مزوّدين حقيقيين ولا Push ولا فلوس حقيقية ولا Deployment على الـ Production
+> **Status:** PARTIALLY IMPLEMENTED — منصة الطلبات الأساسية شغّالة على بيئة معاينة ببيانات تجريبية غير حقيقية (Synthetic Data)؛ مفيش مزوّدين حقيقيين ولا Push ولا فلوس حقيقية ولا Deployment على الـ Production
 > **Language / اللغة:** [English](system-overview.md) · العربية
 
 الصفحة دي هي الخريطة. بتسمّي كل جزء بيتعمل له Deployment، وإيه اللي بيكلّم إيه، وأنهي Integrations حقيقية وأنهي لأ. التفاصيل في الصفحات المجاورة، ومعنى البيزنس في [نموذج الـ Marketplace](../01-business/marketplace-model-ar.md).
@@ -44,7 +44,7 @@
 | متطلب الـ MFA | سياسة في قاعدة بيانات السيرفر بالإضافة لتأكيدات Keycloak | `backend/app/src/main/java/com/matbakhy/app/mfa/MfaPolicyService.java` |
 | نصوص الواجهة وتخطيط الـ RTL | الـ Clients (العربي RTL هو الافتراضي، والإنجليزي LTR) | `apps/*/src/i18n.ts`, `packages/design-tokens` |
 
-الـ Clients بتعرض القيم اللي جاية من السيرفر؛ وسعر الوحدة اللي السلة فاكراه هو تقدير بس (`apps/customer-web/src/cart.ts`).
+الـ Clients بتعرض القيم اللي جاية من السيرفر؛ وسعر الوحدة المحفوظ في السلة هو تقدير بس (`apps/customer-web/src/cart.ts`).
 
 ## التكاملات الخارجية: إيه الموجود فعلًا
 
@@ -67,7 +67,7 @@
 |---|---|---|---|
 | `LOCAL` | جهاز المطوّر عن طريق `scripts/dev.sh up` و`infra/compose.yaml` | Fakes، والمفاتيح الخاصة بالتطوير مسموحة، والـ Profile بتاع `dev` بيضيف Migrations اصطناعية | `backend/app/src/main/java/com/matbakhy/app/config/MatbakhyProperties.java` |
 | `CI` | تشغيلات الاختبارات | زي LOCAL | نفس المكان |
-| `PREVIEW` | المعاينة المحدودة الوصول ببيانات اصطناعية | الـ Fakes مسموحة، والأسرار لازم تكون حقيقية، وبيظهر إشعار الديمو | `deploy/web-preview/compose.yaml` |
+| `PREVIEW` | المعاينة المحدودة الوصول ببيانات تجريبية غير حقيقية | الـ Fakes مسموحة، والأسرار لازم تكون حقيقية، وبيظهر إشعار الديمو | `deploy/web-preview/compose.yaml` |
 | `STAGING`, `PRODUCTION` | متعرّفين في الـ Enum؛ والتطبيق بيرفض يشتغل من غير مزوّدين حقيقيين | مفيش | `backend/app/src/main/java/com/matbakhy/app/providers/ProviderConfiguration.java` |
 
 يعني النهارده البيئة الوحيدة اللي متعمل لها Deployment هي المعاينة. مفيش بيئة Production ولا فلوس حقيقية ولا SMS/email/push حقيقي ولا إصدار على متاجر التطبيقات. أي كلام عن "staging" في المستندات القديمة اعتبره المعاينة؛ شوف [البنية التحتية والـ Deployment](infrastructure-and-deployment-ar.md).

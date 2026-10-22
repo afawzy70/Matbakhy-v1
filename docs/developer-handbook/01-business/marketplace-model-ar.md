@@ -1,7 +1,7 @@
 # نموذج الـ Marketplace
 
 > **Owner role:** Business documentation
-> **Status:** PARTIALLY IMPLEMENTED — الـ Marketplace المعاملاتي والاستكشاف والتوافر والموافقة متنفّذين؛ أي تسييل (Monetization) بعد صفر عمولة PLANNED.
+> **Status:** PARTIALLY IMPLEMENTED — عمليات البيع والطلب في الـ Marketplace والاستكشاف والتوافر والموافقة متنفّذين؛ أي تحقيق دخل (Monetization) بعد صفر عمولة PLANNED.
 > **Language / اللغة:** [English](marketplace-model.md) · العربية
 
 ## الهيكل التلاتي الأطراف
@@ -15,16 +15,16 @@ flowchart LR
   K -- "بيسلّم الأكل (استلام أو توصيل بترتيب الطبّاخ)" --> C
 ```
 
-سهم الدفع المنقّط هو الحقيقة البيزنس الأساسية: **الفلوس بتتحرك بين العميل والمطبخ، مش عن طريق مطبخي** (القرار D16). المنصة بتخزّن اللي كل طرف *بيبلّغ* بيه عنها.
+سهم الدفع المنقّط هو الحقيقة الأساسية في نموذج العمل: **الفلوس بتتحرك بين العميل والمطبخ، مش عن طريق مطبخي** (القرار D16). المنصة بتخزّن اللي كل طرف *بيبلّغ* بيه عنها.
 
 ## المنصة مسؤولة عن إيه
 
 | المسؤولية | المعنى | متنفّذة في |
 |---|---|---|
-| بوابة جودة العرض | الطبّاخين اللي وافق عليهم الموظفين بس هم اللي يبيعوا؛ والمطبخ الموقوف أو المتوقف مؤقتًا بيوقف المبيعات الجديدة | `CookReviewService`، `KitchenService` في `backend/modules/cooks/src/main/java/com/matbakhy/cooks/internal/` |
+| ضوابط جودة المطابخ المعروضة | الطبّاخين اللي وافق عليهم الموظفين بس هم اللي يبيعوا؛ والمطبخ الموقوف أو المتوقف مؤقتًا بيوقف المبيعات الجديدة | `CookReviewService`، `KitchenService` في `backend/modules/cooks/src/main/java/com/matbakhy/cooks/internal/` |
 | سلامة الكتالوج | الوجبة محتاجة عنوان ووصف وحصة وسعر موجب ومكونات وإقرار صريح بمسببات الحساسية وصورة معتمدة قبل ما تتنشر | `MealService` في `backend/modules/catalog/src/main/java/com/matbakhy/catalog/internal/meal/MealService.java` |
-| حقيقة التوافر | عدّادات حصص الـ Slot والوجبة هي المصدر الوحيد لـ "فاضل كام"؛ وبتتقفل بترتيب ثابت وقت الطلب | `SlotService`، `SlotInventory` في `backend/modules/availability/` |
-| حقيقة السعر | السيرفر بيحسب كل مبلغ؛ والـ Quotes غير قابلة للتعديل وبتنتهي | `QuoteService` |
+| المرجع الفعلي للتوافر | عدّادات حصص الـ Slot والوجبة هي المصدر الوحيد لـ "فاضل كام"؛ وبتتقفل بترتيب ثابت وقت الطلب | `SlotService`، `SlotInventory` في `backend/modules/availability/` |
+| المرجع الفعلي للسعر | السيرفر بيحسب كل مبلغ؛ والـ Quotes غير قابلة للتعديل وبتنتهي | `QuoteService` |
 | أمان المعاملة | تسجيل الأوردر والحجز والـ Snapshots والأحداث وسجل الكاش/الدفع بيتثبّتوا مع بعض بشكل ذرّي؛ وإعادة المحاولة Idempotent | `OrderService.placeOnce` |
 | الاستثناءات | حالات الدعم، وإلغاء الاستثناء وتجاوز التسليم من العمليات، والاسترداد، وطابور النزاعات | `backend/modules/support`، `OpsOrderService`، `PaymentService` |
 | المراجعة (Audit) | إجراءات الموظفين والقراءات الحساسة بتتسجّل في سجل مراجعة بيتضاف بس | `backend/modules/operations`، الجدول `audit_event` (V4) |

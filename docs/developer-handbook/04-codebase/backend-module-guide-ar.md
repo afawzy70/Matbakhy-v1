@@ -67,7 +67,7 @@ flowchart TD
 - المسؤولية: عناصر أساسية (Primitives) من غير أي معرفة بالـ Domain.
 - نقاط الدخول: `Money` (`backend/shared/src/main/java/com/matbakhy/shared/Money.java`)، و`ApiException` + `ErrorCode`
   (`.../shared/error/`)، والـ Interface اسمه `IdempotentCommands` (`.../shared/idempotency/IdempotentCommands.java`)،
-  و`PersonalDataEraser` (Hook مسح الخصوصية، بتنفّذه identity و cooks و catalog و orders و support و notifications)،
+  و`PersonalDataEraser` (Hook لمسح البيانات الشخصية، بتنفّذه identity و cooks و catalog و orders و support و notifications)،
   و`RuntimeEnvironment` و`RequestContext` و`Languages` والـ Annotation اسمه `DomainModule`.
 - الاختبارات: `backend/shared/src/test/java/com/matbakhy/shared/MoneyTest.java`؛ أكواد الأخطاء بتتقارن بالـ Enum بتاع الـ OpenAPI
   في `packages/api-client/test/registry.test.ts`.
@@ -84,7 +84,7 @@ flowchart TD
   `AccountLifecycleService.java` و`AccountErasureService.java` + `AccountErasureJob.java`.
 - الـ APIs اللي بيقدّمها (`identity/api`): `Permission` (Enum صلاحيات الموظفين) و`AccessPolicy` و`CurrentAccount` و`AccountDirectory` و
   `AddressDirectory` و`CheckoutContactPolicy` و`GrantDirectory` و`EgyptianPhone` و`PhoneVerificationSender` (Port؛ الـ Fake
-  هو `backend/app/src/main/java/com/matbakhy/app/providers/FakePhoneVerificationSender.java`، ومسموح بس في البيئات الاصطناعية (Synthetic) LOCAL و CI و PREVIEW؛ البيئتين STAGING و PRODUCTION بيرفضوا يشتغلوا من غير Provider حقيقي، O07).
+  هو `backend/app/src/main/java/com/matbakhy/app/providers/FakePhoneVerificationSender.java`، ومسموح بس في بيئات البيانات التجريبية غير الحقيقية (Synthetic Data) LOCAL و CI و PREVIEW؛ البيئتين STAGING و PRODUCTION بيرفضوا يشتغلوا من غير Provider حقيقي، O07).
 - الـ DB: الـ Migrations هي V1 و V2 و V3 و V4 و V21 و V27. الاختبارات: `IdentityIntegrationTest` و `ContactIntegrationTest` و
   `StaffAccessIntegrationTest` و `EgyptianPhoneTest` و `AccountErasureIntegrationTest` (في `backend/app/src/test/java/com/matbakhy/app/identity/` و `.../privacy/`).
 - نقاط التوسعة: صلاحية موظف جديدة (Enum + واجهة المنح + التوثيق)؛ قاعدة تواصل جديدة في `CheckoutContactPolicy`.
@@ -115,7 +115,7 @@ flowchart TD
 
 ## `catalog` — الوجبات والميديا والاكتشاف والمفضلة والنشاط
 
-- المسؤولية: وجبات بـ Revisions غير قابلة للتعديل، وحراس النشر (Publication Guards)، وخط رفع الميديا (رفع موقّع، الحجم/النوع/الفحص)،
+- المسؤولية: وجبات بـ Revisions غير قابلة للتعديل، وضوابط السماح بالنشر (Publication Guards)، وخط رفع الميديا (رفع موقّع، الحجم/النوع/الفحص)،
   والاكتشاف (Discovery) على السيرفر، والمناطق، والمفضلة، وعدّادات النشاط العضوي الآمنة للخصوصية.
 - المصدر: `backend/modules/catalog/src/main/java/com/matbakhy/catalog/`. نقاط الدخول: `web/MealController.java` و
   `DiscoveryController.java` و`UploadController.java` و`FavoriteController.java` و`ModerationController.java` و`ActivityController.java`؛

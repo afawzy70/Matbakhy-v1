@@ -27,10 +27,10 @@
 
 ### الـ Authentication والـ Redirect والـ Deep Links
 
-* **الـ Flow.** `signIn` في `apps/customer-mobile/src/auth.ts`: OIDC Authorization Code + PKCE (S256) في **متصفح النظام** (عمره ما بيبقى Web View مضمّن)، و`prompt=login` دايمًا، و`preferEphemeralSession: true`، والـ Scopes هي `openid profile email`، والعميل العام `matbakhy-mobile` من غير سرّ (`apps/customer-mobile/src/config.ts`). لازم الـ URL الراجع يساوي الـ Redirect URI بالظبط، ويشيل الـ `state` بتاعنا وكود `code` ومن غير `error` (`apps/customer-mobile/src/redirect.ts`، `checkRedirect`) قبل تبادل الـ Token؛ وإلا `INVALID_REDIRECT` أو `STATE_MISMATCH` أو `PROVIDER_ERROR` أو `MISSING_CODE`.
+* **الـ Flow.** `signIn` في `apps/customer-mobile/src/auth.ts`: OIDC Authorization Code + PKCE (S256) في **متصفح النظام** (عمره ما بيبقى Web View مضمّن)، و`prompt=login` دايمًا، و`preferEphemeralSession: true`، والـ Scopes هي `openid profile email`، والعميل العام `matbakhy-mobile` من غير سرّ (`apps/customer-mobile/src/config.ts`). لازم الـ URL الراجع يساوي الـ Redirect URI بالظبط، ويحتوي على الـ `state` بتاعنا وكود `code` ومن غير `error` (`apps/customer-mobile/src/redirect.ts`، `checkRedirect`) قبل تبادل الـ Token؛ وإلا `INVALID_REDIRECT` أو `STATE_MISMATCH` أو `PROVIDER_ERROR` أو `MISSING_CODE`.
 * **الـ Redirect URI.** `<scheme>://auth/callback`؛ والـ Scheme في التطوير هو `matbakhy-dev` (`apps/customer-mobile/app.json`؛ وعميل Keycloak في `infra/identity/matbakhy-realm.json` بيسجّل `matbakhy-dev://auth/callback`). معرّفات وتوقيع Staging/production قرار المالك O08 (`app.json` `extra.note`): PLANNED. خارج التطوير لازم رابط الـ API والـ Issuer يبقوا HTTPS (وإلا `ConfigError`).
 * **الـ Deep Links.** `apps/customer-mobile/src/linking.ts`: البادئة `<scheme>://`؛ المسارات `orders` (تبويب)، `orders/:orderId`، `meals/:mealId`، `cart`؛ وأي URL بيبدأ بـ `<scheme>://auth/` بيتفلتر عشان الـ Callback بتاع تسجيل الدخول مايتعاملش كأنه تنقل. الرابط بيسمّي شاشة بس: والسيرفر هو اللي بيقرر الوصول (أوردر حساب تاني بيظهر "not found"). الـ Scheme المخصص بس هو المتنفّذ؛ وUniversal Links / App Links (https) PLANNED / مش موجودة.
-* **استمرار الـ Session.** `apps/customer-mobile/src/tokenStore.ts` بيحتفظ بسجل JSON واحد (Access Token، Refresh Token، ID Token، الانتهاء، الـ Subject) في `expo-secure-store` بـ `WHEN_UNLOCKED_THIS_DEVICE_ONLY` (تخزين مدعوم بـ iOS Keychain / Android Keystore)؛ السجلات التالفة أو المنتهية من غير Refresh بتتحذف وبتتعامل كأنه مسجّل خروج. القراءة الأولى الفاشلة بتتعاد مرة واحدة بعد 300 ms عشان الـ Keystore اللي مش جاهز (اتشاف في تشغيل أندرويد البارد) مايبانش كأنه تسجيل خروج. `apps/customer-mobile/src/session.ts` بيجدد الـ Access Token قبل الانتهاء بـ 30 s، وتجديد واحد مشترك للمتصلين المتزامنين؛ ورفض المزوّد (`invalid_grant`) أو Token لـ Subject تاني بينهي الـ Session؛ والمزوّد غير المتاح بيحافظ عليها.
+* **استمرار الـ Session.** `apps/customer-mobile/src/tokenStore.ts` بيحتفظ بسجل JSON واحد (Access Token، Refresh Token، ID Token، الانتهاء، الـ Subject) في `expo-secure-store` بـ `WHEN_UNLOCKED_THIS_DEVICE_ONLY` (تخزين مدعوم بـ iOS Keychain / Android Keystore)؛ السجلات التالفة أو المنتهية من غير Refresh بتتحذف وبتتعامل كأنه مسجّل خروج. القراءة الأولى الفاشلة بتتعاد مرة واحدة بعد 300 ms عشان الـ Keystore اللي مش جاهز (اتشاف في تشغيل أندرويد البارد) مايبانش كأنه تسجيل خروج. `apps/customer-mobile/src/session.ts` بيجدد الـ Access Token قبل الانتهاء بـ 30 s، وتجديد واحد مشترك للمتصلين المتزامنين؛ ورفض المزوّد (`invalid_grant`) أو Token لـ Subject تاني بينهي الـ Session؛ ولو المزوّد مش متاح، التطبيق بيحتفظ بالـ Session.
 * **طبقة الطلبات.** `apps/customer-mobile/src/mobileApi.ts`: Bearer Token من الـ Session، و`Accept-Language`؛ `401` مع Token → تسجيل خروج محلي؛ `403` والجسم `code = STEP_UP_REQUIRED` → `onStepUpRequired`. الـ Backend بيخدم الـ Bearer Chain (`bearerChain` في `backend/app/src/main/java/com/matbakhy/app/security/SecurityConfiguration.java`): تحقق JWT بدون حالة (الـ Issuer، الـ Audience `apiAudience`، التوقيع، الانتهاء)، من غير Cookies ولا CSRF Token.
 
 ### السلة وإعادة محاولات الأوردر الآمنة (`basket.ts`، `placement.ts`)
@@ -57,7 +57,7 @@
 | الجانب | أندرويد | iOS | الدليل |
 |---|---|---|---|
 | متصفح النظام المستخدم لتسجيل الدخول | Chrome Custom Tabs | `ASWebAuthenticationSession` | تعليق في `apps/customer-mobile/src/auth.ts` |
-| خيار الـ Session المؤقتة | `preferEphemeralSession: true` بيتبعت على الاتنين؛ الأثر على أندرويد: NOT VERIFIED | مُحترَم؛ بيمنع إعادة استخدام Cookie Keycloak السابقة بصمت | `auth.ts`، `signIn.test.ts` |
+| خيار الـ Session المؤقتة | `preferEphemeralSession: true` بيتبعت على الاتنين؛ الأثر على أندرويد: NOT VERIFIED | بيتطبّق؛ وبيمنع إعادة استخدام Cookie Keycloak السابقة بصمت | `auth.ts`، `signIn.test.ts` |
 | HTTP العادي على localhost في التطوير | مسموح من خلال Config Plugin لمعرّفات التطوير بس | مش محتاج | `apps/customer-mobile/plugins/withLocalhostCleartext.cjs` |
 | التخزين الآمن | `expo-secure-store` مدعوم بـ Keystore (اتلاحظ فشل قراءة في التشغيل البارد، ومن هنا إعادة المحاولة) | Keychain | `basket.ts`، `tokenStore.ts` |
 | معرّفات الـ Bundle | `com.matbakhy.customer.dev` | `com.matbakhy.customer.dev` | `app.json` |
@@ -66,7 +66,7 @@
 
 ## الرحلات
 
-عناصر مشتركة لكل الرحلات اللي تحت. **الطرف:** زائر أو عميل (Bearer Token؛ سلطة `ACCOUNT_ACTIVE`؛ ملكية على مستوى الكائن). **الـ Backend والجداول:** مطابقة لرحلات الويب؛ شوف الرحلات المرقمة في [ويب العميل](customer-web-ar.md) (من CW-1 لـ CW-7) بدل تكرارها. **الاختبارات (كلها):** jest `apps/customer-mobile/src/App.test.tsx`، `apps/customer-mobile/src/auth.test.ts`، `apps/customer-mobile/src/signIn.test.ts`، `apps/customer-mobile/src/ordering.test.ts`؛ وأداة الـ CI الـ Native فوق؛ وبيانات البذر `apps/customer-mobile/e2e-native/seed.sql` (بيانات اصطناعية (Synthetic)، للـ CI بس). نتايج المجموعات دي للـ Commit الحالي: NOT VERIFIED هنا.
+عناصر مشتركة لكل الرحلات اللي تحت. **الطرف:** زائر أو عميل (Bearer Token؛ سلطة `ACCOUNT_ACTIVE`؛ ملكية على مستوى الكائن). **الـ Backend والجداول:** مطابقة لرحلات الويب؛ شوف الرحلات المرقمة في [ويب العميل](customer-web-ar.md) (من CW-1 لـ CW-7) بدل تكرارها. **الاختبارات (كلها):** jest `apps/customer-mobile/src/App.test.tsx`، `apps/customer-mobile/src/auth.test.ts`، `apps/customer-mobile/src/signIn.test.ts`، `apps/customer-mobile/src/ordering.test.ts`؛ وأداة الـ CI الـ Native فوق؛ وبيانات البذر `apps/customer-mobile/e2e-native/seed.sql` (بيانات تجريبية غير حقيقية (Synthetic Data)، للـ CI بس). نتايج المجموعات دي للـ Commit الحالي: NOT VERIFIED هنا.
 
 ### CM-1 تسجيل الدخول، إعادة التشغيل، تسجيل الخروج، تبديل الحساب
 1. الهدف: Session موبايل مصادَق عليها مابتتسربش بين الناس (BR-048، TC-048).
@@ -92,7 +92,7 @@
 13. اختبارات المالك E2E: E2E-BASKET-026، E2E-BASKET-009، E2E-BASKET-010، E2E-DISC-115. 14. IMPLEMENTED. 15. مفيش مزامنة سلة الزائر مع الجهاز.
 
 ### CM-3 عرض السعر، التسجيل، واسترجاع الأوردر غير المؤكد
-1. الهدف: تسجيل أوردر واحد بالظبط حتى لو التطبيق مات (BR-023، TC-049، TC-132). 2. الطرف: العميل. 3. المتطلب المسبق: تليفون متحقق منه، عنوان للتوصيل.
+1. الهدف: تسجيل أوردر واحد بالظبط حتى لو التطبيق اتقفل فجأة (BR-023، TC-049، TC-132). 2. الطرف: العميل. 3. المتطلب المسبق: تليفون متحقق منه، عنوان للتوصيل.
 4. البداية: Cart. 5. الإجراءات: التحقق من التليفون، اختيار الوضع والدفع (COD أو DEPOSIT)، "Calculate total"، تأكيد، تسجيل؛ إيقاف إجباري أثناء الإرسال؛ إعادة الفتح وهو Offline؛ إعادة الفتح Online ودوس "Check and retry".
 6. الاستجابات: شاشة تغيّر السعر بالإجماليات القديمة والجديدة وقبول صريح (D13)؛ إشعار غير مؤكد؛ بعد الاسترجاع بيتفتح الأوردر الوحيد.
 7. الـ API: `POST /api/v1/me/phone/challenges[/…/verify]`، `GET/POST /api/v1/me/addresses`، `POST /api/v1/quotes`، `POST /api/v1/orders`، `GET /api/v1/orders/by-request/{clientRequestId}`.
@@ -106,7 +106,7 @@
 6. الاستجابات: التحديث كل 10 ثواني؛ كود التسليم بيظهر لما السيرفر يرجّعه؛ نص العربون بيذكر إن المطبخ لازم يؤكد الاستلام.
 7. الـ API: `GET /api/v1/orders`، `GET /api/v1/orders/{orderId}`، `POST …/cancel`، `POST …/cancellation-requests`، `POST …/payment/transfer-report`، `POST …/reviews`.
 8–9. زي CW-5. 10. زي CW-5. 11. معرّف أوردر حساب تاني → شاشة "not found".
-12. الاختبارات: `App.test.tsx` ("deep links (MB-033)"، "MB-053 on native")، `OrderingTests.swift` testF (Deep Link دافئ وبارد) و testK (العربون)، `order-roundtrip-android.sh` (Deep Link دافئ وبارد؛ تقرير تحويل العربون).
+12. الاختبارات: `App.test.tsx` ("deep links (MB-033)"، "MB-053 on native")، `OrderingTests.swift` testF (Deep Link والتطبيق شغّال أو مقفول) و testK (العربون)، `order-roundtrip-android.sh` (Deep Link والتطبيق شغّال أو مقفول؛ تقرير تحويل العربون).
 13. اختبارات المالك E2E: E2E-ORDER-122، E2E-FIN-113، E2E-ORDER-120. 14. IMPLEMENTED. 15. تغطية الـ Deep Link على أندرويد بـ `adb am start` بس.
 
 ### CM-5 الـ Step-up للـ MFA (D18)

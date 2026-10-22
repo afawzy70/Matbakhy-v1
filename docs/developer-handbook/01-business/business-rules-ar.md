@@ -9,7 +9,7 @@
 المصادر الأصلية (اقرأها عشان تعرف النص بالظبط):
 
 - نص القواعد: `docs/product/03-business-rules.md`
-- القواعد في صيغة مقروءة للآلة: `planning/rules.json` (كل قاعدة ليها `story_id` و`scenario_ids` و`status`؛ كل القواعد حاليًا `PROPOSED_DEFAULT` إلا لو قرار لاحق من المالك قال غير كده)
+- القواعد في صيغة قابلة للقراءة آليًا: `planning/rules.json` (كل قاعدة ليها `story_id` و`scenario_ids` و`status`؛ كل القواعد حاليًا `PROPOSED_DEFAULT` إلا لو قرار لاحق من المالك قال غير كده)
 - السيناريوهات: `planning/scenarios.json`
 - قرارات المالك اللي بتلغي القواعد أو بتوسّعها: `docs/product/01-context-and-decisions.md` (D10، D13، D14، D16، D17، D18)
 - حالات الـ E2E بتاعة المالك: `docs/quality/owner-acceptance/cases/*.json` (`discovery-basket.json` و`orders-finance.json` و`cook-ops.json` و`config-security.json`)
@@ -46,7 +46,7 @@
   - DB: `SPRING_SESSION`, `SPRING_SESSION_ATTRIBUTES` (V2).
   - Test: `identity/IdentityIntegrationTest.java` (`web_login_creates_server_session_and_mutations_require_csrf`, `native_authorization_without_pkce_is_refused_by_the_provider`, `code_exchange_with_wrong_pkce_verifier_fails`, `cors_allows_only_configured_web_origins`), `security/CsrfCookieDefaultIntegrationTest.java`.
   - E2E: CFG-002, CFG-003, CFG-004, CFG-036, CFG-037.
-- **BR-003 — أول Checkout محتاج إيميل متحقَّق منه ورقم تليفون مصري متطبَّع ومتحقَّق منه؛ تغيير التليفون بيلغي التحقق.**
+- **BR-003 — أول Checkout محتاج إيميل متحقَّق منه ورقم تليفون مصري بصيغة موحّدة ومتحقَّق منه؛ تغيير التليفون بيلغي التحقق.**
   - Impl: `backend/modules/identity/src/main/java/com/matbakhy/identity/internal/AccountLifecycleService.java` (بينفّذ `CheckoutContactPolicy`)، `backend/modules/identity/src/main/java/com/matbakhy/identity/api/EgyptianPhone.java`؛ بيتنادى من `QuoteService.create`.
   - API: API-011, API-012. DB: `phone_challenge` (الـ check هو `^\+201[0125][0-9]{8}$`)، V3.
   - Test: `identity/ContactIntegrationTest.java` (`changing_a_verified_phone_requires_verifying_the_new_number`, `invalid_numbers_are_rejected_without_sending`), `orders/QuoteIntegrationTest.java` (`contact_verification_kitchen_state_and_cutoff_are_enforced_by_server_time`), `identity/EgyptianPhoneTest.java`.
@@ -59,14 +59,14 @@
 ## الـ Authorization وفصل الحسابات
 
 - **BR-006 — كل مطبخ وأوردر وحالة وقايمة وعدّاد وتصدير بيتشيّك على نطاق الـ Object؛ الـ id اللي مينفعش تخمينه مش Authorization.**
-  - Impl: تحديد النطاق على مستوى الـ Query في الـ Services (مثلًا `OrderLifecycleService.lock` و`PaymentService.lockForCustomer`) و`AccessPolicy` / `backend/app/src/main/java/com/matbakhy/app/security/ScopedAccessPolicy.java`. الـ Objects الغريبة بترجع 404.
+  - Impl: تحديد النطاق على مستوى الـ Query في الـ Services (مثلًا `OrderLifecycleService.lock` و`PaymentService.lockForCustomer`) و`AccessPolicy` / `backend/app/src/main/java/com/matbakhy/app/security/ScopedAccessPolicy.java`. الـ Objects الخاصة بمستخدم أو مطبخ تاني بترجع 404.
   - DB: أعمدة المالك/المطبخ (`customer_order.customer_id` و`kitchen_id` و`kitchen.owner_id`).
   - Test: `identity/StaffAccessIntegrationTest.java` (`kitchen_scope_matrix`), `orders/OrderPlacementIntegrationTest.java` (`customers_see_only_their_own_orders_with_paging_and_events`, `another_customer_cannot_find_an_order_by_its_client_request_id`), `orders/OrderLifecycleIntegrationTest.java` (`cooks_act_only_on_their_kitchen_and_suspension_blocks_acceptance_but_not_fulfillment`).
   - E2E: E2E-ORDER-037, E2E-ORDER-120, E2E-COOK-054, E2E-DISC-106.
 - **فصل الحسابات (العميل والطبّاخ والـ Staff نطاقات مختلفة لحساب واحد).** مغطّى بـ BR-006 وBR-007 وBR-008. العميل ميقدرش ينفّذ أوامر الطبّاخ، والطبّاخ ميقدرش يستخدم أوامر العميل؛ مفيش مسار تسجيل عام بيدّي موافقة طبّاخ أو صلاحية Staff؛ وتبديل الحسابات على الجهاز بيمسح بيانات الشخص السابق (BR-048).
   - Test: `orders/OrderLifecycleIntegrationTest.java` (`the_ordering_customer_cannot_run_cook_commands_and_the_cook_cannot_use_the_customer_cancel`), `identity/StaffAccessIntegrationTest.java` (`customer_cannot_grant_privileges_and_the_attempt_is_audited`, `role_fields_in_customer_requests_are_rejected`, `provider_role_claims_grant_no_staff_permission` في `IdentityIntegrationTest.java`).
   - E2E: E2E-OPS-058, CFG-005, CFG-006, E2E-DISC-004.
-- **BR-007 — صلاحيات الـ Staff بتتحدد من ناحية السيرفر؛ الصلاحيات الملغاة بتوقف شغل؛ والـ MFA بيتبع سياسة الأدمن لكل فئة (D18).**
+- **BR-007 — صلاحيات الـ Staff بتتحدد من ناحية السيرفر؛ الصلاحيات اللي اتسحبت بتبطل تشتغل؛ والـ MFA بيتبع سياسة الأدمن لكل فئة (D18).**
   - Impl: `backend/modules/identity/src/main/java/com/matbakhy/identity/internal/GrantService.java`, `backend/modules/identity/src/main/java/com/matbakhy/identity/api/Permission.java`, `AccountMapper` (الصلاحيات بتتقرا من جديد مع كل Request).
   - API: API-091..API-093. DB: `user_grant` بـ unique index على صلاحية نشطة واحدة لكل مستخدم وصلاحية (V4)، و`audit_event` للإضافة بس (V4).
   - Test: `identity/StaffAccessIntegrationTest.java` (`revoked_grant_stops_working_on_the_next_request`, `expired_grants_confer_nothing`, `grant_changes_require_recent_mfa`, `audit_is_append_only_and_redacted`).
@@ -125,7 +125,7 @@
 
 ## حجز السعة (Capacity)
 
-- **BR-013 / BR-025 — السعة محدودة لكل وجبة-في-Slot ولكل طبّاخ-في-Slot؛ آخر وجبة مبتتباعش زيادة عن اللازم أبدًا.** Impl: `backend/modules/availability/src/main/java/com/matbakhy/availability/internal/JdbcSlotInventory.java`, `SlotService`. DB: `cook_slot`, `meal_slot` (V8)، `stock_allocation` (V11). Test: `availability/SlotIntegrationTest.java` (`the_last_portion_is_bounded_by_both_the_meal_and_the_slot_aggregate`, `capacity_cannot_be_reduced_below_what_orders_already_hold`)، `OrderPlacementIntegrationTest` (`twenty_customers_racing_for_the_last_portion_produce_exactly_one_order`, `a_two_meal_order_is_refused_without_partial_reservation_once_the_kitchen_slot_total_is_used_up`). E2E: E2E-ORDER-115, E2E-BASKET-016, E2E-BASKET-017, E2E-BASKET-018, E2E-ORDER-114, E2E-COOK-106.
+- **BR-013 / BR-025 — السعة محدودة لكل وجبة-في-Slot ولكل طبّاخ-في-Slot؛ آخر حصة مينفعش تتباع لأكتر من عميل.** Impl: `backend/modules/availability/src/main/java/com/matbakhy/availability/internal/JdbcSlotInventory.java`, `SlotService`. DB: `cook_slot`, `meal_slot` (V8)، `stock_allocation` (V11). Test: `availability/SlotIntegrationTest.java` (`the_last_portion_is_bounded_by_both_the_meal_and_the_slot_aggregate`, `capacity_cannot_be_reduced_below_what_orders_already_hold`)، `OrderPlacementIntegrationTest` (`twenty_customers_racing_for_the_last_portion_produce_exactly_one_order`, `a_two_meal_order_is_refused_without_partial_reservation_once_the_kitchen_slot_total_is_used_up`). E2E: E2E-ORDER-115, E2E-BASKET-016, E2E-BASKET-017, E2E-BASKET-018, E2E-ORDER-114, E2E-COOK-106.
 - **BR-014 / BR-015 — التخزين بـ UTC، والجدولة بتوقيت Africa/Cairo، والـ Cutoff قبل البداية.** Impl: `CairoTime`, `SlotService.create`. Test: `availability/SlotIntegrationTest.java` (`ordinary_slots_store_utc_instants_for_cairo_wall_clock_times`, `a_local_time_skipped_by_the_spring_change_is_rejected`, `server_time_reaching_cutoff_closes_ordering_and_capacity_edits`). E2E: E2E-COOK-105, E2E-BASKET-023.
 
 ## الإلغاء والانتهاء والإفراج

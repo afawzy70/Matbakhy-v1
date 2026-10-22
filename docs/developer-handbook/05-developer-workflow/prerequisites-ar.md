@@ -4,7 +4,7 @@
 > **Status:** REFERENCE — الحاجات اللي لازم المطوّر يسطّبها قبل ما يبني Matbakhy أو يشغّله، مع الإصدارات اللي الـ Repository مثبّتها.
 > **Language / اللغة:** [English](prerequisites.md) · العربية
 
-الإصدارات اللي تحت مأخوذة من `package.json` و`.node-version` و`backend/pom.xml` و`backend/.mvn/wrapper/maven-wrapper.properties` و`infra/compose.yaml` و`.github/workflows/ci.yml`. الشرح الأطول للأسباب موجود في [toolchain.md](../../engineering/toolchain.md)؛ ولو الصفحة دي والملفات اختلفوا، صدّق الملفات (لأنها اللي بيقرأها الـ CI).
+الإصدارات اللي تحت مأخوذة من `package.json` و`.node-version` و`backend/pom.xml` و`backend/.mvn/wrapper/maven-wrapper.properties` و`infra/compose.yaml` و`.github/workflows/ci.yml`. الشرح الأطول للأسباب موجود في [toolchain.md](../../engineering/toolchain.md)؛ ولو الصفحة دي والملفات اختلفوا، اعتمد على الملفات (لأنها اللي بيقرأها الـ CI).
 
 ## الأدوات المطلوبة
 
@@ -23,7 +23,7 @@
 
 الأمر `scripts/dev.sh doctor` بيفحص Docker (الـ CLI والـ Daemon وcompose v2) وJDK 21 وإصدار Node بالظبط من `.node-version` وpnpm وcurl وopenssl، وبيطبع رسالة واضحة تقولك تعمل إيه لكل حاجة ناقصة.
 
-نتيجة مهمة: الملف `.npmrc` بيضبط `engine-strict=true` (و`save-exact=true`)، فـ pnpm بيرفض يسطّب على Node برّه `engines.node`؛ وكمان `scripts/check_workspace.sh` بيفشل إلا لو `node --version` بيساوي `.node-version` و`pnpm --version` بيساوي إصدار `packageManager`. إصدار Node رئيسي مختلف (مثلًا 22) مش مدعوم للـ Workspace كله، حتى لو شوية أوامر بدت شغّالة.
+نتيجة مهمة: الملف `.npmrc` بيضبط `engine-strict=true` (و`save-exact=true`)، فـ pnpm بيرفض يسطّب على Node برّه `engines.node`؛ وكمان `scripts/check_workspace.sh` بيفشل إلا لو `node --version` بيساوي `.node-version` و`pnpm --version` بيساوي إصدار `packageManager`. إصدار Node رئيسي مختلف (مثلًا 22) مش مدعوم للـ Workspace كله، حتى لو بعض الأوامر باين إنها شغّالة.
 
 ## أدوات اختيارية (للمهمة المناسبة بس)
 
@@ -39,7 +39,7 @@
 | نظام التشغيل | الحالة |
 |---|---|
 | Linux (الـ CI بيستخدم Ubuntu 24.04) | IMPLEMENTED: كل الأوامر في الدليل ده مكتوبة لـ bash على Linux |
-| macOS | NOT VERIFIED لأوامر JavaScript والـ Backend؛ وشغل iOS الـ Native في `.github/workflows/native-build.yml` هو الدليل الوحيد على macOS |
+| macOS | NOT VERIFIED لأوامر JavaScript والـ Backend؛ وتشغيل Job بناء iOS الـ Native في `.github/workflows/native-build.yml` هو الدليل الوحيد على macOS |
 | Windows | NOT VERIFIED. السكريبتات `scripts/dev.sh` و`scripts/check_workspace.sh` وباقي سكريبتات `.sh` محتاجة bash: استخدم WSL2 مع تكامل WSL بتاع Docker Desktop وخلّي الـ Clone جوّه نظام ملفات WSL. [toolchain.md](../../engineering/toolchain.md) فيه المقابلات بتاعت PowerShell للتسطيب والـ Typecheck والاختبار والبناء و`mvnw.cmd`، ومعلّمة NOT_RUN هناك |
 
 الملف `docs/status/latest.md` كمان بيسجّل "Windows/macOS developer commands" على إنها NOT_RUN. لو شغّلتها، بلّغ بالنتيجة على إنها إصلاح لعيب في التوثيق (شوف [documentation-policy.md](documentation-policy-ar.md)).

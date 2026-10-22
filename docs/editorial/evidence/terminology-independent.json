@@ -1,0 +1,84 @@
+{
+  "commit": "3391e57d7fe921bc90b961f843b126fc8098512e",
+  "reviewer": "Architecture/code editor; independent of terminology follow-up author",
+  "complete_english_originals_reread": [
+    "docs/developer-handbook/03-architecture/database-architecture.md",
+    "docs/developer-handbook/03-architecture/infrastructure-and-deployment.md"
+  ],
+  "additional_english_section": "07-reference/implementation-status.md: Backend capabilities",
+  "checks": [
+    {
+      "id": 1,
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "corrected": "حالات المطابقة (Reconciliation)",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 2,
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "corrected": "مهلة الطلب المسبق (lead time)",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 3,
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "corrected": "سكريبت مطابقة البيانات",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 4,
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "corrected": "المقصود بالتسوية في عنوان القسم هو مطابقة البيانات (Reconciliation)، مش التسوية المالية (Settlement). السكريبت `scripts/db-backup.sh` بيكتب",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 5,
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "corrected": "كل أعداد الاختلافات اللي فحص المطابقة بيطلعها تكون صفر",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 6,
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "corrected": "وفحص مطابقة البيانات للقراءة بس",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 7,
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "corrected": "وبيفحص مطابقة بياناته",
+      "status": "PASS",
+      "reason": "Compared with complete English source; counter reconciliation, financial settlement and lead time remain distinct."
+    },
+    {
+      "id": 18,
+      "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+      "corrected": "استلام المطبخ، النزاعات، المطابقة، تبليغ الاسترداد",
+      "status": "PASS",
+      "reason": "English capability explicitly says deposit reconciliation; commission settlements are separate row."
+    }
+  ],
+  "protected": "PASS: fences, inline code, headings, links unchanged by integration.",
+  "conflict_resolution": "PASS: restore now says data reconciliation; previously reviewed Docker image rollback wording and all migration safety conditions retained.",
+  "source_confirmation": "infra/db/reconcile.sql header and violations SELECT confirm zero counts mean violations, not financial settlements.",
+  "glossary": {
+    "status": "PASS after root repair verified",
+    "finding": "Lead time / cutoff wording آخر موعد لقبول الطلب conflates ordering cutoff with kitchen acceptance deadline acceptBy.",
+    "severity": "MAJOR",
+    "recommendation": "آخر موعد لتسجيل طلب جديد; explain acceptBy is separate and bounded by cutoff.",
+    "resolution": "Root changed cutoff to last time for new order placement and explicitly distinguished acceptBy; complete glossary independently read for source precision.",
+    "sha256": "5d53892269af97c25cb71e8c069a78323ea050d252d1f00e3e2299ccfa4e9231"
+  },
+  "status": "PASS",
+  "limitations": [
+    "AI semantic review is not human approval.",
+    "GitHub RTL rendering not visually tested."
+  ],
+  "outstanding_confirmed_findings": []
+}

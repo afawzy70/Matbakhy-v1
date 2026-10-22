@@ -30,7 +30,7 @@ stateDiagram-v2
     OUT_FOR_DELIVERY --> COMPLETED: تجاوز التسليم من العمليات (API-077)
 ```
 
-الحالات النهائية (Terminal): `COMPLETED` و`REJECTED` و`EXPIRED` و`CANCELLED` و`DELIVERY_FAILED` (`OrderLifecycleService.TERMINAL`). الأوردر النهائي مبيتعدّلش: حارس الأوامر بيرفضه، وTrigger في الـ Database (`customer_order_terminal_guard`، `backend/app/src/main/resources/db/migration/V12__order_lifecycle.sql`) بيرفض التحديثات المباشرة (استثناء ضيق واحد: تحديث المسح لأسباب الخصوصية في V21 للـ Snapshots الخاصة ببيانات الاتصال/العنوان والملاحظة، شوف [معمارية قاعدة البيانات](../03-architecture/database-architecture-ar.md)). الاسترداد والنزاعات وتغييرات الدفع مبتعيدش كتابة حالة الأوردر أبدًا؛ هي عايشة في سجلات منفصلة (`order_payment` و`cash_obligation` و`refund`).
+الحالات النهائية (Terminal): `COMPLETED` و`REJECTED` و`EXPIRED` و`CANCELLED` و`DELIVERY_FAILED` (`OrderLifecycleService.TERMINAL`). الأوردر النهائي مبيتعدّلش: حارس الأوامر بيرفضه، وTrigger في الـ Database (`customer_order_terminal_guard`، `backend/app/src/main/resources/db/migration/V12__order_lifecycle.sql`) بيرفض التحديثات المباشرة (استثناء ضيق واحد: تحديث المسح لأسباب الخصوصية في V21 للـ Snapshots الخاصة ببيانات الاتصال/العنوان والملاحظة، شوف [معمارية قاعدة البيانات](../03-architecture/database-architecture-ar.md)). الاسترداد والنزاعات وتغييرات الدفع مبتعيدش كتابة حالة الأوردر أبدًا؛ بتتسجّل في سجلات منفصلة (`order_payment` و`cash_obligation` و`refund`).
 
 كل أمر ليه الخصائص دي (`OrderLifecycleService`):
 
@@ -71,9 +71,9 @@ stateDiagram-v2
 | إلغاء الطبّاخ (المقبول) | allocated → released، مرة واحدة بالظبط | `release(o, Stage.ALLOCATED)` |
 | الإلغاء الاستثنائي من العمليات (قيد التحضير أو جاهز) | **المخزون المستهلَك بيفضل مستهلَك والتزام الكاش بيتساب من غير تغيير**؛ والمالية بتراجعه يدويًا | `opsExceptionCancel` |
 
-القواعد: سعة الـ Slot مينفعش تتخفض أبدًا تحت مجموع المحجوز+المخصَّص+المستهلَك (`SlotService`، حالة المالك E2E-COOK-106)؛ الـ Cutoff = بداية الـ Slot − وقت التجهيز (`lead_minutes` من 30 لـ 1440)؛ بعد الـ Cutoff الـ Slot بيرفض العروض وتعديلات السعة (E2E-BASKET-023). عميلين بيتنافسوا على آخر وجبة بينتج عنهم أوردر واحد بالظبط (الاختبار `twenty_customers_racing_for_the_last_portion_produce_exactly_one_order`، `backend/app/src/test/java/com/matbakhy/app/orders/OrderPlacementIntegrationTest.java`؛ E2E-ORDER-115).
+القواعد: سعة الـ Slot مينفعش تتخفض أبدًا تحت مجموع المحجوز+المخصَّص+المستهلَك (`SlotService`، حالة المالك E2E-COOK-106)؛ الـ Cutoff = بداية الـ Slot − مهلة الطلب المسبق (lead time) (`lead_minutes` من 30 لـ 1440)؛ بعد الـ Cutoff الـ Slot بيرفض العروض وتعديلات السعة (E2E-BASKET-023). عميلين بيتنافسوا على آخر حصة بينتج عنهم أوردر واحد بالظبط (الاختبار `twenty_customers_racing_for_the_last_portion_produce_exactly_one_order`، `backend/app/src/test/java/com/matbakhy/app/orders/OrderPlacementIntegrationTest.java`؛ E2E-ORDER-115).
 
-*مثال:* الـ Slot فيه 3 وجبات متبقية؛ العميل A طلب 2، والعميل B طلب 2 في نفس اللحظة. العرضين بينجحوا (العرض مبيحجزش مخزون). التسجيل بيتسلسل: أوردر A بيتعمل؛ وتسجيل B بيرجع `409 STOCK_CHANGED` مع `INSUFFICIENT_PORTIONS`؛ سلة B وتفاصيلها بتفضل وB يقدر يقلل الكمية.
+*مثال:* الـ Slot فيه 3 حصص متبقية؛ العميل A طلب 2، والعميل B طلب 2 في نفس اللحظة. العرضين بينجحوا (العرض مبيحجزش مخزون). التسجيل بيتسلسل: أوردر A بيتعمل؛ وتسجيل B بيرجع `409 STOCK_CHANGED` مع `INSUFFICIENT_PORTIONS`؛ سلة B وتفاصيلها بتفضل وB يقدر يقلل الكمية.
 
 ## الخطوة 4 — العرض وحساب السعر
 
@@ -96,7 +96,7 @@ stateDiagram-v2
 
 | الحالة | الاستجابة | تجربة العميل |
 |---|---|---|
-| العرض أقدم من موعد انتهائه | `409 QUOTE_EXPIRED` | "The quote expired. Calculate the total again." |
+| مدة صلاحية العرض انتهت | `409 QUOTE_EXPIRED` | "The quote expired. Calculate the total again." |
 | إصدار السياسة اتغيّر | `409 PRICE_CHANGED`، السبب `POLICY_CHANGED` | لازم يعمل عرض جديد ويوافق من جديد |
 | Revision الوجبة أو سعر الوحدة اتغيّر | `409 PRICE_CHANGED`، السبب `MEAL_CHANGED` | أي Revision جديدة للوجبة بتبطل العرض، حتى لو السعر زي ما هو. الواجهة بتنسب تغيير السعر للمطبخ بس لو مبالغ الوحدة اختلفت فعلًا (`packages/api-client/src/priceChanges.ts`)؛ غير كده بتعرض إشعار عام بإن التفاصيل اتغيّرت. بتتعرض الإجماليات القديمة والجديدة |
 | رسوم التوصيل أو الإجمالي اتغيّر | `409 PRICE_CHANGED`، السبب `TOTAL_CHANGED` | بيتقاله إن رسوم التوصيل/الضريبة اتغيّرت (مش المطبخ) |
@@ -123,7 +123,7 @@ stateDiagram-v2
 ## الخطوة 7 — المطبخ بيقبل أو يرفض
 
 - **القبول** (API-055): الطبّاخ المالك بس، والحالة `PENDING_ACCEPTANCE`، والمطبخ مسموح له يقبل (`KitchenStatus.canAcceptOrders`: حالة التشغيل `ACTIVE` أو `PAUSED`؛ المطبخ المعلَّق أو المقفول مينفعش يقبل)، و`now < acceptBy` (قبل الموعد بـ ميلي ثانية بيعدّي؛ عند الموعد بالظبط بيترفض؛ الاختبار `acceptance_is_allowed_one_millisecond_before_the_deadline_and_refused_exactly_at_it`). الأثر: reserved→allocated؛ والعميل بياخد بيانات اتصال المطبخ وموقعه (للاستلام).
-- **الرفض** (API-056): كود السبب من `KITCHEN_BUSY` و`INGREDIENT_UNAVAILABLE` و`OUTSIDE_CAPACITY` و`OTHER`. الأثر: المخزون بيتفرج عنه مرة واحدة؛ التزام الكاش `NOT_DUE`؛ وحالة الدفع بتتحرك (أوردرات العربون بتعدّي على المطابقة، شوف صفحة الدفع).
+- **الرفض** (API-056): كود السبب من `KITCHEN_BUSY` و`INGREDIENT_UNAVAILABLE` و`OUTSIDE_CAPACITY` و`OTHER`. الأثر: الحصص المحجوزة بترجع متاحة مرة واحدة؛ التزام الكاش `NOT_DUE`؛ وحالة الدفع بتتحرك (أوردرات العربون بتعدّي على المطابقة، شوف صفحة الدفع).
 - **الانتهاء**: الـ Job اسمه `OrderExpiryJob` بيشتغل كل 30 ثانية (قابلة للضبط) وبينهي الأوردرات المعلّقة اللي `accept_by <= now` حسب *وقت السيرفر*؛ والقبول/الإلغاء/الانتهاء المتزامنين بينتج عنهم فايز واحد بالظبط (E2E-ORDER-028، والاختبار `accept_cancel_and_expire_racing_produce_one_legal_outcome_and_at_most_one_release`).
 
 موعد القبول: `min(created + acceptance window (15 min in the synthetic policy), slot cutoff)`؛ لازم يفضل على الأقل `min_acceptance_minutes` (5) وقت التسجيل.
@@ -131,7 +131,7 @@ stateDiagram-v2
 ## الخطوة 8 — التحضير
 
 - **التحضير (Prepare)** (API-057): من `ACCEPTED`؛ والمطبخ لازم يكون قادر ينفّذ الأوردرات المقبولة (`KitchenStatus.canFulfillAcceptedOrders`: أي حالة تشغيل ما عدا `CLOSED`، فحتى المطبخ المعلَّق يقدر يخلّص اللي قبله فعلًا)، وفي أوردرات العربون المطبخ لازم يكون بلّغ بالفعل باستلام العربون (`PaymentService.requireReadyForPreparation` → `DEPOSIT_NOT_RECEIVED`؛ E2E-FIN-106). المخزون allocated→consumed.
-- **إلغاء الطبّاخ** (API-062): من `ACCEPTED` بس (قبل التحضير)، والسبب من `INGREDIENT_UNAVAILABLE` و`KITCHEN_ISSUE` و`OTHER`؛ وبيفرّج عن التخصيص مرة واحدة (E2E-ORDER-110).
+- **إلغاء الطبّاخ** (API-062): من `ACCEPTED` بس (قبل التحضير)، والسبب من `INGREDIENT_UNAVAILABLE` و`KITCHEN_ISSUE` و`OTHER`؛ وبيرجع الحصص المخصّصة متاحة مرة واحدة (E2E-ORDER-110).
 - **جاهز (Ready)** (API-058): من `PREPARING`؛ والسيرفر بيولّد **كود تسليم** من ست أرقام (`HandoverCodes.issue`) بيتخزّن كـ Hash بمفتاح مع قيمة عرض مشفّرة؛ والكود ظاهر لصاحب الأوردر بس (`OrderService.handoverCode`، وبس وقت `READY` أو `OUT_FOR_DELIVERY` وصالح للاستخدام) ومبيظهرش أبدًا في DTOs الطبّاخ أو الـ Staff (E2E-ORDER-030).
 
 > الإيقاف المؤقت والتعليق: الإيقاف المؤقت (Pause) بيوقف البيع الجديد بس (الأوردرات المعلّقة لسه ممكن تتقبل)؛ والتعليق (Suspension) بيوقف القبول كمان؛ والأوردرات المقبولة بالفعل بتفضل قابلة للتنفيذ في الحالتين (E2E-COOK-050؛ الاختبار `pause_stops_new_sales_suspension_stops_acceptance_and_accepted_orders_stay_fulfillable`).

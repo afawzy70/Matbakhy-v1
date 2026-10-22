@@ -1,0 +1,73 @@
+{
+  "reviewer": "business editorial agent, final terminology follow-up",
+  "baseline_sha": "cd9403a987ce1d7f33360195ab554401e3e2a122",
+  "full_english_originals_reread": [
+    "docs/developer-handbook/03-architecture/database-architecture.md",
+    "docs/developer-handbook/03-architecture/infrastructure-and-deployment.md"
+  ],
+  "findings": [
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "old": "حالات التسوية (Reconciliation)",
+      "new": "حالات المطابقة (Reconciliation)",
+      "reason": "Payment reconciliation differs from commission settlement.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "old": "وقت التجهيز المسبق",
+      "new": "مهلة الطلب المسبق (lead time)",
+      "reason": "Lead time sets cutoff before slot; not cooking preparation time.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "old": "سكريبت التسوية",
+      "new": "سكريبت مطابقة البيانات",
+      "reason": "Counter reconciliation checks allocations; no financial settlement occurs.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "old": "السكريبت `scripts/db-backup.sh` بيكتب",
+      "new": "المقصود بالتسوية في عنوان القسم هو مطابقة البيانات (Reconciliation)، مش التسوية المالية (Settlement). السكريبت `scripts/db-backup.sh` بيكتب",
+      "reason": "Clarify legacy heading in existing paragraph while preserving its anchor and structural parity.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+      "old": "كل أعداد التسوية تكون صفر",
+      "new": "كل أعداد الاختلافات اللي فحص المطابقة بيطلعها تكون صفر",
+      "reason": "Zero applies to reconciliation discrepancies, not settlement counts.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "old": "وتسوية قراءة بس",
+      "new": "وفحص مطابقة البيانات للقراءة بس",
+      "reason": "Provisioning performs read-only reconciliation, not settlement.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    },
+    {
+      "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+      "old": "وبيعمل له تسوية",
+      "new": "وبيفحص مطابقة بياناته",
+      "reason": "Restore reconciliation verifies data rather than financial settlement.",
+      "severity": "MAJOR",
+      "technical_semantic_risk": "Clarifies distinct technical concepts without changing behaviour or executable text."
+    }
+  ],
+  "heading_compatibility": "Legacy database heading retained to preserve inbound anchors; its meaning explicitly clarified as data reconciliation, not financial settlement.",
+  "protected_content": "fences, inline code, headings unchanged; exact assertions PASS",
+  "semantic_review": "Every edited sentence compared with complete English originals. Independent follow-up review requested.",
+  "limitations": [
+    "AI review is not human approval.",
+    "GitHub RTL rendering not visually tested."
+  ]
+}

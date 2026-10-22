@@ -40,7 +40,7 @@
 | `src/Account.tsx` | البروفايل والمفضلة وصندوق الإشعارات وحالات الدعم (`SupportCaseDetail`) والعناوين وطلب الحذف |
 | `src/Security.tsx` | تفضيل التحقق بخطوتين ورابط الـ Step-up (`/oauth2/authorization/keycloak?stepUp=true`) |
 | `src/activity.ts` | نشاط تصفح مجهول الهوية ومنزوع التكرار (`POST /api/v1/activity`) |
-| `src/EnvironmentNotice.tsx` | بانر لبيئات البيانات الاصطناعية/المعاينة |
+| `src/EnvironmentNotice.tsx` | بانر لبيئات البيانات التجريبية غير الحقيقية/المعاينة |
 | `src/App.test.tsx` | اختبارات Vitest + Testing Library بـ `fetch` وهمي (جدول Routes بصيغة `"METHOD /path": () => response`) |
 
 تفاصيل عن التسجيل تستاهل تعرفها: التسجيل المعلّق `{clientRequestId, idempotencyKey, quoteId, terms, cancellation}` بيتكتب
@@ -59,7 +59,7 @@ API مرة واحدة بعد تسجيل الدخول (`checkSession`، `src/App.
 | المنطقة | الملفات |
 |---|---|
 | الطبّاخ | `src/cook/Dashboard.tsx` و `Orders.tsx` (قبول/رفض/تحضير/جاهز/إرسال/تسليم/إلغاء/تقرير الكاش) و `Meals.tsx` (CRUD ورفع الصور وتاريخ الأسعار) و `Slots.tsx` و `Payments.tsx` (استلام العربون والمشكلة والاسترداد وبروفايل الدفع) و `Statement.tsx` و `Insights.tsx` و `Settings.tsx` و `Onboarding.tsx` (الطلب)، والمساعدات المشتركة `shared.tsx` |
-| الموظفين | `src/ops/Reviews.tsx` (طلبات الطبّاخين وإشراف المراجعات) و `Catalogue.tsx` و `Cases.tsx` و `OpsOrders.tsx` و `Finance.tsx` (التحقق من الكاش والاستردادات والتسويات وكشوف الحساب) و `Payments.tsx` (طابور مطابقة العرابين والموافقة على المستلم) و `Configuration.tsx` و `Staff.tsx` و `Security.tsx` (سياسة الـ MFA وإعادة الضبط) |
+| الموظفين | `src/ops/Reviews.tsx` (طلبات الطبّاخين وإشراف المراجعات) و `Catalogue.tsx` و `Cases.tsx` و `OpsOrders.tsx` و `Finance.tsx` (التحقق من الكاش والاستردادات والتسويات وكشوف الحساب) و `Payments.tsx` (طابور مطابقة مدفوعات العربون والموافقة على المستلم) و `Configuration.tsx` و `Staff.tsx` و `Security.tsx` (سياسة الـ MFA وإعادة الضبط) |
 | الـ Step-up | لما السيرفر يرد بـ `STEP_UP_REQUIRED` التطبيق بيعرض شاشة Step-up بدل البيانات |
 | الاختبارات | `src/App.test.tsx` (Vitest)؛ رحلات Playwright في `apps/operations-web/e2e/` (`cook-workspace.e2e.ts` و `customer-journey.e2e.ts` و `keyboard.e2e.ts` و `money-reflow.e2e.ts` و `operations-layout.e2e.ts`)، والإعدادات `apps/operations-web/playwright.config.ts`؛ و Smoke الـ Staging في `apps/operations-web/e2e-staging/smoke.staging.ts` |
 
@@ -70,7 +70,7 @@ API مرة واحدة بعد تسجيل الدخول (`checkSession`، `src/App.
 
 - شاشة جديدة للعميل: Component تحت `apps/customer-web/src/`، وتعبير منتظم للـ Route في `App.tsx`، والنصوص في `i18n.ts` (باللغتين)، والاختبار في `App.test.tsx`.
 - قسم جديد للطبّاخ/الموظفين: Component تحت `apps/operations-web/src/cook/` أو `ops/`، والفحص + التاب في `App.tsx`، والنصوص في `i18n.ts`.
-- حقل محتاجه ناقص من الاستجابة: غيّر الـ Backend و `contracts/openapi.yaml` الأول، وولّد الـ Client من جديد ([عقود الـ API](api-contracts-ar.md))؛ ماتعملش Cast حوالين الأنواع المتولّدة.
+- حقل محتاجه ناقص من الاستجابة: غيّر الـ Backend و `contracts/openapi.yaml` الأول، وولّد الـ Client من جديد ([عقود الـ API](api-contracts-ar.md))؛ ماتستخدمش Type cast عشان تتجاوز الأنواع المتولّدة.
 - التنسيق (Styling): التوكنز من `packages/design-tokens/tokens.json` (شوف [المكتبات المشتركة](shared-libraries-ar.md))؛ و `scripts/check_design.sh` بيحرس البراند.
 
 ## القيود المعروفة وفجوات التوثيق

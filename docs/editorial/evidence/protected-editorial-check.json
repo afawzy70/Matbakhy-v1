@@ -1,0 +1,578 @@
+[
+  {
+    "file": "docs/developer-handbook/00-getting-started/glossary-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/00-getting-started/learning-roadmap-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/00-getting-started/project-overview-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/00-getting-started/repository-navigation-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/actors-and-permissions-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/business-rules-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/kitchen-management-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/marketplace-model-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/order-lifecycle-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/pricing-and-payments-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/product-vision-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/01-business/target-users-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/authentication-and-mfa-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/backoffice-admin-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/complete-order-journey-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/cook-operations-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/customer-mobile-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/customer-web-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/02-user-journeys/finance-and-support-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/backend-architecture-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/database-architecture-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/diagrams-ar.md",
+    "changed": false,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/frontend-architecture-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/identity-and-security-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/infrastructure-and-deployment-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/integration-and-events-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/mobile-architecture-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/03-architecture/system-overview-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/api-contracts-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/backend-module-guide-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/frontend-code-guide-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/mobile-code-guide-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/order-implementation-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/payment-implementation-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/pricing-implementation-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/repository-map-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/04-codebase/shared-libraries-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/branch-maintenance-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/ci-cd-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/documentation-maintenance-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/documentation-policy-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/git-and-pr-workflow-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/local-environment-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/prerequisites-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/preview-environment-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/run-and-debug-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/test-execution-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/05-developer-workflow/troubleshooting-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/06-onboarding-labs/day-1-business-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/06-onboarding-labs/day-2-applications-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/06-onboarding-labs/day-3-backend-security-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/06-onboarding-labs/day-4-development-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/06-onboarding-labs/day-5-first-contribution-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/06-onboarding-labs/final-assessment-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/architecture-decisions-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/branch-cleanup-audit-2026-10-20-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/documentation-map-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/frequently-asked-questions-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/fresh-developer-simulation-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/implementation-status-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/independent-reviews-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/inventory-and-gaps-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/07-reference/requirements-traceability-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  },
+  {
+    "file": "docs/developer-handbook/README-ar.md",
+    "changed": true,
+    "fences_exact": true,
+    "inline_code_exact": true,
+    "link_destinations_exact": true,
+    "arrows_exact": true,
+    "new_bidi_controls": false
+  }
+]

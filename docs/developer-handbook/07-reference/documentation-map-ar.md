@@ -4,14 +4,14 @@
 > **Status:** REFERENCE — أنهي مستند هو المرجع في إيه، وعلاقة الدليل بالمستندات الأقدم
 > **Language / اللغة:** [English](documentation-map.md) · العربية
 
-الدليل بيشرح وبيربط؛ لكنه مش بديل للمستندات المرجعية تحت. لما مستندين يختلفوا، ترتيب الثقة هو: **الكود الشغّال والـ Migrations والعقود والاختبارات** (حقيقة التنفيذ) → سجل قرارات المالك (`planning/decisions.json`، `docs/product/01-context-and-decisions.md`، `docs/delivery/07-owner-decisions-implementation-sequence.md`) للنية → المستندات الموضوعية → تقارير الحالة (لقطات تاريخية).
+الدليل بيشرح وبيربط؛ لكنه مش بديل للمستندات المرجعية تحت. لما مستندين يختلفوا، ترتيب الثقة هو: **الكود الشغّال والـ Migrations والعقود والاختبارات** (حقيقة التنفيذ) → سجل قرارات المالك (`planning/decisions.json`، `docs/product/01-context-and-decisions.md`، `docs/delivery/07-owner-decisions-implementation-sequence.md`) لمعرفة السلوك المقصود → المستندات المتخصصة → تقارير الحالة (لقطات تاريخية).
 
 | الموضوع | المصدر المرجعي | صفحة الدليل اللي بتشرحه |
 |---|---|---|
 | قرارات المالك D01.. | `planning/decisions.json`، `docs/product/01-context-and-decisions.md`، `docs/delivery/07-owner-decisions-implementation-sequence.md` | [القرارات المعمارية](architecture-decisions-ar.md) |
 | قواعد العمل BR-nnn | `planning/rules.json`، `docs/product/03-business-rules.md` | [قواعد العمل](../01-business/business-rules-ar.md) |
-| الـ State Machines | `docs/product/04-state-machines.md` (النية)، `backend/modules/orders` (التنفيذ) | [دورة حياة الأوردر](../01-business/order-lifecycle-ar.md) |
-| الأدوار والصلاحيات | `backend/modules/identity` (`Permission.java`)، `docs/product/06-permissions.md` (النية) | [الأطراف والصلاحيات](../01-business/actors-and-permissions-ar.md) |
+| الـ State Machines | `docs/product/04-state-machines.md` (السلوك المقصود)، `backend/modules/orders` (التنفيذ) | [دورة حياة الأوردر](../01-business/order-lifecycle-ar.md) |
+| الأدوار والصلاحيات | `backend/modules/identity` (`Permission.java`)، `docs/product/06-permissions.md` (الصلاحيات المقصودة) | [الأطراف والصلاحيات](../01-business/actors-and-permissions-ar.md) |
 | العربونات | `docs/product/09-deposit-payment-states.md`، `docs/strategy/mvp-direct-deposit-payment.md` | [التسعير والدفع](../01-business/pricing-and-payments-ar.md)، [تنفيذ الدفع](../04-codebase/payment-implementation-ar.md) |
 | الـ Quote القديم / تغيّر السعر | `docs/product/rq-004-stale-quote.md` | [تنفيذ التسعير](../04-codebase/pricing-implementation-ar.md) |
 | عقد الـ API | `contracts/openapi.yaml`، `contracts/endpoints.json` | [عقود الـ API](../04-codebase/api-contracts-ar.md) |
@@ -26,10 +26,10 @@
 | بروتوكول التسليم، تقارير التقدم | `docs/delivery/`، `docs/status/` | [مسار Git والـ PR](../05-developer-workflow/git-and-pr-workflow-ar.md) |
 | سياسة التوثيق DOC-001 | [سياسة التوثيق](../05-developer-workflow/documentation-policy-ar.md) | — |
 
-## مستندات تاريخية أو لحظية (ماتعتبرهاش حالية)
+## مستندات تاريخية أو بتسجّل الحالة في وقت معيّن (ماتعتبرهاش حالية)
 
 `docs/status/latest.md` و`docs/status/daily/*` (التقارير)، و`docs/quality/0*-qa-*.md` (مستندات تسليم النسخ المرشّحة لاختبارات الـ QA)، و`docs/quality/stabilization/` (أدلة التجميع)، و`verification/runs/` (أدلة تشغيلات بعينها). بتوصف اللي كان صح عند Commit معيّن؛ استخدم [حالة التنفيذ](implementation-status-ar.md) للصورة الحالية.
 
 ## التكرار المعروف
 
-منطق البيزنس متوصّف في `docs/product/*` (النية) و`planning/rules.json` (مقروء آليًا) والكود. الدليل بيربط عمدًا بدل ما ينسخ؛ شوف [الجرد والفجوات](inventory-and-gaps-ar.md) للتناقضات اللي اتلاقت بينهم.
+منطق البيزنس متوصّف في `docs/product/*` (السلوك المقصود) و`planning/rules.json` (مقروء آليًا) والكود. الدليل بيربط عمدًا بدل ما ينسخ؛ شوف [الجرد والفجوات](inventory-and-gaps-ar.md) للتناقضات اللي اتلاقت بينهم.

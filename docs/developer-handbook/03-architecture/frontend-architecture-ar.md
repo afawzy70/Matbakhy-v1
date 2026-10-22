@@ -23,7 +23,7 @@
 ## الحزم المشتركة
 
 * **`packages/api-client`** (`@matbakhy/api-client`): الدالة `createApiClient(options)` بتغلّف `openapi-fetch` بأنواع `paths` المتولّدة من `packages/api-client/src/generated/schema.ts`. وبتصدّر كمان `parseMoney` (بترفض الكسور العشرية والـ Strings والحقول الزيادة، و`EGP` بس) و`priceChanges(previousQuote, nextQuote)`، اللي بتشرح تغيّر السعر كفروقات في الوجبة / رسوم التوصيل / الضريبة عشان الـ UI عمره ما يلوم المطبخ على رسم منصة. الـ Schema بتتولّد من `contracts/openapi.yaml`؛ و`pnpm contract:check` بيفشل لو فيه Drift.
-* **`packages/design-tokens`**: الملف `tokens.json` هو المصدر الوحيد لاسم البراند واللوحة اللونية والطباعة؛ و`packages/design-tokens/scripts/generate-css.mjs` بيكتب `src/generated/tokens.css` (اللي التطبيقين بيستوردوه)؛ و`direction(locale)` بترجّع `rtl` للعربي. التطبيقات بتقرا اسم البراند من هنا (`brand.name[locale]`)، و`vite.config.ts` بيحقنه في `index.html`. الحالة في `package.json`: مسودة في انتظار موافقة المالك O05 (الاتجاه البصري المعتمد موجود في `docs/design/approved/DESIGN.md`).
+* **`packages/design-tokens`**: الملف `tokens.json` هو المصدر الوحيد لاسم البراند والألوان والخطوط (Typography)؛ و`packages/design-tokens/scripts/generate-css.mjs` بيكتب `src/generated/tokens.css` (اللي التطبيقين بيستوردوه)؛ و`direction(locale)` بترجّع `rtl` للعربي. التطبيقات بتقرا اسم البراند من هنا (`brand.name[locale]`)، و`vite.config.ts` بيحقنه في `index.html`. الحالة في `package.json`: مسودة في انتظار موافقة المالك O05 (الاتجاه البصري المعتمد موجود في `docs/design/approved/DESIGN.md`).
 
 ## طبقة الوصول للـ API
 
@@ -34,7 +34,7 @@
 * Middleware للطلبات بيحدد `Accept-Language` من متغيّر داخلي بتحدّثه `setLanguage` **في نفس الـ Event handler** اللي بيغيّر اللغة (مش من `document.lang`، اللي بيتحدّث بعد الـ Render؛ وده صلّح ملاحظة الـ QA اسمها MBQA-001)، وبينسخ Cookie اسمها `XSRF-TOKEN` (مقروءة) في `X-XSRF-TOKEN` مع كل طلب مش GET (حماية CSRF بطريقة double-submit؛ وجانب الـ API هو `csrf.spa()` في `SecurityConfiguration.webChain`).
 * النداءات اللي بتغيّر البيانات بتمرّر `Idempotency-Key` بتتعمل بـ `newIdempotencyKey()` (`web-<uuid>` أو `ops-<uuid>`).
 * `errorCode(error)` بترجّع كود الخطأ الثابت بتاع الـ API أو `"NETWORK"`.
-* عرض الفلوس بيستخدم `Intl.NumberFormat` مع `ar-EG` / `en-EG` و`EGP`، وبيقسم القروش الصحيحة على 100 عند حافة العرض بس (`formatMoney`). والأوقات بتتنسّق بـ `Africa/Cairo`.
+* عرض الفلوس بيستخدم `Intl.NumberFormat` مع `ar-EG` / `en-EG` و`EGP`، وبيقسم القروش الصحيحة على 100 وقت العرض بس (`formatMoney`). والأوقات بتتنسّق بـ `Africa/Cairo`.
 
 ### التحميل والأخطاء
 
@@ -46,7 +46,7 @@
 
 | مسار الـ Hash | الـ Component | ملاحظات |
 |---|---|---|
-| `/` | `Browse.tsx` | الاكتشاف (Discovery)؛ مربعات النيّة (intent tiles)، والفلاتر، والترتيب. عام. |
+| `/` | `Browse.tsx` | الاكتشاف (Discovery)؛ مربعات اختيارات المستخدم (intent tiles)، والفلاتر، والترتيب. عام. |
 | `/meal/<uuid>` | `Meal.tsx` | اختيار الـ Slot والكمية، والإضافة للسلة. بمفتاح لكل وجبة. |
 | `/kitchen/<slug>` | `Kitchen.tsx` | صفحة المطبخ العامة |
 | `/checkout` | `Checkout.tsx` | النمط (توصيل/استلام)، والـ Quote، ومراجعة تغيّر السعر، والشروط، وتسجيل الأوردر، واختيار العربون (`Payment.tsx`) |
@@ -59,7 +59,7 @@
 * **التصفّح عام**؛ أما الطلب فمحتاج Session وتليفون متحقق منه (السيرفر بيرجّع `CONTACT_VERIFICATION_REQUIRED`). و`App.tsx` بينادي `GET /api/v1/me` عند التحميل عشان يعرف لو فيه Session.
 * **السلة** (`src/cart.ts`): محفوظة في `localStorage` تحت `matbakhy.cart`، مطبخ واحد وSlot واحد. الأسعار المخزّنة هناك تقديرات للعرض؛ والسيرفر هو اللي بيعمل Quote للإجمالي المعتمد. و**تسجيل أوردر معلّق** (`matbakhy.pendingPlacement`) بيخزّن `clientRequestId` و`idempotencyKey` *قبل* ما الطلب يتبعت، فإعادة المحاولة بعد رد ضايع مينفعش تلاقي أو تكرر غير نفس الأوردر (`GET /api/v1/orders/by-request/{clientRequestId}` موجود لده).
 * **تغيّر السعر:** عند `409 PRICE_CHANGED` وقت التسجيل، `Checkout.tsx` بيعمل Quote جديد، وبيعرض `PriceChangeNotice` المبني من `priceChanges(...)`، وبيطلب من العميل يعلّم على "قبول الإجمالي الجديد" قبل ما الـ Quote الجديد يتسجّل. الرسم: [تغيّر السعر](diagrams-ar.md#10-تغير-السعر-وإعادة-تأكيد-الـ-quote-القديم).
-* **تسجيل الخروج** (MBQA-003): بينادي `POST /api/v1/auth/logout`، وبيمسح السلة والأوردر المعلّق، وبعدين بيروح للينك إنهاء الـ Session عند مزوّد الهوية اللي راجع كـ `idpLogoutUrl`؛ وبيحذّر الأول لو فيه أوردر مش متأكد. و Handler لـ `pageshow` بيعيد تحميل الصفحات المسترجعة من الـ back-forward cache.
+* **تسجيل الخروج** (MBQA-003): بينادي `POST /api/v1/auth/logout`، وبيمسح السلة والأوردر المعلّق، وبعدين بيروح للينك إنهاء الـ Session عند مزوّد الهوية اللي راجع كـ `idpLogoutUrl`؛ وبيحذّر الأول لو فيه أوردر لسه تسجيله مش مؤكّد. و Handler لـ `pageshow` بيعيد تحميل الصفحات المسترجعة من الـ back-forward cache.
 * **النشاط العضوي** (`activity.ts`): `POST /api/v1/activity` من نوع fire-and-forget بـ id زائر عشوائي لكل تاب؛ والسيرفر بيخزّن Hash يومي بمفتاح بس.
 * **إشعار الديمو:** `EnvironmentNotice` بيظهر لما التطبيق يتبني بـ `VITE_DEMO_NOTICE=true` أو لما `GET /api/v1/configuration/public` يقول `environment.demo`.
 
@@ -99,4 +99,4 @@
 
 * `packages/design-tokens/package.json` لسه بيسمّي الـ Tokens مسودة في انتظار O05 بينما `CLAUDE.md` مسجّل الاتجاه المعتمد terracotta/Cairo؛ والكود بيستورد خط Cairo والـ Tokens، فاعتبر وصف الحزمة قديم.
 * مفيش مكتبة Routing في الـ Frontend، فالروابط العميقة (Deep links) في ويب العميل هي URLs بـ Hash (`#/orders/<id>`).
-* ويب العمليات بيجرّب لحد تسع Endpoints مع كل تحميل؛ ده بسيط بس كتير الكلام، وإضافة منطقة موظفين جديدة محتاجة إضافة Probe وتاب في `App.tsx`.
+* ويب العمليات بيجرّب لحد تسع Endpoints مع كل تحميل؛ ده بسيط بس بيولّد طلبات شبكة كتير، وإضافة منطقة موظفين جديدة محتاجة إضافة Probe وتاب في `App.tsx`.

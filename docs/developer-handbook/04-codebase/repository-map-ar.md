@@ -21,7 +21,7 @@
 | `contracts/` | `contracts/openapi.yaml` (العقد المعرّف بالـ Types) و `contracts/endpoints.json` (سجل الـ Routes) | شوف [عقود الـ API](api-contracts-ar.md) |
 | `infra/` | Stack التطوير المحلي: `infra/compose.yaml` و Realm الـ Keycloak `infra/identity/matbakhy-realm.json` وملاحظات محاكي التخزين وSQL مطابقة الـ DB | محلي بس |
 | `deploy/web-preview/` | نشر Preview/staging: ملفات Compose وCaddy وسكريبتات النشر وRealm الـ Keycloak للمعاينة والمراقبة (Observability) وتجهيز E2E بتاع المالك | شوف `deploy/web-preview/README.md` بتاعه |
-| `planning/` | حزمة التخطيط المقروءة آليًا: `backlog.json` و `decisions.json` و `rules.json` و `scenarios.json` و `gates.json` و `execution-state.json` و `inventory.json` | حالة `planning/backlog.json` تلميح، مش إثبات |
+| `planning/` | ملفات التخطيط القابلة للقراءة آليًا: `backlog.json` و `decisions.json` و `rules.json` و `scenarios.json` و `gates.json` و `execution-state.json` و `inventory.json` | حالة `planning/backlog.json` تلميح، مش إثبات |
 | `verification/` | سجلات الأدلة (`verification/runs/*`) والقوالب | بيكتبها `scripts/record_evidence.py` |
 | `docs/` | المنتج والهندسة والتسليم والعمليات والجودة والأمان والحالة وده الدليل | سياق، مش إثبات؛ الكود هو اللي بيكسب لو اتعارضوا |
 | `scripts/` | أدوات الـ Repo: `scripts/dev.sh` و `scripts/verify.py` و `scripts/next_task.py` و `scripts/validate_blueprint.py` و `scripts/doc001_check.py` وفحوصات الأسرار/التصميم/الـ Workspace وأدوات E2E بتاع المالك | |

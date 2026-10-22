@@ -1,10 +1,10 @@
 # شرح تنفيذ الدفع والكاش والـ Ledger
 
 > **Owner role:** Backend architecture
-> **Status:** PARTIALLY IMPLEMENTED — الدفع كاش عند الاستلام والعربون اللي بيبلّغ عنه المطبخ والمطابقة والـ Ledger موجودين؛ الفلوس الحقيقية متقفّلة بـ Gate ومفيش Payment Gateway ولا تحقق بنكي ولا مطابقة آلية (بقرار)
+> **Status:** PARTIALLY IMPLEMENTED — الدفع كاش عند الاستلام والعربون اللي بيبلّغ عنه المطبخ والمطابقة والـ Ledger موجودين؛ التعاملات المالية الحقيقية مش مفعّلة حاليًا وتفعيلها مرتبط بشروط الـ Gate ومفيش Payment Gateway ولا تحقق بنكي ولا مطابقة آلية (بقرار)
 > **Language / اللغة:** [English](payment-implementation.md) · العربية
 
-الكود بيعمل إيه في الفلوس. الإطار المنتجي: [التسعير والدفع](../01-business/pricing-and-payments-ar.md)، `docs/strategy/mvp-direct-deposit-payment.md`، `docs/product/09-deposit-payment-states.md`. القرارات: D05 (الكاش أولًا)، D10 (صفر عمولة)، D16 (العربون اليدوي بيتدفع مباشرة للمطبخ، وبيبلّغ عنه المطبخ — مش "متحقق منه بنكيًا" أبدًا). مصطلح مهم: **مطبخي مبيحتفظش بفلوس العملاء أبدًا.** كل حالة تحت بتسجّل اللي طرف *بلّغ* بيه.
+الكود بيعمل إيه في الفلوس. منظور المنتج: [التسعير والدفع](../01-business/pricing-and-payments-ar.md)، `docs/strategy/mvp-direct-deposit-payment.md`، `docs/product/09-deposit-payment-states.md`. القرارات: D05 (الكاش أولًا)، D10 (صفر عمولة)، D16 (العربون اليدوي بيتدفع مباشرة للمطبخ، وبيبلّغ عنه المطبخ — مش "متحقق منه بنكيًا" أبدًا). مصطلح مهم: **مطبخي مبيحتفظش بفلوس العملاء أبدًا.** كل حالة تحت بتسجّل اللي طرف *بلّغ* بيه.
 
 ## تلات حاجات منفصلة (مفصولين في الكود)
 
@@ -64,10 +64,10 @@ stateDiagram-v2
 | `kitchenReceipt` `:265` | `POST /api/v1/cook/orders/{id}/payment/receipt` (API-101) | مطبخ الأوردر؛ `expectedVersion`؛ المبلغ لازم يساوي العربون (`DOES_NOT_MATCH_DEPOSIT`)؛ بيترفض بعد ما الأوردر يخلص | بيتسجّل كإفادة من المطبخ |
 | `reportProblem` `:290` | `POST /api/v1/cook/orders/{id}/payment/problem` (API-105) | المطبخ؛ النوع `NOT_RECEIVED` أو `AMOUNT_MISMATCH` (+ المبلغ اللي اتشاف) | بيفتح حالة دعم PAYMENT واحدة (`NEEDS_CASE`، `:428`، عن طريق `OrderCases.openPaymentCase`؛ V28) |
 | `queue` `:305` | `GET /api/v1/ops/payments` (API-106) | `finance.verify` | الحالات DISPUTED، RECONCILE_PENDING، REFUND_OWED |
-| `decide` `:323` | `POST /api/v1/ops/orders/{id}/payment/decision` (API-107) | `finance.verify` + MFA حديث؛ السبب من 10 لـ 500؛ الأوردر لازم يكون خلص؛ **ولا قرار بيعلّم الفلوس إنها اتستلمت** | النتايج `REFUND_OWED` أو `CLOSED_NO_FUNDS`؛ متسجّل في الـ Audit |
+| `decide` `:323` | `POST /api/v1/ops/orders/{id}/payment/decision` (API-107) | `finance.verify` + MFA حديث؛ السبب من 10 لـ 500؛ الأوردر لازم يكون خلص؛ **ولا قرار بيسجّل إن الفلوس اتستلمت** | النتايج `REFUND_OWED` أو `CLOSED_NO_FUNDS`؛ متسجّل في الـ Audit |
 | `reportRefund` `:347` | `POST /api/v1/cook/orders/{id}/payment/refund` (API-108) | المطبخ؛ المرجع مطلوب | إفادة المطبخ إنه رجّع الفلوس |
 | `requireReadyForPreparation` `:380` | بينادي عليها `OrderLifecycleService` في `prepare` (`OrderLifecycleService.java:142`) | | أوردر العربون مينفعش يوصل PREPARING لحد `KITCHEN_RECEIPT_REPORTED` (`DEPOSIT_NOT_RECEIVED`) |
-| `orderClosed` `:393` | بتتنادى من `OrderLifecycleService.transition` (`:370`) لكل حالة نهائية غير COMPLETED | النظام | العربونات المنتهية بتتقفل بهدوء؛ أي تحويل متبلّغ عنه بيروح للمطابقة، ومبيتقفلش بصمت أبدًا |
+| `orderClosed` `:393` | بتتنادى من `OrderLifecycleService.transition` (`:370`) لكل حالة نهائية غير COMPLETED | النظام | مدفوعات العربون المنتهية بتتقفل بهدوء؛ أي تحويل متبلّغ عنه بيروح للمطابقة، ومبيتقفلش بصمت أبدًا |
 
 كل تغيير حالة بيعدّي على `PaymentService.move` (`:413`): مقارنة-وتعيين (Compare-and-set) على `(state, version)`، وإضافة `payment_event` (للإضافة بس، V24)، وفتح حالة دعم لو الحالة الجديدة محتاجة إنسان، وكتابة `outbox_event` باسم `PAYMENT_<STATE>` للحالات في `NOTIFIED` (`:448`) عشان الطرف التاني يتبلّغ جوه التطبيق. الاختبارات: `DepositPaymentIntegrationTest` (TC-158..160)، `PaymentReconciliationIntegrationTest` (TC-161، TC-162).
 
@@ -88,7 +88,7 @@ stateDiagram-v2
 
 ## الـ Gate بتاع الفلوس الحقيقية
 
-مفيش مسار في الكود بيحرّك فلوس حقيقية. مستلم المطبخ بيتعرض للعميل، والعميل بيدفع برّه المنصة، والمطبخ بيقول إنه استلم. الـ D16 وبوابات الإصدار (`planning/gates.json`، `docs/delivery/07-owner-decisions-implementation-sequence.md`) بتمنع تفعيل الفلوس الحقيقية قبل المراجعة القانونية/مراجعة المزوّد؛ وحارس المعاينة/البيانات الاصطناعية (Synthetic) هو `backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`. حالة المالك CFG-045 بتتأكد إن العربونات التجريبية مبتعملش أي تأثيرات جانبية خارجة.
+مفيش مسار في الكود بيحرّك فلوس حقيقية. مستلم المطبخ بيتعرض للعميل، والعميل بيدفع برّه المنصة، والمطبخ بيقول إنه استلم. الـ D16 وبوابات الإصدار (`planning/gates.json`، `docs/delivery/07-owner-decisions-implementation-sequence.md`) بتمنع تفعيل الفلوس الحقيقية قبل المراجعة القانونية/مراجعة المزوّد؛ وضابط بيئات المعاينة/البيانات التجريبية غير الحقيقية (Synthetic Data) هو `backend/app/src/main/java/com/matbakhy/app/config/EnvironmentGuard.java`. حالة المالك CFG-045 بتتأكد إن مدفوعات العربون التجريبية مبتعملش أي تأثيرات جانبية خارجة.
 
 ## المناطق المحتاجة مراجعة
 
