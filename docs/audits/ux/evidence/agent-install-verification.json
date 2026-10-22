@@ -1,0 +1,33 @@
+{
+  "upstream_repository": "https://github.com/msitarzewski/agency-agents",
+  "upstream_sha": "f99f6aa910a442b0197b768ce0ea7751e35e2060",
+  "audited_source_sha": "cc52fa4224e3163677a1215dc8f63ede2a9dbe4c",
+  "owner_decisions_main_sha": "047f42eebfcfc904622a123bbb8bdf9b2a16cda8",
+  "codex_version": "0.159.2",
+  "active_codex_home": "/run/codex-environment/codex-home",
+  "active_agent_directory": "/run/codex-environment/codex-home/agents",
+  "prior_active_config_exists": false,
+  "prior_active_agents": [],
+  "installed_identifiers": [
+    "ux-researcher",
+    "ux-architect"
+  ],
+  "registered_roles": [
+    "design-ux-researcher",
+    "design-ux-architect"
+  ],
+  "agent_files": [
+    {
+      "slug": "ux-researcher",
+      "name": "UX Researcher",
+      "sha256": "c6852e334114b8c64189d01a0d05390ebfd34724d699d1d1aedb8634b45f00cc",
+      "upstream_body_preserved": true
+    },
+    {
+      "slug": "ux-architect",
+      "name": "UX Architect",
+      "sha256": "5f4279fa22c69ce96045f55cf55bdf069b51e72a956207fb5dda7ba3de8fffab",
+      "upstream_body_preserved": true
+    }
+  ]
+}

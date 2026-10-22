@@ -1,0 +1,14 @@
+
+Running 5 tests using 1 worker
+
+(node:34568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 e2e/cook-workspace.e2e.ts:67:1 › cook fulfils pickup and delivery orders through the real API (17.0s)
+  ✓  2 e2e/customer-journey.e2e.ts:87:1 › customer orders delivery and pickup in the customer web and follows the cook's actions (45.3s)
+  ✓  3 e2e/customer-journey.e2e.ts:555:1 › customer screens keep the approved layout across widths and both directions (13.8s)
+  ✓  4 e2e/keyboard.e2e.ts:48:1 › keyboard-only customer and cook journeys with visible focus and focus restoration (2.9s)
+  ✓  5 e2e/operations-layout.e2e.ts:87:1 › operations sections keep layout and accessibility across widths and both directions (24.7s)
+
+  5 passed (1.7m)
