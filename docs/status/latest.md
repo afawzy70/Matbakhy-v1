@@ -2,6 +2,10 @@
 
 Implementation-agent report (self-reported, not an independent review certificate).
 
+## 2026-10-22 — Directory fingerprint approval
+
+Owner approved and applied the exact directory-scan equivalent (5 exact fingerprints total). Tested source 433f93b9771d87e05da859637fbe83a85ddf4c01: Gitleaks 8.30.1 history PASS, 566 commits, zero findings. Local committable-tree scan finds only the same non-credential namespace under its different /tmp path; no local exception added. Exact /repo validation awaits remote CI because local system permissions prevent creating that mount path. Workspace 8 tests, DOC-001 32 tests/docs, 81 handbook pairs and diff check PASS. Coverage unchanged: 200 represented / 1005 canonical steps / 1 complete guide / 199 drafts; live execution NOT_RUN. PR #43 remains Draft; no merge or deployment. [Evidence](../../verification/runs/20261022-WORKSPACE-DIRECTORY-SCAN-APPROVAL/evidence.json).
+
 ## 2026-10-22 — Owner-approved scan exceptions follow-up
 
 [PR #43](https://github.com/afawzy70/Matbakhy-v1/pull/43) stays Draft. Tested source 37271995801c0fc18f4c34c24955dc56413f03a8: four owner-approved historical exceptions applied; full-history scan passes (564 commits, zero findings). The same prototype marker remains in directory scan under a different fingerprint; no fifth exception applied. [Security review](../quality/testing-workspace/security-review.md) · [daily report](daily/2026-10-22.md). Coverage remains 200/1005, one guide reviewed complete; no live product execution, merge or deployment.

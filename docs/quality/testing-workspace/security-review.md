@@ -39,3 +39,5 @@ This additional fingerprint is not covered by the four-line approval and has not
 ## Additional directory fingerprint approved
 
 The owner subsequently explicitly approved the exact `/repo` directory fingerprint shown above. It is now applied alongside the four historical fingerprints, for five exact entries total. The earlier tree failure is historical evidence, not the current approval state. No path-wide exclusion or scanner rule change was made. Follow-up evidence records fresh history and committable-tree scans; the Docker wrapper itself remains untested locally.
+
+Follow-up local verification at `433f93b9771d87e05da859637fbe83a85ddf4c01`: history PASS (566 commits, zero findings). Tree scan reports only the same namespace with the local `/tmp` prefix. Creating `/repo` was denied by system permissions and passwordless sudo is unavailable; no alternative exception was added. The actual `/repo` result is pending remote CI. See [follow-up evidence](../../../verification/runs/20261022-WORKSPACE-DIRECTORY-SCAN-APPROVAL/evidence.json).
